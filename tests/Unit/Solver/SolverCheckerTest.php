@@ -16,7 +16,6 @@ use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Security\Holder;
 use Lockrot\Solver\AdvisoryBlocking;
-use Lockrot\Solver\ComposerFeatures;
 use Lockrot\Solver\ComposerSolver;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveChecker;
@@ -85,7 +84,7 @@ final class SolverCheckerTest extends TestCase
             ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/gone' => '^1.0']]]]
         );
 
-        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+        $outcome = (MoveChecks::of($checker))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
 
         self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
         self::assertSame([['source' => 'package', 'package' => 'acme/lib', 'version' => '1.1.0', 'link' => 'require', 'target' => 'acme/gone', 'constraint' => '^1.0']], self::rows($outcome->holds()));
@@ -102,7 +101,7 @@ final class SolverCheckerTest extends TestCase
             [['name' => 'acme/lib', 'version' => '1.2.3']],
             ['acme/lib' => [['version' => '1.2.3'], ['version' => '1.2.5', 'require' => ['acme/gone' => '^1.0']], ['version' => '1.3.0']]]
         );
-        $checks = new MoveChecks($checker, true);
+        $checks = MoveChecks::of($checker);
 
         self::assertSame(MoveCheck::REFUSED, $checks->check(MoveQuery::update('acme/lib', '^1.2.5', '1.2.5'))->check()->result());
         $refused = $checks->refused('acme/lib');
@@ -117,7 +116,7 @@ final class SolverCheckerTest extends TestCase
         self::assertInstanceOf(RootPackageInterface::class, $root);
         $locked = LockFile::fromArray(['packages' => [], 'packages-dev' => [['name' => 'acme/lib', 'version' => '1.2.3']]])->lockedRepository();
         $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.2.3'], ['version' => '1.2.5', 'require' => ['acme/gone' => '^1.0']], ['version' => '1.3.0']]]);
-        $checks = new MoveChecks(new SolverChecker(new ComposerSolver($root, $locked, new PlatformRepository([], ['php' => '8.4.99']), $source, []), [], '8.4.99', false, Deadline::never()), true);
+        $checks = MoveChecks::of(new SolverChecker(new ComposerSolver($root, $locked, new PlatformRepository([], ['php' => '8.4.99']), $source, []), [], '8.4.99', false, Deadline::never()));
 
         self::assertSame(MoveCheck::REFUSED, $checks->check(MoveQuery::update('acme/lib', '^1.2.5', '1.2.5'))->check()->result());
 
@@ -126,9 +125,6 @@ final class SolverCheckerTest extends TestCase
 
     public function testTheCheckerNamesTheVariableThatTurnedTheAdvisoryBlockingOff(): void
     {
-        if (!\in_array('COMPOSER_NO_SECURITY_BLOCKING', ComposerFeatures::blockingVariables(ComposerFeatures::version()), true)) {
-            self::markTestSkipped('Composer 2.9.2 or later reads COMPOSER_NO_SECURITY_BLOCKING');
-        }
         $solver = new ComposerSolver(self::root([]), LockFile::fromArray(['packages' => []])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource([]), []);
         Platform::putEnv('COMPOSER_NO_SECURITY_BLOCKING', '1');
         try {
@@ -150,7 +146,7 @@ final class SolverCheckerTest extends TestCase
             [['name' => 'acme/lib', 'version' => '1.2.3']],
             ['acme/lib' => [['version' => '1.2.3'], ['version' => '1.3.0', 'require' => ['acme/gone' => '^1.0']], ['version' => '1.4.0', 'require' => ['acme/gone' => '^1.0']]]]
         );
-        $checks = new MoveChecks($checker, true);
+        $checks = MoveChecks::of($checker);
 
         self::assertSame(MoveCheck::REFUSED, $checks->check(MoveQuery::require('acme/lib', '^1.3.0', '1.3.0'))->check()->result());
 
@@ -160,12 +156,9 @@ final class SolverCheckerTest extends TestCase
     /** The pool serves no release of the move: the root requirement is the one hold that Composer names, so it stays. */
     public function testARootRequirementThatAdmitsTheReleaseStaysWhenItIsTheOnlyHold(): void
     {
-        if (!ComposerFeatures::hasTemporaryConstraints()) {
-            self::markTestSkipped('Composer 2.2 and 2.3 join the inline constraint to the root requirement: that requirement is the request');
-        }
         $checker = self::checker(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0']]]);
 
-        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+        $outcome = (MoveChecks::of($checker))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
 
         self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require', 'target' => null, 'constraint' => '^1.0']], self::rows($outcome->holds()));
     }
@@ -175,7 +168,7 @@ final class SolverCheckerTest extends TestCase
     {
         $checker = self::checkerWith(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]), ['acme/lib' => '>=1.1']);
 
-        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+        $outcome = (MoveChecks::of($checker))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
 
         self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
         self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'conflict', 'target' => null, 'constraint' => '>=1.1'], self::rows($outcome->holds()));
@@ -186,7 +179,7 @@ final class SolverCheckerTest extends TestCase
     {
         $checker = self::checker(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0']]]);
 
-        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::require('acme/lib', '^2.0', '2.0.0'));
+        $outcome = (MoveChecks::of($checker))->check(MoveQuery::require('acme/lib', '^2.0', '2.0.0'));
 
         self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
         self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => null, 'constraint' => '^2.0']], self::rows($outcome->holds()));
@@ -209,16 +202,13 @@ final class SolverCheckerTest extends TestCase
     /** A root requirement that excludes the release still holds it. */
     public function testARootRequirementThatExcludesTheMovesReleaseHoldsIt(): void
     {
-        if (!ComposerFeatures::hasTemporaryConstraints()) {
-            self::markTestSkipped('Composer 2.2 and 2.3 join the inline constraint to the root requirement: that requirement is the request');
-        }
         $checker = self::checker(
             ['acme/lib' => '~1.0.0'],
             [['name' => 'acme/lib', 'version' => '1.0.0']],
             ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]
         );
 
-        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+        $outcome = (MoveChecks::of($checker))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
 
         self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
         self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require', 'target' => null, 'constraint' => '~1.0.0'], self::rows($outcome->holds()));
@@ -894,9 +884,6 @@ final class SolverCheckerTest extends TestCase
      */
     public function testAnAdvisoryOfANewDependencyThatTheRunDidNotLookUpBlocksTheMove(): void
     {
-        if (!ComposerFeatures::blocksAdvisories()) {
-            self::markTestSkipped('Composer below 2.9 has no SecurityAdvisoryPoolFilter: it blocks nothing in an update');
-        }
         $asked = [];
         $lookup = static function (array $names, bool $complete) use (&$asked): array {
             $asked[] = $names;
@@ -920,9 +907,6 @@ final class SolverCheckerTest extends TestCase
      */
     public function testAMoveThatInstallsANameWhoseAdvisoriesTheLookupCouldNotReadIsNotChecked(): void
     {
-        if (!ComposerFeatures::blocksAdvisories()) {
-            self::markTestSkipped('Composer below 2.9 has no SecurityAdvisoryPoolFilter: it blocks nothing in an update');
-        }
         $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/new-dependency' => '^1.0']]], 'acme/new-dependency' => [['version' => '1.0.0']]]);
         $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, []);
         $checker = static fn (bool $read): MoveChecker => (new SolverChecker($solver, [], '8.4.99', true, Deadline::never(), new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static fn (array $names, bool $complete): ?array => $read ? [] : null)))->withAdvisories(['acme/lib' => []], ['acme/lib']);
@@ -943,9 +927,6 @@ final class SolverCheckerTest extends TestCase
     /** Composer's `block-abandoned` removes an abandoned release from the pool of an update. */
     public function testAMoveToAnAbandonedReleaseIsRefusedWhenTheConfigBlocksAbandonedPackages(): void
     {
-        if (!ComposerFeatures::blocksAdvisories()) {
-            self::markTestSkipped('Composer below 2.9 has no SecurityAdvisoryPoolFilter: it blocks nothing in an update');
-        }
         $config = new Config(false);
         $config->merge(['config' => ['audit' => ['block-abandoned' => true]]]);
         $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'abandoned' => true]]]);
@@ -1111,9 +1092,6 @@ final class SolverCheckerTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('advisoryCheckers')]
     public function testOnlyACopyOfACheckerThatBlocksAdvisoriesReadsTheRunsRecords(bool $blocksAdvisories, string $result): void
     {
-        if (!class_exists(PartialSecurityAdvisory::class)) {
-            self::markTestSkipped('Composer below 2.4 has no advisory records');
-        }
         $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]);
         $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, []);
         $checker = new SolverChecker($solver, [], '8.4.99', $blocksAdvisories, Deadline::never(), new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static fn (array $names, bool $complete): array => []));
@@ -1155,7 +1133,7 @@ final class SolverCheckerTest extends TestCase
             ]
         );
 
-        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('firebase/php-jwt', '^7.0.0', 'v7.0.0', null, 'v7.2.1'));
+        $outcome = (MoveChecks::of($checker))->check(MoveQuery::update('firebase/php-jwt', '^7.0.0', 'v7.0.0', null, 'v7.2.1'));
 
         self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => 'v7.2.1'], $outcome->check()->jsonSerialize());
         self::assertSame([], $outcome->holds());
@@ -1185,7 +1163,7 @@ final class SolverCheckerTest extends TestCase
             ]
         );
 
-        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('erusev/parsedown', '^1.8.0', '1.8.0', null, '1.8.0'));
+        $outcome = (MoveChecks::of($checker))->check(MoveQuery::update('erusev/parsedown', '^1.8.0', '1.8.0', null, '1.8.0'));
 
         self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
         self::assertContains(['source' => 'package', 'package' => 'knuckleswtf/scribe', 'version' => '5.3.0', 'link' => 'require', 'target' => null, 'constraint' => '1.7.4'], self::rows($outcome->holds()));
@@ -1228,7 +1206,7 @@ final class SolverCheckerTest extends TestCase
             ]
         );
 
-        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('acme/lib', '^2.0', '2.0.0', null, '2.0.0'));
+        $outcome = (MoveChecks::of($checker))->check(MoveQuery::update('acme/lib', '^2.0', '2.0.0', null, '2.0.0'));
 
         self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
         self::assertContains(['source' => 'package', 'package' => 'acme/h', 'version' => '1.0.0', 'link' => 'require', 'target' => null, 'constraint' => '^1.0'], self::rows($outcome->holds()));
@@ -1255,7 +1233,7 @@ final class SolverCheckerTest extends TestCase
             ]
         );
 
-        $outcome = (new MoveChecks($checker, true))->check(MoveQuery::update('acme/lib', '^2.0.0', '2.0.0'));
+        $outcome = (MoveChecks::of($checker))->check(MoveQuery::update('acme/lib', '^2.0.0', '2.0.0'));
 
         self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
         self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => 'acme/http', 'constraint' => '^1.0'], self::rows($outcome->holds()));

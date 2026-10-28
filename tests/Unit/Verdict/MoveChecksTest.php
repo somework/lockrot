@@ -14,7 +14,7 @@ final class MoveChecksTest extends TestCase
 {
     public function testACopyThatAnswersOnlyWhatWasAskedKeepsTheAnswersAndAsksNothingNew(): void
     {
-        $checks = new MoveChecks(new RecordedMoveChecker(['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], []), true);
+        $checks = MoveChecks::of(new RecordedMoveChecker(['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], []));
         $asked = MoveQuery::update('a/b', '^2.0', '2.0.0');
         $checks->check($asked);
 
@@ -29,14 +29,14 @@ final class MoveChecksTest extends TestCase
     public function testTheJointRequestLeavesOutAPackageWhoseLinkAdmitsTheRelease(): void
     {
         $query = MoveQuery::update('a/b', '^2.0', '2.0.0');
-        $checks = new MoveChecks(new RecordedMoveChecker([
+        $checks = MoveChecks::of(new RecordedMoveChecker([
             $query->key() => ['result' => 'refused', 'holds' => [
                 ['source' => 'package', 'package' => 'h/h', 'version' => '1.0.0', 'link' => 'require', 'constraint' => '^1.0'],
                 ['source' => 'package', 'package' => 'q/q', 'version' => '1.0.0', 'link' => 'require', 'constraint' => '>=1.0'],
             ]],
             'joint '.rtrim($query->key()).' with h/h' => ['result' => 'resolves', 'form' => 'inline', 'installs' => ['a/b' => '2.0.0', 'h/h' => '2.0.0']],
             'joint '.rtrim($query->key()).' with h/h q/q' => ['result' => 'resolves', 'form' => 'inline', 'installs' => ['a/b' => '2.0.0', 'h/h' => '2.0.0', 'q/q' => '1.5.0']],
-        ], [], true), true);
+        ], [], true));
 
         $outcome = $checks->check($query);
 

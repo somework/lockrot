@@ -18,9 +18,6 @@ final class PoolAdvisoriesTest extends TestCase
 
     protected function setUp(): void
     {
-        if (!class_exists(PartialSecurityAdvisory::class)) {
-            self::markTestSkipped('Composer below 2.4 has no advisory records');
-        }
     }
 
     public function testOneLookupAsksThePartialRecordsOfEachNameThatTheRunDidNotCoverOnce(): void

@@ -12,7 +12,6 @@ use Composer\Semver\VersionParser;
 use Composer\Util\Platform;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Solver\AdvisoryBlocking;
-use Lockrot\Solver\ComposerFeatures;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -23,9 +22,6 @@ final class AdvisoryBlockingTest extends TestCase
 {
     protected function setUp(): void
     {
-        if (!ComposerFeatures::blocksAdvisories()) {
-            self::markTestSkipped('Composer below 2.9 has no SecurityAdvisoryPoolFilter: it blocks no advisory in an update');
-        }
     }
 
     protected function tearDown(): void
@@ -44,9 +40,6 @@ final class AdvisoryBlockingTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('variablesThatComposer210Reads')]
     public function testOnComposer210EitherVariableTurnsOffTheBlockingOfAdvisoriesAndAbandonedPackages(array $set): void
     {
-        if (version_compare(ComposerFeatures::version(), '2.10.0-dev', '<')) {
-            self::markTestSkipped('Composer 2.10 and later read COMPOSER_NO_BLOCKING');
-        }
         foreach ($set as $name) {
             Platform::putEnv($name, '1');
         }
@@ -67,23 +60,6 @@ final class AdvisoryBlockingTest extends TestCase
         yield 'COMPOSER_NO_BLOCKING' => [['COMPOSER_NO_BLOCKING']];
         yield 'COMPOSER_NO_SECURITY_BLOCKING' => [['COMPOSER_NO_SECURITY_BLOCKING']];
         yield 'both, in the list order' => [['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING']];
-    }
-
-    public function testOnComposer29OnlyComposerNoSecurityBlockingTurnsTheBlockingOff(): void
-    {
-        if (version_compare(ComposerFeatures::version(), '2.9.2', '<') || version_compare(ComposerFeatures::version(), '2.10.0-dev', '>=')) {
-            self::markTestSkipped('Composer 2.9.2 to 2.9.x read COMPOSER_NO_SECURITY_BLOCKING alone');
-        }
-        Platform::putEnv('COMPOSER_NO_BLOCKING', '1');
-        self::assertSame([], AdvisoryBlocking::fromConfig(self::config([]))->disabledBy());
-        self::assertTrue(AdvisoryBlocking::fromConfig(self::config([]))->blocks());
-
-        Platform::putEnv('COMPOSER_NO_SECURITY_BLOCKING', '1');
-        $blocking = AdvisoryBlocking::fromConfig(self::config([]));
-
-        self::assertSame(['COMPOSER_NO_SECURITY_BLOCKING'], $blocking->disabledBy());
-        self::assertFalse($blocking->blocks());
-        self::assertSame([], self::ranges($blocking, 'high'));
     }
 
     /**
@@ -421,9 +397,6 @@ final class AdvisoryBlockingTest extends TestCase
 
     private static function requireComposer210(): void
     {
-        if (version_compare(ComposerFeatures::version(), '2.10.0-dev', '<')) {
-            self::markTestSkipped('Composer 2.10 and later read the blocking variables with Platform::getBoolEnv() and read config.policy');
-        }
     }
 
     /** @param array<string, mixed> $audit */

@@ -23,13 +23,6 @@ final class MoveQueryTest extends TestCase
         self::assertSame([[], ['acme/lib' => '^2.0', 'php' => '>=8.1']], [$request->inline(), $request->rootChanges()]);
     }
 
-    public function testAPlainUpdateAllowsThePackageWithNoInlineConstraint(): void
-    {
-        $request = MoveQuery::plainUpdate('acme/lib', '2.0.0', '>=8.1')->request();
-
-        self::assertSame([['acme/lib' => 'acme/lib'], [], ['php' => '>=8.1']], [$request->allow(), $request->inline(), $request->rootChanges()]);
-    }
-
     public function testAnUpdateWithoutPhpChangesNoRootRequirement(): void
     {
         self::assertSame([], MoveQuery::update('acme/lib', '^2.0', '2.0.0')->request()->rootChanges());

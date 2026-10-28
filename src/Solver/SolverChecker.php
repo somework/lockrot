@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
+use Composer\Composer;
 use Composer\Package\BasePackage;
 use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
@@ -131,7 +132,7 @@ final class SolverChecker implements MoveChecker
 
     public function composerVersion(): string
     {
-        return ComposerFeatures::version();
+        return Composer::getVersion();
     }
 
     public function solverError(): ?array

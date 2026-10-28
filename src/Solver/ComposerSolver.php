@@ -7,7 +7,6 @@ namespace Lockrot\Solver;
 use Composer\DependencyResolver\DefaultPolicy;
 use Composer\DependencyResolver\LockTransaction;
 use Composer\DependencyResolver\Operation\InstallOperation;
-use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\DependencyResolver\Pool;
 use Composer\DependencyResolver\PoolOptimizer;
@@ -33,7 +32,6 @@ use Composer\Repository\RootPackageRepository;
 use Composer\Semver\CompilingMatcher;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
-use Composer\Semver\Constraint\MultiConstraint;
 
 /**
  * Runs Composer's own Solver offline for one request. It builds the request that
@@ -166,20 +164,9 @@ final class ComposerSolver
             $requires[$name] = $link->getConstraint();
         }
         $parser = new VersionParser();
-        $requested = $request->rootChanges();
         $temporary = [];
         foreach ($request->inline() as $name => $constraint) {
             $temporary[$name] = $parser->parseConstraints($constraint);
-        }
-        $unrequired = [];
-        if (!ComposerFeatures::hasTemporaryConstraints()) {
-            // Composer 2.2 and 2.3 have no temporary constraints: the inline constraint joins the root requirement.
-            $unrequired = array_keys(array_diff_key($temporary, $requires));
-            foreach ($temporary as $name => $constraint) {
-                $requires[$name] = isset($requires[$name]) ? MultiConstraint::create([$requires[$name], $constraint], true) : $constraint;
-            }
-            $requested += $request->inline();
-            $temporary = [];
         }
         $preferred = $this->preferredVersions($request);
         $policy = new DefaultPolicy($root->getPreferStable(), false, $preferred);
@@ -190,7 +177,7 @@ final class ComposerSolver
             foreach ($this->locked->getPackages() as $package) {
                 $locked[$package->getName()] = $package->getVersion();
             }
-            $holds = ProblemHolds::of($answer, $pool, $root, $request->moved(), $requested, $locked);
+            $holds = ProblemHolds::of($answer, $pool, $root, $request->moved(), $request->rootChanges(), $locked);
             $setsPhp = $this->setsPhp;
             // A shadowed name has loaded versions, so the refusal never wants it, yet its hidden releases can change the answer.
             $shadowed = array_intersect($this->failures($loaded->asked()), [VersionSource::SHADOWED]);
@@ -198,18 +185,9 @@ final class ComposerSolver
             return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $this->failures($holds->wanted()) + $shadowed);
         }
 
-        $installs = self::installs($answer);
-        $from = self::updatedFrom($answer);
-        foreach ($unrequired as $name) {
-            // Composer before 2.4 has no temporary constraint, so the inline name became a root requirement: drop what that requirement alone keeps.
-            if (!$this->requiredAfter($answer, $name)) {
-                unset($installs[$name], $from[$name]);
-            }
-        }
-
         // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
         // A virtual name, which a package provides, is unreached too: only a refusal that wants an unreached name proves nothing.
-        return Solution::resolved($installs, $from, array_diff($this->failures($loaded->asked()), [VersionSource::UNREACHED]));
+        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), array_diff($this->failures($loaded->asked()), [VersionSource::UNREACHED]));
     }
 
     /**
@@ -249,30 +227,6 @@ final class ComposerSolver
         }
 
         return $failures;
-    }
-
-    private function requiredAfter(LockTransaction $transaction, string $name): bool
-    {
-        $packages = [];
-        foreach ($this->locked->getPackages() as $package) {
-            $packages[$package->getName()] = $package;
-        }
-        foreach ($transaction->getOperations() as $operation) {
-            if ($operation instanceof UpdateOperation) {
-                $packages[$operation->getTargetPackage()->getName()] = $operation->getTargetPackage();
-            } elseif ($operation instanceof InstallOperation) {
-                $packages[$operation->getPackage()->getName()] = $operation->getPackage();
-            } elseif ($operation instanceof UninstallOperation) {
-                unset($packages[$operation->getPackage()->getName()]);
-            }
-        }
-        foreach ($packages as $package) {
-            if (isset($package->getRequires()[$name])) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -315,11 +269,7 @@ final class ComposerSolver
     {
         $flags = $root->getStabilityFlags();
         $flags[$root->getName()] = BasePackage::$stabilities[VersionParser::parseStability($root->getVersion())];
-        $arguments = [$root->getMinimumStability(), $flags, $root->getAliases(), $root->getReferences(), $requires];
-        if (ComposerFeatures::hasTemporaryConstraints()) {
-            $arguments[] = $temporary;
-        }
-        $set = new RepositorySet(...$arguments);
+        $set = new RepositorySet($root->getMinimumStability(), $flags, $root->getAliases(), $root->getReferences(), $requires, $temporary);
         // A package takes one repository, so each pass gets its own copy of the root.
         $fixedRoot = clone $root;
         if (!$fixedRoot instanceof BasePackage) {

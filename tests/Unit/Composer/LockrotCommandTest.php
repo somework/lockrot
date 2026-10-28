@@ -37,7 +37,6 @@ use Lockrot\Json\JsonReader;
 use Lockrot\Lock\LockFile;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\SignalSet;
-use Lockrot\Solver\ComposerFeatures;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FixedAdvisories;
@@ -990,9 +989,6 @@ final class LockrotCommandTest extends TestCase
     /** Composer 2.10 refuses `yes` for a blocking variable, so the command that lockrot prints would fail. */
     public function testABlockingVariableThatComposerRefusesIsExit2AndNamesTheVariable(): void
     {
-        if (version_compare(ComposerFeatures::version(), '2.10.0-dev', '<')) {
-            self::markTestSkipped('Composer 2.10 and later read COMPOSER_NO_BLOCKING with Platform::getBoolEnv()');
-        }
         $project = $this->tempDir('lockrot-blocking-variable-');
         file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/blocking-variable-test', 'require' => ['acme/kept' => '^1.0']]));
         file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));

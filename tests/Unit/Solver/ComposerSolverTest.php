@@ -15,7 +15,6 @@ use Composer\Semver\VersionParser;
 use Lockrot\Lock\LockFile;
 use Lockrot\Security\Holder;
 use Lockrot\Solver\AdvisoryBlocking;
-use Lockrot\Solver\ComposerFeatures;
 use Lockrot\Solver\ComposerSolver;
 use Lockrot\Solver\PoolAdvisories;
 use Lockrot\Solver\SolveRequest;
@@ -53,9 +52,6 @@ final class ComposerSolverTest extends TestCase
     /** Composer 2.7 and later keep every name off the allow list at its locked release where they can (`update --minimal-changes`). */
     public function testAMinimalChangesSolveKeepsADependencyThatTheMoveDoesNotNeedToChange(): void
     {
-        if (version_compare(ComposerFeatures::version(), '2.7.0', '<')) {
-            self::markTestSkipped('Composer below 2.7 has no --minimal-changes');
-        }
         $solver = self::solver(
             ['require' => ['acme/lib' => '^1.0']],
             [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/zeta' => '^1.0']], ['name' => 'acme/zeta', 'version' => '1.0.0']],
@@ -66,7 +62,7 @@ final class ComposerSolverTest extends TestCase
         self::assertSame(['acme/lib' => '1.1.0', 'acme/zeta' => '1.1.0'], $solver->solve($request)->installs());
         self::assertSame(['acme/lib' => '1.1.0'], $solver->withMinimalChanges()->solve($request)->installs());
         self::assertSame(['acme/lib' => '1.1.0', 'acme/zeta' => '1.1.0'], $solver->solve($request)->installs(), 'the solver itself keeps its policy');
-        self::assertSame(['acme/lib' => '1.1.0'], $solver->withMinimalChanges()->solve(SolveRequest::plain('acme/lib'))->installs(), 'the name that the update allows is no preferred one');
+        self::assertSame(['acme/lib' => '1.1.0'], $solver->withMinimalChanges()->solve(SolveRequest::update(['acme/lib' => '']))->installs(), 'the name that the update allows is no preferred one');
     }
 
     /** monica's socialiteproviders/facebook: the solve takes another reference of the locked tag, which moves no version. */
@@ -162,9 +158,6 @@ final class ComposerSolverTest extends TestCase
 
     public function testAnUpdatePastARequireDevConstraintIsRefusedByThatRootRequirement(): void
     {
-        if (!ComposerFeatures::hasTemporaryConstraints()) {
-            self::markTestSkipped('Composer 2.2 and 2.3 join the inline constraint to the root requirement: that requirement is the request');
-        }
         $solver = self::solver(['require-dev' => ['acme/dev' => '^1.0']], [], ['acme/dev' => [['version' => '1.0.0'], ['version' => '2.0.0']]], [['name' => 'acme/dev', 'version' => '1.0.0']]);
 
         $solution = $solver->solve(SolveRequest::update(['acme/dev' => '^2.0']));
@@ -189,9 +182,6 @@ final class ComposerSolverTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('bothSections')]
     public function testAnUpdatePastAConstraintInRequireAndRequireDevNamesTheSectionOfTheSolvedConstraint(string $require, string $dev, string $held, string $section): void
     {
-        if (!ComposerFeatures::hasTemporaryConstraints()) {
-            self::markTestSkipped('Composer 2.2 and 2.3 join the inline constraint to the root requirement: that requirement is the request');
-        }
         $solver = self::solver(['require' => ['acme/lib' => $require], 'require-dev' => ['acme/lib' => $dev]], [['name' => 'acme/lib', 'version' => '1.5.0']], ['acme/lib' => [['version' => '1.5.0'], ['version' => '2.0.0']]]);
 
         $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^2.0']));
@@ -249,9 +239,6 @@ final class ComposerSolverTest extends TestCase
     /** A root requirement holds a move only through a requirement that it leaves no candidate. */
     public function testARefusalNamesNoRootRequirementOfARequirementThatKeepsACandidate(): void
     {
-        if (!ComposerFeatures::hasTemporaryConstraints()) {
-            self::markTestSkipped('Composer 2.2 lists the root requirement of each dependency that -W frees as a rule of the problem');
-        }
         $solver = self::solver(
             ['require' => ['acme/lib' => '^1.0', 'acme/dep' => '^1.0', 'acme/y' => '^1.0']],
             [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/dep' => '^1.0']], ['name' => 'acme/dep', 'version' => '1.0.0'], ['name' => 'acme/y', 'version' => '1.0.0']],
@@ -396,9 +383,6 @@ final class ComposerSolverTest extends TestCase
     /** The project itself can be an abandoned package: `block-abandoned` removes no root. */
     public function testAnAbandonedRootStaysWhenTheConfigBlocksAbandonedPackages(): void
     {
-        if (!ComposerFeatures::blocksAdvisories()) {
-            self::markTestSkipped('Composer below 2.9 has no SecurityAdvisoryPoolFilter: it blocks nothing in an update');
-        }
         $config = new Config(false);
         $config->merge(['config' => ['audit' => ['block-abandoned' => true]]]);
         $solver = self::solver(['require' => ['acme/user' => '^1.0'], 'provide' => ['acme/virtual' => '1.0.0'], 'abandoned' => true], [['name' => 'acme/user', 'version' => '1.0.0']], ['acme/user' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/virtual' => '^1.0']]]])
@@ -440,9 +424,6 @@ final class ComposerSolverTest extends TestCase
 
     public function testTheBlockedRangesAndTheAdvisoryRangesOfOneNameBothBlock(): void
     {
-        if (!class_exists(PartialSecurityAdvisory::class)) {
-            self::markTestSkipped('Composer below 2.4 has no advisory records');
-        }
         $parser = new VersionParser();
         $lookup = static fn (array $names, bool $complete): array => ['acme/lib' => [PartialSecurityAdvisory::create('acme/lib', ['advisoryId' => 'PKSA-1111-2222-3333', 'affectedVersions' => '>=1.2,<1.3'], $parser)]];
         $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0'], ['version' => '1.2.0']]], [], ['acme/lib' => [$parser->parseConstraints('>=1.1,<1.2')]])

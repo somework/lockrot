@@ -1546,16 +1546,9 @@ defs['noteMovesNotChecked'] = obj(("`moves_not_checked`: Composer's solver refus
     'php': d('The php version that the solve ran at: `config.platform.php` in the target minor, else the target minor at its newest patch (`8.4.99`).', {'type': 'string', 'minLength': 1}),
     'problem': PROBLEM,
 })
-defs['noteUpdateNowReduced'] = obj(("`update_now_reduced`: the command leaves out the members that Composer's refusal of the combined update names, and, "
-                                    "under Composer 2.2 or 2.3, each plain member that the resolving solve installs below its move version (§5.6)."), {
+defs['noteUpdateNowReduced'] = obj("`update_now_reduced`: the command leaves out the members that Composer's refusal of the combined update names (§5.6).", {
     'left_out': arr('The members that `update_now_command` leaves out, in report order.', ref('packageName'), minItems=1, uniqueItems=True),
-    'held_below': arr(("The plain members that the combined solve installs below their move version, in report order, each also in `left_out`. "
-                  "Empty when only a refusal leaves members out."), obj('A member left out below its fix.', {
-        'package': ref('packageName'),
-        'installs': d('The release that the combined solve installs for it, as the lock would write it.', {'type': 'string', 'minLength': 1}),
-    })),
-    'problem': nul("Composer's problem text of the refused combined update, without colour. Foreign text, not contract. Null when no refusal leaves a member out.",
-                   {'type': 'string', 'minLength': 1}),
+    'problem': d("Composer's problem text of the refused combined update, without colour. Foreign text, not contract.", {'type': 'string', 'minLength': 1}),
 })
 defs['noteUpdateNowRefused'] = obj("`update_now_refused`: Composer refuses the members of `security.update_now` together, even without the members its refusal names.", {
     'problem': PROBLEM,

@@ -18,7 +18,6 @@ use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
-use Lockrot\Solver\ComposerFeatures;
 use Lockrot\Solver\ComposerSolver;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveCheckers;
@@ -287,9 +286,6 @@ final class MoveCheckersTest extends TestCase
      */
     public function testTheMoveChecksAdvisoryLookupKeepsOutAVcsNameThatAMoveWithAllDependenciesFrees(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class) || !ComposerFeatures::blocksAdvisories()) {
-            self::markTestSkipped('Composer without advisory blocking');
-        }
         $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0', 'acme/zeta' => '^1.0 || ^2.0', 'acme/vcs' => '^1.0']], RootPackage::class);
         self::assertInstanceOf(RootPackageInterface::class, $root);
         $packagist = ['notification-url' => 'https://packagist.org/downloads/'];

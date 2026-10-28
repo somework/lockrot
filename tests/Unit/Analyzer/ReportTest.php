@@ -380,7 +380,7 @@ final class ReportTest extends TestCase
     public function testWithMoveChecksAndWithNoteLeaveTheOriginalReportUntouched(): void
     {
         $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0);
-        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::OFFLINE), true);
+        $checks = MoveChecks::of(new UncheckedMoves(MoveCheck::OFFLINE));
 
         $checked = $report->withMoveChecks(new MoveCheckRun(null, false, [], MoveCheck::notChecked(MoveCheck::OFFLINE)), UpdateNow::of([], $checks));
         $noted = $report->withNote(RunNote::offline());

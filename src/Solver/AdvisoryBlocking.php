@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
-use Composer\Advisory\AuditConfig;
 use Composer\Advisory\Auditor;
 use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Config;
@@ -80,50 +79,23 @@ final class AdvisoryBlocking
      */
     public static function fromConfig(Config $config): self
     {
-        if (!ComposerFeatures::blocksAdvisories()) {
-            return self::none();
-        }
-        $version = ComposerFeatures::version();
-        if (class_exists(PolicyConfig::class)) {
-            $policyVariable = self::isTrue(self::POLICY_VARIABLE);
-            // PolicyConfig::fromConfig() returns before it reads this variable when `policy` is off.
-            $advisoriesVariable = $config->get('policy') === false ? null : self::isTrue(self::ADVISORIES_VARIABLE);
-            try {
-                $policy = PolicyConfig::fromConfig($config);
-            } catch (\Throwable $e) {
-                throw new ConfigException('Composer rejects the policy configuration: '.$e->getMessage(), 0, $e);
-            }
-            $disabledBy = self::noBlocking($version);
-            if (!$policy->enabled || !$policy->advisories->shouldBlock(ListPolicyConfig::BLOCK_SCOPE_UPDATE)) {
-                return self::none(array_merge($disabledBy, self::policySwitch($config, $policyVariable, $advisoriesVariable)));
-            }
-            if ($disabledBy !== []) {
-                return self::none($disabledBy);
-            }
-
-            return new self(true, $policy->advisories->getIgnoreListForOperation('block'), $policy->advisories->getIgnoreSeverityForOperation('block'), $policy->abandoned->shouldBlock(ListPolicyConfig::BLOCK_SCOPE_UPDATE), $policy->abandoned->getFlatIgnoreForOperation('block'));
-        }
-        $disabledBy = self::noBlocking($version);
-        // Composer 2.10 has no AuditConfig::fromConfig().
-        $factory = [AuditConfig::class, 'fromConfig'];
+        $policyVariable = self::isTrue(self::POLICY_VARIABLE);
+        // PolicyConfig::fromConfig() returns before it reads this variable when `policy` is off.
+        $advisoriesVariable = $config->get('policy') === false ? null : self::isTrue(self::ADVISORIES_VARIABLE);
         try {
-            $audit = \is_callable($factory) ? $factory($config) : null;
+            $policy = PolicyConfig::fromConfig($config);
         } catch (\Throwable $e) {
-            throw new ConfigException('Composer rejects the audit configuration: '.$e->getMessage(), 0, $e);
+            throw new ConfigException('Composer rejects the policy configuration: '.$e->getMessage(), 0, $e);
         }
-        $settings = \is_object($audit) ? get_object_vars($audit) : [];
-        if (($settings['blockInsecure'] ?? true) === false) {
-            return self::none(array_merge($disabledBy, [self::AUDIT_KEY]));
+        $disabledBy = self::noBlocking();
+        if (!$policy->enabled || !$policy->advisories->shouldBlock(ListPolicyConfig::BLOCK_SCOPE_UPDATE)) {
+            return self::none(array_merge($disabledBy, self::policySwitch($config, $policyVariable, $advisoriesVariable)));
         }
         if ($disabledBy !== []) {
             return self::none($disabledBy);
         }
-        // Composer 2.9.2 and later split each list by operation, 2.9.0 and 2.9.1 block with the whole audit list and no severity.
-        if (\array_key_exists('ignoreListForBlocking', $settings)) {
-            return new self(true, self::listOf($settings['ignoreListForBlocking']), self::severitiesOf($settings['ignoreSeverityForBlocking'] ?? []), ($settings['blockAbandoned'] ?? false) === true, self::listOf($settings['ignoreAbandonedForBlocking'] ?? []));
-        }
 
-        return new self(true, self::listOf($settings['ignoreList'] ?? []), [], ($settings['blockAbandoned'] ?? false) === true, self::listOf($settings['ignoreAbandonedPackages'] ?? []));
+        return new self(true, $policy->advisories->getIgnoreListForOperation('block'), $policy->advisories->getIgnoreSeverityForOperation('block'), $policy->abandoned->shouldBlock(ListPolicyConfig::BLOCK_SCOPE_UPDATE), $policy->abandoned->getFlatIgnoreForOperation('block'));
     }
 
     public function blocks(): bool
@@ -197,11 +169,11 @@ final class AdvisoryBlocking
      *
      * @throws ConfigException when Composer refuses the value of a variable that it reads
      */
-    private static function noBlocking(string $version): array
+    private static function noBlocking(): array
     {
         $disabledBy = [];
-        $checked = version_compare($version, '2.10.0-dev', '>=');
-        foreach (ComposerFeatures::blockingVariables($version) as $name) {
+        $checked = true;
+        foreach (['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING'] as $name) {
             $checked = $checked && self::isTrue($name) !== true;
             if (!\in_array(Platform::getEnv($name), [false, '', '0'], true)) {
                 $disabledBy[] = $name;
@@ -254,30 +226,5 @@ final class AdvisoryBlocking
 
         // The caller asks only when the blocking is off, and a `policy.advisories` list blocks unless its `block` is false.
         return [self::BLOCK_KEY];
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return array<string, ?string>
-     */
-    private static function severitiesOf($value): array
-    {
-        $severities = [];
-        foreach (self::listOf($value) as $severity => $reason) {
-            $severities[(string) $severity] = $reason;
-        }
-
-        return $severities;
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return array<int|string, ?string> the keys as written, a value that is no string as null
-     */
-    private static function listOf($value): array
-    {
-        return array_map(static fn ($reason): ?string => \is_string($reason) ? $reason : null, \is_array($value) ? $value : []);
     }
 }
