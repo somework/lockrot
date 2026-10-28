@@ -28,6 +28,7 @@ final class SolverChecker implements MoveChecker
         VersionSource::BUDGET => MoveCheck::INSTALL_TIME_BUDGET,
         VersionSource::FAILED => MoveCheck::UNLOADED_NAME,
         VersionSource::UNREACHED => MoveCheck::UNLOADED_NAME,
+        VersionSource::SHADOWED => MoveCheck::UNLOADED_NAME,
     ];
 
     private ComposerSolver $solver;
@@ -331,7 +332,8 @@ final class SolverChecker implements MoveChecker
         if ($this->failed($solution)) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::SOLVER_ERROR));
         }
-        if ($newest !== null && $solution->resolves() && self::installsNewest($solution, $moved[0], $newest)) {
+        // A shadowed name can lose the release that the solve installs, so it stops even a solve that installs $newest.
+        if ($newest !== null && $solution->resolves() && self::installsNewest($solution, $moved[0], $newest) && !\in_array(VersionSource::SHADOWED, $solution->unloaded(), true)) {
             return $solution;
         }
         $unloaded = $this->notLoaded($solution, ...$moved);
@@ -384,7 +386,7 @@ final class SolverChecker implements MoveChecker
         foreach ($moved as $name) {
             $failures[] = $this->solver->source()->failure($name);
         }
-        foreach ([VersionSource::BUDGET, VersionSource::OFFLINE, VersionSource::FAILED, VersionSource::UNREACHED] as $failure) {
+        foreach ([VersionSource::BUDGET, VersionSource::OFFLINE, VersionSource::FAILED, VersionSource::UNREACHED, VersionSource::SHADOWED] as $failure) {
             if (\in_array($failure, $failures, true)) {
                 return self::NOT_LOADED[$failure];
             }

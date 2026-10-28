@@ -11,6 +11,7 @@ use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\ArrayRepository;
+use Composer\Repository\PackageRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Util\Platform;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
@@ -216,6 +217,25 @@ final class MoveCheckersTest extends TestCase
         yield 'the variable' => [[], '1', true];
         yield 'the variable at 0' => [[], '0', false];
         yield 'the variable at an empty value' => [[], '', false];
+    }
+
+    /** R5-33: Composer takes acme/x from the canonical package repository, which defines 1.0.0 only, so it refuses acme/lib 2.0.0. */
+    public function testAPackageRepositoryBeforeTheComposerRepositoryHidesItsVersionsOfTheName(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $loader = new ArrayLoader();
+        $package = new PackageRepository(['package' => [['name' => 'acme/x', 'version' => '1.0.0']]]);
+        $repository = new RecordingComposerRepository([
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/lib', 'version' => '2.0.0', 'require' => ['acme/x' => '^2.0']]),
+            $loader->load(['name' => 'acme/x', 'version' => '2.0.0']),
+        ]);
+
+        $check = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), new Config(false), [$package, $repository], '8.4', false, Deadline::never())->check(MoveQuery::require('acme/lib', '^2.0', '2.0.0'))->check();
+
+        self::assertSame(MoveCheck::REFUSED, $check->result());
     }
 
     /** `-W` frees a root requirement that a VCS repository serves: the solve offers its locked version, and no other. */

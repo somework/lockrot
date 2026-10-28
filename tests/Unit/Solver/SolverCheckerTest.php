@@ -732,6 +732,34 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize());
     }
 
+    /**
+     * R5-33: a canonical vcs repository before the Composer repository can serve acme/zeta and hide
+     * the release that the solve installs, so even a solve that installs the newest proves nothing.
+     */
+    public function testASolveThatReadsAShadowedNameIsNotChecked(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/zeta' => '^2.0']]], 'acme/zeta' => [['version' => '2.0.0']]],
+            ['acme/zeta' => VersionSource::SHADOWED]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0', null, '1.1.0'))->check()->jsonSerialize());
+    }
+
+    public function testACombinedSolveThatReadsAShadowedNameIsNotChecked(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/zeta' => '^2.0']]], 'acme/zeta' => [['version' => '2.0.0']]],
+            ['acme/zeta' => VersionSource::SHADOWED]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->combined(['acme/lib' => '^1.1.0'])->check()->jsonSerialize());
+    }
+
     /** A virtual name such as `psr/log-implementation` is listed by no repository: a solve that a provider meets proves the move. */
     public function testASolveThatResolvesBelowTheNewestWithANameNoComposerRepositoryListsResolves(): void
     {

@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Solver;
 
+use Composer\Config;
 use Composer\Downloader\TransportException;
+use Composer\IO\NullIO;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
 use Composer\Repository\FilterRepository;
+use Composer\Repository\PackageRepository;
+use Composer\Repository\PathRepository;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Deadline;
 use Lockrot\Solver\RepositoryVersions;
 use Lockrot\Solver\VersionSource;
+use Lockrot\Tests\Support\ConfiguredRepository;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\RecordingComposerRepository;
 use PHPUnit\Framework\TestCase;
@@ -53,7 +58,7 @@ final class RepositoryVersionsTest extends TestCase
 
     public function testTheFirstComposerRepositoryThatListsATaggedReleaseOfTheNameWins(): void
     {
-        $versions = new RepositoryVersions([new ArrayRepository([self::package('acme/lib', '9.0.0')]), self::repository(['acme/other' => ['1.0.0']]), self::repository(['acme/lib' => ['1.0.0', 'dev-main']]), self::repository(['acme/lib' => ['2.0.0']])], [], false, Deadline::never());
+        $versions = new RepositoryVersions([self::repository(['acme/other' => ['1.0.0']]), self::repository(['acme/lib' => ['1.0.0', 'dev-main']]), self::repository(['acme/lib' => ['2.0.0']]), new ArrayRepository([self::package('acme/lib', '9.0.0')])], [], false, Deadline::never());
 
         self::assertSame(['1.0.0'], self::pretty($versions->versions('acme/lib')));
         self::assertNull($versions->failure('acme/lib'));
@@ -608,6 +613,84 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([['1.0.0'], null], [self::pretty($withPath->versions('acme/lib')), $withPath->failure('acme/lib')]);
         self::assertSame([[], VersionSource::UNREACHED], [$withFilteredPath->versions('acme/private'), $withFilteredPath->failure('acme/private')]);
         self::assertSame([[], null], [$composerOnly->versions('acme/private'), $composerOnly->failure('acme/private')]);
+    }
+
+    /** R5-33: Composer reads an inline package repository, and a canonical one hides the name in every later repository. */
+    public function testAPackageRepositoryBeforeAComposerRepositoryServesTheNameAlone(): void
+    {
+        $package = new PackageRepository(['package' => [['name' => 'acme/lib', 'version' => '9.0.0']]]);
+        $versions = new RepositoryVersions([$package, self::repository(['acme/lib' => ['1.0.0', '2.0.0']])], [], false, Deadline::never());
+
+        self::assertSame([['9.0.0'], null], [self::pretty($versions->versions('acme/lib')), $versions->failure('acme/lib')]);
+    }
+
+    public function testAPackageRepositoryThatIsNotCanonicalAddsItsVersionsToTheLaterRepositories(): void
+    {
+        $package = new FilterRepository(new PackageRepository(['package' => [['name' => 'acme/lib', 'version' => '9.0.0']]]), ['canonical' => false]);
+        $versions = new RepositoryVersions([$package, self::repository(['acme/lib' => ['1.0.0']])], [], false, Deadline::never());
+
+        self::assertSame(['9.0.0', '1.0.0'], self::pretty($versions->versions('acme/lib')));
+    }
+
+    public function testAPathRepositoryBeforeAComposerRepositoryServesTheNameAlone(): void
+    {
+        $dir = sys_get_temp_dir().'/lockrot-path-repository-'.bin2hex(random_bytes(4));
+        mkdir($dir.'/lib', 0777, true);
+        $this->tempDirs[] = $dir;
+        file_put_contents($dir.'/lib/composer.json', (string) json_encode(['name' => 'acme/lib', 'version' => '9.0.0']));
+        $path = new PathRepository(['url' => $dir.'/lib'], new NullIO(), new Config(false));
+        $versions = new RepositoryVersions([$path, self::repository(['acme/lib' => ['1.0.0']])], [], false, Deadline::never());
+
+        self::assertSame([['9.0.0'], null], [self::pretty($versions->versions('acme/lib')), $versions->failure('acme/lib')]);
+    }
+
+    /**
+     * R5-33: lockrot does not load a vcs repository, which the ArrayRepository stands for. A
+     * canonical one can serve the name and hide the Composer repository's versions.
+     */
+    public function testANameThatAComposerRepositoryListsAfterACanonicalRepositoryThatTheSourceDoesNotLoadIsShadowed(): void
+    {
+        $versions = new RepositoryVersions([new ArrayRepository(), self::repository(['acme/lib' => ['1.0.0']])], [], false, Deadline::never());
+
+        self::assertSame([['1.0.0'], VersionSource::SHADOWED], [self::pretty($versions->versions('acme/lib')), $versions->failure('acme/lib')]);
+    }
+
+    /**
+     * @dataProvider repositoriesThatHideNoName
+     *
+     * @param array{only?: list<string>, exclude?: list<string>, canonical?: bool} $options
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('repositoriesThatHideNoName')]
+    public function testARepositoryThatTheSourceDoesNotLoadHidesNoNameThatItsFilterLeavesOut(array $options): void
+    {
+        $versions = new RepositoryVersions([new FilterRepository(new ConfiguredRepository($options), $options), self::repository(['acme/lib' => ['1.0.0']])], [], false, Deadline::never());
+
+        self::assertSame([['1.0.0'], null], [self::pretty($versions->versions('acme/lib')), $versions->failure('acme/lib')]);
+    }
+
+    /** @return iterable<string, array{array{only?: list<string>, exclude?: list<string>, canonical?: bool}}> */
+    public static function repositoriesThatHideNoName(): iterable
+    {
+        yield 'only other names' => [['only' => ['other/*']]];
+        yield 'the name excluded' => [['exclude' => ['acme/lib']]];
+        yield 'not canonical' => [['canonical' => false]];
+    }
+
+    public function testARepositoryThatTheSourceDoesNotLoadAndWhoseFilterAdmitsTheNameHidesIt(): void
+    {
+        $options = ['only' => ['acme/*']];
+        $versions = new RepositoryVersions([new FilterRepository(new ConfiguredRepository($options), $options), self::repository(['acme/lib' => ['1.0.0']])], [], false, Deadline::never());
+
+        self::assertSame([['1.0.0'], VersionSource::SHADOWED], [self::pretty($versions->versions('acme/lib')), $versions->failure('acme/lib')]);
+    }
+
+    public function testANameThatLoadsAloneAfterACanonicalRepositoryThatTheSourceDoesNotLoadIsShadowed(): void
+    {
+        $versions = new RepositoryVersions([new ArrayRepository(), self::recording(['acme/lib' => ['1.0.0']], ['acme/bad'])], [], false, Deadline::never());
+
+        $versions->versionsOf(['acme/lib', 'acme/bad']);
+
+        self::assertSame([['1.0.0'], VersionSource::SHADOWED, VersionSource::FAILED], [self::pretty($versions->versions('acme/lib')), $versions->failure('acme/lib'), $versions->failure('acme/bad')]);
     }
 
     public function testOfflineANameThatNoComposerRepositoryListsStaysOffline(): void
