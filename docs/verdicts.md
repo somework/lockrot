@@ -759,15 +759,24 @@ Limits of the check:
   [stability flag](https://getcomposer.org/doc/04-schema.md#package-links) admits `dev` for the
   package, and so does the check. A move to a dev snapshot is
   not a move that lockrot proposes.
-- It reads package and path repositories as Composer reads them. It does not read a vcs
-  repository, so it offers a package that only a vcs repository serves at its locked version only.
-- A canonical vcs repository before a Composer repository can serve a name that a solve needs.
-  Composer then takes the name from the vcs repository only, and the move reads `not_checked` with
-  `unloaded_name`.
+- It reads package and path repositories as Composer reads them. It does not load a vcs, git or
+  artifact repository, because a load clones or downloads the repository. It knows a name that such
+  a repository serves only from the source or dist URL of a lock entry.
+- It offers a name that the lock records from a vcs repository at its locked version only. A move
+  of that name reads `not_checked` with `not_from_composer_repository`.
+- A canonical vcs repository before a Composer repository serves the names that the lock records
+  from its URL. Composer then takes such a name from the vcs repository only. A move whose solve
+  needs that name reads `not_checked` with `unloaded_name`. A vcs repository that no lock entry
+  names hides no name.
 - It takes the root version from composer.json's `version`, else from `COMPOSER_ROOT_VERSION`, as
-  Composer does. Without both, the root version is `1.0.0`, and Composer guesses it from the vcs
-  checkout. A root `replace` or `provide` of `self.version` can then resolve in lockrot and fail in
-  Composer, or the reverse. So can a package that requires the root package.
+  Composer does. Without both, the standalone run solves the root at `1.0.0`, and Composer guesses
+  the root version from the vcs checkout. A root `replace` or `provide` of `self.version` can then
+  resolve in lockrot and fail in Composer, or the reverse. So can a package that requires the root
+  package. In plugin mode, the root version is Composer's own guess.
+- It reads [`update-with-minimal-changes`](https://getcomposer.org/doc/06-config.md#update-with-minimal-changes)
+  and `COMPOSER_MINIMAL_CHANGES` on Composer 2.7 and later, as Composer does. It does not read
+  `COMPOSER_PREFER_STABLE`, `COMPOSER_PREFER_LOWEST`, `COMPOSER_WITH_DEPENDENCIES` or
+  `COMPOSER_WITH_ALL_DEPENDENCIES`.
 - With `--offline`, a package that composer.json admits at `dev` needs its `~dev` file in
   Composer's cache. Without that file, the move is not checked (`check.reason` `offline`). From
   these repositories, such a package with tags and no dev version also reads `not_checked` with
@@ -797,7 +806,8 @@ Limits of the check:
     `config.policy.advisories` is not set. `policy.advisories.audit` is not a switch.
 
     When Composer refuses the value of one of the variables, such as `COMPOSER_NO_BLOCKING=maybe`,
-    or the value of `config.policy`, lockrot stops with exit code 2 and prints Composer's message.
+    or a key under `config.policy` or `config.audit`, lockrot stops with exit code 2. It prints
+    `Composer rejects the policy configuration:` and Composer's message, which can omit the key.
 
 - When a package that a resolving solve asks for could not be loaded, the solve can resolve at a
   lower release than Composer installs. The move is then not checked, with the load reason

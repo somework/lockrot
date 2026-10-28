@@ -91,9 +91,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   step with a version, branch or name from the lock or a repository outside it is left out, so a
   hostile lock cannot inject into a pasted command. This affects a reader who copies these commands. Action: if a step is missing,
   check that lock entry before you write the command by hand. ([The move](docs/schema.md#the-move))
-- **CLI:** a repository host's redirect to another host no longer receives lockrot's
-  `Authorization` or `PRIVATE-TOKEN` header, on Composer 2.10 or later with curl. lockrot asks the
-  redirect target again without it. ([Which credentials](docs/internals.md#which-credentials))
+- **CLI:** a repository host's redirect to another origin no longer receives lockrot's
+  `Authorization` or `PRIVATE-TOKEN` header. lockrot asks the redirect target again without it. ([Which credentials](docs/internals.md#which-credentials))
 - **table, github, markdown:** a control character from the lock or a repository prints as an
   escape (`\x1B`), also in `--explain`, in the error lines on stderr, as in the install-time
   summary. So does a character that prints as nothing, such as a zero-width space (`\u{200B}`). A
@@ -122,6 +121,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   writes `check` with the release it `installs`. A refused move asks once more with its holders, and
   `moves_with[]` names the holders that move. A move still refused names its holds in `held_by[]`
   and prints only `composer why-not --locked`. ([The move check](docs/verdicts.md#the-move-check))
+- **All formats:** the move check reads `update-with-minimal-changes` and `COMPOSER_MINIMAL_CHANGES`
+  on Composer 2.7 and later, as Composer does. It loads no vcs, git or artifact repository. A
+  package that the lock records from a vcs repository stays at its locked version, and its move
+  reads `not_checked`. ([The move check](docs/verdicts.md#the-move-check))
+- **json:** `security.update_now_command` holds no PHP raise step. Only the `update now:` line says
+  to raise `require.php` first. ([Security](docs/schema.md#security-advisories-with-no-fix-expected))
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
   installs, with require-dev and without, and the links that set each edge. The minors and edges
   assume no override, and `platform_override` names the lock's `platform-overrides.php`. The text
@@ -230,8 +235,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([Upgrading to 0.14](docs/changes/0.14.md#how-014-reaches-you))
 - **Breaking:** **Config:** on Composer 2.10 and later, a value that Composer refuses in
   `COMPOSER_NO_BLOCKING`, `COMPOSER_NO_SECURITY_BLOCKING`, `COMPOSER_POLICY`,
-  `COMPOSER_POLICY_ADVISORIES_BLOCK` or `config.policy` exits 2, `--offline` too. 0.13 read none of
-  them. Action: set the variable to `0`, `1`, `true`, `false`, `on` or `off`, or fix the key.
+  `COMPOSER_POLICY_ADVISORIES_BLOCK`, `config.policy` or `config.audit` exits 2, `--offline` too.
+  0.13 read none of them. Action: set the variable to `0`, `1`, `true`, `false`, `on` or `off`,
+  or fix the key.
   ([The move check](docs/verdicts.md#the-move-check))
 - **Breaking:** **Config:** an `ignore[].flags`, `accept-unchecked` or `advisory-lookup` value that
   0.13 ignored and config-2 refuses (`"flags": "stale"`, `"advisory-lookup": 1`) now exits 2. One

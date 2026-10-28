@@ -444,7 +444,8 @@ admits_project_php, held_by, reason}`
 
 The root `security` holds `update_now`, the packages whose advisories `composer update` fixes, and
 `update_now_command`, their argv `["composer", "update", …]`. `update_now_command` is null when
-`update_now` is empty, and the `update now:` line is then hidden. In `jq`, read it as
+`update_now` is empty, and the `update now:` line is then hidden. It holds no PHP raise step: only
+the `update now:` line says to raise `require.php` first. In `jq`, read it as
 `.security.update_now_command // [] | join(" ")`, which gives an empty string when there is no
 command.
 
