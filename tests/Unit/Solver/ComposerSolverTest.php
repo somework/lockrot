@@ -18,6 +18,7 @@ use Lockrot\Solver\AdvisoryBlocking;
 use Lockrot\Solver\ComposerSolver;
 use Lockrot\Solver\PoolAdvisories;
 use Lockrot\Solver\SolveRequest;
+use Lockrot\Solver\VersionSource;
 use Lockrot\Tests\Support\ArrayVersionSource;
 use PHPUnit\Framework\TestCase;
 
@@ -564,6 +565,27 @@ final class ComposerSolverTest extends TestCase
 
         $requires = array_map(static fn (Holder $hold): array => [$hold->source(), $hold->package(), $hold->version(), $hold->link()], array_filter($holds, static fn (Holder $hold): bool => $hold->target() === 'acme/gone'));
         self::assertSame([[Holder::PACKAGE, 'acme/lib', 'dev-main', Holder::REQUIRE]], array_values(array_unique($requires, \SORT_REGULAR)), 'holds: '.json_encode(self::rows($holds)));
+    }
+
+    /** A freed vcs-locked name has its locked release only, so a refusal that wants another release of it proves nothing. */
+    public function testARefusalThatWantsAnotherReleaseOfEachFreedVcsLockedNameNamesEachUnreached(): void
+    {
+        $vcs = ['source' => ['type' => 'git', 'url' => 'https://git.example.org/acme/vcs.git', 'reference' => 'abc']];
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0', 'acme/other' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['name' => 'acme/other', 'version' => '1.0.0', 'require' => ['acme/util' => '^1.0']], ['name' => 'acme/core', 'version' => '1.0.0'] + $vcs, ['name' => 'acme/util', 'version' => '1.0.0'] + $vcs],
+            [
+                'acme/lib' => [['version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/core' => '^2.0']]],
+                'acme/other' => [['version' => '1.0.0', 'require' => ['acme/util' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/util' => '^2.0']]],
+                'acme/core' => [['version' => '2.0.0']],
+                'acme/util' => [['version' => '2.0.0']],
+            ]
+        )->withLockedOnly(['acme/core', 'acme/util']);
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1', 'acme/other' => '^1.1'])->withTransitive(SolveRequest::WITH_DEPENDENCIES));
+
+        self::assertFalse($solution->resolves());
+        self::assertEquals(['acme/core' => VersionSource::UNREACHED, 'acme/util' => VersionSource::UNREACHED], $solution->unloaded(), 'the key order is free');
     }
 
     /** A listed update keeps a vcs-locked dependency at its lock, as Composer does, so its refusal proves something. */
