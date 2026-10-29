@@ -19,10 +19,18 @@ These scripts connect lockrot with its report renderer,
   ([Cutting a release](../../CONTRIBUTING.md#cutting-a-release)). The release branch tests the page
   of the pre-release before the renderer release.
 - Cut the renderer release with a commit that changes only the version of its newest
-  pre-release. The page carries that version, so its bytes, its CSP hash and its manifest differ
-  from the pre-release. The CI of the lockrot release pull request that vendors the release tests
-  those final bytes, before the lockrot tag.
+  pre-release and its pin. The pin moves to the lockrot commit that vendors that pre-release. A
+  lockrot rc tag keeps that commit reachable, and a green full check on
+  `release/full-check-<sha>` passes the renderer's release gate
+  ([Cutting a release](../../CONTRIBUTING.md#cutting-a-release), step 1). The page carries the
+  version, so its bytes, its CSP hash and its manifest differ from the pre-release. The CI of the
+  lockrot release pull request that vendors the release tests those final bytes, before the
+  lockrot tag.
 - `update-renderer` and `check-vendored` accept only an attestation from the renderer's
   `release.yml`, run for the tag that the manifest names. A tag can move, and a moved tag gets a
   second attestation. So `check-vendored` also requires the source commit that `update-renderer`
   pinned in `renderer-commit`.
+- Before the first final renderer tag, check that the renderer repository has a tag ruleset on
+  `refs/tags/v*` that blocks deletion and update: `gh api repos/somework/lockrot-report/rulesets`.
+  If it is missing, create it, with lockrot's tag ruleset as the model. A moved tag gets a second
+  attestation.

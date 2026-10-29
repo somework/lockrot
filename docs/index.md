@@ -28,8 +28,8 @@ ones.
 The Composer plugin needs PHP 7.4+ and Composer 2.10+:
 
 ```bash
-composer require --dev somework/lockrot
 composer config allow-plugins.somework/lockrot true
+composer require --dev somework/lockrot
 composer lockrot
 ```
 

@@ -13,8 +13,8 @@ Each finding carries its evidence and the dependency chain that pulled it in. lo
 `composer.lock` and `composer.json` and writes neither.
 
 ```bash
-composer require --dev somework/lockrot
 composer config allow-plugins.somework/lockrot true
+composer require --dev somework/lockrot
 composer lockrot
 ```
 
@@ -33,11 +33,15 @@ The Composer plugin needs PHP 7.4+ and Composer 2.10+ and adds `composer lockrot
 `composer rot`):
 
 ```bash
-composer require --dev somework/lockrot
 composer config allow-plugins.somework/lockrot true
+composer require --dev somework/lockrot
 ```
 
-The `composer config` line grants the plugin the permission that Composer asks for.
+Run the `composer config` line first. It grants the plugin the permission that Composer asks for,
+and a non-interactive Composer, such as a CI job, stops with an error without it.
+
+A run that reads a 0.13 baseline file exits `2` until you regenerate the file.
+[Upgrading to 0.14](https://lockrot.dev/changes/0.14/) has the steps for each install.
 
 The plugin also prints a short summary of the graded packages that a `composer require`, `update`
 or `install` changes. To silence it, set `extra.lockrot.install-time` to `off`

@@ -93,6 +93,8 @@ with `lockrot:`, any other failure with `lockrot failed:`. `-v` adds the stack t
       also has the strings `alias` and `alias_normalized`.
     - Each `name` is a string, and no name is listed twice, case ignored.
 
+- `vendor/bin/lockrot` when the composer/composer package that it loads is older than 2.10, or on
+  a non-CLI PHP SAPI with `register_argc_argv=On`. It runs nothing.
 - A value the configuration rejects: in `extra.lockrot`, in an environment variable, or on the
   command line ([configuration.md](configuration.md#extralockrot-keys)). That includes two values
   of one kind in `--fail-on`, `none` beside another value, and `vulnerable-low`.

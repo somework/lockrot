@@ -56,6 +56,12 @@ final class CompatibilityPageTest extends TestCase
         self::assertSame(ClosedSets::report2Values(), $listed);
     }
 
+    /** The plugin does nothing below the Composer floor, so the page promises no reduced check there. */
+    public function testThePagePromisesNoReducedPluginCheckOnAnOlderComposer(): void
+    {
+        self::assertStringNotContainsString('checks less under an older', self::prose('compatibility.md'));
+    }
+
     public function testThePagePromisesNoLockrotActionMajorLine(): void
     {
         self::assertStringNotContainsString('lockrot-action@v1', self::read('compatibility.md'));

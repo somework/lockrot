@@ -37,6 +37,7 @@ matrix in `.github/workflows/ci.yml`) and these gates:
 | Docs build | `mkdocs.yml` | `pip install -r docs/requirements.txt`, then `mkdocs build --strict` |
 | Corpus self-test | `tools/corpus/tests/` | `tools/corpus/corpus selftest` |
 | Move check oracle | `.github/actions/move-check-oracle`: one run on each composer/composer version that the train 7d cases record in `inputs.move_check.composer`. A version that no case records fails. Each run compares the result, form, holds and cause of an answer, and its installs, except for the baseline and a combined update | With each recorded composer/composer installed in turn: `LOCKROT_COMPOSER_ORACLE=1 vendor/bin/phpunit tests/Integration/MoveCheckComposerOracleTest.php` |
+| Engine page recordings | The `engine-pages` job of `ci.yml` | Install the composer/composer version that `build/phar/composer.lock` holds. Then run `vendor/bin/phpunit --fail-on-skipped --fail-on-empty-test-suite tests/Integration/EnginePageCasesTest.php`, and the same command on `tests/Integration/BaselinedProjectTest.php`. On another Composer, `EnginePageCasesTest` skips, and `BaselinedProjectTest` does not compare the recorded files |
 | PHAR build and byte-identical rebuild | `build/build-phar.sh` | `build/build-phar.sh` ([The PHAR](#the-phar)) |
 
 Document an escaped mutant that no test can kill, with the reason, in
@@ -358,9 +359,16 @@ maintainer.
 
     - The heading carries the day of the final `vX.Y.Z` tag, not the day of the rc tag. Write the
       planned tag day. If the final tag falls on another day, add a commit to the release pull
-      request that changes only that date. That commit changes no file of the contract bundle. If
-      the day changes after the merge, open a pull request into `main` that changes only that
-      date, and tag its merge commit.
+      request that changes only that date and `docs/example-run.md`. That commit changes no file
+      of the contract bundle. If the day changes after the merge, open a pull request into `main`
+      that changes only that date and `docs/example-run.md`. Then tag its merge commit.
+
+    - Re-record `docs/example-run.md` with the command and the environment that the top of the
+      page names (`GITHUB_TOKEN`, `COLUMNS`, the snapshot). Run a PHAR that you build from the
+      release branch ([The PHAR](#the-phar)), with `LOCKROT_TODAY=<planned tag day>`. Set the
+      sentence that starts "Recorded on" to "Recorded on <planned tag day> with lockrot X.Y.Z".
+      Then run `ExampleRunQuotesTest`. Fix each page that quotes a line that the recording
+      changed. If the tag day moves, record the page again for the date commit.
 
     - Copy every `resources/lockrot-*.schema.json` file to
       `tests/fixtures/schema-evolution/schemas/X.Y.Z/` and pin their sha256 in `RELEASED_SCHEMAS`
@@ -380,17 +388,27 @@ maintainer.
 
         1. When the contract bundle changes, run `tools/report/record`. Commit it with the version,
            the dated CHANGELOG heading, the schema copies and the golden pins of this step.
-        2. Tag that commit `vX.Y.Z-rc.N` and push the tag. The tag keeps the commit reachable, so
-           the renderer needs no repin after the merge. `phar.yml` ignores a `-rc.` tag. Packagist
-           lists it as a pre-release, which a project on stable minimum-stability does not install.
+        2. Tag that commit `vX.Y.Z-rc.N` and push the tag. The tag keeps the commit reachable for
+           the renderer pre-release. `phar.yml` ignores a `-rc.` tag. Packagist lists it as a
+           pre-release, which a project on stable minimum-stability does not install.
         3. Pin the renderer to that commit, then tag a renderer pre-release `vX.Y.Z-rc.M`. Run
            `tools/report/update-renderer vX.Y.Z-rc.M`, commit the files that it writes, and wait
            for the CI run of the push to the release branch to pass. A change to the renderer's
            `release.yml` then runs first on a pre-release. The release pull request's
-           `check-vendored` step refuses a pre-release, so it passes only after step 5.
-        4. Release lockrot-report `vX.Y.Z` with a commit that changes only the version of that
-           pre-release.
-        5. Run `tools/report/update-renderer vX.Y.Z`, and commit only the files that it writes. This
+           `check-vendored` step refuses a pre-release, so it passes only after step 8.
+        4. Let V be the commit of step 3. Tag V `vX.Y.Z-rc.<N+1>` and push the tag. The
+           renderer's `node scripts/contract.mjs reachable` accepts a commit on `main` or on a
+           lockrot tag, and the rebase merge never puts V on `main`.
+        5. Push V unchanged to `release/full-check-<sha of V>`:
+           `git push origin <V>:refs/heads/release/full-check-<V>`, with the full hex sha of V in
+           both places. Wait for a green full check of the whole tree on that branch. The
+           renderer's `release.yml` gate accepts a full check only from such a branch. The full
+           check that the rc tag of step 4 starts does not count, because its branch is the tag.
+           Then delete the branch.
+        6. In lockrot-report, run `node scripts/contract.mjs repin <V>`. Set the version in
+           `CHANGELOG.md` and `package.json`. Commit only the version and the pin.
+        7. Merge that commit into the renderer's `main`. Then tag `vX.Y.Z` on `main`.
+        8. Run `tools/report/update-renderer vX.Y.Z`, and commit only the files that it writes. This
            commit must not change the contract bundle.
 
 2. Build the PHAR and check that `php build/lockrot.phar --version` prints the new version.
@@ -402,6 +420,10 @@ maintainer.
     - When the release changes the flag set, a schema number or the score model, the lockrot.dev
       change that reads it is merged. The lockrot.dev build stops on a set that it does not know.
     - A lockrot-action release that `@v1` jobs need on the tag day is published.
+    - Before the first final renderer tag, `gh api repos/somework/lockrot-report/rulesets`
+      lists a ruleset on `refs/tags/v*` that blocks deletion and update. If it is missing, create
+      it, with lockrot's tag ruleset as the model. A moved tag gets a second attestation, and
+      `update-renderer` then cannot name one source commit for the release.
 
 4. Merge the release pull request into `main` with CI green. On a pull request into `main`, the
    `quality` job also runs `tools/report/check-vendored`, the renderer check of the tag.
