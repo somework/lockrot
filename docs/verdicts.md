@@ -495,6 +495,10 @@ origin: Packagist, a private repository, vcs, a path or an archive. packages-dev
   Composer 2.11, `composer audit` skips a `dev-*` version and the default branch alias. lockrot
   still counts their advisories.
 
+- On Composer 2.10 and later, `composer audit` also reports a version that a filter list names,
+  such as Packagist's malware list, and `composer install` refuses it by default. lockrot reads no
+  filter list. So such a version is not `vulnerable`, and `security.status` can read `clear`.
+
 - lockrot asks each repository for full records. When a repository answers with a record that
   holds only an id and a range, its answer fails with the run note
   [`advisories_unavailable`](notes.md#advisories_unavailable). From Composer 2.11, `composer audit`
@@ -666,8 +670,9 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 The `update now:` footer line lists every package whose `update` move Composer's solver resolves
 with the constraint inline, with one command for all of them.
 
-The table, markdown and github formats, `--explain` and the install-time block print each command
-in its POSIX form, for a POSIX shell. For cmd.exe or PowerShell, render `commands[]` as
+The table, markdown, github, gitlab and sarif formats, `--explain` and the install-time block print
+each command in its POSIX form, for a POSIX shell. `commands[]` carries the argv of each command for
+other shells. For cmd.exe or PowerShell, render `commands[]` as
 [The move](schema.md#the-move) shows, or use the copy menu of the html page.
 
 ### <a name="the-move-check"></a>The move check {#the-move-check}
@@ -739,7 +744,8 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
   <package>:<constraint>`, which adds no root requirement.
 - **A package that composer.json lists.** It gets the `composer require` step of the section that
   lists it, also in a run without `--dev`. For a package that only `require-dev` lists, the step
-  adds `--dev`, and the line reads "require <package> <constraint> in require-dev".
+  adds `--dev`, and the line reads "require <package> <constraint> in require-dev". With `--dev`
+  the package is direct, and the line omits the suffix.
 - **A package that both sections list.** The step adds `--no-interaction` and names the package
   as the `require-dev` key spells it. Composer then writes the requirement to `require` and
   removes the `require-dev` line, whatever the terminal answers. The line reads "require <package>
@@ -754,14 +760,17 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
   [`update_now_not_checked`](notes.md#update_now_not_checked) says why. When the baseline does not
   resolve, `update now:` is empty too.
 - **The baseline.** First, lockrot solves a partial update of a name outside the lock. When
-  Composer refuses it, the lock itself does not install on the target PHP. Then no move is checked,
-  and the run note [`moves_not_checked`](notes.md#moves_not_checked) gives Composer's problem text.
+  Composer refuses it, the lock itself does not install on the target PHP. Then no move is checked
+  (`check.reason` `baseline_refused`), and the run note [`moves_not_checked`](notes.md#moves_not_checked) gives Composer's problem text.
   When that refusal needs a package that could not be loaded, `run.move_check.baseline` is
   `not_checked` with the load reason (`unloaded_name`, `offline` or `install_time_budget`). Each
   move then reads that reason.
 
 Limits of the check:
 
+- The answers are those of the Composer that runs lockrot: the Composer that the PHAR bundles, or
+  the project's Composer for the plugin. The printed commands can behave differently on another
+  Composer.
 - It ignores the requirements on `ext-*`, `lib-*`, `php-debug`, `php-ipv6` and `php-zts`, as
   `--ignore-platform-req` does, so the machine that runs lockrot decides no move. It checks a name
   that `config.platform` sets, because that name is the project's own fact. `run.move_check` lists
@@ -849,6 +858,13 @@ Limits of the check:
 - On Composer 2.11 and later, a cooldown period under `config.policy` withholds the versions that
   are newer than the period in an update. The check does not apply this policy. So a move that
   resolves in lockrot can fail in Composer, or install an older version.
+- lockrot runs no Composer plugin, and a plugin can change the versions that an update offers.
+  Symfony Flex keeps each `symfony/*` component at `extra.symfony.require` or `SYMFONY_REQUIRE`,
+  unless composer.json requires the component with a constraint outside it. So in a project that
+  installs symfony/flex, a move that resolves in lockrot can fail in Composer, or install an older
+  version.
+- When lockrot read no release of the move's row, or a requirement has no constraint, it tries no
+  move (`check.reason` `no_release_read`). The commands stay.
 - It stops a chain of refusals after `Analyzer::CHECK_PASSES` passes. A new request after the
   last one is not checked (`check.reason` `pass_cap`).
 - When Composer's solver fails on a request, the move is not checked (`check.reason`

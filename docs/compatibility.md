@@ -278,9 +278,8 @@ when a finding reaches `fail-on`, are frozen with the rest of the [configuration
 - The Composer plugin, the signed PHAR, the Docker image `ghcr.io/somework/lockrot` and
   `somework/lockrot-action` run the same lockrot code and write documents to the same schemas.
 - The PHAR, and the image and the Action that run it, bundle a Composer new enough for every check.
-  Only the plugin runs on the project's Composer, and it checks less under an older one
-  ([`advisories_not_checked`](notes.md#advisories_not_checked),
-  [which advisory settings it reads](verdicts.md#security-advisories)).
+  Only the plugin runs on the project's Composer. It needs Composer 2.10 or newer and does nothing
+  on an older one ([install requirements](index.md#install)).
 - The PHAR's asset names and the [verification path](phar.md#verifying-the-download) are stable.
 - lockrot-action's inputs follow Semantic Versioning. Before 1.0, lockrot promises nothing about
   the action's major lines. From 1.0, this page names the action line that follows lockrot 1.x.
@@ -300,6 +299,9 @@ when a finding reaches `fail-on`, are frozen with the rest of the [configuration
   release. The move check gives the answers of the Composer that runs lockrot, and these answers can
   differ between minors
   ([The move check](verdicts.md#the-move-check)).
+- The move check runs no Composer plugin. A plugin that limits the versions of an update, such as
+  Symfony Flex with `extra.symfony.require`, can make a move that resolves in lockrot fail in
+  Composer ([The move check](verdicts.md#the-move-check)).
 - *Planned:* within 1.x the floor rises only in a minor release, never in a patch, with a warning
   on stderr one minor release ahead.
 
