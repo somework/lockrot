@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
+use Composer\Advisory\PartialSecurityAdvisory;
+use Composer\Advisory\SecurityAdvisory;
 use Composer\DependencyResolver\Pool;
 
 /**
@@ -55,12 +57,12 @@ final class PolicyRemovals
     {
         $maps = [];
         if (method_exists($pool, 'getAllSecurityRemovedPackageVersions')) {
-            /** @var array<string, array<string, mixed>> $security name => version => the advisories */
+            /** @var array<string, array<string, array<SecurityAdvisory|PartialSecurityAdvisory>>> $security name => version => the advisories */
             $security = $pool->getAllSecurityRemovedPackageVersions();
             $maps[self::ADVISORIES] = $security;
         }
         if (method_exists($pool, 'getAllAbandonedRemovedPackageVersions')) {
-            /** @var array<string, array<string, mixed>> $abandoned name => version => the pretty version */
+            /** @var array<string, array<string, string>> $abandoned name => version => the pretty version */
             $abandoned = $pool->getAllAbandonedRemovedPackageVersions();
             $maps[self::ABANDONED] = $abandoned;
         }
