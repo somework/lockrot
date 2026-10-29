@@ -25,7 +25,7 @@ final class TransactionPackages
      * Every entry is flagged prod. A transaction and its operations record no `require` or
      * `require-dev` section, and `PackageInterface::isDev()` tells whether a version is a branch
      * snapshot, which is the question of the `pinned` verdict. The caller resolves the flag through
-     * the lock ({@see InstallTimeSummary::withDevFlagsFrom()}).
+     * the lock ({@see InstallTimeSummary::inMergedLock()}).
      *
      * @return list<LockedPackage> in operation order
      */

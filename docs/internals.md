@@ -211,9 +211,9 @@ public Drupal site locks showed both.
 
 - lockrot keeps the answer to a request with its own credential header apart from the answer to a
   request without one. So a run with a token asks again for a repository that answered 404 to a
-  run without a token. Where lockrot sends no credential header of its own ([What is
-  sent](#what-is-sent)), a run with Composer's credentials and a run without them read one cached
-  answer. After you add such credentials, run `composer clear-cache`.
+  run without a token. When lockrot has no token of its own for the host
+  ([Which credentials](#which-credentials)), a run with Composer's credentials and a run without
+  them read one cached answer. After you add such credentials, run `composer clear-cache`.
 
 - With Composer's cache disabled (`composer --no-cache`), lockrot keeps answers in memory for the
   run and writes nothing.
@@ -288,8 +288,7 @@ lock with thousands of packages, each reached from very many direct requirements
 `memory_limit`. The run then stops with PHP's "Allowed memory size" error and writes no report. To
 raise the limit, set `COMPOSER_MEMORY_LIMIT`, for example `COMPOSER_MEMORY_LIMIT=4G composer
 lockrot`. For the PHAR, `php -d memory_limit=4G lockrot.phar` also works.
-[Pull request 157](https://github.com/somework/lockrot/pull/157) records the lock sizes that were
-measured.
+[Pull request 157](https://github.com/somework/lockrot/pull/157) records the measured lock sizes.
 
 ## Related
 

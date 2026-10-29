@@ -76,7 +76,7 @@ final class ComposerCacheAdapterTest extends TestCase
         self::assertNull($adapter->get('k'));
     }
 
-    /** Composer's Cache rethrows an ErrorException when its retry of a rename or a read fails. */
+    /** Composer's Cache::write() rethrows an ErrorException when its retry fails, and a failed read throws one. */
     public function testAFailingCacheIsAMissAndAFailedWriteIsDropped(): void
     {
         $cache = $this->createMock(Cache::class);
