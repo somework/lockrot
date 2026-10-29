@@ -10,6 +10,18 @@ use PHPUnit\Framework\TestCase;
 
 final class ClockTest extends TestCase
 {
+    private string $timezone;
+
+    protected function setUp(): void
+    {
+        $this->timezone = date_default_timezone_get();
+    }
+
+    protected function tearDown(): void
+    {
+        date_default_timezone_set($this->timezone);
+    }
+
     public function testFixedClockReturnsGivenInstant(): void
     {
         $clock = Clock::fixed('2026-09-14T00:00:00+00:00');
@@ -113,6 +125,23 @@ final class ClockTest extends TestCase
             '2026-09-14',
             Clock::fromEnvironment(['LOCKROT_TODAY' => '2026-09-14T00:00:00+00:00'])->now()->format('Y-m-d')
         );
+    }
+
+    /** @return iterable<string, array{string, string}> LOCKROT_TODAY, the instant */
+    public static function todaysWithoutAZone(): iterable
+    {
+        yield 'a date' => ['2026-09-14', '2026-09-14T00:00:00+00:00'];
+        yield 'a date-time without an offset' => ['2026-09-14T10:30:00', '2026-09-14T10:30:00+00:00'];
+        yield 'an explicit offset wins' => ['2026-09-14T00:00:00+03:00', '2026-09-14T00:00:00+03:00'];
+    }
+
+    /** @dataProvider todaysWithoutAZone */
+    #[DataProvider('todaysWithoutAZone')]
+    public function testLockrotTodayWithoutAnOffsetIsUtcWhateverTheDefaultTimezone(string $today, string $instant): void
+    {
+        date_default_timezone_set('Europe/Kyiv');
+
+        self::assertSame($instant, Clock::fromEnvironment(['LOCKROT_TODAY' => $today])->now()->format(\DATE_ATOM));
     }
 
     public function testFromEnvironmentFallsBackToNowWhenLockrotTodayIsUnusable(): void
