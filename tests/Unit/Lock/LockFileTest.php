@@ -12,6 +12,7 @@ use Lockrot\Exception\ConfigException;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use Lockrot\Tests\Support\JsonPath;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class LockFileTest extends TestCase
@@ -191,19 +192,11 @@ final class LockFileTest extends TestCase
         self::assertSame(0, $thrown->getCode(), 'lockrot carries no exception codes; a run exits on its verdict, not on these');
     }
 
-    /** The reported index is the entry's position, not whatever key the JSON object carried. */
-    public function testTheReportedEntryIndexIsPositional(): void
-    {
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('composer.lock entry #1 in packages cannot be loaded: entry must be a JSON object');
-        LockFile::fromArray(['packages' => [7 => ['name' => 'a/b', 'version' => '1.0.0'], 9 => 'not-an-object']]);
-    }
-
     public function testNonArrayLockEntryThrowsConfigExceptionWithIndex(): void
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('composer.lock entry #1 in packages-dev cannot be loaded: entry must be a JSON object');
-        LockFile::fromArray(['packages-dev' => [['name' => 'a/b', 'version' => '1.0.0'], 'not-an-object']]);
+        LockFile::fromArray(['packages' => [], 'packages-dev' => [['name' => 'a/b', 'version' => '1.0.0'], 'not-an-object']]);
     }
 
     public function testMissingFileThrows(): void
@@ -261,7 +254,7 @@ final class LockFileTest extends TestCase
 
     public function testALockWithoutTheKeysHasNoPlatformAndNoPackagesDev(): void
     {
-        $lock = LockFile::fromArray(['packages' => [], 'platform' => [], 'platform-overrides' => ['php' => false]]);
+        $lock = LockFile::fromArray(['packages' => [], 'platform' => [], 'platform-overrides' => ['ext-intl' => false]]);
 
         self::assertSame([], $lock->platform());
         self::assertSame([], $lock->platformDev());
@@ -425,8 +418,6 @@ final class LockFileTest extends TestCase
             'aliases' => [
                 ['package' => 'vendor/a', 'version' => 'dev-main', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev'],
                 ['package' => 'vendor/missing', 'version' => 'dev-main', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev'],
-                (object) ['package' => 'vendor/b', 'version' => '2.0.0', 'alias' => '3.0.x-dev', 'alias_normalized' => '3.0.9999999.9999999-dev'],
-                'vendor/b',
             ],
         ]);
 
@@ -439,7 +430,201 @@ final class LockFileTest extends TestCase
         }
         sort($versions);
 
-        self::assertSame([['vendor/a', '1.0.x-dev', true], ['vendor/a', 'dev-main', false], ['vendor/b', '2.0.0', false]], $versions, 'an aliases entry that is not an array, or names no locked package, adds nothing');
+        self::assertSame([['vendor/a', '1.0.x-dev', true], ['vendor/a', 'dev-main', false], ['vendor/b', '2.0.0', false]], $versions, 'an aliases entry that names no locked package adds nothing');
         self::assertCount(0, LockFile::empty()->lockedRepository()->getPackages());
+    }
+
+    /**
+     * Each body is valid JSON that Composer's Locker cannot use, or that breaks a lockrot rule.
+     *
+     * @return iterable<string, array{0: array<string, mixed>, 1: non-empty-string}>
+     */
+    public static function refusedLocks(): iterable
+    {
+        $entry = ['name' => 'a/b', 'version' => '1.0.0'];
+
+        yield 'no packages' => [[], 'alt.lock: packages must be a list of package entries'];
+        yield 'null packages' => [['packages' => null], 'alt.lock: packages must be a list of package entries'];
+        yield 'string packages' => [['packages' => 'oops'], 'alt.lock: packages must be a list of package entries'];
+        yield 'only packages-dev' => [['packages-dev' => []], 'alt.lock: packages must be a list of package entries'];
+        yield 'packages as an object' => [['packages' => ['a' => $entry]], 'alt.lock: packages must be a list of package entries'];
+        yield 'string packages-dev' => [['packages' => [], 'packages-dev' => 'x'], 'alt.lock: packages-dev must be a list of package entries'];
+        yield 'packages-dev as an object' => [['packages' => [], 'packages-dev' => ['a' => $entry]], 'alt.lock: packages-dev must be a list of package entries'];
+        yield 'string platform' => [['packages' => [], 'platform' => 'x'], 'alt.lock: platform must be an object'];
+        yield 'string platform-dev' => [['packages' => [], 'platform-dev' => 'x'], 'alt.lock: platform-dev must be an object'];
+        yield 'string platform-overrides' => [['packages' => [], 'platform-overrides' => 'x'], 'alt.lock: platform-overrides must be an object'];
+        yield 'number as platform override' => [['packages' => [], 'platform-overrides' => ['php' => 8.1]], 'alt.lock: platform-overrides cannot be loaded: '];
+        yield 'platform constraint that Composer cannot parse' => [['packages' => [], 'platform' => ['php' => 'not a constraint !!']], 'alt.lock: platform cannot be loaded: '];
+        yield 'platform-dev constraint that Composer cannot parse' => [['packages' => [], 'platform-dev' => ['ext-json' => '>= ~']], 'alt.lock: platform-dev cannot be loaded: '];
+        yield 'override of a package that is not a platform package' => [['packages' => [], 'platform-overrides' => ['foo/bar' => '1.0']], 'alt.lock: platform-overrides cannot be loaded: foo/bar is no platform package'];
+        yield 'self.version before a platform constraint that Composer cannot parse' => [['packages' => [], 'platform' => ['php' => 'self.version', 'ext-json' => '>= ~']], 'alt.lock: platform cannot be loaded: '];
+        yield 'override that Composer cannot normalise' => [['packages' => [], 'platform-overrides' => ['php' => 'eight']], 'alt.lock: platform-overrides cannot be loaded: '];
+        yield 'php override false' => [['packages' => [], 'platform-overrides' => ['php' => false]], 'alt.lock: platform-overrides cannot be loaded: '];
+        yield 'string aliases' => [['packages' => [], 'aliases' => 'x'], 'alt.lock: aliases must hold objects with the string package'];
+        yield 'alias of a locked package without alias_normalized' => [['packages' => [$entry], 'aliases' => [['package' => 'a/b', 'version' => '1.0.0', 'alias' => '1.0.x-dev']]], 'alt.lock: aliases entry for a/b must have the strings alias and alias_normalized'];
+        yield 'alias of a locked package without alias' => [['packages' => [$entry], 'aliases' => [['package' => 'a/b', 'version' => '1.0.0', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases entry for a/b must have the strings alias and alias_normalized'];
+        yield 'alias that is a string' => [['packages' => [$entry], 'aliases' => ['a/b']], 'alt.lock: aliases must hold objects with the string package'];
+        yield 'alias without package' => [['packages' => [$entry], 'aliases' => [['version' => '1.0.0', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases must hold objects with the string package'];
+        yield 'a broken alias before a whole one' => [['packages' => [$entry], 'aliases' => ['a/b', ['package' => 'a/b', 'version' => '1.0.0', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases must hold objects with the string package'];
+        yield 'number as name' => [['packages' => [['name' => 5, 'version' => '1.0.0']]], 'alt.lock entry #0 in packages cannot be loaded: "name" must be a string'];
+        yield 'number as type' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'type' => 5]]], 'alt.lock entry #0 in packages cannot be loaded: '];
+        yield 'name in both sections' => [['packages' => [$entry], 'packages-dev' => [['name' => 'a/b', 'version' => '2.0.0']]], 'alt.lock lists a/b twice: entry #0 in packages and entry #0 in packages-dev'];
+        yield 'name twice ignoring case' => [['packages' => [['name' => 'other/x', 'version' => '1.0.0'], $entry, ['name' => 'A/B', 'version' => '1.0.0']]], 'alt.lock lists a/b twice: entry #1 in packages and entry #2 in packages'];
+        yield 'invalid name twice' => [['packages' => [['name' => '--x', 'version' => '1.0.0'], ['name' => '--x', 'version' => '1.0.0']]], 'alt.lock lists --x twice: entry #0 in packages and entry #1 in packages'];
+    }
+
+    /**
+     * @dataProvider refusedLocks
+     *
+     * @param array<string, mixed> $lock
+     * @param non-empty-string     $message
+     */
+    #[DataProvider('refusedLocks')]
+    public function testALockThatComposerOrLockrotRefusesIsAConfigErrorThatNamesTheFile(array $lock, string $message): void
+    {
+        $thrown = null;
+        try {
+            LockFile::fromArray($lock, 'alt.lock');
+        } catch (ConfigException $e) {
+            $thrown = $e;
+        }
+
+        self::assertNotNull($thrown, 'the lock loads');
+        self::assertStringStartsWith($message, $thrown->getMessage());
+    }
+
+    public function testAFileLockIsNamedByItsFileNameUnlessACallerNamesIt(): void
+    {
+        $dir = sys_get_temp_dir().'/lockrot-lockfile-'.bin2hex(random_bytes(4));
+        mkdir($dir);
+        file_put_contents($dir.'/alt.lock', '[]');
+        try {
+            foreach ([[null, 'alt.lock: '], ['sub/alt.lock', 'sub/alt.lock: ']] as [$name, $prefix]) {
+                $thrown = null;
+                try {
+                    LockFile::fromFile($dir.'/alt.lock', $name);
+                } catch (ConfigException $e) {
+                    $thrown = $e;
+                }
+                self::assertNotNull($thrown);
+                self::assertStringStartsWith($prefix.'packages must be a list', $thrown->getMessage());
+            }
+        } finally {
+            unlink($dir.'/alt.lock');
+            rmdir($dir);
+        }
+    }
+
+    /**
+     * Composer reads each of these, so lockrot does too.
+     *
+     * @return iterable<string, array{0: array<string, mixed>}>
+     */
+    public static function acceptedLocks(): iterable
+    {
+        yield 'empty packages' => [['packages' => []]];
+        yield 'empty packages as an object' => [['packages' => [], 'packages-dev' => []]];
+        yield 'null packages-dev' => [['packages' => [], 'packages-dev' => null]];
+        yield 'empty platform' => [['packages' => [], 'platform' => [], 'platform-dev' => null]];
+        yield 'empty string platform' => [['packages' => [], 'platform' => '', 'platform-dev' => false]];
+        yield 'null platform-overrides and aliases' => [['packages' => [], 'platform-overrides' => null, 'aliases' => null]];
+        yield 'extension override false' => [['packages' => [], 'platform-overrides' => ['ext-redis' => false]]];
+        yield 'number inside platform' => [['packages' => [], 'platform' => ['php' => 8.1]]];
+        yield 'list inside platform-dev' => [['packages' => [], 'platform-dev' => ['ext-json' => ['not a constraint']]]];
+        yield 'platform constraints that Composer parses' => [['packages' => [], 'platform' => ['php' => '>=7.4 <8.5', 'ext-json' => '*'], 'platform-dev' => ['ext-intl' => '^1.0 || dev-main']]];
+        yield 'empty aliases' => [['packages' => [], 'aliases' => []]];
+        yield 'self.version in platform and platform-dev' => [['packages' => [], 'platform' => ['php' => 'self.version'], 'platform-dev' => ['ext-json' => 'self.version']]];
+    }
+
+    /**
+     * @dataProvider acceptedLocks
+     *
+     * @param array<string, mixed> $lock
+     */
+    #[DataProvider('acceptedLocks')]
+    public function testALockThatComposerReadsLoads(array $lock): void
+    {
+        self::assertSame([], LockFile::fromArray($lock)->packages(true));
+    }
+
+    public function testANumberInsidePlatformIsSkippedAsComposerSkipsIt(): void
+    {
+        self::assertSame(['ext-json' => '*'], LockFile::fromArray(['packages' => [], 'platform' => ['php' => 8.1, 'ext-json' => '*']])->platform());
+    }
+
+    public function testAPlatformOverrideIsReadWithoutCaseAndTheLaterKeyWins(): void
+    {
+        self::assertSame('8.1.5', LockFile::fromArray(['packages' => [], 'platform-overrides' => ['PHP' => '8.1.5']])->platformOverridePhp());
+        self::assertSame('8.2.0', LockFile::fromArray(['packages' => [], 'platform-overrides' => ['php' => '8.1.5', 'PHP' => '8.2.0']])->platformOverridePhp());
+        self::assertNull(LockFile::fromArray(['packages' => [], 'platform-overrides' => ['php' => '8.1.5', 'PHP' => false]])->platformOverridePhp(), 'a later false wins over the earlier string');
+    }
+
+    public function testEachAliasNamesItsLockedPackage(): void
+    {
+        $lock = LockFile::fromArray([
+            'packages' => [['name' => 'vendor/a', 'version' => 'dev-main'], ['name' => 'vendor/b', 'version' => 'dev-main']],
+            'aliases' => [
+                ['package' => 'vendor/a', 'version' => 'dev-main', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev'],
+                ['package' => 'vendor/b', 'version' => 'dev-main', 'alias' => '2.0.x-dev', 'alias_normalized' => '2.0.9999999.9999999-dev'],
+            ],
+        ]);
+
+        self::assertCount(4, $lock->lockedRepository()->getPackages(), 'two locked packages and one alias of each');
+    }
+
+    /** Composer's Locker matches an alias against the lower-case package names as written. */
+    public function testAMixedCaseAliasNamesNoPackageAsInComposer(): void
+    {
+        $lock = LockFile::fromArray([
+            'packages' => [['name' => 'vendor/a', 'version' => 'dev-main']],
+            'aliases' => [['package' => 'Vendor/A', 'version' => 'dev-main', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']],
+        ]);
+
+        self::assertCount(1, $lock->lockedRepository()->getPackages());
+    }
+
+    /** Composer's Locker skips an `aliases` entry whose package is not locked, and reads no other field of it. */
+    public function testAnAliasesObjectAndAnEntryForNoLockedPackageLoadAsInComposer(): void
+    {
+        $lock = LockFile::fromArray([
+            'packages' => [['name' => 'vendor/a', 'version' => 'dev-main']],
+            'aliases' => [
+                'first' => ['package' => 'vendor/missing', 'alias' => '1.0.x-dev'],
+                'second' => ['package' => 'vendor/a', 'version' => 'dev-main', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev'],
+            ],
+        ]);
+
+        self::assertCount(2, $lock->lockedRepository()->getPackages(), 'the locked package and the alias of it');
+    }
+
+    /** @return iterable<string, array{0: array<string, mixed>, 1: string}> */
+    public static function platformDataThatComposerRefuses(): iterable
+    {
+        yield 'a php override that is no version' => [['packages' => [], 'platform-overrides' => ['php' => 'eight']], 'alt.lock: platform-overrides cannot be loaded: '];
+        yield 'a php override of false' => [['packages' => [], 'platform-overrides' => ['php' => false]], 'alt.lock: platform-overrides cannot be loaded: '];
+        yield 'a platform constraint that Composer cannot parse' => [['packages' => [], 'platform' => ['php' => 'not a constraint !!']], 'alt.lock: platform cannot be loaded: '];
+    }
+
+    /**
+     * @dataProvider platformDataThatComposerRefuses
+     *
+     * @param array<string, mixed> $lock
+     */
+    #[DataProvider('platformDataThatComposerRefuses')]
+    public function testPlatformDataThatComposerRefusesKeepsComposersReason(array $lock, string $prefix): void
+    {
+        $thrown = null;
+        try {
+            LockFile::fromArray($lock, 'alt.lock');
+        } catch (ConfigException $e) {
+            $thrown = $e;
+        }
+
+        self::assertNotNull($thrown);
+        $cause = $thrown->getPrevious();
+        self::assertNotNull($cause, 'the Composer failure is kept as the cause');
+        self::assertNotSame('', $cause->getMessage());
+        self::assertSame($prefix.$cause->getMessage(), $thrown->getMessage());
+        self::assertSame(0, $thrown->getCode(), 'lockrot carries no exception codes; a run exits on its verdict, not on these');
     }
 }

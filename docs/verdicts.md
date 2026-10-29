@@ -132,8 +132,8 @@ If the successor is already in the lock, remove the old package. An `abandoned` 
 ### <a name="abandoned"></a>Composer's abandoned ignore list {#abandoned}
 
 lockrot reads Composer's abandoned ignore list as `composer audit` reads it: a listed package raises
-no S1. The list is `config.policy.abandoned.ignore` on Composer 2.10 and later, and
-`config.audit.ignore-abandoned` on Composer 2.9. Older Composer releases have no such list.
+no S1. The list is `config.policy.abandoned.ignore`. When `config.policy.abandoned` is not set,
+Composer reads the legacy `config.audit.ignore-abandoned` in its place.
 
 - Only the mark goes. An archived repository (S3) still raises `abandoned`, and the release and
   push dates still give `silent` or `stale`. A package whose only fact was the mark reads `ok`, not
@@ -450,8 +450,6 @@ When the lookup does not run, or runs in part, the finding carries S10 `{check: 
 
 - `--offline`.
 
-- Composer older than 2.4: the plugin on an LTS Composer. The PHAR bundles a newer one.
-
 - At install time, for the repositories that remain once the budget is spent.
 
 - A repository that failed. The run gets a [note](notes.md#advisories_unavailable) and, under
@@ -476,7 +474,7 @@ origin: Packagist, a private repository, vcs, a path or an archive. packages-dev
 - lockrot asks each configured Composer repository that publishes advisories. A repository without
   a feed is listed with the outcome `no_feed`.
 
-- On Composer 2.9 and later, while advisory blocking is on, [the move check](#the-move-check)
+- While advisory blocking is on, [the move check](#the-move-check)
   asks for the advisories of each name that a solve loads and that no earlier lookup covered,
   such as a new dependency of a move.
   `run.advisory_lookup` describes the run's own lookup only.
@@ -572,8 +570,8 @@ the move.
 ### Accepting advisories {#accepting-advisories}
 
 Accept an advisory where `composer audit` accepts it: `config.policy.advisories` (`ignore-id`,
-`ignore`, `ignore-severity`) on Composer 2.10 and later, `config.audit.ignore` from 2.4 and
-`config.audit.ignore-severity` from 2.9. What audit drops on the Composer that runs lockrot,
+`ignore`, `ignore-severity`), or the legacy `config.audit.ignore` and `config.audit.ignore-severity`
+when `config.policy.advisories` is not set. What audit drops on the Composer that runs lockrot,
 lockrot drops.
 
 - An ignored advisory is listed in `security.ignored[]`, with the setting that matched (`by`) and
@@ -685,7 +683,9 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
     - `root-require`: a root requirement on another package that the move needs at another
       version. With no `target`, it is the move's own constraint, and no release that Composer can
       install meets it.
-    - `platform`: a requirement on `php`.
+    - `platform`: a requirement on a platform package that the solve checks: `php`, `php-64bit`,
+      `composer-plugin-api`, `composer-runtime-api`, `composer`, or a name that `config.platform`
+      sets.
     - `require` or `conflict` of the target release, or a `conflict` that composer.json declares.
     - `replace`: a package that replaces `target`, or the moved package when `target` is null.
       Composer installs only one of the two.
@@ -731,6 +731,11 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
 - **A package that composer.json lists.** It gets the `composer require` step of the section that
   lists it, also in a run without `--dev`. For a package that only `require-dev` lists, the step
   adds `--dev`, and the line reads "require <package> <constraint> in require-dev".
+- **A package that both sections list.** The step adds `--no-interaction` and names the package
+  as the `require-dev` key spells it. Composer then writes the requirement to `require` and
+  removes the `require-dev` line, whatever the terminal answers. The line reads "require <package>
+  <constraint>, which removes it from require-dev". The php step does the same when `require-dev`
+  lists php.
 - **Update now.** lockrot solves the candidates of `update now:` as one request. A move that
   resolves only through a joint request is no candidate: its own step moves its holders. It leaves out the
   candidates that Composer refuses together with the others, and writes a run note. The members of
@@ -748,8 +753,13 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
 
 Limits of the check:
 
-- It ignores `ext-*` requirements, as `--ignore-platform-req=ext-*` does. `run.move_check` says so
-  once per run (`ignores_extensions`), and the `moves:` footer line names it.
+- It ignores the requirements on `ext-*`, `lib-*`, `php-debug`, `php-ipv6` and `php-zts`, as
+  `--ignore-platform-req` does, so the machine that runs lockrot decides no move. It checks a name
+  that `config.platform` sets, because that name is the project's own fact. `run.move_check` lists
+  the patterns once per run (`ignored_platform`), and the `moves:` footer line names them.
+- It checks `php`, `php-64bit`, `composer-plugin-api`, `composer-runtime-api` and `composer`.
+  `php-64bit` takes the version of the solve's php on a 64-bit PHP. The other three take the
+  versions of the Composer that runs lockrot.
 - It solves at `config.platform.php` when that version is in the target PHP's minor, else at the
   newest patch of the target minor (`8.4.99`). Composer reads `8.4` as `8.4.0`. It keeps every
   other `config.platform` override.
@@ -777,7 +787,7 @@ Limits of the check:
   resolve in lockrot and fail in Composer, or the reverse. So can a package that requires the root
   package. In plugin mode, the root version is Composer's own guess.
 - It reads [`update-with-minimal-changes`](https://getcomposer.org/doc/06-config.md#update-with-minimal-changes)
-  and `COMPOSER_MINIMAL_CHANGES` on Composer 2.7 and later, as Composer does. It does not read
+  and `COMPOSER_MINIMAL_CHANGES`, as Composer does. It does not read
   `COMPOSER_PREFER_STABLE`, `COMPOSER_PREFER_LOWEST`, `COMPOSER_WITH_DEPENDENCIES` or
   `COMPOSER_WITH_ALL_DEPENDENCIES`.
 - With `--offline`, a package that composer.json admits at `dev` needs its `~dev` file in
@@ -790,7 +800,7 @@ Limits of the check:
     - A repository whose `packages.json` inlines `packages` beside `metadata-url`.
     - A server that answers 404 for a missing `~dev` file.
 
-- On Composer 2.9 and later, it removes the versions that an advisory affects, as Composer does in
+- It removes the versions that an advisory affects, as Composer does in
   an update. It reads the settings of Composer's `block` operation: the ignore list, the ignored
   severities and the blocking of abandoned packages. It blocks every name that the update can move,
   packages-dev and new dependencies included. A switch that turns Composer's advisory blocking off
@@ -803,10 +813,9 @@ Limits of the check:
       `config.policy.advisories.block` and `config.audit.block-insecure`.
 
     The list names only the switches that the running Composer reads. It omits a switch when a
-    switch that Composer reads later turns the blocking on again. Composer 2.9.0 and 2.9.1 read only
-    `config.audit.block-insecure`, and later 2.9 releases also read `COMPOSER_NO_SECURITY_BLOCKING`.
-    Composer 2.10 and later read every switch. They read `config.audit.block-insecure` only when
-    `config.policy.advisories` is not set. `policy.advisories.audit` is not a switch.
+    switch that Composer reads later turns the blocking on again. Composer reads
+    `config.audit.block-insecure` only when `config.policy.advisories` is not set.
+    `policy.advisories.audit` is not a switch.
 
     When Composer refuses the value of one of the variables, such as `COMPOSER_NO_BLOCKING=maybe`,
     or a key under `config.policy` or `config.audit`, lockrot stops with exit code 2. It prints
@@ -833,15 +842,12 @@ Limits of the check:
 - When Composer's solver fails on a request, the move is not checked (`check.reason`
   `solver_error`), and the run note [`move_check_failed`](notes.md#move_check_failed) names the
   failure. The run still writes its report.
-- Composer 2.2 and 2.3 accept an inline constraint only on a root requirement. There, the
-  `update` move of a package that composer.json does not require gets the plain `composer update
-  <package>`. A `require`, `raise-php` or `tag` move of such a package gets no package step.
 - The solver stops at the first failing chain. The scan adds what `composer prohibits` names, but
   `held_by[]` can still miss a hold that a deeper chain holds.
 - A run without composer.json checks no move (`check.reason` `no_composer_json`).
 - A run whose composer.json Composer cannot load checks no move (`check.reason`
   `composer_json_invalid`). Composer refuses such a file, for example for a requirement name that
-  is no package name. Composer 2.2 stops the run with its own error instead.
+  is no package name.
 - The check does not read whether the lock has a `packages-dev` key. A lock without that key can
   get a move that resolves and its command, but Composer refuses an update with require-dev on
   such a lock.
@@ -950,7 +956,7 @@ the lowest edge when the target lies below it, else the edge after the last mino
 set. Abridged from the [example run](example-run.md):
 
 ```text
-moves: checked with the solver of Composer 2.10.3 against the lock; ext-* requirements not checked
+moves: checked with the solver of Composer 2.10.3 against the lock; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked
 php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
 ```
 
@@ -1159,7 +1165,7 @@ formats print only under `--all`, keeps its verdict and adds the same `checks mi
 | `repository_activity` | `not_from_composer_repository` | The package comes from vcs, or from an origin that lockrot cannot tell: lockrot asks no host for it | S3, S4 |
 | `release_metadata` | `not_from_composer_repository` | The same origins: no Composer repository serves its releases | S2, S8 |
 | `release_dates` | `undated_releases` | A release that S2 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it | S2 when the highest tag is undated. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
-| `advisories` | `offline`, `composer_too_old`, `install_time_budget`, `lookup_failed`, `no_feed` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
+| `advisories` | `offline`, `install_time_budget`, `lookup_failed`, `no_feed` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
 | `releases` | `releases_unknown` | A counted advisory's fix is unknown because the package's release data did not come | S9 |
 
 S10's `data` lists each missing check as `unchecked` (`{check, reason, blocks}`) and every blocked

@@ -128,6 +128,169 @@ final class DependencyGraphTest extends TestCase
         self::assertSame(['wallabag/rulerz', 'wallabag/rulerz-bundle'], array_keys($graph->chainsTo('hoa/ruler')));
     }
 
+    public function testShortestChainMatchesAnEarlyStoppingWalkOnSeededGraphs(): void
+    {
+        foreach (self::seededGraphs() as $seed => [$packages, $require, $requireDev]) {
+            foreach ([false, true] as $dev) {
+                [$graph, $edges, $roots] = self::built($packages, $require, $requireDev, $dev);
+                foreach (array_keys($packages) as $target) {
+                    self::assertSame(self::earlyStoppingChain($edges, $roots, $target), $graph->shortestChain($target), "seed $seed, dev ".var_export($dev, true).", $target");
+                }
+            }
+        }
+    }
+
+    public function testChainsToMatchesAPerRootWalkOnSeededGraphs(): void
+    {
+        foreach (self::seededGraphs() as $seed => [$packages, $require, $requireDev]) {
+            foreach ([false, true] as $dev) {
+                [$graph, $edges, $roots] = self::built($packages, $require, $requireDev, $dev);
+                foreach (array_keys($packages) as $target) {
+                    self::assertSame(self::perRootChains($edges, $roots, $target), $graph->chainsTo($target), "seed $seed, dev ".var_export($dev, true).", $target");
+                }
+            }
+        }
+    }
+
+    /**
+     * Random plain-require graphs of lower-case names, with no replace or provide, so that the test
+     * owns the edges and roots. Each graph has cycles, a self-require, a root and a requirement that
+     * the lock does not carry, a root in both sections, and many equally short paths.
+     *
+     * @return array<int, array{array<string, list<string>>, list<string>, list<string>}>
+     */
+    private static function seededGraphs(): array
+    {
+        $graphs = [];
+        foreach ([1, 7, 42] as $seed) {
+            mt_srand($seed);
+            $names = array_map(static fn (int $i): string => \sprintf('v/p%03d', $i), range(0, 299));
+            $packages = [];
+            foreach ($names as $i => $name) {
+                $requires = [];
+                for ($n = mt_rand(0, 4); $n > 0; --$n) {
+                    $requires[] = $names[mt_rand(0, 299)];
+                }
+                if ($i % 50 === 0) {
+                    $requires[] = $name;
+                    $requires[] = 'v/absent';
+                }
+                $packages[$name] = array_values(array_unique($requires));
+            }
+            $require = ['v/ghost'];
+            $requireDev = [];
+            for ($n = 0; $n < 12; ++$n) {
+                $require[] = $names[mt_rand(0, 299)];
+                $requireDev[] = $names[mt_rand(0, 299)];
+            }
+            $requireDev[] = $require[1];
+            $graphs[$seed] = [$packages, array_values(array_unique($require)), array_values(array_unique($requireDev))];
+        }
+
+        return $graphs;
+    }
+
+    /**
+     * @param array<string, list<string>> $packages
+     * @param list<string>                $require
+     * @param list<string>                $requireDev
+     *
+     * @return array{DependencyGraph, array<string, list<string>>, list<string>}
+     */
+    private static function built(array $packages, array $require, array $requireDev, bool $dev): array
+    {
+        $lock = [];
+        foreach ($packages as $name => $requires) {
+            $lock[] = ['name' => $name, 'version' => '1.0.0', 'require' => array_fill_keys($requires, '*')];
+        }
+        $graph = DependencyGraph::fromLock(
+            LockFile::fromArray(['packages' => $lock]),
+            ProjectConfig::fromArray(['require' => array_fill_keys($require, '*'), 'require-dev' => array_fill_keys($requireDev, '*')]),
+            $dev
+        );
+
+        return [$graph, $packages, $dev ? array_merge($require, $requireDev) : $require];
+    }
+
+    /**
+     * A multi-source walk that stops at $target, with every root seeded in order, duplicates kept.
+     *
+     * @param array<string, list<string>> $edges
+     * @param list<string>                $roots
+     *
+     * @return list<string>
+     */
+    private static function earlyStoppingChain(array $edges, array $roots, string $target): array
+    {
+        $parent = [];
+        $queue = [];
+        foreach ($roots as $root) {
+            $parent[$root] = null;
+            $queue[] = $root;
+        }
+        while ($queue !== []) {
+            $current = array_shift($queue);
+            if ($current === $target) {
+                return self::unwound($parent, $target);
+            }
+            foreach ($edges[$current] ?? [] as $next) {
+                if (!\array_key_exists($next, $parent) && isset($edges[$next])) {
+                    $parent[$next] = $current;
+                    $queue[] = $next;
+                }
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * A single-source walk from each root, keeping the roots that reach $target, sorted by name.
+     *
+     * @param array<string, list<string>> $edges
+     * @param list<string>                $roots
+     *
+     * @return array<string, list<string>>
+     */
+    private static function perRootChains(array $edges, array $roots, string $target): array
+    {
+        $chains = [];
+        foreach ($roots as $root) {
+            $parent = [$root => null];
+            $queue = [$root];
+            while ($queue !== []) {
+                $current = array_shift($queue);
+                foreach ($edges[$current] ?? [] as $next) {
+                    if (!\array_key_exists($next, $parent) && isset($edges[$next])) {
+                        $parent[$next] = $current;
+                        $queue[] = $next;
+                    }
+                }
+            }
+            if (isset($edges[$target]) && \array_key_exists($target, $parent)) {
+                $chains[$root] = self::unwound($parent, $target);
+            }
+        }
+        ksort($chains, \SORT_STRING);
+
+        return $chains;
+    }
+
+    /**
+     * @param array<string, string|null> $parent
+     *
+     * @return list<string>
+     */
+    private static function unwound(array $parent, string $target): array
+    {
+        $chain = [];
+        for ($node = $target; $node !== null; $node = $parent[$node]) {
+            $chain[] = $node;
+        }
+
+        return array_reverse($chain);
+    }
+
     private function wallabag(): DependencyGraph
     {
         return DependencyGraph::fromLock(

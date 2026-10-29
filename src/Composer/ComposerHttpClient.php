@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Composer;
 
-use Composer\Composer;
 use Composer\Config;
 use Composer\Downloader\TransportException;
 use Composer\IO\IOInterface;
@@ -43,11 +42,11 @@ final class ComposerHttpClient implements HttpClientInterface
      * @param IOInterface $io       the IO that the downloader was built with, see {@see withoutRedundantAuthorization()}
      * @param Config      $config   the Config that the downloader was built with: Composer resolves the origin of a request against its `gitlab-domains`
      * @param ?Deadline   $deadline install-time budget, where null or a never-expiring deadline keeps {@see DEFAULT_TIMEOUT}
-     * @param ?bool       $refusesRedirects whether the downloader takes `prevent_url_access_callable`, null for {@see refusesRedirects()}
+     * @param ?bool       $refusesRedirects whether the downloader takes `prevent_url_access_callable`, null for whether curl runs it: RemoteFilesystem throws on the option
      */
     public function __construct(HttpDownloader $downloader, IOInterface $io, Config $config, Clock $clock, ?Deadline $deadline = null, ?bool $refusesRedirects = null)
     {
-        $this->refusesRedirects = $refusesRedirects ?? self::refusesRedirects(Composer::getVersion(), HttpDownloader::isCurlEnabled());
+        $this->refusesRedirects = $refusesRedirects ?? HttpDownloader::isCurlEnabled();
         $this->downloader = (new Loop($downloader))->getHttpDownloader();
         $this->io = $io;
         $this->config = $config;
@@ -77,10 +76,9 @@ final class ComposerHttpClient implements HttpClientInterface
     /**
      * $headers without lockrot's own credential headers (`Authorization`, `PRIVATE-TOKEN`) when
      * Composer's AuthHelper adds credentials of its own, because a request with two is refused and
-     * GitHub answers 401 "Bad credentials". The origin and credential rules copy AuthHelper of
-     * Composer 2.2 and 2.10, so the header that Composer adds is the one on the wire. The token that
-     * lockrot resolved still lifts
-     * the repository-activity cap. See docs/internals.md#which-credentials.
+     * GitHub answers 401 "Bad credentials". The origin and credential rules copy Composer's
+     * AuthHelper, so the header that Composer adds is the one on the wire. The token that lockrot
+     * resolved still lifts the repository-activity cap. See docs/internals.md#which-credentials.
      *
      * @param list<string> $headers
      *
@@ -156,7 +154,7 @@ final class ComposerHttpClient implements HttpClientInterface
         $redirects = [];
         /** @var array<string, string> $stopped the URLs whose request, redirect hop or retry the install-time budget stopped */
         $stopped = [];
-        // Composer 2.10's curl downloader asks this before each request, hop and retry starts.
+        // Composer's curl downloader asks this before each request, hop and retry starts.
         // Requests above its limit wait in a queue.
         $budgetEnded = function (string $url) use (&$stopped): bool {
             if (!$this->deadline->isPast()) {
@@ -245,8 +243,8 @@ final class ComposerHttpClient implements HttpClientInterface
     }
 
     /**
-     * A request with lockrot's credentials where the downloader cannot stop a redirect: Composer
-     * below 2.10, or no curl. RemoteFilesystem follows no hop past its `redirects` cap, so lockrot
+     * A request with lockrot's credentials where the downloader cannot stop a redirect: without
+     * curl. RemoteFilesystem follows no hop past its `redirects` cap, so lockrot
      * follows a same-origin hop with the credentials. A target on another origin goes in $redirects
      * for a request without them.
      *
@@ -317,15 +315,6 @@ final class ComposerHttpClient implements HttpClientInterface
     private static function options(int $timeout, array $headers): array
     {
         return ['http' => ['timeout' => $timeout, 'header' => $headers], 'retry-auth-failure' => false];
-    }
-
-    /**
-     * Composer 2.10 and later ask `prevent_url_access_callable` before each request of a redirect
-     * chain, and only its curl downloader takes the option: RemoteFilesystem throws on it.
-     */
-    public static function refusesRedirects(string $composerVersion, bool $curl): bool
-    {
-        return $curl && version_compare($composerVersion, '2.10.0-dev', '>=');
     }
 
     private static function origin(string $url): string

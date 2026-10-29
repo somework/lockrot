@@ -1398,7 +1398,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/consistency 1.17.05.02 \u2014 finding high, 18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-29 (9.0 years ago); last push 2021-04-28 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/consistency 1.17.05.02 \u2014 finding high, 18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-29 (9.0 years ago); last push 2021-04-28 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/consistency"
@@ -1495,7 +1495,7 @@
                     "level": "warning",
                     "rank": 25.0,
                     "message": {
-                        "text": "hoa/consistency 1.17.05.02 \u2014 finding high, 18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 old-promise: released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/consistency 1.17.05.02 \u2014 finding high, 18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 old-promise: released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a replacement (none named); it comes in through wallabag/rulerz and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/consistency"
@@ -2110,7 +2110,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "scheb/2fa-bundle v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-04-16 (4.4 years ago); 8.x released v8.6.1 (2026-07-10). Do: require scheb/2fa-bundle ^8.6 \u2014 clears left-behind; 8.x needs php ~8.4.0 || ~8.5.0; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and scheb/2fa-backup-code v5.13.2 (requires self.version (v5.13.2); itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version (v5.13.2); itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version (v5.13.2); itself left-behind) and scheb/2fa-trusted-device v5.13.2 (requires self.version (v5.13.2); itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "scheb/2fa-bundle v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-04-16 (4.4 years ago); 8.x released v8.6.1 (2026-07-10). Do: require scheb/2fa-bundle ^8.6 \u2014 clears left-behind; 8.x needs php ~8.4.0 || ~8.5.0; the target php 8.4 runs it; held by composer.json (requires ^5.13.2), scheb/2fa-backup-code v5.13.2 (requires self.version (v5.13.2); itself left-behind), scheb/2fa-email v5.13.2 (requires self.version (v5.13.2); itself left-behind), scheb/2fa-google-authenticator v5.13.2 (requires self.version (v5.13.2); itself left-behind) and scheb/2fa-trusted-device v5.13.2 (requires self.version (v5.13.2); itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "scheb/2fa-bundle"
@@ -2901,7 +2901,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/compiler 3.17.08.08 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-08 (9.1 years ago); last push 2021-04-29 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/compiler 3.17.08.08 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-08 (9.1 years ago); last push 2021-04-29 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/compiler"
@@ -2997,7 +2997,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/event 1.17.01.13 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.0 years ago); last push 2021-04-29 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/exception requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/event 1.17.01.13 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.0 years ago); last push 2021-04-29 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/exception requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/event"
@@ -3094,7 +3094,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/exception 1.17.01.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.0 years ago); last push 2021-04-29 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/consistency requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/exception 1.17.01.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.0 years ago); last push 2021-04-29 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/consistency requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/exception"
@@ -3190,7 +3190,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/file 1.17.07.11 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-07-11 (9.2 years ago); last push 2018-01-23 (8.6 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/file 1.17.07.11 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-07-11 (9.2 years ago); last push 2018-01-23 (8.6 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/file"
@@ -3286,7 +3286,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/iterator 2.17.01.10 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.7 years ago); last push 2021-04-29 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/iterator 2.17.01.10 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.7 years ago); last push 2021-04-29 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/iterator"
@@ -3383,7 +3383,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/math 1.17.05.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.3 years ago); last push 2021-04-29 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/math 1.17.05.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.3 years ago); last push 2021-04-29 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/math"
@@ -3480,7 +3480,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/protocol 1.17.01.14 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-14 (9.7 years ago); last push 2021-04-29 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/protocol 1.17.01.14 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-14 (9.7 years ago); last push 2021-04-29 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/protocol"
@@ -3576,7 +3576,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/regex 1.17.01.13 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-13 (9.7 years ago); last push 2018-07-20 (8.2 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/regex 1.17.01.13 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-13 (9.7 years ago); last push 2018-07-20 (8.2 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/regex"
@@ -3673,7 +3673,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/ruler 2.17.05.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.3 years ago); last push 2021-07-10 (5.2 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/ruler 2.17.05.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.3 years ago); last push 2021-07-10 (5.2 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/ruler"
@@ -3768,7 +3768,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/stream 1.17.02.21 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-02-21 (9.6 years ago); last push 2021-08-09 (5.1 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/file requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/stream 1.17.02.21 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-02-21 (9.6 years ago); last push 2021-08-09 (5.1 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/file requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/stream"
@@ -3865,7 +3865,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/ustring 4.17.01.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-29 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/regex requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/ustring 4.17.01.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-29 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/regex requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/ustring"
@@ -3963,7 +3963,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/visitor 2.17.01.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-28 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/visitor 2.17.01.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-28 (5.4 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/visitor"
@@ -4059,7 +4059,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/zformat 1.17.01.10 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.7 years ago); last push 2018-02-12 (8.6 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/math requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/zformat 1.17.01.10 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.7 years ago); last push 2018-02-12 (8.6 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/math requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/zformat"
@@ -5510,7 +5510,7 @@
                 {
                     "executionSuccessful": true,
                     "exitCode": 1,
-                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 38 findings fail it \u00b7 advisories not applied to 200 packages: not checked (Composer below 2.4) \u00b7 target php 8.4 (--target-php)",
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 38 findings fail it \u00b7 advisories not applied to 200 packages: not checked (no repository publishes advisories) \u00b7 target php 8.4 (--target-php)",
                     "properties": {
                         "gate": {
                             "fails": true,
@@ -5579,10 +5579,10 @@
                                 {
                                     "check": "advisories",
                                     "packages": 200,
-                                    "reason": "composer_too_old"
+                                    "reason": "no_feed"
                                 }
                             ],
-                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 38 findings fail it \u00b7 advisories not applied to 200 packages: not checked (Composer below 2.4) \u00b7 target php 8.4 (--target-php)"
+                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 38 findings fail it \u00b7 advisories not applied to 200 packages: not checked (no repository publishes advisories) \u00b7 target php 8.4 (--target-php)"
                         },
                         "fail_on": "high",
                         "fail_on_source": "option",

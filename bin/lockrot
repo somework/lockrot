@@ -3,6 +3,18 @@
 
 declare(strict_types=1);
 
+// Composer's SAPI guard of bin/composer. Box's requirement checker stops the archive first, but
+// nothing stops the source script: on a web SAPI with register_argc_argv=On, a query string sets the
+// command line.
+if (\PHP_SAPI !== 'cli' && \PHP_SAPI !== 'phpdbg') {
+    if ((bool) \ini_get('register_argc_argv')) {
+        echo 'lockrot cannot run safely on a non-CLI SAPI with register_argc_argv=On. Aborting.'.\PHP_EOL;
+        exit(1);
+    }
+
+    echo 'Warning: run lockrot with the CLI version of PHP, not the '.\PHP_SAPI.' SAPI'.\PHP_EOL;
+}
+
 // The floor of composer.json and of build/phar/composer.json: an older PHP prints one line instead
 // of a parse error, as the PHAR does.
 if (\PHP_VERSION_ID < 70400) {
@@ -26,10 +38,34 @@ if (!class_exists(\Composer\Console\Application::class)) {
     exit(2);
 }
 
+// The floor of LockrotPlugin. The source script runs on the host project's composer/composer, which
+// can be older, and then a Composer method that lockrot calls is a fatal error. A source checkout of
+// Composer reports its branch, such as `2.10-dev+source`, so only the minor counts.
+preg_match('/^\d+\.\d+/', \Composer\Composer::getVersion(), $lockrotComposerMinor);
+if (version_compare($lockrotComposerMinor[0] ?? '0', '2.10', '<')) {
+    fwrite(\STDERR, 'lockrot requires Composer 2.10 or newer, not '.\Composer\Composer::getVersion()."\n");
+    exit(1);
+}
+unset($lockrotComposerMinor);
+
+// The process setup of Composer's bin/composer, which the plugin path inherits from `composer`. The
+// restart without Xdebug follows Composer's switch: COMPOSER_ALLOW_XDEBUG=1 keeps Xdebug. Omitted:
+// the PHP check (the floor check covers it), the HHVM and iconv checks (Box's requirement checker
+// covers them in the archive), the opcache-preload hint (cosmetic), COMPOSER_BINARY (lockrot runs no scripts), and
+// error_reporting with ErrorHandler (Application::doRun() registers the handler). Without the
+// memory_limit step, the PHAR runs out of memory on a large lock at the default limit of PHP.
+setlocale(\LC_ALL, 'C');
+(new \Composer\XdebugHandler\XdebugHandler('Composer'))->check();
 putenv('COMPOSER_DISABLE_XDEBUG_WARN=1');
 
-// Raise memory_limit as Composer's own binary does. Without it the PHAR runs out of memory on a large
-// lock at the default limit of PHP, while the plugin path inherits the raised limit from `composer`.
+// Before doRun() registers its handler, and for a fatal error, PHP's CLI default writes errors to
+// stdout, where they corrupt --format=json.
+if (\PHP_SAPI === 'cli') {
+    $lockrotLogsToSapiDefault = '' === \ini_get('error_log') && (bool) \ini_get('log_errors');
+    @ini_set('display_errors', $lockrotLogsToSapiDefault ? '0' : 'stderr');
+    unset($lockrotLogsToSapiDefault);
+}
+
 $lockrotMemoryLimit = getenv('COMPOSER_MEMORY_LIMIT');
 if (\is_string($lockrotMemoryLimit) && $lockrotMemoryLimit !== '') {
     @ini_set('memory_limit', $lockrotMemoryLimit);
@@ -48,6 +84,17 @@ if (\is_string($lockrotMemoryLimit) && $lockrotMemoryLimit !== '') {
 }
 unset($lockrotMemoryLimit);
 
+// PHP mangles environment variables with Unicode characters in $_SERVER on Windows:
+// https://github.com/php/php-src/issues/7896
+if ((\PHP_VERSION_ID < 80016 || (\PHP_VERSION_ID >= 80100 && \PHP_VERSION_ID < 80103)) && \Composer\Util\Platform::isWindows()) {
+    foreach ($_SERVER as $lockrotServerVar => $lockrotServerVal) {
+        if (($lockrotServerVal = getenv($lockrotServerVar)) !== false) {
+            $_SERVER[$lockrotServerVar] = $lockrotServerVal;
+        }
+    }
+    unset($lockrotServerVar, $lockrotServerVal);
+}
+
 // The inspected project's Composer plugins are third-party code that lockrot never needs. Composer
 // reads $_SERVER['argv'] itself (Application::run() builds its own ArgvInput), so this code adds
 // --no-plugins there.
@@ -61,7 +108,6 @@ unset($lockrotArgv);
 
 // `lockrot.phar --version` prints one line about lockrot. Composer's getLongVersion() appends its
 // own release date, and its doRun() adds a PHP-version line and a "diagnose" hint after the version.
-// Both methods have no return type in the older supported Composer, so this subclass can declare one.
 $application = new class () extends \Composer\Console\Application {
     /**
      * Only primary names: aliases (`rot`, `selfupdate`) travel with their command. `list` stays: its
@@ -183,9 +229,9 @@ $application = new class () extends \Composer\Console\Application {
     }
 
     /**
-     * Composer's doRun() preamble reads the inspected project's composer.json. Composer 2.9 and later
-     * also load the project's autoloader for each `scripts` entry that looks like a class name, which
-     * runs the project's code even with `--no-plugins`. Both steps need `is_file()` on the file that
+     * Composer's doRun() preamble reads the inspected project's composer.json. It also loads the
+     * project's autoloader for each `scripts` entry that looks like a class name, which runs the
+     * project's code even with `--no-plugins`. Both steps need `is_file()` on the file that
      * COMPOSER names: the null device makes it false, while `file_exists()` stays true and keeps the
      * "no composer.json" walk-up quiet. doRunCommand() restores COMPOSER, so the command reads the
      * project and its repositories. The finally restores it where no command runs.

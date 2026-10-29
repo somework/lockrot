@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Composer\Repository\AdvisoryProviderInterface;
 use Lockrot\Analyzer\MoveCheckRun;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\UpdateNow;
@@ -51,9 +50,6 @@ final class MoveCheckWallabagTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer 2.2 has no AdvisoryProviderInterface: no move reaches a vulnerable package');
-        }
         self::$report = WallabagSite::analyze('7.4');
     }
 
@@ -97,7 +93,7 @@ final class MoveCheckWallabagTest extends TestCase
         self::assertNotContains('symfony/monolog-bridge', $members);
         self::assertNotContains('symfony/yaml', $members);
         self::assertContains('phpseclib/phpseclib:^3.0.57', JsonPath::arrayAt($security, ['update_now_command']));
-        self::assertSame(['resolves', true], [JsonPath::stringAt($report, ['run', 'move_check', 'baseline']), JsonPath::arrayAt($report, ['run', 'move_check'])['ignores_extensions']]);
+        self::assertSame(['resolves', ['ext-*', 'lib-*', 'php-debug', 'php-ipv6', 'php-zts']], [JsonPath::stringAt($report, ['run', 'move_check', 'baseline']), JsonPath::arrayAt($report, ['run', 'move_check'])['ignored_platform']]);
     }
 
     /** The relations of the move check hold on every move of the lock. */

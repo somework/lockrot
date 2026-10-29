@@ -314,7 +314,7 @@ final class MoveTest extends TestCase
         self::assertStringStartsWith('move symfony/routing to ^5.4.53 through mautic/core-lib', JsonPath::stringAt($move, ['text']));
     }
 
-    /** Case `E` with a solve above the newest v5.4.53, as the plain form gives under Composer 2.2 or 2.3: the move and `security.gets` name the release that Composer installs. */
+    /** Case `E` with a solve above the newest v5.4.53: the move and `security.gets` name the release that Composer installs. */
     public function testAnUpdateThatInstallsAboveTheNewestReleaseNamesTheReleaseItGets(): void
     {
         $case = CaseHydrator::case('E');
@@ -455,7 +455,7 @@ final class MoveTest extends TestCase
         self::assertSame([['composer', 'update', 'a/b'], ['composer', 'why-not', 'a/b', '1.9.0', '--locked']], $move['commands']);
         self::assertSame(['raise-php'], array_column(JsonPath::arrayAt($move, ['also']), 'kind'));
         self::assertArrayNotHasKey('through', JsonPath::arrayAt($move, ['also', 0]));
-        self::assertSame('composer update a/b (gets 1.9.0) — clears the advisory; left-behind, old-promise stay', $move['text']);
+        self::assertSame('composer update a/b (gets 1.9.0) — clears the advisory; left-behind and old-promise stay', $move['text']);
         self::assertSame(['next_step', 'update', null], [JsonPath::stringAt($finding, ['security', 'move_in']), JsonPath::stringAt($finding, ['security', 'fix_kind']), JsonPath::arrayAt($finding, ['security'])['partial']]);
     }
 

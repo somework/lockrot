@@ -44,9 +44,8 @@ final class FormatContext
         $this->lockName = self::DEFAULT_LOCK_NAME;
         $this->lockDirectory = null;
         if ($lockPath !== null) {
-            $relative = $projectDirectory === null ? null : Path::relativeTo($lockPath, $projectDirectory);
-            $this->lockName = $relative ?? basename($lockPath);
-            $this->lockDirectory = $relative === null ? \dirname($lockPath) : $projectDirectory;
+            $this->lockName = self::lockNameOf($lockPath, $projectDirectory);
+            $this->lockDirectory = $projectDirectory === null || Path::relativeTo($lockPath, $projectDirectory) === null ? \dirname($lockPath) : $projectDirectory;
         }
         $this->failOn = $failOn;
         $this->toolVersion = $toolVersion;
@@ -71,6 +70,12 @@ final class FormatContext
     public static function forFailOn(?string $lockPath, FailOn $failOn, string $toolVersion = Version::STRING, int $terminalWidth = self::DEFAULT_WIDTH, ?string $projectDirectory = null): self
     {
         return new self($lockPath, $failOn, $toolVersion, $terminalWidth, $projectDirectory);
+    }
+
+    /** {@see lockName()} of a lock: relative to $projectDirectory when the lock is inside it, else its file name. */
+    public static function lockNameOf(string $lockPath, ?string $projectDirectory): string
+    {
+        return ($projectDirectory === null ? null : Path::relativeTo($lockPath, $projectDirectory)) ?? basename($lockPath);
     }
 
     public static function unknown(): self

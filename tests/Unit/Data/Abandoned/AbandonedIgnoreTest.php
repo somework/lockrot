@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Data\Abandoned;
 
 use Composer\Config;
-use Composer\Policy\AbandonedPolicyConfig;
 use Composer\Util\Platform;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
-use Lockrot\Data\Abandoned\AbandonedPolicyReader;
 use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -27,13 +25,6 @@ final class AbandonedIgnoreTest extends TestCase
     protected function tearDown(): void
     {
         putenv($this->composerPolicy === false ? 'COMPOSER_POLICY' : 'COMPOSER_POLICY='.$this->composerPolicy);
-    }
-
-    private static function needsPolicyApi(): void
-    {
-        if (!class_exists(AbandonedPolicyConfig::class)) {
-            self::markTestSkipped('Composer without the policy API (2.10 and later)');
-        }
     }
 
     /** @param array<string, mixed> $config the `config` section of composer.json */
@@ -89,7 +80,6 @@ final class AbandonedIgnoreTest extends TestCase
     #[DataProvider('policyShapes')]
     public function testEveryPolicyShapeGivesItsPatternReasonAndConstraints(array $ignore, string $name, array $expected): void
     {
-        self::needsPolicyApi();
 
         $ignoreList = self::read(['policy' => ['abandoned' => ['ignore' => $ignore]]]);
 
@@ -127,7 +117,6 @@ final class AbandonedIgnoreTest extends TestCase
 
     public function testComposerPolicyZeroNamesTheVariable(): void
     {
-        self::needsPolicyApi();
         Platform::putEnv('COMPOSER_POLICY', '0');
         try {
             $off = self::read([])->notAuditedBy();
@@ -165,14 +154,12 @@ final class AbandonedIgnoreTest extends TestCase
 
     public function testARuleOnlyForBlockingIsNotApplied(): void
     {
-        self::needsPolicyApi();
 
         self::assertNull(self::read(['policy' => ['abandoned' => ['ignore' => ['a/pkg' => ['on-audit' => false]]]]])->match('a/pkg'));
     }
 
     public function testANameOutsideEveryPatternHasNoMatch(): void
     {
-        self::needsPolicyApi();
         $ignore = self::read(['policy' => ['abandoned' => ['ignore' => ['a/*' => null, 'b/pkg' => null]]]]);
 
         self::assertNull($ignore->match('b/other'));
@@ -182,7 +169,6 @@ final class AbandonedIgnoreTest extends TestCase
 
     public function testTheLegacyListIsReadUnder210WithItsOwnSetting(): void
     {
-        self::needsPolicyApi();
         $ignore = self::read(['audit' => ['ignore-abandoned' => [
             'a/plain' => 'legacy reason',
             'a/block' => ['apply' => 'block', 'reason' => 'blocking only'],
@@ -199,7 +185,6 @@ final class AbandonedIgnoreTest extends TestCase
 
     public function testThePolicyListWinsOverTheLegacyOne(): void
     {
-        self::needsPolicyApi();
         $ignore = self::read([
             'policy' => ['abandoned' => ['ignore' => ['a/policy' => 'policy']]],
             'audit' => ['ignore-abandoned' => ['a/legacy' => 'legacy']],
@@ -211,7 +196,6 @@ final class AbandonedIgnoreTest extends TestCase
 
     public function testADisabledPolicyGivesNoList(): void
     {
-        self::needsPolicyApi();
         $legacy = ['audit' => ['ignore-abandoned' => ['a/pkg' => null]]];
 
         self::assertNull(self::read(['policy' => ['abandoned' => false]] + $legacy)->match('a/pkg'), 'policy.abandoned: false');
@@ -222,7 +206,6 @@ final class AbandonedIgnoreTest extends TestCase
     /** The list is read on its own, so another section Composer rejects cannot empty it. */
     public function testABrokenMalwareSectionOrAReservedListNameDoesNotEmptyTheList(): void
     {
-        self::needsPolicyApi();
         foreach ([
             'a broken malware section' => ['malware' => ['ignore' => ['vendor/x' => 42]]],
             'a reserved custom list name' => ['licenses' => ['allow' => ['MIT']]],
@@ -236,7 +219,6 @@ final class AbandonedIgnoreTest extends TestCase
 
     public function testAListComposerRejectsGivesNoListAndTheFirstLineOfWhy(): void
     {
-        self::needsPolicyApi();
 
         $ignore = self::read(['policy' => ['abandoned' => ['ignore' => ['a/pkg' => 42]]]]);
 
@@ -249,7 +231,6 @@ final class AbandonedIgnoreTest extends TestCase
 
     public function testABadConstraintMakesTheListUnreadable(): void
     {
-        self::needsPolicyApi();
 
         $ignore = self::read(['policy' => ['abandoned' => ['ignore' => ['a/pkg' => ['constraint' => 'not a constraint']]]]]);
 
@@ -263,7 +244,6 @@ final class AbandonedIgnoreTest extends TestCase
      */
     public function testARealComposerConfigWithoutAPolicyKeyReadsTheLegacyList(): void
     {
-        self::needsPolicyApi();
 
         $none = AbandonedIgnore::fromConfig(new Config(false));
         self::assertNull($none->whyUnreadable(), 'no policy key');
@@ -280,7 +260,6 @@ final class AbandonedIgnoreTest extends TestCase
 
     public function testComposerPolicyZeroInTheEnvironmentGivesNoList(): void
     {
-        self::needsPolicyApi();
         putenv('COMPOSER_POLICY=0');
 
         $ignore = self::read(['policy' => ['abandoned' => ['ignore' => ['a/pkg' => null]]]]);
@@ -291,99 +270,12 @@ final class AbandonedIgnoreTest extends TestCase
 
     public function testAnUnreadableEnvironmentMakesTheListUnreadable(): void
     {
-        self::needsPolicyApi();
         putenv('COMPOSER_POLICY=maybe');
 
         $ignore = self::read(['policy' => ['abandoned' => ['ignore' => ['a/pkg' => null]]]]);
 
         self::assertNull($ignore->match('a/pkg'));
         self::assertNotNull($ignore->whyUnreadable());
-    }
-
-    /**
-     * @param AbandonedPolicyReader::POLICY|AbandonedPolicyReader::AUDIT_CONFIG|AbandonedPolicyReader::NONE $api
-     * @param array<mixed>|\Throwable                                                                     $list what Composer 2.9's AuditConfig holds
-     */
-    private static function reader(string $api, $list = []): AbandonedPolicyReader
-    {
-        return new class ($api, $list) implements AbandonedPolicyReader {
-            /** @var AbandonedPolicyReader::POLICY|AbandonedPolicyReader::AUDIT_CONFIG|AbandonedPolicyReader::NONE */
-            private string $api;
-            /** @var array<mixed>|\Throwable */
-            private $list;
-
-            /**
-             * @param AbandonedPolicyReader::POLICY|AbandonedPolicyReader::AUDIT_CONFIG|AbandonedPolicyReader::NONE $api
-             * @param array<mixed>|\Throwable $list
-             */
-            public function __construct(string $api, $list)
-            {
-                $this->api = $api;
-                $this->list = $list;
-            }
-
-            public function api(): string
-            {
-                return $this->api;
-            }
-
-            public function policyRules(array $policy, array $audit): array
-            {
-                throw new \LogicException('not the policy API');
-            }
-
-            public function auditConfigList(Config $config): array
-            {
-                if ($this->list instanceof \Throwable) {
-                    throw $this->list;
-                }
-
-                return $this->list;
-            }
-        };
-    }
-
-    public function testComposer29ReadsAListsValues(): void
-    {
-        $ignore = AbandonedIgnore::fromConfig(new Config(false), self::reader(AbandonedPolicyReader::AUDIT_CONFIG, ['a/pkg', 'b/*']));
-
-        $match = $ignore->match('b/other');
-        self::assertNotNull($match);
-        self::assertSame(AbandonedIgnoreMatch::BY_AUDIT, $match->by());
-        self::assertSame([['pattern' => 'b/*', 'reason' => null, 'constraints' => []]], JsonPath::decoded($match->rules()));
-        self::assertSame([['pattern' => 'a/pkg', 'reason' => null, 'constraints' => []]], self::rules($ignore, 'a/pkg'));
-        self::assertNull($ignore->match('c/pkg'));
-    }
-
-    public function testComposer29ReadsAMapsKeysWithTheirReasons(): void
-    {
-        $ignore = AbandonedIgnore::fromConfig(new Config(false), self::reader(AbandonedPolicyReader::AUDIT_CONFIG, ['a/pkg' => 'why', 'b/pkg' => null]));
-
-        self::assertSame([['pattern' => 'a/pkg', 'reason' => 'why', 'constraints' => []]], self::rules($ignore, 'a/pkg'));
-        self::assertSame([['pattern' => 'b/pkg', 'reason' => null, 'constraints' => []]], self::rules($ignore, 'b/pkg'));
-        self::assertNull($ignore->match('why'), 'a reason is not a pattern');
-
-        $numeric = AbandonedIgnore::fromConfig(new Config(false), self::reader(AbandonedPolicyReader::AUDIT_CONFIG, ['123' => null]));
-        self::assertSame([['pattern' => '123', 'reason' => null, 'constraints' => []]], self::rules($numeric, '123'), 'PHP turns the key into an integer: the pattern stays a string');
-    }
-
-    public function testComposer29RejectingTheListGivesNoListAndWhy(): void
-    {
-        $ignore = AbandonedIgnore::fromConfig(new Config(false), self::reader(AbandonedPolicyReader::AUDIT_CONFIG, new \InvalidArgumentException("Invalid 'apply' value\nmore")));
-
-        self::assertNull($ignore->match('a/pkg'));
-        self::assertSame("Invalid 'apply' value", $ignore->whyUnreadable());
-    }
-
-    public function testComposerBelow29HasNoList(): void
-    {
-        $config = new Config(false);
-        $config->merge(['config' => ['audit' => ['ignore-abandoned' => ['a/pkg']]]]);
-
-        $ignore = AbandonedIgnore::fromConfig($config, self::reader(AbandonedPolicyReader::NONE, ['a/pkg']));
-
-        self::assertNull($ignore->match('a/pkg'));
-        self::assertNull($ignore->whyUnreadable());
     }
 
     public function testNoneMatchesNothing(): void

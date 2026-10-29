@@ -150,6 +150,17 @@ final class HtmlFormatterTest extends TestCase
         self::assertSame($command, J::stringAt(self::payloadOf($page), ['report', 'findings', 0, 'package']));
     }
 
+    /** R6-13: the page can go to stdout, so a C1 control or a bidi control from the lock is escaped in the payload. */
+    public function testThePayloadIsAsciiAndReadsBackTheLockText(): void
+    {
+        $package = "evil/a\u{9B}31mb\u{202E}c";
+        $page = $this->page($this->report([$this->finding($package)]));
+        preg_match('{<script id="lockrot-data" type="application/json">(.*?)</script>}s', $page, $m);
+
+        self::assertDoesNotMatchRegularExpression('/[\x80-\xFF]/', $m[1] ?? '', 'no byte at or above 0x80');
+        self::assertSame($package, J::stringAt(self::payloadOf($page), ['report', 'findings', 0, 'package']));
+    }
+
     /**
      * @return iterable<string, array{list<array{string, string}>, int, string, string}>
      */

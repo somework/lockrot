@@ -17,7 +17,7 @@ final class CommandArgument
     /** The Composer options that lockrot writes, by subcommand, after every package argument: anywhere else, a leading `-` came from data. */
     private const OPTIONS = [
         'update' => ['--with-dependencies' => true, '--with-all-dependencies' => true],
-        'require' => ['--dev' => true, '--no-update' => true, '--with-dependencies' => true, '--with-all-dependencies' => true],
+        'require' => ['--dev' => true, '--no-interaction' => true, '--no-update' => true, '--with-dependencies' => true, '--with-all-dependencies' => true],
         'why-not' => ['--locked' => true],
     ];
     private const SUBCOMMANDS = ['update' => true, 'require' => true, 'why-not' => true];

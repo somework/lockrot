@@ -41,11 +41,20 @@ final class LinkIndexTest extends TestCase
         self::assertSame([[Holder::REQUIRE_DEV, '^1.0']], array_map(static fn (Holder $holder): array => [$holder->link(), $holder->constraint()], $index->excluding('c/d', '2.0.0.0')));
     }
 
-    public function testANameInBothRootSectionsWithTwoConstraintsKeepsEachSection(): void
+    public function testANameInBothRootSectionsWithTwoConstraintsLeavesTheOtherRequireNamesTheirHolds(): void
     {
-        $index = LinkIndex::of(LockFile::fromArray(['packages' => []]), ProjectConfig::fromArray(['require' => ['a/b' => '^1.0'], 'require-dev' => ['a/b' => '^1.5']]));
+        $index = LinkIndex::of(LockFile::fromArray(['packages' => []]), ProjectConfig::fromArray(['require' => ['a/b' => '^1.0', 'c/d' => '^1.0'], 'require-dev' => ['a/b' => '^2.0']]));
 
-        self::assertSame([[Holder::REQUIRE, '^1.0'], [Holder::REQUIRE_DEV, '^1.5']], array_map(static fn (Holder $holder): array => [$holder->link(), $holder->constraint()], $index->excluding('a/b', '2.0.0.0')));
+        self::assertSame([[Holder::REQUIRE, '^1.0']], array_map(static fn (Holder $holder): array => [$holder->link(), $holder->constraint()], $index->excluding('c/d', '2.0.0.0')));
+    }
+
+    /** Composer solves the root with the require-dev constraint of a name that both sections list (W4). */
+    public function testANameInBothRootSectionsWithTwoConstraintsIsHeldByItsRequireDevConstraint(): void
+    {
+        $index = LinkIndex::of(LockFile::fromArray(['packages' => []]), ProjectConfig::fromArray(['require' => ['a/b' => '^1.0'], 'require-dev' => ['a/b' => '^2.0']]));
+
+        self::assertSame([], $index->excluding('a/b', '2.1.0.0'), 'the require constraint holds nothing');
+        self::assertSame([[Holder::REQUIRE_DEV, '^2.0']], array_map(static fn (Holder $holder): array => [$holder->link(), $holder->constraint()], $index->excluding('a/b', '1.5.0.0')));
     }
 
     /** Composer reads `self.version` as the holding package's own version. */

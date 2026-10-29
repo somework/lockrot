@@ -37,7 +37,6 @@ use Lockrot\Json\JsonReader;
 use Lockrot\Lock\LockFile;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\SignalSet;
-use Lockrot\Solver\ComposerFeatures;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FixedAdvisories;
@@ -990,9 +989,6 @@ final class LockrotCommandTest extends TestCase
     /** Composer 2.10 refuses `yes` for a blocking variable, so the command that lockrot prints would fail. */
     public function testABlockingVariableThatComposerRefusesIsExit2AndNamesTheVariable(): void
     {
-        if (version_compare(ComposerFeatures::version(), '2.10.0-dev', '<')) {
-            self::markTestSkipped('Composer 2.10 and later read COMPOSER_NO_BLOCKING with Platform::getBoolEnv()');
-        }
         $project = $this->tempDir('lockrot-blocking-variable-');
         file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/blocking-variable-test', 'require' => ['acme/kept' => '^1.0']]));
         file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));
@@ -1343,10 +1339,6 @@ final class LockrotCommandTest extends TestCase
      */
     public function testAComposerJsonThatComposerCannotLoadLeavesEveryMoveUncheckedForThatReason(): void
     {
-        // @phpstan-ignore function.alreadyNarrowedType (the guard is for Composer 2.2 LTS)
-        if (!method_exists(BaseCommand::class, 'tryComposer')) {
-            self::markTestSkipped('Composer 2.2 has no BaseCommand::tryComposer(): it stops the run on such a composer.json');
-        }
         $project = $this->tempDir('lockrot-invalid-manifest-');
         file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/invalid-manifest-test', 'require' => ['acme/<<fg=red>>' => '1.0.0']]));
         file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));
@@ -2184,7 +2176,7 @@ final class LockrotCommandTest extends TestCase
         [, , $verbose] = $this->runCommandWithSplitStreams($command, ['--target-php' => '8.4']);
 
         self::assertSame(2, $code);
-        self::assertStringContainsString('findings.acme/empty: What the baseline knows about one package', $plain);
+        self::assertStringContainsString('findings.acme/empty: An entry needs `flags`, `advisories` or both.', $plain);
         self::assertStringNotContainsString('required', $plain);
         self::assertStringContainsString('required', $verbose);
     }
@@ -2747,6 +2739,24 @@ final class LockrotCommandTest extends TestCase
         self::assertStringStartsWith('lockrot: composer.lock not found in ', $stderr);
     }
 
+    /** The generate path takes its exit code from the same gate: only a strict network failure is exit 1. */
+    public function testAGenerateRunWithAStrictNetworkFailureExitsOne(): void
+    {
+        $this->fixtureCopy(self::WALLABAG_LOCK);
+        $failing = new class () implements MetadataLoaderInterface {
+            public function load(array $installedByName): MetadataBatch
+            {
+                return new MetadataBatch([], [], array_fill_keys(array_keys($installedByName), 'connection refused'));
+            }
+        };
+
+        [$strict, , $stderr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--strict-network' => true, '--fail-on' => 'none', '--target-php' => '8.4'], $failing);
+        [$lenient] = $this->runWithSplitStreams(['--generate-baseline' => true, '--fail-on' => 'abandoned', '--target-php' => '8.4'], $failing);
+
+        self::assertSame(1, $strict, $stderr);
+        self::assertSame(0, $lenient);
+    }
+
     public function testExplainWithOutputIsExit2AndWritesNothing(): void
     {
         $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
@@ -2756,7 +2766,7 @@ final class LockrotCommandTest extends TestCase
 
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
-        self::assertSame(LockrotCommand::UPGRADE_NOTICE."\n"."lockrot: --explain prints one package on stdout and --output writes whole-run reports; run them separately\n", $stderr);
+        self::assertSame("lockrot: --explain prints one package on stdout and --output writes whole-run reports; run them separately\n", $stderr);
         self::assertFalse($called);
         self::assertFileDoesNotExist($dir.'/r.json');
     }
@@ -2989,6 +2999,83 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString($reason, $errors[0]);
     }
 
+    /** @return iterable<string, array{0: string, 1: string}> */
+    public static function refusedCommandLines(): iterable
+    {
+        yield 'two --fail-on values' => ['lockrot --fail-on=high --fail-on=none', 'lockrot: --fail-on is given twice'];
+        yield 'one --fail-on value twice' => ['lockrot --fail-on=high --fail-on high', 'lockrot: --fail-on is given twice'];
+        yield 'two --baseline values' => ['lockrot --baseline=a.json --baseline=b.json', 'lockrot: --baseline is given twice'];
+        yield 'two --target-php values' => ['lockrot --target-php=8.1 --target-php=8.4', 'lockrot: --target-php is given twice'];
+        yield '--explain with --output' => ['lockrot --explain=a/b --output=json:r.json', 'lockrot: --explain prints one package on stdout and --output writes whole-run reports; run them separately'];
+        yield '--explain with --generate-baseline' => ['lockrot --explain=a/b --generate-baseline', 'lockrot: --explain prints one package and --generate-baseline writes the whole run\'s baseline; run them separately'];
+    }
+
+    /**
+     * lockrot checks each rule of the command line before it reads composer.json. The refusal is
+     * the only error, though the manifest is broken, and lockrot writes no baseline.
+     *
+     * @dataProvider refusedCommandLines
+     */
+    #[DataProvider('refusedCommandLines')]
+    public function testACommandLineThatBreaksAnOptionRuleIsExitTwoBeforeTheManifestIsRead(string $commandLine, string $line): void
+    {
+        $dir = $this->tempDir('lockrot-refused-line-');
+        file_put_contents($dir.'/composer.json', '{broken');
+        chdir($dir);
+
+        [$code, $stdout, $errors] = $this->runCommandLine($commandLine);
+
+        self::assertSame(2, $code);
+        self::assertSame('', $stdout);
+        self::assertSame([$line], $errors);
+        self::assertSame(['composer.json'], array_values(array_diff(scandir($dir) ?: [], ['.', '..'])));
+    }
+
+    public function testLockrotDisableSkipsAnOptionRuleToo(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        putenv('LOCKROT_DISABLE=1');
+        try {
+            [$code, , $errors] = $this->runCommandLine('lockrot --fail-on=high --fail-on=none --explain=a/b --generate-baseline');
+        } finally {
+            putenv('LOCKROT_DISABLE');
+        }
+
+        self::assertSame(0, $code);
+        self::assertSame(['lockrot disabled via LOCKROT_DISABLE'], $errors);
+    }
+
+    /** An option outside the once-only set keeps the console's rule: the last value wins, and `--output` is a list. */
+    public function testARepeatedOptionOutsideTheOnceOnlySetStillRuns(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        $dir = $this->tempDir('lockrot-twice-');
+        $command = $this->command($this->loader());
+        $output = new SplitStreamOutput();
+
+        $code = $command->run(new StringInput('lockrot --target-php=8.4 --format=table --format=json --dev --dev --output=json:'.$dir.'/a.json --output=json:'.$dir.'/b.json'), $output);
+
+        self::assertSame(0, $code, $output->fetchErrors());
+        self::assertIsArray(json_decode($output->fetch(), true));
+        self::assertFileExists($dir.'/a.json');
+        self::assertFileExists($dir.'/b.json');
+    }
+
+    /**
+     * The repeat check reads each once-only option as a list of values. That reading equals the
+     * console's own only for an option that requires a value.
+     */
+    public function testEachOnceOnlyOptionRequiresAValue(): void
+    {
+        $definition = $this->buildDefaultCommand()->getDefinition();
+
+        self::assertSame(['fail-on', 'baseline', 'target-php'], LockrotCommand::ONCE_ONLY_OPTIONS);
+        foreach (LockrotCommand::ONCE_ONLY_OPTIONS as $name) {
+            self::assertTrue($definition->getOption($name)->isValueRequired(), $name);
+            self::assertFalse($definition->getOption($name)->isArray(), $name);
+        }
+    }
+
     /** The options Composer's own application adds to every command are part of what the command reads. */
     public function testTheApplicationsOwnOptionsAreNotUsageErrors(): void
     {
@@ -3194,6 +3281,31 @@ final class LockrotCommandTest extends TestCase
             $explained = json_decode($stdout, true);
             self::assertIsArray($explained);
             self::assertSame('>=8.2', JsonPath::stringAt($explained, ['run', 'project_php']), 'the report and --explain name the same floor');
+        });
+    }
+
+    /** A refusal names the lock that Composer reads, as the annotations name it. */
+    public function testALockRefusalNamesTheLockThatComposerNames(): void
+    {
+        $dir = $this->tempDir('lockrot-composer-env-refusal-');
+        mkdir($dir.'/app');
+        file_put_contents($dir.'/app/alt.json', '{}');
+        file_put_contents($dir.'/app/alt.lock', '{"packages-dev": []}');
+        copy(\dirname(self::WALLABAG_LOCK).'/composer.lock', $dir.'/app/other.lock');
+        file_put_contents($dir.'/app/other.json', '{}');
+        chdir($dir);
+
+        $this->withComposerFile('app/alt.json', function (): void {
+            [$code, , $stderr] = $this->runWithSplitStreams(['--target-php' => '8.4']);
+
+            self::assertSame(2, $code);
+            self::assertSame("lockrot: app/alt.lock: packages must be a list of package entries\n", $stderr);
+        });
+        $this->withComposerFile('app/other.json', function (): void {
+            [$code, , $stderr] = $this->runWithSplitStreams(['--explain' => 'nobody/nothing', '--target-php' => '8.4']);
+
+            self::assertSame(2, $code);
+            self::assertSame("lockrot: nobody/nothing is not in app/other.lock\n", $stderr);
         });
     }
 

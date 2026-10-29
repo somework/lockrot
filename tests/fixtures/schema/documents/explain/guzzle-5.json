@@ -387,7 +387,7 @@
    ],
    "through": [],
    "also": [],
-   "text": "require guzzlehttp/guzzle ^8.2 — clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+   "text": "require guzzlehttp/guzzle ^8.2 — clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4), php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
   },
   "security": {
    "status": "vulnerable",

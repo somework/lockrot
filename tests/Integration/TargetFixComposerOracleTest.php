@@ -7,7 +7,6 @@ namespace Lockrot\Tests\Integration;
 use Composer\Factory;
 use Composer\IO\NullIO;
 use Composer\Package\Loader\RootPackageLoader;
-use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\RepositoryFactory;
 use Lockrot\Analyzer\PhpWindow;
 use Lockrot\Analyzer\TargetFix;
@@ -93,9 +92,6 @@ final class TargetFixComposerOracleTest extends TestCase
     #[DataProvider('answers')]
     public function testTheFixListsThePackagesThatComposerUpdatesAndFollowsItsAnswer(string $lock, string $target, array $asked, array $composer): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer 2.2 has no AdvisoryProviderInterface: no solve blocks a vulnerable release, and the drupal-site refusal comes from advisory blocking');
-        }
         $dir = self::FIXTURES.$lock;
         $server = FixtureRepositoryServer::fromLockFiles([$dir.'/composer.lock'], self::P2, array_values(array_filter(JsonPath::decodeFile(self::P2.'/names.json'), 'is_string')));
         if (isset(self::ADVISORIES[$lock])) {

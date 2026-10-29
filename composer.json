@@ -35,14 +35,14 @@
     },
     "require": {
         "php": "^7.4 || ^8.0",
-        "composer-plugin-api": "^2.2"
+        "composer-plugin-api": "^2.9"
     },
     "suggest": {
         "ext-openssl": "Lets lockrot.phar self-update verify release signatures; checked at runtime, the plugin itself never needs it"
     },
     "require-dev": {
         "ext-zlib": "*",
-        "composer/composer": "^2.2",
+        "composer/composer": "^2.10",
         "friendsofphp/php-cs-fixer": "^3.70",
         "nikic/php-parser": "^5.1",
         "phpstan/phpstan": "^2.1",

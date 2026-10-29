@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Composer\Advisory\AuditConfig;
 use Composer\Advisory\Auditor;
-use Composer\Composer;
 use Composer\Config;
 use Composer\IO\BufferIO;
 use Composer\Package\AliasPackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\PackageInterface;
 use Composer\Policy\PolicyConfig;
-use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\RepositorySet;
 use Lockrot\Data\Advisory\AdvisoryIgnore;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
@@ -23,9 +20,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The installed-version result of lockrot's one lookup equals what Composer's own `Auditor`
- * reports, counted and ignored, for each lock and config of the table. Keyed by capability:
- * Composer 2.2 has no advisory API, 2.4 and 2.5 no ignore list, 2.6 to 2.9 read `config.audit`, 2.10
- * and later the policy API.
+ * reports, counted and ignored, for each lock and config of the table.
  */
 final class AuditParityTest extends TestCase
 {
@@ -44,9 +39,6 @@ final class AuditParityTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            return;
-        }
         self::$server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         self::$server->withAdvisoryApi([
             'acme/stable' => [
@@ -125,12 +117,6 @@ final class AuditParityTest extends TestCase
 
     public function testThePolicyApiLegMatchesComposersAuditor(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer 2.2 has no advisory API: there is no lookup to compare');
-        }
-        if (!class_exists(PolicyConfig::class)) {
-            self::markTestSkipped('Composer below 2.10 has no policy API: the config.audit leg covers it');
-        }
         $compared = 0;
         foreach (self::policyConfigs() as $label => $section) {
             $config = self::config($section);
@@ -146,9 +132,6 @@ final class AuditParityTest extends TestCase
     /** Composer's policy switches stop install-time blocking, never `composer audit`: every advisory still counts. */
     public function testThePolicyOffSettingsStillCountAsComposersAuditorCounts(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class) || !class_exists(PolicyConfig::class)) {
-            self::markTestSkipped('Composer below 2.10 has no policy switch');
-        }
         $before = getenv('COMPOSER_POLICY');
         $cases = [
             'policy: false' => [['policy' => false], null, true],
@@ -172,58 +155,6 @@ final class AuditParityTest extends TestCase
         } finally {
             putenv($before === false ? 'COMPOSER_POLICY' : 'COMPOSER_POLICY='.$before);
         }
-    }
-
-    public function testTheAuditConfigLegMatchesComposersAuditor(): void
-    {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer 2.2 has no advisory API: there is no lookup to compare');
-        }
-        if (class_exists(PolicyConfig::class)) {
-            self::markTestSkipped('Composer 2.10 or later: this leg runs only on Composer 2.4 to 2.9');
-        }
-        foreach (self::auditConfigs() as $label => $section) {
-            $config = self::config($section);
-            [$ignoreList, $ignoreSeverity] = self::legacyLists($config);
-            $auditor = new Auditor();
-            $audit = new \ReflectionMethod(Auditor::class, 'audit');
-            $composer = self::composerResult(static function (BufferIO $io, RepositorySet $set, array $packages) use ($auditor, $audit, $ignoreList, $ignoreSeverity): int {
-                $status = $audit->invokeArgs($auditor, [$io, $set, $packages, Auditor::FORMAT_JSON, true, $ignoreList, 'report', $ignoreSeverity]);
-
-                return \is_int($status) ? $status : -1;
-            });
-            $lockrot = self::lockrotResult($config);
-            if (version_compare(Composer::getVersion(), '2.7.0', '<')) {
-                // Composer before 2.7 audits one version per name and misses the branch alias version.
-                // lockrot audits both, as Composer 2.7 does: https://github.com/composer/composer/commit/0c99bfc8fd
-                self::assertSame(['PKSA-b1'], $lockrot['counted']['acme/branch'] ?? null, $label);
-                unset($lockrot['counted']['acme/branch']);
-            }
-
-            self::assertSame($composer, $lockrot, $label);
-        }
-    }
-
-    /**
-     * What Composer 2.6 to 2.9's AuditCommand passes the Auditor: the lists AuditConfig keeps for
-     * audit on 2.9.2 and later, else the raw `config.audit` lists.
-     *
-     * @return array{array<mixed>, array<mixed>}
-     */
-    private static function legacyLists(Config $config): array
-    {
-        if (class_exists(AuditConfig::class) && property_exists(AuditConfig::class, 'ignoreListForAudit')) {
-            $auditConfig = (new \ReflectionMethod(AuditConfig::class, 'fromConfig'))->invoke(null, $config);
-            $properties = \is_object($auditConfig) ? get_object_vars($auditConfig) : [];
-
-            return [(array) ($properties['ignoreListForAudit'] ?? []), (array) ($properties['ignoreSeverityForAudit'] ?? [])];
-        }
-        $audit = $config->get('audit');
-        $audit = \is_array($audit) ? $audit : [];
-        // Composer 2.6 to 2.8 read no `audit.ignore-severity`.
-        $severities = class_exists(AuditConfig::class) && \is_array($audit['ignore-severity'] ?? null) ? $audit['ignore-severity'] : [];
-
-        return [\is_array($audit['ignore'] ?? null) ? $audit['ignore'] : [], $severities];
     }
 
     /** @param array<string, mixed> $section */

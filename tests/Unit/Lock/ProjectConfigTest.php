@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Lock;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Lock\OriginFacts;
 use Lockrot\Lock\ProjectConfig;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class ProjectConfigTest extends TestCase
@@ -42,6 +43,65 @@ final class ProjectConfigTest extends TestCase
         self::assertNull(ProjectConfig::empty()->requirePhp());
     }
 
+    /** @return iterable<string, array{0: array<string, mixed>}> */
+    public static function phpRequirements(): iterable
+    {
+        yield 'lower case' => [['php' => '>=8.1 <8.3']];
+        yield 'upper case' => [['PHP' => '>=8.1 <8.3']];
+        yield 'both spellings, the later wins' => [['php' => '^7.4', 'PHP' => '^8.2']];
+        yield 'a later value that is no string' => [['php' => '^7.4', 'PHP' => 8]];
+        yield 'empty' => [['PHP' => '']];
+    }
+
+    /**
+     * `require.php` is the php link that Composer reads: the key in any case, the later of two
+     * spellings, a string value only.
+     *
+     * @dataProvider phpRequirements
+     *
+     * @param array<string, mixed> $require
+     */
+    #[DataProvider('phpRequirements')]
+    public function testThePhpRequirementIsThePhpLinkThatComposerReads(array $require): void
+    {
+        $config = ProjectConfig::fromArray(['require' => $require]);
+        $link = $config->platformConstraints(ProjectConfig::REQUIRE)['php'] ?? '';
+
+        self::assertSame($link === '' ? null : $link, $config->requirePhp());
+    }
+
+    public function testAnUpperCasePhpKeyIsTheProjectsPhp(): void
+    {
+        self::assertSame('>=8.1 <8.3', ProjectConfig::fromArray(['require' => ['PHP' => '>=8.1 <8.3']])->requirePhp());
+        self::assertSame('8.1.5', ProjectConfig::fromArray(['config' => ['platform' => ['PHP' => '8.1.5']]])->platformPhp());
+        self::assertSame('8.2.0', ProjectConfig::fromArray(['config' => ['platform' => ['php' => '8.1.5', 'PHP' => '8.2.0']]])->platformPhp());
+        self::assertNull(ProjectConfig::fromArray(['config' => ['platform' => ['php' => '8.1.5', 'PHP' => false]]])->platformPhp(), 'a later false wins');
+    }
+
+    /** A direct requirement is a link that Composer reads: its lower-case name, with a string constraint. */
+    public function testADirectRequirementIsALinkThatComposerReads(): void
+    {
+        $config = ProjectConfig::fromArray(['require' => ['Vendor/A' => '^1', 'vendor/b' => 1], 'require-dev' => ['Vendor/Dev' => '^2', 'vendor/dev' => '^3']]);
+
+        self::assertSame(['vendor/a'], $config->directRequires());
+        self::assertSame(['vendor/dev'], $config->directDevRequires());
+    }
+
+    /** Which sections of composer.json list a name, and the key as written there: the later spelling wins. */
+    public function testListedInNamesTheSectionsAndTheKeysAsWritten(): void
+    {
+        $config = ProjectConfig::fromArray([
+            'require' => ['vendor/a' => '^1', 'PHP' => '^8.1', 'vendor/skip' => 5],
+            'require-dev' => ['Vendor/A' => '^2', 'VENDOR/A' => '^3', 'php' => '^8.2'],
+        ]);
+
+        self::assertSame([ProjectConfig::REQUIRE => 'vendor/a', ProjectConfig::REQUIRE_DEV => 'VENDOR/A'], $config->listedIn('vendor/a'));
+        self::assertSame([ProjectConfig::REQUIRE => 'PHP', ProjectConfig::REQUIRE_DEV => 'php'], $config->listedIn('PHP'));
+        self::assertSame([], $config->listedIn('vendor/skip'), 'Composer reads no link without a string constraint');
+        self::assertSame([], $config->listedIn('vendor/none'));
+        self::assertSame([], ProjectConfig::empty()->listedIn('vendor/a'));
+    }
+
     public function testPlatformPackagesAreExcludedFromRequires(): void
     {
         $cfg = ProjectConfig::fromArray([
@@ -62,9 +122,11 @@ final class ProjectConfigTest extends TestCase
      */
     public function testANumericRequireKeyIsReportedAsAStringName(): void
     {
-        $cfg = ProjectConfig::fromArray(['require' => [123 => '^1.0', 'a/b' => '^1.0']]);
+        $cfg = ProjectConfig::fromArray(['require' => [123 => '^1.0', 'a/b' => '^1.0'], 'require-dev' => [456 => '^2.0']]);
 
         self::assertSame(['123', 'a/b'], $cfg->directRequires());
+        self::assertSame(['456'], $cfg->directDevRequires());
+        self::assertSame([ProjectConfig::REQUIRE => '123'], $cfg->listedIn('123'));
     }
 
     /**
@@ -242,7 +304,7 @@ final class ProjectConfigTest extends TestCase
         self::assertSame(['phpunit/phpunit' => '^9.6', 'mockery/mockery' => '^1.6'], $cfg->constraints(ProjectConfig::REQUIRE_DEV));
         self::assertSame(['symfony/symfony' => '*'], $cfg->constraints(ProjectConfig::CONFLICT));
         self::assertSame([], ProjectConfig::empty()->constraints(ProjectConfig::REQUIRE));
-        self::assertSame(['Twig/Twig', 'broken/value'], $cfg->directRequires(), 'the names stay as written');
+        self::assertSame(['twig/twig'], $cfg->directRequires(), 'Composer reads a link without a string constraint as no link');
     }
 
     public function testThePlatformLinksAreKeptApartUnderLowercasedNames(): void
@@ -261,5 +323,29 @@ final class ProjectConfigTest extends TestCase
         self::assertSame(['php' => '>=8.2'], $cfg->platformConstraints(ProjectConfig::REQUIRE_DEV));
         self::assertSame(['php' => '8.3.0'], $cfg->platformConstraints(ProjectConfig::CONFLICT));
         self::assertSame([], ProjectConfig::empty()->platformConstraints(ProjectConfig::REQUIRE));
+    }
+
+    /** PHP turns a numeric key of composer.json into an int: the listing gives it as written. */
+    public function testAListingGivesANumericKeyAsAString(): void
+    {
+        self::assertSame([ProjectConfig::REQUIRE => '123'], ProjectConfig::fromArray(['require' => ['123' => '^1.0']])->listedIn('123'));
+    }
+
+    public function testAListingNamesEachLiteralSectionWithItsKeyAsWritten(): void
+    {
+        $cfg = ProjectConfig::fromArray([
+            'require' => ['Vendor/A' => '^1.0', 'vendor/b' => '^1.0', 'PHP' => '>=8.1', 'vendor/c' => ['^1'], 'vendor/d' => '^1.0'],
+            'require-dev' => ['vendor/a' => '^2.0', 'Vendor/A' => '^2.1', 'vendor/c' => '^1.0', 'php' => '>=8.2', 'vendor/e' => false],
+            'provide' => ['vendor/f' => '1.0'],
+        ]);
+
+        self::assertSame([ProjectConfig::REQUIRE => 'Vendor/A', ProjectConfig::REQUIRE_DEV => 'Vendor/A'], $cfg->listedIn('vendor/a'), 'the later duplicate key wins');
+        self::assertSame([ProjectConfig::REQUIRE => 'vendor/b'], $cfg->listedIn('VENDOR/B'));
+        self::assertSame([ProjectConfig::REQUIRE_DEV => 'vendor/c'], $cfg->listedIn('vendor/c'), 'a value that is not a string lists nothing');
+        self::assertSame([ProjectConfig::REQUIRE => 'vendor/d'], $cfg->listedIn('vendor/d'));
+        self::assertSame([], $cfg->listedIn('vendor/e'));
+        self::assertSame([], $cfg->listedIn('vendor/f'), 'provide is not a literal section of a require');
+        self::assertSame([ProjectConfig::REQUIRE => 'PHP', ProjectConfig::REQUIRE_DEV => 'php'], $cfg->listedIn('php'));
+        self::assertSame([], ProjectConfig::empty()->listedIn('php'));
     }
 }

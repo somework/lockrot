@@ -37,6 +37,11 @@ python3 tools/schema/make_negatives_other.py config-2
 references a published description must not hold. A unit test applies its expression `SHIP_BANNED`
 to every generated file (`CONTRIBUTING.md`, "Changing a schema").
 
+`inherited-descriptions.json` lists each description that a builder copies from `inputs/` and that
+holds for schema number 2. A test fails on a copy that the list does not name. If it fails, read
+the copied text against the number 2 document. Then list its pointer, or give the node a new
+description.
+
 ## The pinned inputs
 
 `inputs/` holds the lockrot 0.13.0 report, explain and config schema files. `inputs/SHA256SUMS.json`

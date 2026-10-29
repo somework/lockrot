@@ -1,5 +1,6 @@
 """The pull-request mutation gate: which escapes it lets through, and which it stops."""
 
+import json
 import os
 import sys
 import tempfile
@@ -29,45 +30,87 @@ final class Openness
     }
 }
 """
+# The checkout a fixture log names. Gate.run_gate swaps it for the test's own checkout.
+CHECKOUT = '/home/runner/work/lockrot/lockrot'
 
 
-def log(*escaped):
-    out = ['Escaped mutants:', '================', '']
-    for n, (line, mutator, original) in enumerate(escaped, 1):
-        out += ['{}) /home/runner/work/lockrot/lockrot/src/Signal/Openness.php:{}    [M] {} [ID] {}'.format(n, line, mutator, 'a' * 32),
-                '', '@@ @@', '     {', '-' + original, '+        changed', '']
-    return '\n'.join(out + ['Timed Out mutants:', '==================', ''])
+def row(line, mutator, original, checkout=CHECKOUT):
+    return {'mutator': {'mutatorName': mutator, 'originalSourceCode': '', 'mutatedSourceCode': '',
+                        'originalFilePath': checkout + '/src/Signal/Openness.php', 'originalStartLine': line},
+            'diff': '@@ @@\n     {\n-' + original + '\n+        changed\n', 'processOutput': ''}
+
+
+def log(*escaped, uncovered=(), ignored=(), skipped=0, stats=None, checkout=CHECKOUT):
+    data = {'stats': {'escapedCount': len(escaped), 'notCoveredCount': len(uncovered), 'ignoredCount': len(ignored),
+                      'skippedCount': skipped, 'timeOutCount': 0},
+            'escaped': [row(*e, checkout) for e in escaped], 'uncovered': [row(*u, checkout) for u in uncovered],
+            'ignored': [row(*i, checkout) for i in ignored], 'killed': [], 'timeouted': []}
+    data['stats'].update(stats or {})
+    return json.dumps(data)
 
 
 class Gate(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.root = self.directory.name
-        os.makedirs(os.path.join(self.root, 'src', 'Signal'))
-        with open(os.path.join(self.root, 'src', 'Signal', 'Openness.php'), 'w', encoding='utf-8') as handle:
+        self.check_out(self.root)
+
+    @staticmethod
+    def check_out(root):
+        os.makedirs(os.path.join(root, 'src', 'Signal'))
+        with open(os.path.join(root, 'src', 'Signal', 'Openness.php'), 'w', encoding='utf-8') as handle:
             handle.write(SOURCE)
 
     def tearDown(self):
         self.directory.cleanup()
 
-    def run_gate(self, logs, ledger):
-        paths = []
+    def run_gate(self, logs, ledger, options=(), root=None):
+        root = root or self.root
+        paths = list(options)
         for n, text in enumerate(logs):
-            paths.append(os.path.join(self.root, 'infection{}.log'.format(n)))
+            paths.append(os.path.join(self.root, 'infection{}.json'.format(n)))
             with open(paths[-1], 'w', encoding='utf-8') as handle:
-                handle.write(text)
+                handle.write(text.replace(CHECKOUT, root))
         paths.append(os.path.join(self.root, 'equivalents.md'))
         with open(paths[-1], 'w', encoding='utf-8') as handle:
             handle.write(ledger)
-        return pr_gate.main(paths, self.root)
+        return pr_gate.main(paths, root)
 
 
-class ReadingTheLog(unittest.TestCase):
-    def test_only_escapes_are_read_each_with_its_original_line(self):
-        text = log((7, 'Plus', '        return (int) $parts[0] + 0;'))
-        text += '\n1) /x/src/Signal/Openness.php:12    [M] Plus [ID] ' + 'b' * 32 + '\n@@ @@\n-        return 1;\n'
-        self.assertEqual([('src/Signal/Openness.php', 7, 'Plus', 'return (int) $parts[0] + 0;')],
-                         [tuple(e) for e in pr_gate.escapes(text)])
+class ReadingTheLog(Gate):
+    def test_each_mutant_keeps_its_section_and_its_original_line(self):
+        text = log((7, 'Plus', '        return (int) $parts[0] + 0;'), uncovered=[(12, 'IncrementInteger', '        return 1;')])
+        self.assertEqual([('escaped', 'src/Signal/Openness.php', 7, 'Plus', 'return (int) $parts[0] + 0;'),
+                          ('uncovered', 'src/Signal/Openness.php', 12, 'IncrementInteger', 'return 1;')],
+                         [tuple(m) for m in pr_gate.read_log(text, CHECKOUT).mutants])
+
+    def test_a_log_without_the_uncovered_array_is_an_error(self):
+        data = json.loads(log())
+        del data['uncovered']
+        self.assertEqual(2, self.run_gate([json.dumps(data)], '')[0])
+
+    def test_an_array_whose_length_differs_from_its_stats_count_is_an_error(self):
+        self.assertEqual(2, self.run_gate([log((7, 'Plus', 'x'), stats={'escapedCount': 2})], '')[0])
+        self.assertEqual(2, self.run_gate([log(stats={'notCoveredCount': 1})], '')[0])
+
+    def test_a_text_log_is_an_error_not_a_pass(self):
+        self.assertEqual(2, self.run_gate(['Escaped mutants:\n================\n'], '')[0])
+
+    def test_a_checkout_under_a_directory_named_src_keeps_its_own_paths(self):
+        checkout = os.path.join(self.root, 'src', 'lockrot')
+        self.check_out(checkout)
+
+        code, summary = self.run_gate([log((7, 'Plus', PLUS))], '', ('--paths', 'src/Signal/Openness.php'), checkout)
+
+        self.assertEqual(1, code, summary)
+        self.assertIn('`src/Signal/Openness.php` Plus (line 7)', summary)
+
+    def test_a_log_of_another_checkout_is_an_error_not_a_pass(self):
+        escape = log((7, 'Plus', PLUS), checkout='/elsewhere/src/lockrot')
+
+        for options in (('--paths', 'src/Signal'), ('--shard', 'src/Signal'), ('--report-only',)):
+            with self.subTest(options=options):
+                self.assertEqual(2, self.run_gate([escape], '', options)[0])
 
 
 class TheKey(Gate):
@@ -134,7 +177,7 @@ class TheKey(Gate):
 
 class TheVerdict(Gate):
     def test_no_escape_passes(self):
-        code, summary = self.run_gate(['Escaped mutants:\n================\n\nTimed Out mutants:\n'], '')
+        code, summary = self.run_gate([log()], '')
         self.assertEqual(0, code)
         self.assertIn('No mutant escaped', summary)
 
@@ -143,12 +186,98 @@ class TheVerdict(Gate):
         ledger = '- `src/Signal/Openness.php` Plus `return (int) $parts[0] + 0;` -- why.\n'
         _, partly = self.run_gate([escapes], ledger)
         _, none = self.run_gate([escapes], '')
-        self.assertIn('1 escaped mutant(s) have an entry.', partly)
+        self.assertIn('1 mutant(s) have an entry.', partly)
         self.assertNotIn('have an entry.', none)
 
     def test_a_missing_log_is_an_error_not_a_pass(self):
-        code, _ = pr_gate.main([os.path.join(self.root, 'absent.log'), os.path.join(self.root, 'absent.md')], self.root)
+        code, _ = pr_gate.main([os.path.join(self.root, 'absent.json'), os.path.join(self.root, 'absent.md')], self.root)
         self.assertEqual(2, code)
+
+
+PLUS = 'return (int) $parts[0] + 0;'
+DOCUMENTED_PLUS = '- `src/Signal/Openness.php` Plus `' + PLUS + '` -- why.\n'
+
+
+class Uncovered(Gate):
+    def test_an_uncovered_mutant_without_an_entry_fails(self):
+        code, summary = self.run_gate([log(uncovered=[(7, 'Plus', PLUS)])], '')
+        self.assertEqual(1, code)
+        self.assertIn('| uncovered |', summary)
+
+    def test_an_escape_entry_does_not_excuse_an_uncovered_mutant_on_its_line(self):
+        self.assertEqual(1, self.run_gate([log(uncovered=[(7, 'Plus', PLUS)])], DOCUMENTED_PLUS)[0])
+
+    def test_a_not_covered_entry_does_not_excuse_an_escape_on_its_line(self):
+        ledger = '- `src/Signal/Openness.php` NotCovered `' + PLUS + '` -- a matrix row runs it.\n'
+        self.assertEqual(1, self.run_gate([log((7, 'Plus', PLUS))], ledger)[0])
+        self.assertEqual(0, self.run_gate([log(uncovered=[(7, 'Plus', PLUS)])], ledger)[0])
+
+    def test_a_not_covered_entry_covers_any_mutator_of_its_line_up_to_its_count(self):
+        ledger = '- `src/Signal/Openness.php` NotCovered x2 `' + PLUS + '` -- why.\n'
+        self.assertEqual(0, self.run_gate([log(uncovered=[(7, 'Plus', PLUS), (7, 'CastInt', PLUS)])], ledger)[0])
+        self.assertEqual(1, self.run_gate([log(uncovered=[(7, 'Plus', PLUS), (7, 'CastInt', PLUS), (7, 'Minus', PLUS)])], ledger)[0])
+
+    def test_not_covered_method_accounts_for_its_count_of_the_method(self):
+        two = [(6, 'UnwrapExplode', "$parts = explode('.', $v);"), (7, 'Plus', PLUS)]
+        ledger = '- `src/Signal/Openness.php` NotCoveredMethod x2 `major()` -- e2e only.\n'
+        self.assertEqual(0, self.run_gate([log(uncovered=two)], ledger)[0])
+        self.assertEqual(1, self.run_gate([log(uncovered=two + [(7, 'CastInt', PLUS)])], ledger)[0])
+
+    def test_not_covered_method_needs_its_count(self):
+        ledger = '- `src/Signal/Openness.php` NotCoveredMethod `major()` -- e2e only.\n'
+        self.assertEqual(1, self.run_gate([log(uncovered=[(7, 'Plus', PLUS)])], ledger)[0])
+
+    def test_a_not_covered_entry_of_a_declaration_line_does_not_widen_to_its_method(self):
+        ledger = '- `src/Signal/Openness.php` NotCovered `public function major(string $v): int` -- why.\n'
+        self.assertEqual(1, self.run_gate([log(uncovered=[(7, 'Plus', PLUS)])], ledger)[0])
+
+    def test_an_ignored_mutant_fails_even_with_an_entry(self):
+        code, summary = self.run_gate([log(ignored=[(7, 'Plus', PLUS)])], DOCUMENTED_PLUS)
+        self.assertEqual(1, code)
+        self.assertIn('ignored', summary)
+
+    def test_a_skipped_mutant_fails(self):
+        self.assertEqual(1, self.run_gate([log(skipped=1)], '')[0])
+
+
+class ShardMode(Gate):
+    SHARD = ('--shard', 'src/Signal src/Version.php')
+
+    def test_a_not_covered_claim_must_match_its_whole_count(self):
+        ledger = '- `src/Signal/Openness.php` NotCovered x2 `' + PLUS + '` -- why.\n'
+        code, summary = self.run_gate([log(uncovered=[(7, 'Plus', PLUS)])], ledger, self.SHARD)
+        self.assertEqual(1, code)
+        self.assertIn('claims 2 uncovered mutant(s), and 1 match it', summary)
+        self.assertEqual(0, self.run_gate([log(uncovered=[(7, 'Plus', PLUS)])], ledger)[0])
+
+    def test_a_claim_outside_the_shard_is_not_read(self):
+        ledger = '- `src/Signal/Openness.php` NotCovered x2 `' + PLUS + '` -- why.\n'
+        self.assertEqual(0, self.run_gate([log()], ledger, ('--shard', 'src/Verdict'))[0])
+
+    def test_an_unused_escape_claim_is_a_warning_in_shard_mode_only(self):
+        code, summary = self.run_gate([log()], DOCUMENTED_PLUS, self.SHARD)
+        self.assertEqual(0, code)
+        self.assertIn('Warning: no escape used the entry', summary)
+        self.assertNotIn('Warning', self.run_gate([log()], DOCUMENTED_PLUS)[1])
+
+    def test_report_only_lists_and_passes(self):
+        code, summary = self.run_gate([log((7, 'CastInt', PLUS))], '', self.SHARD + ('--report-only',))
+        self.assertEqual(0, code)
+        self.assertIn('**no**', summary)
+
+    def test_report_only_still_stops_on_an_unreadable_log(self):
+        self.assertEqual(2, self.run_gate(['{}'], '', ('--report-only',))[0])
+
+    def test_paths_keep_only_the_mutants_of_their_files(self):
+        self.assertEqual(0, self.run_gate([log((7, 'Plus', PLUS))], '', ('--paths', 'src/Signal/Other.php'))[0])
+        self.assertEqual(1, self.run_gate([log((7, 'Plus', PLUS))], '', ('--paths', 'src/Signal/Openness.php'))[0])
+
+    def test_paths_leave_the_whole_count_check_to_shard_mode(self):
+        ledger = '- `src/Signal/Openness.php` NotCovered x2 `' + PLUS + '` -- why.\n'
+        self.assertEqual(0, self.run_gate([log(uncovered=[(7, 'Plus', PLUS)])], ledger, ('--paths', 'src/Signal'))[0])
+
+    def test_an_unknown_option_is_an_error(self):
+        self.assertEqual(2, self.run_gate([log()], '', ('--full',))[0])
 
 
 class StaleEntries(Gate):
@@ -167,6 +296,12 @@ class StaleEntries(Gate):
                   '- `src/Signal/Openness.php` TrueValue `return 1;` — equivalent, but which line?\n')
 
         self.assertEqual(['- `src/Signal/Openness.php` TrueValue `return 1;` — equivalent, but which line?'], pr_gate.stale(ledger, pr_gate.Source(self.root)))
+
+    def test_a_not_covered_method_entry_is_stale_when_its_method_left_the_file(self):
+        ledger = ('- `src/Signal/Openness.php` NotCoveredMethod x1 `minor()` — e2e only.\n'
+                  '- `src/Signal/Openness.php` NotCoveredMethod x1 `gone()` — e2e only.\n')
+
+        self.assertEqual(['- `src/Signal/Openness.php` NotCoveredMethod x1 `gone()` — e2e only.'], pr_gate.stale(ledger, pr_gate.Source(self.root)))
 
 
 class TheLedger(unittest.TestCase):

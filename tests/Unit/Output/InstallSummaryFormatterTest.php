@@ -14,12 +14,18 @@ use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ConsoleMarkup;
+use Lockrot\Output\FindingBlock;
 use Lockrot\Output\InstallSummaryFormatter;
+use Lockrot\Output\TerminalText;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FlagSet;
+use Lockrot\Verdict\Move;
+use Lockrot\Verdict\Moves;
+use Lockrot\Verdict\MoveSubject;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -177,9 +183,83 @@ final class InstallSummaryFormatterTest extends TestCase
     public function testALongMoveIsCutAtAWordBoundary(): void
     {
         foreach (self::lines(CaseHydrator::composite()) as $line) {
-            self::assertLessThanOrEqual(InstallSummaryFormatter::MAX_FINDING_LINE + \strlen('…'), \strlen($line), $line);
+            self::assertLessThanOrEqual(InstallSummaryFormatter::MAX_FINDING_LINE + 1, TerminalText::characters($line), $line);
         }
         self::assertStringEndsWith(' clears 15…', self::lines(CaseHydrator::composite())[1]);
+    }
+
+    /**
+     * R6-11, the wallabag shape: the prose before the command fits, so the command shows whole past
+     * the limit, after the platform step that it needs. The cut prose after it leaves a space
+     * before the ellipsis, so a copied command takes no `…`.
+     */
+    public function testACommandAfterTheProseThatFitsShowsWholeAndTheEllipsisStandsApart(): void
+    {
+        $line = self::lines(self::report([self::withMove('symfony/http-client', '7.4.29', [['composer', 'update', 'symfony/http-client', '--with-dependencies']])]))[1];
+
+        self::assertStringEndsWith(' — First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/http-client --with-dependencies …', $line);
+    }
+
+    /**
+     * The budget counts characters of the shown text: `—` and `·` are one each, and a control
+     * character from the lock counts as its escape.
+     */
+    public function testACutLineHoldsAtMostTheCharacterBudget(): void
+    {
+        $finding = self::withMove("acme/lib\u{202E}", null, [], '1.0.0 — · — · — · — · — · — · — · — · — · — · — · — · — · — · — · — · — · — · — · — · — · — · — ·');
+        $line = self::lines(self::report([$finding]))[1];
+
+        self::assertStringContainsString('acme/lib\\u{202E}', $line);
+        self::assertStringEndsWith('…', $line);
+        self::assertGreaterThanOrEqual(InstallSummaryFormatter::MAX_FINDING_LINE - 2, TerminalText::characters($line), $line);
+        self::assertLessThanOrEqual(InstallSummaryFormatter::MAX_FINDING_LINE + 1, TerminalText::characters($line), $line);
+    }
+
+    /**
+     * However little room the head leaves, the shown move is a run of its whole words: a cut never
+     * splits the word after ` — `.
+     */
+    public function testTheMoveAfterTheHeadIsCutOnlyAtAWordBoundary(): void
+    {
+        $cuts = [];
+        foreach (range(100, 150) as $length) {
+            $finding = self::withMove('acme/'.str_repeat('a', $length), null, []);
+            $line = self::lines(self::report([$finding]))[1];
+            $move = (string) FindingBlock::move($finding);
+            $at = strpos($line, ' — ');
+            if ($at !== false && substr($line, -\strlen(TerminalText::ELLIPSIS)) === TerminalText::ELLIPSIS) {
+                $cuts[$length] = [substr($line, $at + \strlen(' — '), -\strlen(TerminalText::ELLIPSIS)), $move];
+            }
+        }
+        self::assertNotSame([], $cuts);
+
+        foreach ($cuts as $length => [$shown, $move]) {
+            self::assertTrue($shown === '' || ($shown === substr($move, 0, \strlen($shown)) && substr($move, \strlen($shown), 1) === ' '), $length.': "'.$shown.'" of "'.$move.'"');
+        }
+    }
+
+    /** A name with no space is cut between whole units: never inside an escape or a UTF-8 sequence. */
+    public function testALongNameIsCutBetweenWholeUnits(): void
+    {
+        $line = self::lines(self::report([self::withMove('acme/'.str_repeat('a', 140)."\u{202E}—b", null, [])]))[1];
+
+        self::assertSame(1, preg_match('//u', $line), 'valid UTF-8');
+        self::assertDoesNotMatchRegularExpression('/\\\\u\{[0-9A-F]*…/', $line);
+        self::assertLessThanOrEqual(InstallSummaryFormatter::MAX_FINDING_LINE + 1, TerminalText::characters($line), $line);
+    }
+
+    /**
+     * One abandoned finding whose update move runs $commands, with the lock's platform PHP.
+     *
+     * @param list<list<string>> $commands
+     */
+    private static function withMove(string $package, ?string $platformOverride, array $commands, string $version = '5.4.0'): Finding
+    {
+        $finding = (new FindingBuilder())->withPackage($package)->withVersion($version)->withVerdict(Verdict::ABANDONED)->build();
+        $subject = new MoveSubject($package, $version, true, [], '8.4', null, null, $platformOverride);
+        $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '5.x', '5.4.9', '5.4.9', null, null, null, false, [], [], [], [], [], null, [], $commands, $subject);
+
+        return $finding->withMoves(new Moves($move, null, null, null, []));
     }
 
     public function testNothingGradedAndNothingFailedProducesNoLinesAtAll(): void

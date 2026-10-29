@@ -127,9 +127,9 @@ final class MarkdownFormatter implements FormatterInterface
         if ($gateLine !== null) {
             $why[] = self::code($gateLine);
         }
-        $move = FindingBlock::move($finding);
+        $move = FindingBlock::moveParts($finding);
         if ($move !== null) {
-            $why[] = '**Do:** '.self::text($move);
+            $why[] = '**Do:** '.implode('', array_map(static fn (array $part): string => $part[1] ? self::code($part[0]) : self::text($part[0]), $move));
         }
         foreach (FindingBlock::evidence($finding) as $flag => $summary) {
             $why[] = '*'.$flag.':* '.self::text($summary);

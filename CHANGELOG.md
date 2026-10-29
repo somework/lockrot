@@ -35,13 +35,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** **CLI:** `--fail-on=unchecked` also fails when advisories or an advisory's release
   data were not read, when a repository host cannot be asked, and on a package from vcs or an
   unknown origin. A path package and a package outside the `composer-repositories` scope are skips.
-  Action: list a GitLab host in `gitlab-domains`, or accept a lasting gap in `accept-unchecked`. On
-  Composer below 2.4, upgrade Composer or run the PHAR. ([What was not checked](docs/verdicts.md#what-was-not-checked))
+  Action: list a GitLab host in `gitlab-domains`, or accept a lasting gap in `accept-unchecked`.
+  ([What was not checked](docs/verdicts.md#what-was-not-checked))
 - **Breaking:** **Install-time:** with `install-time-strict` and `fail-on: unchecked`, an advisory
-  gap stops the install: `no_feed`, `lookup_failed`, an exhausted budget, and every changing install
-  on Composer 2.2 and 2.3 (`composer_too_old`, which `accept-unchecked` cannot accept). Action:
-  remove `unchecked` from that `fail-on`, or accept a `no_feed` gap in `accept-unchecked`. On
-  Composer 2.2 and 2.3, upgrade Composer to 2.4 or later.
+  gap stops the install: `no_feed`, `lookup_failed` and an exhausted budget. Action: remove
+  `unchecked` from that `fail-on`, or accept a `no_feed` gap in `accept-unchecked`.
   ([`install-time-strict`](docs/install-time.md#install-time-strict))
 - **All formats:** a new flag `capped` (S11, 8 points) marks an installed release whose
   `require.php` stops below the newest PHP minor that the root php allows. It decides at once, and
@@ -76,6 +74,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- **Breaking:** **CLI, PHAR, self-update:** a token goes only to the host that issued it.
+  `GITHUB_TOKEN` is not sent to github.com when `GITHUB_SERVER_URL` names another host (GitHub
+  Enterprise Server, GHE.com, Gitea or Forgejo Actions). `GITLAB_TOKEN` is not sent to gitlab.com
+  when `CI_SERVER_URL` or `GITLAB_HOST` names another host. Such a run is anonymous on the public
+  host, also when a lockrot cache from another machine could answer, and `-v` names each token
+  that lockrot keeps back. `self-update` sends its token to api.github.com only, whatever
+  `LOCKROT_RELEASE_URL` names. lockrot cannot stop Composer from sending the runner's token, when a
+  setup step writes it into `github-oauth`. Action: if you put a github.com or gitlab.com token in
+  `GITHUB_TOKEN` or `GITLAB_TOKEN` on such a runner, move it to `LOCKROT_GITHUB_TOKEN` or
+  `LOCKROT_GITLAB_TOKEN`. ([Which credentials](docs/internals.md#which-credentials))
 - **All formats:** advisories are looked up by name for every package the run checks (packages-dev
   with `--dev`), so the names of packages from vcs, a path, an archive or an origin lockrot cannot
   tell now reach each Composer repository that publishes advisories. Action: set
@@ -205,6 +213,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **PHAR:** the archive restarts without Xdebug, as `composer` does, so a run with Xdebug loaded
+  is no slower than one without it. PHP errors go to stderr, and the locale is C. Action: to keep
+  Xdebug, set `COMPOSER_ALLOW_XDEBUG=1`. ([What the PHAR does](docs/phar.md#what-the-phar-does-and-does-not-do))
 - **Breaking:** **gitlab, sarif:** one record per flag, plus one per advisory in SARIF. 0.13
   identities stay. SARIF `properties.verdict` is the grade, `signals` is `signal_ids`, `baseline` is
   `baseline_status`. A baseline-covered result carries `suppressions`. Action: guard on
@@ -281,6 +292,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- **Breaking:** **CLI, Install-time:** the Composer plugin needs Composer 2.10 or later
+  (`composer-plugin-api` `^2.9`). Composer 2.8 and older do not install lockrot 0.14. On Composer
+  2.9 the plugin does nothing and prints one line that names the version it needs. Action: upgrade
+  Composer to 2.10 or later, or run the PHAR.
+  ([Install](docs/index.md#install))
 - **Breaking:** **json, PHAR:** the unnumbered schema files in `resources/` are gone. Each file
   carries its number: `lockrot-report.schema.json` is `lockrot-report-1.schema.json`, and the same
   holds for `baseline`, `config` and `explain`. Action: validate against

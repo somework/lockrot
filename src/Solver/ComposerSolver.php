@@ -7,14 +7,12 @@ namespace Lockrot\Solver;
 use Composer\DependencyResolver\DefaultPolicy;
 use Composer\DependencyResolver\LockTransaction;
 use Composer\DependencyResolver\Operation\InstallOperation;
-use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\DependencyResolver\Pool;
 use Composer\DependencyResolver\PoolOptimizer;
 use Composer\DependencyResolver\Request;
 use Composer\DependencyResolver\Solver;
 use Composer\DependencyResolver\SolverProblemsException;
-use Composer\Filter\PlatformRequirementFilter\PlatformRequirementFilterFactory;
 use Composer\Filter\PlatformRequirementFilter\PlatformRequirementFilterInterface;
 use Composer\IO\NullIO;
 use Composer\Package\AliasPackage;
@@ -30,28 +28,29 @@ use Composer\Repository\LockArrayRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositorySet;
 use Composer\Repository\RootPackageRepository;
-use Composer\Semver\CompilingMatcher;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
-use Composer\Semver\Constraint\MultiConstraint;
+use Lockrot\Analyzer\PhpWindow;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 
 /**
  * Runs Composer's own Solver offline for one request. It builds the request that
  * `Composer\Installer::doUpdate()` builds for `composer update <names> --dry-run`: the root's
  * stability settings and requirements, the lock as the locked packages, the platform, and the
  * remote versions of the names that the pool builder asks for ({@see LoadedVersions}). It ignores
- * `ext-*` requirements, as `--ignore-platform-req=ext-*` does.
+ * the requirements on {@see IGNORED_PLATFORM} that `config.platform` does not set ({@see HostPlatformFilter}).
  *
  * @internal
  */
 final class ComposerSolver
 {
+    /** The platform patterns that the machine running lockrot provides, in the order of `run.move_check.ignored_platform`. */
+    public const IGNORED_PLATFORM = ['ext-*', 'lib-*', ...PhpWindow::HOST_FEATURES];
+
     private RootPackageInterface $root;
     private LockArrayRepository $locked;
     private PlatformRepository $platform;
     private VersionSource $source;
-    /** @var array<string, list<ConstraintInterface>> */
-    private array $blocked;
     private PlatformRequirementFilterInterface $filter;
     private ?PoolAdvisories $advisories = null;
     private ?ArrayRepository $lockedOnly = null;
@@ -63,29 +62,17 @@ final class ComposerSolver
     /** @var array{0: Pool, 1: LockTransaction|SolverProblemsException} the optimized pool and Composer's answer of the last solve */
     private array $lastAnswer;
 
-    /**
-     * @param array<string, list<ConstraintInterface>> $blocked the advisory ranges by name that Composer 2.9 and later block in an update, none to block nothing
-     */
-    public function __construct(RootPackageInterface $root, LockArrayRepository $locked, PlatformRepository $platform, VersionSource $source, array $blocked)
+    /** @param list<string> $configuredPlatform the lower-case names that `config.platform` sets */
+    public function __construct(RootPackageInterface $root, LockArrayRepository $locked, PlatformRepository $platform, VersionSource $source, array $configuredPlatform = [])
     {
         $this->root = $root;
         $this->locked = $locked;
         $this->platform = $platform;
         $this->source = $source;
-        $this->blocked = $blocked;
-        $this->filter = PlatformRequirementFilterFactory::fromBoolOrList(['ext-*']);
+        $this->filter = new HostPlatformFilter($configuredPlatform);
     }
 
-    /** @param array<string, list<ConstraintInterface>> $blocked */
-    public function withBlocked(array $blocked): self
-    {
-        $clone = clone $this;
-        $clone->blocked = $blocked;
-
-        return $clone;
-    }
-
-    /** A copy that blocks what Composer 2.9 and later block in an update, for every name that the pool holds. */
+    /** A copy whose solves block what Composer blocks in an update, with the records that $advisories serves. */
     public function withAdvisories(PoolAdvisories $advisories): self
     {
         $clone = clone $this;
@@ -160,37 +147,25 @@ final class ComposerSolver
     private function solveOrThrow(SolveRequest $request): Solution
     {
         $root = $this->rootWith($request->rootChanges(), $request->devChanges());
-        $links = array_merge($root->getRequires(), $root->getDevRequires());
         $requires = [];
-        foreach ($links as $name => $link) {
+        foreach (self::rootLinks($root) as $name => $link) {
             $requires[$name] = $link->getConstraint();
         }
         $parser = new VersionParser();
-        $requested = $request->rootChanges();
         $temporary = [];
         foreach ($request->inline() as $name => $constraint) {
             $temporary[$name] = $parser->parseConstraints($constraint);
         }
-        $unrequired = [];
-        if (!ComposerFeatures::hasTemporaryConstraints()) {
-            // Composer 2.2 and 2.3 have no temporary constraints: the inline constraint joins the root requirement.
-            $unrequired = array_keys(array_diff_key($temporary, $requires));
-            foreach ($temporary as $name => $constraint) {
-                $requires[$name] = isset($requires[$name]) ? MultiConstraint::create([$requires[$name], $constraint], true) : $constraint;
-            }
-            $requested += $request->inline();
-            $temporary = [];
-        }
         $preferred = $this->preferredVersions($request);
         $policy = new DefaultPolicy($root->getPreferStable(), false, $preferred);
-        [$set, $composerRequest, $pool, $fixedRoot, $loaded] = $this->pool($root, $requires, $temporary, $request);
+        [$set, $composerRequest, $pool, $fixedRoot, $loaded, $feed] = $this->pool($root, $requires, $temporary, $request);
         [$pool, $answer] = $this->answer($policy, $composerRequest, $pool, $fixedRoot, $preferred);
         if ($answer instanceof SolverProblemsException) {
             $locked = [];
             foreach ($this->locked->getPackages() as $package) {
                 $locked[$package->getName()] = $package->getVersion();
             }
-            $holds = ProblemHolds::of($answer, $pool, $root, $request->moved(), $requested, $locked);
+            $holds = ProblemHolds::of($answer, $pool, $root, $request->moved(), $request->rootChanges(), $locked);
             $setsPhp = $this->setsPhp;
             // A shadowed name has loaded versions, so the refusal never wants it, yet its hidden releases can change the answer.
             $shadowed = array_intersect($this->failures($loaded->asked()), [VersionSource::SHADOWED]);
@@ -198,18 +173,22 @@ final class ComposerSolver
             return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $this->failures($holds->wanted()) + $shadowed);
         }
 
-        $installs = self::installs($answer);
-        $from = self::updatedFrom($answer);
-        foreach ($unrequired as $name) {
-            // Composer before 2.4 has no temporary constraint, so the inline name became a root requirement: drop what that requirement alone keeps.
-            if (!$this->requiredAfter($answer, $name)) {
-                unset($installs[$name], $from[$name]);
-            }
-        }
-
         // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
         // A virtual name, which a package provides, is unreached too: only a refusal that wants an unreached name proves nothing.
-        return Solution::resolved($installs, $from, array_diff($this->failures($loaded->asked()), [VersionSource::UNREACHED]));
+        // Composer blocks a release by each name that it replaces too.
+        $held = array_merge([], ...array_map(static fn (BasePackage $package): array => $package->getNames(false), $answer->getNewLockPackages(false)));
+
+        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), array_diff($this->failures($loaded->asked()), [VersionSource::UNREACHED]), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)));
+    }
+
+    /**
+     * The root links that Composer's solve reads: a require-dev link replaces the require link of its name.
+     *
+     * @return array<string, Link>
+     */
+    public static function rootLinks(RootPackageInterface $root): array
+    {
+        return array_merge($root->getRequires(), $root->getDevRequires());
     }
 
     /**
@@ -251,30 +230,6 @@ final class ComposerSolver
         return $failures;
     }
 
-    private function requiredAfter(LockTransaction $transaction, string $name): bool
-    {
-        $packages = [];
-        foreach ($this->locked->getPackages() as $package) {
-            $packages[$package->getName()] = $package;
-        }
-        foreach ($transaction->getOperations() as $operation) {
-            if ($operation instanceof UpdateOperation) {
-                $packages[$operation->getTargetPackage()->getName()] = $operation->getTargetPackage();
-            } elseif ($operation instanceof InstallOperation) {
-                $packages[$operation->getPackage()->getName()] = $operation->getPackage();
-            } elseif ($operation instanceof UninstallOperation) {
-                unset($packages[$operation->getPackage()->getName()]);
-            }
-        }
-        foreach ($packages as $package) {
-            if (isset($package->getRequires()[$name])) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     /**
      * The optimized pool and Composer's answer: the transaction, or the refusal. The forms of one
      * move often build the same pool, and Composer then answers the same.
@@ -309,17 +264,13 @@ final class ComposerSolver
      * @param array<string, ConstraintInterface> $requires  the root requirements: RepositorySet leaves out the platform ones
      * @param array<string, ConstraintInterface> $temporary
      *
-     * @return array{0: RepositorySet, 1: Request, 2: Pool, 3: BasePackage, 4: LoadedVersions} the set, the request, the built pool, the root's copy in it and the remote versions
+     * @return array{0: RepositorySet, 1: Request, 2: Pool, 3: BasePackage, 4: LoadedVersions, 5: PoolAdvisoryFeed|null} the set, the request, the built pool, the root's copy in it, the remote versions and the advisory feed of a solve that blocks
      */
     private function pool(RootPackageInterface $root, array $requires, array $temporary, SolveRequest $request): array
     {
         $flags = $root->getStabilityFlags();
         $flags[$root->getName()] = BasePackage::$stabilities[VersionParser::parseStability($root->getVersion())];
-        $arguments = [$root->getMinimumStability(), $flags, $root->getAliases(), $root->getReferences(), $requires];
-        if (ComposerFeatures::hasTemporaryConstraints()) {
-            $arguments[] = $temporary;
-        }
-        $set = new RepositorySet(...$arguments);
+        $set = new RepositorySet($root->getMinimumStability(), $flags, $root->getAliases(), $root->getReferences(), $requires, $temporary);
         // A package takes one repository, so each pass gets its own copy of the root.
         $fixedRoot = clone $root;
         if (!$fixedRoot instanceof BasePackage) {
@@ -348,65 +299,25 @@ final class ComposerSolver
         }
         $composerRequest->setUpdateAllowList($request->allow(), $request->transitive());
 
-        // Composer 2.9 and later filter the built pool, then optimize it: the builder marks the packages that stay locked.
         $pool = $set->createPool($composerRequest, new NullIO());
-        // By name and version, as Composer's isLockedPackage() reads it: a root alias of a locked release keeps the release.
-        $stayLocked = [];
-        foreach ($composerRequest->getLockedPackages() as $package) {
-            $base = $package instanceof AliasPackage ? $package->getAliasOf() : $package;
-            $key = $base->getName().' '.$base->getVersion();
-            $stayLocked[$key] = $key;
+        if ($this->advisories === null || !$this->advisories->blocking()->blocks()) {
+            return [$set, $composerRequest, $pool, $fixedRoot, $loaded, null];
         }
-        // Composer looks up the advisories of every pool package that can move: packages-dev and new dependencies too.
-        $names = [];
-        foreach ($pool->getPackages() as $package) {
-            $base = $package instanceof AliasPackage ? $package->getAliasOf() : $package;
-            if (!$base instanceof RootPackageInterface && !PlatformRepository::isPlatformPackage($base->getName()) && !isset($stayLocked[$base->getName().' '.$base->getVersion()])) {
-                $names[$base->getName()] = $base->getName();
-            }
+        // Composer filters the built pool, then optimizes it, as PoolBuilder::buildPool() does.
+        $filter = $this->advisories->blocking()->poolFilter();
+        $error = $this->advisories->blocking()->filterError();
+        if ($filter === null) {
+            throw new \RuntimeException('Composer\'s advisory pool filter cannot be built: '.($error === null ? 'unknown error' : $error->getMessage()), 0, $error);
         }
-        $blocking = $this->advisories === null ? null : $this->advisories->blocking();
-        $blocked = $this->blocked;
-        foreach ($this->advisories === null ? [] : $this->advisories->ranges($names) as $name => $ranges) {
-            $blocked[$name] = array_merge($blocked[$name] ?? [], $ranges);
+        $feed = new PoolAdvisoryFeed($this->advisories);
+        try {
+            $pool = $filter->filter($pool, [$feed], $composerRequest);
+        } catch (\Error $e) {
+            // The filter is Composer's internal API: a drift fails this solve, never the run.
+            throw new \RuntimeException('Composer\'s advisory pool filter failed: '.$e->getMessage(), 0, $e);
         }
 
-        return [$set, $composerRequest, new Pool(array_filter($pool->getPackages(), self::keeps($blocked, $stayLocked, $blocking)), $pool->getUnacceptableFixedOrLockedPackages()), $fixedRoot, $loaded];
-    }
-
-    /**
-     * Whether the pool may offer a version, as SecurityAdvisoryPoolFilter keeps them: not an
-     * abandoned package that the config blocks, then a dev version, the locked version of a name
-     * that stays locked, and a version outside every blocked range of each of its names.
-     *
-     * @param array<string, list<ConstraintInterface>> $blocked
-     * @param array<string, string>                    $stayLocked by `name version`
-     *
-     * @return \Closure(BasePackage): bool
-     */
-    private static function keeps(array $blocked, array $stayLocked, ?AdvisoryBlocking $blocking): \Closure
-    {
-        return static function (BasePackage $package) use ($blocked, $stayLocked, $blocking): bool {
-            $base = $package instanceof AliasPackage ? $package->getAliasOf() : $package;
-            if ($base instanceof RootPackageInterface) {
-                return true;
-            }
-            if ($blocking !== null && $blocking->blocksAbandoned($base)) {
-                return false;
-            }
-            if ($base->isDev() || isset($stayLocked[$base->getName().' '.$base->getVersion()])) {
-                return true;
-            }
-            foreach ($base->getNames(false) as $name) {
-                foreach ($blocked[$name] ?? [] as $range) {
-                    if (CompilingMatcher::match($range, Constraint::OP_EQ, $base->getVersion())) {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        };
+        return [$set, $composerRequest, $pool, $fixedRoot, $loaded, $feed];
     }
 
     /**
@@ -478,12 +389,17 @@ final class ComposerSolver
     }
 
     /**
-     * Composer's text without the version of the platform that runs lockrot: Composer appends it to
+     * Composer's text as its console prints it without colour, and without the version of the platform that runs lockrot: Composer appends it to
      * each override (`actual: 8.5.1`, `same as actual`), and lockrot overrides `php` with the target.
      * When lockrot chose that php, Composer's `; overridden via config.platform` on it goes too.
      */
     private static function problemText(string $text, bool $setsPhp): string
     {
+        try {
+            $text = (new OutputFormatter(false))->format($text) ?? $text;
+        } catch (\InvalidArgumentException $markup) {
+            // Composer puts a repository's advisory id into the text unescaped, and a style that the id names can be unknown.
+        }
         if ($setsPhp) {
             $text = preg_replace('/(php(?:-[a-z0-9]+)? version \([^;)]*); overridden via config\.platform(?=[,)])/', '$1', $text) ?? $text;
         }

@@ -365,11 +365,14 @@ final class PhpWindowTest extends TestCase
     /** @return iterable<string, array{0: array<string, mixed>, 1: ?array<string, mixed>}> */
     public static function unknowable(): iterable
     {
-        yield 'a package that provides php' => [['packages' => [self::package('acme/a') + ['provide' => ['php' => '8.4.0']]]], null];
-        yield 'a package that replaces php-64bit' => [['packages' => [self::package('acme/a') + ['replace' => ['php-64bit' => '*']]]], null];
-        yield 'a root that replaces php' => [['packages' => []], ['replace' => ['PHP' => '*']]];
+        foreach (['provide' => 'provides', 'replace' => 'replaces'] as $link => $verb) {
+            foreach (['php', 'php-64bit'] as $name) {
+                yield 'a package that '.$verb.' '.$name => [['packages' => [self::package('acme/a') + [$link => [$name => '8.4.0']]]], null];
+                yield 'a root that '.$verb.' '.$name => [['packages' => []], [$link => [$name => '*']]];
+            }
+        }
+        yield 'a root that replaces PHP in upper case' => [['packages' => []], ['replace' => ['PHP' => '*']]];
         yield 'a root php link that does not parse' => [['packages' => []], ['require' => ['php' => '>=8.0 <<<']]];
-        yield 'a lock platform link that does not parse' => [['packages' => [], 'platform' => ['php-64bit' => 'not a constraint']], null];
     }
 
     /**

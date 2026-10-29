@@ -191,6 +191,25 @@ final class BaselineTest extends TestCase
         ]);
     }
 
+    /** A key is the package's Composer name: a hand-edited spelling covers the same package. */
+    public function testAKeyIsReadAsTheComposerName(): void
+    {
+        $entry = ['version' => '1.0.0', 'first_seen' => '2026-01-15', 'flags' => ['stale' => ['known_since' => '2026-01-15']]];
+        $baseline = Baseline::fromArray(self::root() + ['findings' => ['Acme/Legacy' => $entry]]);
+
+        self::assertSame(['acme/legacy'], $baseline->packages());
+        self::assertNotNull($baseline->entryFor('acme/legacy'));
+    }
+
+    public function testTwoKeysOfOneNameAreRefused(): void
+    {
+        $entry = ['version' => '1.0.0', 'first_seen' => '2026-01-15', 'flags' => ['stale' => ['known_since' => '2026-01-15']]];
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('baseline file is invalid: findings lists acme/legacy twice, as Acme/Legacy and acme/legacy');
+        Baseline::fromArray(self::root() + ['findings' => ['Acme/Legacy' => $entry, 'acme/legacy' => $entry]]);
+    }
+
     /**
      * Any `lockrot.schema` but the integer 2, or none, fails against baseline-2 with the schema
      * error. BaselineFile refuses the integer 1 before this reader runs.

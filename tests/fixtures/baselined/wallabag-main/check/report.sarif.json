@@ -643,7 +643,7 @@
                     "level": "error",
                     "rank": 50.0,
                     "message": {
-                        "text": "spomky-labs/otphp v10.0.3 \u2014 finding high, 24 = left-behind 16 \u00f7 2 transitive + vulnerable 16 [high advisory] \u2014 left-behind: branch 10.x last released 2022-03-17 (4.6 years ago); 11.x released 11.5.0 (2026-06-06). Do: move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "spomky-labs/otphp v10.0.3 \u2014 finding high, 24 = left-behind 16 \u00f7 2 transitive + vulnerable 16 [high advisory] \u2014 left-behind: branch 10.x last released 2022-03-17 (4.6 years ago); 11.x released 11.5.0 (2026-06-06). Do: move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2), scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "spomky-labs/otphp"
@@ -740,7 +740,7 @@
                     "level": "error",
                     "rank": 80.0,
                     "message": {
-                        "text": "spomky-labs/otphp v10.0.3 is affected by PKSA-kbc7-dq62-pt7d (high advisory): Unbounded digits parameter in a provisioning URI triggers an uncaught DivisionByZeroError in OTP generation. Do: move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "spomky-labs/otphp v10.0.3 is affected by PKSA-kbc7-dq62-pt7d (high advisory): Unbounded digits parameter in a provisioning URI triggers an uncaught DivisionByZeroError in OTP generation. Do: move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2), scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "spomky-labs/otphp",
@@ -905,7 +905,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "spomky-labs/otphp v10.0.3 is affected by PKSA-qv5y-crcz-9nxw (medium advisory): Mass-assignment in Factory::loadFromProvisioningUri lets a hostile provisioning URI corrupt OTP state or leak an uncaught TypeError. Do: move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "spomky-labs/otphp v10.0.3 is affected by PKSA-qv5y-crcz-9nxw (medium advisory): Mass-assignment in Factory::loadFromProvisioningUri lets a hostile provisioning URI corrupt OTP state or leak an uncaught TypeError. Do: move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2), scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "spomky-labs/otphp",
@@ -1977,7 +1977,7 @@
                     "level": "note",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/consistency 1.17.05.02 \u2014 finding high, 18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-29 (9.1 years ago); last push 2021-04-28 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/consistency 1.17.05.02 \u2014 finding high, 18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-29 (9.1 years ago); last push 2021-04-28 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/consistency"
@@ -2083,7 +2083,7 @@
                     "level": "note",
                     "rank": 25.0,
                     "message": {
-                        "text": "hoa/consistency 1.17.05.02 \u2014 finding high, 18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 old-promise: released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/consistency 1.17.05.02 \u2014 finding high, 18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 old-promise: released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a replacement (none named); it comes in through wallabag/rulerz and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/consistency"
@@ -2469,7 +2469,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "doctrine/event-manager 1.2.0 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 1.x last released 2022-10-12 (4.0 years ago); 2.x released 2.1.1 (2026-01-29). Do: require doctrine/event-manager ^2.1 \u2014 clears left-behind; 2.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^1.2) and symfony/doctrine-bridge v5.4.48 (requires ~1.0) and doctrine/doctrine-fixtures-bundle 3.7.1 (requires symfony/doctrine-bridge ^5.4.48 || ^6.4.16 || ^7.1.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "doctrine/event-manager 1.2.0 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 1.x last released 2022-10-12 (4.0 years ago); 2.x released 2.1.1 (2026-01-29). Do: require doctrine/event-manager ^2.1 \u2014 clears left-behind; 2.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^1.2), symfony/doctrine-bridge v5.4.48 (requires ~1.0) and doctrine/doctrine-fixtures-bundle 3.7.1 (requires symfony/doctrine-bridge ^5.4.48 || ^6.4.16 || ^7.1.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "doctrine/event-manager"
@@ -2578,7 +2578,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "lcobucci/jwt 4.3.0 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 4.x last released 2023-01-02 (3.8 years ago); 5.x released 5.6.0 (2025-10-17). Do: require lcobucci/jwt ^5.6 \u2014 clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.3) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself left-behind) and scheb/2fa-trusted-device 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "lcobucci/jwt 4.3.0 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 4.x last released 2023-01-02 (3.8 years ago); 5.x released 5.6.0 (2025-10-17). Do: require lcobucci/jwt ^5.6 \u2014 clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.3), composer.json (requires scheb/2fa-bundle ^5.13.2), scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself left-behind) and scheb/2fa-trusted-device 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "lcobucci/jwt"
@@ -2674,7 +2674,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "scheb/2fa-backup-code v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24). Do: require scheb/2fa-backup-code ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-backup-code v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "scheb/2fa-backup-code v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24). Do: require scheb/2fa-backup-code ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2), composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-backup-code v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "scheb/2fa-backup-code"
@@ -2764,7 +2764,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "scheb/2fa-bundle v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=8.2; 7.x released v7.14.0 (2026-06-12). Do: require scheb/2fa-bundle ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires symfony/config ^5.4.46) and composer.json (requires symfony/dependency-injection ^5.4.48) and composer.json (requires symfony/event-dispatcher ^5.4.45) and composer.json (requires symfony/framework-bundle ^5.4.45) and composer.json (requires symfony/http-foundation ^5.4.48) and composer.json (requires symfony/http-kernel ^5.4.48) and composer.json (requires symfony/security-bundle ^5.4.45) and composer.json (requires symfony/twig-bundle ^5.4.45) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/config ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/dependency-injection ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/event-dispatcher ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/framework-bundle ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/http-foundation ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/http-kernel ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/property-access ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/security-bundle ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/twig-bundle ^6.4 || ^7.0) and scheb/2fa-backup-code v5.13.2 (requires self.version (v5.13.2); itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version (v5.13.2); itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version (v5.13.2); itself left-behind) and scheb/2fa-trusted-device v5.13.2 (requires self.version (v5.13.2); itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "scheb/2fa-bundle v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=8.2; 7.x released v7.14.0 (2026-06-12). Do: require scheb/2fa-bundle ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2), composer.json (requires symfony/config ^5.4.46), composer.json (requires symfony/dependency-injection ^5.4.48), composer.json (requires symfony/event-dispatcher ^5.4.45), composer.json (requires symfony/framework-bundle ^5.4.45), composer.json (requires symfony/http-foundation ^5.4.48), composer.json (requires symfony/http-kernel ^5.4.48), composer.json (requires symfony/security-bundle ^5.4.45), composer.json (requires symfony/twig-bundle ^5.4.45), scheb/2fa-bundle v7.14.0, its own release (requires symfony/config ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/dependency-injection ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/event-dispatcher ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/framework-bundle ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/http-foundation ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/http-kernel ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/property-access ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/security-bundle ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/twig-bundle ^6.4 || ^7.0), scheb/2fa-backup-code v5.13.2 (requires self.version (v5.13.2); itself left-behind), scheb/2fa-email v5.13.2 (requires self.version (v5.13.2); itself left-behind), scheb/2fa-google-authenticator v5.13.2 (requires self.version (v5.13.2); itself left-behind) and scheb/2fa-trusted-device v5.13.2 (requires self.version (v5.13.2); itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "scheb/2fa-bundle"
@@ -2863,7 +2863,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "scheb/2fa-email v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-06-08). Do: require scheb/2fa-email ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-email v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "scheb/2fa-email v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-06-08). Do: require scheb/2fa-email ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2), composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-email v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "scheb/2fa-email"
@@ -2958,7 +2958,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "scheb/2fa-google-authenticator v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24). Do: require scheb/2fa-google-authenticator ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)) and scheb/2fa-google-authenticator v7.14.0, its own release (requires spomky-labs/otphp ^11.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "scheb/2fa-google-authenticator v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24). Do: require scheb/2fa-google-authenticator ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2), composer.json (requires scheb/2fa-bundle ^5.13.2), scheb/2fa-google-authenticator v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)) and scheb/2fa-google-authenticator v7.14.0, its own release (requires spomky-labs/otphp ^11.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "scheb/2fa-google-authenticator"
@@ -3048,7 +3048,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "scheb/2fa-trusted-device v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24). Do: require scheb/2fa-trusted-device ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires lcobucci/jwt ^4.3) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-trusted-device v7.14.0, its own release (requires lcobucci/jwt ^5.0) and scheb/2fa-trusted-device v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "scheb/2fa-trusted-device v5.13.2 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24). Do: require scheb/2fa-trusted-device ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2), composer.json (requires lcobucci/jwt ^4.3), composer.json (requires scheb/2fa-bundle ^5.13.2), scheb/2fa-trusted-device v7.14.0, its own release (requires lcobucci/jwt ^5.0) and scheb/2fa-trusted-device v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "scheb/2fa-trusted-device"
@@ -3814,7 +3814,7 @@
                     "level": "note",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/compiler 3.17.08.08 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-08 (9.2 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/compiler 3.17.08.08 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-08 (9.2 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/compiler"
@@ -3919,7 +3919,7 @@
                     "level": "note",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/event 1.17.01.13 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.1 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/exception requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/event 1.17.01.13 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.1 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/exception requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/event"
@@ -4025,7 +4025,7 @@
                     "level": "note",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/exception 1.17.01.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.1 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/consistency requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/exception 1.17.01.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.1 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/consistency requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/exception"
@@ -4130,7 +4130,7 @@
                     "level": "note",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/file 1.17.07.11 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-07-11 (9.3 years ago); last push 2018-01-23 (8.7 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/file 1.17.07.11 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-07-11 (9.3 years ago); last push 2018-01-23 (8.7 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/file"
@@ -4235,7 +4235,7 @@
                     "level": "note",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/iterator 2.17.01.10 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.8 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/iterator 2.17.01.10 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.8 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/iterator"
@@ -4341,7 +4341,7 @@
                     "level": "note",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/math 1.17.05.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.4 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/math 1.17.05.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.4 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/math"
@@ -4447,7 +4447,7 @@
                     "level": "note",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/protocol 1.17.01.14 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-14 (9.7 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/protocol 1.17.01.14 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-14 (9.7 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/protocol"
@@ -4552,7 +4552,7 @@
                     "level": "note",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/regex 1.17.01.13 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-13 (9.7 years ago); last push 2018-07-20 (8.2 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/regex 1.17.01.13 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-13 (9.7 years ago); last push 2018-07-20 (8.2 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/regex"
@@ -4658,7 +4658,7 @@
                     "level": "note",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/ruler 2.17.05.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.4 years ago); last push 2021-07-10 (5.3 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/ruler 2.17.05.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.4 years ago); last push 2021-07-10 (5.3 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/ruler"
@@ -4762,7 +4762,7 @@
                     "level": "note",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/stream 1.17.02.21 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-02-21 (9.6 years ago); last push 2021-08-09 (5.2 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/file requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/stream 1.17.02.21 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-02-21 (9.6 years ago); last push 2021-08-09 (5.2 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/file requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/stream"
@@ -4868,7 +4868,7 @@
                     "level": "note",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/ustring 4.17.01.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/regex requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/ustring 4.17.01.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/regex requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/ustring"
@@ -4975,7 +4975,7 @@
                     "level": "note",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/visitor 2.17.01.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-28 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/visitor 2.17.01.16 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-28 (5.5 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/visitor"
@@ -5080,7 +5080,7 @@
                     "level": "note",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/zformat 1.17.01.10 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.8 years ago); last push 2018-02-12 (8.7 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/math requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle."
+                        "text": "hoa/zformat 1.17.01.10 \u2014 finding high, 16 = abandoned 32 \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.8 years ago); last push 2018-02-12 (8.7 years ago). Do: find a replacement (none named); it comes in through wallabag/rulerz (hoa/math requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/zformat"
@@ -5974,7 +5974,7 @@
                     "level": "warning",
                     "rank": 50.0,
                     "message": {
-                        "text": "symfony/psr-http-message-bridge v2.3.1 \u2014 finding medium, 8 = left-behind 16 \u00f7 2 transitive \u2014 left-behind: branch 2.x last released 2023-07-26 (3.2 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=8.2; 7.x released v7.4.8 (2026-03-24). Do: move symfony/psr-http-message-bridge to ^7.4 through sentry/sentry-symfony \u2014 clears left-behind; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires sentry/sentry-symfony ^5.2.0) and composer.json (requires symfony/http-foundation ^5.4.48) and symfony/psr-http-message-bridge v7.4.0, its own release (requires symfony/http-foundation ^6.4|^7.0|^8.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "symfony/psr-http-message-bridge v2.3.1 \u2014 finding medium, 8 = left-behind 16 \u00f7 2 transitive \u2014 left-behind: branch 2.x last released 2023-07-26 (3.2 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=8.2; 7.x released v7.4.8 (2026-03-24). Do: move symfony/psr-http-message-bridge to ^7.4 through sentry/sentry-symfony \u2014 clears left-behind; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires sentry/sentry-symfony ^5.2.0), composer.json (requires symfony/http-foundation ^5.4.48) and symfony/psr-http-message-bridge v7.4.0, its own release (requires symfony/http-foundation ^6.4|^7.0|^8.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "symfony/psr-http-message-bridge"
@@ -6067,7 +6067,7 @@
                     "level": "note",
                     "rank": 50.0,
                     "message": {
-                        "text": "thecodingmachine/safe v2.5.0 \u2014 finding medium, 8 = left-behind 16 \u00f7 2 transitive \u2014 left-behind: branch 2.x last released 2023-04-05 (3.5 years ago); 3.x released v3.4.0 (2026-02-04). Do: move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator \u2014 clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2) and spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires spomky-labs/otphp ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "thecodingmachine/safe v2.5.0 \u2014 finding medium, 8 = left-behind 16 \u00f7 2 transitive \u2014 left-behind: branch 2.x last released 2023-04-05 (3.5 years ago); 3.x released v3.4.0 (2026-02-04). Do: move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator \u2014 clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2), spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind), scheb/2fa-google-authenticator v5.13.2 (requires spomky-labs/otphp ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "thecodingmachine/safe"
@@ -6900,7 +6900,7 @@
                     "level": "note",
                     "rank": 25.0,
                     "message": {
-                        "text": "sebastian/code-unit-reverse-lookup 2.0.3 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 left-behind: branch 2.x last released 2020-09-28 (6.0 years ago); 4.x released 4.0.1 (2024-07-03). Do: move sebastian/code-unit-reverse-lookup to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^2.0.3) and phpunit/phpunit 9.6.34 (requires phpunit/php-code-coverage ^9.2.32) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "sebastian/code-unit-reverse-lookup 2.0.3 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 left-behind: branch 2.x last released 2020-09-28 (6.0 years ago); 4.x released 4.0.1 (2024-07-03). Do: move sebastian/code-unit-reverse-lookup to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^2.0.3), phpunit/phpunit 9.6.34 (requires phpunit/php-code-coverage ^9.2.32) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "sebastian/code-unit-reverse-lookup"
@@ -7003,7 +7003,7 @@
                     "level": "note",
                     "rank": 25.0,
                     "message": {
-                        "text": "sebastian/code-unit-reverse-lookup 2.0.3 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 old-promise: released 2020-09-28 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: move sebastian/code-unit-reverse-lookup to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^2.0.3) and phpunit/phpunit 9.6.34 (requires phpunit/php-code-coverage ^9.2.32) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "sebastian/code-unit-reverse-lookup 2.0.3 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 old-promise: released 2020-09-28 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: move sebastian/code-unit-reverse-lookup to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^2.0.3), phpunit/phpunit 9.6.34 (requires phpunit/php-code-coverage ^9.2.32) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "sebastian/code-unit-reverse-lookup"
@@ -7063,7 +7063,7 @@
                     "level": "note",
                     "rank": 25.0,
                     "message": {
-                        "text": "sebastian/object-enumerator 4.0.4 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 left-behind: branch 4.x last released 2020-10-26 (6.0 years ago); 8.x released 8.1.0 (2026-08-13), needs php >=8.4 above the project's php >=8.2; 6.x released 6.0.1 (2024-07-03). Do: move sebastian/object-enumerator to ^6.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 6.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/object-enumerator 6.0.0, its own release (requires sebastian/object-reflector ^4.0) and sebastian/object-enumerator 6.0.0, its own release (requires sebastian/recursion-context ^6.0) and phpunit/phpunit 9.6.33 (requires ^4.0.4) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "sebastian/object-enumerator 4.0.4 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 left-behind: branch 4.x last released 2020-10-26 (6.0 years ago); 8.x released 8.1.0 (2026-08-13), needs php >=8.4 above the project's php >=8.2; 6.x released 6.0.1 (2024-07-03). Do: move sebastian/object-enumerator to ^6.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 6.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/object-enumerator 6.0.0, its own release (requires sebastian/object-reflector ^4.0), sebastian/object-enumerator 6.0.0, its own release (requires sebastian/recursion-context ^6.0), phpunit/phpunit 9.6.33 (requires ^4.0.4) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "sebastian/object-enumerator"
@@ -7165,7 +7165,7 @@
                     "level": "note",
                     "rank": 25.0,
                     "message": {
-                        "text": "sebastian/object-enumerator 4.0.4 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 old-promise: released 2020-10-26 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: move sebastian/object-enumerator to ^6.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 6.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/object-enumerator 6.0.0, its own release (requires sebastian/object-reflector ^4.0) and sebastian/object-enumerator 6.0.0, its own release (requires sebastian/recursion-context ^6.0) and phpunit/phpunit 9.6.33 (requires ^4.0.4) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "sebastian/object-enumerator 4.0.4 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 old-promise: released 2020-10-26 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: move sebastian/object-enumerator to ^6.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 6.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/object-enumerator 6.0.0, its own release (requires sebastian/object-reflector ^4.0), sebastian/object-enumerator 6.0.0, its own release (requires sebastian/recursion-context ^6.0), phpunit/phpunit 9.6.33 (requires ^4.0.4) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "sebastian/object-enumerator"
@@ -7225,7 +7225,7 @@
                     "level": "note",
                     "rank": 25.0,
                     "message": {
-                        "text": "sebastian/object-reflector 2.0.4 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 left-behind: branch 2.x last released 2020-10-26 (6.0 years ago); 6.x released 6.1.0 (2026-08-13), needs php >=8.4 above the project's php >=8.2; 4.x released 4.0.1 (2024-07-03). Do: move sebastian/object-reflector to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/object-enumerator 4.0.4 (requires ^2.0; itself left-behind) and sebastian/global-state 5.0.8 (requires ^2.0) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9) and phpunit/phpunit 9.6.34 (requires sebastian/global-state ^5.0.8); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "sebastian/object-reflector 2.0.4 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 left-behind: branch 2.x last released 2020-10-26 (6.0 years ago); 6.x released 6.1.0 (2026-08-13), needs php >=8.4 above the project's php >=8.2; 4.x released 4.0.1 (2024-07-03). Do: move sebastian/object-reflector to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/object-enumerator 4.0.4 (requires ^2.0; itself left-behind), sebastian/global-state 5.0.8 (requires ^2.0), phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9) and phpunit/phpunit 9.6.34 (requires sebastian/global-state ^5.0.8); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "sebastian/object-reflector"
@@ -7328,7 +7328,7 @@
                     "level": "note",
                     "rank": 25.0,
                     "message": {
-                        "text": "sebastian/object-reflector 2.0.4 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 old-promise: released 2020-10-26 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: move sebastian/object-reflector to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/object-enumerator 4.0.4 (requires ^2.0; itself left-behind) and sebastian/global-state 5.0.8 (requires ^2.0) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9) and phpunit/phpunit 9.6.34 (requires sebastian/global-state ^5.0.8); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "sebastian/object-reflector 2.0.4 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 old-promise: released 2020-10-26 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: move sebastian/object-reflector to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/object-enumerator 4.0.4 (requires ^2.0; itself left-behind), sebastian/global-state 5.0.8 (requires ^2.0), phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9) and phpunit/phpunit 9.6.34 (requires sebastian/global-state ^5.0.8); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "sebastian/object-reflector"
@@ -7388,7 +7388,7 @@
                     "level": "note",
                     "rank": 25.0,
                     "message": {
-                        "text": "sebastian/version 3.0.2 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 left-behind: branch 3.x last released 2020-09-28 (6.0 years ago); 7.x released 7.0.1 (2026-10-04), needs php >=8.4 above the project's php >=8.2; 5.x released 5.0.2 (2024-10-09). Do: move sebastian/version to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^3.0.2) and phpunit/phpunit 9.6.33 (requires ^3.0.2) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "sebastian/version 3.0.2 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 left-behind: branch 3.x last released 2020-09-28 (6.0 years ago); 7.x released 7.0.1 (2026-10-04), needs php >=8.4 above the project's php >=8.2; 5.x released 5.0.2 (2024-10-09). Do: move sebastian/version to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^3.0.2), phpunit/phpunit 9.6.33 (requires ^3.0.2) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "sebastian/version"
@@ -7490,7 +7490,7 @@
                     "level": "note",
                     "rank": 25.0,
                     "message": {
-                        "text": "sebastian/version 3.0.2 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 old-promise: released 2020-09-28 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: move sebastian/version to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^3.0.2) and phpunit/phpunit 9.6.33 (requires ^3.0.2) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
+                        "text": "sebastian/version 3.0.2 \u2014 finding low, 5 = ((left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u00f7 2 dev \u2014 old-promise: released 2020-09-28 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: move sebastian/version to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^3.0.2), phpunit/phpunit 9.6.33 (requires ^3.0.2) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "sebastian/version"
@@ -7743,7 +7743,7 @@
                     "level": "warning",
                     "rank": 25.0,
                     "message": {
-                        "text": "lcobucci/clock 3.3.1 \u2014 finding low, 4 = capped 8 \u00f7 2 transitive \u2014 capped: requires php ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded. Do: raise require.php to >=8.4, then move lcobucci/clock to ^3.6.0 through lcobucci/jwt, scheb/2fa-trusted-device \u2014 clears capped; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 8.2 (a minor raise); the target php 8.4 runs it; what requires it must allow it; the newest release of lcobucci/jwt (5.6.0) no longer requires it; Composer's solver checked it against the lock."
+                        "text": "lcobucci/clock 3.3.1 \u2014 finding low, 4 = capped 8 \u00f7 2 transitive \u2014 capped: requires php ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded. Do: raise require.php to >=8.4, then move lcobucci/clock to ^3.6.0 through lcobucci/jwt and scheb/2fa-trusted-device \u2014 clears capped; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 8.2 (a minor raise); the target php 8.4 runs it; what requires it must allow it; the newest release of lcobucci/jwt (5.6.0) no longer requires it; Composer's solver checked it against the lock."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "lcobucci/clock"

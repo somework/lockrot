@@ -6,6 +6,7 @@ namespace Lockrot\Verdict;
 
 use Lockrot\Allowlist\AcceptedCheck;
 use Lockrot\Allowlist\AllowlistEntry;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Forge\ActivityLookup;
@@ -95,7 +96,7 @@ final class FindingDetails
         $package = $facts->package();
         $status = $facts->metadataStatus();
         $coverage = $facts->advisoryCoverage();
-        $reason = $coverage === null ? 'composer_too_old' : $coverage->reason();
+        $reason = $coverage === null ? AdvisoryCoverage::NO_FEED : $coverage->reason();
         $requires = $package->requirePhp();
         // A lookup that some feed answered is partial, whether or not that feed counted an advisory.
         $answered = $coverage !== null && $coverage->records() !== null;

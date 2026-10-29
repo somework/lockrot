@@ -8,7 +8,7 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Config\Gate;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Move;
-use Lockrot\Verdict\ShellCommand;
+use Lockrot\Verdict\MoveText;
 
 /**
  * The `table` format, a list grouped by grade. A row is prose, not a cell in a box,
@@ -121,34 +121,16 @@ final class TableFormatter implements FormatterInterface
     private function moveLines(Move $move): array
     {
         $lines = [];
-        foreach (self::commandParts($move) as [$part, $isCommand]) {
+        foreach (MoveText::parts($move) as [$part, $isCommand]) {
+            $part = trim($part);
+            if ($part === '') {
+                continue;
+            }
             $prefix = $lines === [] ? self::LINE.'do: ' : self::DO_HANG;
             $lines = array_merge($lines, $isCommand ? [self::escape($prefix.$part)] : $this->wrapped($prefix, $part, self::DO_HANG));
         }
 
         return $lines;
-    }
-
-    /**
-     * The move text cut around the first command that it names, as [text, whether it is the command].
-     * A second command stays in the text part.
-     *
-     * @return list<array{0: string, 1: bool}>
-     */
-    public static function commandParts(Move $move): array
-    {
-        $text = $move->text();
-        foreach ($move->commands() as $argv) {
-            $command = ShellCommand::posix($argv);
-            if ($command !== null && ($at = strpos($text, $command)) !== false) {
-                $before = trim(substr($text, 0, $at));
-                $after = trim(substr($text, $at + \strlen($command)));
-
-                return array_merge($before === '' ? [] : [[$before, false]], [[$command, true]], $after === '' ? [] : [[$after, false]]);
-            }
-        }
-
-        return [[$text, false]];
     }
 
     /**

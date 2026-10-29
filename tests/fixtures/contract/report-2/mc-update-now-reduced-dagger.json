@@ -797,8 +797,16 @@
         "move_check": {
             "composer": "2.10.3",
             "blocks_advisories": false,
-            "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "blocking_disabled_by": [
+                "config.audit.block-insecure"
+            ],
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -1177,12 +1185,12 @@
     },
     "data_date": "2026-10-01T17:41:20+00:00",
     "notes": [
-        "update now: the command leaves out symfony/yaml, typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0."
+        "update now: the command leaves out symfony/yaml and typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0."
     ],
     "note_details": [
         {
             "code": "update_now_reduced",
-            "text": "update now: the command leaves out symfony/yaml, typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0.",
+            "text": "update now: the command leaves out symfony/yaml and typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0.",
             "docs_url": "https://lockrot.dev/notes/#update_now_reduced",
             "sets_network_failures": false,
             "data": {
@@ -1190,7 +1198,6 @@
                     "symfony/yaml",
                     "typo3/html-sanitizer"
                 ],
-                "held_below": [],
                 "problem": "  Problem 1\n    - Root composer.json requires symfony/yaml ^6.4 -> satisfiable by symfony/yaml[v6.4.40].\n    - Root composer.json requires typo3/html-sanitizer ^2.2 -> satisfiable by typo3/html-sanitizer[v2.3.2].\n    - symfony/yaml v6.4.40 conflicts with acme/un-x 2.0.0.\n    - typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0 -> satisfiable by acme/un-x[2.0.0]."
             }
         }

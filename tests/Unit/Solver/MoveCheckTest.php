@@ -24,7 +24,6 @@ final class MoveCheckTest extends TestCase
         self::assertNull(MoveCheck::resolves(MoveCheck::INLINE, 'dev-main')->installsBelow('not a version'));
     }
 
-    /** Under Composer 2.2 or 2.3 the plain `composer update <pkg>` has no root cap, so it can install a release above the newest. */
     public function testAReleaseAboveTheNewestIsNamed(): void
     {
         self::assertSame('3.0.0', MoveCheck::resolves(MoveCheck::INLINE, '3.0.0')->installsAbove('2.12.3'));
@@ -39,7 +38,7 @@ final class MoveCheckTest extends TestCase
     public function testAnIncompleteAdvisoryLookupNamesThePackageThatTheLookupDidNotCover(): void
     {
         self::assertSame(
-            "update now: not checked with Composer's solver (the advisory lookup did not cover a package it installs), so lockrot writes no command for a/b",
+            "update now: not checked with Composer's solver (the advisory lookup did not cover a package in the result), so lockrot writes no command for a/b",
             RunNote::updateNowNotChecked(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE, ['a/b'])->text()
         );
     }

@@ -1,7 +1,7 @@
-::warning file=composer.lock,title=lockrot%3A low — stale::league/config v1.2.0: 4 = stale 8 ÷ 2 transitive. Do: —. stale: last release 2022-12-11 (3.8 years ago). (via laravel/framework, laravel/tinker)
+::warning file=composer.lock,title=lockrot%3A low — stale::league/config v1.2.0: 4 = stale 8 ÷ 2 transitive. Do: —. stale: last release 2022-12-11 (3.8 years ago). (via laravel/framework and laravel/tinker)
 ::warning title=lockrot::advisories not checked: the gate could not read the advisories of every package
 flags: stale 1
 depth: 1 of 1 flagged package is named by no line of composer.json · 2 hops 1 · deepest: league/config, 2 hops (laravel/framework › league/commonmark › league/config)
 security: no vulnerable package · advisories not checked
 php: the lock installs on PHP 8.4 to 8.5
-gate: passes · --fail-on=high · no finding fails it · advisories not applied to 76 packages: not checked (Composer below 2.4) · target php 8.4 (--target-php)
+gate: passes · --fail-on=high · no finding fails it · advisories not applied to 76 packages: not checked (no repository publishes advisories) · target php 8.4 (--target-php)

@@ -17,5 +17,5 @@ php: the lock installs on PHP 7.2 to 8.5
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.
-note: GitHub token not set: repository activity checked for 0 candidate packages, 1 package skipped (set GITHUB_TOKEN to
-check all)
+note: GitHub token not set: repository activity checked for 0 candidate packages, 1 package skipped (set
+LOCKROT_GITHUB_TOKEN or GITHUB_TOKEN to a github.com token to check all)

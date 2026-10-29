@@ -20,6 +20,9 @@ class TheFullCheckSubset(unittest.TestCase):
     def test_a_branch_without_a_subset_runs_every_shard(self):
         self.assertEqual(SHARDS, full_check_subset.selected('release/full-check-1ca57573', SHARDS))
 
+    def test_an_rc_tag_runs_every_shard(self):
+        self.assertEqual(SHARDS, full_check_subset.selected('v0.14.0-rc.1', SHARDS))
+
     def test_the_names_after_the_double_hyphen_choose_the_shards_in_matrix_order(self):
         self.assertEqual(
             ['verdicts', 'data and the rest'],

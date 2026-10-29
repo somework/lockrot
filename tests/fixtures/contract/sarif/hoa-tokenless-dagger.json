@@ -257,7 +257,7 @@
                         {
                             "level": "note",
                             "message": {
-                                "text": "GitHub token not set: repository activity checked for 0 candidate packages, 1 package skipped (set GITHUB_TOKEN to check all)"
+                                "text": "GitHub token not set: repository activity checked for 0 candidate packages, 1 package skipped (set LOCKROT_GITHUB_TOKEN or GITHUB_TOKEN to a github.com token to check all)"
                             }
                         }
                     ]

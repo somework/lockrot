@@ -14,6 +14,20 @@ start the reason with `in method():`.
 `tools/mutation/tests/test_pr_gate.py` fails on an entry whose line is not in src. Rewrite or remove the
 entry in the commit that changes the line.
 
+An escape entry never accounts for an uncovered mutant, the mutant of a line that no test that
+Infection runs reaches. Write such an entry in one of two forms:
+
+    - `src/Path/File.php` NotCovered xN `the uncovered line, as in the source` — reason
+    - `src/Path/File.php` NotCoveredMethod xN `method()` — reason
+
+`NotCovered` accounts for N uncovered mutants of its line, of any mutator. `NotCoveredMethod`
+accounts for N uncovered mutants of the method, and it needs its count. The report of a full run
+names an entry that matches fewer mutants than its count. The reason is one of these three:
+
+- a Composer-version leg: name the test and the CI matrix row that run it.
+- bootstrap code that only an e2e test runs.
+- unreachable code: name the invariant that makes it unreachable.
+
 ## src/Allowlist
 
 - `src/Allowlist/AllowlistEntry.php` AssignCoalesce `$parser = self::$parser ??= new VersionParser();` — a memo. `VersionParser` has no state, so a new instance normalises the same way.
@@ -35,7 +49,7 @@ entry in the commit that changes the line.
 - `src/Analyzer/Report.php` AssignCoalesce `$gate ??= $this->gate();` — the gate is derived from the report alone, so computing it again gives the gate that the caller passed.
 - `src/Analyzer/Report.php` UnwrapArraySlice ``$rows[$finding->package()] = \array_slice($row, 0, $lead, true) + ['rank' => $at + 1] + \array_slice($row, $lead, null, true) + [`` — in findingRows(): the union keeps the first of each key, so the whole row in place of its tail adds the same keys in the same order.
 - `src/Analyzer/RunNote.php` CastString `$host = (string) $where->host();` — every entry of the host note comes from `LocatedRepository::unsupported()`, which always names a host.
-- `src/Analyzer/UpdateNow.php` CastString `return self::reachingTheFix($kept, $retry, $findings, $checks, [array_keys(array_diff_key($inline, $kept)), (string) $outcome->problem()]);` — a refused combined outcome always carries its problem text.
+- `src/Analyzer/UpdateNow.php` CastString `return self::resolved($kept, $findings, RunNote::updateNowReduced(self::inReportOrder(array_keys(array_diff_key($inline, $kept)), $findings), (string) $outcome->problem()));` — a refused combined outcome always carries its problem text.
 
 ## src/Baseline
 
@@ -66,10 +80,11 @@ entry in the commit that changes the line.
 - `src/Composer/LockrotCommand.php` LogicalOr `if ($finding === null || $facts === null) {` — in explain(): one loop fills both, so one is null exactly when the other is.
 - `src/Composer/LockrotCommand.php` CastArray `foreach ((array) $input->getOption('output') as $spec) {` — `--output` is `VALUE_IS_ARRAY`, so symfony/console always returns an array. The cast is for PHPStan.
 - `src/Composer/LockrotCommand.php` ReturnRemoval `return null;` — in resolveComposer(): without a composer.json, `tryComposer()` returns null too.
-- `src/Composer/LockrotCommand.php` Ternary, FalseValue `$composer = method_exists($this, 'tryComposer') ? $this->tryComposer() : $this->getComposer(false);` — the vendored Composer has `tryComposer()`, and its `getComposer(false)` calls `tryComposer()`.
 - `src/Composer/SelfUpdateCommand.php` FalseValue `$phar = $this->runningPhar ?? \Phar::running(false);` — the two calls differ only inside a running PHAR. Infection does not run the e2e `PharTest`.
 - `src/Composer/SelfUpdateCommand.php` FunctionCallRemoval `class_exists(TerminalText::class);` — the call loads the class before the archive is replaced. From the source tree the autoloader also finds it later.
 - `src/Composer/LockrotCommand.php` Coalesce `$lockrot->project() ?? $project->name(),` — in explain(): explain-2 writes no `run.project`, so no output reads the project name of this run.
+- `src/Composer/RejectsUnreadableInput.php` ProtectedVisibility `protected function inputRefusal(InputInterface $input): ?string` — `LockrotCommand` declares its own `inputRefusal()`, which wins over the trait's. `SelfUpdateCommand` calls the trait's from the same class, where `private` works too.
+- `src/Composer/RejectsUnreadableInput.php` CloneRemoval `$copy = clone $input;` — both commands call `parent::run()` next, and Symfony's `run()` binds the input again with the command's own definition.
 
 ## src/Config
 
@@ -99,12 +114,11 @@ entry in the commit that changes the line.
 - `src/Data/Repository/RepositoryMetadataLoader.php` TrueValue `$seen[$id] = true;` — a set. Only `isset()` reads it.
 - `src/Data/Repository/RepositoryUrl.php` DecrementInteger `return strncmp($shown, '...', 3) === 0;` — nothing that `shown()` returns starts with `..` and no third dot.
 - `src/Data/Repository/RepositoryUrl.php` LessThan `return $at !== null && ($line === null || $at < $line) ? $at : null;` — in closer(): one pattern finds both offsets, each at its own character, so they are never equal.
-- `src/Data/Abandoned/ComposerAbandonedPolicyReader.php` UnwrapArrayFilter `return array_filter($config, 'is_string', \ARRAY_FILTER_USE_KEY);` — Composer's policy readers look up named keys only, so an integer key that the filter drops changes nothing.
+- `src/Data/Abandoned/AbandonedIgnore.php` UnwrapArrayFilter `return array_filter($config, 'is_string', \ARRAY_FILTER_USE_KEY);` — Composer's policy readers look up named keys only, so an integer key that the filter drops changes nothing.
 - `src/Data/Advisory/AdvisoryIgnore.php` FalseValue `return new self([], [], false);` — the flag sets only the `by` of a match, and an empty list matches nothing.
 - `src/Data/Advisory/AdvisoryIgnore.php` FalseValue `return new self([], [], false, $why);` — the flag sets only the `by` of a match, and an empty list matches nothing.
 - `src/Data/Advisory/AdvisoryIgnore.php` TrueValue `return new self([], [], true, null, ['policy_key' => $policyKey, 'value' => $value]);` — the flag sets only the `by` of a match, and an empty list matches nothing.
-- `src/Data/Advisory/AdvisoryIgnore.php` CastString `$ids[(string) $key] = \is_string($reason) ? $reason : null;` — PHP stores a numeric string key as an integer either way, and `array_key_exists()` finds it by the string.
-- `src/Data/Advisory/ComposerAdvisoryPolicyReader.php` UnwrapArrayFilter x2 `$advisories = AdvisoriesPolicyConfig::fromRawConfig(array_filter($policy, 'is_string', \ARRAY_FILTER_USE_KEY), array_filter($audit, 'is_string', \ARRAY_FILTER_USE_KEY), new VersionParser());` — Composer's policy readers look up named keys only, so an integer key that the filter drops changes nothing.
+- `src/Data/Advisory/AdvisoryIgnore.php` UnwrapArrayFilter `return array_filter($config, 'is_string', \ARRAY_FILTER_USE_KEY);` — Composer's policy readers look up named keys only, so an integer key that the filter drops changes nothing.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` TrueValue `$ids[$advisory->advisoryId] = true;` — only the keys are counted.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in attribute(): a package name holds a `/`, so PHP never stores it as an integer key.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in coverage(): a package name holds a `/`, so PHP never stores it as an integer key.
@@ -115,7 +129,6 @@ entry in the commit that changes the line.
 - `src/Filesystem/AtomicWriter.php` FunctionCallRemoval `error_clear_last();` — every failing call records its own warning, which replaces the last one.
 - `src/Filesystem/Path.php` CastString `return strpos($path, $root) === 0 ? (string) substr($path, \strlen($root)) : null;` — `$root` ends in `/` and `$path` does not, so `$path` is longer and `substr()` never returns false.
 - `src/Filesystem/Path.php` LogicalOr, DecrementInteger x2 `if ($a['ino'] === 0 || $b['ino'] === 0) {` — the filesystems of CI and of developers report an inode. Only a Windows filesystem without a file index reaches the fallback.
-- `src/Graph/DependencyGraph.php` ReturnRemoval `return $this->trees[$root];` — a memo. The edges do not change, so the tree is the same.
 - `src/Graph/DependencyGraph.php` TrueValue `$present[$package->name()] = true;` — a set. Only `isset()` reads it.
 - `src/Graph/DependencyGraph.php` ArrayItemRemoval `foreach (isset($present[$name]) ? [$name] : ($satisfiedBy[$name] ?? [$name]) as $package) {` — a name that no locked package satisfies has no edges: a walk follows only an existing edge, and `namedIn()` answers only for a package with edges.
 - `src/Graph/DependencyGraph.php` TrueValue `$resolved[$package] = true;` — a set. Only its keys are read.
@@ -134,11 +147,13 @@ entry in the commit that changes the line.
 - `src/Output/MarkdownFormatter.php` DecrementInteger `$nonce = bin2hex(random_bytes(16));` — the footer replaces each stand-in before it returns, so the nonce length never reaches the output, and 15 random bytes are as far out of reach of the data.
 - `src/Output/MarkdownFormatter.php` IncrementInteger `$nonce = bin2hex(random_bytes(16));` — the footer replaces each stand-in before it returns, so the nonce length never reaches the output.
 - `src/Output/InstallSummaryFormatter.php` LogicalAnd `$gateLine = $gate !== null && $run !== null && $gate->fails() ? '  '.self::text(RunGateText::render($gate, $run)) : null;` — a report decides its gate only from its run settings, so the gate and the run are null together.
+- `src/Output/InstallSummaryFormatter.php` FalseValue `$afterCommand = false;` — the first piece is the head, which is prose and holds a space, so a head that does not fit keeps a word and the start value never decides the ellipsis.
+- `src/Output/InstallSummaryFormatter.php` IncrementInteger `$cut = TerminalText::neutralise($text, max(0, $room));` — a room of 0 or 1 holds no space after a first character, so both cuts show no word.
 - `src/Output/AgeText.php` Coalesce `$key = ReleaseBranch::of($version) ?? ReleaseBranch::aliasLine($version);` — `ReleaseBranch::of()` answers only a release and `aliasLine()` only a branch alias, so at most one of them is not null.
 - `src/Output/HtmlFormatter.php` BitwiseOr `return htmlspecialchars($value, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');` — `title()` is the one caller, and its string holds no quote and no invalid byte.
 - `src/Output/JsonFormatter.php` FalseValue `public function format(Report $report, bool $showAll = false): string` — the JSON document lists every finding and does not read `$showAll`.
 - `src/Output/ReportTarget.php` GreaterThan `if (strpos($spec, $known.':') === 0 && \strlen($known) > \strlen($format)) {` — two format names of one length cannot both start a spec before its colon, so `>=` picks the same name.
-- `src/Output/TerminalWidth.php` Coalesce `$width = self::fromEnv($env) ?? self::fromConsoleTerminal($env) ?? self::fromApplication($application) ?? FormatContext::DEFAULT_WIDTH;` — `fromConsoleTerminal()` gives null when `COLUMNS` is set, so the order of the first two steps does not matter.
+- `src/Output/TerminalWidth.php` Coalesce `$width = self::fromEnv($env) ?? self::fromConsoleTerminal($env) ?? FormatContext::DEFAULT_WIDTH;` — `fromConsoleTerminal()` gives null when `COLUMNS` is set, so the order of the first two steps does not matter.
 - `src/Output/HtmlFormatter.php` UnwrapArrayFilter and UnwrapArrayValues `return \is_array($reads) ? array_values(array_filter($reads, 'is_int')) : [];` — the vendored manifest lists its report numbers as a JSON list of integers, so the filter keeps every item and the keys stay `0..n-1`.
 - `src/Output/SarifFormatter.php` CastString `return TerminalText::breakJsonLogCommands((string) preg_replace('{^( {20}"rank": -?\d+)(,?)$}m', '$1.0$2', $json))."\n";` — the pattern is a constant that compiles, so `preg_replace()` returns a string and never null.
 
@@ -158,16 +173,26 @@ entry in the commit that changes the line.
 
 - `src/Signal/PhpFloor.php` CastString `return ($kind === self::PROJECT ? 'the project\'s php ' : 'the target PHP ').(string) $this->php($kind);` — `php($kind)` is null only for an absent floor, and no caller describes one.
 - `src/Signal/PhpFloor.php` ReturnRemoval `return null;` — in parse(): composer/semver reads null as `""` and throws, and the `catch` returns the same value.
+- `src/Signal/PhpFloor.php` CastInt `foreach ([$point, $major.'.'.$minor.'.'.((int) $patch + 1)] as $candidate) {` — `startPoint()` writes the patch as digits, and PHP adds a digit string as the integer it spells. The cast is for the type.
 - `src/Signal/Rule/LeftBehindRule.php` LessThanOrEqualTo `if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $ownAt) {` — a higher branch released at the instant of the installed branch cannot be alive while the installed branch is old enough for S8.
 
 ## src/Solver
 
 - `src/Solver/AdvisoryBlocking.php` DecrementInteger, IncrementInteger `throw new ConfigException('Composer rejects the policy configuration: '.$e->getMessage(), 0, $e);` — no code reads the code of this exception.
+- `src/Solver/AdvisoryBlocking.php` FalseValue `return self::blocking(PolicyConfig::fromConfig(new Config(false)));` — only tests call `everyAdvisory()`, and their environment sets no variable that `Config` reads.
 - `src/Solver/ComposerSolver.php` Concat `$inputs = SolverInputs::of($pool, $request, $root).serialize($preferred);` — a cache key. A `serialize()` string ends where its own syntax ends, so either order tells the inputs apart.
+- `src/Solver/ComposerSolver.php` DecrementInteger, IncrementInteger `throw new \RuntimeException('Composer\'s advisory pool filter cannot be built: '.($error === null ? 'unknown error' : $error->getMessage()), 0, $error);` — no code reads the code of this exception.
 - `src/Solver/MoveCheckers.php` UnwrapArrayUnique `foreach (array_unique(array_filter([$package->getSourceUrl(), $package->getDistUrl()])) as $url) {` — only `in_array()` reads the names that a URL serves, so a name twice in the list changes no answer.
 - `src/Solver/MoveCheckers.php` Ternary `$solver = self::minimalChanges($config) ? $solver->withMinimalChanges() : $solver;` — a move check reads only the moved package's release, and minimal changes changes only the releases of the other names.
 - `src/Solver/MoveCheckers.php` CastBool x2 `return (bool) Platform::getEnv('COMPOSER_MINIMAL_CHANGES') || (bool) $config->get('update-with-minimal-changes');` — `||` returns a bool, and `(bool)` reads `'0'` as PHP's `||` does.
+- `src/Solver/PoolAdvisories.php` CastString `$missing[] = (string) $name;` — a package name holds a `/`, so PHP never turns its array key into an int.
+- `src/Solver/PoolAdvisories.php` CastString `$answer['unread'][] = (string) $name;` — as the `$missing` cast.
+- `src/Solver/PoolAdvisories.php` CastString `$answer['namesFound'][] = (string) $name;` — as the `$missing` cast.
+- `src/Solver/PoolAdvisoryFeed.php` MethodCallRemoval `parent::__construct();` — `ArrayRepository::__construct()` with no packages adds none, and its first read creates the empty list.
+- `src/Solver/PoolAdvisoryFeed.php` FalseValue `public function getSecurityAdvisories(array $packageConstraintMap, bool $allowPartialAdvisories = false): array` — Composer's `RepositorySet` passes the argument on every call.
+- `src/Solver/PoolAdvisoryFeed.php` ArrayItemRemoval `return ['namesFound' => $answer['namesFound'], 'advisories' => $answer['advisories']];` — `RepositorySet::getSecurityAdvisoriesForConstraints()` reads only `advisories` of the answer.
 - `src/Solver/RepositoryVersions.php` UnwrapArrayFilter, UnwrapArrayValues `$options[$key] = array_values(array_filter($config[$key], 'is_string'));` — Composer builds the repository's `FilterRepository` from the same config, and it fails on an entry that is neither a string nor a number. No number matches a `vendor/name`, and `FilterRepository` reads only the values.
+- `src/Solver/SolverInputs.php` UnwrapArrayMap x2 `return array_map(static fn (array $versions): array => array_map('strval', array_keys($versions)), $removed);` — a cache key. A version key is a normalized version, never an int, and the removal map without the outer map tells the same pools apart.
 
 ## src/Verdict
 

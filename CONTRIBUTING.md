@@ -32,7 +32,7 @@ matrix in `.github/workflows/ci.yml`) and these gates:
 | Gate | Configured in | Run it locally |
 |---|---|---|
 | Core coverage | Directories: `phpunit.core-coverage.xml.dist`. Floor: the "Core coverage gate" step of `ci.yml` | With pcov or Xdebug: `vendor/bin/phpunit -c phpunit.core-coverage.xml.dist --coverage-clover build/clover-core.xml`, `composer global require rregeer/phpunit-coverage-check`, then `$(composer global config bin-dir --absolute)/coverage-check build/clover-core.xml <floor>` |
-| Mutation score (Infection) | Shards and their `min_msi`: the `mutation` job of `ci.yml`. Whole-tree floor for a local run: `infection.json5` | On the PHP that `.github/actions/mutation-shard/action.yml` sets up, with pcov or Xdebug: `composer global config --no-plugins allow-plugins.infection/extension-installer true`, `composer global require infection/infection:<constraint in that action>`, then `$(composer global config bin-dir --absolute)/infection --threads=max` |
+| Mutation score (Infection) | Shards and their `min_msi`: the `mutation` job of `ci.yml`. Whole-tree floor for a local run: `infection.json5` | On the PHP that `.github/actions/mutation-shard/action.yml` sets up, with pcov or Xdebug: `composer global config --no-plugins allow-plugins.infection/extension-installer true`, `composer global require infection/infection:<release in that action>`, the composer/composer pin step of that action, then `$(composer global config bin-dir --absolute)/infection --threads=max --with-uncovered` |
 | Undeclared dependencies | `composer-require-checker.json` | `composer global require maglnet/composer-require-checker`, then `$(composer global config bin-dir --absolute)/composer-require-checker check --config-file=composer-require-checker.json composer.json` |
 | Docs build | `mkdocs.yml` | `pip install -r docs/requirements.txt`, then `mkdocs build --strict` |
 | Corpus self-test | `tools/corpus/tests/` | `tools/corpus/corpus selftest` |
@@ -47,8 +47,8 @@ Document an escaped mutant that no test can kill, with the reason, in
 | Floor | Declared in | What it rules out |
 |---|---|---|
 | PHP 7.4 | `composer.json` `require.php`, `phpstan.neon.dist` `phpVersion` | PHP 8 syntax: `match`, enums, constructor promotion, `readonly`, union types in signatures, the nullsafe operator, named arguments. PHP 8 functions such as `str_contains()` without a guard |
-| Composer plugin API 2.2 | `composer.json` `"composer-plugin-api": "^2.2"` | Composer API added after 2.2 without a version guard |
-| symfony/console 2.8 API | The Composer 2.2 LTS binary, which bundles console 2.8 | Console API added after 2.8. `require-dev` resolves a newer console. Such a call passes locally and fails only in the plugin e2e step on the Composer 2.2 rows of CI |
+| Composer 2.10 | `composer.json` `"composer-plugin-api": "^2.9"` and the version check of `LockrotPlugin` (Composer 2.9 also reports plugin API 2.9.0) | Composer API added after 2.10 without a version guard |
+| symfony/console 5.4 API | The Composer PHAR, which Composer builds for PHP 7.2.5 and which bundles console 5.4 | Console API added after 5.4 |
 
 PHPUnit 9 runs the 7.4 and 8.0 rows, so a test declares each data provider twice: `@dataProvider`
 in the docblock and `#[DataProvider]` as an attribute.

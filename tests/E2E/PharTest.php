@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\E2E;
 
+use Composer\XdebugHandler\XdebugHandler;
 use Lockrot\SelfUpdate\ReleaseKey;
 use Lockrot\Tests\Support\Contract\BaselinedScenario;
 use Lockrot\Tests\Support\FixtureCliRun;
@@ -111,6 +112,65 @@ final class PharTest extends TestCase
         self::assertSame(['critical', 'high', 'medium', 'low', 'unknown', 'finished', 'ok'], array_keys($counts));
         self::assertIsArray($json['findings']);
         self::assertNotContains('abandoned', array_column($json['findings'], 'lead'));
+    }
+
+    /**
+     * The archive restarts without Xdebug as `composer` does, under Composer's own switch. The
+     * handler reports its check whether Xdebug is loaded or not, and a restart only when Xdebug
+     * runs in this PHP.
+     */
+    public function testTheArchiveChecksForXdebugBeforeItRuns(): void
+    {
+        $process = new Process([\PHP_BINARY, $this->phar(), '--version'], null, ['XDEBUG_HANDLER_DEBUG' => '1', 'COMPOSER_ALLOW_XDEBUG' => false]);
+        $process->setTimeout(300)->run();
+
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        self::assertSame('lockrot '.Version::STRING."\n", $process->getOutput());
+        self::assertStringContainsString('Checking COMPOSER_ALLOW_XDEBUG', $process->getErrorOutput());
+        if (XdebugHandler::isXdebugActive()) {
+            self::assertStringContainsString('Restarted', $process->getErrorOutput());
+        }
+    }
+
+    /**
+     * The process setup of Composer's bin/composer: errors go to stderr, the locale is C, and the
+     * memory limit is raised. The probe reports at shutdown, which runs after the archive's exit().
+     */
+    public function testTheArchiveSetsUpItsProcessAsComposersBinaryDoes(): void
+    {
+        $dir = sys_get_temp_dir().'/lockrot-probe-'.bin2hex(random_bytes(4));
+        mkdir($dir);
+        $this->tempDirs[] = $dir;
+        $probe = $dir.'/probe.php';
+        file_put_contents($probe, '<?php register_shutdown_function(static function (): void { fwrite(STDERR, "probe display_errors=".ini_get("display_errors")." locale=".setlocale(LC_ALL, "0")." memory_limit=".ini_get("memory_limit")."\n"); });');
+
+        $process = new Process(
+            [\PHP_BINARY, '-d', 'display_errors=1', '-d', 'log_errors=0', '-d', 'memory_limit=128M', '-d', 'auto_prepend_file='.$probe, $this->phar(), '--version'],
+            null,
+            ['COMPOSER_MEMORY_LIMIT' => false, 'COMPOSER_ALLOW_XDEBUG' => '1', 'LC_ALL' => 'en_US.UTF-8']
+        );
+        $process->setTimeout(300)->run();
+
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        self::assertSame('lockrot '.Version::STRING."\n", $process->getOutput());
+        self::assertStringContainsString("probe display_errors=stderr locale=C memory_limit=1536M\n", $process->getErrorOutput());
+    }
+
+    /**
+     * Box's requirement checker stops the archive before the SAPI guard of bin/lockrot runs. On a web
+     * SAPI with register_argc_argv=On, a query string can set the command line.
+     */
+    public function testTheArchiveDoesNotRunOnAWebSapiThatReadsArgvFromTheQueryString(): void
+    {
+        $cgi = \dirname(\PHP_BINARY).'/php-cgi';
+        if (!is_executable($cgi)) {
+            self::markTestSkipped('no php-cgi beside '.\PHP_BINARY);
+        }
+        $process = new Process([$cgi, '-q', '-d', 'register_argc_argv=1', $this->phar(), '--version']);
+        $process->setTimeout(300)->run();
+
+        self::assertNotSame(0, $process->getExitCode(), $process->getOutput());
+        self::assertStringNotContainsString('lockrot '.Version::STRING, $process->getOutput());
     }
 
     /**

@@ -11,13 +11,14 @@ use Composer\Package\Loader\RootPackageLoader;
 use Composer\Repository\RepositoryFactory;
 use Composer\Semver\Semver;
 use Composer\Semver\VersionParser;
+use Composer\Util\Platform;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\Holder;
+use Lockrot\Solver\AdvisoryBlocking;
 use Lockrot\Solver\CheckOutcome;
-use Lockrot\Solver\ComposerFeatures;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveChecker;
 use Lockrot\Solver\MoveCheckers;
@@ -47,10 +48,31 @@ use PHPUnit\Framework\TestCase;
 #[Group('covers-nothing')]
 final class MoveCheckComposerOracleTest extends TestCase
 {
+    private const WORLDS = __DIR__.'/../fixtures/move-check-oracle/worlds.json';
+
     private ?string $project = null;
+
+    /** @var array<string, string|false> each environment switch of the advisory blocking => its value before the test */
+    private array $switches = [];
+
+    protected function setUp(): void
+    {
+        // The CLI ran each world without these variables: a value in the shell would turn a world's blocking off.
+        foreach (AdvisoryBlocking::SWITCHES as $switch) {
+            if (strpos($switch, 'config.') !== 0) {
+                $this->switches[$switch] = getenv($switch);
+                Platform::clearEnv($switch);
+            }
+        }
+    }
 
     protected function tearDown(): void
     {
+        foreach ($this->switches as $switch => $value) {
+            if ($value !== false) {
+                Platform::putEnv($switch, $value);
+            }
+        }
         if ($this->project !== null) {
             array_map('unlink', glob($this->project.'/*') ?: []);
             rmdir($this->project);
@@ -65,6 +87,12 @@ final class MoveCheckComposerOracleTest extends TestCase
             if (\is_array($case) && \is_array($case['solver_world'] ?? null)) {
                 yield JsonPath::stringAt($case, ['id']) => [$case['solver_world'], JsonPath::stringAt($case, ['run', 'move_check', 'composer'])];
             }
+        }
+        // A world that no report case needs, such as one with advisory blocking on: tests/fixtures/move-check-oracle/README.md.
+        $oracle = JsonPath::decodeFile(self::WORLDS);
+        foreach (JsonPath::arrayAt($oracle, ['worlds']) as $world) {
+            self::assertIsArray($world);
+            yield 'oracle '.JsonPath::stringAt($world, ['world_id']) => [$world, JsonPath::stringAt($oracle, ['composer'])];
         }
     }
 
@@ -86,6 +114,9 @@ final class MoveCheckComposerOracleTest extends TestCase
         $world = JsonPath::arrayAt($solverWorld, ['world']);
         $answers = JsonPath::arrayAt($solverWorld, ['answers']);
         $server = FixtureRepositoryServer::fromReleases(self::releases(JsonPath::arrayAt($world, ['repo'])));
+        if (JsonPath::has($world, ['advisories'])) {
+            $server->withSecurityAdvisories(self::releases(JsonPath::arrayAt($world, ['advisories'])));
+        }
         $server->start();
         try {
             $checker = $this->checker($server, $world, JsonPath::stringAt($world, ['platform_php']));
@@ -93,7 +124,7 @@ final class MoveCheckComposerOracleTest extends TestCase
             $actual = [];
             foreach ($answers as $key => $answer) {
                 self::assertIsArray($answer);
-                $outcome = self::ask($checker, (string) $key, $answers, JsonPath::arrayAt($world, ['repo']), self::inlineNames($world));
+                $outcome = self::ask($checker, (string) $key, $answers, JsonPath::arrayAt($world, ['repo']));
                 $withProblem = $key === 'baseline' || strpos((string) $key, 'combined ') === 0;
                 [$installs, $actualInstalls] = self::installs((string) $key, $answer, $outcome, JsonPath::arrayAt($world, ['lock']));
                 // lockrot reads no hold of a refused baseline: every move is then not checked.
@@ -204,9 +235,8 @@ final class MoveCheckComposerOracleTest extends TestCase
      *
      * @param array<mixed, mixed> $answers
      * @param array<mixed, mixed> $repo
-     * @param list<string>|null   $inlineNames the names that take an inline constraint, null for any name
      */
-    private static function ask(MoveChecker $checker, string $key, array $answers, array $repo, ?array $inlineNames): CheckOutcome
+    private static function ask(MoveChecker $checker, string $key, array $answers, array $repo): CheckOutcome
     {
         if ($key === 'baseline') {
             return $checker->baseline();
@@ -223,7 +253,7 @@ final class MoveCheckComposerOracleTest extends TestCase
                         && ($answer['result'] ?? null) === MoveCheck::RESOLVES && ($answer['form'] ?? null) === MoveCheck::INLINE;
                 }));
                 self::assertCount(1, $update, $key.': one update request of '.$name.' that resolves inline');
-                $inline[$name] = $inlineNames === null || \in_array($name, $inlineNames, true) ? explode(' ', (string) $update[0])[2] : '';
+                $inline[$name] = explode(' ', (string) $update[0])[2];
             }
 
             return $checker->combined($inline);
@@ -231,10 +261,10 @@ final class MoveCheckComposerOracleTest extends TestCase
         if ($words[0] === 'joint') {
             [$move, $holders] = explode(' with ', substr($key, \strlen('joint ')), 2);
 
-            return $checker->joint(self::query($move, $repo, $inlineNames), explode(' ', $holders));
+            return $checker->joint(self::query($move, $repo), explode(' ', $holders));
         }
 
-        return $checker->check(self::query($key, $repo, $inlineNames));
+        return $checker->check(self::query($key, $repo));
     }
 
     /**
@@ -242,9 +272,8 @@ final class MoveCheckComposerOracleTest extends TestCase
      * constraint admits.
      *
      * @param array<mixed, mixed> $repo
-     * @param list<string>|null   $inlineNames
      */
-    private static function query(string $key, array $repo, ?array $inlineNames): MoveQuery
+    private static function query(string $key, array $repo): MoveQuery
     {
         [$verb, $package, $constraint] = explode(' ', $key);
         $php = explode(' ', $key)[3] ?? '';
@@ -256,27 +285,7 @@ final class MoveCheckComposerOracleTest extends TestCase
             return MoveQuery::require($package, $constraint, $version, $php === '' ? null : $php, $newest);
         }
 
-        // As MoveBuilder asks it: the update that lockrot prints, plain where Composer takes no inline constraint.
-        return $inlineNames === null || \in_array($package, $inlineNames, true)
-            ? MoveQuery::update($package, $constraint, $version, $php === '' ? null : $php, $newest)
-            : MoveQuery::plainUpdate($package, $version, $php === '' ? null : $php, $newest);
-    }
-
-    /**
-     * Composer 2.2 and 2.3 take an inline constraint only on a root requirement.
-     *
-     * @param array<mixed, mixed> $world
-     *
-     * @return list<string>|null null where any name takes one
-     */
-    private static function inlineNames(array $world): ?array
-    {
-        if (ComposerFeatures::hasTemporaryConstraints()) {
-            return null;
-        }
-        $root = array_replace(JsonPath::arrayAt($world, ['root']), JsonPath::has($world, ['root_extra']) ? JsonPath::arrayAt($world, ['root_extra']) : []);
-
-        return array_values(array_map('strval', array_merge(array_keys(\is_array($root['require'] ?? null) ? $root['require'] : []), array_keys(\is_array($root['require-dev'] ?? null) ? $root['require-dev'] : []))));
+        return MoveQuery::update($package, $constraint, $version, $php === '' ? null : $php, $newest);
     }
 
     /**

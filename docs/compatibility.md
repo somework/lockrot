@@ -164,7 +164,7 @@ Frozen for 1.x:
 | Note codes | Frozen reasons | Catch-all |
 |---|---|---|
 | [`metadata_unavailable`](notes.md#metadata_unavailable), [`monorepo_parent_unavailable`](notes.md#monorepo_parent_unavailable) | `offline`, `install_time_budget`, `no_versions` | `fetch_failed` |
-| [`advisories_not_checked`](notes.md#advisories_not_checked) | `offline`, `composer_too_old`, `install_time_budget` | none |
+| [`advisories_not_checked`](notes.md#advisories_not_checked) | `offline`, `install_time_budget` | none |
 | [`repository_activity_not_checked`](notes.md#repository_activity_not_checked) | `install_time_budget` | none |
 
 Not frozen:
@@ -289,9 +289,8 @@ when a finding reaches `fail-on`, are frozen with the rest of the [configuration
   that the archive does not carry ([which release it installs](phar.md#which-release-it-installs)).
 - All of 0.x is one major line for `self-update`. So `self-update` from 0.13 installs 0.14 at once,
   and every later 0.x minor too. There is no guard ([phar.md](phar.md#keeping-it-updated)).
-- Composer's abandoned ignore list exists on Composer 2.10 (`config.policy.abandoned.ignore`) and
-  2.9 (`config.audit.ignore-abandoned`). The plugin on an older Composer has none, as
-  `composer audit` there has none ([Abandoned](verdicts.md#abandoned)).
+- Composer's abandoned ignore list is `config.policy.abandoned.ignore`, with the legacy
+  `config.audit.ignore-abandoned` as its fallback ([Abandoned](verdicts.md#abandoned)).
 
 ### PHP platform
 

@@ -574,7 +574,7 @@ final class AnalyzerTest extends TestCase
         // fetched at all — the note must still say the check did not run.
         $report = $this->singlePackageReport($this->recent(), false);
         self::assertStringContainsString(
-            'GitHub token not set: repository activity checked for 0 candidate packages, 1 package skipped (set GITHUB_TOKEN to check all)',
+            'GitHub token not set: repository activity checked for 0 candidate packages, 1 package skipped (set LOCKROT_GITHUB_TOKEN or GITHUB_TOKEN to a github.com token to check all)',
             implode("\n", $report->notes())
         );
     }
@@ -700,7 +700,7 @@ final class AnalyzerTest extends TestCase
         // Composer's merged config, COMPOSER_HOME/config.json included, sets the solve's php: composer.json sets none here.
         $lock = LockFile::fromArray(['packages' => [self::locked('vendor/pkg') + ['require' => ['php' => '>=8.2.15']]], 'packages-dev' => []]);
         $analyzer = $this->analyzer($this->loader(['vendor/pkg' => $this->ancient()]), $this->http([]), true, new Allowlist([]), false, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, null, null, '8.2')
-            ->withMoveChecks(new MoveChecks(new RecordedMoveChecker([], ['php' => '8.2.10']), true));
+            ->withMoveChecks(MoveChecks::of(new RecordedMoveChecker([], ['php' => '8.2.10'])));
 
         $window = $analyzer->analyze($lock, ProjectConfig::empty(), false)->phpWindow();
 
@@ -713,7 +713,7 @@ final class AnalyzerTest extends TestCase
         $lock = LockFile::fromArray(['packages' => [self::locked('vendor/pkg')]]);
         $analyzer = $this->analyzer($this->loader(['vendor/pkg' => $this->ancient()]), $this->http([]), true, new Allowlist([]));
 
-        $checked = $analyzer->withMoveChecks(new MoveChecks(new RecordedMoveChecker([], []), true));
+        $checked = $analyzer->withMoveChecks(MoveChecks::of(new RecordedMoveChecker([], [])));
 
         self::assertNull($analyzer->analyze($lock, ProjectConfig::empty(), false)->moveCheck());
         self::assertNotNull($checked->analyze($lock, ProjectConfig::empty(), false)->moveCheck());
@@ -872,7 +872,7 @@ final class AnalyzerTest extends TestCase
         $report = $this->analyzeLock($packages, $this->loader($metadata), $this->http($answers), false, null, 2);
 
         self::assertContains(
-            'GitHub token not set: repository activity checked for 2 candidate packages, 1 package skipped (set GITHUB_TOKEN to check all)',
+            'GitHub token not set: repository activity checked for 2 candidate packages, 1 package skipped (set LOCKROT_GITHUB_TOKEN or GITHUB_TOKEN to a github.com token to check all)',
             $report->notes()
         );
     }
@@ -946,7 +946,7 @@ final class AnalyzerTest extends TestCase
         $report = $this->analyzeLock($packages, $this->loader($metadata), $this->http($answers), false);
 
         self::assertSame([
-            'GitHub token not set: repository activity checked for 1 candidate package, 0 packages skipped (set GITHUB_TOKEN to check all)',
+            'GitHub token not set: repository activity checked for 1 candidate package, 0 packages skipped (set LOCKROT_GITHUB_TOKEN or GITHUB_TOKEN to a github.com token to check all)',
             'Bitbucket credentials not set: repository activity checked for 1 candidate package, 0 packages skipped (add bitbucket.org credentials to auth.json to check all)',
             'GitHub unreachable for 1 repositories: HTTP 500',
             'GitLab API rate limit reached; repository activity missing for 1 repositories',

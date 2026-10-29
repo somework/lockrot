@@ -63,6 +63,12 @@ final class LockrotCommand extends BaseCommand
     /** The formats whose stdout is a document: a failing gate also gets a stderr line. */
     private const DOCUMENT_FORMATS = ['json', 'sarif', 'gitlab', 'html'];
 
+    /**
+     * The options whose repeat is exit 2, an identical repeat included: a later value silently
+     * changes the gate. Every other option keeps the console's rule that the last value wins.
+     */
+    public const ONCE_ONLY_OPTIONS = ['fail-on', 'baseline', 'target-php'];
+
     /** The formats a CI step parses: writing one prints the upgrade notice. */
     private const NOTICE_FORMATS = ['json', 'sarif', 'gitlab'];
 
@@ -130,6 +136,23 @@ final class LockrotCommand extends BaseCommand
         }
 
         return $this->unreadableInput($input, $output) ?? parent::run($input, $output);
+    }
+
+    /** The rules of the command line: docs/configuration.md#cli-options. */
+    protected function inputRefusal(InputInterface $input): ?string
+    {
+        $repeated = $this->repeatedOption($input, self::ONCE_ONLY_OPTIONS);
+        if ($repeated !== null || !\is_string($input->getOption('explain'))) {
+            return $repeated;
+        }
+        if (self::outputSpecs($input) !== []) {
+            return '--explain prints one package on stdout and --output writes whole-run reports; run them separately';
+        }
+        if ($input->getOption('generate-baseline') === true) {
+            return '--explain prints one package and --generate-baseline writes the whole run\'s baseline; run them separately';
+        }
+
+        return null;
     }
 
     /**
@@ -218,12 +241,10 @@ final class LockrotCommand extends BaseCommand
                 // manifest from Composer's preamble, see bin/lockrot), so say where it looked.
                 throw new ConfigException(basename($lockPath).' not found in '.\dirname($lockPath).'; lockrot does not look in parent directories: run it from the project root or pass -d <dir>');
             }
-            $lock = LockFile::fromFile($lockPath);
+            $lockName = FormatContext::lockNameOf($lockPath, $cwd);
+            $lock = LockFile::fromFile($lockPath, $lockName);
             $explain = $input->getOption('explain');
             $specs = self::outputSpecs($input);
-            if (\is_string($explain) && $specs !== []) {
-                throw new ConfigException('--explain prints one package on stdout and --output writes whole-run reports; run them separately');
-            }
             // Resolving the path touches nothing, and the files that --output must not name include it.
             $baselineFile = BaselineFile::resolve(\dirname($composerFile), $lockrot->baseline(), Version::STRING);
             // Checked before the analysis, like the baseline: a typo in a path fails before a
@@ -236,7 +257,7 @@ final class LockrotCommand extends BaseCommand
             // Before the baseline is read: an explanation ignores it, so a missing or unreadable
             // baseline must not block it.
             if (\is_string($explain)) {
-                return $this->explain($output, $explain, $analyzer, $lock, $project, $lockrot);
+                return $this->explain($output, $explain, $analyzer, $lock, $lockName, $project, $lockrot);
             }
             // Read before the analysis, so a missing explicit path or an unreadable file fails before
             // a full repository round. A generate run can name a file that does not exist: it creates it.
@@ -297,7 +318,7 @@ final class LockrotCommand extends BaseCommand
 
             // The annotation formats point back at the lock: an unreadable one throws
             // ConfigException here, which is exit 2.
-            $context = FormatContext::forFailOn($lockPath, $failOn, Version::STRING, TerminalWidth::detect($env, $this->getApplication()), $cwd);
+            $context = FormatContext::forFailOn($lockPath, $failOn, Version::STRING, TerminalWidth::detect($env), $cwd);
             // Written raw: lockrot renders console markup itself (see ConsoleMarkup), so a `<` in a
             // constraint or a package name reaches the terminal or the parser untouched.
             $rendered = Formatters::for($format, $context, $page)->format($report, $showAll);
@@ -314,7 +335,7 @@ final class LockrotCommand extends BaseCommand
                 $this->writeError($output, 'lockrot: '.$this->gateText($report, $gate));
             }
 
-            return $gate->fails() ? Policy::EXIT_FINDINGS : Policy::EXIT_OK;
+            return Policy::exitCode($gate);
         } catch (ConfigException $e) {
             // Raw: a config error can quote the project's own keys (see ProjectConfig) or a path,
             // which are text, not console markup.
@@ -339,7 +360,7 @@ final class LockrotCommand extends BaseCommand
     }
 
     /** `--explain <package>`: docs/configuration.md#explaining-one-package. */
-    private function explain(OutputInterface $output, string $name, Analyzer $analyzer, LockFile $lock, ProjectConfig $project, LockrotConfig $lockrot): int
+    private function explain(OutputInterface $output, string $name, Analyzer $analyzer, LockFile $lock, string $lockName, ProjectConfig $project, LockrotConfig $lockrot): int
     {
         $format = $lockrot->format();
         if ($format !== 'table' && $format !== 'json') {
@@ -351,7 +372,7 @@ final class LockrotCommand extends BaseCommand
         }
         $locked = $lock->find($name);
         if ($locked === null) {
-            throw new ConfigException($name.' is not in composer.lock');
+            throw new ConfigException($name.' is not in '.$lockName);
         }
         if ($locked->isDev() && !$lockrot->includeDev()) {
             throw new ConfigException($name.' is in packages-dev; pass --dev to explain it');
@@ -439,7 +460,7 @@ final class LockrotCommand extends BaseCommand
             $this->writeError($output, 'lockrot: '.$this->gateText($report, $gate));
         }
 
-        return $gate->fails() ? Policy::EXIT_FINDINGS : Policy::EXIT_OK;
+        return Policy::exitCode($gate);
     }
 
     /** `gate.text`, the `gate:` line that every format prints. */
@@ -679,9 +700,7 @@ final class LockrotCommand extends BaseCommand
             return null;
         }
 
-        // Composer 2.3 and later has tryComposer(). Composer 2.2 LTS has only getComposer(bool $required).
-        // @phpstan-ignore function.alreadyNarrowedType (the guard is for Composer 2.2 LTS)
-        $composer = method_exists($this, 'tryComposer') ? $this->tryComposer() : $this->getComposer(false);
+        $composer = $this->tryComposer();
 
         return $composer instanceof Composer ? $composer : null;
     }

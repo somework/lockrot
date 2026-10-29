@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "66e76f37312d6f7a82c6c03953ec4926175d82cc5d3908d140ca62b1d3d14c67",
+        "tests/fixtures/flags/cases.json": "27be7df6edee7317e18ac256236bc74589937178c5f6f3410b26f85dbee0c450",
         "tests/fixtures/flags/composite.json": "931aa288bfbfee92d7103d91a1d3c78a9d0d5625dd044f214ca72e1c9c73a6e7",
-        "tests/fixtures/flags/provenance.json": "1fff0322061d2774ac386db5a00d2752aa7fbede9b97884d9076c33dc9e74bbd"
+        "tests/fixtures/flags/provenance.json": "bdfdfdab167108f92f70d5a64aaa78f855d6246d6e0ade25d844be309b8315f5"
     },
     "version_mask": {
         "paths": [
@@ -43,24 +43,21 @@
         "host-accepted‡",
         "host-accept-expired‡",
         "no-feed-accepted‡",
-        "vcs-accepted‡",
-        "mc-plain-update‡",
-        "mc-update-now-plain‡",
-        "mc-update-now-below‡"
+        "vcs-accepted‡"
     ],
     "model_only": "model-only/ holds the model documents of cases_without_inputs: the hydrator cannot rebuild those cases, so lockrot did not write them",
     "baseline_2": "the gate-row baselines of tests/fixtures/schema/documents/baseline/gate-rows/, read by Baseline::fromArray() and written by BaselineFile::write()",
     "case_lock": "each case is formatted beside a composer.lock of its lock entries, as tests/Support/CaseHydrator.php lockJson() lays it out",
     "model_goldens": {
         "compared": {
-            "age_line": 169,
-            "baseline_suffix": 171,
-            "commands_cmd": 153,
-            "commands_posix": 153,
-            "gate_line": 172,
-            "next_step_text": 129,
-            "run_gate_line": 173,
-            "score_text": 172
+            "age_line": 173,
+            "baseline_suffix": 175,
+            "commands_cmd": 157,
+            "commands_posix": 157,
+            "gate_line": 176,
+            "next_step_text": 130,
+            "run_gate_line": 177,
+            "score_text": 176
         },
         "inputs_differ": {
             "age_line": 4,
@@ -68,14 +65,14 @@
             "commands_cmd": 20,
             "commands_posix": 20,
             "gate_line": 1,
-            "next_step_text": 44,
+            "next_step_text": 47,
             "score_text": 1
         }
     },
     "page_goldens": {
         "file": "page-goldens.json",
         "source": "the model's page goldens (security-axis/r3/page-goldens.json in the private model), copied byte for byte and not recorded",
-        "sha256": "4aa51cc1c529b221341656b0b7770b202ca8a6c95f07c7ecf65acf9c8f9f1e62",
+        "sha256": "f4be5d5be4744afd6d86bc8e357564375b32415dec8c8ac5f2d84509e25a8c0d",
         "read_by": "tests/Integration/PageGoldensTest.php validates each page document against the report-2 schema and reads title, description, grade_line, figure_line, load_line, gate_partition, ready, run_notes, flags_notes, advisory_groups, sheet_moves, sheet_holders and sheet_ladder. The other keys are the renderer's"
     },
     "engine_pages": "page/ holds the report-2 that bin/lockrot writes for each case of Lockrot\\Tests\\Support\\Contract\\EnginePage::CASES. tools/report/record --engine-pages records them",

@@ -58,7 +58,7 @@ final class ProblemHolds
         $out->locked = $locked;
         $out->requires = $root->getRequires();
         $out->devRequires = $root->getDevRequires();
-        $rootRequires = array_merge($root->getDevRequires(), $root->getRequires());
+        $rootRequires = ComposerSolver::rootLinks($root);
         foreach ($e->getProblems() as $problem) {
             foreach ($problem->getReasons() as $section) {
                 foreach ($section as $rule) {

@@ -59,7 +59,7 @@ final class MoveCheck implements \JsonSerializable
         self::NO_RELEASE_READ => 'no release of the row was read',
         self::PASS_CAP => 'Composer refused each move before it',
         self::SOLVER_ERROR => "Composer's solver failed on it",
-        self::ADVISORY_LOOKUP_INCOMPLETE => 'the advisory lookup did not cover a package it installs',
+        self::ADVISORY_LOOKUP_INCOMPLETE => 'the advisory lookup did not cover a package in the result',
     ];
 
     /** @var self::RESOLVES|self::REFUSED|self::NOT_CHECKED */

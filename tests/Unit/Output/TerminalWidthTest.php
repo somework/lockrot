@@ -8,21 +8,17 @@ use Lockrot\Output\FormatContext;
 use Lockrot\Output\TerminalWidth;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Terminal;
 
 /**
- * The four sources are exposed as named methods rather than hidden inside detect(), because two of
- * them cannot be reached through detect() from this test suite: symfony/console 5.4 is what
- * require-dev resolves, so Terminal always exists here and always answers, which makes the
- * Application and default steps unreachable until the plugin runs under Composer 2.2.25's bundled
- * 2.8. Testing each source directly is what keeps them covered on this side.
+ * Each source is a method of its own: require-dev resolves a console whose Terminal always answers,
+ * so detect() never reaches the default from this suite without a COLUMNS that is set but rejected.
  */
 final class TerminalWidthTest extends TestCase
 {
     public function testColumnsFromTheEnvironmentWins(): void
     {
-        self::assertSame(99, TerminalWidth::detect(['COLUMNS' => '99'], null));
+        self::assertSame(99, TerminalWidth::detect(['COLUMNS' => '99']));
     }
 
     /** @return iterable<string, array{0: array<string, string>}> */
@@ -56,7 +52,7 @@ final class TerminalWidthTest extends TestCase
     public function testWithoutColumnsTheConsoleTerminalDecides(): void
     {
         self::assertSame((new Terminal())->getWidth(), TerminalWidth::fromConsoleTerminal([]));
-        self::assertSame(max(FormatContext::MIN_WIDTH, (new Terminal())->getWidth()), TerminalWidth::detect([], null));
+        self::assertSame(max(FormatContext::MIN_WIDTH, (new Terminal())->getWidth()), TerminalWidth::detect([]));
     }
 
     /**
@@ -70,124 +66,12 @@ final class TerminalWidthTest extends TestCase
     {
         self::assertNull(TerminalWidth::fromConsoleTerminal(['COLUMNS' => 'abc']));
         self::assertNull(TerminalWidth::fromConsoleTerminal(['COLUMNS' => '0']));
-        self::assertSame(FormatContext::DEFAULT_WIDTH, TerminalWidth::detect(['COLUMNS' => 'abc'], null));
-        self::assertSame(FormatContext::DEFAULT_WIDTH, TerminalWidth::detect(['COLUMNS' => ''], null));
-    }
-
-    /** With COLUMNS out of play, an older console's own answer is what decides — the 2.8 path. */
-    public function testAnUnusableColumnsFallsThroughToTheApplication(): void
-    {
-        self::assertSame(72, TerminalWidth::detect(['COLUMNS' => '80.5'], $this->applicationReporting(72, 24)));
-    }
-
-    public function testAConsoleApplicationWithoutTheOlderDimensionsMethodSaysNothing(): void
-    {
-        self::assertNull(TerminalWidth::fromApplication(new Application()));
-        self::assertNull(TerminalWidth::fromApplication(null));
-    }
-
-    /**
-     * symfony/console 2.8 has no Terminal class and reports the width through
-     * Application::getTerminalDimensions() instead. 5.4 has no such method, so the only way to
-     * exercise the branch on this side is an application that declares it — which is exactly the
-     * shape the 2.8 class has.
-     */
-    public function testAnApplicationThatStillReportsDimensionsSuppliesTheWidth(): void
-    {
-        self::assertSame(72, TerminalWidth::fromApplication($this->applicationReporting(72, 24)));
-    }
-
-    public function testAnApplicationThatCannotTellTheWidthSaysNothing(): void
-    {
-        self::assertNull(TerminalWidth::fromApplication($this->applicationReporting(null, null)));
-        self::assertNull(TerminalWidth::fromApplication($this->applicationReporting(0, 24)));
-    }
-
-    /** Only the first element is the width; a console that knows it but not the height still answers. */
-    public function testAnApplicationThatKnowsTheWidthButNotTheHeightStillAnswers(): void
-    {
-        self::assertSame(72, TerminalWidth::fromApplication($this->applicationReporting(72, null)));
-    }
-
-    /**
-     * Where both sources exist the newer one decides. Nothing in this suite runs without a Terminal
-     * class, so a swap of the two steps passes every other test.
-     */
-    public function testTheConsoleTerminalOutranksAnOlderApplication(): void
-    {
-        $detected = TerminalWidth::detect([], $this->applicationReporting(4242, 24));
-
-        self::assertSame(max(FormatContext::MIN_WIDTH, (new Terminal())->getWidth()), $detected);
-        self::assertNotSame(4242, $detected);
+        self::assertSame(FormatContext::DEFAULT_WIDTH, TerminalWidth::detect(['COLUMNS' => 'abc']));
+        self::assertSame(FormatContext::DEFAULT_WIDTH, TerminalWidth::detect(['COLUMNS' => '']));
     }
 
     public function testTheResultNeverFallsBelowTheMinimum(): void
     {
-        self::assertSame(FormatContext::MIN_WIDTH, TerminalWidth::detect(['COLUMNS' => '10'], null));
-    }
-
-    private function applicationReporting(?int $width, ?int $height): Application
-    {
-        return new class ($width, $height) extends Application {
-            private ?int $width;
-            private ?int $height;
-
-            public function __construct(?int $width, ?int $height)
-            {
-                parent::__construct();
-                $this->width = $width;
-                $this->height = $height;
-            }
-
-            /** @return array{0: int|null, 1: int|null} */
-            public function getTerminalDimensions(): array
-            {
-                return [$this->width, $this->height];
-            }
-        };
-    }
-
-    /**
-     * @return iterable<string, array{mixed}>
-     */
-    public static function answersThatAreNotAWidth(): iterable
-    {
-        yield 'not an array' => ['80x24'];
-        yield 'empty array' => [[]];
-        yield 'a numeric string' => [['80', 24]];
-        yield 'a float' => [[80.0, 24]];
-    }
-
-    /**
-     * @dataProvider answersThatAreNotAWidth
-     *
-     * @param mixed $answer
-     */
-    #[DataProvider('answersThatAreNotAWidth')]
-    public function testAnApplicationAnsweringAnythingButAPositiveIntegerWidthSaysNothing($answer): void
-    {
-        self::assertNull(TerminalWidth::fromApplication($this->applicationAnswering($answer)));
-    }
-
-    /** @param mixed $answer whatever getTerminalDimensions() returns, no shape promised */
-    private function applicationAnswering($answer): Application
-    {
-        return new class ($answer) extends Application {
-            /** @var mixed */
-            private $answer;
-
-            /** @param mixed $answer */
-            public function __construct($answer)
-            {
-                parent::__construct();
-                $this->answer = $answer;
-            }
-
-            /** @return mixed */
-            public function getTerminalDimensions()
-            {
-                return $this->answer;
-            }
-        };
+        self::assertSame(FormatContext::MIN_WIDTH, TerminalWidth::detect(['COLUMNS' => '10']));
     }
 }

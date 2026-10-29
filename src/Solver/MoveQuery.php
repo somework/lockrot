@@ -13,8 +13,6 @@ namespace Lockrot\Solver;
  */
 final class MoveQuery
 {
-    private const ANY = '*';
-
     private string $package;
     private string $constraint;
     private string $version;
@@ -41,12 +39,6 @@ final class MoveQuery
     public static function update(string $package, string $constraint, string $version, ?string $php = null, ?string $newest = null): self
     {
         return new self($package, $constraint, $version, false, $php, $newest);
-    }
-
-    /** `composer update <package>` with no inline constraint, which allows any release: the constraint reads `*`. */
-    public static function plainUpdate(string $package, string $version, ?string $php = null, ?string $newest = null): self
-    {
-        return new self($package, self::ANY, $version, false, $php, $newest);
     }
 
     public static function require(string $package, string $constraint, string $version, ?string $php = null, ?string $newest = null): self
@@ -105,7 +97,7 @@ final class MoveQuery
 
         return $this->isRequire
             ? SolveRequest::require($this->package, [$this->package => $this->constraint] + $php, $this->dev)
-            : ($this->constraint === self::ANY ? SolveRequest::plain($this->package) : SolveRequest::update([$this->package => $this->constraint]))->withRootChanges($php);
+            : SolveRequest::update([$this->package => $this->constraint])->withRootChanges($php);
     }
 
     /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
-use Lockrot\Solver\CheckOutcome;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Verdict\CommandArgument;
 use Lockrot\Verdict\Finding;
@@ -28,17 +27,19 @@ final class UpdateNow
     private ?array $command;
     private ?RunNote $note;
     private ?string $raiseTo;
+    private bool $phpInRequireDev;
 
     /**
      * @param list<string>      $members
      * @param list<string>|null $command
      */
-    private function __construct(array $members, ?array $command, ?RunNote $note, ?string $raiseTo = null)
+    private function __construct(array $members, ?array $command, ?RunNote $note, ?string $raiseTo = null, bool $phpInRequireDev = false)
     {
         $this->members = $members;
         $this->command = $command;
         $this->note = $note;
         $this->raiseTo = $raiseTo;
+        $this->phpInRequireDev = $phpInRequireDev;
     }
 
     /** @param list<Finding> $findings in report order */
@@ -49,12 +50,7 @@ final class UpdateNow
             $move = $finding->nextStep();
             $check = $move === null ? null : $move->check();
             if ($finding->securityStanding()->isVulnerable() && $move !== null && $move->kind() === Move::UPDATE && $move->movesWith() === [] && $check !== null && $check->isResolved() && $check->form() === MoveCheck::INLINE) {
-                // On Composer 2.2 and 2.3, lockrot lists a package that composer.json does not require plain, and the check solves the line as printed.
-                $constraint = $checks->writesInline($finding->isDirect() || $finding->namedIn() !== []) ? '^'.ltrim((string) $move->version(), 'vV') : '';
-                // A plain name has no constraint that holds it at its fix.
-                if ($constraint !== '' || $check->installsBelow((string) $move->version()) === null) {
-                    $inline[$finding->package()] = $constraint;
-                }
+                $inline[$finding->package()] = '^'.ltrim((string) $move->version(), 'vV');
             }
         }
         $members = array_keys($inline);
@@ -63,7 +59,7 @@ final class UpdateNow
         }
         $outcome = $checks->checker()->combined($inline);
         if ($outcome->check()->isResolved()) {
-            return self::reachingTheFix($inline, $outcome, $findings, $checks, null);
+            return self::resolved($inline, $findings, null);
         }
         if (!$outcome->check()->isRefused()) {
             return new self([], null, RunNote::updateNowNotChecked((string) $outcome->check()->reason(), $members));
@@ -76,85 +72,13 @@ final class UpdateNow
         $kept = array_diff_key($inline, array_flip(array_filter($named, 'is_string')));
         $retry = $kept === [] || $kept === $inline ? null : $checks->checker()->combined($kept);
         if ($retry !== null && $retry->check()->isResolved()) {
-            return self::reachingTheFix($kept, $retry, $findings, $checks, [array_keys(array_diff_key($inline, $kept)), (string) $outcome->problem()]);
+            return self::resolved($kept, $findings, RunNote::updateNowReduced(self::inReportOrder(array_keys(array_diff_key($inline, $kept)), $findings), (string) $outcome->problem()));
         }
         if ($retry !== null && !$retry->check()->isRefused()) {
             return new self([], null, RunNote::updateNowNotChecked((string) $retry->check()->reason(), $members));
         }
 
         return new self([], null, RunNote::updateNowRefused((string) ($retry === null ? $outcome->problem() : $retry->problem())));
-    }
-
-    /**
-     * A plain name has no constraint that holds it at its fix, so a resolving solve can keep it
-     * below its move version. Such a member is left out, and the rest is asked once more, until the
-     * solve installs each member at its fix.
-     *
-     * @param array<string, string>           $inline
-     * @param list<Finding>                   $findings
-     * @param array{list<string>, string}|null $refused the members that a refusal left out, and its problem
-     */
-    private static function reachingTheFix(array $inline, CheckOutcome $outcome, array $findings, MoveChecks $checks, ?array $refused): self
-    {
-        $below = [];
-        $asked = $inline;
-        // Each pass leaves out at least one member, so the loop ends.
-        while (($short = self::belowTheFix($asked, $outcome->changes(), $findings)) !== []) {
-            $below += $short;
-            $asked = array_diff_key($asked, $short);
-            if ($asked === []) {
-                return new self([], null, self::reducedNote($below, $findings, $refused));
-            }
-            $outcome = $checks->checker()->combined($asked);
-            if ($outcome->check()->isRefused()) {
-                return new self([], null, RunNote::updateNowRefused((string) $outcome->problem()));
-            }
-            if (!$outcome->check()->isResolved()) {
-                return new self([], null, RunNote::updateNowNotChecked((string) $outcome->check()->reason(), array_keys($inline)));
-            }
-        }
-        return self::resolved($asked, $findings, $below === [] && $refused === null ? null : self::reducedNote($below, $findings, $refused));
-    }
-
-    /**
-     * @param array<string, string> $inline
-     * @param array<string, string> $changes the release of each name that the solve changes
-     * @param list<Finding>         $findings
-     *
-     * @return array<string, string> each plain member that the solve installs below its move version => the release that it gets
-     */
-    private static function belowTheFix(array $inline, array $changes, array $findings): array
-    {
-        $below = [];
-        foreach ($findings as $finding) {
-            $move = $finding->nextStep();
-            $fix = $move === null ? null : $move->version();
-            $package = $finding->package();
-            if (($inline[$package] ?? null) !== '' || $fix === null) {
-                continue;
-            }
-            $gets = $changes[$package] ?? $finding->version();
-            if (MoveCheck::resolves(MoveCheck::INLINE, $gets)->installsBelow($fix) !== null) {
-                $below[$package] = $gets;
-            }
-        }
-
-        return $below;
-    }
-
-    /**
-     * @param array<string, string>            $below
-     * @param list<Finding>                    $findings
-     * @param array{list<string>, string}|null $refused
-     */
-    private static function reducedNote(array $below, array $findings, ?array $refused): RunNote
-    {
-        $heldBelow = [];
-        foreach (self::inReportOrder(array_keys($below), $findings) as $package) {
-            $heldBelow[] = ['package' => $package, 'installs' => $below[$package]];
-        }
-
-        return RunNote::updateNowReduced(self::inReportOrder(array_merge($refused[0] ?? [], array_keys($below)), $findings), $refused[1] ?? null, $heldBelow);
     }
 
     /**
@@ -185,7 +109,26 @@ final class UpdateNow
     {
         $argv = self::argv($inline, $findings);
 
-        return new self($argv === null ? [] : array_keys($inline), $argv, $note, $argv === null ? null : self::raiseOf($inline, $findings));
+        $first = self::member($inline, $findings);
+
+        return new self($argv === null ? [] : array_keys($inline), $argv, $note, $argv === null ? null : self::raiseOf($inline, $findings), $first !== null && $first->subject()->isPhpInRequireDev());
+    }
+
+    /**
+     * The move of the first member. Every move reads the php keys of one composer.json.
+     *
+     * @param array<string, string> $inline
+     * @param list<Finding>         $findings
+     */
+    private static function member(array $inline, array $findings): ?Move
+    {
+        foreach ($findings as $finding) {
+            if (isset($inline[$finding->package()])) {
+                return $finding->nextStep();
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -229,6 +172,12 @@ final class UpdateNow
         return $this->raiseTo;
     }
 
+    /** Whether require-dev lists php, so the raise removes that line. */
+    public function isPhpInRequireDev(): bool
+    {
+        return $this->phpInRequireDev;
+    }
+
     /** @return list<string> */
     public function members(): array
     {
@@ -258,7 +207,7 @@ final class UpdateNow
         foreach ($findings as $finding) {
             $package = $finding->package();
             if (isset($inline[$package])) {
-                $argv[] = $inline[$package] === '' ? $package : $package.':'.$inline[$package];
+                $argv[] = $package.':'.$inline[$package];
             }
         }
 

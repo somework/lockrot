@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Analyzer;
 
 use Composer\Config;
-use Composer\Policy\AbandonedPolicyConfig;
 use Composer\Semver\VersionParser;
 use Composer\Util\Platform;
 use Lockrot\Allowlist\Allowlist;
@@ -17,7 +16,6 @@ use Lockrot\Clock;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
 use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
-use Lockrot\Data\Abandoned\AbandonedPolicyReader;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
@@ -307,25 +305,9 @@ final class AnalyzerLookupTest extends TestCase
         ]]);
         $metadata = ['a/listed' => self::metadata(true, '2026-08-01T00:00:00+00:00'), 'z/marked' => self::metadata(true, '2026-08-01T00:00:00+00:00')];
         $composer = new Config(false);
-        $composer->merge(['config' => ['audit' => ['abandoned' => 'ignore']]]);
-        $reader = new class () implements AbandonedPolicyReader {
-            public function api(): string
-            {
-                return self::AUDIT_CONFIG;
-            }
+        $composer->merge(['config' => ['audit' => ['abandoned' => 'ignore', 'ignore-abandoned' => ['a/listed' => 'migration planned']]]]);
 
-            public function policyRules(array $policy, array $audit): array
-            {
-                return [];
-            }
-
-            public function auditConfigList(Config $config): array
-            {
-                return ['a/listed' => 'migration planned'];
-            }
-        };
-
-        $report = self::analyzer(self::loader($metadata), self::http([self::GITHUB => [200, self::LIVE]], new \ArrayObject()), true, new Allowlist([]), AbandonedIgnore::fromConfig($composer, $reader))->analyze($lock, ProjectConfig::empty(), false);
+        $report = self::analyzer(self::loader($metadata), self::http([self::GITHUB => [200, self::LIVE]], new \ArrayObject()), true, new Allowlist([]), AbandonedIgnore::fromConfig($composer))->analyze($lock, ProjectConfig::empty(), false);
         $codes = array_map(static fn (RunNote $n): string => $n->code(), $report->runNotes());
 
         self::assertSame(
@@ -337,9 +319,6 @@ final class AnalyzerLookupTest extends TestCase
 
     public function testAnUnreadableListIsNoted(): void
     {
-        if (!class_exists(AbandonedPolicyConfig::class)) {
-            self::markTestSkipped('Composer without the policy API (2.10 and later)');
-        }
         Platform::putEnv('COMPOSER_POLICY', 'maybe');
         try {
             $ignore = AbandonedIgnore::fromConfig(new Config(false));

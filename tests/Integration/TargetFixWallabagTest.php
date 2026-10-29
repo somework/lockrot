@@ -7,7 +7,6 @@ namespace Lockrot\Tests\Integration;
 use Composer\Factory;
 use Composer\IO\NullIO;
 use Composer\Package\Loader\RootPackageLoader;
-use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\RepositoryFactory;
 use Lockrot\Analyzer\PhpWindow;
 use Lockrot\Analyzer\TargetFix;
@@ -47,9 +46,6 @@ final class TargetFixWallabagTest extends TestCase
 
     public function testTheRefusalAtPhp84NamesOnlyTheRootRequirementOfTheGuzzle5Adapter(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer 2.2 has no AdvisoryProviderInterface: no solve blocks a vulnerable release');
-        }
         $server = BaselinedScenario::repositoryServer(self::SCENARIO);
         $server->start();
         try {

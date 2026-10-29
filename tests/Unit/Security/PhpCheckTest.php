@@ -38,6 +38,9 @@ final class PhpCheckTest extends TestCase
         yield 'two holes above the project floor' => ['>=7.4', '>=7.3 !=7.4.0 !=7.4.1', '>=7.4.2', PhpCheck::PATCH];
         yield 'a patch suffix at the project floor' => ['>=7.4', '>=7.4.0-p1', '>=7.4.1', PhpCheck::PATCH];
         yield 'a dev branch' => ['>=7.4', '7.4.x-dev', null, null];
+        yield 'a release that starts with no lower bound' => ['>=8.0', '<8.0 || >=8.2', '>=8.2', PhpCheck::MINOR];
+        yield 'a release whose first range ends below the project floor' => ['>=8.1', '<7.0 || >=8.2', '>=8.2', PhpCheck::MINOR];
+        yield 'a project floor with a hole at its bound' => ['>=8.1 !=8.1.0', '>8.1.0', null, null];
     }
 
     public function testAStarRequirePhpAllowsTheReleaseAndAsksNoRaise(): void

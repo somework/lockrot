@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Composer\Advisory\AuditConfig;
 use Composer\Advisory\Auditor;
 use Composer\Config;
 use Composer\Package\CompletePackage;
@@ -15,14 +14,13 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * lockrot's abandoned ignore list matches a name exactly when Composer's own
- * `Auditor::filterAbandonedPackages` drops the package. Keyed by capability: Composer 2.2 to 2.8
- * have no list, 2.9 reads `AuditConfig`, 2.10 and later the policy API.
+ * `Auditor::filterAbandonedPackages` drops the package.
  */
 final class AbandonedIgnoreParityTest extends TestCase
 {
     private const NAMES = ['doctrine/cache', 'doctrine/annotations', 'symfony/debug', 'acme/Mixed-Case', 'acme/other', 'other/doctrine'];
 
-    /** @return iterable<string, array<string, mixed>> the `config` sections that Composer 2.9 reads */
+    /** @return iterable<string, array<string, mixed>> the `config.audit` sections */
     private static function auditConfigs(): iterable
     {
         yield 'no list' => [];
@@ -48,32 +46,11 @@ final class AbandonedIgnoreParityTest extends TestCase
 
     public function testThePolicyApiLegMatchesComposersFilter(): void
     {
-        if (!class_exists(PolicyConfig::class)) {
-            self::markTestSkipped('Composer below 2.10 has no policy API');
-        }
         foreach (self::policyConfigs() as $label => $section) {
             $config = self::config($section);
             $flat = PolicyConfig::fromConfig($config)->abandoned->getFlatIgnoreForOperation('audit');
 
             self::assertSame(self::kept($flat), self::lockrotKept(AbandonedIgnore::fromConfig($config)), $label);
-        }
-    }
-
-    public function testTheAuditConfigLegMatchesComposersFilter(): void
-    {
-        if (class_exists(PolicyConfig::class)) {
-            self::markTestSkipped('Composer 2.10 or later: this leg runs only on Composer 2.9');
-        }
-        if (!class_exists(AuditConfig::class) || !method_exists(AuditConfig::class, 'fromConfig')) {
-            self::markTestSkipped('Composer 2.2 to 2.8 have no abandoned ignore list');
-        }
-        foreach (self::auditConfigs() as $label => $section) {
-            $config = self::config($section);
-            $auditConfig = (new \ReflectionMethod(AuditConfig::class, 'fromConfig'))->invoke(null, $config);
-            $properties = \is_object($auditConfig) ? get_object_vars($auditConfig) : [];
-            $list = $properties['ignoreAbandonedForAudit'] ?? $properties['ignoreAbandonedPackages'] ?? [];
-
-            self::assertSame(self::kept(\is_array($list) ? $list : []), self::lockrotKept(AbandonedIgnore::fromConfig($config)), $label);
         }
     }
 
@@ -98,17 +75,13 @@ final class AbandonedIgnoreParityTest extends TestCase
     }
 
     /**
-     * @param array<mixed> $ignoreAbandoned
+     * @param array<string, string|null> $ignoreAbandoned
      *
      * @return list<string> the names Composer still reports as abandoned
      */
     private static function kept(array $ignoreAbandoned): array
     {
-        // Through reflection: the parameter type of Composer 2.9 and 2.10 differ, and phpstan reads 2.10.
-        $filter = new \ReflectionMethod(Auditor::class, 'filterAbandonedPackages');
-        $kept = $filter->invoke(new Auditor(), self::packages(), $ignoreAbandoned);
-        self::assertIsArray($kept);
-        $kept = array_map(static fn ($package): string => $package instanceof PackageInterface ? $package->getName() : '', $kept);
+        $kept = array_map(static fn ($package): string => $package instanceof PackageInterface ? $package->getName() : '', (new Auditor())->filterAbandonedPackages(self::packages(), $ignoreAbandoned));
 
         return array_values($kept);
     }

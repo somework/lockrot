@@ -145,42 +145,42 @@ final class RunFooterTest extends TestCase
     /** The blocking that the config or COMPOSER_POLICY_ADVISORIES_BLOCK turns off reads as off too. */
     public function testTheMovesLineNamesAConfigKeyOrThePolicyVariableThatTurnedTheBlockingOff(): void
     {
-        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $checks = MoveChecks::of(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON));
         $byConfig = self::report([])->withMoveChecks(new MoveCheckRun('2.10.3', false, ['config.audit.block-insecure'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
         $byVariable = self::report([])->withMoveChecks(new MoveCheckRun('2.10.3', false, ['COMPOSER_NO_SECURITY_BLOCKING', 'COMPOSER_POLICY_ADVISORIES_BLOCK'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
 
-        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by config.audit.block-insecure; ext-* requirements not checked', RunFooter::moveCheck($byConfig));
-        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by COMPOSER_NO_SECURITY_BLOCKING and COMPOSER_POLICY_ADVISORIES_BLOCK; ext-* requirements not checked', RunFooter::moveCheck($byVariable));
+        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by config.audit.block-insecure; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked', RunFooter::moveCheck($byConfig));
+        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by COMPOSER_NO_SECURITY_BLOCKING and COMPOSER_POLICY_ADVISORIES_BLOCK; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked', RunFooter::moveCheck($byVariable));
     }
 
     public function testTheMovesLineNamesEachVariableThatTurnedTheBlockingOff(): void
     {
-        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $checks = MoveChecks::of(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON));
         $report = self::report([])->withMoveChecks(new MoveCheckRun('2.10.3', false, ['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
 
-        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by COMPOSER_NO_BLOCKING and COMPOSER_NO_SECURITY_BLOCKING; ext-* requirements not checked', RunFooter::moveCheck($report));
-        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by `COMPOSER_NO_BLOCKING` and `COMPOSER_NO_SECURITY_BLOCKING`; ext-* requirements not checked', RunFooter::moveCheck($report, static fn (string $name): string => '`'.$name.'`'));
+        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by COMPOSER_NO_BLOCKING and COMPOSER_NO_SECURITY_BLOCKING; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked', RunFooter::moveCheck($report));
+        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by `COMPOSER_NO_BLOCKING` and `COMPOSER_NO_SECURITY_BLOCKING`; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked', RunFooter::moveCheck($report, static fn (string $name): string => '`'.$name.'`'));
     }
 
     public function testTheMovesLineJoinsThreeSwitchesAsAListWithAndBeforeTheLast(): void
     {
-        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $checks = MoveChecks::of(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON));
         $report = self::report([])->withMoveChecks(new MoveCheckRun('2.10.3', false, ['COMPOSER_POLICY', 'config.policy', 'config.policy.advisories'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
 
-        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by COMPOSER_POLICY, config.policy and config.policy.advisories; ext-* requirements not checked', RunFooter::moveCheck($report));
+        self::assertSame('moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by COMPOSER_POLICY, config.policy and config.policy.advisories; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked', RunFooter::moveCheck($report));
     }
 
     public function testTheMovesLineOfARunThatBlocksNoAdvisoryAddsNoWords(): void
     {
-        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $checks = MoveChecks::of(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON));
         $report = self::report([])->withMoveChecks(new MoveCheckRun('2.8.12', false, [], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
 
-        self::assertSame('moves: checked with the solver of Composer 2.8.12 against the lock; ext-* requirements not checked', RunFooter::moveCheck($report));
+        self::assertSame('moves: checked with the solver of Composer 2.8.12 against the lock; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked', RunFooter::moveCheck($report));
     }
 
     public function testTheMovesLineOfARunWithNoCheckSaysWhyInWords(): void
     {
-        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $checks = MoveChecks::of(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON));
         $report = self::report([])->withMoveChecks(new MoveCheckRun(null, false, [], MoveCheck::notChecked(MoveCheck::NO_COMPOSER_JSON)), UpdateNow::of([], $checks));
 
         self::assertSame('moves: not checked (the project has no composer.json)', RunFooter::moveCheck($report));
@@ -201,7 +201,7 @@ final class RunFooterTest extends TestCase
     #[DataProvider('baselineLoadReasons')]
     public function testTheMovesLineOfABaselineThatALoadStoppedNamesTheLock(string $reason, string $line): void
     {
-        $checks = new MoveChecks(new UncheckedMoves($reason), true);
+        $checks = MoveChecks::of(new UncheckedMoves($reason));
         $report = self::report([])->withMoveChecks(new MoveCheckRun(null, false, [], MoveCheck::notChecked($reason)), UpdateNow::of([], $checks));
 
         self::assertSame($line, RunFooter::moveCheck($report));

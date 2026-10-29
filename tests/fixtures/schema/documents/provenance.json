@@ -1,16 +1,16 @@
 {
  "source": "security-axis/r3/docs",
- "model_run_date": "2026-10-28",
+ "model_run_date": "2026-10-29",
  "suite": "the model suite reports every step passed",
  "documents": {
   "corpus": 49,
   "variants": 3,
-  "cases": 197,
+  "cases": 198,
   "coverage/baselined": 49,
   "coverage/variants": 77,
-  "explain": 192,
+  "explain": 193,
   "explain/coverage": 99,
-  "baseline/cases": 7,
+  "baseline/cases": 6,
   "baseline/corpus": 49,
   "baseline/earlier": 50,
   "baseline/gate-rows": 33,
@@ -19,6 +19,6 @@
   "config": 33,
   "config/coverage": 42,
   "config/repo-docs": 4,
-  "page": 20
+  "page": 21
  }
 }

@@ -481,7 +481,7 @@
                         {
                             "level": "note",
                             "message": {
-                                "text": "update now: the command leaves out symfony/yaml, typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0."
+                                "text": "update now: the command leaves out symfony/yaml and typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0."
                             }
                         }
                     ]

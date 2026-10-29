@@ -63,6 +63,14 @@ def ref(name, desc=None):
     return out
 
 
+def rule_group(rule, keyword, branches):
+    """one rule group of config-2 or baseline-2, as an `allOf` member.
+
+    SchemaErrors prints `rule` for a document that breaks the group. The editor description stays on
+    the node around it (tests/Unit/Json/SchemaRuleGroupsTest.php)."""
+    return {'description': rule, keyword: branches}
+
+
 def nullable(inner, desc):
     """`inner` or null; desc says what null means."""
     return {'description': desc, 'oneOf': [inner, {'type': 'null'}]}
@@ -663,6 +671,14 @@ def explain_schema():
     for k, dsc in [('dev', 'Whether the entry is in packages-dev.'), ('branch_snapshot', 'Whether the installed version is a branch snapshot.'),
                    ('type', 'The entry\'s package type.')]:
         lock['properties'][k]['description'] = dsc
+    lock['properties']['from_composer_repository']['description'] = (
+        "True when the lock entry carries a Composer `notification-url`. Composer writes one only for a package served by a `type: composer` repository that "
+        "advertises a notify URL (`notify-batch` or `notify` in its packages.json); packagist.org and Private Packagist do. False otherwise: a `path`, `vcs`, "
+        "`artifact` or inline `package` repository entry, and also a package from a `type: composer` repository that advertises no notify URL (asset-packagist.org; "
+        "a Satis build without `notify-batch`). lockrot asks no repository for the metadata or the repository activity of a false entry, so the finding has no "
+        "metadata, activity or libyears. It asks for its advisories by name, except under `advisory-lookup: composer-repositories`. True does not mean "
+        "packagist.org. Stays a boolean for 1.x: the finer account of where an entry came from is `origin`, and this key is true exactly when `origin.kind` is "
+        "`packagist` or `composer`. Same value as the finding's `from_composer_repository`.")
     D['lock'] = lock
     D['metadata'] = explain_metadata()
     D['repositoryMetadata'] = D.pop('metadata')
@@ -734,10 +750,10 @@ def baseline_schema():
                                       "The file never stores an advisory that Composer's audit policy ignores. The writer drops an id only after a complete lookup.",
                        'type': 'object', 'minProperties': 1, 'additionalProperties': adv},
     }, required=['version', 'first_seen'])
-    entry['anyOf'] = [
+    entry['allOf'] = [rule_group('An entry needs `flags`, `advisories` or both.', 'anyOf', [
         {'description': 'An entry stores at least one counted maintenance flag...', 'required': ['flags']},
         {'description': '...or at least one counted advisory. A graded finding has a counted fact, and a carried entry keeps the facts it recorded.', 'required': ['advisories']},
-    ]
+    ])]
     return {
         '$schema': DRAFT,
         'id': 'https://lockrot.dev/schema/baseline-2.json',
@@ -806,13 +822,15 @@ def config_schema():
                         'each value and accepts whitespace around commas. `--fail-on` and `LOCKROT_FAIL_ON` replace this value whole. This schema checks the '
                         'spelling of each value. Two values of one kind and `none` beside another value are errors of lockrot itself (exit 2), which name the values. '
                         '`run.fail_on` writes the list in canonical form.'),
-        'oneOf': [
+        'allOf': [rule_group('`fail-on` is one value, a comma-separated list of values, or a non-empty array of distinct values.', 'oneOf', [
             {'description': 'A comma-separated list in one string: `"high"`, `"left-behind, vulnerable-high"`.', 'type': 'string',
-             'anyOf': [{'description': 'One value, as an editor offers it.', 'enum': FAIL_ON_VALUES}, {'pattern': lst}]},
+             'allOf': [rule_group('A fail-on string is one value or a comma-separated list of values.', 'anyOf', [
+                 {'description': 'One value, as an editor offers it.', 'enum': FAIL_ON_VALUES}, {'pattern': lst}])]},
             {'description': 'A JSON array, read as the string form is read: `["left-behind", "vulnerable-high"]`.', 'type': 'array', 'minItems': 1,
              'uniqueItems': True, 'items': {'description': 'One value.', 'type': 'string',
-                                            'anyOf': [{'description': 'As an editor offers it.', 'enum': FAIL_ON_VALUES}, {'pattern': one}]}},
-        ],
+                                            'allOf': [rule_group('Each item is one fail-on value.', 'anyOf', [
+                                                {'description': 'As an editor offers it.', 'enum': FAIL_ON_VALUES}, {'pattern': one}])]}},
+        ])],
     }
     ign = s['properties']['ignore']
     ign['description'] = ('The allowlist of the project: each entry accepts maintenance flags of the packages it matches, with a reason. An accepted '
@@ -884,11 +902,14 @@ def accept_unchecked_schema():
                                 'accept such a package by `package`.', {'pattern': URL_PATTERN}),
         },
         'required': ['check', 'reason'],
-        'not': {'description': 'The advisories check is never scoped by host.', 'properties': {'check': {'enum': ['advisories']}}, 'required': ['check', 'host']},
-        'oneOf': [
-            {'description': 'Scoped by host.', 'required': ['host']},
-            {'description': 'Scoped by repository.', 'required': ['repository']},
-            {'description': 'Scoped by package.', 'required': ['package']},
+        'allOf': [
+            rule_group('An entry with `check: advisories` cannot have `host`.', 'not',
+                       {'description': 'The advisories check is never scoped by host.', 'properties': {'check': {'enum': ['advisories']}}, 'required': ['check', 'host']}),
+            rule_group('An entry needs exactly one of `host`, `repository` and `package`.', 'oneOf', [
+                {'description': 'Scoped by host.', 'required': ['host']},
+                {'description': 'Scoped by repository.', 'required': ['repository']},
+                {'description': 'Scoped by package.', 'required': ['package']},
+            ]),
         ],
     }
     return {

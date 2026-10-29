@@ -315,7 +315,7 @@ shapes leave out the parts that do not apply. A score of 0 carries only `model`,
 | `score_model` | object | The whole score model: weights, severities, fix kinds, bands, sort and rules ([Score model 1](verdicts/model-1.md)) |
 | `score_rules_used` | object | Rule id → the number of findings on which the rule changed or decided a number. Null for `sort` |
 | `advisory_lookup` | object | `scope` and `scope_source`, the packages asked and not asked, and each Composer repository that can publish advisories, with its `outcome` ([Which advisories count](verdicts.md#which-advisories-count)) |
-| `move_check` | object or null | Which Composer checked the moves (`composer`), and whether it blocked the versions that an advisory affects. `blocking_disabled_by` lists the switches that turned that blocking off, environment variables and composer.json `config` keys, `[]` when none did. `baseline` says whether Composer's solver resolves or refuses the lock itself, with `reason` when lockrot did not check it. `ignores_extensions` is always true: the solve ignores every `ext-*` requirement. `composer lockrot` always writes `move_check`. A run that checks no move says why in `baseline` and `reason` ([The move check](verdicts.md#the-move-check)) |
+| `move_check` | object or null | Which Composer checked the moves (`composer`), and whether it blocked the versions that an advisory affects. `blocking_disabled_by` lists the switches that turned that blocking off, environment variables and composer.json `config` keys, `[]` when none did. `baseline` says whether Composer's solver resolves or refuses the lock itself, with `reason` when lockrot did not check it. `ignored_platform` lists the platform patterns whose requirements the solve ignores, except a name that `config.platform` sets. `composer lockrot` always writes `move_check`. A run that checks no move says why in `baseline` and `reason` ([The move check](verdicts.md#the-move-check)) |
 | `php_window` | object or null | The PHP minors on which the lock installs, with require-dev (`with_dev`) and without (`without_dev`), and the links that set each edge. It also holds the lock's `platform-overrides.php` and the host features that a requirement names. `target` says whether the window admits the target PHP. `target_fix` names the update of the packages that exclude the target, and the answer of Composer's solver to it. Its `platform_step` says whether to set `config.platform.php` to your release of the target PHP first. Its `lock_platform` lists the root `require` links that exclude the target and that only the lock's `platform` or `platform-dev` holds. Null when the window is unknowable ([The PHP window](verdicts.md#the-php-window)) |
 
 ### The gate
@@ -398,6 +398,8 @@ Each argument of `commands`, of `security.update_now_command` and of
 spaces. Only the Composer options that lockrot writes start with `-`:
 
 - `--no-update` and `--dev` in a `require` step
+- `--no-interaction` in a `require` step of a name that both `require` and `require-dev` list,
+  and in the step that raises `php` when `require-dev` lists it
 - `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step
 - `--locked` in a `why-not` step
 - `--lock` as the one argument of an `update` step: `composer update --lock`
@@ -569,9 +571,10 @@ An entry is `unknown` when lockrot cannot decide, for example:
 Read a kind that you do not know by `from_composer_repository`. Show it as written and link nothing.
 
 - **`from_composer_repository`** is true when the lock entry carries a `notification-url`. True
-  does not mean packagist.org. lockrot asks a repository for metadata, advisories and repository
-  activity only about such an entry, so a false one has no metadata, advisories, activity or
-  libyears. `--explain` writes it as `lock.from_composer_repository`. It stays a boolean in 1.x,
+  does not mean packagist.org. lockrot asks a repository for metadata and repository activity only
+  about such an entry, so a false one has no metadata, activity or libyears. lockrot still asks for
+  its advisories by name, except under `advisory-lookup: composer-repositories`. `--explain` writes
+  it as `lock.from_composer_repository`. It stays a boolean in 1.x,
   and `origin` is the finer account.
 
 - **`registry`** takes its values from the schema's `x-known-values`, the hosts that this release

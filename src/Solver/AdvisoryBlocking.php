@@ -4,22 +4,19 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
-use Composer\Advisory\AuditConfig;
 use Composer\Advisory\Auditor;
-use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Config;
-use Composer\Package\PackageInterface;
+use Composer\DependencyResolver\SecurityAdvisoryPoolFilter;
+use Composer\IO\NullIO;
 use Composer\Policy\ListPolicyConfig;
 use Composer\Policy\PolicyConfig;
-use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Util\Platform;
 use Lockrot\Exception\ConfigException;
 
 /**
- * What Composer 2.9 and later block in an update: the settings of the `block` operation, read
- * through the API of the Composer that runs lockrot, and applied with Composer's own Auditor, as
- * `SecurityAdvisoryPoolFilter` applies them. phpstan analyses against the newest Composer, so the
- * Composer 2.9 settings are read as the object's properties.
+ * Whether an update blocks advisories, read through the API of the Composer that runs lockrot, and
+ * Composer's own `SecurityAdvisoryPoolFilter` that blocks them. The filter is Composer's internal
+ * API: when this Composer cannot build it, each solve with blocking on fails with that error.
  *
  * @internal
  */
@@ -34,44 +31,50 @@ final class AdvisoryBlocking
     private const BLOCK_KEY = 'config.policy.advisories.block';
     private const AUDIT_KEY = 'config.audit.block-insecure';
     private bool $blocks;
-    /** @var array<int|string, ?string> */
-    private array $list;
-    /** @var array<string, ?string> */
-    private array $severities;
-    private bool $abandoned;
-    /** @var array<int|string, ?string> */
-    private array $abandonedIgnore;
+    private ?SecurityAdvisoryPoolFilter $filter = null;
+    private ?\Throwable $filterError = null;
     /** @var list<value-of<self::SWITCHES>> */
     private array $disabledBy;
 
-    /**
-     * Each list keeps the keys that this Composer's Auditor reads: a list on Composer 2.9.0 and 2.9.1.
-     *
-     * @param array<int|string, ?string> $list            the ignore list for blocking
-     * @param array<string, ?string>     $severities      the severities that blocking ignores
-     * @param array<int|string, ?string> $abandonedIgnore the abandoned packages that blocking ignores
-     * @param list<value-of<self::SWITCHES>> $disabledBy the {@see SWITCHES} that turned the blocking off
-     */
-    private function __construct(bool $blocks, array $list, array $severities, bool $abandoned, array $abandonedIgnore, array $disabledBy = [])
+    /** @param list<value-of<self::SWITCHES>> $disabledBy the {@see SWITCHES} that turned the blocking off */
+    private function __construct(bool $blocks, array $disabledBy = [])
     {
         $this->blocks = $blocks;
-        $this->list = $list;
-        $this->severities = $severities;
-        $this->abandoned = $abandoned;
-        $this->abandonedIgnore = $abandonedIgnore;
         $this->disabledBy = $disabledBy;
     }
 
     /** @param list<value-of<self::SWITCHES>> $disabledBy */
     private static function none(array $disabledBy = []): self
     {
-        return new self(false, [], [], false, [], $disabledBy);
+        return new self(false, $disabledBy);
     }
 
-    /** Every advisory blocks, and no abandoned package: a test's Composer 2.9 default. */
+    /** Composer's blocking with $policy, or the error of a filter that this Composer cannot build. */
+    private static function blocking(PolicyConfig $policy): self
+    {
+        $blocking = new self(true);
+        try {
+            $blocking->filter = new SecurityAdvisoryPoolFilter(new Auditor(), $policy, new NullIO());
+        } catch (\Throwable $e) {
+            $blocking->filterError = $e;
+        }
+
+        return $blocking;
+    }
+
+    /** Composer's default policy: every advisory blocks, and no abandoned package. */
     public static function everyAdvisory(): self
     {
-        return new self(true, [], [], false, []);
+        return self::blocking(PolicyConfig::fromConfig(new Config(false)));
+    }
+
+    /** Blocking on, with a pool filter that this Composer could not build: for a test of that failure. */
+    public static function unbuildable(\Throwable $error): self
+    {
+        $blocking = new self(true);
+        $blocking->filterError = $error;
+
+        return $blocking;
     }
 
     /**
@@ -80,50 +83,23 @@ final class AdvisoryBlocking
      */
     public static function fromConfig(Config $config): self
     {
-        if (!ComposerFeatures::blocksAdvisories()) {
-            return self::none();
-        }
-        $version = ComposerFeatures::version();
-        if (class_exists(PolicyConfig::class)) {
-            $policyVariable = self::isTrue(self::POLICY_VARIABLE);
-            // PolicyConfig::fromConfig() returns before it reads this variable when `policy` is off.
-            $advisoriesVariable = $config->get('policy') === false ? null : self::isTrue(self::ADVISORIES_VARIABLE);
-            try {
-                $policy = PolicyConfig::fromConfig($config);
-            } catch (\Throwable $e) {
-                throw new ConfigException('Composer rejects the policy configuration: '.$e->getMessage(), 0, $e);
-            }
-            $disabledBy = self::noBlocking($version);
-            if (!$policy->enabled || !$policy->advisories->shouldBlock(ListPolicyConfig::BLOCK_SCOPE_UPDATE)) {
-                return self::none(array_merge($disabledBy, self::policySwitch($config, $policyVariable, $advisoriesVariable)));
-            }
-            if ($disabledBy !== []) {
-                return self::none($disabledBy);
-            }
-
-            return new self(true, $policy->advisories->getIgnoreListForOperation('block'), $policy->advisories->getIgnoreSeverityForOperation('block'), $policy->abandoned->shouldBlock(ListPolicyConfig::BLOCK_SCOPE_UPDATE), $policy->abandoned->getFlatIgnoreForOperation('block'));
-        }
-        $disabledBy = self::noBlocking($version);
-        // Composer 2.10 has no AuditConfig::fromConfig().
-        $factory = [AuditConfig::class, 'fromConfig'];
+        $policyVariable = self::isTrue(self::POLICY_VARIABLE);
+        // PolicyConfig::fromConfig() returns before it reads this variable when `policy` is off.
+        $advisoriesVariable = $config->get('policy') === false ? null : self::isTrue(self::ADVISORIES_VARIABLE);
         try {
-            $audit = \is_callable($factory) ? $factory($config) : null;
+            $policy = PolicyConfig::fromConfig($config);
         } catch (\Throwable $e) {
-            throw new ConfigException('Composer rejects the audit configuration: '.$e->getMessage(), 0, $e);
+            throw new ConfigException('Composer rejects the policy configuration: '.$e->getMessage(), 0, $e);
         }
-        $settings = \is_object($audit) ? get_object_vars($audit) : [];
-        if (($settings['blockInsecure'] ?? true) === false) {
-            return self::none(array_merge($disabledBy, [self::AUDIT_KEY]));
+        $disabledBy = self::noBlocking();
+        if (!$policy->enabled || !$policy->advisories->shouldBlock(ListPolicyConfig::BLOCK_SCOPE_UPDATE)) {
+            return self::none(array_merge($disabledBy, self::policySwitch($config, $policyVariable, $advisoriesVariable)));
         }
         if ($disabledBy !== []) {
             return self::none($disabledBy);
         }
-        // Composer 2.9.2 and later split each list by operation, 2.9.0 and 2.9.1 block with the whole audit list and no severity.
-        if (\array_key_exists('ignoreListForBlocking', $settings)) {
-            return new self(true, self::listOf($settings['ignoreListForBlocking']), self::severitiesOf($settings['ignoreSeverityForBlocking'] ?? []), ($settings['blockAbandoned'] ?? false) === true, self::listOf($settings['ignoreAbandonedForBlocking'] ?? []));
-        }
 
-        return new self(true, self::listOf($settings['ignoreList'] ?? []), [], ($settings['blockAbandoned'] ?? false) === true, self::listOf($settings['ignoreAbandonedPackages'] ?? []));
+        return self::blocking($policy);
     }
 
     public function blocks(): bool
@@ -137,55 +113,15 @@ final class AdvisoryBlocking
         return $this->disabledBy;
     }
 
-    /**
-     * The ranges that an update blocks, by package name.
-     *
-     * @param array<string, list<PartialSecurityAdvisory>> $records every record of each name
-     *
-     * @return array<string, list<ConstraintInterface>>
-     */
-    public function ranges(array $records): array
+    /** Composer's pool filter, null when the blocking is off or when this Composer could not build it ({@see filterError()}). */
+    public function poolFilter(): ?SecurityAdvisoryPoolFilter
     {
-        if (!$this->blocks || $records === []) {
-            return [];
-        }
-        $ranges = [];
-        // Composer before 2.9 has no public processAdvisories(): with no ignore rule, every record blocks.
-        if ($this->list === [] && $this->severities === []) {
-            foreach ($records as $name => $advisories) {
-                foreach ($advisories as $advisory) {
-                    $ranges[$name][] = $advisory->affectedVersions;
-                }
-            }
-
-            return $ranges;
-        }
-        // @phpstan-ignore argument.type (the list keeps the shape that this Composer's Auditor reads)
-        foreach ((new Auditor())->processAdvisories($records, $this->list, $this->severities)['advisories'] as $name => $advisories) {
-            foreach ($advisories as $advisory) {
-                $ranges[$name][] = $advisory->affectedVersions;
-            }
-        }
-
-        return $ranges;
+        return $this->filter;
     }
 
-    /**
-     * Whether partial records leave out what the ignore list matches: Composer 2.9.2 and later then
-     * ask the complete records.
-     *
-     * @param array<string, list<PartialSecurityAdvisory>> $records
-     */
-    public function needsComplete(array $records): bool
+    public function filterError(): ?\Throwable
     {
-        // @phpstan-ignore function.alreadyNarrowedType (Composer 2.9.0 and 2.9.1 have no such method), argument.type (the list keeps the shape that this Composer's Auditor reads)
-        return method_exists(Auditor::class, 'needsCompleteAdvisoryLoad') && (new Auditor())->needsCompleteAdvisoryLoad($records, $this->list);
-    }
-
-    public function blocksAbandoned(PackageInterface $package): bool
-    {
-        // @phpstan-ignore argument.type (the list keeps the shape that this Composer's Auditor reads)
-        return $this->abandoned && (new Auditor())->filterAbandonedPackages([$package], $this->abandonedIgnore) !== [];
+        return $this->filterError;
     }
 
     /**
@@ -197,11 +133,11 @@ final class AdvisoryBlocking
      *
      * @throws ConfigException when Composer refuses the value of a variable that it reads
      */
-    private static function noBlocking(string $version): array
+    private static function noBlocking(): array
     {
         $disabledBy = [];
-        $checked = version_compare($version, '2.10.0-dev', '>=');
-        foreach (ComposerFeatures::blockingVariables($version) as $name) {
+        $checked = true;
+        foreach (['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING'] as $name) {
             $checked = $checked && self::isTrue($name) !== true;
             if (!\in_array(Platform::getEnv($name), [false, '', '0'], true)) {
                 $disabledBy[] = $name;
@@ -254,30 +190,5 @@ final class AdvisoryBlocking
 
         // The caller asks only when the blocking is off, and a `policy.advisories` list blocks unless its `block` is false.
         return [self::BLOCK_KEY];
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return array<string, ?string>
-     */
-    private static function severitiesOf($value): array
-    {
-        $severities = [];
-        foreach (self::listOf($value) as $severity => $reason) {
-            $severities[(string) $severity] = $reason;
-        }
-
-        return $severities;
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return array<int|string, ?string> the keys as written, a value that is no string as null
-     */
-    private static function listOf($value): array
-    {
-        return array_map(static fn ($reason): ?string => \is_string($reason) ? $reason : null, \is_array($value) ? $value : []);
     }
 }

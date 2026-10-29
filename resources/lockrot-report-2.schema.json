@@ -92,7 +92,7 @@
       "type": "boolean"
     },
     "not_from_composer_repository": {
-      "description": "How many of the packages checked lockrot asked no repository about: the lock entry carries no Composer notification-url — a path, vcs, artifact or inline package entry, or a package from a `type: composer` repository that advertises no notify URL. Equals the number of findings whose `from_composer_repository` is false.",
+      "description": "How many of the packages checked came from no Composer repository: the lock entry carries no Composer notification-url — a path, vcs, artifact or inline package entry, or a package from a `type: composer` repository that advertises no notify URL. lockrot asks no repository for their metadata or repository activity. It asks for their advisories by name, except under `advisory-lookup: composer-repositories`. Equals the number of findings whose `from_composer_repository` is false.",
       "type": "integer",
       "minimum": 0
     },
@@ -261,7 +261,7 @@
       }
     },
     "exposure": {
-      "description": "Direct requirements that pull in attributable flagged packages (see `exposure_rule`), with how many, most first, then by name: the same count S7 carries on the requirement's finding. A direct requirement appears here only when it pulls in such a package; a flagged direct requirement that pulls in none is not listed, and its own verdict is on its finding.",
+      "description": "Direct requirements that pull in graded transitive packages, `[{package, flagged}]`, one per finding that carries S7, its `flagged` equal to S7's: every graded transitive package reached from 1 to `exposure_rule.max_fan_in` direct requirements is named by each of them (vulnerable-only ones included).",
       "type": "array",
       "items": {
         "type": "object",
@@ -1167,7 +1167,7 @@
       ]
     },
     "forgeId": {
-      "description": "The kind of repository host a note is about: `github`, `gitlab` (gitlab.com and every host in Composer's `gitlab-domains`) or `bitbucket`. An open set: a later release can add a host; read one you do not know as \"other\". The display name (`GitHub`) is the explanation's `activity.forge`, which is not this set.",
+      "description": "The kind of repository host a note is about: `github`, `gitlab` (gitlab.com and every host in Composer's `gitlab-domains`) or `bitbucket`. An open set: a later release can add a host; read one you do not know as \"other\".",
       "type": "string",
       "pattern": "^[a-z][a-z0-9_]*$",
       "x-known-values": [
@@ -1287,12 +1287,11 @@
       ]
     },
     "advisoriesNotCheckedReason": {
-      "description": "Why security advisories were not checked: `offline` (`--offline`; advisories are never served from a cache), `composer_too_old` (Composer below 2.4 has no advisory API), `install_time_budget` (the install-time budget ran out), `lookup_failed` (every feed threw). An open set: read a reason you do not know as another reason.",
+      "description": "Why security advisories were not checked: `offline` (`--offline`; advisories are never served from a cache), `install_time_budget` (the install-time budget ran out), `lookup_failed` (every feed threw). An open set: read a reason you do not know as another reason.",
       "type": "string",
       "pattern": "^[a-z][a-z0-9_]*$",
       "x-known-values": [
         "offline",
-        "composer_too_old",
         "install_time_budget",
         "lookup_failed"
       ]
@@ -4586,7 +4585,7 @@
           "uniqueItems": true
         },
         "commands": {
-          "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell). The kinds without a command have `[]`. A transitive `require`, `raise-php` or `tag` move has no step for its package unless `check` resolves it. Then the step is `composer update vendor/pkg:<constraint>` with the form's option, on a Composer that takes an inline constraint there. A `raise-php` move starts with its php step (`composer require php:>=8.1 --no-update`). An `update`, `require`, `raise-php` or `tag` move whose `check` does not resolve it ends with `composer why-not vendor/pkg <version> --locked`. A move with `moves_with` entries runs the joint request: `composer update vendor/pkg:<constraint>` followed by the holders. A root requirement writes it in two steps: `composer require vendor/pkg:<constraint> --no-update`, then `composer update vendor/pkg` followed by the holders. A `require` step on a package that composer.json lists only in `require-dev` adds `--dev`. The command argument rule: each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. A move that `check` resolves only with its dependencies ends its step with `--with-dependencies` or `--with-all-dependencies`, and a move that `check` refuses has no `update` or `require` step. Only lockrot's own options start with `-`: `--no-update` and `--dev` in a `require` step, `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step, and `--locked` in a `why-not` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell.",
+          "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell). The kinds without a command have `[]`. A transitive `require`, `raise-php` or `tag` move has no step for its package unless `check` resolves it. Then the step is `composer update vendor/pkg:<constraint>` with the form's option, on a Composer that takes an inline constraint there. A `raise-php` move starts with its php step (`composer require php:>=8.1 --no-update`). An `update`, `require`, `raise-php` or `tag` move whose `check` does not resolve it ends with `composer why-not vendor/pkg <version> --locked`. A move with `moves_with` entries runs the joint request: `composer update vendor/pkg:<constraint>` followed by the holders. A root requirement writes it in two steps: `composer require vendor/pkg:<constraint> --no-update`, then `composer update vendor/pkg` followed by the holders. A `require` step on a package that composer.json lists only in `require-dev` adds `--dev`. A `require` step on a name that both `require` and `require-dev` list adds `--no-interaction` and spells the name as the `require-dev` key does: Composer then writes `require` and removes the `require-dev` line. The php step does the same when `require-dev` lists php. The command argument rule: each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. A move that `check` resolves only with its dependencies ends its step with `--with-dependencies` or `--with-all-dependencies`, and a move that `check` refuses has no `update` or `require` step. Only lockrot's own options start with `-`: `--no-update`, `--dev` and `--no-interaction` in a `require` step, `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step, and `--locked` in a `why-not` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell.",
           "type": "array",
           "items": {
             "description": "One command as its argument list (`[\"composer\", \"require\", \"php:>=8.1\", \"--no-update\"]`).",
@@ -5847,7 +5846,7 @@
           "uniqueItems": true
         },
         "commands": {
-          "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell). The kinds without a command have `[]`. A transitive `require`, `raise-php` or `tag` move has no step for its package unless `check` resolves it. Then the step is `composer update vendor/pkg:<constraint>` with the form's option, on a Composer that takes an inline constraint there. A `raise-php` move starts with its php step (`composer require php:>=8.1 --no-update`). An `update`, `require`, `raise-php` or `tag` move whose `check` does not resolve it ends with `composer why-not vendor/pkg <version> --locked`. A move with `moves_with` entries runs the joint request: `composer update vendor/pkg:<constraint>` followed by the holders. A root requirement writes it in two steps: `composer require vendor/pkg:<constraint> --no-update`, then `composer update vendor/pkg` followed by the holders. A `require` step on a package that composer.json lists only in `require-dev` adds `--dev`. The command argument rule: each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. A move that `check` resolves only with its dependencies ends its step with `--with-dependencies` or `--with-all-dependencies`, and a move that `check` refuses has no `update` or `require` step. Only lockrot's own options start with `-`: `--no-update` and `--dev` in a `require` step, `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step, and `--locked` in a `why-not` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell.",
+          "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell). The kinds without a command have `[]`. A transitive `require`, `raise-php` or `tag` move has no step for its package unless `check` resolves it. Then the step is `composer update vendor/pkg:<constraint>` with the form's option, on a Composer that takes an inline constraint there. A `raise-php` move starts with its php step (`composer require php:>=8.1 --no-update`). An `update`, `require`, `raise-php` or `tag` move whose `check` does not resolve it ends with `composer why-not vendor/pkg <version> --locked`. A move with `moves_with` entries runs the joint request: `composer update vendor/pkg:<constraint>` followed by the holders. A root requirement writes it in two steps: `composer require vendor/pkg:<constraint> --no-update`, then `composer update vendor/pkg` followed by the holders. A `require` step on a package that composer.json lists only in `require-dev` adds `--dev`. A `require` step on a name that both `require` and `require-dev` list adds `--no-interaction` and spells the name as the `require-dev` key does: Composer then writes `require` and removes the `require-dev` line. The php step does the same when `require-dev` lists php. The command argument rule: each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. A move that `check` resolves only with its dependencies ends its step with `--with-dependencies` or `--with-all-dependencies`, and a move that `check` refuses has no `update` or `require` step. Only lockrot's own options start with `-`: `--no-update`, `--dev` and `--no-interaction` in a `require` step, `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step, and `--locked` in a `why-not` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell.",
           "type": "array",
           "items": {
             "description": "One command as its argument list (`[\"composer\", \"require\", \"php:>=8.1\", \"--no-update\"]`).",
@@ -7114,7 +7113,7 @@
           "$ref": "#/definitions/severity"
         },
         "by": {
-          "description": "The Composer setting that ignores it (`policy.advisories` on 2.10+, `audit.ignore` or `audit.ignore-severity` on 2.4–2.9). An open set: read an unknown key as another setting.",
+          "description": "The Composer setting that ignores it: `policy.advisories`, or `audit.ignore` or `audit.ignore-severity` when composer.json sets no `config.policy.advisories`. An open set: read an unknown key as another setting.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_.-]*$",
           "x-known-values": [
@@ -7210,7 +7209,7 @@
           "minimum": 0
         },
         "feeds": {
-          "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
+          "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/advisoryFeed"
@@ -7794,7 +7793,7 @@
           "minimum": 0
         },
         "feeds": {
-          "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
+          "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/advisoryFeed"
@@ -8026,14 +8025,13 @@
           "type": "boolean"
         },
         "unchecked_reason": {
-          "description": "Why the lookup did not complete: `offline composer_too_old install_time_budget lookup_failed`, and `not_from_composer_repository` (outside the composer-repositories scope), `unparseable_version`, `no_feed`; an open set; null on a complete lookup.",
+          "description": "Why the lookup did not complete: `offline install_time_budget lookup_failed`, and `not_from_composer_repository` (outside the composer-repositories scope), `unparseable_version`, `no_feed`; an open set; null on a complete lookup.",
           "oneOf": [
             {
               "type": "string",
               "pattern": "^[a-z][a-z0-9_]*$",
               "x-known-values": [
                 "offline",
-                "composer_too_old",
                 "install_time_budget",
                 "lookup_failed",
                 "not_from_composer_repository",
@@ -8055,7 +8053,7 @@
           "minimum": 0
         },
         "feeds": {
-          "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
+          "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/advisoryFeed"
@@ -9089,7 +9087,6 @@
             "offline",
             "undated_releases",
             "releases_unknown",
-            "composer_too_old",
             "lookup_failed",
             "host_not_supported",
             "no_feed",
@@ -12415,7 +12412,7 @@
           ],
           "properties": {
             "by": {
-              "description": "The Composer setting that holds the list: `policy.abandoned` (`config.policy.abandoned.ignore`, Composer 2.10 and later) or `audit.ignore-abandoned` (Composer 2.9, and the legacy fallback of 2.10). An open set: read an unknown key as another setting.",
+              "description": "The Composer setting that holds the list: `policy.abandoned` (`config.policy.abandoned.ignore`), or `audit.ignore-abandoned` when composer.json sets no `config.policy.abandoned`. An open set: read an unknown key as another setting.",
               "type": "string",
               "pattern": "^[a-z][a-z0-9_.-]*$",
               "x-known-values": [
@@ -12638,14 +12635,13 @@
           ]
         },
         "reason": {
-          "description": "Why. On `not_asked`: `offline`, `composer_too_old`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the composer-repositories scope. On `failed`: `transport` or `invalid_response`. Null on `answered` and `no_feed`. An open set.",
+          "description": "Why. On `not_asked`: `offline`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the composer-repositories scope. On `failed`: `transport` or `invalid_response`. Null on `answered` and `no_feed`. An open set.",
           "oneOf": [
             {
               "type": "string",
               "pattern": "^[a-z][a-z0-9_]*$",
               "x-known-values": [
                 "offline",
-                "composer_too_old",
                 "install_time_budget",
                 "not_from_composer_repository",
                 "transport",
@@ -12773,7 +12769,7 @@
       ]
     },
     "advisoryLookup": {
-      "description": "How the run's own advisory lookup went: its scope, the packages it asked, and the outcome of each advisory-capable repository. The lookups that the move check's solves make on Composer 2.9 and later are not in it.",
+      "description": "How the run's own advisory lookup went: its scope, the packages it asked, and the outcome of each advisory-capable repository. The lookups that the move check's solves make are not in it.",
       "type": "object",
       "required": [
         "scope",
@@ -13088,7 +13084,7 @@
           "x-deprecated": true
         },
         "lead": {
-          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding: jq reads `.lead` where it read `.verdict`.",
+          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding when no Composer abandoned ignore list applies: jq reads `.lead` where it read `.verdict`.",
           "oneOf": [
             {
               "$ref": "#/definitions/maintenanceFlag"
@@ -19920,7 +19916,7 @@
           ]
         },
         "share": {
-          "description": "A fraction.",
+          "description": "The share a `select` or `share` rule takes (`{num, den}`: ¼ for corroborating).",
           "type": "object",
           "required": [
             "num",
@@ -20607,7 +20603,7 @@
                     "$ref": "#/definitions/severity"
                   },
                   "share": {
-                    "description": "A fraction.",
+                    "description": "On `share`: the fraction.",
                     "type": "object",
                     "required": [
                       "num",
@@ -20887,7 +20883,7 @@
                 ]
               },
               "order": {
-                "description": "Groups.",
+                "description": "On `dir: order`: the groups, first first (finished and ok are one group).",
                 "type": "array",
                 "items": {
                   "description": "A group.",
@@ -21469,7 +21465,7 @@
           "minLength": 1
         },
         "project_php_lowest": {
-          "description": "The lowest PHP `require.php` admits: its lower bound normalised to MAJOR.MINOR.PATCH, a fourth segment and a stability suffix dropped (`7.2.5.0-dev` is `7.2.5`, `^7.4.0-RC1` gives `7.4.0`; `7.2.0` for `^7.2 || ^8.0.0`; an exclusive stable bound gives the next patch: `>7.4` gives `7.4.1`, and the post-release bound `>=7.4.0-p1` gives `7.4.1`; an exclusive pre-release bound gives its release: `>7.4.0-RC1` gives `7.4.0`). Null exactly when the constraint has no lowest: no `require.php`, `*`, an alternative with no lower bound (`<8`), or a constraint it cannot parse. Print it with a trailing `.0` patch dropped.",
+          "description": "The lowest stable MAJOR.MINOR.PATCH that `require.php` admits: each range of the constraint is read at its start and at the next patch, and the first point that the constraint matches counts (`^7.4.0-RC1` gives `7.4.0`; `7.2.0` for `^7.2 || ^8.0.0`; an exclusive stable bound gives the next patch: `>7.4` gives `7.4.1`, and the post-release bound `>=7.4.0-p1` gives `7.4.1`; an exclusive pre-release bound gives its release: `>7.4.0-RC1` gives `7.4.0`; a `!=` hole moves it: `>=8.1 !=8.1.0` gives `8.1.1`; a range with no stable version is passed: `==7.4.0-RC1 || ^8.1` gives `8.1.0`). Null exactly when the constraint has no lowest: no `require.php`, `*`, an alternative with no lower bound (`<8`), a constraint that admits no stable version (`>=8.1 <8.1.0`, `>=8.2 <8.1`), or one it cannot parse. Print it with a trailing `.0` patch dropped.",
           "oneOf": [
             {
               "type": "string",
@@ -21527,7 +21523,7 @@
           ]
         },
         "thresholds": {
-          "description": "The ages, in years, that separate one verdict from the next.",
+          "description": "The ages, in years, that raise `silent`, `left-behind` and `stale`: each flag of `score_model.flags` names the keys that it reads in `thresholds`.",
           "oneOf": [
             {
               "type": "object",
@@ -21619,7 +21615,7 @@
                 "composer",
                 "blocks_advisories",
                 "blocking_disabled_by",
-                "ignores_extensions",
+                "ignored_platform",
                 "baseline",
                 "reason"
               ],
@@ -21633,11 +21629,11 @@
                   "minLength": 1
                 },
                 "blocks_advisories": {
-                  "description": "Whether the solve removed the versions that an advisory affects, as Composer 2.9 and later do in an update.",
+                  "description": "Whether the solve removed the versions that an advisory affects, as Composer does in an update.",
                   "type": "boolean"
                 },
                 "blocking_disabled_by": {
-                  "description": "The switches that turn off the advisory blocking of the running Composer, in this order: `COMPOSER_NO_BLOCKING`, `COMPOSER_NO_SECURITY_BLOCKING`, `COMPOSER_POLICY`, `COMPOSER_POLICY_ADVISORIES_BLOCK`, `config.policy`, `config.policy.advisories`, `config.policy.advisories.block`, `config.audit.block-insecure`. A switch is listed when it holds a value that turns the blocking off and no switch that Composer reads after it turns the blocking on again. Composer 2.9.0 and 2.9.1 read only `config.audit.block-insecure`, and later 2.9 releases also read `COMPOSER_NO_SECURITY_BLOCKING`. Composer 2.10 and later read every switch, and read `config.audit.block-insecure` only when `config.policy.advisories` is not set. Empty when no switch turns the blocking off. Closed.",
+                  "description": "The switches that turn off the advisory blocking of the running Composer, in this order: `COMPOSER_NO_BLOCKING`, `COMPOSER_NO_SECURITY_BLOCKING`, `COMPOSER_POLICY`, `COMPOSER_POLICY_ADVISORIES_BLOCK`, `config.policy`, `config.policy.advisories`, `config.policy.advisories.block`, `config.audit.block-insecure`. A switch is listed when it holds a value that turns the blocking off and no switch that Composer reads after it turns the blocking on again. Composer reads `config.audit.block-insecure` only when `config.policy.advisories` is not set. Empty when no switch turns the blocking off. Closed.",
                   "type": "array",
                   "items": {
                     "description": "One switch: an environment variable, or a key of composer.json `config`. Closed.",
@@ -21655,12 +21651,13 @@
                   },
                   "uniqueItems": true
                 },
-                "ignores_extensions": {
-                  "description": "Always true: the solve ignores every `ext-*` requirement, as `--ignore-platform-req=ext-*` does, so the extensions of the machine that runs lockrot decide no move.",
-                  "type": "boolean",
-                  "enum": [
-                    true
-                  ]
+                "ignored_platform": {
+                  "description": "The platform patterns whose requirements the solve ignores, as `--ignore-platform-req` does, so the machine that runs lockrot decides no move. A name that composer.json `config.platform` sets is checked even when a pattern matches it (ruling R6-2).",
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
                 },
                 "baseline": {
                   "description": "The partial update of a name outside the lock: `refused` means Composer refuses the lock itself, so no move is checked (the `moves_not_checked` note). Closed.",
@@ -22279,7 +22276,7 @@
       "properties": {}
     },
     "noteMetadataUnavailable": {
-      "description": "`metadata_unavailable`: metadata was asked for and did not come for `package_count` packages. `reasons` groups them by message, in the order the text lists them, and their `package_count`s sum to the note's. Each such finding is `unknown`, with `libyears_unmeasured` `metadata_unavailable`.",
+      "description": "`metadata_unavailable`: metadata was asked for and did not come for `package_count` packages. `reasons` groups them by message, in the order the text lists them, and their `package_count`s sum to the note's. Each such finding has `metadata.status` `unavailable` and `libyears_unmeasured` `unavailable`. Its verdict comes from what lockrot could still read, so a counted advisory still grades it.",
       "type": "object",
       "required": [
         "package_count",
@@ -22474,7 +22471,7 @@
       }
     },
     "noteRepositoryActivityNotFound": {
-      "description": "`repository_activity_not_found`: the host answered 404 for `repositories` (private, renamed or removed). An answer, not a network failure; where the host did not also rate-limit, this is the only record of them: their findings carry no S10 and their explanation's `activity` is null.",
+      "description": "`repository_activity_not_found`: the host answered 404 for `repositories` (private, renamed or removed). An answer, not a network failure. Their findings carry no S10, and their `activity.status` is `not_found`.",
       "type": "object",
       "required": [
         "forge_id",
@@ -22550,7 +22547,7 @@
       ],
       "properties": {
         "by": {
-          "description": "The Composer setting that holds the list: `policy.abandoned` (`config.policy.abandoned.ignore`, Composer 2.10 and later) or `audit.ignore-abandoned` (Composer 2.9, and the legacy fallback of 2.10). An open set: read an unknown key as another setting.",
+          "description": "The Composer setting that holds the list: `policy.abandoned` (`config.policy.abandoned.ignore`), or `audit.ignore-abandoned` when composer.json sets no `config.policy.abandoned`. An open set: read an unknown key as another setting.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_.-]*$",
           "x-known-values": [
@@ -22821,11 +22818,10 @@
       }
     },
     "noteUpdateNowReduced": {
-      "description": "`update_now_reduced`: the command leaves out the members that Composer's refusal of the combined update names, and, under Composer 2.2 or 2.3, each plain member that the resolving solve installs below its move version.",
+      "description": "`update_now_reduced`: the command leaves out the members that Composer's refusal of the combined update names.",
       "type": "object",
       "required": [
         "left_out",
-        "held_below",
         "problem"
       ],
       "properties": {
@@ -22838,34 +22834,9 @@
           "minItems": 1,
           "uniqueItems": true
         },
-        "held_below": {
-          "description": "The plain members that the combined solve installs below their move version, in report order, each also in `left_out`. Empty when only a refusal leaves members out.",
-          "type": "array",
-          "items": {
-            "description": "A member left out below its fix.",
-            "type": "object",
-            "required": [
-              "package",
-              "installs"
-            ],
-            "properties": {
-              "package": {
-                "$ref": "#/definitions/packageName"
-              },
-              "installs": {
-                "description": "The release that the combined solve installs for it, as the lock would write it.",
-                "type": "string",
-                "minLength": 1
-              }
-            }
-          }
-        },
         "problem": {
-          "description": "Composer's problem text of the refused combined update, without colour. Foreign text, not contract. Null when no refusal leaves a member out.",
-          "type": [
-            "string",
-            "null"
-          ],
+          "description": "Composer's problem text of the refused combined update, without colour. Foreign text, not contract.",
+          "type": "string",
           "minLength": 1
         }
       }
@@ -23235,7 +23206,8 @@
                 "not_from_composer_repository",
                 "no_composer_json",
                 "composer_json_invalid",
-                "solver_error"
+                "solver_error",
+                "advisory_lookup_incomplete"
               ]
             },
             {
@@ -23955,7 +23927,6 @@
           "pattern": "^[a-z][a-z0-9_]*$",
           "x-known-values": [
             "offline",
-            "composer_too_old",
             "install_time_budget",
             "lookup_failed",
             "no_feed",
@@ -24271,7 +24242,7 @@
           }
         },
         "update_now_command": {
-          "description": "The one command the overview's \"Update now\" copies, as an argv list: `composer`, `update`, then each member with its constraint inline (`vendor/pkg:^1.2`) in the order of `update_now`. Under Composer 2.2 or 2.3, a member whose move is the plain `update` is written plain (`vendor/pkg`), and the solve reads it so. Composer's solver checked it as one request: a member that the combined request refuses is left out (the `update_now_reduced` note). Null when `update_now` is empty, and when Composer refuses the members together (the `update_now_refused` note); then the line is hidden (a page never builds a command, and a bare `composer update` updates the whole lock).",
+          "description": "The one command the overview's \"Update now\" copies, as an argv list: `composer`, `update`, then each member with its constraint inline (`vendor/pkg:^1.2`) in the order of `update_now`. Composer's solver checked it as one request: a member that the combined request refuses is left out (the `update_now_reduced` note). Null when `update_now` is empty, and when Composer refuses the members together (the `update_now_refused` note); then the line is hidden (a page never builds a command, and a bare `composer update` updates the whole lock).",
           "oneOf": [
             {
               "description": "The argv: `composer`, `update`, then one argument per member.",

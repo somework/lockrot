@@ -798,7 +798,13 @@
             "composer": "2.10.3",
             "blocks_advisories": true,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -6019,7 +6025,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require bacon/bacon-qr-code ^3.1 \u2014 clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.0) and pragmarx/google2fa-qrcode v1.0.3 (requires ~1.0|~2.0; itself left-behind) and pragmarx/google2fa-laravel v1.4.1 (requires pragmarx/google2fa-qrcode ^1.0; itself left-behind) and pragmarx/google2fa-qrcode v1.0.2 (requires pragmarx/google2fa ~4.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require bacon/bacon-qr-code ^3.1 \u2014 clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.0), pragmarx/google2fa-qrcode v1.0.3 (requires ~1.0|~2.0; itself left-behind), pragmarx/google2fa-laravel v1.4.1 (requires pragmarx/google2fa-qrcode ^1.0; itself left-behind) and pragmarx/google2fa-qrcode v1.0.2 (requires pragmarx/google2fa ~4.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",

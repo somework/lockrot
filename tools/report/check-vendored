@@ -4,7 +4,7 @@
 # pinned ("Which renderer a lockrot release vendors" in tools/report/README.md). The release pull
 # request into main and the tag workflow run it.
 #
-#   tools/report/check-vendored     exit 1 on a pre-release or a local build, non-zero on a missing attestation
+#   tools/report/check-vendored     exit 1 on a pre-release, a local build or a commit off the renderer's main, non-zero on a missing attestation
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
@@ -18,3 +18,9 @@ commit=$(cat tools/report/renderer-commit 2>/dev/null || true)
 for file in report.html manifest.json; do
   gh attestation verify "resources/report/$file" --repo "$REPO" --signer-workflow "$REPO/.github/workflows/release.yml" --source-ref "refs/tags/v$version" --source-digest "$commit"
 done
+# A final renderer tag comes from the renderer's main branch, so the vendored commit must be on it.
+status=$(gh api "repos/$REPO/compare/$commit...main" --jq .status)
+case "$status" in
+  ahead|identical) ;;
+  *) echo "::error::the vendored renderer commit $commit is not on the main branch of $REPO (compare status: $status)"; exit 1 ;;
+esac

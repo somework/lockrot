@@ -18,7 +18,6 @@ use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
-use Lockrot\Solver\ComposerFeatures;
 use Lockrot\Solver\ComposerSolver;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveCheckers;
@@ -40,7 +39,7 @@ final class MoveCheckersTest extends TestCase
     public function testAPlatformPhpWithNoPatchInTheTargetMinorIsKeptAsWritten(): void
     {
         $php = MoveCheckers::platformPhp('8.4', '8.4');
-        $solver = new ComposerSolver(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => $php]), new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['php' => '>=8.4.1']]]]), []);
+        $solver = new ComposerSolver(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => $php]), new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['php' => '>=8.4.1']]]]));
 
         $outcome = (new SolverChecker($solver, [], $php, false, Deadline::never()))->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
 
@@ -89,6 +88,34 @@ final class MoveCheckersTest extends TestCase
         $checker = MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]]), ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
 
         self::assertSame('8.4.3', $checker->platformPhp());
+    }
+
+    /** Composer lower-cases each `config.platform` name, so `PHP` is the project's php. */
+    public function testAConfiguredPlatformPhpWrittenInCapitalsIsTheProjectsPhp(): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['platform' => ['PHP' => '8.4.3']]]);
+
+        $checker = MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]]), ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
+
+        self::assertSame(['8.4.3', '8.4.3'], [$checker->platformPhp(), $checker->configuredPhp()]);
+    }
+
+    /** Ruling R6-2: a library that `config.platform` sets is the project's fact, whatever case it is written in. */
+    public function testAReleaseThatNeedsMoreThanAConfiguredLibraryIsRefused(): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['platform' => ['Lib-Lockrot-Test' => '1.0.0']]]);
+        $loader = new ArrayLoader();
+        $repository = new RecordingComposerRepository([
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.1.0', 'require' => ['lib-lockrot-test' => '^2.0']]),
+        ]);
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+
+        $check = MoveCheckers::forProject(self::root(), $lock, ProjectConfig::empty(), $config, [$repository], '8.4', false, Deadline::never())->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
+
+        self::assertSame(MoveCheck::REFUSED, $check->result());
     }
 
     /** `target_fix.platform_step` reads the configured php: the solve runs at the target minor's newest patch instead. */
@@ -283,13 +310,11 @@ final class MoveCheckersTest extends TestCase
 
     /**
      * Ruling R2-24: under `advisory-lookup: composer-repositories`, the `-W` solve frees acme/vcs,
-     * which a VCS repository serves. The move check keeps its name out of the advisory lookup.
+     * which a VCS repository serves. The move check keeps its name out of the advisory lookup, and
+     * the resolve that still holds it proves nothing (ruling R2-47, widened by R6).
      */
     public function testTheMoveChecksAdvisoryLookupKeepsOutAVcsNameThatAMoveWithAllDependenciesFrees(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class) || !ComposerFeatures::blocksAdvisories()) {
-            self::markTestSkipped('Composer without advisory blocking');
-        }
         $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0', 'acme/zeta' => '^1.0 || ^2.0', 'acme/vcs' => '^1.0']], RootPackage::class);
         self::assertInstanceOf(RootPackageInterface::class, $root);
         $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
@@ -331,7 +356,7 @@ final class MoveCheckersTest extends TestCase
             ->withAdvisories([], ['acme/lib', 'acme/zeta']);
         $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
 
-        self::assertSame([MoveCheck::RESOLVES, MoveCheck::WITH_ALL_DEPENDENCIES], [$check->result(), $check->form()]);
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::ADVISORY_LOOKUP_INCOMPLETE], [$check->result(), $check->reason()]);
         self::assertNotContains('acme/vcs', $feed->asked, 'asked: '.implode(', ', $feed->asked));
     }
 

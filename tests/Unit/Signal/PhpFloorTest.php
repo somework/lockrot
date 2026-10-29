@@ -288,9 +288,53 @@ final class PhpFloorTest extends TestCase
         yield 'a hyphen range' => ['7.3 - 8.1', '7.3.0'];
         yield 'any version' => ['*', null];
         yield 'an upper bound only' => ['<8', null];
+        yield 'an upper bound only, then a range' => ['<7.0 || >=8.1', null];
         yield 'an unreadable constraint' => ['whatever', null];
         yield 'a date version' => ['>=201001', null];
         yield 'no require.php' => [null, null];
+        yield 'a hole at the bound' => ['>=8.1 !=8.1.0', '8.1.1'];
+        yield 'two holes at the bound' => ['>=8.1 !=8.1.0 !=8.1.1', '8.1.2'];
+        yield 'a pre-release alone, then a range' => ['==7.4.0-RC1 || ^8.1', '8.1.0'];
+        yield 'a range that holds no stable version' => ['>=8.1 <8.1.0', null];
+        yield 'an unsatisfiable constraint' => ['>=8.2 <8.1', null];
+    }
+
+    /**
+     * R6-5: every published point is a version that `require.php` itself admits.
+     *
+     * @dataProvider floorPoints
+     */
+    #[DataProvider('floorPoints')]
+    public function testTheLowestPointIsAdmittedByRequirePhp(?string $requirePhp, ?string $point): void
+    {
+        $lowest = $requirePhp === null ? null : PhpFloor::pointOf($requirePhp);
+
+        self::assertSame($point, $lowest);
+        if ($lowest !== null) {
+            self::assertTrue((new VersionParser())->parseConstraints((string) $requirePhp)->matches(new Constraint('==', $lowest.'.0')), $requirePhp.' admits '.$lowest);
+        }
+    }
+
+    /**
+     * Above a point, the lowest stable version is the next one that the constraint admits: the
+     * patch after $above in the same range, else the start of a later range.
+     *
+     * @dataProvider pointsAbove
+     */
+    #[DataProvider('pointsAbove')]
+    public function testTheLowestPointAboveAPointIsTheNextAdmittedVersion(string $php, string $above, ?string $point): void
+    {
+        self::assertSame($point, PhpFloor::lowestStable((new VersionParser())->parseConstraints($php), $above));
+    }
+
+    /** @return iterable<string, array{string, string, ?string}> */
+    public static function pointsAbove(): iterable
+    {
+        yield 'the patch after the point' => ['>=7.4', '7.4.0', '7.4.1'];
+        yield 'past a non-zero fourth segment' => ['>=7.2.5.1', '7.2.6', '7.2.7'];
+        yield 'past an exclusive bound' => ['>7.1.3', '7.1.4', '7.1.5'];
+        yield 'a range with no lower bound is skipped' => ['<7.0 || >=8.1', '7.4.0', '8.1.0'];
+        yield 'nothing above the range' => ['>=7.4 <7.4.1', '7.4.0', null];
     }
 
     /**
@@ -335,7 +379,7 @@ final class PhpFloorTest extends TestCase
     public function testTheDisplayRowsOfTheFloorPointAreRecorded(): void
     {
         $rows = [];
-        foreach (['^7.2', '>=7.2.5', '>7.1', '~8.0.0', '>=7.4.0-RC1', '7.*', '*', '<8', 'whatever', null] as $requirePhp) {
+        foreach (['^7.2', '>=7.2.5', '>7.1', '~8.0.0', '>=7.4.0-RC1', '7.*', '*', '<8', 'whatever', null, '>=8.1 !=8.1.0', '>=8.2 <8.1', '==7.4.0-RC1 || ^8.1'] as $requirePhp) {
             $point = (new PhpFloor(null, $requirePhp))->lowestAsString();
             $rows[] = [
                 'require_php' => $requirePhp,

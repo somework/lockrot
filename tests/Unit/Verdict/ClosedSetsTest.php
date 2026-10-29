@@ -72,6 +72,8 @@ final class ClosedSetsTest extends TestCase
     private const LIBYEARS_REASONS_1 = ['branch_snapshot', 'no_stable_release_date', 'not_from_composer_repository', 'metadata_unavailable'];
     private const PRIORITY_STEPS_1 = ['transitive', 'unreached', 'dev', 'no_fix_expected'];
     private const NO_FIX_REASONS_1 = ['not_on_installed_branch', 'releases_unknown', 'affected_range_unknown', 'no_release_fixes'];
+    /** report-1's reasons of `advisories_not_checked`, frozen with the `-1` files. Composer 2.10 and later write no `composer_too_old`. */
+    private const ADVISORIES_NOT_CHECKED_REASONS_1 = ['offline', 'composer_too_old', 'install_time_budget'];
     /** The note codes lockrot 0.13.0 wrote: the `-1` files keep their 0.13.0 bytes, and RunNote::CODES writes one more. */
     private const NOTE_CODES_1 = ['offline', 'metadata_unavailable', 'monorepo_parent_unavailable', 'advisory_ignore_unreadable', 'advisories_unavailable', 'advisories_not_checked',
         'repository_activity_not_checked', 'repository_activity_anonymous_cap', 'repository_activity_rate_limited', 'repository_activity_unreachable', 'repository_activity_not_found', 'not_from_composer_repository'];
@@ -354,7 +356,7 @@ final class ClosedSetsTest extends TestCase
             'noteCode' => [self::NOTE_CODE, self::NOTE_CODES_1],
             'forgeId' => [self::WORD, RepoRef::FORGES],
             'metadataFailureReason' => [self::WORD, MetadataFailure::REASONS],
-            'advisoriesNotCheckedReason' => [self::WORD, RunNote::ADVISORIES_NOT_CHECKED_REASONS],
+            'advisoriesNotCheckedReason' => [self::WORD, self::ADVISORIES_NOT_CHECKED_REASONS_1],
             'repositoryActivityNotCheckedReason' => [self::WORD, RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS],
         ];
     }

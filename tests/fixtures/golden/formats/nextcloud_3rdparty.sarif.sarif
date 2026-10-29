@@ -281,7 +281,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "pear/console_getopt v1.4.3 \u2014 finding high, 16 = silent 32 \u00f7 2 transitive \u2014 silent: last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago). Do: find a maintained alternative: nothing released for 6.8 years; it comes in through pear/archive_tar, pear/pear-core-minimal: replace or update pear/archive_tar, or replace pear/pear-core-minimal; the newest release of pear/pear-core-minimal (v1.10.18) still requires it."
+                        "text": "pear/console_getopt v1.4.3 \u2014 finding high, 16 = silent 32 \u00f7 2 transitive \u2014 silent: last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago). Do: find a maintained alternative: nothing released for 6.8 years; it comes in through pear/archive_tar and pear/pear-core-minimal: replace or update pear/archive_tar, or replace pear/pear-core-minimal; the newest release of pear/pear-core-minimal (v1.10.18) still requires it."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "pear/console_getopt"
@@ -927,7 +927,7 @@
                 {
                     "executionSuccessful": true,
                     "exitCode": 1,
-                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 3 findings fail it \u00b7 advisories not applied to 94 packages: not checked (Composer below 2.4) \u00b7 target php 8.4 (--target-php)",
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 3 findings fail it \u00b7 advisories not applied to 94 packages: not checked (no repository publishes advisories) \u00b7 target php 8.4 (--target-php)",
                     "properties": {
                         "gate": {
                             "fails": true,
@@ -961,10 +961,10 @@
                                 {
                                     "check": "advisories",
                                     "packages": 94,
-                                    "reason": "composer_too_old"
+                                    "reason": "no_feed"
                                 }
                             ],
-                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 3 findings fail it \u00b7 advisories not applied to 94 packages: not checked (Composer below 2.4) \u00b7 target php 8.4 (--target-php)"
+                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 3 findings fail it \u00b7 advisories not applied to 94 packages: not checked (no repository publishes advisories) \u00b7 target php 8.4 (--target-php)"
                         },
                         "fail_on": "high",
                         "fail_on_source": "option",

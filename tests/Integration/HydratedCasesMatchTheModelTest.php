@@ -206,6 +206,11 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.held_by[].holder.next_step.constraint', 'next_step.held_by[].holder.next_step.to_branch'], self::PHP_STAR],
             ],
         ],
+        'A-php-unsatisfiable‡' => [
+            'held_by' => [
+                [['next_step.held_by[].holder.next_step.constraint', 'next_step.held_by[].holder.next_step.to_branch'], self::PHP_STAR],
+            ],
+        ],
         'tie‡' => [
             'verdict_line' => [
                 [['signals[S5]', 'flags[old-promise]', 'score.total', 'score.terms[].flag', 'score.terms[].part', 'score.terms[].severity'], self::TIE],
@@ -350,7 +355,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
 
     private const MOVE_VERSION = 'The model leaves `version` null on a move whose constraint comes from S8. lockrot names the lowest release that the constraint admits, and the why-not step of a move that does not resolve names it. The move card prints `newest` and reads `version` only when `newest` is null.';
 
-    private const PHP_STAR = 'The case sets the project\'s require.php to `*` (‡). The model keeps the holder\'s own step of case A, and lockrot judges the holder under the case\'s require.php, which admits its newest line.';
+    private const PHP_STAR = 'The case sets the project\'s require.php to `*` or to a constraint that matches no PHP (‡), so the project has no lowest PHP. The model keeps the holder\'s own step of case A. lockrot judges the holder with no project lowest, which admits its newest line.';
 
     private const INSTALLED_COMMIT = 'The model holds the date of a shared commit only for a branch\'s highest tag, so the hydrated lock gives the installed tag no date. lockrot then reads it as undated, not as dated by a commit its tags share.';
 
@@ -368,7 +373,11 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'score.accepted[].if_counted.modifiers[].divide_by' => self::ONLY_PSR_LOG,
         'score.accepted[].if_counted.modifiers[].reason' => self::ONLY_PSR_LOG,
         'age.release.dated_by' => 'No case of the model dates its newest release by a monorepo parent.',
-        'security.partial.unverified' => 'No case of the model leaves a fact of a partial fix unverified.',
+        'security.partial.unverified' => self::PARTIAL_UNVERIFIED,
+        'security.partial.if_applied.at_most=true' => self::PARTIAL_UNVERIFIED,
+        'score.accepted[].if_counted.at_least=true' => 'No case of the model accepts a `stale` that S4 did not decide.',
+        'next_step.also[].held_by[].holder.direct=false' => 'Each also[] move of a case with inputs that a package holds is held by a direct requirement.',
+        'next_step.also[].php_check.target_runs=false' => 'No also[] move of a case with inputs needs a PHP that the target does not run.',
         'unchecked_accepted[].accepted_by.reason' => self::ACCEPT_UNCHECKED,
         'unchecked_accepted[].check' => self::ACCEPT_UNCHECKED,
         'unchecked_accepted[].reason' => self::ACCEPT_UNCHECKED,
@@ -401,6 +410,8 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'next_step.also[].moves_with[].version' => self::ALSO_CHECK,
     ];
 
+    private const PARTIAL_UNVERIFIED = 'No case of the model leaves a fact of a partial fix unverified, so no partial score is an upper bound. NextStepTest builds both sides.';
+
     private const ONLY_PSR_LOG = 'Only psr-log accepts a flag on a halved finding, and it carries no branch rows, so the projector gives it no inputs.';
 
     private const ALSO_ADDS = 'No also[] move of a case with inputs adds a flag.';
@@ -418,6 +429,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
     private const NO_SOLVER_WORLD = 'The case has no solver inputs, so the recording checks no move and writes `run.move_check` null. The model writes the run\'s move check.';
 
     private const ACCEPT_UNCHECKED = 'The cases that accept an unchecked check need an accept-unchecked entry of the project, which the hydrator does not take (`unhydrated()`).';
+
 
     /** @return iterable<string, array{string, string}> */
     public static function caseLines(): iterable
@@ -509,7 +521,8 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             $id = JsonPath::stringAt($case, ['id']);
             $report = JsonPath::decodeFile(self::CONTRACT.'report-2/'.CaseRecording::fileName($id).'.json');
 
-            self::assertSame(self::codesAndData(JsonPath::has($case, ['run_notes']) ? JsonPath::arrayAt($case, ['run_notes']) : []), self::codesAndData(JsonPath::arrayAt($report, ['note_details'])), $id.': the recording\'s notes against the model\'s');
+            $model = self::codesAndData(JsonPath::has($case, ['run_notes']) ? JsonPath::arrayAt($case, ['run_notes']) : []);
+            self::assertSame($model, self::codesAndData(JsonPath::arrayAt($report, ['note_details'])), $id.': the recording\'s notes against the model\'s');
         }
         self::assertGreaterThan(0, $cases);
     }
@@ -547,15 +560,29 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         }
     }
 
-    /** Each path of a line is filled by the model's fields of some case, or listed in UNFILLED. */
+    /**
+     * Each path of a line is filled by the model's fields of some case, or listed in UNFILLED. A
+     * boolean path also needs a case for each value, `path=true` and `path=false`: a relation such
+     * as "unverified is not empty exactly when at_most" then has a case on both sides.
+     */
     public function testEveryPathOfALineIsFilledByACase(): void
     {
         $filled = [];
+        $booleans = [];
         foreach (self::caseLines() as [$id, $line]) {
             $case = CaseHydrator::case($id);
             $model = self::documentOf(JsonPath::arrayAt($case, ['finding']), JsonPath::arrayAt($case, ['run']), self::branchesOf($case['details'] ?? null));
             foreach (self::paths(self::LINES[$line]) as $path) {
-                $filled[$path] = ($filled[$path] ?? false) || self::holdsAValue(Fields::only($model, [$path]));
+                $leaves = self::leaves(Fields::only($model, [$path]));
+                $filled[$path] = ($filled[$path] ?? false) || $leaves !== [];
+                foreach (array_filter($leaves, 'is_bool') as $value) {
+                    $booleans[$path][$value ? 'true' : 'false'] = true;
+                }
+            }
+        }
+        foreach ($booleans as $path => $seen) {
+            foreach (['true', 'false'] as $value) {
+                $filled[$path.'='.$value] = isset($seen[$value]);
             }
         }
         self::assertNotSame([], $filled);
@@ -567,19 +594,22 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         self::assertSame($listed, $unfilled, 'list each path that no case fills in UNFILLED, and take each filled path off it');
     }
 
-    /** @param mixed $node */
-    private static function holdsAValue($node): bool
+    /**
+     * @param mixed $node
+     *
+     * @return list<scalar> the values that are not null
+     */
+    private static function leaves($node): array
     {
         if (!\is_array($node)) {
-            return $node !== null;
+            return \is_scalar($node) ? [$node] : [];
         }
+        $leaves = [];
         foreach ($node as $value) {
-            if (self::holdsAValue($value)) {
-                return true;
-            }
+            $leaves = array_merge($leaves, self::leaves($value));
         }
 
-        return false;
+        return $leaves;
     }
 
     /**

@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 final class SolveRequestTest extends TestCase
 {
-    /** Composer before 2.6 reads the allow list's keys, and later versions its values. */
     public function testTheAllowListNamesEachNameAsKeyAndValue(): void
     {
         self::assertSame([SolveRequest::BASELINE_NAME => SolveRequest::BASELINE_NAME], SolveRequest::baseline()->allow());
@@ -17,7 +16,7 @@ final class SolveRequestTest extends TestCase
         self::assertSame(['acme/a' => 'acme/a'], SolveRequest::require('acme/a', ['acme/a' => '^2.0', 'php' => '>=8.1'], false)->allow());
     }
 
-    /** On Composer 2.2 or 2.3, lockrot lists a package that composer.json does not require plain on the `update now:` line. */
+    /** A name with an empty constraint is on the allow list and gets no inline constraint. */
     public function testAnUpdateTakesNoInlineConstraintForANameThatItListsPlain(): void
     {
         $request = SolveRequest::update(['acme/plain' => '', 'acme/capped' => '^1.2']);

@@ -277,7 +277,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "require a tag \u2014 the newest is v1.0.0 (2019-01-01); 1.x needs php >=7.2, which require.php allows; old-promise, stale stay"
+            "text": "require a tag \u2014 the newest is v1.0.0 (2019-01-01); 1.x needs php >=7.2, which require.php allows; old-promise and stale stay"
         }
     },
     "pinned on a tag with no php": {
@@ -358,7 +358,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "require a tag \u2014 the newest is v1.0.0 (2019-01-01); old-promise, stale stay"
+            "text": "require a tag \u2014 the newest is v1.0.0 (2019-01-01); old-promise and stale stay"
         }
     },
     "pinned on a 0.x branch alias": {
@@ -557,7 +557,7 @@
                 }
             ],
             "also": [],
-            "text": "raise require.php to >=8.1, then move a/b to ^2.3 through d/one, d/three, d/two \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of d/one (2.0.0), d/three (2.0.0) and d/two (2.0.0) no longer require it"
+            "text": "raise require.php to >=8.1, then move a/b to ^2.3 through d/one, d/three and d/two \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of d/one (2.0.0), d/three (2.0.0) and d/two (2.0.0) no longer require it"
         }
     },
     "four dependents that dropped it": {
@@ -824,7 +824,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=8.1, then require a/b ^2.3 \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0) and h/pin dev-master (requires ^1.0; itself pinned) and h/old 1.0.0 (requires ^1.0; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=8.1, then require a/b ^2.3 \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0), h/pin dev-master (requires ^1.0; itself pinned) and h/old 1.0.0 (requires ^1.0; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         }
     },
     "a replacement that the registry names": {
@@ -2258,7 +2258,7 @@
                     "text": "raise require.php to >=8.1, then require a/b ^2.3 \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; 1 advisory stays; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
                 }
             ],
-            "text": "composer update a/b (gets 1.5.0) \u2014 clears the advisory; left-behind, old-promise stay"
+            "text": "composer update a/b (gets 1.5.0) \u2014 clears the advisory; left-behind and old-promise stay"
         },
         "fix_kind": "update",
         "installed_branch_fixes": {
@@ -2405,7 +2405,7 @@
                     "text": "no single release fixes every advisory; see each advisory"
                 }
             ],
-            "text": "composer update a/b (gets 1.5.0) \u2014 clears old-promise and the advisory; stale, 1 advisory stay"
+            "text": "composer update a/b (gets 1.5.0) \u2014 clears old-promise and the advisory; stale and 1 advisory stay"
         },
         "fix_kind": "none",
         "installed_branch_fixes": {
@@ -3173,7 +3173,7 @@
                     "text": "require a/b ^2.3.0 \u2014 clears old-promise and the advisory; 2.x needs php >=7.2, which require.php allows; the target php 8.4 runs it; pinned stays; held by composer.json (requires ^1.0)"
                 }
             ],
-            "text": "require a tag \u2014 the newest on its own line is 2.3.0 (2026-06-01); 2.x needs php >=7.2, which require.php allows; old-promise, 1 advisory stay"
+            "text": "require a tag \u2014 the newest on its own line is 2.3.0 (2026-06-01); 2.x needs php >=7.2, which require.php allows; old-promise and 1 advisory stay"
         },
         "fix_kind": "upgrade",
         "installed_branch_fixes": null,
@@ -4908,7 +4908,7 @@
                     "text": "require a/b ^0.4.0 \u2014 clears left-behind, old-promise and the advisory; 0.4.x needs php >=7.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^0.3); a new 0.x line (Composer treats 0.x minors as breaking) brings its own requirements, which lockrot does not solve"
                 }
             ],
-            "text": "composer update a/b (gets 0.3.5) \u2014 clears the advisory; left-behind, old-promise stay"
+            "text": "composer update a/b (gets 0.3.5) \u2014 clears the advisory; left-behind and old-promise stay"
         },
         "fix_kind": "update",
         "installed_branch_fixes": {

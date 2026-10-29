@@ -34,7 +34,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/silent",
-        "description": "pear/console_getopt v1.4.3 \u2014 finding high (16 = silent 32 \u00f7 2 transitive) \u2014 silent: last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago). Do: find a maintained alternative: nothing released for 6.8 years; it comes in through pear/archive_tar, pear/pear-core-minimal: replace or update pear/archive_tar, or replace pear/pear-core-minimal; the newest release of pear/pear-core-minimal (v1.10.18) still requires it. (via pear/archive_tar, pear/pear-core-minimal)",
+        "description": "pear/console_getopt v1.4.3 \u2014 finding high (16 = silent 32 \u00f7 2 transitive) \u2014 silent: last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago). Do: find a maintained alternative: nothing released for 6.8 years; it comes in through pear/archive_tar and pear/pear-core-minimal: replace or update pear/archive_tar, or replace pear/pear-core-minimal; the newest release of pear/pear-core-minimal (v1.10.18) still requires it. (via pear/archive_tar and pear/pear-core-minimal)",
         "categories": [
             "Bug Risk"
         ],
@@ -130,7 +130,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/stale",
-        "description": "pear/pear_exception v1.0.2 \u2014 finding low (4 = stale 8 \u00f7 2 transitive) \u2014 stale: last release 2021-03-21 (5.5 years ago). Do: \u2014. (via pear/archive_tar, pear/pear-core-minimal)",
+        "description": "pear/pear_exception v1.0.2 \u2014 finding low (4 = stale 8 \u00f7 2 transitive) \u2014 stale: last release 2021-03-21 (5.5 years ago). Do: \u2014. (via pear/archive_tar and pear/pear-core-minimal)",
         "categories": [
             "Bug Risk"
         ],

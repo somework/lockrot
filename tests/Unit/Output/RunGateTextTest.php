@@ -149,7 +149,6 @@ final class RunGateTextTest extends TestCase
     public static function reasons(): iterable
     {
         yield 'offline' => ['offline', 'not checked (offline)'];
-        yield 'composer_too_old' => ['composer_too_old', 'not checked (Composer below 2.4)'];
         yield 'install_time_budget' => ['install_time_budget', 'not checked (install-time budget spent)'];
         yield 'lookup_failed' => ['lookup_failed', 'not checked (a repository failed)'];
         yield 'no_feed' => ['no_feed', 'not checked (no repository publishes advisories)'];

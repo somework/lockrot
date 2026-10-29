@@ -66,6 +66,51 @@ final class NextStepTest extends TestCase
         self::assertSame(self::split(JsonPath::arrayAt($case, ['finding', 'next_step'])), self::split(JsonPath::arrayAt($finding, ['next_step'])), $id);
     }
 
+    public function testAPartialFixWhoseReleaseIsUndatedLeavesOldPromiseUnverifiedAndScoresAnUpperBound(): void
+    {
+        $partial = self::oldPromisePartial(null);
+
+        self::assertSame([['kind' => 'flag', 'id' => 'old-promise', 'reason' => 'undated']], $partial['unverified']);
+        self::assertNotContains('old-promise', array_column(JsonPath::arrayAt($partial, ['clears']), 'id'));
+        self::assertTrue(JsonPath::boolAt($partial, ['if_applied', 'at_most']));
+    }
+
+    public function testAPartialFixReleasedAfterTheGaClearsOldPromiseAndScoresExactly(): void
+    {
+        $partial = self::oldPromisePartial('2026-08-12T03:46:05+00:00');
+
+        self::assertSame([], $partial['unverified']);
+        self::assertContains(['kind' => 'flag', 'id' => 'old-promise', 'basis' => 'released_after_ga'], JsonPath::arrayAt($partial, ['clears']));
+        self::assertFalse(JsonPath::boolAt($partial, ['if_applied', 'at_most']));
+    }
+
+    /**
+     * The case `partial` with laravel/framework installed from a release before PHP 8's GA with an
+     * open php, so old-promise fires, and the partial fix v9.52.22 released at $time.
+     *
+     * @return array<mixed, mixed> the finding's `security.partial`
+     */
+    private static function oldPromisePartial(?string $time): array
+    {
+        $case = CaseHydrator::case('partial');
+        $old = ['time' => '2019-01-01T00:00:00+00:00', 'php' => '>=7.1.3'];
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $lock = JsonPath::arrayAt($inputs, ['lock']);
+        $lock[0] = $old + JsonPath::arrayAt($lock, [0]);
+        $releases = [];
+        foreach (JsonPath::arrayAt($inputs, ['releases']) as $release) {
+            self::assertIsArray($release);
+            $releases[] = (['v9.52.16' => $old, 'v9.52.22' => ['time' => $time]][JsonPath::stringAt($release, ['version'])] ?? []) + $release;
+        }
+        $case['inputs'] = ['lock' => $lock, 'releases' => $releases] + $inputs;
+        $findings = JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::report($case)->toArray()), ['findings']);
+        $finding = array_values(array_filter($findings, static fn ($each): bool => \is_array($each) && ($each['package'] ?? null) === 'laravel/framework'))[0] ?? [];
+        self::assertIsArray($finding);
+        self::assertContains('old-promise', array_column(JsonPath::arrayAt($finding, ['flags']), 'id'));
+
+        return JsonPath::arrayAt($finding, ['security', 'partial']);
+    }
+
     /**
      * @param array<mixed, mixed> $move
      *

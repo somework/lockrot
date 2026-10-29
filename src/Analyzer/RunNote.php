@@ -11,6 +11,7 @@ use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Solver\MoveCheck;
+use Lockrot\Verdict\ListWords;
 
 /**
  * Each code has one named constructor, which derives the sentence from the facts, so the text and
@@ -84,16 +85,14 @@ final class RunNote
     public const DOCS_URL = 'https://lockrot.dev/notes/#';
 
     public const ADVISORIES_OFFLINE = 'offline';
-    public const ADVISORIES_COMPOSER_TOO_OLD = 'composer_too_old';
     public const INSTALL_TIME_BUDGET = 'install_time_budget';
-    public const ADVISORIES_NOT_CHECKED_REASONS = [self::ADVISORIES_OFFLINE, self::ADVISORIES_COMPOSER_TOO_OLD, self::INSTALL_TIME_BUDGET];
+    public const ADVISORIES_NOT_CHECKED_REASONS = [self::ADVISORIES_OFFLINE, self::INSTALL_TIME_BUDGET];
     /** The same reason strings as S10 carries on the findings that the note concerns. */
     public const REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS = [NotCheckedRule::BUDGET];
 
     /** Each text states the cost of the missing check: no advisory adds points, and `if_applied` assumes none on the move's versions. */
     private const ADVISORIES_NOT_CHECKED_TEXT = [
         self::ADVISORIES_OFFLINE => 'security advisories not checked (offline)'.self::ADVISORIES_NOT_CHECKED_COST,
-        self::ADVISORIES_COMPOSER_TOO_OLD => 'security advisories not checked (needs Composer 2.4 or newer)'.self::ADVISORIES_NOT_CHECKED_COST,
         self::INSTALL_TIME_BUDGET => 'security advisories not checked (install-time budget spent)'.self::ADVISORIES_NOT_CHECKED_COST,
     ];
 
@@ -110,7 +109,7 @@ final class RunNote
 
     /** GitLab's anonymous limit needs no cap, so it has no sentence. */
     private const ANONYMOUS_CAP_TEXT = [
-        RepoRef::GITHUB => 'GitHub token not set: repository activity checked for %d candidate %s, %d %s skipped (set GITHUB_TOKEN to check all)',
+        RepoRef::GITHUB => 'GitHub token not set: repository activity checked for %d candidate %s, %d %s skipped (set LOCKROT_GITHUB_TOKEN or GITHUB_TOKEN to a github.com token to check all)',
         RepoRef::BITBUCKET => 'Bitbucket credentials not set: repository activity checked for %d candidate %s, %d %s skipped (add bitbucket.org credentials to auth.json to check all)',
     ];
 
@@ -493,35 +492,24 @@ final class RunNote
     }
 
     /**
-     * D9: the members of `security.update_now` that the combined command leaves out. Composer
-     * refuses the members that `$heldBelow` does not hold together with the others, and the solve
-     * installs each member of `$heldBelow` below its move version.
+     * D9: the members of `security.update_now` that the combined command leaves out, because
+     * Composer refuses them together with the others.
      *
-     * @param list<string>                                    $leftOut   in report order
-     * @param string|null                                     $problem   the refusal's problem text, null without a refusal
-     * @param list<array{package: string, installs: string}> $heldBelow in report order
+     * @param list<string> $leftOut in report order
+     * @param string       $problem the refusal's problem text
      */
-    public static function updateNowReduced(array $leftOut, ?string $problem, array $heldBelow = []): self
+    public static function updateNowReduced(array $leftOut, string $problem): self
     {
         if ($leftOut === []) {
             throw new \InvalidArgumentException('A note about the update now command names at least one package that it leaves out.');
         }
-        $reasons = [];
-        if ($problem !== null) {
-            $refused = \count($leftOut) - \count($heldBelow) === 1 ? 'it' : 'them';
-            $cause = self::causeOfFirstProblem($problem);
-            $reasons[] = \sprintf("Composer's solver refuses %s together with the others: %s", $refused, $heldBelow === [] ? $cause : rtrim($cause, '.'));
-        }
-        if ($heldBelow !== []) {
-            $installs = array_map(static fn (array $member): string => $member['package'].' at '.$member['installs'], $heldBelow);
-            $reasons[] = \sprintf("together with the others, Composer's solver installs %s, %s", implode(', ', $installs), \count($heldBelow) === 1 ? 'below its fix' : 'below their fixes');
-        }
 
         return self::of(self::UPDATE_NOW_REDUCED, \sprintf(
-            'update now: the command leaves out %s, because %s',
-            implode(', ', $leftOut),
-            implode(', and ', $reasons)
-        ), false, ['left_out' => $leftOut, 'held_below' => $heldBelow, 'problem' => $problem]);
+            "update now: the command leaves out %s, because Composer's solver refuses %s together with the others: %s",
+            ListWords::of($leftOut),
+            \count($leftOut) === 1 ? 'it' : 'them',
+            self::causeOfFirstProblem($problem)
+        ), false, ['left_out' => $leftOut, 'problem' => $problem]);
     }
 
     /** D9: Composer refuses the members of `security.update_now` together, so the report writes no command. */

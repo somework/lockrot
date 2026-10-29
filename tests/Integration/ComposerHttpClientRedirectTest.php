@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Composer\Composer;
 use Composer\Factory;
 use Composer\IO\NullIO;
 use Composer\Util\Filesystem;
@@ -127,9 +126,6 @@ final class ComposerHttpClientRedirectTest extends TestCase
         if (!HttpDownloader::isCurlEnabled()) {
             self::markTestSkipped('Composer takes prevent_url_access_callable through curl only');
         }
-        if (version_compare(Composer::getVersion(), '2.10.0-dev', '<')) {
-            self::markTestSkipped('Composer takes prevent_url_access_callable from 2.10: the OnAnyComposer test covers an older one');
-        }
         self::assertSame(
             ['authorization' => null, 'private_token' => null, 'user_agent' => 'lockrot', 'path' => '/headers'],
             $this->headersSeenAfter('/other-host')
@@ -144,8 +140,8 @@ final class ComposerHttpClientRedirectTest extends TestCase
         );
     }
 
-    /** A downloader that cannot stop a redirect, as Composer below 2.10 or without curl. */
-    public function testARedirectToAnotherHostArrivesWithoutLockrotsCredentialsOnAnyComposer(): void
+    /** A downloader that cannot stop a redirect, as Composer's downloader is without curl. */
+    public function testARedirectToAnotherHostArrivesWithoutLockrotsCredentialsWithoutCurl(): void
     {
         self::assertSame(
             ['authorization' => null, 'private_token' => null, 'user_agent' => 'lockrot', 'path' => '/headers'],
@@ -171,7 +167,7 @@ final class ComposerHttpClientRedirectTest extends TestCase
         self::assertSame([0, null], [$result->status(), $result->body()]);
     }
 
-    public function testARedirectOnTheSameHostKeepsLockrotsCredentialsOnAnyComposer(): void
+    public function testARedirectOnTheSameHostKeepsLockrotsCredentialsWithoutCurl(): void
     {
         self::assertSame(
             ['authorization' => 'token secret', 'private_token' => 'secret', 'user_agent' => 'lockrot', 'path' => '/headers'],
@@ -180,7 +176,7 @@ final class ComposerHttpClientRedirectTest extends TestCase
     }
 
     /** A downloader that cannot stop a redirect names the other host to lockrot, and lockrot sends that host only a request without its credentials. */
-    public function testNoRequestToAnotherHostCarriesLockrotsCredentialsOnAnyComposer(): void
+    public function testNoRequestToAnotherHostCarriesLockrotsCredentialsWithoutCurl(): void
     {
         $this->headersSeenAfter('/other-host', false);
 
@@ -204,13 +200,13 @@ final class ComposerHttpClientRedirectTest extends TestCase
      * @dataProvider locations
      */
     #[DataProvider('locations')]
-    public function testARedirectWithLockrotsCredentialsGoesWhereComposerSendsItOnAnyComposer(string $path, string $answeredPath): void
+    public function testARedirectWithLockrotsCredentialsGoesWhereComposerSendsItWithoutCurl(string $path, string $answeredPath): void
     {
         self::assertSame($answeredPath, $this->headersSeenAfter($path, false)['path']);
     }
 
     /** Composer's own downloaders follow at most 20 redirects. */
-    public function testARequestWithLockrotsCredentialsFollowsAtMostTwentyRedirectsOnAnyComposer(): void
+    public function testARequestWithLockrotsCredentialsFollowsAtMostTwentyRedirectsWithoutCurl(): void
     {
         self::assertSame('/chain/0', $this->headersSeenAfter('/chain/20', false)['path']);
 
@@ -219,14 +215,14 @@ final class ComposerHttpClientRedirectTest extends TestCase
         self::assertSame([0, null], [$tooFar->status(), $tooFar->body()]);
     }
 
-    public function testAFailedRequestWithLockrotsCredentialsKeepsTheAnswersHeadersOnAnyComposer(): void
+    public function testAFailedRequestWithLockrotsCredentialsKeepsTheAnswersHeadersWithoutCurl(): void
     {
         $result = $this->fetch('/limited', false);
 
         self::assertSame([403, '0'], [$result->status(), $result->header('X-RateLimit-Remaining')]);
     }
 
-    public function testEachRequestWithLockrotsCredentialsGetsItsAnswerOnAnyComposer(): void
+    public function testEachRequestWithLockrotsCredentialsGetsItsAnswerWithoutCurl(): void
     {
         $urls = [$this->server->url().'/headers', $this->server->url().'/same-host'];
 

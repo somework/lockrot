@@ -131,13 +131,6 @@ final class RunNoteTest extends TestCase
             false,
             ['reason' => 'offline', 'composer_repositories_checked' => 0],
         ];
-        yield 'advisories on an old Composer' => [
-            static fn (): RunNote => RunNote::advisoriesNotChecked(RunNote::ADVISORIES_COMPOSER_TOO_OLD, 0),
-            'advisories_not_checked',
-            'security advisories not checked (needs Composer 2.4 or newer): no finding is graded for an advisory, and each next step\'s score after the move assumes its versions carry none',
-            false,
-            ['reason' => 'composer_too_old', 'composer_repositories_checked' => 0],
-        ];
         yield 'advisories past the budget' => [
             static fn (): RunNote => RunNote::advisoriesNotChecked(RunNote::INSTALL_TIME_BUDGET, 2),
             'advisories_not_checked',
@@ -169,14 +162,14 @@ final class RunNoteTest extends TestCase
         yield 'the GitHub cap' => [
             static fn (): RunNote => RunNote::repositoryActivityAnonymousCap(RepoRef::GITHUB, 11, 80, 9),
             'repository_activity_anonymous_cap',
-            'GitHub token not set: repository activity checked for 11 candidate packages, 89 packages skipped (set GITHUB_TOKEN to check all)',
+            'GitHub token not set: repository activity checked for 11 candidate packages, 89 packages skipped (set LOCKROT_GITHUB_TOKEN or GITHUB_TOKEN to a github.com token to check all)',
             false,
             ['forge_id' => 'github', 'checked' => 11, 'skipped_no_token' => 80, 'skipped_budget' => 9],
         ];
         yield 'the GitHub cap counts one of each in the singular' => [
             static fn (): RunNote => RunNote::repositoryActivityAnonymousCap(RepoRef::GITHUB, 1, 1, 0),
             'repository_activity_anonymous_cap',
-            'GitHub token not set: repository activity checked for 1 candidate package, 1 package skipped (set GITHUB_TOKEN to check all)',
+            'GitHub token not set: repository activity checked for 1 candidate package, 1 package skipped (set LOCKROT_GITHUB_TOKEN or GITHUB_TOKEN to a github.com token to check all)',
             false,
             ['forge_id' => 'github', 'checked' => 1, 'skipped_no_token' => 1, 'skipped_budget' => 0],
         ];
@@ -324,35 +317,14 @@ final class RunNoteTest extends TestCase
             'update_now_reduced',
             "update now: the command leaves out acme/b, because Composer's solver refuses it together with the others: acme/a 2.1.0 conflicts with acme/b <3.0.",
             false,
-            ['left_out' => ['acme/b'], 'held_below' => [], 'problem' => self::CONFLICT],
+            ['left_out' => ['acme/b'], 'problem' => self::CONFLICT],
         ];
-        yield 'update now without two packages' => [
-            static fn (): RunNote => RunNote::updateNowReduced(['acme/b', 'acme/c'], self::CONFLICT),
+        yield 'update now without three packages' => [
+            static fn (): RunNote => RunNote::updateNowReduced(['acme/b', 'acme/c', 'acme/d'], self::CONFLICT),
             'update_now_reduced',
-            "update now: the command leaves out acme/b, acme/c, because Composer's solver refuses them together with the others: acme/a 2.1.0 conflicts with acme/b <3.0.",
+            "update now: the command leaves out acme/b, acme/c and acme/d, because Composer's solver refuses them together with the others: acme/a 2.1.0 conflicts with acme/b <3.0.",
             false,
-            ['left_out' => ['acme/b', 'acme/c'], 'held_below' => [], 'problem' => self::CONFLICT],
-        ];
-        yield 'update now without a package that the solve installs below its fix' => [
-            static fn (): RunNote => RunNote::updateNowReduced(['acme/b'], null, [['package' => 'acme/b', 'installs' => '1.0.0']]),
-            'update_now_reduced',
-            "update now: the command leaves out acme/b, because together with the others, Composer's solver installs acme/b at 1.0.0, below its fix",
-            false,
-            ['left_out' => ['acme/b'], 'held_below' => [['package' => 'acme/b', 'installs' => '1.0.0']], 'problem' => null],
-        ];
-        yield 'update now without a refused package and a package below its fix' => [
-            static fn (): RunNote => RunNote::updateNowReduced(['acme/b', 'acme/c'], self::CONFLICT, [['package' => 'acme/c', 'installs' => '1.0.0']]),
-            'update_now_reduced',
-            "update now: the command leaves out acme/b, acme/c, because Composer's solver refuses it together with the others: acme/a 2.1.0 conflicts with acme/b <3.0, and together with the others, Composer's solver installs acme/c at 1.0.0, below its fix",
-            false,
-            ['left_out' => ['acme/b', 'acme/c'], 'held_below' => [['package' => 'acme/c', 'installs' => '1.0.0']], 'problem' => self::CONFLICT],
-        ];
-        yield 'update now without packages that the solve installs below their fixes' => [
-            static fn (): RunNote => RunNote::updateNowReduced(['acme/b', 'acme/c'], null, [['package' => 'acme/b', 'installs' => '1.0.0'], ['package' => 'acme/c', 'installs' => '2.0.0']]),
-            'update_now_reduced',
-            "update now: the command leaves out acme/b, acme/c, because together with the others, Composer's solver installs acme/b at 1.0.0, acme/c at 2.0.0, below their fixes",
-            false,
-            ['left_out' => ['acme/b', 'acme/c'], 'held_below' => [['package' => 'acme/b', 'installs' => '1.0.0'], ['package' => 'acme/c', 'installs' => '2.0.0']], 'problem' => null],
+            ['left_out' => ['acme/b', 'acme/c', 'acme/d'], 'problem' => self::CONFLICT],
         ];
         yield 'update now refused' => [
             static fn (): RunNote => RunNote::updateNowRefused(self::CONFLICT),
@@ -480,7 +452,7 @@ final class RunNoteTest extends TestCase
             'update_now_not_checked',
             'move_check_failed',
         ], RunNote::CODES);
-        self::assertSame(['offline', 'composer_too_old', 'install_time_budget'], RunNote::ADVISORIES_NOT_CHECKED_REASONS);
+        self::assertSame(['offline', 'install_time_budget'], RunNote::ADVISORIES_NOT_CHECKED_REASONS);
         self::assertSame(['install_time_budget'], RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS);
     }
 

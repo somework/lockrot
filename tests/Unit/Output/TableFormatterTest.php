@@ -31,10 +31,8 @@ use Lockrot\Tests\Support\TextGolden;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\FindingDetails;
-use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Move;
 use Lockrot\Verdict\MoveChecks;
-use Lockrot\Verdict\MoveSubject;
 use Lockrot\Verdict\ShellCommand;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -249,30 +247,6 @@ final class TableFormatterTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider movesAndTheirParts
-     *
-     * @param list<list<string>>              $commands
-     * @param list<array{0: string, 1: bool}> $parts
-     */
-    #[DataProvider('movesAndTheirParts')]
-    public function testTheMoveTextIsCutAroundTheCommandThatItNames(string $kind, string $source, ?string $override, array $commands, array $parts): void
-    {
-        $move = new Move($kind, $source, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', null, null, null, false, [], [], [], [], [], null, [], $commands, new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, $override));
-
-        self::assertSame($parts, TableFormatter::commandParts($move));
-    }
-
-    /** @return iterable<string, array{string, string, ?string, list<list<string>>, list<array{0: string, 1: bool}>}> */
-    public static function movesAndTheirParts(): iterable
-    {
-        $update = ['composer', 'update', 'acme/lib'];
-        yield 'the command first' => [Move::UPDATE, FlagSet::VULNERABLE, null, [$update], [['composer update acme/lib', true], ['(gets 2.0.0)', false]]];
-        yield 'a platform step before the command' => [Move::UPDATE, FlagSet::VULNERABLE, '7.4.29', [$update], [['First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29.', false], ['composer update acme/lib', true], ['(gets 2.0.0)', false]]];
-        yield 'a command that no shell takes, before the named one' => [Move::UPDATE, FlagSet::VULNERABLE, null, [['composer', 'update', 'acme/lib;x'], $update], [['composer update acme/lib', true], ['(gets 2.0.0)', false]]];
-        yield 'no command in the text' => [Move::FIND_ALTERNATIVE, FlagSet::ABANDONED, null, [], [['find a replacement (none named)', false]]];
-    }
-
     public function testAKnownFlagReadsBaselineAndTheScoreLineCarriesTheSuffix(): void
     {
         $report = self::report();
@@ -379,10 +353,10 @@ final class TableFormatterTest extends TestCase
     /** A critical, a medium and a low finding, and two score-0 ones that only `--all` shows. */
     public function testTheMovesLineNamesTheVariableThatTurnedTheBlockingOff(): void
     {
-        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $checks = MoveChecks::of(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON));
         $report = self::report()->withMoveChecks(new MoveCheckRun('2.9.5', false, ['COMPOSER_NO_SECURITY_BLOCKING'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
 
-        self::assertStringContainsString('against the lock, with advisory blocking turned off by COMPOSER_NO_SECURITY_BLOCKING; ext-* requirements not checked', self::formatter(400)->format($report));
+        self::assertStringContainsString('against the lock, with advisory blocking turned off by COMPOSER_NO_SECURITY_BLOCKING; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked', self::formatter(400)->format($report));
     }
 
     private static function report(): Report

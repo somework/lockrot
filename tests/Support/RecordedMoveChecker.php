@@ -28,6 +28,8 @@ final class RecordedMoveChecker implements MoveChecker
     private ?array $covered = null;
     /** @var list<array<string, string>> */
     private array $combinedAsked = [];
+    /** @var list<MoveQuery> */
+    private array $queries = [];
 
     /**
      * @param array<string, array<mixed, mixed>> $checks key => `{result, form, reason, installs, holds, problem}`, with
@@ -51,6 +53,7 @@ final class RecordedMoveChecker implements MoveChecker
 
     public function check(MoveQuery $query): CheckOutcome
     {
+        $this->queries[] = $query;
         if ($this->baselineRefused()) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::BASELINE_REFUSED));
         }
@@ -65,6 +68,7 @@ final class RecordedMoveChecker implements MoveChecker
      */
     public function joint(MoveQuery $query, array $holders): CheckOutcome
     {
+        $this->queries[] = $query;
         sort($holders);
         $joint = $this->recorded('joint '.rtrim($query->key()).' with '.implode(' ', $holders), 'joint *');
         if ($joint === null) {
@@ -72,6 +76,12 @@ final class RecordedMoveChecker implements MoveChecker
         }
 
         return $this->unread($joint) ?? self::outcome($joint, $query->package())->withChanges(self::installs($joint));
+    }
+
+    /** @return list<MoveQuery> each query of {@see check()} and {@see joint()}, in the order asked */
+    public function queries(): array
+    {
+        return $this->queries;
     }
 
     /** As {@see \Lockrot\Solver\SolverChecker}: Composer refuses the lock itself, so lockrot asks no move of it. */

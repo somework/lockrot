@@ -35,6 +35,8 @@ final class ProjectConfig
     private array $constraints = [];
     /** @var array<string, array<string, string>> section => lowercased platform package name => constraint */
     private array $platformConstraints = [];
+    /** @var array<string, array<string, string>> `require` or `require-dev` => lowercased name => the key as written */
+    private array $keys = [];
     private bool $read = true;
 
     /**
@@ -78,22 +80,22 @@ final class ProjectConfig
     /** @param array<string, mixed> $json */
     public static function fromArray(array $json): self
     {
-        $extraRoot = $json['extra'] ?? null;
         $config = $json['config'] ?? null;
         $platformRoot = \is_array($config) ? ($config['platform'] ?? null) : null;
-        $platform = \is_array($platformRoot) ? ($platformRoot['php'] ?? null) : null;
-
+        // Composer's PlatformRepository reads `config.platform` without case: the later key wins.
+        $platform = \is_array($platformRoot) ? (array_change_key_case($platformRoot, \CASE_LOWER)['php'] ?? null) : null;
+        $requires = self::constraintsOf($json[self::REQUIRE] ?? null, false);
+        $devRequires = self::constraintsOf($json[self::REQUIRE_DEV] ?? null, false);
+        $requirePhp = self::constraintsOf($json[self::REQUIRE] ?? null, true)['php'] ?? '';
         $name = $json['name'] ?? null;
-        $require = $json['require'] ?? null;
-        $requirePhp = \is_array($require) ? ($require['php'] ?? null) : null;
 
         $config = new self(
-            self::packageNames($require),
-            self::packageNames($json['require-dev'] ?? null),
-            self::lockrotExtraFrom($extraRoot),
+            array_map('strval', array_keys($requires)),
+            array_map('strval', array_keys($devRequires)),
+            self::lockrotExtraFrom($json['extra'] ?? null),
             \is_string($platform) ? $platform : null,
             \is_string($name) && $name !== '' ? $name : null,
-            \is_string($requirePhp) && $requirePhp !== '' ? $requirePhp : null,
+            $requirePhp !== '' ? $requirePhp : null,
             ConfiguredRepositories::fromManifest($json['repositories'] ?? null)
         );
         foreach ([self::REQUIRE, self::REQUIRE_DEV, self::CONFLICT] as $section) {
@@ -102,11 +104,17 @@ final class ProjectConfig
         foreach ([self::REQUIRE, self::REQUIRE_DEV, self::CONFLICT, self::PROVIDE, self::REPLACE] as $section) {
             $config->platformConstraints[$section] = self::constraintsOf($json[$section] ?? null, true);
         }
+        foreach ([self::REQUIRE, self::REQUIRE_DEV] as $section) {
+            $config->keys[$section] = self::keysOf($json[$section] ?? null);
+        }
 
         return $config;
     }
 
     /**
+     * A link section as Composer's ArrayLoader::parseLinks() reads it: the name in lower case, the
+     * later of two spellings, a string constraint only.
+     *
      * @param mixed $links
      * @return array<string, string>
      */
@@ -114,7 +122,7 @@ final class ProjectConfig
     {
         $constraints = [];
         foreach (\is_array($links) ? $links : [] as $name => $constraint) {
-            $name = strtolower((string) $name);
+            $name = PackageName::key((string) $name);
             if (\is_string($constraint) && PlatformRepository::isPlatformPackage($name) === $platform) {
                 $constraints[$name] = $constraint;
             }
@@ -199,20 +207,19 @@ final class ProjectConfig
     }
 
     /**
-     * @param mixed $require
-     * @return list<string>
+     * @param mixed $links
+     * @return array<string, string> lowercased name => the key as written, for each link that {@see constraintsOf()} reads
      */
-    private static function packageNames($require): array
+    private static function keysOf($links): array
     {
-        $names = [];
-        foreach (\is_array($require) ? array_keys($require) : [] as $name) {
-            $name = (string) $name;
-            if (!PlatformRepository::isPlatformPackage($name)) {
-                $names[] = $name;
+        $keys = [];
+        foreach (\is_array($links) ? $links : [] as $name => $constraint) {
+            if (\is_string($constraint)) {
+                $keys[PackageName::key((string) $name)] = (string) $name;
             }
         }
 
-        return $names;
+        return $keys;
     }
 
     public function isRead(): bool
@@ -220,13 +227,13 @@ final class ProjectConfig
         return $this->read;
     }
 
-    /** @return list<string> */
+    /** @return list<string> the package names of `require`, as {@see constraints()} names them */
     public function directRequires(): array
     {
         return $this->requires;
     }
 
-    /** @return list<string> */
+    /** @return list<string> the package names of `require-dev`, as {@see constraints()} names them */
     public function directDevRequires(): array
     {
         return $this->devRequires;
@@ -257,6 +264,25 @@ final class ProjectConfig
         return $this->platformConstraints[$section] ?? [];
     }
 
+    /**
+     * The sections of composer.json that list a package or platform name, each with its key as
+     * written there. Composer's require command finds and removes a key by that spelling.
+     *
+     * @return array<string, string> `require` or `require-dev` => the key as written, in that order
+     */
+    public function listedIn(string $name): array
+    {
+        $listed = [];
+        foreach ([self::REQUIRE, self::REQUIRE_DEV] as $section) {
+            $key = $this->keys[$section][PackageName::key($name)] ?? null;
+            if ($key !== null) {
+                $listed[$section] = $key;
+            }
+        }
+
+        return $listed;
+    }
+
     /** @return array<string, mixed> */
     public function lockrotExtra(): array
     {
@@ -278,14 +304,15 @@ final class ProjectConfig
         return $this->repositories;
     }
 
+    /** `config.platform.php`, its key read without case as Composer reads it, or null when it is no string. */
     public function platformPhp(): ?string
     {
         return $this->platformPhp;
     }
 
     /**
-     * The project's own `require.php` as written (`>=7.2.5`, `^8.2`), or null when the manifest
-     * makes no promise. A branch that S8 tells the project to follow must admit it
+     * The project's own `require.php` as written (`>=7.2.5`, `^8.2`), its key read as Composer reads
+     * it ({@see platformConstraints()}), or null when the manifest makes no promise. A branch that S8 tells the project to follow must admit it
      * ({@see \Lockrot\Signal\PhpFloor}, docs/verdicts.md#within-reach). Composer resolves only
      * against the platform, so a lock can hold what the requirement forbids.
      */

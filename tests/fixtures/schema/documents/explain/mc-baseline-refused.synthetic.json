@@ -1223,8 +1223,16 @@
   "move_check": {
    "composer": "2.10.3",
    "blocks_advisories": false,
-   "blocking_disabled_by": [],
-   "ignores_extensions": true,
+   "blocking_disabled_by": [
+    "config.audit.block-insecure"
+   ],
+   "ignored_platform": [
+    "ext-*",
+    "lib-*",
+    "php-debug",
+    "php-ipv6",
+    "php-zts"
+   ],
    "baseline": "refused",
    "reason": null
   },

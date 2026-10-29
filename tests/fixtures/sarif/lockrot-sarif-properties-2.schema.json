@@ -53,7 +53,7 @@
       "minLength": 1
     },
     "advisoryLookup": {
-      "description": "How the run's own advisory lookup went: its scope, the packages it asked, and the outcome of each advisory-capable repository. The lookups that the move check's solves make on Composer 2.9 and later are not in it.",
+      "description": "How the run's own advisory lookup went: its scope, the packages it asked, and the outcome of each advisory-capable repository. The lookups that the move check's solves make are not in it.",
       "type": "object",
       "required": [
         "scope",
@@ -151,14 +151,13 @@
           ]
         },
         "reason": {
-          "description": "Why. On `not_asked`: `offline`, `composer_too_old`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the composer-repositories scope. On `failed`: `transport` or `invalid_response`. Null on `answered` and `no_feed`. An open set.",
+          "description": "Why. On `not_asked`: `offline`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the composer-repositories scope. On `failed`: `transport` or `invalid_response`. Null on `answered` and `no_feed`. An open set.",
           "oneOf": [
             {
               "type": "string",
               "pattern": "^[a-z][a-z0-9_]*$",
               "x-known-values": [
                 "offline",
-                "composer_too_old",
                 "install_time_budget",
                 "not_from_composer_repository",
                 "transport",
@@ -725,7 +724,6 @@
           "pattern": "^[a-z][a-z0-9_]*$",
           "x-known-values": [
             "offline",
-            "composer_too_old",
             "install_time_budget",
             "lookup_failed",
             "no_feed",
@@ -2026,7 +2024,7 @@
           "x-deprecated": true
         },
         "lead": {
-          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding: jq reads `.lead` where it read `.verdict`.",
+          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding when no Composer abandoned ignore list applies: jq reads `.lead` where it read `.verdict`.",
           "oneOf": [
             {
               "$ref": "#/definitions/maintenanceFlag"
@@ -2301,7 +2299,7 @@
           "x-deprecated": true
         },
         "lead": {
-          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding: jq reads `.lead` where it read `.verdict`.",
+          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding when no Composer abandoned ignore list applies: jq reads `.lead` where it read `.verdict`.",
           "oneOf": [
             {
               "$ref": "#/definitions/maintenanceFlag"
@@ -2516,7 +2514,7 @@
           "x-deprecated": true
         },
         "lead": {
-          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding: jq reads `.lead` where it read `.verdict`.",
+          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding when no Composer abandoned ignore list applies: jq reads `.lead` where it read `.verdict`.",
           "oneOf": [
             {
               "$ref": "#/definitions/maintenanceFlag"
@@ -2727,7 +2725,7 @@
           "x-deprecated": true
         },
         "lead": {
-          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding: jq reads `.lead` where it read `.verdict`.",
+          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding when no Composer abandoned ignore list applies: jq reads `.lead` where it read `.verdict`.",
           "oneOf": [
             {
               "$ref": "#/definitions/maintenanceFlag"

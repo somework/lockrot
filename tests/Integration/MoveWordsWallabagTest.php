@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Composer\Repository\AdvisoryProviderInterface;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\WallabagSite;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -32,9 +31,6 @@ final class MoveWordsWallabagTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer 2.2 has no AdvisoryProviderInterface: no move reaches a vulnerable package');
-        }
         foreach (['7.4', '8.4'] as $target) {
             self::$reports[$target] = JsonPath::decoded(WallabagSite::analyze($target)->toArray());
         }
@@ -98,7 +94,7 @@ final class MoveWordsWallabagTest extends TestCase
     {
         $text = JsonPath::stringAt(self::move('7.4', 'symfony/mailer'), ['text']);
 
-        self::assertStringContainsString('composer.json (requires symfony/mime ^4.4.47) and symfony/mailer v5.4.52, its own release (requires psr/event-dispatcher ^1) and symfony/mailer v5.4.0, its own release (requires symfony/mime ^5.2.6|^6.0) and ', $text);
+        self::assertStringContainsString('composer.json (requires symfony/mime ^4.4.47), symfony/mailer v5.4.52, its own release (requires psr/event-dispatcher ^1), symfony/mailer v5.4.0, its own release (requires symfony/mime ^5.2.6|^6.0), ', $text);
         self::assertStringNotContainsString('symfony/mailer v5.4.52 (requires', $text);
     }
 

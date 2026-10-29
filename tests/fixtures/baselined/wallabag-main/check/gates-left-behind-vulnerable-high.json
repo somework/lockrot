@@ -803,7 +803,13 @@
             "composer": "2.10.3",
             "blocks_advisories": true,
             "blocking_disabled_by": [],
-            "ignores_extensions": true,
+            "ignored_platform": [
+                "ext-*",
+                "lib-*",
+                "php-debug",
+                "php-ipv6",
+                "php-zts"
+            ],
             "baseline": "resolves",
             "reason": null
         },
@@ -2815,7 +2821,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2), scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "vulnerable",
@@ -5750,7 +5756,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -6911,7 +6917,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require doctrine/event-manager ^2.1 \u2014 clears left-behind; 2.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^1.2) and symfony/doctrine-bridge v5.4.48 (requires ~1.0) and doctrine/doctrine-fixtures-bundle 3.7.1 (requires symfony/doctrine-bridge ^5.4.48 || ^6.4.16 || ^7.1.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require doctrine/event-manager ^2.1 \u2014 clears left-behind; 2.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^1.2), symfony/doctrine-bridge v5.4.48 (requires ~1.0) and doctrine/doctrine-fixtures-bundle 3.7.1 (requires symfony/doctrine-bridge ^5.4.48 || ^6.4.16 || ^7.1.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -7301,7 +7307,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require lcobucci/jwt ^5.6 \u2014 clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.3) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself left-behind) and scheb/2fa-trusted-device 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require lcobucci/jwt ^5.6 \u2014 clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.3), composer.json (requires scheb/2fa-bundle ^5.13.2), scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself left-behind) and scheb/2fa-trusted-device 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -7671,7 +7677,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require scheb/2fa-backup-code ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-backup-code v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require scheb/2fa-backup-code ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2), composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-backup-code v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -8310,7 +8316,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require scheb/2fa-bundle ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires symfony/config ^5.4.46) and composer.json (requires symfony/dependency-injection ^5.4.48) and composer.json (requires symfony/event-dispatcher ^5.4.45) and composer.json (requires symfony/framework-bundle ^5.4.45) and composer.json (requires symfony/http-foundation ^5.4.48) and composer.json (requires symfony/http-kernel ^5.4.48) and composer.json (requires symfony/security-bundle ^5.4.45) and composer.json (requires symfony/twig-bundle ^5.4.45) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/config ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/dependency-injection ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/event-dispatcher ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/framework-bundle ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/http-foundation ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/http-kernel ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/property-access ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/security-bundle ^6.4 || ^7.0) and scheb/2fa-bundle v7.14.0, its own release (requires symfony/twig-bundle ^6.4 || ^7.0) and scheb/2fa-backup-code v5.13.2 (requires self.version (v5.13.2); itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version (v5.13.2); itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version (v5.13.2); itself left-behind) and scheb/2fa-trusted-device v5.13.2 (requires self.version (v5.13.2); itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require scheb/2fa-bundle ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2), composer.json (requires symfony/config ^5.4.46), composer.json (requires symfony/dependency-injection ^5.4.48), composer.json (requires symfony/event-dispatcher ^5.4.45), composer.json (requires symfony/framework-bundle ^5.4.45), composer.json (requires symfony/http-foundation ^5.4.48), composer.json (requires symfony/http-kernel ^5.4.48), composer.json (requires symfony/security-bundle ^5.4.45), composer.json (requires symfony/twig-bundle ^5.4.45), scheb/2fa-bundle v7.14.0, its own release (requires symfony/config ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/dependency-injection ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/event-dispatcher ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/framework-bundle ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/http-foundation ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/http-kernel ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/property-access ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/security-bundle ^6.4 || ^7.0), scheb/2fa-bundle v7.14.0, its own release (requires symfony/twig-bundle ^6.4 || ^7.0), scheb/2fa-backup-code v5.13.2 (requires self.version (v5.13.2); itself left-behind), scheb/2fa-email v5.13.2 (requires self.version (v5.13.2); itself left-behind), scheb/2fa-google-authenticator v5.13.2 (requires self.version (v5.13.2); itself left-behind) and scheb/2fa-trusted-device v5.13.2 (requires self.version (v5.13.2); itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -8684,7 +8690,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require scheb/2fa-email ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-email v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require scheb/2fa-email ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2), composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-email v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -9064,7 +9070,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require scheb/2fa-google-authenticator ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-google-authenticator v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)) and scheb/2fa-google-authenticator v7.14.0, its own release (requires spomky-labs/otphp ^11.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require scheb/2fa-google-authenticator ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2), composer.json (requires scheb/2fa-bundle ^5.13.2), scheb/2fa-google-authenticator v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)) and scheb/2fa-google-authenticator v7.14.0, its own release (requires spomky-labs/otphp ^11.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -9500,7 +9506,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require scheb/2fa-trusted-device ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and composer.json (requires lcobucci/jwt ^4.3) and composer.json (requires scheb/2fa-bundle ^5.13.2) and scheb/2fa-trusted-device v7.14.0, its own release (requires lcobucci/jwt ^5.0) and scheb/2fa-trusted-device v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require scheb/2fa-trusted-device ^7.14 \u2014 clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2), composer.json (requires lcobucci/jwt ^4.3), composer.json (requires scheb/2fa-bundle ^5.13.2), scheb/2fa-trusted-device v7.14.0, its own release (requires lcobucci/jwt ^5.0) and scheb/2fa-trusted-device v7.14.0, its own release (requires scheb/2fa-bundle self.version (v7.14.0)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -12520,7 +12526,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -12865,7 +12871,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/exception requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/exception requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -13211,7 +13217,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/consistency requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/consistency requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -13556,7 +13562,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -13901,7 +13907,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -14247,7 +14253,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -14593,7 +14599,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -14938,7 +14944,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -15284,7 +15290,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -15628,7 +15634,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/file requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/file requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -15974,7 +15980,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/regex requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/regex requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -16321,7 +16327,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -16666,7 +16672,7 @@
                     }
                 ],
                 "also": [],
-                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/math requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+                "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/math requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
             },
             "security": {
                 "status": "clear",
@@ -19683,7 +19689,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move symfony/psr-http-message-bridge to ^7.4 through sentry/sentry-symfony \u2014 clears left-behind; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires sentry/sentry-symfony ^5.2.0) and composer.json (requires symfony/http-foundation ^5.4.48) and symfony/psr-http-message-bridge v7.4.0, its own release (requires symfony/http-foundation ^6.4|^7.0|^8.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move symfony/psr-http-message-bridge to ^7.4 through sentry/sentry-symfony \u2014 clears left-behind; 7.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires sentry/sentry-symfony ^5.2.0), composer.json (requires symfony/http-foundation ^5.4.48) and symfony/psr-http-message-bridge v7.4.0, its own release (requires symfony/http-foundation ^6.4|^7.0|^8.0); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -20099,7 +20105,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator \u2014 clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2) and spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires spomky-labs/otphp ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator \u2014 clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2), spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind), scheb/2fa-google-authenticator v5.13.2 (requires spomky-labs/otphp ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -22616,7 +22622,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/code-unit-reverse-lookup to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^2.0.3) and phpunit/phpunit 9.6.34 (requires phpunit/php-code-coverage ^9.2.32) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move sebastian/code-unit-reverse-lookup to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^2.0.3), phpunit/phpunit 9.6.34 (requires phpunit/php-code-coverage ^9.2.32) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -23086,7 +23092,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/object-enumerator to ^6.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 6.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/object-enumerator 6.0.0, its own release (requires sebastian/object-reflector ^4.0) and sebastian/object-enumerator 6.0.0, its own release (requires sebastian/recursion-context ^6.0) and phpunit/phpunit 9.6.33 (requires ^4.0.4) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move sebastian/object-enumerator to ^6.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 6.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/object-enumerator 6.0.0, its own release (requires sebastian/object-reflector ^4.0), sebastian/object-enumerator 6.0.0, its own release (requires sebastian/recursion-context ^6.0), phpunit/phpunit 9.6.33 (requires ^4.0.4) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -23575,7 +23581,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/object-reflector to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/object-enumerator 4.0.4 (requires ^2.0; itself left-behind) and sebastian/global-state 5.0.8 (requires ^2.0) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9) and phpunit/phpunit 9.6.34 (requires sebastian/global-state ^5.0.8); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move sebastian/object-reflector to ^4.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 4.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by sebastian/object-enumerator 4.0.4 (requires ^2.0; itself left-behind), sebastian/global-state 5.0.8 (requires ^2.0), phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9) and phpunit/phpunit 9.6.34 (requires sebastian/global-state ^5.0.8); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -24043,7 +24049,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move sebastian/version to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^3.0.2) and phpunit/phpunit 9.6.33 (requires ^3.0.2) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move sebastian/version to ^5.0 through phpunit/phpunit \u2014 clears left-behind and old-promise; 5.x needs php >=8.2, which require.php allows; the target php 8.4 runs it; held by phpunit/php-code-coverage 9.2.32 (requires ^3.0.2), phpunit/phpunit 9.6.33 (requires ^3.0.2) and phpunit/phpunit 9.6.38 (requires sebastian/exporter ^4.0.9); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -24992,7 +24998,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.4, then move lcobucci/clock to ^3.6.0 through lcobucci/jwt, scheb/2fa-trusted-device \u2014 clears capped; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 8.2 (a minor raise); the target php 8.4 runs it; what requires it must allow it; the newest release of lcobucci/jwt (5.6.0) no longer requires it; Composer's solver checked it against the lock"
+                "text": "raise require.php to >=8.4, then move lcobucci/clock to ^3.6.0 through lcobucci/jwt and scheb/2fa-trusted-device \u2014 clears capped; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 8.2 (a minor raise); the target php 8.4 runs it; what requires it must allow it; the newest release of lcobucci/jwt (5.6.0) no longer requires it; Composer's solver checked it against the lock"
             },
             "security": {
                 "status": "clear",

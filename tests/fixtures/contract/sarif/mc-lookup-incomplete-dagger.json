@@ -46,7 +46,7 @@
                     "level": "error",
                     "rank": 80.0,
                     "message": {
-                        "text": "typo3/html-sanitizer v2.2.0 is affected by CVE-2026-47345 (high advisory): TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting. Do: composer update 'typo3/html-sanitizer:^2.3.2' (gets v2.3.2) \u2014 clears the advisory; not checked with Composer's solver (the advisory lookup did not cover a package it installs), so it holds only if Composer resolves it."
+                        "text": "typo3/html-sanitizer v2.2.0 is affected by CVE-2026-47345 (high advisory): TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting. Do: composer update 'typo3/html-sanitizer:^2.3.2' (gets v2.3.2) \u2014 clears the advisory; not checked with Composer's solver (the advisory lookup did not cover a package in the result), so it holds only if Composer resolves it."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "typo3/html-sanitizer",

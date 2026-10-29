@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Config;
 
-use Lockrot\Analyzer\Report;
-
 /** @internal */
 final class Policy
 {
@@ -13,10 +11,9 @@ final class Policy
     public const EXIT_FINDINGS = 1;
     public const EXIT_ERROR = 2;
 
-    public static function exitCode(Report $report, LockrotConfig $config): int
+    /** The exit code of a run's gate: docs/ci.md#exit-codes. */
+    public static function exitCode(Gate $gate): int
     {
-        return Gate::decide($report, $config->failOn(), $config->strictNetwork(), Gate::MODE_CHECK)->fails()
-            ? self::EXIT_FINDINGS
-            : self::EXIT_OK;
+        return $gate->fails() ? self::EXIT_FINDINGS : self::EXIT_OK;
     }
 }

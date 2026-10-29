@@ -79,10 +79,13 @@ What each value fails the run on, and which to start with, is in [In CI](ci.md).
 | `--output=<format>:<path>` | Also write the report to a file. Repeatable ([Writing reports to files](#writing-reports-to-files)) | — (command line only) |
 | `--markdown-max-bytes=<bytes>` | Keep each markdown report written through `--output` within this many bytes: rows are left out from the end, and a last row counts them. The heading, the `gate:` line, the table head, that row and the footer always print. The report on stdout is never cut | — (command line only) |
 
+`--fail-on`, `--baseline` and `--target-php` can be given once only: a second one is exit `2`,
+also with the same value, because a later value can loosen the gate. Every other option that takes
+one value keeps the last one.
+
 Composer's global options apply as well: `-d <dir>` (`--working-dir`) runs lockrot in another
 project directory, and `-q` silences everything lockrot prints, the report on stdout included.
-Join the directory to the option (`--working-dir=app` or `-dapp`): Composer 2.2 does not read
-`-d app`. Exit codes are in [ci.md](ci.md#exit-codes).
+Exit codes are in [ci.md](ci.md#exit-codes).
 
 ## Environment overrides
 
@@ -91,8 +94,8 @@ Join the directory to the option (`--working-dir=app` or `-dapp`): Composer 2.2 
 | `LOCKROT_DISABLE` | `1` or `true`: `composer lockrot` and the PHAR print `lockrot disabled via LOCKROT_DISABLE` on stderr and exit `0` before they read anything — the command line, `composer.json` or the lock. lockrot also skips the install-time summary. `lockrot.phar self-update` ignores it |
 | `LOCKROT_FAIL_ON` | Overrides `fail-on` |
 | `LOCKROT_TARGET_PHP` | Overrides `target-php` |
-| `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN` | Token for github.com (S3, S4). When Composer holds credentials for github.com, lockrot sends Composer's instead ([credentials](internals.md#repository-hosts-and-credentials)) |
-| `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN` | Personal access token, sent to gitlab.com only. Without credentials, GitLab hides the archived flag (S3). A self-hosted instance uses Composer's `gitlab-token` or `gitlab-oauth` ([credentials](internals.md#repository-hosts-and-credentials)) |
+| `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN` | Token for github.com (S3, S4). `GITHUB_TOKEN` counts only when `GITHUB_SERVER_URL` is unset, empty or names github.com. When Composer holds credentials for github.com, lockrot sends Composer's instead ([credentials](internals.md#repository-hosts-and-credentials)) |
+| `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN` | Personal access token, sent to gitlab.com only. `GITLAB_TOKEN` counts only when `CI_SERVER_URL` and `GITLAB_HOST` are each unset, empty or name gitlab.com. Without credentials, GitLab hides the archived flag (S3). A self-hosted instance uses Composer's `gitlab-token` or `gitlab-oauth` ([credentials](internals.md#repository-hosts-and-credentials)) |
 | `COMPOSER` | The manifest, as for every Composer command: `COMPOSER=alt.json composer lockrot` reads `extra.lockrot` from `alt.json`, analyses `alt.lock` and looks for the baseline next to `alt.json` |
 
 When `COMPOSER_ROOT_VERSION` is unset, lockrot sets it to `1.0.0` for the run, so Composer does not
@@ -334,7 +337,8 @@ after the built-in list, so a package that the built-in list matches keeps the b
 ### Composer's abandoned ignore list {#composer-abandoned-ignore}
 
 Composer has its own list of abandoned packages that `composer audit` does not report:
-`config.policy.abandoned.ignore` on Composer 2.10 and later, `config.audit.ignore-abandoned` on 2.9.
+`config.policy.abandoned.ignore`, or the legacy `config.audit.ignore-abandoned` when
+`config.policy.abandoned` is not set.
 lockrot reads it as `composer audit` does, and it differs from an `ignore` entry:
 
 | | Composer's list | `ignore` entry with `flags: ["abandoned"]` |
@@ -387,8 +391,8 @@ names, for one of three reasons:
 | `not_from_composer_repository` | The package is installed from vcs, or from an origin that lockrot cannot tell | `host`, `repository` (its vcs URL) or `package`. For an unknown origin, by `package` |
 
 Every other reason stays S10, whatever the list says: `offline`, `rate_limit`, `lookup_failed`,
-`install_time_budget`, `composer_too_old`, `undated_releases`, `releases_unknown` and the rest. A
-rerun with a token, the network or a newer Composer closes most of them. `undated_releases` can stay
+`install_time_budget`, `undated_releases`, `releases_unknown` and the rest. A rerun with a token
+or the network closes most of them. `undated_releases` can stay
 on every run ([What `--fail-on=unchecked` fails on](ci.md#what-unchecked-fails-on)).
 
 - **A scope matches the package, never the cause of the gap.** So

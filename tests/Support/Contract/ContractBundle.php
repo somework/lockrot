@@ -88,6 +88,11 @@ final class ContractBundle
         ['iex', 'calc'],
         ['composer', 'exec', 'calc'],
         ['composer', 'update', '   '],
+        ['composer', 'require', 'Vendor/Package:^2.0', '--no-interaction'],
+        ['composer', 'require', 'PHP:>=8.1', '--no-interaction', '--no-update'],
+        ['composer', 'require', '--no-interaction', 'vendor/package:^2.0'],
+        ['composer', 'update', 'vendor/package', '--no-interaction'],
+        ['composer', 'why-not', 'vendor/package', '--no-interaction'],
     ];
 
     /** @var array<string, string> each written file's contents, by its path in the bundle */

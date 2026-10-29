@@ -38,7 +38,8 @@ The block is at most ten lines, in this order:
 
 - The header, with the counts per grade.
 - One line per graded package, in the report's order: its grade, its score, its counted flags and
-  its move, cut at 160 characters. When `vulnerable` is the only counted flag, it adds its
+  its move, cut at a word boundary past 160 characters. A command in the move shows whole, even
+  past 160 characters, or not at all, and a space parts it from the `…`. When `vulnerable` is the only counted flag, it adds its
   advisories: the deciding severity and the count (`vulnerable (critical advisory; 15 in all)`).
   For one advisory or for low ones it gives the count before the severity
   (`vulnerable (1 high advisory)`, `vulnerable (2 low advisories)`).
@@ -158,9 +159,6 @@ transaction before any package operation runs, and Composer exits `1`. The messa
   (`install_time_budget`), fails (`lookup_failed`) or finds no feed (`no_feed`) stops the install.
   So does a package whose metadata did not arrive and that carries a counted advisory
   (`releases_unknown`).
-- On Composer 2.2 and 2.3, lockrot cannot look up advisories (`composer_too_old`), so
-  `fail-on: unchecked` stops every install that changes a package. `accept-unchecked` cannot
-  accept that reason. Upgrade Composer to 2.4 or later, or remove `unchecked` from `fail-on`.
 - lockrot never stops a `--dry-run`, since no operation is about to run.
 
 A stopped `composer require` or `composer update` leaves `composer.lock` updated (and, for

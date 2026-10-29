@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Config;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Config\LockrotConfig;
+use Lockrot\Config\Gate;
 use Lockrot\Config\Policy;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
@@ -29,23 +31,27 @@ final class PolicyTest extends TestCase
         return new Report($findings, $networkFailures ? [Notes::text('a lookup failed', true)] : [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), \count($findings), 0);
     }
 
-    private function config(string $failOn, bool $strict = false): LockrotConfig
+    /** The exit code of the gate that the run's documents write, as the command computes it. */
+    private static function exitCode(Report $report, string $failOn, bool $strict = false, string $mode = Gate::MODE_CHECK): int
     {
-        return LockrotConfig::fromSources([], [], ['fail-on' => $failOn, 'strict-network' => $strict], '8.4.0', null);
+        $gate = $report->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse($failOn), RunSettings::SOURCE_OPTION, null, null, $strict, $mode))->gate();
+        self::assertNotNull($gate);
+
+        return Policy::exitCode($gate);
     }
 
     public function testFailOnNoneExitsZeroOnAnAbandonedFinding(): void
     {
-        self::assertSame(0, Policy::exitCode($this->report([Verdict::ABANDONED]), $this->config('none')));
+        self::assertSame(0, self::exitCode($this->report([Verdict::ABANDONED]), 'none'));
     }
 
     public function testAVerdictThresholdFailsOnItsOwnVerdictAndAbove(): void
     {
-        self::assertSame(1, Policy::exitCode($this->report([Verdict::SILENT]), $this->config('silent')));
-        self::assertSame(1, Policy::exitCode($this->report([Verdict::ABANDONED]), $this->config('silent')));
-        self::assertSame(0, Policy::exitCode($this->report([Verdict::STALE, Verdict::PINNED]), $this->config('silent')));
-        self::assertSame(1, Policy::exitCode($this->report([Verdict::STALE]), $this->config('stale')));
-        self::assertSame(0, Policy::exitCode($this->report([Verdict::UNKNOWN, Verdict::FINISHED, Verdict::OK]), $this->config('stale')));
+        self::assertSame(1, self::exitCode($this->report([Verdict::SILENT]), 'silent'));
+        self::assertSame(1, self::exitCode($this->report([Verdict::ABANDONED]), 'silent'));
+        self::assertSame(0, self::exitCode($this->report([Verdict::STALE, Verdict::PINNED]), 'silent'));
+        self::assertSame(1, self::exitCode($this->report([Verdict::STALE]), 'stale'));
+        self::assertSame(0, self::exitCode($this->report([Verdict::UNKNOWN, Verdict::FINISHED, Verdict::OK]), 'stale'));
     }
 
     /**
@@ -60,27 +66,27 @@ final class PolicyTest extends TestCase
         $transitiveDev = (new FindingBuilder())->withPackage('a/deep')->withVerdict(Verdict::ABANDONED)->withChain(['a/root', 'a/deep'])->withDataDate($at)->withDev(true)->build();
         $report = static fn (Finding ...$findings): Report => new Report(array_values($findings), [], $at, \count($findings), 0);
 
-        self::assertSame(1, Policy::exitCode($report($directProd), $this->config('critical')));
-        self::assertSame(0, Policy::exitCode($report($transitiveDev), $this->config('critical')));
-        self::assertSame(0, Policy::exitCode($report($transitiveDev), $this->config('high')));
-        self::assertSame(1, Policy::exitCode($report($transitiveDev), $this->config('medium')), 'inclusive, like the verdict threshold');
-        self::assertSame(1, Policy::exitCode($report($transitiveDev), $this->config('low')));
-        self::assertSame(1, Policy::exitCode($report($transitiveDev, $directProd), $this->config('critical')), 'any one finding at the threshold fails the run');
-        self::assertSame(0, Policy::exitCode($this->report([Verdict::UNKNOWN, Verdict::OK]), $this->config('low')), 'an unflagged finding has no priority to reach');
+        self::assertSame(1, self::exitCode($report($directProd), 'critical'));
+        self::assertSame(0, self::exitCode($report($transitiveDev), 'critical'));
+        self::assertSame(0, self::exitCode($report($transitiveDev), 'high'));
+        self::assertSame(1, self::exitCode($report($transitiveDev), 'medium'), 'inclusive, like the verdict threshold');
+        self::assertSame(1, self::exitCode($report($transitiveDev), 'low'));
+        self::assertSame(1, self::exitCode($report($transitiveDev, $directProd), 'critical'), 'any one finding at the threshold fails the run');
+        self::assertSame(0, self::exitCode($this->report([Verdict::UNKNOWN, Verdict::OK]), 'low'), 'an unflagged finding has no priority to reach');
     }
 
     public function testAnAcceptedFindingNeverFailsAPriorityThresholdEither(): void
     {
         $report = $this->baselinedReport([['a/known', Verdict::ABANDONED]], [['a/known', Verdict::ABANDONED], ['a/fresh', Verdict::STALE]]);
 
-        self::assertSame(0, Policy::exitCode($report, $this->config('critical')), 'a/known is critical but accepted; a/fresh is medium');
-        self::assertSame(1, Policy::exitCode($report, $this->config('medium')), 'a/fresh is new and medium');
+        self::assertSame(0, self::exitCode($report, 'critical'), 'a/known is critical but accepted; a/fresh is medium');
+        self::assertSame(1, self::exitCode($report, 'medium'), 'a/fresh is new and medium');
     }
 
     public function testStrictNetworkFailsARunWithAFailedLookup(): void
     {
-        self::assertSame(0, Policy::exitCode($this->report([], true), $this->config('none')));
-        self::assertSame(1, Policy::exitCode($this->report([], true), $this->config('none', true)));
+        self::assertSame(0, self::exitCode($this->report([], true), 'none'));
+        self::assertSame(1, self::exitCode($this->report([], true), 'none', true));
     }
 
     /**
@@ -114,7 +120,7 @@ final class PolicyTest extends TestCase
     {
         $report = $this->baselinedReport([['a/known', Verdict::ABANDONED]], [['a/known', Verdict::ABANDONED]]);
 
-        self::assertSame(0, Policy::exitCode($report, $this->config('silent')));
+        self::assertSame(0, self::exitCode($report, 'silent'));
     }
 
     public function testANewFindingTripsFailOn(): void
@@ -124,14 +130,14 @@ final class PolicyTest extends TestCase
             ['a/fresh', Verdict::SILENT],
         ]);
 
-        self::assertSame(1, Policy::exitCode($report, $this->config('silent')));
+        self::assertSame(1, self::exitCode($report, 'silent'));
     }
 
     public function testAWorsenedFindingTripsFailOn(): void
     {
         $report = $this->baselinedReport([['a/known', Verdict::STALE]], [['a/known', Verdict::ABANDONED]]);
 
-        self::assertSame(1, Policy::exitCode($report, $this->config('silent')));
+        self::assertSame(1, self::exitCode($report, 'silent'));
     }
 
     /** A worsened finding below the threshold is still below it: the baseline narrows what is compared, it does not lower the bar. */
@@ -139,20 +145,28 @@ final class PolicyTest extends TestCase
     {
         $report = $this->baselinedReport([['a/known', Verdict::STALE]], [['a/known', Verdict::OLD_PROMISE]]);
 
-        self::assertSame(0, Policy::exitCode($report, $this->config('silent')));
+        self::assertSame(0, self::exitCode($report, 'silent'));
     }
 
     public function testStaleBaselineEntriesNeverTripFailOn(): void
     {
         $report = $this->baselinedReport([['a/gone', Verdict::ABANDONED]], []);
 
-        self::assertSame(0, Policy::exitCode($report, $this->config('stale')));
+        self::assertSame(0, self::exitCode($report, 'stale'));
     }
 
     public function testStrictNetworkStillWinsOverABaselineThatCoversEverything(): void
     {
         $report = $this->baselinedReport([['a/known', Verdict::ABANDONED]], [['a/known', Verdict::ABANDONED]], true);
 
-        self::assertSame(1, Policy::exitCode($report, $this->config('none', true)));
+        self::assertSame(1, self::exitCode($report, 'none', true));
+    }
+
+    /** A generate run exits 1 only on a network failure under --strict-network, whatever --fail-on says. */
+    public function testAGenerateRunExitsOneOnlyOnAStrictNetworkFailure(): void
+    {
+        self::assertSame(0, self::exitCode($this->report([Verdict::ABANDONED]), 'abandoned', false, Gate::MODE_GENERATE_BASELINE));
+        self::assertSame(0, self::exitCode($this->report([Verdict::ABANDONED], true), 'abandoned', false, Gate::MODE_GENERATE_BASELINE));
+        self::assertSame(1, self::exitCode($this->report([], true), 'none', true, Gate::MODE_GENERATE_BASELINE));
     }
 }

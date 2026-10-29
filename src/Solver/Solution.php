@@ -9,7 +9,8 @@ use Lockrot\Security\Holder;
 /**
  * What one solve gave: the versions it installs, or the holds and Composer's problem text of a
  * refusal, with the names that a refusal needs and that the {@see VersionSource} could not load, or
- * the exception that Composer failed with.
+ * the exception that Composer failed with. It also names each name whose advisories the solve could
+ * not read and that its result holds.
  *
  * @internal
  */
@@ -25,6 +26,8 @@ final class Solution
     private array $unloaded;
     /** @var array<string, string> */
     private array $updatedFrom = [];
+    /** @var list<string> */
+    private array $advisoryUnread = [];
     /** @var array{class: string, message: string}|null */
     private ?array $error = null;
 
@@ -45,12 +48,14 @@ final class Solution
     /**
      * @param array<string, string> $installs
      * @param array<string, string> $updatedFrom name => the locked pretty version, for each name that the solve updates
-     * @param array<string, string> $unloaded    the names that the solve asked for and could not load
+     * @param array<string, string> $unloaded       the names that the solve asked for and could not load
+     * @param list<string>          $advisoryUnread the names that the result holds and whose advisories the solve could not read
      */
-    public static function resolved(array $installs, array $updatedFrom = [], array $unloaded = []): self
+    public static function resolved(array $installs, array $updatedFrom = [], array $unloaded = [], array $advisoryUnread = []): self
     {
         $solution = new self($installs, [], null, $unloaded);
         $solution->updatedFrom = $updatedFrom;
+        $solution->advisoryUnread = $advisoryUnread;
 
         return $solution;
     }
@@ -116,5 +121,11 @@ final class Solution
     public function unloaded(): array
     {
         return $this->unloaded;
+    }
+
+    /** @return list<string> the names that the result holds and whose advisories the solve could not read */
+    public function advisoryUnread(): array
+    {
+        return $this->advisoryUnread;
     }
 }

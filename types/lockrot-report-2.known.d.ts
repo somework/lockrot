@@ -18,7 +18,7 @@ export type OriginRegistry = "packagist.org" | "repo.packagist.com" | "wp-packag
 /** open set at #/definitions/signalId */
 export type SignalId = "S1" | "S2" | "S3" | "S4" | "S5" | "S6" | "S7" | "S8" | "S9" | "S10" | "S11" | (string & {});
 /** open set at #/definitions/advisoriesNotCheckedReason */
-export type AdvisoriesNotCheckedReason = "offline" | "composer_too_old" | "install_time_budget" | "lookup_failed" | (string & {});
+export type AdvisoriesNotCheckedReason = "offline" | "install_time_budget" | "lookup_failed" | (string & {});
 /** closed set at #/definitions/flag */
 export type Flag = "abandoned" | "silent" | "pinned" | "left-behind" | "old-promise" | "stale" | "capped" | "vulnerable";
 /** closed set at #/definitions/maintenanceFlag */
@@ -126,7 +126,7 @@ export type SecurityUncheckedStatus = "unchecked";
 /** open set at #/definitions/securityUnchecked/properties/check */
 export type SecurityUncheckedCheck = "partial" | "not_run" | (string & {});
 /** open set at #/definitions/securityUnchecked/properties/unchecked_reason/oneOf/0 */
-export type SecurityUncheckedUncheckedReason = "offline" | "composer_too_old" | "install_time_budget" | "lookup_failed" | "not_from_composer_repository" | "unparseable_version" | "no_feed" | (string & {});
+export type SecurityUncheckedUncheckedReason = "offline" | "install_time_budget" | "lookup_failed" | "not_from_composer_repository" | "unparseable_version" | "no_feed" | (string & {});
 /** closed set at #/definitions/headline/properties/unit */
 export type HeadlineUnit = "years" | "php" | "php_minor" | "reason" | "advisories";
 /** closed set at #/definitions/headline/properties/source/oneOf/0 */
@@ -170,7 +170,7 @@ export type FindingFlagId7 = "vulnerable";
 /** open set at #/definitions/checkMissing/properties/check */
 export type CheckMissingCheck = "repository_activity" | "release_dates" | "advisories" | "releases" | "release_metadata" | (string & {});
 /** open set at #/definitions/checkMissing/properties/reason */
-export type CheckMissingReason = "no_token" | "anonymous_budget" | "install_time_budget" | "rate_limit" | "fetch_failed" | "offline" | "undated_releases" | "releases_unknown" | "composer_too_old" | "lookup_failed" | "host_not_supported" | "no_feed" | "not_from_composer_repository" | (string & {});
+export type CheckMissingReason = "no_token" | "anonymous_budget" | "install_time_budget" | "rate_limit" | "fetch_failed" | "offline" | "undated_releases" | "releases_unknown" | "lookup_failed" | "host_not_supported" | "no_feed" | "not_from_composer_repository" | (string & {});
 /** open set at #/definitions/checkSkipped/properties/check */
 export type CheckSkippedCheck = "repository_activity" | "release_metadata" | "advisories" | "release_branch" | "repository_archived" | (string & {});
 /** open set at #/definitions/checkSkipped/properties/reason */
@@ -282,7 +282,7 @@ export type AdvisoryFeedAnswer3 = "failed" | "not_asked";
 /** closed set at #/definitions/advisoryRepository/properties/outcome */
 export type AdvisoryRepositoryOutcome = "answered" | "failed" | "not_asked" | "no_feed";
 /** open set at #/definitions/advisoryRepository/properties/reason/oneOf/0 */
-export type AdvisoryRepositoryReason = "offline" | "composer_too_old" | "install_time_budget" | "not_from_composer_repository" | "transport" | "invalid_response" | (string & {});
+export type AdvisoryRepositoryReason = "offline" | "install_time_budget" | "not_from_composer_repository" | "transport" | "invalid_response" | (string & {});
 /** closed set at #/definitions/advisoryRepository/anyOf/0/properties/outcome */
 export type AdvisoryRepositoryOutcome2 = "answered";
 /** closed set at #/definitions/advisoryRepository/anyOf/1/properties/outcome */
@@ -401,8 +401,6 @@ export type RunFailOnSource = "option" | "env" | "config" | "default";
 export type RunMode = "check" | "generate_baseline" | (string & {});
 /** closed set at #/definitions/run/properties/move_check/oneOf/0/properties/blocking_disabled_by/items */
 export type RunMoveCheckBlockingDisabledByItem = "COMPOSER_NO_BLOCKING" | "COMPOSER_NO_SECURITY_BLOCKING" | "COMPOSER_POLICY" | "COMPOSER_POLICY_ADVISORIES_BLOCK" | "config.policy" | "config.policy.advisories" | "config.policy.advisories.block" | "config.audit.block-insecure";
-/** closed set at #/definitions/run/properties/move_check/oneOf/0/properties/ignores_extensions */
-export type RunMoveCheckIgnoresExtensions = true;
 /** closed set at #/definitions/run/properties/move_check/oneOf/0/properties/baseline */
 export type RunMoveCheckBaseline = "resolves" | "refused" | "not_checked";
 /** open set at #/definitions/run/properties/move_check/oneOf/0/properties/reason/oneOf/0 */
@@ -430,7 +428,7 @@ export type PhpWindowReqTarget = "php" | "php-64bit";
 /** closed set at #/definitions/targetFix/properties/check */
 export type TargetFixCheck = "resolves" | "refused" | "not_checked";
 /** open set at #/definitions/targetFix/properties/reason/oneOf/0 */
-export type TargetFixReason = "unloaded_name" | "offline" | "install_time_budget" | "not_from_composer_repository" | "no_composer_json" | "composer_json_invalid" | "solver_error" | (string & {});
+export type TargetFixReason = "unloaded_name" | "offline" | "install_time_budget" | "not_from_composer_repository" | "no_composer_json" | "composer_json_invalid" | "solver_error" | "advisory_lookup_incomplete" | (string & {});
 /** closed set at #/definitions/targetFix/anyOf/0/properties/check */
 export type TargetFixCheck2 = "resolves";
 /** closed set at #/definitions/targetFix/anyOf/1/properties/check */
@@ -498,7 +496,7 @@ export type NoteDetailCode26 = "package_name_invalid";
 /** open set at #/definitions/gateNotApplied/properties/check */
 export type GateNotAppliedCheck = "advisories" | (string & {});
 /** open set at #/definitions/gateNotApplied/properties/reason */
-export type GateNotAppliedReason = "offline" | "composer_too_old" | "install_time_budget" | "lookup_failed" | "no_feed" | "not_from_composer_repository" | "unparseable_version" | (string & {});
+export type GateNotAppliedReason = "offline" | "install_time_budget" | "lookup_failed" | "no_feed" | "not_from_composer_repository" | "unparseable_version" | (string & {});
 /** open set at #/definitions/rootGate/properties/tripped_by/items */
 export type RootGateTrippedByItem = "strict_network" | "fail_on" | (string & {});
 /** open set at #/definitions/rootSecurity/properties/check */

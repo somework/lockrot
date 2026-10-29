@@ -11,9 +11,9 @@
       pulls in 1 flagged package: microsoft/azure-storage-common (stale)
 
 <options=bold><fg=red>high (1)</fg=red></options=bold>
-  pear/console_getopt v1.4.3  via pear/archive_tar, pear/pear-core-minimal  ·  silent
+  pear/console_getopt v1.4.3  via pear/archive_tar and pear/pear-core-minimal  ·  silent
       16 = silent 32 ÷ 2 transitive
-      do: find a maintained alternative: nothing released for 6.8 years; it comes in through pear/archive_tar,
+      do: find a maintained alternative: nothing released for 6.8 years; it comes in through pear/archive_tar and
           pear/pear-core-minimal: replace or update pear/archive_tar, or replace pear/pear-core-minimal; the newest
           release of pear/pear-core-minimal (v1.10.18) still requires it
       silent       last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago)
@@ -41,7 +41,7 @@
       4 = stale 8 ÷ 2 transitive
       do: —
       stale        last release 2021-10-09 (4.9 years ago); last push 2023-07-18 (3.2 years ago)
-  pear/pear_exception v1.0.2  via pear/archive_tar, pear/pear-core-minimal  ·  stale
+  pear/pear_exception v1.0.2  via pear/archive_tar and pear/pear-core-minimal  ·  stale
       4 = stale 8 ÷ 2 transitive
       do: —
       stale        last release 2021-03-21 (5.5 years ago)
@@ -58,7 +58,7 @@ microsoft/azure-storage-blob 1
 advisories: 0 packages asked, 94 not asked
 php: the lock installs on PHP 8.3 to 8.5; Composer checks it at 8.3.0 from config.platform.php
 <fg=red>gate: fails · --fail-on=high · 3 findings fail it ·</fg=red>
-<fg=red>advisories not applied to 94 packages: not checked (Composer below 2.4) · target php 8.4 (--target-php)</fg=red>
+<fg=red>advisories not applied to 94 packages: not checked (no repository publishes advisories) · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.
 note: Repository activity not checked for 3 packages on hosts lockrot cannot ask: codeberg.org (3). A host that runs

@@ -83,9 +83,9 @@ def ref(name):
 
 
 def d(desc, schema):
-    """a property schema with its description first."""
+    """a property schema with its description first; `desc` replaces a description that a copied node carries."""
     out = {'description': desc}
-    out.update(schema)
+    out.update((k, v) for k, v in schema.items() if k != 'description')
     return out
 
 
@@ -140,6 +140,8 @@ for k in ('dateTime', 'date', 'packageName', 'level', 'years', 'datedBy', 'forge
           'forgeRepository', 'failedForgeRepository', 'originKind', 'originRegistry', 'signalId'):
     defs[k] = copy.deepcopy(R1['definitions'][k])
 defs['signalId']['x-known-values'] = defs['signalId']['x-known-values'] + ['S11']  # CAPPED (§5.10)
+defs['forgeId']['description'] = defs['forgeId']['description'].replace(" The display name (`GitHub`) is the explanation's `activity.forge`, which is not this set.", '')
+assert 'display name' not in defs['forgeId']['description']
 defs['dateTime']['description'] = 'An ISO 8601 date-time with its offset, as lockrot writes every instant (`2026-10-01T17:39:31+00:00`).'
 defs['date']['description'] = 'A calendar date, `YYYY-MM-DD`.'
 defs['level']['description'] = "A signal's own level, as report-1 (`info`, `warn`, `high`); kept for consumers, never printed beside a grade (§2.1). Closed."
@@ -148,9 +150,9 @@ defs['years']['description'] = ('Years elapsed on the run clock (`Clock::yearsSi
                                 'The one-decimal rule is stated, not encoded: `multipleOf: 0.1` has no exact binary form and standard validators (ajv, '
                                 'python-jsonschema) reject a third of all tenths with it (attack round 1); only `multipleOf: 0.5` is used, which is exact.')
 defs['years'].pop('multipleOf', None)
-defs['advisoriesNotCheckedReason'] = open_set(['offline', 'composer_too_old', 'install_time_budget', 'lookup_failed'],
-    "Why security advisories were not checked (§5.1): `offline` (`--offline`; advisories are never served from a cache), `composer_too_old` "
-    "(Composer below 2.4 has no advisory API), `install_time_budget` (the install-time budget ran out), `lookup_failed` (every feed threw, §5.7). "
+defs['advisoriesNotCheckedReason'] = open_set(['offline', 'install_time_budget', 'lookup_failed'],
+    "Why security advisories were not checked (§5.1): `offline` (`--offline`; advisories are never served from a cache), "
+    "`install_time_budget` (the install-time budget ran out), `lookup_failed` (every feed threw, §5.7). "
     "An open set: read a reason you do not know as another reason.")
 defs['flag'] = closed(FLAGS, 'A flag id (§2.1), in the frozen flag order `abandoned silent pinned left-behind old-promise stale capped vulnerable`. Closed: a new flag is a report-3 event (§3.7, §8.2).')
 defs['maintenanceFlag'] = closed(MAINT, 'A maintenance flag id: the flag order without `vulnerable` (§2.1). The same closed set as `flag`, restricted; the values `lead`, an accepted flag and a baseline entry can name.')
@@ -526,10 +528,11 @@ def move_props(with_also):
                          "A move with `moves_with` entries runs the joint request: `composer update vendor/pkg:<constraint>` followed by the holders. "
                          "A root requirement writes it in two steps: `composer require vendor/pkg:<constraint> --no-update`, then `composer update vendor/pkg` followed by the holders. "
                          "A `require` step on a package that composer.json lists only in `require-dev` adds `--dev`. "
+                         "A `require` step on a name that both `require` and `require-dev` list adds `--no-interaction` and spells the name as the `require-dev` key does: Composer then writes `require` and removes the `require-dev` line. The php step does the same when `require-dev` lists php. "
                          "The command argument rule (§5.6): each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. "
                          "An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. "
                          "A move that `check` resolves only with its dependencies ends its step with `--with-dependencies` or `--with-all-dependencies`, and a move that `check` refuses has no `update` or `require` step. "
-                         "Only lockrot's own options start with `-`: `--no-update` and `--dev` in a `require` step, `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step, and `--locked` in a `why-not` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. "
+                         "Only lockrot's own options start with `-`: `--no-update`, `--dev` and `--no-interaction` in a `require` step, `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step, and `--locked` in a `why-not` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. "
                          "lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. "
                          "A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell."),
                         arr('One command as its argument list (`["composer", "require", "php:>=8.1", "--no-update"]`).', {'type': 'string', 'minLength': 1}, minItems=1)),
@@ -578,8 +581,8 @@ defs['ignoredAdvisory'] = obj("An advisory Composer's audit ignore lists match (
     'cve': nul('Its CVE, null when it has none.', {'type': 'string'}),
     'title': nul('Its title, without a leading `<cve>: `.', {'type': 'string'}),
     'severity': ref('severity'),
-    'by': open_set(['policy.advisories', 'audit.ignore', 'audit.ignore-severity'], ("The Composer setting that ignores it (SPEC §4.1: `policy.advisories` on 2.10+, `audit.ignore` or "
-                   "`audit.ignore-severity` on 2.4–2.9). An open set: read an unknown key as another setting."), DOTTED),
+    'by': open_set(['policy.advisories', 'audit.ignore', 'audit.ignore-severity'], ("The Composer setting that ignores it (SPEC §4.1): `policy.advisories`, or `audit.ignore` or "
+                   "`audit.ignore-severity` when composer.json sets no `config.policy.advisories`. An open set: read an unknown key as another setting."), DOTTED),
     'matched': open_set(['id', 'cve', 'remote_id', 'package', 'severity'], ("What the entry matched on (SPEC §4.1): the advisory `id`, its `cve`, its `remote_id`, the `package`, "
                         "or the `severity`. An open set.")),
     'reason': nul("The reason the policy entry gives, the project's words (data, never inside a machine string); null when it gives none.", {'type': 'string'}),
@@ -588,17 +591,17 @@ SEC_COMMON = {
     'check': open_set(['complete', 'partial', 'not_run'], ("How the advisory lookup went (§5.1, §5.5): `complete`, `partial`, `not_run` (round 4, underscore). "
                       "Composer's policy never stops the lookup. An open set (§8.2).")),
     'complete': d('`check` is `complete`.', {'type': 'boolean'}),
-    'unchecked_reason': nul(("Why the lookup did not complete: `offline composer_too_old install_time_budget lookup_failed`, and (C75) "
+    'unchecked_reason': nul(("Why the lookup did not complete: `offline install_time_budget lookup_failed`, and (C75) "
                              "`not_from_composer_repository` (outside the composer-repositories scope), `unparseable_version`, `no_feed`; an open set (§8.2, round 4); null on a complete lookup."),
-                            {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['offline', 'composer_too_old', 'install_time_budget', 'lookup_failed',
+                            {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['offline', 'install_time_budget', 'lookup_failed',
                                                                                   'not_from_composer_repository', 'unparseable_version', 'no_feed']}),
     'ignored': arr("The advisories Composer's audit policy ignores (§5.1; round 4 moves them here from S9).", ref('ignoredAdvisory')),
     'ignored_count': d('The length of `ignored` (I21).', INT0),
     'records': nul(("The distinct advisories that every answering feed holds for this name, for all versions, before the ignore lists and attribution (C75). "
                     "At least the counted advisories plus `ignored_count`. Null when no feed answered. Evidence only: no score, gate or flag reads it."), dict(INT0)),
     'feeds': arr(("One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order (C75). "
-                  "lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, "
-                  "Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none."),
+                  "lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline "
+                  "or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none."),
                  ref('advisoryFeed')),
 }
 defs['securityVulnerable'] = obj("`status: vulnerable` (§7.6): whenever an advisory counts, even on a partial lookup. `vulnerable`'s facts live here and in the S9 rows (§2.1).", dict({
@@ -606,7 +609,7 @@ defs['securityVulnerable'] = obj("`status: vulnerable` (§7.6): whenever an advi
 }, **{
     # an advisory counts only when a lookup returned it, so this shape's lookup is
     # `complete` or `partial` (never `not_run`), and an incomplete one stopped part-way (`install_time_budget`
-    # `lookup_failed`; `offline` and `composer_too_old` look nothing up). Still open sets: the strict
+    # `lookup_failed`; `offline` looks nothing up). Still open sets: the strict
     # reading holds lockrot's output to the values this shape can take
     'check': open_set(['complete', 'partial'], ("How the advisory lookup went: `complete`, or `partial` (a Composer repository did not return advisories, or "
                       "the install-time budget ran out part-way); an advisory counts only when a lookup returned it. An open set.")),
@@ -723,7 +726,7 @@ defs['checkMissing'] = obj("A check that did not run and raised S10 (S10's `unch
                       "age, dated only by a shared commit), `advisories` (S9: the advisory lookup did not complete), `releases` (S9's fix part: releases could not be read), "
                       "`release_metadata` (S2, S8: a package from a vcs or an unknown origin, whose release metadata no Composer repository serves). An open set.")),
     'reason': open_set(['no_token', 'anonymous_budget', 'install_time_budget', 'rate_limit', 'fetch_failed', 'offline', 'undated_releases', 'releases_unknown',
-                        'composer_too_old', 'lookup_failed', 'host_not_supported', 'no_feed', 'not_from_composer_repository'],
+                        'lookup_failed', 'host_not_supported', 'no_feed', 'not_from_composer_repository'],
                        ('Why it did not run (§2.3, §7.9 page vocabulary): `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4). '
                         '`no_feed`: no Composer repository of the run publishes advisories (S9). '
                         '`not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). On a path, artifact or '
@@ -1087,8 +1090,8 @@ defs['age'] = obj(("How old four dates are on the run clock (C72). The dates are
 }, allOf=[{'description': f'`{k}` is null exactly when `{k}_unmeasured` is set.',
            'anyOf': [{'properties': {k: {'type': 'object'}, k + '_unmeasured': _N}}, {'properties': {k: _N, k + '_unmeasured': {'type': 'string'}}}]}
           for k in ('installed', 'release', 'branch_release', 'push')])
-AI_BY = open_set(['policy.abandoned', 'audit.ignore-abandoned'], ("The Composer setting that holds the list: `policy.abandoned` (`config.policy.abandoned.ignore`, "
-                 "Composer 2.10 and later) or `audit.ignore-abandoned` (Composer 2.9, and the legacy fallback of 2.10). An open set: read an unknown key as another setting."), DOTTED)
+AI_BY = open_set(['policy.abandoned', 'audit.ignore-abandoned'], ("The Composer setting that holds the list: `policy.abandoned` (`config.policy.abandoned.ignore`), "
+                 "or `audit.ignore-abandoned` when composer.json sets no `config.policy.abandoned`. An open set: read an unknown key as another setting."), DOTTED)
 defs['abandonedIgnored'] = nul(("Composer's abandoned ignore list (the audit operation) matched this package. So lockrot did not raise its abandoned marking (S1), "
                                 "and the marking does not count. An archived repository (S3) and the liveness dates still count (C69). Null when no rule removed S1."),
     obj('The ignored marking.', {
@@ -1120,9 +1123,9 @@ defs['advisoryRepository'] = obj("One advisory-capable Composer repository of th
     'composer_repository': d('The name that Composer gives the repository, credentials stripped (the join key).', {'type': 'string', 'minLength': 1}),
     'registry': nul('The registry host for display. Null for another repository. An open set.', dict(REGISTRY)),
     'outcome': closed(['answered', 'failed', 'not_asked', 'no_feed'], 'What the repository did in this run. `no_feed`: it publishes no advisories. Closed.'),
-    'reason': nul(("Why. On `not_asked`: `offline`, `composer_too_old`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the "
+    'reason': nul(("Why. On `not_asked`: `offline`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the "
                    "composer-repositories scope. On `failed`: `transport` or `invalid_response`. Null on `answered` and `no_feed`. An open set."),
-                  {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['offline', 'composer_too_old', 'install_time_budget', 'not_from_composer_repository',
+                  {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['offline', 'install_time_budget', 'not_from_composer_repository',
                                                                         'transport', 'invalid_response']}),
     'message': nul('The first line of what the repository threw, credentials stripped. Foreign text, not contract. Set on `failed`.', {'type': 'string'}),
     'packages_with_records': nul('Asked names with at least one record. Set on `answered`.', dict(INT0)),
@@ -1134,7 +1137,7 @@ defs['advisoryRepository'] = obj("One advisory-capable Composer repository of th
     {'description': '`not_asked`: a reason, no message.', 'properties': {'outcome': {'enum': ['not_asked']}, 'reason': {'type': 'string'}, 'message': _N, 'packages_with_records': _N, 'records': _N}},
 ])
 defs['advisoryLookup'] = obj("How the run's own advisory lookup went (C75): its scope, the packages it asked, and the outcome of each advisory-capable repository. "
-                             "The lookups that the move check's solves make on Composer 2.9 and later are not in it.", {
+                             "The lookups that the move check's solves make are not in it.", {
     'scope': closed(['all', 'composer-repositories'], ("`extra.lockrot.advisory-lookup` as config-2 spells it: `all` (every locked package, the default) or "
                                                        "`composer-repositories`. Closed.")),
     'scope_source': closed(['config', 'default'], 'Where `scope` came from. Closed.'),
@@ -1177,7 +1180,7 @@ FINDING = {
     'verdict': ref('verdict'),
     'priority': {**closed(['critical', 'high', 'medium', 'low', 'none'], '`verdict` when graded, else `none` (§4.2): a deprecated alias that leaves in report-3.'),
                  'x-deprecated': True},
-    'lead': nul("The first counted maintenance flag; null when none counts (§4.2). Equal to 0.13's verdict word on every 0.13-flagged finding: jq reads `.lead` where it read `.verdict`.", ref('maintenanceFlag')),
+    'lead': nul("The first counted maintenance flag; null when none counts (§4.2). Equal to 0.13's verdict word on every 0.13-flagged finding when no Composer abandoned ignore list applies (§6.6): jq reads `.lead` where it read `.verdict`.", ref('maintenanceFlag')),
     'rank': d("Position in the run's order (`run.score_model.sort`), 1 first. A report writes `findings[]` in rank order, and re-sorting by `run.score_model.sort[]` gives the same order (I20); an explain document carries the rank the package has in the run it explains. SARIF's `rank` is the opposite polarity.", INT1),
     'flags': arr('Every fired flag in flag order, accepted in place (§8.2); each id once.', ref('findingFlag'), uniqueItems=True),
     'score': ref('score'),
@@ -1382,10 +1385,11 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
                     'always a string with `target_php_source` beside it (§8.2).', {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}),
     'target_php_source': closed(['option', 'env', 'config', 'platform', 'runtime'], "Which link of the chain set it (`config` = `extra.lockrot.target-php`, `platform` = `config.platform.php`). Closed (§8.2)."),
     'project_php': nul("The project's `require.php` as written (report-1); never parse it.", {'type': 'string', 'minLength': 1}),
-    'project_php_lowest': nul("The lowest PHP `require.php` admits: `PhpFloor`'s lower bound normalised to MAJOR.MINOR.PATCH, a fourth segment and a stability suffix dropped "
-                              "(`7.2.5.0-dev` is `7.2.5`, `^7.4.0-RC1` gives `7.4.0`; `7.2.0` for `^7.2 || ^8.0.0`; an exclusive stable bound gives the next patch: `>7.4` gives `7.4.1`, "
-                              "and the post-release bound `>=7.4.0-p1` gives `7.4.1`; an exclusive pre-release bound gives its release: `>7.4.0-RC1` gives `7.4.0`). Null exactly when `PhpFloor` has no lowest: no `require.php`, `*`, an alternative with no lower bound (`<8`), or a constraint "
-                              "it cannot parse (§5.3). Print it with a trailing `.0` patch dropped.",
+    'project_php_lowest': nul("The lowest stable MAJOR.MINOR.PATCH that `require.php` admits: each range of the constraint is read at its start and at the next patch, "
+                              "and the first point that the constraint matches counts (`^7.4.0-RC1` gives `7.4.0`; `7.2.0` for `^7.2 || ^8.0.0`; an exclusive stable bound gives the next patch: `>7.4` gives `7.4.1`, "
+                              "and the post-release bound `>=7.4.0-p1` gives `7.4.1`; an exclusive pre-release bound gives its release: `>7.4.0-RC1` gives `7.4.0`; a `!=` hole moves it: `>=8.1 !=8.1.0` gives `8.1.1`; "
+                              "a range with no stable version is passed: `==7.4.0-RC1 || ^8.1` gives `8.1.0`). Null exactly when `PhpFloor` has no lowest: no `require.php`, `*`, an alternative with no lower bound (`<8`), "
+                              "a constraint that admits no stable version (`>=8.1 <8.1.0`, `>=8.2 <8.1`), or one it cannot parse (§5.3). Print it with a trailing `.0` patch dropped.",
                               {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+\\.[0-9]+$'}),
     'lock_file': nul('The name of the lock (report-1), never its path.', {'type': 'string'}),
     'fail_on': d("The parsed values in kind order (grade, flag, vulnerable, unchecked; a list holds one value per kind), joined with `,`, no spaces, lower case (`high`, "
@@ -1397,7 +1401,7 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
     'include_dev': d("Whether packages-dev were analysed (`--dev`): the graph then walks `require-dev` too, so a reach sentence names the requirements it walked. Equal to the report's root `include_dev`.",
                      {'type': 'boolean'}),
     'mode': copy.deepcopy(R1RUN['mode']),
-    'thresholds': d("The ages, in years, that separate the liveness words (report-1).", copy.deepcopy(R1RUN['thresholds'])),
+    'thresholds': d("The ages, in years, that raise `silent`, `left-behind` and `stale`: each flag of `score_model.flags` names the keys that it reads in `thresholds`.", copy.deepcopy(R1RUN['thresholds'])),
     'flag_ids': arr('The eight flag ids in flag order (the vocabulary used, not a setting).', ref('flag'), minItems=1, uniqueItems=True),
     'verdicts': arr('The seven verdicts, highest first.', ref('verdict'), minItems=1, uniqueItems=True),
     'graded_verdicts': arr('The grades, highest first (replaces `flagged_verdicts`).', ref('grade'), minItems=1, uniqueItems=True),
@@ -1408,14 +1412,14 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
     'advisory_lookup': ref('advisoryLookup'),
     'move_check': nul("How Composer's solver checked the run's moves (§5.6). `composer lockrot` always writes it. A run that checks no move says why in `baseline` and `reason`.", obj('The move check of the run.', {
         'composer': nul('The version of the Composer that solved; null when nothing solved.', {'type': 'string', 'minLength': 1}),
-        'blocks_advisories': d('Whether the solve removed the versions that an advisory affects, as Composer 2.9 and later do in an update.', {'type': 'boolean'}),
+        'blocks_advisories': d('Whether the solve removed the versions that an advisory affects, as Composer does in an update.', {'type': 'boolean'}),
         'blocking_disabled_by': arr("The switches that turn off the advisory blocking of the running Composer, in this order: " + ', '.join('`%s`' % n for n in BLOCKING_SWITCHES) + ". "
                                     "A switch is listed when it holds a value that turns the blocking off and no switch that Composer reads after it turns the blocking on again. "
-                                    "Composer 2.9.0 and 2.9.1 read only `config.audit.block-insecure`, and later 2.9 releases also read `COMPOSER_NO_SECURITY_BLOCKING`. "
-                                    "Composer 2.10 and later read every switch, and read `config.audit.block-insecure` only when `config.policy.advisories` is not set. Empty when no switch turns the blocking off. Closed.",
+                                    "Composer reads `config.audit.block-insecure` only when `config.policy.advisories` is not set. Empty when no switch turns the blocking off. Closed.",
                                     closed(BLOCKING_SWITCHES, 'One switch: an environment variable, or a key of composer.json `config`. Closed.'), uniqueItems=True),
-        'ignores_extensions': d("Always true: the solve ignores every `ext-*` requirement, as `--ignore-platform-req=ext-*` does, so the extensions of the machine that runs lockrot decide no move.",
-                                {'type': 'boolean', 'enum': [True]}),
+        'ignored_platform': arr("The platform patterns whose requirements the solve ignores, as `--ignore-platform-req` does, so the machine that runs lockrot decides no move. "
+                                "A name that composer.json `config.platform` sets is checked even when a pattern matches it (ruling R6-2).",
+                                {'type': 'string', 'minLength': 1}),
         'baseline': closed(['resolves', 'refused', 'not_checked'], ("The partial update of a name outside the lock: `refused` means Composer refuses the lock "
                                                                    "itself, so no move is checked (the `moves_not_checked` note). Closed.")),
         'reason': nul("Why the baseline was not checked; null unless `baseline` is `not_checked`. An open set, with the values of `check.reason` that a whole run can have.",
@@ -1490,6 +1494,11 @@ for c in NOTE_CODES:
              'moves_not_checked', 'update_now_reduced', 'update_now_refused', 'update_now_not_checked', 'move_check_failed', 'package_name_invalid'):
         continue
     defs[NOTE_DEFS[c]] = copy.deepcopy(R1['definitions'][NOTE_DEFS[c]])
+defs['noteMetadataUnavailable']['description'] = ("`metadata_unavailable`: metadata was asked for and did not come for `package_count` packages. `reasons` groups them by "
+    "message, in the order the text lists them, and their `package_count`s sum to the note's. Each such finding has `metadata.status` `unavailable` and "
+    "`libyears_unmeasured` `unavailable`. Its verdict comes from what lockrot could still read, so a counted advisory still grades it.")
+defs['noteRepositoryActivityNotFound']['description'] = ("`repository_activity_not_found`: the host answered 404 for `repositories` (private, renamed or removed). An answer, "
+    "not a network failure. Their findings carry no S10, and their `activity.status` is `not_found`.")
 defs['noteAdvisoriesNotChecked']['description'] = ("`advisories_not_checked` (0.13's code and data, reworded, §6.2): no advisory was looked up, so no finding is graded "
     "for an advisory and each move's score after it assumes its versions carry none. One lookup per run asks every advisory of every name, so the installed "
     "versions and the moves' versions are checked together or not at all.")
@@ -1546,16 +1555,9 @@ defs['noteMovesNotChecked'] = obj(("`moves_not_checked`: Composer's solver refus
     'php': d('The php version that the solve ran at: `config.platform.php` in the target minor, else the target minor at its newest patch (`8.4.99`).', {'type': 'string', 'minLength': 1}),
     'problem': PROBLEM,
 })
-defs['noteUpdateNowReduced'] = obj(("`update_now_reduced`: the command leaves out the members that Composer's refusal of the combined update names, and, "
-                                    "under Composer 2.2 or 2.3, each plain member that the resolving solve installs below its move version (§5.6)."), {
+defs['noteUpdateNowReduced'] = obj("`update_now_reduced`: the command leaves out the members that Composer's refusal of the combined update names (§5.6).", {
     'left_out': arr('The members that `update_now_command` leaves out, in report order.', ref('packageName'), minItems=1, uniqueItems=True),
-    'held_below': arr(("The plain members that the combined solve installs below their move version, in report order, each also in `left_out`. "
-                  "Empty when only a refusal leaves members out."), obj('A member left out below its fix.', {
-        'package': ref('packageName'),
-        'installs': d('The release that the combined solve installs for it, as the lock would write it.', {'type': 'string', 'minLength': 1}),
-    })),
-    'problem': nul("Composer's problem text of the refused combined update, without colour. Foreign text, not contract. Null when no refusal leaves a member out.",
-                   {'type': 'string', 'minLength': 1}),
+    'problem': d("Composer's problem text of the refused combined update, without colour. Foreign text, not contract.", {'type': 'string', 'minLength': 1}),
 })
 defs['noteUpdateNowRefused'] = obj("`update_now_refused`: Composer refuses the members of `security.update_now` together, even without the members its refusal names.", {
     'problem': PROBLEM,
@@ -1617,7 +1619,7 @@ defs['targetFix'] = obj("`run.php_window.target_fix` (§5.9): one update that un
     'reason': nul(("Why the update was not checked, from the reasons of `next_step.check.reason`. Null on `resolves` and `refused`, and on `not_checked` "
                    "exactly when `run.move_check` is null (a run that checks no move)."), {'type': 'string', 'pattern': SNAKE,
                   'x-known-values': ['unloaded_name', 'offline', 'install_time_budget', 'not_from_composer_repository', 'no_composer_json', 'composer_json_invalid',
-                                     'solver_error']}),
+                                     'solver_error', 'advisory_lookup_incomplete']}),
     'held_by': arr(("On `refused`, the holds that the refusal names, as a move's `held_by[]`, less the `platform` holds on php of the listed "
                     "packages. `[]` when the refusal names no hold. At the root ceiling, which lockrot decides without a solve, the holds are "
                     "the root links that fail at `target.php`: `link` is the link's section, `require`, `require-dev` or `conflict`, and "
@@ -1670,7 +1672,7 @@ defs['gateValueFailing'] = obj('One `run.gates` value and how many findings fail
 defs['gateNotApplied'] = obj('A check that the gate could not apply, on how many packages, and why: the gap where the gate failed open, as data.', {
     'check': open_set(['advisories'], "What was not checked (the `check` vocabulary of S10). An open set."),
     'packages': d('Packages that the gate could not judge on it for this reason: the covered unchecked findings whose `security.unchecked_reason` is `reason`.', INT1),
-    'reason': open_set(['offline', 'composer_too_old', 'install_time_budget', 'lookup_failed', 'no_feed', 'not_from_composer_repository', 'unparseable_version'],
+    'reason': open_set(['offline', 'install_time_budget', 'lookup_failed', 'no_feed', 'not_from_composer_repository', 'unparseable_version'],
                        "Why: the `security.unchecked_reason` of the unchecked findings. An open set."),
 })
 defs['rootGate'] = obj("The run's gate (report-1's, §6.2) plus the finding counts the `gate:` line prints (§7.6).", {
@@ -1709,8 +1711,7 @@ defs['rootSecurity'] = obj("The root security block (SPEC root block, §7.6, §8
     'update_now': arr(("The vulnerable packages whose lead move is an `update` that Composer's solver resolves inline, in report order; in a run that checks no move, "
                        "the packages whose `security.fix_kind` is `update` (§5.3). A name outside the command argument set of `next_step.commands` (§5.6) is left out."), ref('packageName')),
     'update_now_command': nul(("The one command the overview's \"Update now\" copies, as an argv list: `composer`, `update`, then each member with its constraint inline "
-                               "(`vendor/pkg:^1.2`) in the order of `update_now`. Under Composer 2.2 or 2.3, a member whose move is the plain `update` is written plain "
-                               "(`vendor/pkg`), and the solve reads it so. Composer's solver checked it as one request: a member that the combined request refuses is "
+                               "(`vendor/pkg:^1.2`) in the order of `update_now`. Composer's solver checked it as one request: a member that the combined request refuses is "
                                "left out (the `update_now_reduced` note). Null when `update_now` is empty, and when Composer refuses the members together (the "
                                "`update_now_refused` note); then the line is hidden (attack round 1: a page never builds a command, and a bare `composer update` updates the whole lock)."),
                               {'description': 'The argv: `composer`, `update`, then one argument per member.', 'type': 'array',
@@ -1761,7 +1762,11 @@ ROOT = {
     'packages_flagged': COUNT('Graded findings: the number at the top of the report (§8.4).'),
     'packages_multi_flag': COUNT('Graded findings with two or more counted flags (the `flags:` line, §7.6).'),
     'include_dev': d('Whether packages-dev were analysed (report-1).', {'type': 'boolean'}),
-    'not_from_composer_repository': copy.deepcopy(R1['properties']['not_from_composer_repository']),
+    'not_from_composer_repository': d("How many of the packages checked came from no Composer repository: the lock entry carries no Composer notification-url — a path, vcs, artifact or "
+                                      "inline package entry, or a package from a `type: composer` repository that advertises no notify URL. lockrot asks no repository for their "
+                                      "metadata or repository activity. It asks for their advisories by name, except under `advisory-lookup: composer-repositories`. "
+                                      "Equals the number of findings whose `from_composer_repository` is false.",
+                                      copy.deepcopy(R1['properties']['not_from_composer_repository'])),
     'packages_unchecked_accepted': COUNT("Findings with at least one check that the project accepted in `extra.lockrot.accept-unchecked` (a non-empty `unchecked_accepted[]`)."),
     'network_failures': d('Whether some note sets it (report-1).', {'type': 'boolean'}),
     'counts': obj('Findings per verdict, all seven required (§8.2; `.counts.<cause>` is null in report-2: read `.flags.<cause>.leading`).', {v: COUNT(f'Findings whose verdict is `{v}`.') for v in VERDICTS}),

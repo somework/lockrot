@@ -16,7 +16,7 @@ fix, by package: composer update 1
 libyears: 1.9 behind across the one package · 1.9 from direct requirements ·
 furthest behind typo3/html-sanitizer v2.2.0 at 1.9
 advisories: 1 package asked · packagist.org answered (6 on record for 1 package)
-moves: checked with the solver of Composer 2.10.3 against the lock; ext-* requirements not checked
+moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by config.audit.block-insecure; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked
 php: the lock installs on PHP 8.1 to 8.5
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for

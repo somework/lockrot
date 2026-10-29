@@ -19,6 +19,7 @@ use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\Signal;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\ListWords;
 use Lockrot\Verdict\MoveText;
 use Lockrot\Verdict\ScoreModel;
 
@@ -186,7 +187,7 @@ final class ExplainFormatter
         if ($finding->isDirect()) {
             return 'direct requirement: maintenance not halved for reach';
         }
-        $where = $finding->reach() === 'unreached' ? 'unreached' : 'via '.implode(', ', $finding->directDependents());
+        $where = $finding->reach() === 'unreached' ? 'unreached' : 'via '.ListWords::of($finding->directDependents());
 
         return $where.': maintenance '.($maintenance ? 'halved' : 'would be halved (none counts)').'; security is never halved for reach';
     }
@@ -204,7 +205,7 @@ final class ExplainFormatter
             $clears[] = $fact->id();
         }
         if ($clears !== []) {
-            $lines[] = 'clears '.implode(', ', $clears);
+            $lines[] = 'clears '.ListWords::of($clears);
         }
         foreach ($move->also() as $also) {
             $lines[] = 'also: '.$also->text();
@@ -402,7 +403,7 @@ final class ExplainFormatter
         $widths = self::BRANCH_COLUMNS;
         foreach ($cells as [, $columns]) {
             foreach ($columns as $i => $column) {
-                $widths[$i] = max($widths[$i], self::characters($column));
+                $widths[$i] = max($widths[$i], TerminalText::characters($column));
             }
         }
         $lines = ['repository metadata', self::escape(self::branchRow(' ', ['branch', 'highest tag', 'released', 'php'], 'fixes', $widths))];
@@ -418,7 +419,7 @@ final class ExplainFormatter
         $datedBy = $explanation->branchesDatedBy();
         if ($datedBy !== null) {
             [$parent, $branches] = $datedBy;
-            $lines[] = self::escape(\sprintf('%s %s dated by %s, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo\'s by their release', \count($branches) === 1 ? 'branch' : 'branches', implode(', ', $branches), $parent));
+            $lines[] = self::escape(\sprintf('%s %s dated by %s, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo\'s by their release', \count($branches) === 1 ? 'branch' : 'branches', ListWords::of($branches), $parent));
         }
 
         return $lines;
@@ -444,7 +445,7 @@ final class ExplainFormatter
         $holders = array_map(static fn (Holder $holder): string => $holder->source() === Holder::ROOT ? 'composer.json'
             : ($holder->package() === $package ? $package.' '.$holder->version().', its own release' : (string) $holder->package()), MoveText::inTextOrder($joint ? [] : $candidate->heldBy(), $package));
         if ($holders !== []) {
-            $cell .= '; held by '.implode(' and ', array_unique($holders));
+            $cell .= '; held by '.ListWords::of(array_unique($holders));
         }
         if ($after !== null) {
             // D10: the caveat stays only where Composer's solver did not check the move.
@@ -466,16 +467,10 @@ final class ExplainFormatter
     {
         $row = '   '.$mark;
         foreach ($columns as $i => $column) {
-            $row .= ' '.$column.str_repeat(' ', $widths[$i] - self::characters($column));
+            $row .= ' '.$column.str_repeat(' ', $widths[$i] - TerminalText::characters($column));
         }
 
         return rtrim($row.' '.$fix);
-    }
-
-    /** UTF-8 characters, without ext-mbstring: every byte but a continuation byte starts one. */
-    private static function characters(string $text): int
-    {
-        return \strlen(preg_replace('/[\x80-\xBF]/', '', $text) ?? '');
     }
 
     /**

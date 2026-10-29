@@ -14,6 +14,8 @@ use Lockrot\Score\WorsenedFact;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\ListWords;
+use Lockrot\Verdict\MoveText;
 
 /**
  * The parts of a finding block that table, markdown and github share, each a plain string
@@ -45,10 +47,9 @@ final class FindingBlock
     public static function dependents(Finding $finding): string
     {
         $dependents = $finding->directDependents();
-        $named = implode(', ', \array_slice($dependents, 0, self::DEPENDENTS_NAMED));
         $more = \count($dependents) - self::DEPENDENTS_NAMED;
 
-        return $more > 0 ? $named.' and '.$more.' more' : $named;
+        return ListWords::of(array_merge(\array_slice($dependents, 0, self::DEPENDENTS_NAMED), $more > 0 ? [$more.' more'] : []));
     }
 
     /**
@@ -74,12 +75,6 @@ final class FindingBlock
         return $items;
     }
 
-    /** The counted flags joined ` · `, the github title's and the markdown Flags cell's list. */
-    public static function flagList(Finding $finding): string
-    {
-        return implode(' · ', $finding->flagIds());
-    }
-
     /** `score.text`. */
     public static function scoreLine(Finding $finding): string
     {
@@ -92,6 +87,18 @@ final class FindingBlock
         $move = $finding->isGraded() ? $finding->nextStep() : null;
 
         return $move === null ? null : $move->text();
+    }
+
+    /**
+     * {@see move()} as {@see MoveText::parts()}, null for a finding with no move.
+     *
+     * @return list<array{0: string, 1: bool}>|null
+     */
+    public static function moveParts(Finding $finding): ?array
+    {
+        $move = $finding->isGraded() ? $finding->nextStep() : null;
+
+        return $move === null ? null : MoveText::parts($move);
     }
 
     /**
