@@ -4765,7 +4765,7 @@ export const d_A_both_sections_dagger = {
                             "link": "require",
                             "target": "php",
                             "constraint": "^7.2 || ^8.0.0",
-                            "dev": false
+                            "dev": true
                         }
                     ]
                 },
@@ -5201,6 +5201,15 @@ export const d_A_both_sections_dagger = {
                 "crosses_major": true,
                 "held_by": [
                     {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": null,
+                        "constraint": "^2.0",
+                        "holder": null
+                    },
+                    {
                         "source": "package",
                         "package": "symfony/twig-bridge",
                         "version": "v3.4.47",
@@ -5329,6 +5338,7 @@ export const d_A_both_sections_dagger = {
                         "composer",
                         "require",
                         "php:>=8.1",
+                        "--no-interaction",
                         "--no-update"
                     ],
                     [
@@ -5347,7 +5357,7 @@ export const d_A_both_sections_dagger = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0, which removes it from require-dev \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, which removes it from require-dev, then require twig/twig ^3.27.0, which removes it from require-dev \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
@@ -5470,6 +5480,15 @@ export const d_A_both_sections_dagger = {
                                     "admits_project_php": false,
                                     "held_by": [
                                         {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
                                             "source": "package",
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
@@ -5521,6 +5540,15 @@ export const d_A_both_sections_dagger = {
                                     "admits_target_php": true,
                                     "admits_project_php": false,
                                     "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
                                         {
                                             "source": "package",
                                             "package": "symfony/twig-bridge",
@@ -5574,6 +5602,15 @@ export const d_A_both_sections_dagger = {
                                     "admits_project_php": false,
                                     "held_by": [
                                         {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
                                             "source": "package",
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
@@ -5625,6 +5662,15 @@ export const d_A_both_sections_dagger = {
                                     "admits_target_php": true,
                                     "admits_project_php": false,
                                     "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
                                         {
                                             "source": "package",
                                             "package": "symfony/twig-bridge",
@@ -5678,6 +5724,15 @@ export const d_A_both_sections_dagger = {
                                     "admits_project_php": false,
                                     "held_by": [
                                         {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
                                             "source": "package",
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
@@ -5729,6 +5784,15 @@ export const d_A_both_sections_dagger = {
                                     "admits_target_php": true,
                                     "admits_project_php": false,
                                     "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
                                         {
                                             "source": "package",
                                             "package": "symfony/twig-bridge",
@@ -5782,6 +5846,15 @@ export const d_A_both_sections_dagger = {
                                     "admits_project_php": false,
                                     "held_by": [
                                         {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
                                             "source": "package",
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
@@ -5833,6 +5906,15 @@ export const d_A_both_sections_dagger = {
                                     "admits_target_php": true,
                                     "admits_project_php": false,
                                     "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
                                         {
                                             "source": "package",
                                             "package": "symfony/twig-bridge",
@@ -5886,6 +5968,15 @@ export const d_A_both_sections_dagger = {
                                     "admits_project_php": false,
                                     "held_by": [
                                         {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
                                             "source": "package",
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
@@ -5937,6 +6028,15 @@ export const d_A_both_sections_dagger = {
                                     "admits_target_php": true,
                                     "admits_project_php": false,
                                     "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
                                         {
                                             "source": "package",
                                             "package": "symfony/twig-bridge",
@@ -5990,6 +6090,15 @@ export const d_A_both_sections_dagger = {
                                     "admits_project_php": false,
                                     "held_by": [
                                         {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
                                             "source": "package",
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
@@ -6041,6 +6150,15 @@ export const d_A_both_sections_dagger = {
                                     "admits_target_php": true,
                                     "admits_project_php": false,
                                     "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
                                         {
                                             "source": "package",
                                             "package": "symfony/twig-bridge",
@@ -6094,6 +6212,15 @@ export const d_A_both_sections_dagger = {
                                     "admits_project_php": false,
                                     "held_by": [
                                         {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
                                             "source": "package",
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
@@ -6146,6 +6273,15 @@ export const d_A_both_sections_dagger = {
                                     "admits_project_php": false,
                                     "held_by": [
                                         {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
                                             "source": "package",
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
@@ -6197,6 +6333,15 @@ export const d_A_both_sections_dagger = {
                                     "admits_target_php": true,
                                     "admits_project_php": false,
                                     "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
                                         {
                                             "source": "package",
                                             "package": "symfony/twig-bridge",

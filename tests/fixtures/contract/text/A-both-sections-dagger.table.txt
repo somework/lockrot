@@ -1,10 +1,11 @@
 <options=bold><fg=red>critical (1)</fg=red></options=bold>
   twig/twig v2.16.1  direct  ·  vulnerable
       32 = vulnerable 32 [critical advisory]
-      do: raise require.php to \>=8.1, then require twig/twig ^3.27.0, which removes it from require-dev — clears 15
-          advisories; 3.x needs php \>=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by
-          symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to
-          move too; a new major brings its own requirements, which lockrot does not solve
+      do: raise require.php to \>=8.1, which removes it from require-dev, then require twig/twig ^3.27.0, which removes
+          it from require-dev — clears 15 advisories; 3.x needs php \>=8.1.0, require.php allows 7.2 (a major raise);
+          the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires
+          ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own
+          requirements, which lockrot does not solve
       vulnerable   15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst:
                    CVE-2026-46633 PHP code injection via `{% use %}` template name
       age: installed v2.16.1 released 2024-09-09 (2.1 years ago), the newest on 2.x; newest release v3.30.0

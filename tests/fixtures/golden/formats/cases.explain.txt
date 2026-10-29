@@ -1604,6 +1604,189 @@ repository metadata
    * 2.x      v2.16.1       2024-09-09   >=7.1.3    0 of 15
      1.x      v1.44.8       2024-09-09   >=7.2.5    0 of 15
 
+== case A-both-sections‡
+twig/twig v2.16.1 — critical: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v2.16.1   2024-09-09   2.1 years ago
+          2.x        v2.16.1   2024-09-09   2.1 years ago                 below release-warn-years 3
+          newest     v3.30.0   2026-09-25   less than three weeks ago     below release-warn-years 3
+          last push            2026-09-30   less than three weeks ago     below push-warn-years 3
+          libyears 2.0 behind the newest stable release
+repository GitHub github.com/twigphp/Twig: last push 2026-09-30 · fetched 2026-09-14
+
+score     32 = vulnerable 32 [critical advisory]     critical from 32
+  security     vulnerable 32 (critical advisory CVE-2026-46633)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        raise require.php to >=8.1, which removes it from require-dev, then require twig/twig ^3.27.0, which removes it from require-dev — clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
+          clears PKSA-h8hf-ytnd-5t9q, PKSA-8zx5-v2nz-58pb, PKSA-dpx1-78wg-1kqs, PKSA-gw7n-z4yx-7xjt, PKSA-1tmc-rt7x-12w6, PKSA-3mcc-k66d-pydb, PKSA-fbvq-z33h-r2np, PKSA-xx6c-6d96-db2w, PKSA-kvv6-36cr-fkzb, PKSA-yd6k-t2gh-1m43, PKSA-2wrf-1xmk-1pky, PKSA-g9zw-qxh8-pq8w, PKSA-n14z-jjjg-g8vd, PKSA-sjvz-tbbr-vwth and PKSA-yhcn-xrg3-68b1
+
+flags
+  vulnerable   S9 high · 15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name · lookup complete
+    critical   CVE-2026-46633  PHP code injection via `{% use %}` template name
+               PKSA-h8hf-ytnd-5t9q · reported 2026-05-20 · 32 points · fix: php floor raise to 3.x from v3.26.0
+    high       CVE-2026-49981  Twig: Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders for a cached `Template`
+               PKSA-8zx5-v2nz-58pb · reported 2026-07-01 · 16 points · fix: php floor raise to 3.x from v3.27.0
+    high       CVE-2026-47732  Sandbox: multiple `__toString()` policy bypasses via unguarded string coercion points
+               PKSA-dpx1-78wg-1kqs · reported 2026-05-20 · 16 points · fix: php floor raise to 3.x from v3.26.0
+    high       CVE-2026-24425  Possible sandbox bypass when using a source policy
+               PKSA-gw7n-z4yx-7xjt · reported 2026-05-20 · 16 points · fix: php floor raise to 3.x from v3.26.0
+    medium     CVE-2026-48806  Sandbox `__toString()` policy bypass via dynamic mapping keys
+               PKSA-1tmc-rt7x-12w6 · reported 2026-05-27 · 8 points · fix: php floor raise to 3.x from v3.27.0
+    medium     CVE-2026-46638  `{% sandbox %}{% include %}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411)
+               PKSA-3mcc-k66d-pydb · reported 2026-05-20 · 8 points · fix: php floor raise to 3.x from v3.26.0
+    medium     CVE-2026-48808  Sandbox property allowlist bypass via the `column` filter under `SourcePolicyInterface`
+               PKSA-fbvq-z33h-r2np · reported 2026-05-27 · 8 points · fix: php floor raise to 3.x from v3.27.0
+    medium     CVE-2026-48807  Sandbox `__toString()` policy bypass via `Traversable` in `join`/`replace` and `in`/`not in` operators
+               PKSA-xx6c-6d96-db2w · reported 2026-05-27 · 8 points · fix: php floor raise to 3.x from v3.27.0
+    unrated    CVE-2026-46627  Sandbox does not protect against resource exhaustion
+               PKSA-kvv6-36cr-fkzb · reported 2026-05-20 · 8 points · fix: php floor raise to 3.x from v3.26.0
+    unrated    CVE-2026-46636  Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders
+               PKSA-yd6k-t2gh-1m43 · reported 2026-05-27 · 8 points · fix: php floor raise to 3.x from v3.27.0
+    low        CVE-2024-51755  Unguarded calls to __isset() and to array-accesses when the sandbox is enabled
+               PKSA-2wrf-1xmk-1pky · reported 2024-11-06 · 2 points · fix: php floor raise to 3.x from v3.14.1
+    low        CVE-2026-48805  Sandbox state regression in deprecated internal wrappers in `src/Resources/core.php`
+               PKSA-g9zw-qxh8-pq8w · reported 2026-05-27 · 2 points · fix: php floor raise to 3.x from v3.27.0
+    low        CVE-2026-46635  Sandbox property allowlist bypass via the `column` filter (array_column on objects)
+               PKSA-n14z-jjjg-g8vd · reported 2026-05-20 · 2 points · fix: php floor raise to 3.x from v3.26.0
+    low        CVE-2026-46628  The `spaceless` filter implicitly marks its output as safe
+               PKSA-sjvz-tbbr-vwth · reported 2026-05-20 · 2 points · fix: php floor raise to 3.x from v3.26.0
+    low        CVE-2024-51754  Unguarded calls to __toString() when nesting an object into an array
+               PKSA-yhcn-xrg3-68b1 · reported 2024-11-06 · 2 points · fix: php floor raise to 3.x from v3.14.1
+  feeds        packagist.org: 26 on record, 15 affect v2.16.1
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     3.x      v3.30.0       2026-09-25   >=8.1.0    15 of 15 · php floor raise (lowest fix); held by composer.json and symfony/twig-bridge; after it: 0, ok, if Composer resolves it
+   * 2.x      v2.16.1       2024-09-09   >=7.1.3    0 of 15
+     1.x      v1.44.8       2024-09-09   >=7.2.5    0 of 15
+
+== case A-php-lowest-excluded‡
+twig/twig v2.16.1 — critical: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v2.16.1   2024-09-09   2.1 years ago
+          2.x        v2.16.1   2024-09-09   2.1 years ago                 below release-warn-years 3
+          newest     v3.30.0   2026-09-25   less than three weeks ago     below release-warn-years 3
+          last push            2026-09-30   less than three weeks ago     below push-warn-years 3
+          libyears 2.0 behind the newest stable release
+repository GitHub github.com/twigphp/Twig: last push 2026-09-30 · fetched 2026-09-14
+
+score     32 = vulnerable 32 [critical advisory]     critical from 32
+  security     vulnerable 32 (critical advisory CVE-2026-46633)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2.1 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
+          clears PKSA-h8hf-ytnd-5t9q, PKSA-8zx5-v2nz-58pb, PKSA-dpx1-78wg-1kqs, PKSA-gw7n-z4yx-7xjt, PKSA-1tmc-rt7x-12w6, PKSA-3mcc-k66d-pydb, PKSA-fbvq-z33h-r2np, PKSA-xx6c-6d96-db2w, PKSA-kvv6-36cr-fkzb, PKSA-yd6k-t2gh-1m43, PKSA-2wrf-1xmk-1pky, PKSA-g9zw-qxh8-pq8w, PKSA-n14z-jjjg-g8vd, PKSA-sjvz-tbbr-vwth and PKSA-yhcn-xrg3-68b1
+
+flags
+  vulnerable   S9 high · 15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name · lookup complete
+    critical   CVE-2026-46633  PHP code injection via `{% use %}` template name
+               PKSA-h8hf-ytnd-5t9q · reported 2026-05-20 · 32 points · fix: php floor raise to 3.x from v3.26.0
+    high       CVE-2026-49981  Twig: Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders for a cached `Template`
+               PKSA-8zx5-v2nz-58pb · reported 2026-07-01 · 16 points · fix: php floor raise to 3.x from v3.27.0
+    high       CVE-2026-47732  Sandbox: multiple `__toString()` policy bypasses via unguarded string coercion points
+               PKSA-dpx1-78wg-1kqs · reported 2026-05-20 · 16 points · fix: php floor raise to 3.x from v3.26.0
+    high       CVE-2026-24425  Possible sandbox bypass when using a source policy
+               PKSA-gw7n-z4yx-7xjt · reported 2026-05-20 · 16 points · fix: php floor raise to 3.x from v3.26.0
+    medium     CVE-2026-48806  Sandbox `__toString()` policy bypass via dynamic mapping keys
+               PKSA-1tmc-rt7x-12w6 · reported 2026-05-27 · 8 points · fix: php floor raise to 3.x from v3.27.0
+    medium     CVE-2026-46638  `{% sandbox %}{% include %}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411)
+               PKSA-3mcc-k66d-pydb · reported 2026-05-20 · 8 points · fix: php floor raise to 3.x from v3.26.0
+    medium     CVE-2026-48808  Sandbox property allowlist bypass via the `column` filter under `SourcePolicyInterface`
+               PKSA-fbvq-z33h-r2np · reported 2026-05-27 · 8 points · fix: php floor raise to 3.x from v3.27.0
+    medium     CVE-2026-48807  Sandbox `__toString()` policy bypass via `Traversable` in `join`/`replace` and `in`/`not in` operators
+               PKSA-xx6c-6d96-db2w · reported 2026-05-27 · 8 points · fix: php floor raise to 3.x from v3.27.0
+    unrated    CVE-2026-46627  Sandbox does not protect against resource exhaustion
+               PKSA-kvv6-36cr-fkzb · reported 2026-05-20 · 8 points · fix: php floor raise to 3.x from v3.26.0
+    unrated    CVE-2026-46636  Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders
+               PKSA-yd6k-t2gh-1m43 · reported 2026-05-27 · 8 points · fix: php floor raise to 3.x from v3.27.0
+    low        CVE-2024-51755  Unguarded calls to __isset() and to array-accesses when the sandbox is enabled
+               PKSA-2wrf-1xmk-1pky · reported 2024-11-06 · 2 points · fix: php floor raise to 3.x from v3.14.1
+    low        CVE-2026-48805  Sandbox state regression in deprecated internal wrappers in `src/Resources/core.php`
+               PKSA-g9zw-qxh8-pq8w · reported 2026-05-27 · 2 points · fix: php floor raise to 3.x from v3.27.0
+    low        CVE-2026-46635  Sandbox property allowlist bypass via the `column` filter (array_column on objects)
+               PKSA-n14z-jjjg-g8vd · reported 2026-05-20 · 2 points · fix: php floor raise to 3.x from v3.26.0
+    low        CVE-2026-46628  The `spaceless` filter implicitly marks its output as safe
+               PKSA-sjvz-tbbr-vwth · reported 2026-05-20 · 2 points · fix: php floor raise to 3.x from v3.26.0
+    low        CVE-2024-51754  Unguarded calls to __toString() when nesting an object into an array
+               PKSA-yhcn-xrg3-68b1 · reported 2024-11-06 · 2 points · fix: php floor raise to 3.x from v3.14.1
+  feeds        packagist.org: 26 on record, 15 affect v2.16.1
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     3.x      v3.30.0       2026-09-25   >=8.1.0    15 of 15 · php floor raise (lowest fix); held by composer.json and symfony/twig-bridge; after it: 0, ok, if Composer resolves it
+   * 2.x      v2.16.1       2024-09-09   >=7.1.3    0 of 15
+     1.x      v1.44.8       2024-09-09   >=7.2.5    0 of 15
+
+== case A-php-unsatisfiable‡
+twig/twig v2.16.1 — critical: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v2.16.1   2024-09-09   2.1 years ago
+          2.x        v2.16.1   2024-09-09   2.1 years ago                 below release-warn-years 3
+          newest     v3.30.0   2026-09-25   less than three weeks ago     below release-warn-years 3
+          last push            2026-09-30   less than three weeks ago     below push-warn-years 3
+          libyears 2.0 behind the newest stable release
+repository GitHub github.com/twigphp/Twig: last push 2026-09-30 · fetched 2026-09-14
+
+score     32 = vulnerable 32 [critical advisory]     critical from 32
+  security     vulnerable 32 (critical advisory CVE-2026-46633)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0; the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
+          clears PKSA-h8hf-ytnd-5t9q, PKSA-8zx5-v2nz-58pb, PKSA-dpx1-78wg-1kqs, PKSA-gw7n-z4yx-7xjt, PKSA-1tmc-rt7x-12w6, PKSA-3mcc-k66d-pydb, PKSA-fbvq-z33h-r2np, PKSA-xx6c-6d96-db2w, PKSA-kvv6-36cr-fkzb, PKSA-yd6k-t2gh-1m43, PKSA-2wrf-1xmk-1pky, PKSA-g9zw-qxh8-pq8w, PKSA-n14z-jjjg-g8vd, PKSA-sjvz-tbbr-vwth and PKSA-yhcn-xrg3-68b1
+
+flags
+  vulnerable   S9 high · 15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name · lookup complete
+    critical   CVE-2026-46633  PHP code injection via `{% use %}` template name
+               PKSA-h8hf-ytnd-5t9q · reported 2026-05-20 · 32 points · fix: upgrade to 3.x from v3.26.0
+    high       CVE-2026-49981  Twig: Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders for a cached `Template`
+               PKSA-8zx5-v2nz-58pb · reported 2026-07-01 · 16 points · fix: upgrade to 3.x from v3.27.0
+    high       CVE-2026-47732  Sandbox: multiple `__toString()` policy bypasses via unguarded string coercion points
+               PKSA-dpx1-78wg-1kqs · reported 2026-05-20 · 16 points · fix: upgrade to 3.x from v3.26.0
+    high       CVE-2026-24425  Possible sandbox bypass when using a source policy
+               PKSA-gw7n-z4yx-7xjt · reported 2026-05-20 · 16 points · fix: upgrade to 3.x from v3.26.0
+    medium     CVE-2026-48806  Sandbox `__toString()` policy bypass via dynamic mapping keys
+               PKSA-1tmc-rt7x-12w6 · reported 2026-05-27 · 8 points · fix: upgrade to 3.x from v3.27.0
+    medium     CVE-2026-46638  `{% sandbox %}{% include %}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411)
+               PKSA-3mcc-k66d-pydb · reported 2026-05-20 · 8 points · fix: upgrade to 3.x from v3.26.0
+    medium     CVE-2026-48808  Sandbox property allowlist bypass via the `column` filter under `SourcePolicyInterface`
+               PKSA-fbvq-z33h-r2np · reported 2026-05-27 · 8 points · fix: upgrade to 3.x from v3.27.0
+    medium     CVE-2026-48807  Sandbox `__toString()` policy bypass via `Traversable` in `join`/`replace` and `in`/`not in` operators
+               PKSA-xx6c-6d96-db2w · reported 2026-05-27 · 8 points · fix: upgrade to 3.x from v3.27.0
+    unrated    CVE-2026-46627  Sandbox does not protect against resource exhaustion
+               PKSA-kvv6-36cr-fkzb · reported 2026-05-20 · 8 points · fix: upgrade to 3.x from v3.26.0
+    unrated    CVE-2026-46636  Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders
+               PKSA-yd6k-t2gh-1m43 · reported 2026-05-27 · 8 points · fix: upgrade to 3.x from v3.27.0
+    low        CVE-2024-51755  Unguarded calls to __isset() and to array-accesses when the sandbox is enabled
+               PKSA-2wrf-1xmk-1pky · reported 2024-11-06 · 2 points · fix: upgrade to 3.x from v3.14.1
+    low        CVE-2026-48805  Sandbox state regression in deprecated internal wrappers in `src/Resources/core.php`
+               PKSA-g9zw-qxh8-pq8w · reported 2026-05-27 · 2 points · fix: upgrade to 3.x from v3.27.0
+    low        CVE-2026-46635  Sandbox property allowlist bypass via the `column` filter (array_column on objects)
+               PKSA-n14z-jjjg-g8vd · reported 2026-05-20 · 2 points · fix: upgrade to 3.x from v3.26.0
+    low        CVE-2026-46628  The `spaceless` filter implicitly marks its output as safe
+               PKSA-sjvz-tbbr-vwth · reported 2026-05-20 · 2 points · fix: upgrade to 3.x from v3.26.0
+    low        CVE-2024-51754  Unguarded calls to __toString() when nesting an object into an array
+               PKSA-yhcn-xrg3-68b1 · reported 2024-11-06 · 2 points · fix: upgrade to 3.x from v3.14.1
+  feeds        packagist.org: 26 on record, 15 affect v2.16.1
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     3.x      v3.30.0       2026-09-25   >=8.1.0    15 of 15 · upgrade (lowest fix); held by composer.json and symfony/twig-bridge; after it: 0, ok, if Composer resolves it
+   * 2.x      v2.16.1       2024-09-09   >=7.1.3    0 of 15
+     1.x      v1.44.8       2024-09-09   >=7.2.5    0 of 15
+
 == case A-baselined‡
 twig/twig v2.16.1 — critical: vulnerable
   direct requirement (composer.json require)
@@ -6091,6 +6274,37 @@ flags
 repository metadata
      branch   highest tag   released     php        fixes
    * 6.x      v6.4.41       2026-07-05   >=8.1      1 of 1 · composer update (lowest fix); after it: 0, ok; Composer's solver resolves it
+
+== case mc-lookup-kept‡
+symfony/routing v6.4.28 — high: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v6.4.28   2025-10-31   0.9 years ago
+          6.x        v6.4.41   2026-07-05   0.2 years ago                 below release-warn-years 3
+          newest     v6.4.41   2026-07-05   0.2 years ago                 below release-warn-years 3
+          last push            2026-09-29   less than three weeks ago     below push-warn-years 3
+          libyears 0.7 behind the newest stable release
+repository GitHub github.com/symfony/routing: last push 2026-09-29 · fetched 2026-09-14
+
+score     16 = vulnerable 16 [high advisory]     high from 16
+  security     vulnerable 16 (high advisory CVE-2026-48784)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        composer update 'symfony/routing:^6.4.41' (gets v6.4.41) — clears the advisory; not checked with Composer's solver (the advisory lookup did not cover a package in the result), so it holds only if Composer resolves it
+          clears PKSA-bf7t-jnpz-492k
+
+flags
+  vulnerable   S9 high · 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization · lookup complete
+    high       CVE-2026-48784  UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization
+               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 16 points · fix: composer update to 6.x from v6.4.41
+  feeds        packagist.org: 4 on record, 1 affects v6.4.28
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 6.x      v6.4.41       2026-07-05   >=8.1      1 of 1 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
 
 == case mc-canonical-package‡
 symfony/routing v6.4.28 — high: vulnerable

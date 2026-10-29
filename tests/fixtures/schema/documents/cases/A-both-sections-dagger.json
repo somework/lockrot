@@ -838,7 +838,7 @@
        "link": "require",
        "target": "php",
        "constraint": "^7.2 || ^8.0.0",
-       "dev": false
+       "dev": true
       }
      ]
     },

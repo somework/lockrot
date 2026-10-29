@@ -88146,7 +88146,7 @@
          "link": "require",
          "target": "php",
          "constraint": "^7.2 || ^8.0.0",
-         "dev": false
+         "dev": true
         }
        ]
       },
@@ -88190,7 +88190,7 @@
     }
    },
    "synthetic_inputs": [
-    "composer.json lists twig/twig and php in both require and require-dev (‡)",
+    "composer.json lists twig/twig ^2.0 and php in both require and require-dev, with the same constraints (‡ run_inputs._php_lock.root)",
     "next_step.held_by[], also[].held_by[] and the S9 rows' fix.held_by: the lock links of the corpus commit (LINKS)"
    ],
    "finding": {
@@ -90437,6 +90437,14 @@
        "symfony/twig-bridge"
       ],
       "below": null
+     }
+    },
+    "php_lock": {
+     "root": {
+      "require-dev": {
+       "php": "^7.2 || ^8.0.0",
+       "twig/twig": "^2.0"
+      }
      }
     }
    }
@@ -93569,7 +93577,7 @@
   },
   {
    "id": "A-php-unsatisfiable‡",
-   "label": "twig when require.php >=8.0 <7.0 matches no PHP: no project lowest (project_php_lowest null), read as require.php \"*\" (R6-5)",
+   "label": "twig when require.php >=8.0 <7.0 matches no PHP: no project lowest (project_php_lowest null), so the project blocks no branch, as under \"*\"; project_allows stays null (R6-5)",
    "project": "phpbb",
    "run": {
     "project": "phpbb/phpbb",
@@ -94468,7 +94476,7 @@
     }
    },
    "synthetic_inputs": [
-    "require.php >=8.0 <7.0; every branch admits the project, as under \"*\" (‡)",
+    "require.php >=8.0 <7.0: no project lowest (project_php_lowest null), so the project blocks no branch, as under \"*\"; project_allows stays null (‡)",
     "next_step.held_by[], also[].held_by[] and the S9 rows' fix.held_by: the lock links of the corpus commit (LINKS)"
    ],
    "finding": {
