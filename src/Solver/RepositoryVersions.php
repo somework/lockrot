@@ -337,7 +337,12 @@ final class RepositoryVersions implements VersionSource
     /** A repository URL as the lock and the config compare: no case, no trailing slash, no trailing `.git`. */
     public static function urlKey(string $url): string
     {
-        return (string) preg_replace('{/*(?:\.git)?/*$}', '', strtolower($url));
+        $key = rtrim(strtolower($url), '/');
+        if (substr($key, -4) === '.git') {
+            $key = substr($key, 0, -4);
+        }
+
+        return rtrim($key, '/');
     }
 
     /**
