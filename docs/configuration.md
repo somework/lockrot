@@ -231,19 +231,24 @@ and the score are the report's.
 |---|---|---|
 | Verdict | The verdict, the flags and the score, with each step of the sum | `finding.verdict`, `finding.lead`, `finding.flags`, `finding.score` |
 | Next step | The move, what it clears, what holds it and the score after it | `finding.next_step` |
-| Security | Each counted advisory with its fix, what each advisory repository answered, and the ignored advisories | `finding.security` |
+| Security | Each counted advisory with its fix, what each advisory repository answered, and the ignored advisories (the text gives only their count) | `finding.security` |
 | Chain | `direct requirement`, or the shortest `via` chain and the other direct requirements that reach the package, and how many hops below `composer.json` it sits | `finding.direct`, `finding.chain`, `finding.direct_dependents`, `finding.depth`, `finding.named_in` |
 | Allowlist | Who accepts which flags, and why | `finding.allowlist` |
 | Checks | The checks that did not run, as S10 or as skips, and the ones `accept-unchecked` accepted | `finding.checks_missing`, `finding.checks_skipped`, `finding.unchecked_accepted` |
 | Age | The installed release, the newest release, the newest on the installed branch and the last push, each with its years | `finding.age` |
 | Libyears | The package's [libyears](verdicts.md#libyears), or why they were not measured | `finding.libyears`, `finding.libyears_unmeasured` |
-| Origin | Where the package came from and, for an abandoned package whose replacement packagist.org names, the replacement's page ([Where a package came from](schema.md#where-a-package-came-from)) | `finding.origin`, `finding.replacement_url` |
-| Signals | Every signal with its summary and raw data: the dates behind each age, and for S9 each advisory with what fixes it | `finding.signals` |
+| Origin | Where the package came from and, for an abandoned package whose replacement packagist.org names, the replacement's page ([Where a package came from](schema.md#where-a-package-came-from)). JSON only | `finding.origin`, `finding.replacement_url` |
+| Signals | Every signal with its summary and raw data: the dates behind each age, and for S9 each advisory with what fixes it (the text gives the summaries of the fired signals only) | `finding.signals` |
 | Lock entry | Version, `php` constraint, source, and the entry's date with what it is dated by: a release, a branch snapshot's commit, or a commit a subtree split's tags share | `lock` |
-| Repository metadata | Number of versions, whether the package is abandoned and what replaces it, the last stable release, and the release-branch table S8 reads, with what each branch fixes | `metadata` |
+| Repository metadata | Number of versions (JSON only), whether the package is abandoned and what replaces it, the last stable release, and the release-branch table S8 reads, with what each branch fixes | `metadata` |
 | Repository activity | What S3 and S4 read, or why nothing was read | `finding.activity` |
 | Settings | Thresholds, target PHP, and the project's own `require.php` as composer.json writes it (lockrot tests the branch rows against the lowest stable version it admits) | `run.thresholds`, `run.target_php`, `run.project_php` |
 | Run notes | The run's notes | `notes`, `note_details` |
+
+The text prints the allowlisted flag ids, as `accepted` and as `(allowlisted)` next to an unread
+check. The allowlist entry with its reason, the lock entry and the settings are in `--format=json`
+only. The text shows a value of the lock entry or the settings only on a line that reads it, such
+as a threshold beside an age.
 
 The document also carries `lockrot`, `package`, `version` and `generated_at`. The full shape is in
 [the explanation's fields](schema.md#the-explanation).
