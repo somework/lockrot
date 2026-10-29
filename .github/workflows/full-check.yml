@@ -2,8 +2,10 @@ name: full-check
 # A full check pushes a pull request's head unchanged to release/full-check-<sha>. This workflow runs
 # there the whole-tree mutation gate that ci.yml runs on a push, and ci.yml's move-check-oracle job.
 # The pull request's own run has checked every other job on that commit. ci.yml ignores these
-# branches. A push of an rc tag runs this workflow too: the renderer pins the rc-tagged commit, so
-# the whole-tree gate runs on exactly that commit, whatever branch holds it. The two workflows share .github/actions/mutation-coverage,
+# branches. A push of an rc tag runs this workflow too: the whole-tree gate and the oracle run on the
+# rc-tagged commit. This run fails while the commit changes the contract bundle and vendors an older
+# renderer. The renderer's final-tag gate reads only a run on release/full-check-<sha>, never this
+# one (CONTRIBUTING.md, "Cutting a release"). The two workflows share .github/actions/mutation-coverage,
 # .github/actions/mutation-shard and .github/actions/move-check-oracle, and
 # tools/mutation/tests/test_full_check_matrix.py keeps the shard
 # matrix equal to the one in ci.yml. A branch named release/full-check-<sha>--solver,verdicts runs only
