@@ -31,6 +31,7 @@ use Composer\Repository\RootPackageRepository;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Lockrot\Analyzer\PhpWindow;
+use Lockrot\Security\Holder;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 
 /**
@@ -46,6 +47,8 @@ final class ComposerSolver
 {
     /** The platform patterns that the machine running lockrot provides, in the order of `run.move_check.ignored_platform`. */
     public const IGNORED_PLATFORM = ['ext-*', 'lib-*', ...PhpWindow::HOST_FEATURES];
+    /** The package types that Composer's Installer leaves out of an update's pool: https://github.com/composer/composer/blob/2.10.3/src/Composer/Installer.php */
+    private const IGNORED_TYPES = ['php-ext', 'php-ext-zend'];
 
     private RootPackageInterface $root;
     private LockArrayRepository $locked;
@@ -174,7 +177,7 @@ final class ComposerSolver
             // A shadowed name has loaded versions, so the refusal never wants it, yet its hidden releases can change the answer.
             $shadowed = array_intersect($this->failures($loaded->asked()), [VersionSource::SHADOWED]);
 
-            return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $this->failures($holds->wanted()) + $shadowed);
+            return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $this->failures($holds->wanted()) + $shadowed + $this->unreachedLockedOnly($composerRequest, $holds));
         }
 
         // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
@@ -214,6 +217,34 @@ final class ComposerSolver
         }
 
         return $preferred;
+    }
+
+    /**
+     * The wanted names that the solve frees and offers at their locked release only. The pool
+     * builder takes such a name from the locked-only copy and never asks the source for it. A
+     * path repository serves the locked release only, and a root constraint that the refusal
+     * names excludes every release, so both refusals prove something.
+     *
+     * @return array<string, string> name => {@see VersionSource::UNREACHED}
+     */
+    private function unreachedLockedOnly(Request $request, ProblemHolds $holds): array
+    {
+        $lockedOnly = $this->lockedOnly;
+        if ($lockedOnly === null) {
+            return [];
+        }
+        $byRoot = array_map(static fn (Holder $hold): ?string => $hold->target(), array_filter($holds->holds(), static fn (Holder $hold): bool => $hold->link() === Holder::ROOT_REQUIRE));
+        $offered = array_filter($holds->wanted(), static fn (string $name): bool => !\in_array($name, $byRoot, true) && $lockedOnly->findPackages($name) !== []);
+        $unreached = [];
+        foreach ($offered as $name) {
+            foreach ($this->locked->findPackages($name) as $package) {
+                if ($package->getDistType() !== 'path' && !$request->isLockedPackage($package)) {
+                    $unreached[$name] = VersionSource::UNREACHED;
+                }
+            }
+        }
+
+        return $unreached;
     }
 
     /**
@@ -303,7 +334,7 @@ final class ComposerSolver
         }
         $composerRequest->setUpdateAllowList($request->allow(), $request->transitive());
 
-        $pool = $set->createPool($composerRequest, new NullIO());
+        $pool = $set->createPool($composerRequest, new NullIO(), null, null, self::IGNORED_TYPES);
         if ($this->advisories === null || !$this->advisories->blocking()->blocks()) {
             return [$set, $composerRequest, $pool, $fixedRoot, $loaded, null];
         }

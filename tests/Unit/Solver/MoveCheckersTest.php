@@ -56,6 +56,12 @@ final class MoveCheckersTest extends TestCase
         self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '8.4-dev'));
     }
 
+    /** A pre-release of the target minor is no stable release in it: the solve runs at the newest patch. */
+    public function testAPreReleasePlatformPhpInTheTargetMinorIsNotKept(): void
+    {
+        self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '8.4.0-RC1'));
+    }
+
     /** Composer normalises a bare major (`8`) to 8.0.0, so it lies in the target minor 8.0. */
     public function testAPlatformPhpThatComposerNormalisesIntoTheTargetMinorIsKept(): void
     {
@@ -278,6 +284,26 @@ final class MoveCheckersTest extends TestCase
         ]);
 
         $check = MoveCheckers::forProject(self::root(), $lock, ProjectConfig::empty(), new Config(false), [$vcs, $repository], '8.4', false, Deadline::never())->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
+
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME], [$check->result(), $check->reason()]);
+    }
+
+    /** docs/verdicts.md, move-check limits: a solve that needs another release of a vcs-locked name proves nothing. */
+    public function testAMoveThatNeedsAnotherReleaseOfAVcsLockedNameIsNotChecked(): void
+    {
+        $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^1.0']] + $packagist,
+            ['name' => 'acme/core', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://git.example.org/acme/core.git', 'reference' => 'abc']],
+        ]]);
+        $loader = new ArrayLoader();
+        $repository = new RecordingComposerRepository([
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^1.0']]),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.1.0', 'require' => ['acme/core' => '^2.0']]),
+            $loader->load(['name' => 'acme/core', 'version' => '2.0.0']),
+        ]);
+
+        $check = MoveCheckers::forProject(self::root(), $lock, ProjectConfig::empty(), new Config(false), [$repository], '8.4', false, Deadline::never())->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
 
         self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME], [$check->result(), $check->reason()]);
     }

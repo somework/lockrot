@@ -665,6 +665,37 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([['1.0.0'], null], [self::pretty($versions->versions('acme/lib')), $versions->failure('acme/lib')]);
     }
 
+    /**
+     * @dataProvider urlKeys
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('urlKeys')]
+    public function testTheUrlKeyDropsCaseTrailingSlashesAndOneTrailingDotGit(string $url, string $key): void
+    {
+        self::assertSame($key, RepositoryVersions::urlKey($url));
+    }
+
+    /** @return iterable<string, array{string, string}> the URL, its key */
+    public static function urlKeys(): iterable
+    {
+        yield 'a .git and a slash' => ['https://X/a/b.git/', 'https://x/a/b'];
+        yield 'a run of slashes' => ['https://x/a/b///', 'https://x/a/b'];
+        yield 'two .git suffixes' => ['a.git.git', 'a.git'];
+        yield 'a slash before .git' => ['https://x/a/b/.git', 'https://x/a/b'];
+        yield 'a plain URL' => ['https://x/a/b', 'https://x/a/b'];
+    }
+
+    /** The lock is untrusted input, and urlKey() runs before any deadline: a long run of slashes inside the URL must not stall it. */
+    public function testTheUrlKeyOfAUrlWithALongRunOfSlashesReturnsAtOnce(): void
+    {
+        $url = 'https://x/'.str_repeat('/', 300000).'a';
+        $start = hrtime(true);
+
+        $key = RepositoryVersions::urlKey($url);
+
+        self::assertSame($url, $key);
+        self::assertLessThan(1.0, (hrtime(true) - $start) / 1e9); // fragility-ok: the defect is the run time
+    }
+
     public function testAVcsRepositoryThatNoLockEntryNamesShadowsNoName(): void
     {
         $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://github.com/acme/lib']);

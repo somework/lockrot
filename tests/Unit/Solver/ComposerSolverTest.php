@@ -18,6 +18,7 @@ use Lockrot\Solver\AdvisoryBlocking;
 use Lockrot\Solver\ComposerSolver;
 use Lockrot\Solver\PoolAdvisories;
 use Lockrot\Solver\SolveRequest;
+use Lockrot\Solver\VersionSource;
 use Lockrot\Tests\Support\ArrayVersionSource;
 use PHPUnit\Framework\TestCase;
 
@@ -512,6 +513,139 @@ final class ComposerSolverTest extends TestCase
         }
 
         self::assertTrue(self::rootAliasSolver()->withAdvisories(self::advisories(['acme/lib' => ['*']]))->solve(SolveRequest::unlock(['acme/lib']))->resolves());
+    }
+
+    /**
+     * Composer's update and require leave the php-ext and php-ext-zend package types out of the pool.
+     *
+     * @dataProvider phpExtensionTypes
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('phpExtensionTypes')]
+    public function testAnUpdateThatNeedsAPhpExtensionPackageIsRefused(string $type): void
+    {
+        $solver = self::solver(
+            ['require' => ['vendor/a' => '*']],
+            [['name' => 'vendor/a', 'version' => '1.0.0']],
+            ['vendor/a' => [['version' => '1.0.0'], ['version' => '2.0.0', 'require' => ['vendor/pext' => '^1.0']]], 'vendor/pext' => [['version' => '1.0.0', 'type' => $type]]]
+        );
+
+        self::assertFalse($solver->solve(SolveRequest::update(['vendor/a' => '^2.0']))->resolves());
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function phpExtensionTypes(): iterable
+    {
+        yield 'php-ext' => ['php-ext'];
+        yield 'php-ext-zend' => ['php-ext-zend'];
+    }
+
+    /** The locked acme/dep alone provides acme/feature, and the root replaces acme/dep: Composer installs one package of a name. */
+    public function testARefusalByAReplaceOfTheRootNamesTheRootAsTheHolder(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0'], 'replace' => ['acme/dep' => '*']],
+            [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/dep', 'version' => '1.0.0', 'provide' => ['acme/feature' => '1.0.0']]],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/feature' => '^1.0']]], 'acme/feature' => []]
+        );
+
+        $holds = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->holds();
+
+        $replaces = array_values(array_filter($holds, static fn (Holder $hold): bool => $hold->link() === Holder::REPLACE));
+        self::assertCount(1, $replaces, 'holds: '.json_encode(self::rows($holds)));
+        self::assertSame([Holder::ROOT, 'acme/app', null, '*', 'acme/dep'], [$replaces[0]->source(), $replaces[0]->package(), $replaces[0]->version(), $replaces[0]->constraint(), $replaces[0]->target()]);
+    }
+
+    /** A `self.version` requirement gives the branch alias a rule of its own: the hold names the branch that the lock and Packagist list. */
+    public function testARequirementOfABranchAliasHoldsTheAliasedBranch(): void
+    {
+        $branch = ['version' => 'dev-main', 'extra' => ['branch-alias' => ['dev-main' => '1.1.x-dev']], 'require' => ['acme/gone' => 'self.version']];
+        $solver = self::pinned(['acme/lib' => '^1.0@dev'], ['acme/lib' => 20], [], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], $branch]]);
+
+        $holds = $solver->solve(SolveRequest::update(['acme/lib' => '1.1.x-dev']))->holds();
+
+        $requires = array_map(static fn (Holder $hold): array => [$hold->source(), $hold->package(), $hold->version(), $hold->link()], array_filter($holds, static fn (Holder $hold): bool => $hold->target() === 'acme/gone'));
+        self::assertSame([[Holder::PACKAGE, 'acme/lib', 'dev-main', Holder::REQUIRE]], array_values(array_unique($requires, \SORT_REGULAR)), 'holds: '.json_encode(self::rows($holds)));
+    }
+
+    /** A freed vcs-locked name has its locked release only, so a refusal that wants another release of it proves nothing. */
+    public function testARefusalThatWantsAnotherReleaseOfEachFreedVcsLockedNameNamesEachUnreached(): void
+    {
+        $vcs = ['source' => ['type' => 'git', 'url' => 'https://git.example.org/acme/vcs.git', 'reference' => 'abc']];
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0', 'acme/other' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['name' => 'acme/other', 'version' => '1.0.0', 'require' => ['acme/util' => '^1.0']], ['name' => 'acme/core', 'version' => '1.0.0'] + $vcs, ['name' => 'acme/util', 'version' => '1.0.0'] + $vcs],
+            [
+                'acme/lib' => [['version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/core' => '^2.0']]],
+                'acme/other' => [['version' => '1.0.0', 'require' => ['acme/util' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/util' => '^2.0']]],
+                'acme/core' => [['version' => '2.0.0']],
+                'acme/util' => [['version' => '2.0.0']],
+            ]
+        )->withLockedOnly(['acme/core', 'acme/util']);
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1', 'acme/other' => '^1.1'])->withTransitive(SolveRequest::WITH_DEPENDENCIES));
+
+        self::assertFalse($solution->resolves());
+        self::assertEquals(['acme/core' => VersionSource::UNREACHED, 'acme/util' => VersionSource::UNREACHED], $solution->unloaded(), 'the key order is free');
+    }
+
+    /** The pool builder finds the vcs-locked name in the locked-only copy, which no constraint of the require admits, so the pool holds no release of it. */
+    public function testARefusedRequireThatWantsAnotherReleaseOfAFreedVcsLockedNameNamesItUnreached(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['name' => 'acme/core', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://git.example.org/acme/core.git', 'reference' => 'abc']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/core' => '^2.0']]], 'acme/core' => [['version' => '2.0.0']]]
+        )->withLockedOnly(['acme/core']);
+
+        $solution = $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^1.1'], false)->withTransitive(SolveRequest::WITH_DEPENDENCIES));
+
+        self::assertFalse($solution->resolves());
+        self::assertSame(['acme/core' => VersionSource::UNREACHED], $solution->unloaded());
+    }
+
+    /** Composer reads a path package from its path repository, which serves the one release that the lock records. */
+    public function testARefusalThatWantsAnotherReleaseOfALockedPathPackageNamesNoNameUnreached(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['name' => 'acme/core', 'version' => '1.0.0', 'dist' => ['type' => 'path', 'url' => 'core', 'reference' => 'abc']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/core' => '^2.0']]]]
+        )->withLockedOnly(['acme/core']);
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']));
+
+        self::assertFalse($solution->resolves());
+        self::assertSame([], $solution->unloaded());
+    }
+
+    /** The root's own `^1.0` excludes the release that acme/lib wants, so no release from the vcs repository can resolve the move. */
+    public function testARefusalThatTheRootConstraintOfAFreedVcsLockedNameExplainsNamesNoNameUnreached(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0', 'acme/core' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['name' => 'acme/core', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://git.example.org/acme/core.git', 'reference' => 'abc']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/core' => '^2.0']]], 'acme/core' => [['version' => '2.0.0']]]
+        )->withLockedOnly(['acme/core']);
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1'])->withTransitive(SolveRequest::WITH_ALL_DEPENDENCIES));
+
+        self::assertFalse($solution->resolves());
+        self::assertSame([], $solution->unloaded());
+    }
+
+    /** A listed update keeps a vcs-locked dependency at its lock, as Composer does, so its refusal proves something. */
+    public function testAListedUpdateThatAVcsLockedDependencyRefusesNamesNoNameUnreached(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['name' => 'acme/core', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://git.example.org/acme/core.git', 'reference' => 'abc']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/core' => '^2.0']]], 'acme/core' => [['version' => '2.0.0']]]
+        )->withLockedOnly(['acme/core']);
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']));
+
+        self::assertFalse($solution->resolves());
+        self::assertSame([], $solution->unloaded());
     }
 
     private static function rootAliasSolver(): ComposerSolver
