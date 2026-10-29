@@ -514,6 +514,30 @@ final class ComposerSolverTest extends TestCase
         self::assertTrue(self::rootAliasSolver()->withAdvisories(self::advisories(['acme/lib' => ['*']]))->solve(SolveRequest::unlock(['acme/lib']))->resolves());
     }
 
+    /**
+     * Composer's update and require leave the php-ext and php-ext-zend package types out of the pool.
+     *
+     * @dataProvider phpExtensionTypes
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('phpExtensionTypes')]
+    public function testAnUpdateThatNeedsAPhpExtensionPackageIsRefused(string $type): void
+    {
+        $solver = self::solver(
+            ['require' => ['vendor/a' => '*']],
+            [['name' => 'vendor/a', 'version' => '1.0.0']],
+            ['vendor/a' => [['version' => '1.0.0'], ['version' => '2.0.0', 'require' => ['vendor/pext' => '^1.0']]], 'vendor/pext' => [['version' => '1.0.0', 'type' => $type]]]
+        );
+
+        self::assertFalse($solver->solve(SolveRequest::update(['vendor/a' => '^2.0']))->resolves());
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function phpExtensionTypes(): iterable
+    {
+        yield 'php-ext' => ['php-ext'];
+        yield 'php-ext-zend' => ['php-ext-zend'];
+    }
+
     /** A listed update keeps a vcs-locked dependency at its lock, as Composer does, so its refusal proves something. */
     public function testAListedUpdateThatAVcsLockedDependencyRefusesLoadsNoName(): void
     {

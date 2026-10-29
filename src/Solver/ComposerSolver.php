@@ -46,6 +46,8 @@ final class ComposerSolver
 {
     /** The platform patterns that the machine running lockrot provides, in the order of `run.move_check.ignored_platform`. */
     public const IGNORED_PLATFORM = ['ext-*', 'lib-*', ...PhpWindow::HOST_FEATURES];
+    /** The package types that Composer\Installer::$ignoredTypes leaves out of an update's pool. */
+    private const IGNORED_TYPES = ['php-ext', 'php-ext-zend'];
 
     private RootPackageInterface $root;
     private LockArrayRepository $locked;
@@ -323,7 +325,7 @@ final class ComposerSolver
         }
         $composerRequest->setUpdateAllowList($request->allow(), $request->transitive());
 
-        $pool = $set->createPool($composerRequest, new NullIO());
+        $pool = $set->createPool($composerRequest, new NullIO(), null, null, self::IGNORED_TYPES);
         if ($this->advisories === null || !$this->advisories->blocking()->blocks()) {
             return [$set, $composerRequest, $pool, $fixedRoot, $loaded, null];
         }
