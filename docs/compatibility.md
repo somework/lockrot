@@ -296,6 +296,9 @@ when a finding reaches `fail-on`, are frozen with the rest of the [configuration
 
 - The PHP and Composer floors are in the [install requirements](index.md#install). 1.0.0-RC1 chooses
   the floor for 1.x.
+- CI tests the plugin on the Composer 2.10 and 2.11 minors. The move check gives the answers of
+  the Composer that runs lockrot, and these answers can differ between minors
+  ([The move check](verdicts.md#the-move-check)).
 - *Planned:* within 1.x the floor rises only in a minor release, never in a patch, with a warning
   on stderr one minor release ahead.
 
