@@ -2707,15 +2707,6 @@
                 "crosses_major": true,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "scheb/2fa-bundle",
-                        "constraint": "^5.13.2",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "scheb/2fa-google-authenticator",
                         "version": "v5.13.2",
@@ -2821,7 +2812,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2), scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "vulnerable",
@@ -2971,15 +2962,6 @@
                                     "admits_project_php": true,
                                     "held_by": [
                                         {
-                                            "source": "root",
-                                            "package": null,
-                                            "version": null,
-                                            "link": "root-require",
-                                            "target": "scheb/2fa-bundle",
-                                            "constraint": "^5.13.2",
-                                            "holder": null
-                                        },
-                                        {
                                             "source": "package",
                                             "package": "scheb/2fa-google-authenticator",
                                             "version": "v5.13.2",
@@ -3047,15 +3029,6 @@
                                     "admits_target_php": true,
                                     "admits_project_php": true,
                                     "held_by": [
-                                        {
-                                            "source": "root",
-                                            "package": null,
-                                            "version": null,
-                                            "link": "root-require",
-                                            "target": "scheb/2fa-bundle",
-                                            "constraint": "^5.13.2",
-                                            "holder": null
-                                        },
                                         {
                                             "source": "package",
                                             "package": "scheb/2fa-google-authenticator",
@@ -7217,15 +7190,6 @@
                         "holder": null
                     },
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "scheb/2fa-bundle",
-                        "constraint": "^5.13.2",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "scheb/2fa-trusted-device",
                         "version": "v5.13.2",
@@ -7307,7 +7271,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require lcobucci/jwt ^5.6 \u2014 clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.3), composer.json (requires scheb/2fa-bundle ^5.13.2), scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself left-behind) and scheb/2fa-trusted-device 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "require lcobucci/jwt ^5.6 \u2014 clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.3), scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself left-behind) and scheb/2fa-trusted-device 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
@@ -19972,15 +19936,6 @@
                 "crosses_major": true,
                 "held_by": [
                     {
-                        "source": "root",
-                        "package": null,
-                        "version": null,
-                        "link": "root-require",
-                        "target": "scheb/2fa-bundle",
-                        "constraint": "^5.13.2",
-                        "holder": null
-                    },
-                    {
                         "source": "package",
                         "package": "scheb/2fa-google-authenticator",
                         "version": "5.x-dev",
@@ -20105,7 +20060,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator \u2014 clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires scheb/2fa-bundle ^5.13.2), spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind), scheb/2fa-google-authenticator v5.13.2 (requires spomky-labs/otphp ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+                "text": "move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator \u2014 clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind), scheb/2fa-google-authenticator v5.13.2 (requires spomky-labs/otphp ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
             },
             "security": {
                 "status": "clear",
