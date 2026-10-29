@@ -57,7 +57,7 @@ final class ContractBundleIsCurrentTest extends TestCase
         self::assertSame(array_keys($withoutInputs), $capped, 'a capped case without inputs needs a reason here, and a hydrated one leaves the list');
     }
 
-    /** A floor below the recorded count lets a lost hydrated input pass unnoticed. */
+    /** A committed provenance.json with a count below its floor did not come from a passing recording. */
     public function testTheCommittedComparedCountsMeetTheFloors(): void
     {
         $provenance = JsonPath::decodeFile(ContractBundle::DIRECTORY.'/provenance.json');

@@ -90,8 +90,7 @@ final class MoveTextTest extends TestCase
 
     /**
      * wallabag at 8.4: the platform step alone does not make the lock install while Composer refuses
-     * the lock itself. Every format prints the moves_not_checked note, which names the cause of
-     * Composer's first problem.
+     * the lock itself. The moves_not_checked note names the cause of Composer's first problem.
      */
     public function testThePlatformStepOfARefusedBaselinePointsAtTheFirstCauseInTheNote(): void
     {

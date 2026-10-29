@@ -112,8 +112,8 @@ final class MoveText
     /**
      * SPEC §5.6: while the lock records a platform PHP outside the target minor, Composer solves
      * the commands at that PHP, not at the target. The sentence and a space, else an empty string.
-     * While Composer refuses the lock itself, the step alone does not make it install. Every format
-     * prints the moves_not_checked note, and the note names the cause of Composer's first problem.
+     * While Composer refuses the lock itself, the step alone does not make it install: the sentence
+     * points at the moves_not_checked note.
      *
      * @param ?string $platformOverride `run.php_window.platform_override`
      * @param bool    $baselineRefused  `run.move_check.baseline` is `refused`

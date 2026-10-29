@@ -413,6 +413,14 @@ final class RunFooterTest extends TestCase
         self::assertSame('php: the lock installs on PHP 5.3 to 8.3; your target, 8.4, is excluded: require-dev.php allows only <8.4 and conflict.php excludes >=8.4.50', $both);
     }
 
+    /** A pinned patch that the root excludes inside a minor that installs: the line names the patch. */
+    public function testThePhpLineOfTheRootCeilingNamesThePinnedPatchWhenTheWindowListsTheTargetMinor(): void
+    {
+        $line = self::phpLine(['packages' => [], 'packages-dev' => []], ['require' => ['php' => '>=8.4.6'], 'config' => ['platform' => ['php' => '8.4.5']]], '8.4', false, null);
+
+        self::assertSame('php: the lock installs on PHP 8.4 to 8.5; your target, 8.4.5, is excluded: require.php allows only >=8.4.6', $line);
+    }
+
     /** drupal-site at 7.2: below the lowest edge, the line names that edge's setters. */
     public function testThePhpLineOfATargetBelowTheLowestEdgeNamesItsSetters(): void
     {

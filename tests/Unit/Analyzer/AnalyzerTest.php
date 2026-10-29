@@ -184,7 +184,7 @@ final class AnalyzerTest extends TestCase
 
     /**
      * Case `move-check‡` under a platform PHP outside the target minor: while Composer refuses the
-     * lock itself, the step points at the moves_not_checked note that every format prints.
+     * lock itself, the step points at the moves_not_checked note, which the run writes.
      *
      * @param list<string> $phps
      *
@@ -209,6 +209,7 @@ final class AnalyzerTest extends TestCase
 
         self::assertSame([$refused ? 'refused' : 'resolves', $phps === []], [JsonPath::stringAt($document, ['run', 'move_check', 'baseline']), JsonPath::boolAt($document, ['run', 'php_window', 'target', 'inside'])]);
         self::assertStringStartsWith($step.'composer update', JsonPath::stringAt($document, ['findings', 0, 'next_step', 'text']));
+        self::assertSame($refused, \in_array('moves_not_checked', array_column(JsonPath::arrayAt($document, ['note_details']), 'code'), true));
     }
 
     public function testAnalyzeWithFactsKeepsWhatEachFindingWasDecidedOn(): void

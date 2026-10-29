@@ -188,10 +188,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Each branch row's `fixes.if_applied` scores a move to that branch. For a package that comes in
   through a dependency, `through[]` says whether that dependency's newest release requires it.
   `--fail-on` and the exit code do not read `next_step`. ([The move](docs/verdicts.md#move))
-- **All formats:** when the lock records a `config.platform.php` outside the minor of the target
-  PHP, the line of each move with commands and the `update now:` line first say to set it to a
-  target PHP release. When Composer also refuses the lock itself, that sentence says that the run
-  note `moves_not_checked` names the first cause.
+- **All formats:** when the lock records a `config.platform.php` that is not a stable release in
+  the minor of the target PHP, each move line with commands and the `update now:` line first say to
+  set it to a target PHP release. When Composer also refuses the lock itself, that sentence says
+  that the run note `moves_not_checked` names the first cause.
   ([The move](docs/verdicts.md#move))
 - **json:** the `--explain` document writes `run.php_window` with `platform_override` and `target`
   alone, the fields that the move's text reads. It is null when the report has no PHP window.
@@ -379,7 +379,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the php of the branch's newest dated release, such as an LTS backport, beside the highest tag.
   ([Explaining one package](docs/configuration.md#explaining-one-package))
 - **Config:** a `LOCKROT_TODAY` value without an offset is UTC. It took the default timezone of the
-  PHP process. ([Environment overrides](docs/configuration.md#environment-overrides))
+  PHP process. ([Testing hooks](docs/configuration.md#testing-hooks))
 - **All formats:** a move whose solve needs another release of a vcs-locked package reads
   `not_checked` with `unloaded_name`. ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** a refused move names a `composer.json` hold only when the root constraint

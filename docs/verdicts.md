@@ -241,7 +241,8 @@ both of these floors:
 - the target PHP ([`target-php`](configuration.md#extralockrot-keys) or its option and environment
   override, else `config.platform.php`, else the running PHP), at its minor's newest patch
   (`8.4.99`): a branch that does not admit it will not install. The move check solves there
-  too, unless `config.platform.php` is in that minor ([limits of the check](#the-move-check)).
+  too, unless `config.platform.php` is a stable release in that minor
+  ([limits of the check](#the-move-check)).
 
 When that is not the newest branch, the evidence says which floor blocks the newest branch, then
 names the branch within reach. Abridged from the [example run](example-run.md):
@@ -659,13 +660,13 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 
 - **A new major.** A move to a higher branch says that a new major brings its own requirements.
 
-- **A PHP that the lock records.** When `run.php_window.platform_override` lies outside the minor
-  of the target PHP, Composer solves the commands of a move at that PHP, not at the target. The
+- **A PHP that the lock records.** When `run.php_window.platform_override` is not a stable release
+  in the minor of the target PHP, Composer solves the commands of a move at that PHP, not at the target. The
   line of each move with commands then starts with "First set config.platform.php to your PHP
   <target> release: the lock records <version>." So does the `update now:` line. The commands
   stay the same. When `run.move_check.baseline` is `refused`, the sentence goes on with "Composer
-  still refuses the lock itself: the moves_not_checked note names the first cause." Every format
-  prints that [note](notes.md#moves_not_checked).
+  still refuses the lock itself: the moves_not_checked note names the first cause." The run note
+  [`moves_not_checked`](notes.md#moves_not_checked) names the cause of Composer's first problem.
 
 The `update now:` footer line lists every package whose `update` move Composer's solver resolves
 with the constraint inline, with one command for all of them.
@@ -975,7 +976,9 @@ that edge can still downgrade them into the window, when you run it at the targe
 The `php:` line of the table, markdown and github formats prints the window. When the minors of
 `with_dev` differ, the line prints `with_dev` and `without_dev`. The line adds the target when the
 window excludes it. When the window holds the target minor but not `target.php`, a pinned
-`config.platform.php`, the line adds "but not on your target, <target.php>". With `target_fix`, the line ends with its answer. That is the command, the holds
+`config.platform.php`, the line names `target.php` in place of the minor: "but not on your target,
+<target.php>", or "your target, <target.php>, is excluded" at the root ceiling. With `target_fix`,
+the line ends with its answer. That is the command, the holds
 of the refusal, the root links of the root ceiling, or the reason that the run did not check it.
 Each `lock_platform` link adds "the lock records …, which composer.json does not have" last, with
 the update that rewrites it. A

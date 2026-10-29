@@ -267,12 +267,13 @@ final class RunFooter
         $target = $window->targetMinor();
         $fix = $data['target_fix'];
         $records = $fix === null || $fix['lock_platform'] === [] ? '' : '; '.self::lockPlatformWords($fix, $fix['lock_platform'], $target, $name);
+        // A pinned `config.platform.php` patch can fail inside a minor that installs.
+        $patchFails = \in_array($target, ($with ?? $without)['minors'], true);
         if ($fix !== null && TargetFix::isRootCeiling($fix)) {
-            return 'php: '.$clause.'; your target, '.$target.', is excluded: '.self::ceilingWords($fix['held_by']).$records;
+            return 'php: '.$clause.'; your target, '.($patchFails ? $data['target']['php'] : $target).', is excluded: '.self::ceilingWords($fix['held_by']).$records;
         }
         if (!$data['target']['inside']) {
-            // A pinned patch can fail inside a minor that installs: `config.platform.php` in a conflict hole.
-            $clause .= \in_array($target, ($with ?? $without)['minors'], true) ? ', but not on your target, '.$data['target']['php'] : ', so your target, '.$target.', is excluded';
+            $clause .= $patchFails ? ', but not on your target, '.$data['target']['php'] : ', so your target, '.$target.', is excluded';
         }
         if ($fix !== null) {
             return 'php: '.$clause.($fix['packages'] === [] ? '' : '; '.self::fixWords($fix, $target, $name)).$records;
