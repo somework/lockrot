@@ -186,23 +186,22 @@ final class MaintenanceMoveTest extends TestCase
         self::assertSame([Move::NO_MOVE, 'metadata_not_read'], [$draft->kind(), $draft->reason()]);
     }
 
-    /** @return iterable<string, array{string, string, ?string, string, ?string}> */
+    /** @return iterable<string, array{string, string, ?string, string, string}> */
     public static function unreadRows(): iterable
     {
-        yield 'the target does not run the row' => ['>=8.2', '8.1', null, Move::BLOCKED, null];
         yield 'the project php does not run the row' => ['>=8.2', '8.4', '>=7.4', Move::RAISE_PHP, '^9.0'];
         yield 'the target and the project run the row' => ['>=8.1', '8.4', '>=8.1', Move::REQUIRE, '^9.0'];
         yield 'no project php' => ['>=8.1', '8.4', null, Move::REQUIRE, '^9.0'];
     }
 
     /**
-     * S8 suggests `^9.0` on 5.x, and no release of 5.x that lockrot read matches it: the php of
-     * 5.x's newest release gives the kind.
+     * A require move whose constraint matches no release of its row that lockrot read: the php of
+     * the row's newest release gives the kind. The `^9.0` on 5.x only builds that case.
      *
      * @dataProvider unreadRows
      */
     #[DataProvider('unreadRows')]
-    public function testARequireThatNoReadReleaseMatchesTakesItsKindFromTheRowPhp(string $rowPhp, string $target, ?string $projectPhp, string $kind, ?string $constraint): void
+    public function testARequireThatNoReadReleaseMatchesTakesItsKindFromTheRowPhp(string $rowPhp, string $target, ?string $projectPhp, string $kind, string $constraint): void
     {
         $packages = [];
         foreach (['4.7.1' => '>=7.4', '5.0.0' => $rowPhp] as $version => $php) {

@@ -26,6 +26,8 @@ final class CompatibilityPageTest extends TestCase
     /** The two pages that list the verdicts in verdict order. */
     private const VERDICT_PAGES = ['compatibility.md', 'verdicts.md'];
 
+    private const BELOW_FLOOR = '/composer `?v?2\.[2-9](?!\d)/i';
+
     /** @var array<string, string> page => contents, read once */
     private static array $pages = [];
 
@@ -63,23 +65,28 @@ final class CompatibilityPageTest extends TestCase
     }
 
     /**
-     * The plugin does nothing below the Composer floor (`LockrotPlugin::COMPOSER_FLOOR`), so no page
-     * names an older Composer as a condition of lockrot's behaviour. The allowed hits state the floor.
+     * The plugin checks nothing below the Composer floor (`LockrotPlugin::COMPOSER_FLOOR`), so no
+     * page names an older Composer as a condition of lockrot's behaviour. The allowed hits state the
+     * floor.
      */
     public function testNoPageQualifiesABehaviourByAComposerBelowTheFloor(): void
     {
         $hits = [];
         foreach (array_merge(array_keys(DocsPages::in(self::DOCS)), ['../SECURITY.md', '../README.md']) as $page) {
-            preg_match_all('/Composer 2\.[2-9](?!\d)\S*(?: \S+){0,3}/', self::prose($page), $found);
+            preg_match_all(self::BELOW_FLOOR, self::prose($page), $found);
             foreach ($found[0] as $hit) {
                 $hits[] = $page.': '.$hit;
             }
         }
 
-        self::assertSame([
-            'changes/0.14.md: Composer 2.8 and older do',
-            'changes/0.14.md: Composer 2.9, it prints one',
-        ], $hits);
+        self::assertSame(['changes/0.14.md: Composer 2.8', 'changes/0.14.md: Composer 2.9'], $hits);
+    }
+
+    public function testTheComposerQualifierRuleCatchesEachSpelling(): void
+    {
+        $spellings = ['Composer 2.9 and later', 'composer 2.2 LTS', 'Composer v2.7', 'Composer `2.9`', 'Composer 2.9+', 'Composer 2.10 and 2.11'];
+
+        self::assertSame(\array_slice($spellings, 0, 5), preg_grep(self::BELOW_FLOOR, $spellings));
     }
 
     public function testThePagePromisesNoLockrotActionMajorLine(): void

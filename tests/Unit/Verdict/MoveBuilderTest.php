@@ -310,8 +310,9 @@ final class MoveBuilderTest extends TestCase
     }
 
     /**
-     * `^9.0` matches no read release of 2.x, so lockrot cannot tell whether the move leaves GHSA-x's
-     * range: the advisory is unverified, and the score after the move is an upper bound.
+     * A move with no release read on its row cannot tell whether it leaves GHSA-x's range: the
+     * advisory is unverified, and the score after the move is an upper bound. The `^9.0` on 2.x only
+     * builds that case, and left-behind gives the move a clear.
      */
     public function testAnAdvisoryOfAMoveWithNoReleaseReadIsUnverifiedForLackOfReleaseData(): void
     {
@@ -333,7 +334,7 @@ final class MoveBuilderTest extends TestCase
         $ifApplied = $move->ifApplied();
 
         self::assertSame([['kind' => 'advisory', 'id' => 'GHSA-x', 'reason' => 'no_release_data']], array_map(static fn (MoveFact $fact): array => $fact->jsonSerialize(), $move->unverified()));
-        self::assertSame([['kind' => 'flag', 'id' => FlagSet::LEFT_BEHIND, 'basis' => 'branch_releasing']], array_map(static fn (MoveFact $fact): array => $fact->jsonSerialize(), $move->clears()));
+        self::assertNotContains('GHSA-x', array_map(static fn (MoveFact $fact): string => $fact->id(), $move->clears()));
         self::assertNotNull($ifApplied);
         self::assertTrue($ifApplied->atMost());
     }

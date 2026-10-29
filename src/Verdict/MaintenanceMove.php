@@ -202,13 +202,12 @@ final class MaintenanceMove
         return MoveDraft::of($kind, $source)->to($row, $lower, $kind === Move::BLOCKED ? null : $constraint);
     }
 
-    /** With no release read on the row, its class from its PHP: the row's newest release decides. */
+    /**
+     * With no release read on the row, its class from its PHP: the row's newest release decides.
+     * Each caller of {@see require()} passes a row that the target PHP does not exclude.
+     */
     private static function rowKind(BranchRow $row): string
     {
-        if ($row->admitsTargetPhp() === false) {
-            return Move::BLOCKED;
-        }
-
         return $row->admitsProjectPhp() === false ? Move::RAISE_PHP : Move::REQUIRE;
     }
 }

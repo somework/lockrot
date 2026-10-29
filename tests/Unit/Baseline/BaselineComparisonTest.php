@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Baseline;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunNote;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineEntry;
@@ -79,20 +80,21 @@ final class BaselineComparisonTest extends TestCase
         self::assertSame('known', $state('5.6'));
     }
 
-    /** A file under fix model 2 at the run's target: its note replaces the fix comparison. */
+    /** A file under another fix model at the run's target: its note replaces the fix comparison. */
     public function testABaselineUnderAnotherFixModelGetsItsNoteAndNoFixComparison(): void
     {
         $finding = (new FindingBuilder())->withPackage('acme/x')->withChain(['acme/x'])->withFlags(FlagSet::fromSignals([], null, [new CountedAdvisory('A', 'high', 'none')]))->build();
         $report = new Report([$finding], [], new \DateTimeImmutable(self::AT), 1, 0);
         $entry = new BaselineEntry('acme/x', '1.0.0', '2026-01-15', [], [new RecordedAdvisory('A', '2026-01-15', 'high', 'update')]);
-        $baseline = Baseline::of([$entry], self::AT, PhpReleaseDates::minorOf(\PHP_VERSION), 'runtime', Version::STRING, ScoreModel::ID, 2);
+        $other = RunSettings::FIX_MODEL + 1;
+        $baseline = Baseline::of([$entry], self::AT, PhpReleaseDates::minorOf(\PHP_VERSION), 'runtime', Version::STRING, ScoreModel::ID, $other);
 
         $comparison = BaselineComparison::compare($baseline, $report, self::PATH, ['acme/x']);
         $standing = $comparison->standingOf('acme/x');
         $fact = $standing === null ? null : $standing->advisoryState('A');
 
         self::assertSame(
-            [[RunNote::BASELINE_FIX_MODEL_DIFFERS, 'the baseline was written under fix model 2 and this run uses fix model 1: fix changes against the baseline are not compared']],
+            [[RunNote::BASELINE_FIX_MODEL_DIFFERS, 'the baseline was written under fix model '.$other.' and this run uses fix model '.RunSettings::FIX_MODEL.': fix changes against the baseline are not compared']],
             array_map(static fn (RunNote $note): array => [$note->code(), $note->text()], $comparison->notes())
         );
         self::assertSame('known', $fact === null ? null : $fact->state());
