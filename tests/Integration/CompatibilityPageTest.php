@@ -62,6 +62,26 @@ final class CompatibilityPageTest extends TestCase
         self::assertStringNotContainsString('checks less under an older', self::prose('compatibility.md'));
     }
 
+    /**
+     * The plugin does nothing below the Composer floor (`LockrotPlugin::COMPOSER_FLOOR`), so no page
+     * names an older Composer as a condition of lockrot's behaviour. The allowed hits state the floor.
+     */
+    public function testNoPageQualifiesABehaviourByAComposerBelowTheFloor(): void
+    {
+        $hits = [];
+        foreach (array_merge(array_keys(DocsPages::in(self::DOCS)), ['../SECURITY.md', '../README.md']) as $page) {
+            preg_match_all('/Composer 2\.[2-9](?!\d)\S*(?: \S+){0,3}/', self::prose($page), $found);
+            foreach ($found[0] as $hit) {
+                $hits[] = $page.': '.$hit;
+            }
+        }
+
+        self::assertSame([
+            'changes/0.14.md: Composer 2.8 and older do',
+            'changes/0.14.md: Composer 2.9, it prints one',
+        ], $hits);
+    }
+
     public function testThePagePromisesNoLockrotActionMajorLine(): void
     {
         self::assertStringNotContainsString('lockrot-action@v1', self::read('compatibility.md'));

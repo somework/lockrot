@@ -522,8 +522,8 @@ details.
   ([run notes](notes.md)), and with a baseline a `note:` line names its stale entries.
 
 - **Width.** Lines wrap to `COLUMNS` when it is a positive integer. With `COLUMNS` unset, they wrap
-  to the width Composer's console reports (with no terminal: 80, or none under Composer 2.2 LTS),
-  else to 120. Never below 40. A command or path in the summary stays on one line, so it can be
+  to the width Composer's console reports (with no terminal: 80). With any other `COLUMNS`, they
+  wrap to 120. Never below 40. A command or path in the summary stays on one line, so it can be
   wider. For a `table` report written to a file, see
   [Writing reports to files](configuration.md#writing-reports-to-files).
 
