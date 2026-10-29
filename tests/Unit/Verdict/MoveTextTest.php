@@ -88,25 +88,29 @@ final class MoveTextTest extends TestCase
         self::assertSame($step ? 'First set config.platform.php to your PHP '.$target.' release: the lock records '.$override.'. composer update acme/lib (gets 2.0.0)' : 'composer update acme/lib (gets 2.0.0)', $text);
     }
 
-    /** @return iterable<string, array{bool, string}> */
-    public static function refusedBaselines(): iterable
-    {
-        yield 'the target outside the window' => [false, 'the PHP line names the packages.'];
-        yield 'the target inside the window' => [true, 'the Run tab names the cause.'];
-    }
-
     /**
-     * wallabag at 8.4: the platform step alone does not make the lock install while Composer refuses the lock itself.
-     *
-     * @dataProvider refusedBaselines
+     * wallabag at 8.4: the platform step alone does not make the lock install while Composer refuses
+     * the lock itself. Every format prints the moves_not_checked note, which names the cause of
+     * Composer's first problem.
      */
-    #[DataProvider('refusedBaselines')]
-    public function testThePlatformStepOfARefusedBaselineSaysWhereTheCauseIsNamed(bool $inside, string $pointer): void
+    public function testThePlatformStepOfARefusedBaselinePointsAtTheFirstCauseInTheNote(): void
     {
-        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, '7.4.29', $inside);
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, '7.4.29', true);
         $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', null, null, null, false, [], [], [], [], [], null, [], [['composer', 'update', 'acme/lib']], $subject);
 
-        self::assertSame('First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: '.$pointer.' composer update acme/lib (gets 2.0.0)', MoveText::render($move));
+        $text = MoveText::render($move);
+
+        self::assertSame('First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the moves_not_checked note names the first cause. composer update acme/lib (gets 2.0.0)', $text);
+        self::assertStringNotContainsString('Run tab', $text);
+        self::assertStringNotContainsString('PHP line', $text);
+    }
+
+    public function testAReplaceMoveWithNoReplacementSaysReplaceIt(): void
+    {
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null);
+        $move = new Move(Move::REPLACE, FlagSet::ABANDONED, [], null, null, null, null, null, null, null, null, null, null, null, [], [], [], [], [], null, [], [], $subject);
+
+        self::assertSame('replace it', MoveText::render($move));
     }
 
     public function testAMoveWithoutCommandsTakesNoPlatformStep(): void

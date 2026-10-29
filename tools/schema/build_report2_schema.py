@@ -543,7 +543,7 @@ def move_props(with_also):
     if with_also:
         p['also'] = arr("The other part's move, the same object without `also` (§5.6 rule 3); empty when the lead move's `clears` and `unverified` hold every fact of that part.", ref('alsoMove'))
     p['text'] = rendered('The `do:` line, `MoveText` (§5.6, §7.11; versioned by `run.text_grammar`); never empty. A renderer that does not know `kind` (or a `no-move` `reason`) prints this string (§7.9).',
-                         [('next_step' if with_also else 'next_step.also[]'), 'package', 'version', 'signals[].id', 'signals[].data.newest_php', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'])
+                         [('next_step' if with_also else 'next_step.also[]'), 'package', 'version', 'signals[].id', 'signals[].data.newest_php', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.move_check.baseline'])
     p['text']['minLength'] = 1
     return p
 
@@ -1625,7 +1625,7 @@ defs['targetFix'] = obj("`run.php_window.target_fix` (§5.9): one update that un
                     "the root links that fail at `target.php`: `link` is the link's section, `require`, `require-dev` or `conflict`, and "
                     "`target` is `php` or `php-64bit`. Empty on `resolves` and `not_checked`."), ref('heldBy')),
     'platform_step': d(("Whether the words of a `resolves` fix tell you to set `config.platform.php` to your release of the target PHP first. True "
-                        "exactly when the solve's `config.platform.php` is set and lies outside the minor of `run.target_php`. Then `target.php` is "
+                        "exactly when the solve's `config.platform.php` is set and is not a stable release in the minor of `run.target_php`. Then `target.php` is "
                         "the `.99` point of `run.target_php`. The lock's `platform-overrides` does not set it."), {'type': 'boolean'}),
 }, anyOf=[{'description': '`resolves`: a command, no reason, no hold, a package or a `lock_platform` link.', 'properties': {'check': {'enum': ['resolves']}, 'command': {'type': 'array'}, 'reason': {'type': 'null'},
                                                                                          'held_by': {'maxItems': 0}}, 'allOf': [TARGET_FIX_LISTED]},

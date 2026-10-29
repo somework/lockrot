@@ -4627,7 +4627,6 @@
             "run.target_php",
             "run.project_php_lowest",
             "run.php_window.platform_override",
-            "run.php_window.target.inside",
             "run.move_check.baseline"
           ],
           "minLength": 1
@@ -5874,7 +5873,6 @@
             "run.target_php",
             "run.project_php_lowest",
             "run.php_window.platform_override",
-            "run.php_window.target.inside",
             "run.move_check.baseline"
           ],
           "minLength": 1
@@ -23223,7 +23221,7 @@
           }
         },
         "platform_step": {
-          "description": "Whether the words of a `resolves` fix tell you to set `config.platform.php` to your release of the target PHP first. True exactly when the solve's `config.platform.php` is set and lies outside the minor of `run.target_php`. Then `target.php` is the `.99` point of `run.target_php`. The lock's `platform-overrides` does not set it.",
+          "description": "Whether the words of a `resolves` fix tell you to set `config.platform.php` to your release of the target PHP first. True exactly when the solve's `config.platform.php` is set and is not a stable release in the minor of `run.target_php`. Then `target.php` is the `.99` point of `run.target_php`. The lock's `platform-overrides` does not set it.",
           "type": "boolean"
         }
       },

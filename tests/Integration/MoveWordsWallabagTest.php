@@ -24,7 +24,7 @@ use PHPUnit\Framework\TestCase;
 final class MoveWordsWallabagTest extends TestCase
 {
     /** Composer refuses the lock itself at 8.4, and the target lies outside the lock's PHP window. */
-    private const PLATFORM_STEP = 'First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages. ';
+    private const PLATFORM_STEP = 'First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the moves_not_checked note names the first cause. ';
 
     /** @var array<string, array<mixed, mixed>> each report by its target PHP */
     private static array $reports = [];

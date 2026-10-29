@@ -75,7 +75,7 @@ final class MoveText
             $text .= '; '.$through;
         }
         $parts[] = [$text.self::checked($move->check()).self::movesWith($move), false];
-        $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride(), $subject->refusedTargetInside());
+        $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride(), $subject->isBaselineRefused());
         array_unshift($parts, [$step, false]);
 
         return self::joined($parts);
@@ -112,17 +112,18 @@ final class MoveText
     /**
      * SPEC §5.6: while the lock records a platform PHP outside the target minor, Composer solves
      * the commands at that PHP, not at the target. The sentence and a space, else an empty string.
-     * While Composer refuses the lock itself, the step alone does not make it install.
+     * While Composer refuses the lock itself, the step alone does not make it install. Every format
+     * prints the moves_not_checked note, and the note names the cause of Composer's first problem.
      *
-     * @param ?string $platformOverride    `run.php_window.platform_override`
-     * @param ?bool   $refusedTargetInside `run.php_window.target.inside` while `run.move_check.baseline` is `refused`, else null
+     * @param ?string $platformOverride `run.php_window.platform_override`
+     * @param bool    $baselineRefused  `run.move_check.baseline` is `refused`
      */
-    public static function platformStep(?string $targetPhp, ?string $platformOverride, ?bool $refusedTargetInside = null): string
+    public static function platformStep(?string $targetPhp, ?string $platformOverride, bool $baselineRefused = false): string
     {
         if ($targetPhp === null || $platformOverride === null || MoveCheckers::platformPhp($targetPhp, $platformOverride) === $platformOverride) {
             return '';
         }
-        $refused = $refusedTargetInside === null ? '' : ' Composer still refuses the lock itself: '.($refusedTargetInside ? 'the Run tab names the cause.' : 'the PHP line names the packages.');
+        $refused = $baselineRefused ? ' Composer still refuses the lock itself: the moves_not_checked note names the first cause.' : '';
 
         return 'First set config.platform.php to your PHP '.$targetPhp.' release: the lock records '.$platformOverride.'.'.$refused.' ';
     }

@@ -171,29 +171,34 @@ final class AnalyzerTest extends TestCase
         self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. ', JsonPath::stringAt($document, ['findings', 0, 'next_step', 'text']));
     }
 
-    /** @return iterable<string, array{?string, bool, string}> the lock's php of the package, whether Composer refuses the lock itself, and the step */
+    /** @return iterable<string, array{list<string>, bool, string}> the lock's php of each package, whether Composer refuses the lock itself, and the step */
     public static function refusedBaselines(): iterable
     {
         $step = 'First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29.';
-        yield 'a lock that Composer installs' => [null, false, $step.' '];
-        yield 'a refused lock with the target inside the window' => [null, true, $step.' Composer still refuses the lock itself: the Run tab names the cause. '];
-        yield 'a refused lock with the target outside the window' => ['^7.2 || ~8.0.0', true, $step.' Composer still refuses the lock itself: the PHP line names the packages. '];
+        $refused = $step.' Composer still refuses the lock itself: the moves_not_checked note names the first cause. ';
+        yield 'a lock that Composer installs' => [[], false, $step.' '];
+        yield 'a refused lock with the target inside the window' => [[], true, $refused];
+        yield 'a refused lock with the target outside the window' => [['^7.2 || ~8.0.0'], true, $refused];
+        yield 'a refused lock with two packages that exclude the target' => [['^7.2 || ~8.0.0', '^7.0'], true, $refused];
     }
 
     /**
-     * Case `move-check‡` under a platform PHP outside the target minor: the step says where the
-     * cause is named while Composer refuses the lock itself.
+     * Case `move-check‡` under a platform PHP outside the target minor: while Composer refuses the
+     * lock itself, the step points at the moves_not_checked note that every format prints.
+     *
+     * @param list<string> $phps
      *
      * @dataProvider refusedBaselines
      */
     #[DataProvider('refusedBaselines')]
-    public function testThePlatformStepOfARefusedLockSaysWhereTheCauseIsNamed(?string $php, bool $refused, string $step): void
+    public function testThePlatformStepOfARefusedLockPointsAtTheNote(array $phps, bool $refused, string $step): void
     {
         $case = CaseHydrator::case('move-check‡');
         $inputs = JsonPath::arrayAt($case, ['inputs']);
         $inputs['php_lock'] = ['platform-overrides' => ['php' => '7.4.29']];
-        if ($php !== null) {
-            $inputs['lock'] = [['php' => $php] + JsonPath::arrayAt($inputs, ['lock', 0])];
+        $first = JsonPath::arrayAt($inputs, ['lock', 0]);
+        foreach ($phps as $index => $php) {
+            $inputs['lock'][$index] = ['php' => $php] + ($index === 0 ? $first : ['name' => 'acme/old-php'] + $first);
         }
         if ($refused) {
             $inputs['checks'] = ['baseline' => ['result' => 'refused', 'form' => null, 'reason' => null, 'holds' => [], 'problem' => 'Problem 1']] + JsonPath::arrayAt($inputs, ['checks']);
@@ -202,7 +207,7 @@ final class AnalyzerTest extends TestCase
 
         $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
 
-        self::assertSame([$refused ? 'refused' : 'resolves', $php === null], [JsonPath::stringAt($document, ['run', 'move_check', 'baseline']), JsonPath::boolAt($document, ['run', 'php_window', 'target', 'inside'])]);
+        self::assertSame([$refused ? 'refused' : 'resolves', $phps === []], [JsonPath::stringAt($document, ['run', 'move_check', 'baseline']), JsonPath::boolAt($document, ['run', 'php_window', 'target', 'inside'])]);
         self::assertStringStartsWith($step.'composer update', JsonPath::stringAt($document, ['findings', 0, 'next_step', 'text']));
     }
 

@@ -664,8 +664,8 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
   line of each move with commands then starts with "First set config.platform.php to your PHP
   <target> release: the lock records <version>." So does the `update now:` line. The commands
   stay the same. When `run.move_check.baseline` is `refused`, the sentence goes on with "Composer
-  still refuses the lock itself:" and names where the cause is: the `php:` line when the window
-  excludes the target, else the Run tab.
+  still refuses the lock itself: the moves_not_checked note names the first cause." Every format
+  prints that [note](notes.md#moves_not_checked).
 
 The `update now:` footer line lists every package whose `update` move Composer's solver resolves
 with the constraint inline, with one command for all of them.
@@ -778,7 +778,7 @@ Limits of the check:
 - It checks `php`, `php-64bit`, `composer-plugin-api`, `composer-runtime-api` and `composer`.
   `php-64bit` takes the version of the solve's php on a 64-bit PHP. The other three take the
   versions of the Composer that runs lockrot.
-- It solves at `config.platform.php` when that version is in the target PHP's minor, else at the
+- It solves at `config.platform.php` when that version is a stable release in the target PHP's minor, else at the
   newest patch of the target minor (`8.4.99`). Composer reads `8.4` as `8.4.0`. It keeps every
   other `config.platform` override.
 - It offers the tagged releases of a package. It offers the dev versions too when the package has
@@ -958,7 +958,7 @@ it. It also gives the answer of Composer's solver:
   hold. With no package listed, lockrot solves an update that names no package, and `command` is
   `composer update --lock`. On a run with no composer.json, the lock's platform is the root, and
   `lock_platform` is empty.
-- `platform_step` is true when `config.platform.php` lies outside the target minor. The solve then
+- `platform_step` is true when `config.platform.php` is not a stable release in the target minor. The solve then
   runs at the target. Before you run the command, set `config.platform.php` to your release of the
   target PHP. The lock's `platform-overrides` does not set it.
 - A listed name that is no Composer package name reaches no solve. `check` is then `not_checked`
@@ -974,7 +974,8 @@ that edge can still downgrade them into the window, when you run it at the targe
 
 The `php:` line of the table, markdown and github formats prints the window. When the minors of
 `with_dev` differ, the line prints `with_dev` and `without_dev`. The line adds the target when the
-window excludes it. With `target_fix`, the line ends with its answer. That is the command, the holds
+window excludes it. When the window holds the target minor but not `target.php`, a pinned
+`config.platform.php`, the line adds "but not on your target, <target.php>". With `target_fix`, the line ends with its answer. That is the command, the holds
 of the refusal, the root links of the root ceiling, or the reason that the run did not check it.
 Each `lock_platform` link adds "the lock records …, which composer.json does not have" last, with
 the update that rewrites it. A
