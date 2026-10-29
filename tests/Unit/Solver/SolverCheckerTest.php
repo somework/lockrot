@@ -89,6 +89,22 @@ final class SolverCheckerTest extends TestCase
         self::assertSame([['source' => 'package', 'package' => 'acme/lib', 'version' => '1.1.0', 'link' => 'require', 'target' => 'acme/gone', 'constraint' => '^1.0']], self::rows($outcome->holds()));
     }
 
+    /** The root's `^3.0` admits what acme/lib wants, and only stability leaves acme/dep with no candidate, so the root holds nothing. */
+    public function testARootRequirementThatAdmitsTheWantedDependencyIsNoHold(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/dep' => '^2.0 || ^3.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/dep' => '^2.0']], ['name' => 'acme/dep', 'version' => '2.0.0']],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['acme/dep' => '^2.0']], ['version' => '1.1.0', 'require' => ['acme/dep' => '^3.0']]], 'acme/dep' => [['version' => '2.0.0'], ['version' => '3.0.0-beta1']]]
+        );
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'));
+
+        self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
+        self::assertContains(['source' => 'package', 'package' => 'acme/lib', 'version' => '1.1.0', 'link' => 'require', 'target' => 'acme/dep', 'constraint' => '^3.0'], self::rows($outcome->holds()));
+        self::assertNotContains(Holder::ROOT_REQUIRE, array_column(self::rows($outcome->holds()), 'link'), 'holds: '.json_encode(self::rows($outcome->holds())));
+    }
+
     /**
      * The update solve takes the root requirement with its inline constraint, so a refused
      * `update acme/lib:^1.2.5` under `~1.2.0` says nothing about 1.3.0, which only a require reaches.
