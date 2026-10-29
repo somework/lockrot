@@ -341,11 +341,11 @@ final class MoveText
         if ($solve !== null && $solve->isRefused() && ($check === null || $check->targetRuns() !== false)) {
             return 'no move installs '.$where.': Composer names no hold';
         }
-        $text = $requires !== null
-            ? 'no move runs on the target: '.$where.' needs php '.$requires.' and the target php '.$subject->targetPhp().' does not run it'
-            : 'no move runs on the target: the target php '.$subject->targetPhp().' does not run '.$where;
+        if ($requires === null) {
+            throw new \LogicException('A blocked move with no php requirement comes only from a refusal with no hold.');
+        }
 
-        return $text.($move->source() === FlagSet::PINNED ? '; replace it' : '');
+        return 'no move runs on the target: '.$where.' needs php '.$requires.' and the target php '.$subject->targetPhp().' does not run it'.($move->source() === FlagSet::PINNED ? '; replace it' : '');
     }
 
     private static function phpClause(Move $move, MoveSubject $subject, bool $runs): string

@@ -49,6 +49,16 @@ final class MoveTextTest extends TestCase
         self::assertStringStartsWith('no move installs 2.x: Composer names no hold', MoveText::render($move));
     }
 
+    /** A blocked move with no php of its own comes only from a refusal with no hold. */
+    public function testABlockedMoveWithoutAPhpRequirementOrARefusalIsRefused(): void
+    {
+        $move = self::move(Move::BLOCKED, null, [])->withCheck(MoveCheck::notChecked(MoveCheck::OFFLINE));
+
+        $this->expectException(\LogicException::class);
+
+        MoveText::render($move);
+    }
+
     /** The php of the release, not Composer's refusal, keeps the move off the target. */
     public function testARefusedBlockedMoveWhosePhpTheTargetDoesNotRunNamesThePhp(): void
     {

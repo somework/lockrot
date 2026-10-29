@@ -451,11 +451,7 @@ final class ReferenceText
                 if ($solve !== null && Fields::string($solve, 'result') === 'refused' && ($check === null || ($check['target_runs'] ?? null) !== false)) {
                     return 'no move installs '.$where.': Composer names no hold';
                 }
-                $text = $check !== null && \is_string($check['requires'] ?? null)
-                    ? 'no move runs on the target: '.$where.' needs php '.Fields::string($check, 'requires').' and the target php '.$target.' does not run it'
-                    : 'no move runs on the target: the target php '.$target.' does not run '.$where;
-
-                return $text.($pinned ? '; replace it' : '');
+                return 'no move runs on the target: '.$where.' needs php '.Fields::string($check, 'requires').' and the target php '.$target.' does not run it'.($pinned ? '; replace it' : '');
             case 'no-fix':
                 return 'no release fixes it';
             case 'no-single-fix':
