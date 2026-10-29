@@ -1507,7 +1507,7 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => null], $outcome->check()->jsonSerialize());
     }
 
-    /** A newest release that does not parse is installed by no form: the form that installs the highest release wins. */
+    /** No form installs a newest release that does not parse: the form that installs the highest release wins. */
     public function testANewestReleaseThatDoesNotParseLetsTheHighestReleaseWin(): void
     {
         $checker = self::checker(['acme/app-auth' => '^1.0'], self::webauthnLock(), self::webauthnRemote(true));
