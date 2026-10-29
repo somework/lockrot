@@ -105,9 +105,10 @@ jobs:
           done
           if [ "$failed" -ne 0 ]; then exit 1; fi
   # The tests rows exclude MoveCheckComposerOracleTest, or skip it on a composer/composer that
-  # recorded none of train 7d's answers. The latest rows follow each new Composer release. This job
-  # runs the oracle test once on each recorded version, so the test runs on every head. A ruleset
-  # requires a check by its job name, so a renamed job drops out of the ruleset.
+  # neither recorded train 7d's answers nor gave the same answers (ComposerOracle::SAME_ANSWERS).
+  # The latest rows follow each new Composer release. This job runs the oracle test once on each of
+  # those versions, so the test runs on every head. A ruleset requires a check by its job name, so a
+  # renamed job drops out of the ruleset.
   move-check-oracle:
     runs-on: ubuntu-latest
     steps:

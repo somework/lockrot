@@ -15,6 +15,11 @@ final class ComposerOracle
 {
     /** Set to `1`, a run fails the oracle test on another Composer version instead of skipping it. */
     public const REQUIRED = 'LOCKROT_COMPOSER_ORACLE';
+    /**
+     * composer/composer version => the recorded version whose every answer its CLI also gave. The
+     * oracle job on the version keeps the claim true. Evidence: https://github.com/somework/lockrot/pull/151
+     */
+    public const SAME_ANSWERS = ['2.11.0' => '2.10.3'];
 
     /**
      * @param array<mixed, mixed> $document the decoded `tests/fixtures/flags/cases.json`
@@ -39,6 +44,22 @@ final class ComposerOracle
         if ($versions === []) {
             throw new \UnexpectedValueException('no train 7d case records a solver_world');
         }
+        usort($versions, static fn (string $a, string $b): int => version_compare($a, $b));
+
+        return $versions;
+    }
+
+    /**
+     * The versions that the oracle job runs: each recorded version, and each version of
+     * {@see SAME_ANSWERS} that gave the answers of a recorded one.
+     *
+     * @param list<string> $recordedVersions
+     *
+     * @return list<string> in version order
+     */
+    public static function versionsToRun(array $recordedVersions): array
+    {
+        $versions = array_merge($recordedVersions, array_keys(array_intersect(self::SAME_ANSWERS, $recordedVersions)));
         usort($versions, static fn (string $a, string $b): int => version_compare($a, $b));
 
         return $versions;
@@ -70,18 +91,19 @@ final class ComposerOracle
     }
 
     /**
-     * Passes on the Composer that recorded the answers. Else it skips the test, and it fails a
-     * required run on a Composer that no world records.
+     * Passes on the Composer that recorded the answers, or on one that gave the same answers
+     * ({@see SAME_ANSWERS}). Else it skips the test, and it fails a required run on a Composer
+     * outside {@see versionsToRun()}.
      *
      * @param list<string> $recordedVersions the versions of every world ({@see recordedVersions()})
      */
     public static function guard(string $recorded, string $running, bool $required, array $recordedVersions): void
     {
-        if ($running === $recorded) {
+        if ($running === $recorded || (self::SAME_ANSWERS[$running] ?? null) === $recorded) {
             return;
         }
         $reason = 'the answers are those of composer/composer '.$recorded.', and this run has '.$running;
-        if ($required && !\in_array($running, $recordedVersions, true)) {
+        if ($required && !\in_array($running, self::versionsToRun($recordedVersions), true)) {
             Assert::fail($reason.', which no world records');
         }
         Assert::markTestSkipped($reason);

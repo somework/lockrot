@@ -36,8 +36,9 @@ use PHPUnit\Framework\TestCase;
  * Each case of train 7d records the Composer CLI's answers to the requests of its designed world
  * (`solver_world`, SPEC-0.14.md §5.6). lockrot's move checker solves the same requests on
  * that world, served over HTTP, and gives the same result, form, installs, holds and `{cause}` (§6.2). A
- * world runs only on the Composer version that recorded its answers (`run.move_check.composer`), and
- * skips on another one. {@see ComposerOracle::guard()} fails a required run on a version that no world records.
+ * world runs on the Composer version that recorded its answers (`run.move_check.composer`) and on each
+ * version that gave the same answers ({@see ComposerOracle::SAME_ANSWERS}), and skips on another one.
+ * {@see ComposerOracle::guard()} fails a required run on a version outside {@see ComposerOracle::versionsToRun()}.
  * It covers nothing: each solve outlasts a mutant's time limit, and the rule tests kill the mutants.
  *
  * @coversNothing
