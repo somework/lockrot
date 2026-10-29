@@ -283,6 +283,14 @@ Composer loads a repository without one (a Composer v1-style or static repositor
 `packages.json`-only Satis output) whole before lockrot can find any name in it. Its full package
 list stays in memory for the run.
 
+The report grows with the number of packages times the direct requirements that reach each one. A
+lock with thousands of packages, each reached from very many direct requirements, can pass PHP's
+`memory_limit`. The run then stops with PHP's "Allowed memory size" error and writes no report. To
+raise the limit, set `COMPOSER_MEMORY_LIMIT`, for example `COMPOSER_MEMORY_LIMIT=4G composer
+lockrot`. For the PHAR, `php -d memory_limit=4G lockrot.phar` also works.
+[Pull request 157](https://github.com/somework/lockrot/pull/157) records the lock sizes that were
+measured.
+
 ## Related
 
 - [verdicts.md](verdicts.md) — the signals each source feeds, and what an unchecked one means
