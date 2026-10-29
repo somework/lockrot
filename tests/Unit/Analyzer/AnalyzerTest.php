@@ -196,10 +196,12 @@ final class AnalyzerTest extends TestCase
         $case = CaseHydrator::case('move-check‡');
         $inputs = JsonPath::arrayAt($case, ['inputs']);
         $inputs['php_lock'] = ['platform-overrides' => ['php' => '7.4.29']];
-        $first = JsonPath::arrayAt($inputs, ['lock', 0]);
+        $lock = JsonPath::arrayAt($inputs, ['lock']);
+        $first = JsonPath::arrayAt($lock, [0]);
         foreach ($phps as $index => $php) {
-            $inputs['lock'][$index] = ['php' => $php] + ($index === 0 ? $first : ['name' => 'acme/old-php'] + $first);
+            $lock[$index] = ['php' => $php] + ($index === 0 ? $first : ['name' => 'acme/old-php'] + $first);
         }
+        $inputs['lock'] = $lock;
         if ($refused) {
             $inputs['checks'] = ['baseline' => ['result' => 'refused', 'form' => null, 'reason' => null, 'holds' => [], 'problem' => 'Problem 1']] + JsonPath::arrayAt($inputs, ['checks']);
         }

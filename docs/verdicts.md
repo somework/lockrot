@@ -961,7 +961,7 @@ it. It also gives the answer of Composer's solver:
   hold. With no package listed, lockrot solves an update that names no package, and `command` is
   `composer update --lock`. On a run with no composer.json, the lock's platform is the root, and
   `lock_platform` is empty.
-- `platform_step` is true when `config.platform.php` is not a stable release in the target minor. The solve then
+- `platform_step` is true when `config.platform.php` is set and is not a stable release in the target minor. The solve then
   runs at the target. Before you run the command, set `config.platform.php` to your release of the
   target PHP. The lock's `platform-overrides` does not set it.
 - A listed name that is no Composer package name reaches no solve. `check` is then `not_checked`
