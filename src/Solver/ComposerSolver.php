@@ -310,14 +310,14 @@ final class ComposerSolver
         $filter = $this->advisories->blocking()->poolFilter();
         $error = $this->advisories->blocking()->filterError();
         if ($filter === null) {
-            throw new \RuntimeException('Composer\'s advisory pool filter cannot be built: '.($error === null ? 'unknown error' : $error->getMessage()), 0, $error);
+            throw new \RuntimeException('Composer\'s advisory pool filter cannot be built: '.($error === null ? 'unknown error' : $error->getMessage()));
         }
         $feed = new PoolAdvisoryFeed($this->advisories);
         try {
             $pool = $filter->filter($pool, [$feed], $composerRequest);
         } catch (\Error $e) {
             // The filter is Composer's internal API: a drift fails this solve, never the run.
-            throw new \RuntimeException('Composer\'s advisory pool filter failed: '.$e->getMessage(), 0, $e);
+            throw new \RuntimeException('Composer\'s advisory pool filter failed: '.$e->getMessage());
         }
 
         return [$set, $composerRequest, $pool, $fixedRoot, $loaded, $feed];
