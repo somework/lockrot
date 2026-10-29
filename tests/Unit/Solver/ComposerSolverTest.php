@@ -588,8 +588,53 @@ final class ComposerSolverTest extends TestCase
         self::assertEquals(['acme/core' => VersionSource::UNREACHED, 'acme/util' => VersionSource::UNREACHED], $solution->unloaded(), 'the key order is free');
     }
 
+    /** The pool builder finds the vcs-locked name in the locked-only copy, which no constraint of the require admits, so the pool holds no release of it. */
+    public function testARefusedRequireThatWantsAnotherReleaseOfAFreedVcsLockedNameNamesItUnreached(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['name' => 'acme/core', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://git.example.org/acme/core.git', 'reference' => 'abc']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/core' => '^2.0']]], 'acme/core' => [['version' => '2.0.0']]]
+        )->withLockedOnly(['acme/core']);
+
+        $solution = $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^1.1'], false)->withTransitive(SolveRequest::WITH_DEPENDENCIES));
+
+        self::assertFalse($solution->resolves());
+        self::assertSame(['acme/core' => VersionSource::UNREACHED], $solution->unloaded());
+    }
+
+    /** Composer reads a path package from its path repository, which serves the one release that the lock records. */
+    public function testARefusalThatWantsAnotherReleaseOfALockedPathPackageNamesNoNameUnreached(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['name' => 'acme/core', 'version' => '1.0.0', 'dist' => ['type' => 'path', 'url' => 'core', 'reference' => 'abc']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/core' => '^2.0']]]]
+        )->withLockedOnly(['acme/core']);
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']));
+
+        self::assertFalse($solution->resolves());
+        self::assertSame([], $solution->unloaded());
+    }
+
+    /** The root's own `^1.0` excludes the release that acme/lib wants, so no release from the vcs repository can resolve the move. */
+    public function testARefusalThatTheRootConstraintOfAFreedVcsLockedNameExplainsNamesNoNameUnreached(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0', 'acme/core' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['name' => 'acme/core', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://git.example.org/acme/core.git', 'reference' => 'abc']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/core' => '^2.0']]], 'acme/core' => [['version' => '2.0.0']]]
+        )->withLockedOnly(['acme/core']);
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1'])->withTransitive(SolveRequest::WITH_ALL_DEPENDENCIES));
+
+        self::assertFalse($solution->resolves());
+        self::assertSame([], $solution->unloaded());
+    }
+
     /** A listed update keeps a vcs-locked dependency at its lock, as Composer does, so its refusal proves something. */
-    public function testAListedUpdateThatAVcsLockedDependencyRefusesLoadsNoName(): void
+    public function testAListedUpdateThatAVcsLockedDependencyRefusesNamesNoNameUnreached(): void
     {
         $solver = self::solver(
             ['require' => ['acme/lib' => '^1.0']],
