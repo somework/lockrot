@@ -413,6 +413,25 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString("\n   * 2.x      2.10.3        2026-01-01   ^7.2.5 || ^8.0\n", self::plain(new Explanation($finding, F::facts(F::package(['version' => '2.2.1']), $metadata), new Thresholds(), '8.4', self::report())));
     }
 
+    /** A tag comes from repository data, and its escaped form is what the row prints and pads. */
+    public function testATagWithAZeroWidthCharacterKeepsTheReleasedColumnInPlace(): void
+    {
+        $at = new \DateTimeImmutable('2026-01-01T00:00:00+00:00');
+        $branches = [
+            '1' => ['version' => '1.0.0', 'at' => $at, 'highest' => ['normalized' => '1.0.0.0', 'pretty' => "v1.0.0\u{200B}", 'at' => $at, 'php' => null], 'php' => null],
+            '2' => ['version' => '2.0.0', 'at' => $at, 'highest' => ['normalized' => '2.0.0.0', 'pretty' => 'v2.0.0', 'at' => $at, 'php' => null], 'php' => null],
+        ];
+        $metadata = new PackageMetadata('vendor/pkg', false, null, true, $at, '2.0.0', 2, null, 'library', new \DateTimeImmutable(F::NOW), $branches);
+        $finding = (new FindingBuilder())->withVersion('1.0.0')->build();
+
+        $text = self::plain(new Explanation($finding, F::facts(F::package(['version' => '1.0.0']), $metadata), new Thresholds(), '8.4', self::report()));
+
+        self::assertSame(2, preg_match_all('/^   [ *] [12]\.x .*$/m', $text, $rows), $text);
+        $offsets = array_map(static fn (string $row): int => mb_strpos($row, '2026-01-01'), $rows[0]);
+        self::assertSame($offsets[0], $offsets[1], $text);
+        self::assertStringContainsString('v1.0.0\u{200B}', $text, 'the tag stays neutralised');
+    }
+
     /** Case B's monolog-bridge v2.6.13 holds one counted advisory. */
     /** @param list<IgnoredAdvisory> $ignored */
     private static function feedsOf(AdvisoryNameCoverage $lookup, array $ignored = []): string

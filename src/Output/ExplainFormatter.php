@@ -398,7 +398,8 @@ final class ExplainFormatter
         foreach (\array_slice($rows, 0, Explanation::BRANCH_ROWS) as $row) {
             $released = $row['highest_released'] === null ? ($row['highest_commit_date'] === null ? 'undated' : 'commit '.$row['highest_commit_date']->format('Y-m-d')) : $row['highest_released']->format('Y-m-d');
             $fix = isset($fixes[$row['branch']]) ? self::fixesCell($fixes[$row['branch']], $moves->rowIfApplied($row['branch']), $moves->rowCheck($row['branch']), $row['branch'] === $moveBranch, $finding->package(), $moves->rowIsJoint($row['branch'])) : '';
-            $cells[] = [$row['installed'] ? '*' : ' ', [$row['branch'], $row['highest'], $released, $row['php'] ?? '—'], $fix];
+            // Measured and padded in the escaped form that the row prints: an escape is wider than its character.
+            $cells[] = [$row['installed'] ? '*' : ' ', array_map([TerminalText::class, 'neutralise'], [$row['branch'], $row['highest'], $released, $row['php'] ?? '—']), $fix];
         }
         $widths = self::BRANCH_COLUMNS;
         foreach ($cells as [, $columns]) {
