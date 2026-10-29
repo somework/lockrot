@@ -275,8 +275,9 @@ final class ComposerSolver
         $flags = $root->getStabilityFlags();
         $flags[$root->getName()] = BasePackage::$stabilities[VersionParser::parseStability($root->getVersion())];
         $set = new RepositorySet($root->getMinimumStability(), $flags, $root->getAliases(), $root->getReferences(), $requires, $temporary);
-        // A package takes one repository, so each pass gets its own copy of the root. Composer's
-        // root packages, RootPackage and RootAliasPackage, extend BasePackage.
+        // A package takes one repository, so each pass gets its own copy of the root. Each
+        // RootPackageInterface class of composer/composer 2.10 extends BasePackage:
+        // https://github.com/composer/composer/tree/2.10.3/src/Composer/Package
         /** @var BasePackage&RootPackageInterface $fixedRoot */
         $fixedRoot = clone $root;
         $fixedRoot->setRequires([]);

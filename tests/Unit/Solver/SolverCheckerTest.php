@@ -929,7 +929,7 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0', null, '1.1.0'))->check()->jsonSerialize());
     }
 
-    /** A refusal that read a shadowed name proves nothing either: the hidden releases of acme/zeta can change it. */
+    /** A refusal that read a shadowed name proves nothing: the hidden releases of acme/zeta can change it. */
     public function testARefusalThatReadsAShadowedNameIsNotChecked(): void
     {
         $checker = self::checker(
@@ -1572,7 +1572,7 @@ final class SolverCheckerTest extends TestCase
      * @dataProvider blockingSwitch
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('blockingSwitch')]
-    public function testACheckerWithoutAdvisoriesAnswersAsBeforeWithTheRunsRecords(bool $blocks): void
+    public function testTheRunsRecordsBlockNothingInACheckerWithoutAdvisories(bool $blocks): void
     {
         $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]);
         $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source);

@@ -153,11 +153,14 @@ final class ComposerSolverTest extends TestCase
         self::assertSame(['acme/lib'], array_keys($solver->root()->getDevRequires()), 'the solve changes a copy of the root');
     }
 
-    public function testARequireDevOfARequireDevPackageSolvesWithTheNewConstraint(): void
+    /** A `raise-php` move of a require-dev package: `require --dev` writes the php raise after the package. */
+    public function testARequireDevThatAlsoRaisesPhpSolvesWithBothChanges(): void
     {
-        $solver = self::solver(['require-dev' => ['acme/dev' => '^1.0']], [], ['acme/dev' => [['version' => '1.0.0'], ['version' => '2.0.0']]], [['name' => 'acme/dev', 'version' => '1.0.0']]);
+        $solver = self::solver(['require' => ['php' => '<8.0'], 'require-dev' => ['acme/dev' => '^1.0']], [], ['acme/dev' => [['version' => '1.0.0'], ['version' => '2.0.0']]], [['name' => 'acme/dev', 'version' => '1.0.0']]);
 
-        self::assertSame(['acme/dev' => '2.0.0'], $solver->solve(SolveRequest::require('acme/dev', ['acme/dev' => '^2.0'], true))->installs());
+        $solution = $solver->solve(SolveRequest::require('acme/dev', ['acme/dev' => '^2.0', 'php' => '>=8.1'], true));
+
+        self::assertSame(['acme/dev' => '2.0.0'], $solution->installs(), 'the root php requirement <8.0 refuses the solve without the raise');
     }
 
     /** The root's own php requirement is a platform hold, not a root requirement of a package. */
@@ -612,7 +615,7 @@ final class ComposerSolverTest extends TestCase
         self::assertTrue($solver->solve(SolveRequest::baseline())->resolves(), 'a solver without advisories runs no filter');
     }
 
-    /** An \Error inside Composer's filter, here from the advisory lookup that the filter asks, fails that solve only. */
+    /** An \Error inside Composer's filter, here from the advisory lookup that the filter asks, is a failed solve with its message. */
     public function testAnErrorInsideTheFilterFailsTheSolve(): void
     {
         $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]);
