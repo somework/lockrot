@@ -220,9 +220,6 @@ final class NotCheckedRule implements SignalRule
         if ($entry->check() === 'advisories') {
             return 'security advisories not checked ('.(self::ADVISORY_CAUSES[$entry->reason()] ?? $entry->reason()).'), so S9 could not be read';
         }
-        if ($entry->check() === 'releases') {
-            return self::RELEASES_WORDS;
-        }
         if ($entry->check() === 'release_dates') {
             return 'the age of the package was not read (its newest releases are dated by a commit their tags share), so '.implode(' and ', $entry->blocks()).' could not measure it';
         }

@@ -436,6 +436,7 @@ final class NotCheckedRuleTest extends TestCase
         self::assertSame(PackageFacts::METADATA_UNAVAILABLE, $unavailable->metadataStatus());
         self::assertSame(PackageFacts::METADATA_NOT_FOUND, (new PackageFacts(F::package(), null, null, [$advisory]))->metadataStatus(), 'facts built without the flag: no repository failed');
         self::assertNull($this->rule()->evaluate($unavailable), 'the signal itself does not carry it');
+        self::assertSame('the releases were not read, so S9 could not judge a fix', NotCheckedRule::RELEASES_WORDS, "the words of the entry in report-2's S10");
     }
 
     /** @dataProvider noReleasesGap */
