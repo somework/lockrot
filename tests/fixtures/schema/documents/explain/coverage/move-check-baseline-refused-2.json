@@ -1134,7 +1134,8 @@
  },
  "generated_at": "2026-10-01T17:39:50+00:00",
  "notes": [
-  "1 package is not from a Composer repository: their release metadata and repository activity were not read"
+  "1 package is not from a Composer repository: their release metadata and repository activity were not read",
+  "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: acme/legacy-barcode 1.4.0 requires php >=7.4 <8.3."
  ],
  "note_details": [
   {
@@ -1145,6 +1146,17 @@
    "data": {
     "package_count": 1,
     "advisories_asked": true
+   }
+  },
+  {
+   "code": "moves_not_checked",
+   "text": "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: acme/legacy-barcode 1.4.0 requires php >=7.4 <8.3.",
+   "docs_url": "https://lockrot.dev/notes/#moves_not_checked",
+   "sets_network_failures": false,
+   "data": {
+    "reason": "baseline_refused",
+    "php": "8.4.99",
+    "problem": "Problem 1\n    - Root composer.json requires acme/legacy-barcode ^1.4 -> satisfiable by acme/legacy-barcode[1.4.0].\n    - acme/legacy-barcode 1.4.0 requires php >=7.4 <8.3 -> your php version (8.4.99) does not satisfy that requirement."
    }
   }
  ]

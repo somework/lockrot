@@ -344,7 +344,7 @@
    {
     "id": "S10",
     "level": "info",
-    "summary": "the releases were not read, so the fix of each advisory in S9 is not known",
+    "summary": "the releases were not read, so S9 could not judge a fix",
     "data": {
      "unchecked": [
       {

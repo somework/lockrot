@@ -1,12 +1,12 @@
 {
  "pr": "7d",
  "source": {
-  "cases.json": "ec3db0c7849e08f405959af70d154bca0c21d85514e2d6ea041ac5f0da8d23f9",
+  "cases.json": "0bdfbca078395f885cd6f8a0b047ecba729806a6a36e0185a8dda9b8a42270a4",
   "model_run_date": "2026-10-29"
  },
  "suite": "the model suite reports every step passed",
  "page_goldens": {
-  "sha256": "f4be5d5be4744afd6d86bc8e357564375b32415dec8c8ac5f2d84509e25a8c0d",
+  "sha256": "0aeb93b15a692df6860c05468d49e361628d12274683125dc13b7d238c8234c6",
   "rendered": "the model's goldens"
  },
  "dropped": [],
