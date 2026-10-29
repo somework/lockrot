@@ -34,7 +34,7 @@ final class SourceEntryGuardTest extends TestCase
         $process = new Process([$cgi, '-q', '-d', 'register_argc_argv=1', \dirname(__DIR__, 2).'/bin/lockrot', '--version']);
         $process->setTimeout(60)->run();
 
-        self::assertSame(1, $process->getExitCode(), $process->getOutput());
+        self::assertSame(2, $process->getExitCode(), $process->getOutput());
         self::assertSame('lockrot cannot run safely on a non-CLI SAPI with register_argc_argv=On. Aborting.'.\PHP_EOL, $process->getOutput());
     }
 
@@ -75,7 +75,7 @@ final class SourceEntryGuardTest extends TestCase
         $process = new Process([\PHP_BINARY, $this->dir.'/vendor/somework/lockrot/bin/lockrot', '--version']);
         $process->setTimeout(60)->run();
 
-        self::assertSame(1, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
+        self::assertSame(2, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
         self::assertSame('', $process->getOutput());
         self::assertSame("lockrot requires Composer 2.10 or newer, not 2.9.5\n", $process->getErrorOutput());
     }

@@ -28,7 +28,7 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
     /** A port from 1 to 65535 without its leading zeros, which the host pattern allows. */
     private const PORT = '{^(?:[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$}D';
     /** A URL that writes its scheme's default port names the same repository as one that omits it. */
-    private const DEFAULT_PORTS = ['http' => 80, 'https' => 443];
+    private const DEFAULT_PORTS = ['http' => 80, 'https' => 443, 'ssh' => 22, 'git' => 9418];
     /** config-2's `repository` pattern: a scheme URL without userinfo, or the scp form `user@host:path`. */
     private const URL = '{^([a-z][a-z0-9+.-]*://[^\s/?#@]+([/?#]\S*)?|[A-Za-z0-9_.-]+@[A-Za-z0-9_.-]+:\S+)$}D';
 

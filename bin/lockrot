@@ -9,7 +9,7 @@ declare(strict_types=1);
 if (\PHP_SAPI !== 'cli' && \PHP_SAPI !== 'phpdbg') {
     if ((bool) \ini_get('register_argc_argv')) {
         echo 'lockrot cannot run safely on a non-CLI SAPI with register_argc_argv=On. Aborting.'.\PHP_EOL;
-        exit(1);
+        exit(2);
     }
 
     echo 'Warning: run lockrot with the CLI version of PHP, not the '.\PHP_SAPI.' SAPI'.\PHP_EOL;
@@ -44,7 +44,7 @@ if (!class_exists(\Composer\Console\Application::class)) {
 preg_match('/^\d+\.\d+/', \Composer\Composer::getVersion(), $lockrotComposerMinor);
 if (version_compare($lockrotComposerMinor[0] ?? '0', '2.10', '<')) {
     fwrite(\STDERR, 'lockrot requires Composer 2.10 or newer, not '.\Composer\Composer::getVersion()."\n");
-    exit(1);
+    exit(2);
 }
 unset($lockrotComposerMinor);
 

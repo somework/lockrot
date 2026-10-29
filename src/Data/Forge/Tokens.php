@@ -8,7 +8,9 @@ namespace Lockrot\Data\Forge;
  * Only lockrot's own tokens: Composer's HTTP layer applies its own credentials ({@see ForgeAuth}).
  * A token goes only to the host that issued it. `GITHUB_TOKEN` and `GITLAB_TOKEN` count only when
  * each issuer variable of their platform is unset, empty, or names the public host. Otherwise the
- * token is withheld, never sent elsewhere. lockrot's own names stand for the public host.
+ * token is withheld, never sent elsewhere. The issuer variables are those of the CI systems and of
+ * the gh and glab tools, and each can hold a URL or a bare host. lockrot's own names stand for the
+ * public host.
  *
  * @internal
  */
@@ -22,8 +24,12 @@ final class Tokens
     public const ENV_GITHUB_SERVER_URL = 'GITHUB_SERVER_URL';
     /** GitLab CI names its instance here. */
     public const ENV_CI_SERVER_URL = 'CI_SERVER_URL';
-    /** glab reads `GITLAB_TOKEN` for this host. */
+    /** glab reads `GITLAB_TOKEN` for this host, and `GL_HOST` and `GITLAB_URI` are its other names. */
     public const ENV_GITLAB_HOST = 'GITLAB_HOST';
+    public const ENV_GL_HOST = 'GL_HOST';
+    public const ENV_GITLAB_URI = 'GITLAB_URI';
+    /** gh names its default host here: github.com, or a GHE.com or GitHub Enterprise Server host. */
+    public const ENV_GH_HOST = 'GH_HOST';
 
     private ?string $github;
     private ?string $gitlab;
@@ -52,10 +58,10 @@ final class Tokens
         $withheld = [];
         $tokens = new self(
             self::value($env, self::ENV_LOCKROT_GITHUB)
-                ?? self::issuedBy($env, self::ENV_GITHUB, [self::ENV_GITHUB_SERVER_URL], 'github.com', $withheld)
+                ?? self::issuedBy($env, self::ENV_GITHUB, [self::ENV_GITHUB_SERVER_URL, self::ENV_GH_HOST], 'github.com', $withheld)
                 ?? $composerGithubOauthToken,
             self::value($env, self::ENV_LOCKROT_GITLAB)
-                ?? self::issuedBy($env, self::ENV_GITLAB, [self::ENV_CI_SERVER_URL, self::ENV_GITLAB_HOST], 'gitlab.com', $withheld)
+                ?? self::issuedBy($env, self::ENV_GITLAB, [self::ENV_CI_SERVER_URL, self::ENV_GITLAB_HOST, self::ENV_GL_HOST, self::ENV_GITLAB_URI], 'gitlab.com', $withheld)
         );
         $tokens->withheld = $withheld;
 

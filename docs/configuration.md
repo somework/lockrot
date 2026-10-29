@@ -29,7 +29,7 @@ then environment variable, then `extra.lockrot`, then the default.
 | `target-php` | string such as `"8.4"` | `config.platform.php`, else the running PHP | The PHP version the project runs on. S5 checks whether the installed release predates this PHP's major ([Old promise](verdicts.md#old-promise)), and S8 names only a branch that can install on it ([Within reach](verdicts.md#within-reach)). An advisory whose fix does not run on it is `blocked` and counts double ([Fix](verdicts.md#fix)). The move check solves at it ([The move check](verdicts.md#the-move-check)), and the PHP window says whether the lock installs on it ([The PHP window](verdicts.md#the-php-window)) | `--target-php`, `LOCKROT_TARGET_PHP` |
 | `format` | string | `table` | What stdout gets: `table`, `json`, `github`, `sarif`, `gitlab`, `markdown` or `html` ([ci.md](ci.md)). The exit code is the same for every format | `--format` |
 | `include-dev` | boolean | `false` | Also check `packages-dev`. A development package's whole [score](verdicts.md#score) is halved | `--dev` (turns it on only) |
-| `baseline` | string | `lockrot-baseline.json` | The [baseline](baseline.md) file, relative to `composer.json` or absolute. A file that this key names must exist, except under `--generate-baseline`. The default file can be missing | `--baseline` |
+| `baseline` | string | `lockrot-baseline.json` | The [baseline](baseline.md) file, relative to `composer.json` or absolute. A file that this key names must exist, except under `--generate-baseline`. The default file can be missing. Under `--generate-baseline`, a path named `composer.json` or `composer.lock`, the manifest or lock that `COMPOSER` names, or a name that Windows reads as another file (a trailing dot or space, a colon) is exit `2` | `--baseline` |
 | `release-warn-years` / `release-high-years` | integer ≥ 1 | `3` / `5` | Years without a stable release at which S2 ("no stable release") and S8 ("no stable release on the installed branch") reach `warn` / `high` ([signals](verdicts.md#the-signals)) | — |
 | `push-warn-years` / `push-high-years` | integer ≥ 1 | `3` / `5` | Years without a push or commit at which S4 reaches `warn` / `high` | — |
 | `ignore` | array | `[]` | Packages whose maintenance flags you accept, all of them or the ones an entry lists ([the allowlist](#the-allowlist)) | — |
@@ -94,8 +94,8 @@ Exit codes are in [ci.md](ci.md#exit-codes).
 | `LOCKROT_DISABLE` | `1` or `true`: `composer lockrot` and the PHAR print `lockrot disabled via LOCKROT_DISABLE` on stderr and exit `0` before they read anything — the command line, `composer.json` or the lock. lockrot also skips the install-time summary. `lockrot.phar self-update` ignores it |
 | `LOCKROT_FAIL_ON` | Overrides `fail-on` |
 | `LOCKROT_TARGET_PHP` | Overrides `target-php` |
-| `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN` | Token for github.com (S3, S4). `GITHUB_TOKEN` counts only when `GITHUB_SERVER_URL` is unset, empty or names github.com. When Composer holds credentials for github.com, lockrot sends Composer's instead ([credentials](internals.md#repository-hosts-and-credentials)) |
-| `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN` | Personal access token, sent to gitlab.com only. `GITLAB_TOKEN` counts only when `CI_SERVER_URL` and `GITLAB_HOST` are each unset, empty or name gitlab.com. Without credentials, GitLab hides the archived flag (S3). A self-hosted instance uses Composer's `gitlab-token` or `gitlab-oauth` ([credentials](internals.md#repository-hosts-and-credentials)) |
+| `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN` | Token for github.com (S3, S4). `GITHUB_TOKEN` counts only when `GITHUB_SERVER_URL` and `GH_HOST` are each unset, empty or name github.com. When Composer holds credentials for github.com, lockrot sends Composer's instead ([credentials](internals.md#repository-hosts-and-credentials)) |
+| `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN` | Personal access token, sent to gitlab.com only. `GITLAB_TOKEN` counts only when `CI_SERVER_URL`, `GITLAB_HOST`, `GL_HOST` and `GITLAB_URI` are each unset, empty or name gitlab.com. Without credentials, GitLab hides the archived flag (S3). A self-hosted instance uses Composer's `gitlab-token` or `gitlab-oauth` ([credentials](internals.md#repository-hosts-and-credentials)) |
 | `COMPOSER` | The manifest, as for every Composer command: `COMPOSER=alt.json composer lockrot` reads `extra.lockrot` from `alt.json`, analyses `alt.lock` and looks for the baseline next to `alt.json` |
 
 When `COMPOSER_ROOT_VERSION` is unset, lockrot sets it to `1.0.0` for the run, so Composer does not
@@ -231,19 +231,25 @@ and the score are the report's.
 |---|---|---|
 | Verdict | The verdict, the flags and the score, with each step of the sum | `finding.verdict`, `finding.lead`, `finding.flags`, `finding.score` |
 | Next step | The move, what it clears, what holds it and the score after it | `finding.next_step` |
-| Security | Each counted advisory with its fix, what each advisory repository answered, and the ignored advisories | `finding.security` |
+| Security | Each counted advisory with its fix, what each advisory repository answered, and the ignored advisories (the text does not list them) | `finding.security` |
 | Chain | `direct requirement`, or the shortest `via` chain and the other direct requirements that reach the package, and how many hops below `composer.json` it sits | `finding.direct`, `finding.chain`, `finding.direct_dependents`, `finding.depth`, `finding.named_in` |
 | Allowlist | Who accepts which flags, and why | `finding.allowlist` |
 | Checks | The checks that did not run, as S10 or as skips, and the ones `accept-unchecked` accepted | `finding.checks_missing`, `finding.checks_skipped`, `finding.unchecked_accepted` |
 | Age | The installed release, the newest release, the newest on the installed branch and the last push, each with its years | `finding.age` |
 | Libyears | The package's [libyears](verdicts.md#libyears), or why they were not measured | `finding.libyears`, `finding.libyears_unmeasured` |
-| Origin | Where the package came from and, for an abandoned package whose replacement packagist.org names, the replacement's page ([Where a package came from](schema.md#where-a-package-came-from)) | `finding.origin`, `finding.replacement_url` |
-| Signals | Every signal with its summary and raw data: the dates behind each age, and for S9 each advisory with what fixes it | `finding.signals` |
+| Origin | Where the package came from and, for an abandoned package whose replacement packagist.org names, the replacement's page ([Where a package came from](schema.md#where-a-package-came-from)). JSON only | `finding.origin`, `finding.replacement_url` |
+| Signals | Every signal with its summary and raw data: the dates behind each age, and for S9 each advisory with what fixes it (the text gives the summaries of the fired signals only) | `finding.signals` |
 | Lock entry | Version, `php` constraint, source, and the entry's date with what it is dated by: a release, a branch snapshot's commit, or a commit a subtree split's tags share | `lock` |
-| Repository metadata | Number of versions, whether the package is abandoned and what replaces it, the last stable release, and the release-branch table S8 reads, with what each branch fixes | `metadata` |
+| Repository metadata | Number of versions (JSON only), whether the package is abandoned and what replaces it, the last stable release, and the release-branch table S8 reads, with what each branch fixes | `metadata` |
 | Repository activity | What S3 and S4 read, or why nothing was read | `finding.activity` |
 | Settings | Thresholds, target PHP, and the project's own `require.php` as composer.json writes it (lockrot tests the branch rows against the lowest stable version it admits) | `run.thresholds`, `run.target_php`, `run.project_php` |
 | Run notes | The run's notes | `notes`, `note_details` |
+
+The text names the flags that the allowlist accepts on the `accepted` line, and writes
+`(allowlisted)` beside a check that the allowlist skips. The allowlist entry with its reason
+(`finding.allowlist`), the lock entry and the settings are in `--format=json` only. The text shows
+an `accept-unchecked` entry with its reason on the `not checked` line. It shows a value of the lock
+entry or the settings only on a line that reads it, such as a threshold beside an age.
 
 The document also carries `lockrot`, `package`, `version` and `generated_at`. The full shape is in
 [the explanation's fields](schema.md#the-explanation).
@@ -404,8 +410,9 @@ on every run ([What `--fail-on=unchecked` fails on](ci.md#what-unchecked-fails-o
   an ssh source as `ssh://host:2222/path`. A URL without a scheme is the scp form, which names its
   user (`git@host:path`). lockrot compares the host and port without case, then the path, without
   the scheme, a trailing `/` and `.git`. A port with leading zeros (`:0443`) or the default port of
-  the scheme (`https://host:443`) matches the same host and URL without it. A package installed from
-  a `file://` URL is accepted only by `package`.
+  the scheme (`https://host:443`, `ssh://host:22`) matches the same host and URL without it. The
+  scp form `git@host:path` matches too. The default ports are 80 for http, 443 for https, 22 for
+  ssh and 9418 for git. A package installed from a `file://` URL is accepted only by `package`.
 - **Accepting `release_metadata` accepts the unknown fixes too.** On a package from vcs or an
   unknown origin, the releases lockrot did not read are also the releases that the fix of each
   advisory needs. Each counted advisory then has the fix `unknown`, which never doubles. If no
@@ -438,7 +445,7 @@ These variables exist for lockrot's own tests and are not part of the configurat
 
 | Variable | Effect |
 |---|---|
-| `LOCKROT_TODAY` | An ISO 8601 date or date-time, such as `2026-09-14`, used as "now": every age (S2, S4, S8), `generated_at` and the `expires` check of `ignore` and `accept-unchecked` entries. Libyears do not depend on it |
+| `LOCKROT_TODAY` | An ISO 8601 date or date-time, such as `2026-09-14`, used as "now": every age (S2, S4, S8), `generated_at` and the `expires` check of `ignore` and `accept-unchecked` entries. A value without an offset is UTC. Libyears do not depend on it |
 | `LOCKROT_RELEASE_URL` | The release list `lockrot.phar self-update` reads, in the shape of GitHub's `GET /repos/{owner}/{repo}/releases`, instead of GitHub's |
 | `LOCKROT_RELEASE_KEY` | A PEM file whose public key `lockrot.phar self-update` verifies release signatures with, instead of the key built into the archive |
 

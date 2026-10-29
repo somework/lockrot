@@ -83,11 +83,13 @@ carries `User-Agent: lockrot`.
 
 - When both exist, lockrot sends only Composer's header.
 
-- A token goes only to the host that issued it. `GITHUB_TOKEN` counts only when
-  `GITHUB_SERVER_URL` is unset, empty or names github.com. `GITLAB_TOKEN` counts only when each of
-  `CI_SERVER_URL` and `GITLAB_HOST` is unset, empty or names gitlab.com. A port counts as part of
-  the host. So on GitHub Enterprise Server, GHE.com, Gitea or Forgejo Actions, or self-managed
-  GitLab CI, lockrot does not send the runner's token to the public host. It goes on to the next
+- A token goes only to the host that issued it. `GITHUB_TOKEN` counts only when each of
+  `GITHUB_SERVER_URL` and `GH_HOST` is unset, empty or names github.com. `GITLAB_TOKEN` counts only
+  when each of `CI_SERVER_URL`, `GITLAB_HOST`, `GL_HOST` and `GITLAB_URI` is unset, empty or names
+  gitlab.com. A value can be a URL or a bare host, and a port counts as part of the host. So on
+  GitHub Enterprise Server, GHE.com, Gitea or Forgejo Actions, or self-managed GitLab CI, lockrot
+  does not send the runner's token to the public host. The same holds for a token that `gh` or
+  `glab` reads for the host that `GH_HOST`, `GL_HOST` or `GITLAB_URI` names. It goes on to the next
   source, and `-v` prints one line for each token that it does not send. `LOCKROT_GITHUB_TOKEN` and
   `LOCKROT_GITLAB_TOKEN` always count, because they name the public host.
 
@@ -184,9 +186,9 @@ public Drupal site locks showed both.
 - Advisories come from every repository that publishes them, not only the first
   ([Advisories not checked](notes.md#advisories_not_checked)). The run makes one lookup: it sends
   each repository the names of every package that the run checks, whatever its origin, and never
-  a version. On Composer 2.9 and later, while advisory blocking is on, the move check can ask
-  again for names that a solve loads and that no earlier lookup covered, such as a new dependency
-  of a move. It asks for every advisory of each name, and matches the versions itself:
+  a version. While Composer's advisory blocking is on, the move check can ask again for names
+  that a solve loads. It asks only for names that no earlier lookup covered, such as a new
+  dependency of a move. It asks for every advisory of each name, and matches the versions itself:
   the installed version, and the versions that each move admits. `extra.lockrot.advisory-lookup:
   composer-repositories` sends only the names of the packages from a Composer repository
   ([Which advisories count](verdicts.md#which-advisories-count)).

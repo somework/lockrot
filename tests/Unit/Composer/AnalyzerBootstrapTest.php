@@ -152,6 +152,11 @@ final class AnalyzerBootstrapTest extends TestCase
         );
         self::assertSame('', $this->stderrOf($env, OutputInterface::VERBOSITY_NORMAL));
         self::assertSame('', $this->stderrOf(['GITHUB_TOKEN' => 'b'], OutputInterface::VERBOSITY_VERBOSE));
+        self::assertSame(
+            "lockrot: GITHUB_TOKEN is for acme.ghe.com, so lockrot does not send it to github.com. Set LOCKROT_GITHUB_TOKEN to a github.com token.\n"
+            ."lockrot: GITLAB_TOKEN is for gitlab.example.com, so lockrot does not send it to gitlab.com. Set LOCKROT_GITLAB_TOKEN to a gitlab.com token.\n",
+            $this->stderrOf(['GITHUB_TOKEN' => 'b', 'GH_HOST' => 'acme.ghe.com', 'GITLAB_TOKEN' => 'g', 'GL_HOST' => 'https://gitlab.example.com'], OutputInterface::VERBOSITY_VERBOSE)
+        );
     }
 
     /** An issuer that does not parse is named by its raw value, which can carry a terminal escape. */

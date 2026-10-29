@@ -296,6 +296,33 @@ final class ReportTargetsTest extends TestCase
         }
     }
 
+    /** The check that `--generate-baseline` runs on its path: the same three composer-file rules. */
+    public function testRefuseComposerFileRefusesEachComposerFileRuleUnderTheGivenOption(): void
+    {
+        mkdir($this->cwd.'/pkg');
+        file_put_contents($this->cwd.'/pkg/composer.lock', '{}');
+        link($this->cwd.'/pkg/composer.lock', $this->cwd.'/pkg/lock.json');
+        symlink($this->cwd.'/pkg/composer.lock', $this->cwd.'/link.json');
+        $refusal = fn (string $path): string => $this->refusal(static function () use ($path): void {
+            ReportTargets::refuseComposerFile($path, '--baseline=x');
+        });
+
+        self::assertSame([
+            '--baseline=x: a file name that ends in a dot or a space, or holds a colon, is another name on Windows',
+            '--baseline=x: lockrot never writes composer.json or composer.lock',
+            '--baseline=x: lockrot never writes composer.json or composer.lock',
+            '--baseline=x: lockrot never writes composer.json or composer.lock',
+            '--baseline=x: lockrot never writes composer.json or composer.lock',
+        ], [
+            $refusal($this->cwd.'/composer.json.'),
+            $refusal($this->cwd.'/sub/Composer.JSON'),
+            $refusal($this->cwd.'/composer.lock'),
+            $refusal($this->cwd.'/pkg/lock.json'),
+            $refusal($this->cwd.'/link.json'),
+        ]);
+        ReportTargets::refuseComposerFile($this->cwd.'/pkg/baseline.json', '--baseline=x');
+    }
+
     /** @return iterable<string, array{string, string, string}> */
     public static function foldedSpellings(): iterable
     {

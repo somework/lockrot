@@ -16,9 +16,10 @@ final class Clock
         $this->now = $now ?? new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
     }
 
+    /** A value without an offset is UTC, whatever the default timezone of the process. */
     public static function fixed(string $iso8601): self
     {
-        return new self(new \DateTimeImmutable($iso8601));
+        return new self(new \DateTimeImmutable($iso8601, new \DateTimeZone('UTC')));
     }
 
     /**

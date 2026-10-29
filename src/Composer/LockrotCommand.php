@@ -72,6 +72,9 @@ final class LockrotCommand extends BaseCommand
     /** The formats a CI step parses: writing one prints the upgrade notice. */
     private const NOTICE_FORMATS = ['json', 'sarif', 'gitlab'];
 
+    private const MANIFEST_REASON = 'that is the manifest COMPOSER names, which lockrot never writes';
+    private const LOCK_REASON = 'that is the lock COMPOSER names, which lockrot never writes';
+
     /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string, (\Closure(): MoveChecks)|null, ?string): Analyzer */
     private $analyzerFactory;
 
@@ -247,6 +250,10 @@ final class LockrotCommand extends BaseCommand
             $specs = self::outputSpecs($input);
             // Resolving the path touches nothing, and the files that --output must not name include it.
             $baselineFile = BaselineFile::resolve(\dirname($composerFile), $lockrot->baseline(), Version::STRING);
+            $generate = $input->getOption('generate-baseline') === true;
+            if ($generate) {
+                self::refuseComposerBaseline($input, $lockrot, $baselineFile, $composerFile, $lockPath);
+            }
             // Checked before the analysis, like the baseline: a typo in a path fails before a
             // full repository round.
             $targets = ReportTargets::resolve($specs, $cwd, $specs === [] ? [] : self::protectedFiles($cwd, $composerFile, $lockPath, $baselineFile, $project));
@@ -261,7 +268,6 @@ final class LockrotCommand extends BaseCommand
             }
             // Read before the analysis, so a missing explicit path or an unreadable file fails before
             // a full repository round. A generate run can name a file that does not exist: it creates it.
-            $generate = $input->getOption('generate-baseline') === true;
             $existingBaseline = $this->readBaseline($baselineFile, $lockrot->baseline() !== null && !$generate, $generate);
             $format = $lockrot->format();
             // Only `html` needs the facts: it draws a release-branch timeline per package.
@@ -549,9 +555,27 @@ final class LockrotCommand extends BaseCommand
             [BaselineFile::resolve(\dirname($composerFile), \is_string($configured) ? $configured : null, Version::STRING)->path(), $baselineReason],
             [$cwd.'/composer.json', ReportTargets::COMPOSER_REASON],
             [$cwd.'/composer.lock', ReportTargets::COMPOSER_REASON],
-            [$composerFile, 'that is the manifest COMPOSER names, which lockrot never writes'],
-            [$lockPath, 'that is the lock COMPOSER names, which lockrot never writes'],
+            [$composerFile, self::MANIFEST_REASON],
+            [$lockPath, self::LOCK_REASON],
         ];
+    }
+
+    /**
+     * A generated baseline can create its file, so it must not be a composer file or a file that
+     * COMPOSER names: SECURITY.md, "What lockrot does and does not do".
+     *
+     * @throws ConfigException naming the option, the key or the default file that gave the path
+     */
+    private static function refuseComposerBaseline(InputInterface $input, LockrotConfig $lockrot, BaselineFile $baseline, string $composerFile, string $lockPath): void
+    {
+        $source = \is_string($input->getOption('baseline')) ? '--baseline=' : ($lockrot->baseline() !== null ? 'extra.lockrot.baseline ' : 'the baseline ');
+        $label = $source.$baseline->displayPath();
+        ReportTargets::refuseComposerFile($baseline->path(), $label);
+        foreach ([[$composerFile, self::MANIFEST_REASON], [$lockPath, self::LOCK_REASON]] as [$path, $reason]) {
+            if (Path::canonical($path) === Path::canonical($baseline->path()) || Path::sameFile($baseline->path(), $path)) {
+                throw new ConfigException($label.': '.$reason);
+            }
+        }
     }
 
     /**
