@@ -674,7 +674,9 @@ with the constraint inline, with one command for all of them.
 The table, markdown, github, gitlab and sarif formats, `--explain` and the install-time block print
 each command in its POSIX form, for a POSIX shell. `commands[]` carries the argv of each command for
 other shells. For cmd.exe or PowerShell, render `commands[]` as
-[The move](schema.md#the-move) shows, or use the copy menu of the html page.
+[The move](schema.md#the-move) shows, or use the copy menu of the html page. The gitlab report
+carries no run notes, so read the `moves_not_checked` note that a move points at in another
+format.
 
 ### <a name="the-move-check"></a>The move check {#the-move-check}
 

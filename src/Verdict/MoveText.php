@@ -20,6 +20,9 @@ final class MoveText
     /** A sentence names at most this many direct dependents, then "and N more". */
     public const DEPENDENTS_SHOWN = 3;
 
+    /** What the platform step adds while Composer refuses the lock itself. */
+    public const REFUSED_POINTER = ' Composer still refuses the lock itself: the moves_not_checked note names the first cause.';
+
     /** Composer's `require --no-interaction` of a name that both sections list writes `require` and deletes the require-dev line. */
     private const REMOVES_DEV = ', which removes it from require-dev';
 
@@ -123,9 +126,7 @@ final class MoveText
         if ($targetPhp === null || $platformOverride === null || MoveCheckers::platformPhp($targetPhp, $platformOverride) === $platformOverride) {
             return '';
         }
-        $refused = $baselineRefused ? ' Composer still refuses the lock itself: the moves_not_checked note names the first cause.' : '';
-
-        return 'First set config.platform.php to your PHP '.$targetPhp.' release: the lock records '.$platformOverride.'.'.$refused.' ';
+        return 'First set config.platform.php to your PHP '.$targetPhp.' release: the lock records '.$platformOverride.'.'.($baselineRefused ? self::REFUSED_POINTER : '').' ';
     }
 
     /** D10: what Composer's solver said about the move, or why lockrot did not ask it. */

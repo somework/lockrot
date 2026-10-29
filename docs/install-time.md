@@ -43,13 +43,16 @@ The block is at most ten lines, in this order:
   advisories: the deciding severity and the count (`vulnerable (critical advisory; 15 in all)`).
   For one advisory or for low ones it gives the count before the severity
   (`vulnerable (1 high advisory)`, `vulnerable (2 low advisories)`).
-  `… and <n> more` replaces the lines that do not fit.
+  `… and <n> more` replaces the lines that do not fit. When a move's line is longer than 160
+  characters, it drops "Composer still refuses the lock itself: the moves_not_checked note names
+  the first cause." first, so that its command shows.
 - `update now:` with every package that `composer update` fixes, shown or not.
 - The [`gate:` line](ci.md#reading-the-gate-line), when the gate fails.
-- Up to two notes. When the run reads a baseline and no setting gives the target PHP, the first
-  note is lockrot's own: `target php from the running PHP (<version>); fix changes against the
+- Up to two notes. The [`moves_not_checked`](notes.md#moves_not_checked) note comes first, because
+  each move's platform step points at it. When the run reads a baseline and no setting gives the
+  target PHP, the next note is lockrot's own: `target php from the running PHP (<version>); fix changes against the
   baseline not compared`. It has no code. Set the [target PHP](configuration.md#extralockrot-keys)
-  to compare fix changes. The [run notes](notes.md) follow, in the order the run wrote them. A note
+  to compare fix changes. The other [run notes](notes.md) follow, in the order the run wrote them. A note
   that does not fit is counted in the footer.
 - The footer, `Run composer lockrot for details.`
 
@@ -78,7 +81,7 @@ can fail the gate.
 | `lockrot: <m> changed packages checked, one check incomplete` | No package is `unknown`, and a check did not complete: advisories, a monorepo parent's metadata, a repository host, or another check that a finding's S10 names |
 
 The [`gate:` line](ci.md#reading-the-gate-line) follows the header when the gate fails. Then up to
-two notes and the footer follow. They are the run's first notes, so the one behind the failure can
+two notes and the footer follow. They are the run's first notes, `moves_not_checked` first, so the one behind the failure can
 fall past the cut, and the footer does not count the rest. `composer lockrot --format=json` lists
 every note, each with its `sets_network_failures` ([run notes](notes.md)).
 

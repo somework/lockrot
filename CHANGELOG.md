@@ -194,7 +194,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that the run note `moves_not_checked` names the first cause.
   ([The move](docs/verdicts.md#move))
 - **json:** the `--explain` document writes `run.php_window` with `platform_override` and `target`
-  alone, the fields that the move's text reads. It is null when the report has no PHP window.
+  alone, whose php the move's text names. It is null when the report has no PHP window.
   ([The explanation](docs/schema.md#the-explanation))
 - **json:** each finding writes its repository activity lookup (`activity`: read, not found, or
   not read and why), `age` (the installed release, the newest release, the newest release of the
