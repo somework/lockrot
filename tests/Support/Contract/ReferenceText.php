@@ -56,7 +56,7 @@ final class ReferenceText
         'no_release_read' => 'no release of the row was read',
         'pass_cap' => 'Composer refused each move before it',
         'solver_error' => "Composer's solver failed on it",
-        'advisory_lookup_incomplete' => 'the advisory lookup did not cover a package it installs',
+        'advisory_lookup_incomplete' => 'the advisory lookup did not cover a package in the result',
     ];
     private const GRADES = ['critical', 'high', 'medium', 'low'];
 

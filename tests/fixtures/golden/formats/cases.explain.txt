@@ -5950,7 +5950,7 @@ score     16 = vulnerable 16 [high advisory]     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        composer update 'typo3/html-sanitizer:^2.3.2' (gets v2.3.2) — clears the advisory; not checked with Composer's solver (the advisory lookup did not cover a package it installs), so it holds only if Composer resolves it
+do        composer update 'typo3/html-sanitizer:^2.3.2' (gets v2.3.2) — clears the advisory; not checked with Composer's solver (the advisory lookup did not cover a package in the result), so it holds only if Composer resolves it
           clears PKSA-7jn3-yc49-35c6
 
 flags

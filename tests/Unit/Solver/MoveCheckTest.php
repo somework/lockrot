@@ -38,7 +38,7 @@ final class MoveCheckTest extends TestCase
     public function testAnIncompleteAdvisoryLookupNamesThePackageThatTheLookupDidNotCover(): void
     {
         self::assertSame(
-            "update now: not checked with Composer's solver (the advisory lookup did not cover a package it installs), so lockrot writes no command for a/b",
+            "update now: not checked with Composer's solver (the advisory lookup did not cover a package in the result), so lockrot writes no command for a/b",
             RunNote::updateNowNotChecked(MoveCheck::ADVISORY_LOOKUP_INCOMPLETE, ['a/b'])->text()
         );
     }
