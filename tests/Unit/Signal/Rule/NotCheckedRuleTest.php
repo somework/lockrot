@@ -438,6 +438,12 @@ final class NotCheckedRuleTest extends TestCase
         self::assertNull($this->rule()->evaluate($unavailable), 'the signal itself does not carry it');
     }
 
+    /** report-2's S10 prints these words for the releases entry. */
+    public function testTheReleasesEntryHasItsWords(): void
+    {
+        self::assertSame('the releases were not read, so S9 could not judge a fix', NotCheckedRule::RELEASES_WORDS);
+    }
+
     /** @dataProvider noReleasesGap */
     #[DataProvider('noReleasesGap')]
     public function testNoOtherMetadataStatusIsAReleasesGap(PackageFacts $facts, string $status): void

@@ -248,6 +248,27 @@ final class PhpFloorTest extends TestCase
     }
 
     /**
+     * S8's reading of a branch php that the floor does not admit, by its side: the words are the
+     * signal reading's contract.
+     *
+     * @dataProvider missWords
+     */
+    #[DataProvider('missWords')]
+    public function testEachSideHasItsWordsInTheS8Reading(?string $side, string $words): void
+    {
+        self::assertSame($words, PhpFloor::missWords($side, 'the target PHP 8.4'));
+    }
+
+    /** @return iterable<string, array{?string, string}> */
+    public static function missWords(): iterable
+    {
+        yield 'needs a newer PHP' => [PhpFloor::NEEDS_NEWER, ' above the target PHP 8.4'];
+        yield 'stops before' => [PhpFloor::STOPS_BEFORE, ', which stops before the target PHP 8.4'];
+        yield 'skips' => [PhpFloor::SKIPS, ', which skips the target PHP 8.4'];
+        yield 'admits no PHP at all' => [PhpFloor::UNSATISFIABLE, ', which no PHP runs'];
+    }
+
+    /**
      * The stable point that every project comparison reads: an
      * inclusive bound gives its `X.Y.Z`, an exclusive bound or a non-zero fourth segment the next
      * patch, an exclusive pre-release bound its `X.Y.Z`. No lower bound, or no readable constraint,
