@@ -271,7 +271,8 @@ final class RunFooter
             return 'php: '.$clause.'; your target, '.$target.', is excluded: '.self::ceilingWords($fix['held_by']).$records;
         }
         if (!$data['target']['inside']) {
-            $clause .= ', so your target, '.$target.', is excluded';
+            // A pinned patch can fail inside a minor that installs: `config.platform.php` in a conflict hole.
+            $clause .= \in_array($target, ($with ?? $without)['minors'], true) ? ', but not on your target, '.$data['target']['php'] : ', so your target, '.$target.', is excluded';
         }
         if ($fix !== null) {
             return 'php: '.$clause.($fix['packages'] === [] ? '' : '; '.self::fixWords($fix, $target, $name)).$records;

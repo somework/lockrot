@@ -31,6 +31,10 @@ use Lockrot\Verdict\ShellCommand;
  * parents is a whole report, and I25 holds over it. The recording gives every format, the explain-2
  * document and the strings that the PHP grammars own. The report keeps the run notes and the
  * advisory lookup of the case's hydrated lock.
+ *
+ * A case without parents keeps its lock's `packages_checked` and `not_from_composer_repository`, so
+ * its document does not meet the findings counts of docs/schema.md, "The document". Read such a
+ * document for its finding, never as an example of those counts.
  */
 final class CaseRecording
 {

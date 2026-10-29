@@ -186,6 +186,14 @@ final class RunFooterTest extends TestCase
         self::assertSame('moves: not checked (the project has no composer.json)', RunFooter::moveCheck($report));
     }
 
+    public function testTheMovesLineOfARefusedBaselinePointsAtTheNote(): void
+    {
+        $checks = MoveChecks::of(new UncheckedMoves(MoveCheck::BASELINE_REFUSED));
+        $report = self::report([])->withMoveChecks(new MoveCheckRun('2.10.3', false, [], MoveCheck::refused()), UpdateNow::of([], $checks));
+
+        self::assertSame("moves: not checked, because Composer's solver refuses the lock itself (see the moves_not_checked note)", RunFooter::moveCheck($report));
+    }
+
     /** @return iterable<string, array{MoveCheck::*, string}> */
     public static function baselineLoadReasons(): iterable
     {
@@ -251,6 +259,17 @@ final class RunFooterTest extends TestCase
         $line = self::phpLine(['packages' => [], 'packages-dev' => []], ['require' => ['php-64bit' => '<8.4'], 'require-dev' => ['php' => '<8.4'], 'conflict' => ['php' => '>=8.4']], '8.3', true);
 
         self::assertSame('php: the lock installs on PHP 5.3 to 8.3; conflict.php, require-dev.php and require.php-64bit exclude 8.4', $line);
+    }
+
+    /** A pinned patch inside a conflict hole: the target's minor installs, its pinned patch does not. */
+    public function testThePhpLineOfATargetMinorInTheWindowNamesThePinnedPatchThatIsExcluded(): void
+    {
+        $lock = ['packages' => [['name' => 'acme/a', 'version' => '1.0.0', 'conflict' => ['php' => '8.4.5 - 8.4.6']]], 'packages-dev' => []];
+
+        $line = (string) self::phpLine($lock, ['config' => ['platform' => ['php' => '8.4.5']]], '8.4');
+
+        self::assertStringStartsWith('php: the lock installs on PHP 5.3 to 8.5, but not on your target, 8.4.5', $line);
+        self::assertStringNotContainsString('is excluded', $line);
     }
 
     /** wallabag 2.6.14 at 8.4 (§7.0): the fix replaces the override and edge clauses. */
