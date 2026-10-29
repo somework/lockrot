@@ -457,13 +457,15 @@ final class LockFileTest extends TestCase
         yield 'platform constraint that Composer cannot parse' => [['packages' => [], 'platform' => ['php' => 'not a constraint !!']], 'alt.lock: platform cannot be loaded: '];
         yield 'platform-dev constraint that Composer cannot parse' => [['packages' => [], 'platform-dev' => ['ext-json' => '>= ~']], 'alt.lock: platform-dev cannot be loaded: '];
         yield 'override of a package that is not a platform package' => [['packages' => [], 'platform-overrides' => ['foo/bar' => '1.0']], 'alt.lock: platform-overrides cannot be loaded: foo/bar is no platform package'];
+        yield 'self.version before a platform constraint that Composer cannot parse' => [['packages' => [], 'platform' => ['php' => 'self.version', 'ext-json' => '>= ~']], 'alt.lock: platform cannot be loaded: '];
+        yield 'override that Composer cannot normalise' => [['packages' => [], 'platform-overrides' => ['php' => 'eight']], 'alt.lock: platform-overrides cannot be loaded: '];
         yield 'php override false' => [['packages' => [], 'platform-overrides' => ['php' => false]], 'alt.lock: platform-overrides cannot be loaded: '];
-        yield 'string aliases' => [['packages' => [], 'aliases' => 'x'], 'alt.lock: aliases must be a list of objects with the strings package, alias and alias_normalized'];
-        yield 'alias without alias_normalized' => [['packages' => [$entry], 'aliases' => [['package' => 'a/b', 'version' => '1.0.0', 'alias' => '1.0.x-dev']]], 'alt.lock: aliases must be a list of objects with the strings package, alias and alias_normalized'];
-        yield 'alias that is a string' => [['packages' => [$entry], 'aliases' => ['a/b']], 'alt.lock: aliases must be a list of objects with the strings package, alias and alias_normalized'];
-        yield 'alias without package' => [['packages' => [$entry], 'aliases' => [['version' => '1.0.0', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases must be a list of objects with the strings package, alias and alias_normalized'];
-        yield 'a broken alias before a whole one' => [['packages' => [$entry], 'aliases' => ['a/b', ['package' => 'a/b', 'version' => '1.0.0', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases must be a list of objects with the strings package, alias and alias_normalized'];
-        yield 'aliases as an object' => [['packages' => [$entry], 'aliases' => ['a' => ['package' => 'a/b', 'version' => '1.0.0', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases must be a list of objects with the strings package, alias and alias_normalized'];
+        yield 'string aliases' => [['packages' => [], 'aliases' => 'x'], 'alt.lock: aliases must hold objects with the string package'];
+        yield 'alias of a locked package without alias_normalized' => [['packages' => [$entry], 'aliases' => [['package' => 'a/b', 'version' => '1.0.0', 'alias' => '1.0.x-dev']]], 'alt.lock: aliases entry for a/b must have the strings alias and alias_normalized'];
+        yield 'alias of a locked package without alias' => [['packages' => [$entry], 'aliases' => [['package' => 'a/b', 'version' => '1.0.0', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases entry for a/b must have the strings alias and alias_normalized'];
+        yield 'alias that is a string' => [['packages' => [$entry], 'aliases' => ['a/b']], 'alt.lock: aliases must hold objects with the string package'];
+        yield 'alias without package' => [['packages' => [$entry], 'aliases' => [['version' => '1.0.0', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases must hold objects with the string package'];
+        yield 'a broken alias before a whole one' => [['packages' => [$entry], 'aliases' => ['a/b', ['package' => 'a/b', 'version' => '1.0.0', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases must hold objects with the string package'];
         yield 'number as name' => [['packages' => [['name' => 5, 'version' => '1.0.0']]], 'alt.lock entry #0 in packages cannot be loaded: "name" must be a string'];
         yield 'number as type' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'type' => 5]]], 'alt.lock entry #0 in packages cannot be loaded: '];
         yield 'name in both sections' => [['packages' => [$entry], 'packages-dev' => [['name' => 'a/b', 'version' => '2.0.0']]], 'alt.lock lists a/b twice: entry #0 in packages and entry #0 in packages-dev'];
@@ -531,6 +533,7 @@ final class LockFileTest extends TestCase
         yield 'list inside platform-dev' => [['packages' => [], 'platform-dev' => ['ext-json' => ['not a constraint']]]];
         yield 'platform constraints that Composer parses' => [['packages' => [], 'platform' => ['php' => '>=7.4 <8.5', 'ext-json' => '*'], 'platform-dev' => ['ext-intl' => '^1.0 || dev-main']]];
         yield 'empty aliases' => [['packages' => [], 'aliases' => []]];
+        yield 'self.version in platform and platform-dev' => [['packages' => [], 'platform' => ['php' => 'self.version'], 'platform-dev' => ['ext-json' => 'self.version']]];
     }
 
     /**
@@ -580,9 +583,24 @@ final class LockFileTest extends TestCase
         self::assertCount(1, $lock->lockedRepository()->getPackages());
     }
 
+    /** Composer's Locker skips an `aliases` entry whose package is not locked, and reads no other field of it. */
+    public function testAnAliasesObjectAndAnEntryForNoLockedPackageLoadAsInComposer(): void
+    {
+        $lock = LockFile::fromArray([
+            'packages' => [['name' => 'vendor/a', 'version' => 'dev-main']],
+            'aliases' => [
+                'first' => ['package' => 'vendor/missing', 'alias' => '1.0.x-dev'],
+                'second' => ['package' => 'vendor/a', 'version' => 'dev-main', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev'],
+            ],
+        ]);
+
+        self::assertCount(2, $lock->lockedRepository()->getPackages(), 'the locked package and the alias of it');
+    }
+
     /** @return iterable<string, array{0: array<string, mixed>, 1: string}> */
     public static function platformDataThatComposerRefuses(): iterable
     {
+        yield 'a php override that is no version' => [['packages' => [], 'platform-overrides' => ['php' => 'eight']], 'alt.lock: platform-overrides cannot be loaded: '];
         yield 'a php override of false' => [['packages' => [], 'platform-overrides' => ['php' => false]], 'alt.lock: platform-overrides cannot be loaded: '];
         yield 'a platform constraint that Composer cannot parse' => [['packages' => [], 'platform' => ['php' => 'not a constraint !!']], 'alt.lock: platform cannot be loaded: '];
     }

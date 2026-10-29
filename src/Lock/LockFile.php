@@ -53,7 +53,7 @@ final class LockFile
 
     /**
      * A lock loads only when Composer can install it and it keeps lockrot's own rules. `packages` is
-     * a list, `packages-dev` and `aliases` are null or a list, and each `name` is a string. No name is
+     * a list, `packages-dev` is null or a list, and each `name` is a string. No name is
      * listed twice, case ignored, because a finding needs one entry per package. A platform map
      * follows Composer: the later of two keys that differ in case wins.
      *
@@ -64,7 +64,6 @@ final class LockFile
      */
     public static function fromArray(array $lock, string $name = FormatContext::DEFAULT_LOCK_NAME): self
     {
-        $aliases = self::aliases($lock['aliases'] ?? null, $name);
         self::checkPlatformLinks(['platform' => $lock['platform'] ?? null, 'platform-dev' => $lock['platform-dev'] ?? null], $name);
         $overridePhp = self::overridePhpOf($lock['platform-overrides'] ?? [], $name);
         $packages = [];
@@ -98,7 +97,7 @@ final class LockFile
                 $aliased[$package->name()] = $forUpdate instanceof AliasPackage ? $forUpdate->getAliasOf() : $forUpdate;
             }
         }
-        foreach ($aliases as $alias) {
+        foreach (self::aliases($lock['aliases'] ?? null, $seen, $name) as $alias) {
             $of = $aliased[$alias['package']] ?? null;
             if ($of instanceof CompletePackage) {
                 $rootAlias = new CompleteAliasPackage($of, $alias['alias_normalized'], $alias['alias']);
@@ -189,6 +188,10 @@ final class LockFile
                 throw new ConfigException(\sprintf('%s: %s must be an object', $name, $key));
             }
             foreach (array_filter($links, 'is_string') as $constraint) {
+                // Composer's ArrayLoader::createLink() replaces `self.version` with the version of the root.
+                if ($constraint === 'self.version') {
+                    continue;
+                }
                 try {
                     $parser->parseConstraints($constraint);
                 } catch (\UnexpectedValueException $e) {
@@ -200,7 +203,7 @@ final class LockFile
 
     /**
      * `platform-overrides.php` as Composer's PlatformRepository reads it: names in lower case, the
-     * later of two keys wins, and each value is a string or `false`. Composer's Locker passes
+     * later of two keys wins, and each value is a version or `false`. Composer's Locker passes
      * `platform-overrides` to PlatformRepository when it is set.
      *
      * @param mixed $overrides
@@ -216,38 +219,63 @@ final class LockFile
         } catch (\Throwable $e) {
             throw new ConfigException($name.': platform-overrides cannot be loaded: '.$e->getMessage(), 0, $e);
         }
-        // PlatformRepository::initialize() refuses these names when Composer installs the lock.
-        foreach (array_keys($overrides) as $override) {
-            if (!PlatformRepository::isPlatformPackage((string) $override)) {
+        $byName = [];
+        foreach ($overrides as $override => $version) {
+            $byName[strtolower((string) $override)] = $version;
+        }
+        // PlatformRepository::initialize() refuses these names and versions when Composer installs the lock.
+        $parser = new VersionParser();
+        foreach ($byName as $override => $version) {
+            if (!PlatformRepository::isPlatformPackage($override)) {
                 throw new ConfigException(\sprintf('%s: platform-overrides cannot be loaded: %s is no platform package', $name, $override));
+            }
+            try {
+                if (\is_string($version)) {
+                    $parser->normalize($version);
+                }
+            } catch (\UnexpectedValueException $e) {
+                throw new ConfigException($name.': platform-overrides cannot be loaded: '.$e->getMessage(), 0, $e);
             }
         }
 
-        $php = array_change_key_case($overrides, \CASE_LOWER)['php'] ?? null;
+        $php = $byName['php'] ?? null;
 
         return \is_string($php) ? $php : null;
     }
 
     /**
-     * @param mixed $aliases
+     * The `aliases` entries of locked packages. Composer's Locker skips an entry whose package is
+     * not locked, and reads no other field of it.
+     *
+     * @param mixed               $aliases
+     * @param array<string, string> $locked the lower-case names of the locked packages as keys
      *
      * @return list<array{package: string, alias: string, alias_normalized: string}>
      */
-    private static function aliases($aliases, string $name): array
+    private static function aliases($aliases, array $locked, string $name): array
     {
         if ($aliases === null) {
             return [];
         }
-        $valid = \is_array($aliases) && ($aliases === [] || JsonReader::isList($aliases));
-        foreach ($valid ? $aliases : [] as $alias) {
-            $valid = $valid && \is_array($alias) && \is_string($alias['package'] ?? null) && \is_string($alias['alias'] ?? null) && \is_string($alias['alias_normalized'] ?? null);
+        $refusal = $name.': aliases must hold objects with the string package';
+        if (!\is_array($aliases)) {
+            throw new ConfigException($refusal);
         }
-        if (!$valid) {
-            throw new ConfigException($name.': aliases must be a list of objects with the strings package, alias and alias_normalized');
+        $out = [];
+        foreach ($aliases as $alias) {
+            if (!\is_array($alias) || !\is_string($alias['package'] ?? null)) {
+                throw new ConfigException($refusal);
+            }
+            if (!isset($locked[$alias['package']])) {
+                continue;
+            }
+            if (!\is_string($alias['alias'] ?? null) || !\is_string($alias['alias_normalized'] ?? null)) {
+                throw new ConfigException(\sprintf('%s: aliases entry for %s must have the strings alias and alias_normalized', $name, $alias['package']));
+            }
+            $out[] = ['package' => $alias['package'], 'alias' => $alias['alias'], 'alias_normalized' => $alias['alias_normalized']];
         }
 
-        /** @var list<array{package: string, alias: string, alias_normalized: string}> $aliases */
-        return $aliases;
+        return $out;
     }
 
     /**

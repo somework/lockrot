@@ -88,8 +88,9 @@ with `lockrot:`, any other failure with `lockrot failed:`. `-v` adds the stack t
   `alt.lock` under `COMPOSER=alt.json`. The rules:
 
     - `packages` is a list.
-    - `packages-dev` and `aliases` are null or a list.
-    - Each `aliases` entry has the strings `package`, `alias` and `alias_normalized`.
+    - `packages-dev` is null or a list.
+    - Each `aliases` entry is an object with the string `package`. An entry for a locked package
+      also has the strings `alias` and `alias_normalized`.
     - Each `name` is a string, and no name is listed twice, case ignored.
 
 - A value the configuration rejects: in `extra.lockrot`, in an environment variable, or on the
