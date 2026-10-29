@@ -328,6 +328,7 @@ final class SolverCheckerTest extends TestCase
         self::assertStringContainsString('acme/lib', (string) $baseline->problem());
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'baseline_refused', 'installs' => null], $move->check()->jsonSerialize());
         self::assertSame([MoveCheck::NOT_CHECKED, 'baseline_refused'], [$checker->combined(['acme/lib' => '^1.1.0'])->check()->result(), $checker->combined(['acme/lib' => '^1.1.0'])->check()->reason()]);
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'baseline_refused', 'installs' => null], $checker->joint(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'), ['acme/lib'])->check()->jsonSerialize(), 'the joint request');
     }
 
     /**
@@ -928,6 +929,19 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0', null, '1.1.0'))->check()->jsonSerialize());
     }
 
+    /** A refusal that read a shadowed name proves nothing either: the hidden releases of acme/zeta can change it. */
+    public function testARefusalThatReadsAShadowedNameIsNotChecked(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/zeta' => '^1.0', 'php' => '>=9.0']]], 'acme/zeta' => [['version' => '1.0.0']]],
+            ['acme/zeta' => VersionSource::SHADOWED]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize());
+    }
+
     public function testACombinedSolveThatReadsAShadowedNameIsNotChecked(): void
     {
         $checker = self::checker(
@@ -1491,6 +1505,108 @@ final class SolverCheckerTest extends TestCase
         $outcome = $checker->check(MoveQuery::update('web-auth/webauthn-lib', '^5.2.0', '5.2.0', null, '5.4.0'));
 
         self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => null], $outcome->check()->jsonSerialize());
+    }
+
+    /** A newest release that does not parse is installed by no form: the form that installs the highest release wins. */
+    public function testANewestReleaseThatDoesNotParseLetsTheHighestReleaseWin(): void
+    {
+        $checker = self::checker(['acme/app-auth' => '^1.0'], self::webauthnLock(), self::webauthnRemote(true));
+
+        $outcome = $checker->check(MoveQuery::update('web-auth/webauthn-lib', '^5.3.5', '5.3.5', null, 'not-a-version'));
+
+        self::assertSame(['result' => 'resolves', 'form' => 'with-dependencies', 'reason' => null, 'installs' => '5.3.9'], $outcome->check()->jsonSerialize());
+    }
+
+    /** `-w` installs a release whose version does not parse, so it is not higher than the inline 5.3.8: the inline form stays. */
+    public function testAReleaseThatDoesNotParseIsNotHigherThanTheFirstResolvingForm(): void
+    {
+        $remote = self::webauthnRemote(true);
+        $remote['web-auth/webauthn-lib'][2] = ['version' => 'release-5.3.9', 'version_normalized' => '5.3.9.0', 'require' => ['spomky-labs/cbor-php' => '^3.4']];
+        $checker = self::checker(['acme/app-auth' => '^1.0'], self::webauthnLock(), $remote);
+
+        $outcome = $checker->check(MoveQuery::update('web-auth/webauthn-lib', '^5.3.5', '5.3.5', null, '5.4.0'));
+
+        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => '5.3.8'], $outcome->check()->jsonSerialize());
+    }
+
+    /** No hold scan reads a release that does not parse: the refusal keeps the holds of Composer's rules alone. */
+    public function testARefusalOfAMoveWhoseReleaseDoesNotParseKeepsComposersHolds(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '2.0.0', 'require' => ['php' => '>=9.0']]]]
+        );
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^2.0', 'not-a-version'));
+
+        self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
+        self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require', 'target' => null, 'constraint' => '^1.0']], self::rows($outcome->holds()), 'no platform hold of a scanned 2.0.0');
+    }
+
+    /**
+     * The run's records reach Composer's filter as complete records: the `GHSA` ignore rule makes it
+     * load them. The records block only in the copy that withAdvisories() returns.
+     */
+    public function testTheRunsRecordsBlockInTheCopyAndLeaveTheCheckerItComesFromAsItWas(): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['audit' => ['ignore' => ['GHSA-aaaa-bbbb-cccc' => ['apply' => 'block']]]]]);
+        $parser = new VersionParser();
+        $partial = PartialSecurityAdvisory::create('acme/lib', ['advisoryId' => 'PKSA-1111-2222-3333', 'affectedVersions' => '>=1.1.0,<1.2.0'], $parser);
+        $full = PartialSecurityAdvisory::create('acme/lib', ['advisoryId' => 'PKSA-1111-2222-3333', 'affectedVersions' => '>=1.1.0,<1.2.0', 'title' => 'A flaw', 'sources' => [['name' => 'GitHub', 'remoteId' => 'GHSA-dddd-eeee-ffff']], 'reportedAt' => '2026-01-01 00:00:00', 'cve' => null, 'link' => null, 'severity' => 'high'], $parser);
+        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]);
+        $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source);
+        $checker = new SolverChecker($solver, [], '8.4.99', true, Deadline::never(), new PoolAdvisories(AdvisoryBlocking::fromConfig($config), static fn (array $names, bool $complete): array => $complete ? [] : array_intersect_key(['acme/lib' => [$partial]], array_flip($names))));
+        $query = MoveQuery::update('acme/lib', '^1.1.0', '1.1.0');
+
+        $copy = $checker->withAdvisories(['acme/lib' => [$full]], ['acme/lib']);
+
+        self::assertSame(MoveCheck::REFUSED, $copy->check($query)->check()->result(), 'the run\'s record blocks 1.1.0');
+        self::assertSame(MoveCheck::RESOLVES, $checker->check($query)->check()->result(), 'the lookup\'s complete answer has no record');
+    }
+
+    /**
+     * A checker built without advisories has nothing to block with, so the run's records change no answer.
+     *
+     * @dataProvider blockingSwitch
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('blockingSwitch')]
+    public function testACheckerWithoutAdvisoriesAnswersAsBeforeWithTheRunsRecords(bool $blocks): void
+    {
+        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]);
+        $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source);
+        $records = ['acme/lib' => [PartialSecurityAdvisory::create('acme/lib', ['advisoryId' => 'PKSA-1111-2222-3333', 'affectedVersions' => '>=1.1.0,<1.2.0'], new VersionParser())]];
+
+        $copy = (new SolverChecker($solver, [], '8.4.99', $blocks, Deadline::never()))->withAdvisories($records, ['acme/lib']);
+
+        self::assertSame(MoveCheck::RESOLVES, $copy->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check()->result());
+    }
+
+    /** @return iterable<string, array{bool}> */
+    public static function blockingSwitch(): iterable
+    {
+        yield 'blocking on' => [true];
+        yield 'blocking off' => [false];
+    }
+
+    /** The budget runs out after the baseline: the unlock of no name and the joint request are not checked. */
+    public function testAnUnlockOfNoNameAndAJointRequestThatTheBudgetStopsAreNotChecked(): void
+    {
+        // The clock reads: the deadline, the baseline, then the request past the budget.
+        $checker = static function (): SolverChecker {
+            $readings = [0.0, 0.0, 100.0];
+            $now = static function () use (&$readings): float {
+                return array_shift($readings) ?? 100.0;
+            };
+            $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]));
+
+            return new SolverChecker($solver, [], '8.4.99', false, Deadline::inSeconds(10.0, $now));
+        };
+        $budget = ['result' => 'not_checked', 'form' => null, 'reason' => 'install_time_budget', 'installs' => null];
+
+        self::assertSame($budget, $checker()->solveAt([])->check()->jsonSerialize(), 'the unlock of no name');
+        self::assertSame($budget, $checker()->joint(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'), ['acme/lib'])->check()->jsonSerialize(), 'the joint request');
     }
 
     /** @return list<array<string, mixed>> */

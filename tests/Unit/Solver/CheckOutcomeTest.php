@@ -88,6 +88,17 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame([$bundle, $kernel], $outcome->holds());
     }
 
+    /** No link admits a release that does not parse, so no hold drops. */
+    public function testEveryHoldStaysForAReleaseThatDoesNotParse(): void
+    {
+        $bundle = new Holder(Holder::PACKAGE, 'symfony/monolog-bundle', 'v3.8.0', Holder::REQUIRE, '~4.4 || ^5.0');
+        $kernel = new Holder(Holder::ROOT, null, null, Holder::REQUIRE, '^4.4.51', 'symfony/http-kernel');
+
+        $outcome = (new CheckOutcome(MoveCheck::refused(), [$bundle, $kernel]))->withoutAdmitting('not-a-version');
+
+        self::assertSame([$bundle, $kernel], $outcome->holds());
+    }
+
     /** @return iterable<string, array{Holder::REQUIRE|Holder::REQUIRE_DEV|Holder::ROOT_REQUIRE}> */
     public static function rootRequirementLinks(): iterable
     {
@@ -217,6 +228,27 @@ final class CheckOutcomeTest extends TestCase
         $joint = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0')))->withChanges(['p/kg' => '2.0.0', 'h/x' => 'v1.10.0'], ['p/kg' => '1.0.0', 'h/x' => 'v1.9.0']);
 
         self::assertSame([['package' => 'h/x', 'installed_version' => 'v1.9.0', 'version' => 'v1.10.0']], $outcome->joinedWith($joint, 'p/kg', '^2.0', ['h/x'])->movesWith());
+    }
+
+    /** A locked holder release that does not parse is not below the release that the solve moves it to. */
+    public function testAJointSolveThatMovesAHolderFromAReleaseThatDoesNotParseResolvesTheMove(): void
+    {
+        $outcome = new CheckOutcome(MoveCheck::refused(), [new Holder(Holder::PACKAGE, 'h/x', 'release-2', Holder::REQUIRE, '^1')]);
+        $joint = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0')))->withChanges(['p/kg' => '2.0.0', 'h/x' => '2.1.0'], ['p/kg' => '1.0.0', 'h/x' => 'release-2']);
+
+        self::assertSame([['package' => 'h/x', 'installed_version' => 'release-2', 'version' => '2.1.0']], $outcome->joinedWith($joint, 'p/kg', '^2.0', ['h/x'])->movesWith());
+    }
+
+    /** A move constraint that does not parse admits no release: the joint solve keeps the first refusal. */
+    public function testAJointSolveOfAConstraintThatDoesNotParseKeepsTheFirstRefusal(): void
+    {
+        $holds = [new Holder(Holder::PACKAGE, 'h/x', '1.9.0', Holder::REQUIRE, '^1')];
+        $outcome = new CheckOutcome(MoveCheck::refused(), $holds);
+        $joint = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '2.0.0')))->withChanges(['p/kg' => '2.0.0', 'h/x' => '2.0.0'], ['p/kg' => '1.0.0', 'h/x' => '1.9.0']);
+
+        $joined = $outcome->joinedWith($joint, 'p/kg', 'not a constraint!', ['h/x']);
+
+        self::assertSame([MoveCheck::REFUSED, $holds, []], [$joined->check()->result(), $joined->holds(), $joined->movesWith()]);
     }
 
     /** One holder that the solve moves to a dev version spoils the solve, although another holder moves to a tag. */

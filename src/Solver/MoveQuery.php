@@ -75,11 +75,6 @@ final class MoveQuery
         return $this->isRequire;
     }
 
-    public function php(): ?string
-    {
-        return $this->php;
-    }
-
     public function newest(): ?string
     {
         return $this->newest;

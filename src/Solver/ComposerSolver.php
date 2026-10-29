@@ -275,11 +275,10 @@ final class ComposerSolver
         $flags = $root->getStabilityFlags();
         $flags[$root->getName()] = BasePackage::$stabilities[VersionParser::parseStability($root->getVersion())];
         $set = new RepositorySet($root->getMinimumStability(), $flags, $root->getAliases(), $root->getReferences(), $requires, $temporary);
-        // A package takes one repository, so each pass gets its own copy of the root.
+        // A package takes one repository, so each pass gets its own copy of the root. Composer's
+        // root packages, RootPackage and RootAliasPackage, extend BasePackage.
+        /** @var BasePackage&RootPackageInterface $fixedRoot */
         $fixedRoot = clone $root;
-        if (!$fixedRoot instanceof BasePackage) {
-            throw new \LogicException('the root package is no BasePackage: '.\get_class($fixedRoot));
-        }
         $fixedRoot->setRequires([]);
         $set->addRepository(new RootPackageRepository($fixedRoot));
         if ($this->lockedOnly !== null) {

@@ -265,7 +265,7 @@ final class RepositoryVersions implements VersionSource
      * copy of a version that two repositories list.
      *
      * @param list<BasePackage> $loaded
-     * @param list<BasePackage> $packages
+     * @param array<BasePackage> $packages
      *
      * @return list<BasePackage>
      */
@@ -297,11 +297,11 @@ final class RepositoryVersions implements VersionSource
     /**
      * @param array{packages: array<BasePackage>} $result a repository's answer
      *
-     * @return list<BasePackage>
+     * @return array<BasePackage>
      */
     private static function named(array $result, string $name): array
     {
-        return array_values(array_filter($result['packages'], static fn (BasePackage $package): bool => $package->getName() === $name));
+        return array_filter($result['packages'], static fn (BasePackage $package): bool => $package->getName() === $name);
     }
 
     /**
