@@ -5,11 +5,11 @@
  "documents": {
   "corpus": 49,
   "variants": 3,
-  "cases": 194,
+  "cases": 198,
   "coverage/baselined": 49,
-  "coverage/variants": 75,
-  "explain": 189,
-  "explain/coverage": 97,
+  "coverage/variants": 77,
+  "explain": 193,
+  "explain/coverage": 99,
   "baseline/cases": 6,
   "baseline/corpus": 49,
   "baseline/earlier": 50,
@@ -19,6 +19,6 @@
   "config": 33,
   "config/coverage": 42,
   "config/repo-docs": 4,
-  "page": 20
+  "page": 21
  }
 }

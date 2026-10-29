@@ -14435,7 +14435,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter: replace bdunogier/guzzle-site-authenticator, php-http/guzzle5-adapter, or replace or update guzzlehttp/guzzle; the newest release of guzzlehttp/guzzle (8.2.0) no longer requires it"
+    "text": "find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle and php-http/guzzle5-adapter: replace bdunogier/guzzle-site-authenticator and php-http/guzzle5-adapter, or replace or update guzzlehttp/guzzle; the newest release of guzzlehttp/guzzle (8.2.0) no longer requires it"
    },
    "security": {
     "status": "clear",
@@ -14833,7 +14833,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle (guzzlehttp/ringphp requires it), php-http/guzzle5-adapter: replace bdunogier/guzzle-site-authenticator, php-http/guzzle5-adapter, or replace or update guzzlehttp/guzzle"
+    "text": "find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle (guzzlehttp/ringphp requires it) and php-http/guzzle5-adapter: replace bdunogier/guzzle-site-authenticator and php-http/guzzle5-adapter, or replace or update guzzlehttp/guzzle"
    },
    "security": {
     "status": "clear",
@@ -15219,7 +15219,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
    },
    "security": {
     "status": "clear",
@@ -26984,7 +26984,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
    },
    "security": {
     "status": "clear",
@@ -27298,7 +27298,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/exception requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/exception requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
    },
    "security": {
     "status": "clear",
@@ -27613,7 +27613,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
    },
    "security": {
     "status": "clear",
@@ -27927,7 +27927,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
    },
    "security": {
     "status": "clear",
@@ -28241,7 +28241,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/compiler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/compiler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
    },
    "security": {
     "status": "clear",
@@ -28556,7 +28556,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/compiler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/compiler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
    },
    "security": {
     "status": "clear",
@@ -28871,7 +28871,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
    },
    "security": {
     "status": "clear",
@@ -29185,7 +29185,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/compiler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/compiler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
    },
    "security": {
     "status": "clear",
@@ -29500,7 +29500,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle; the newest release of kphoen/rulerz (0.21.1) still requires it"
+    "text": "find a replacement (none named); it comes in through kphoen/rulerz and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle; the newest release of kphoen/rulerz (0.21.1) still requires it"
    },
    "security": {
     "status": "clear",
@@ -29813,7 +29813,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/file requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/file requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
    },
    "security": {
     "status": "clear",
@@ -30128,7 +30128,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/regex requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/regex requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
    },
    "security": {
     "status": "clear",
@@ -30444,7 +30444,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/ruler requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
    },
    "security": {
     "status": "clear",
@@ -30758,7 +30758,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/math requires it), kphoen/rulerz-bundle: replace kphoen/rulerz, kphoen/rulerz-bundle"
+    "text": "find a replacement (none named); it comes in through kphoen/rulerz (hoa/math requires it) and kphoen/rulerz-bundle: replace kphoen/rulerz and kphoen/rulerz-bundle"
    },
    "security": {
     "status": "clear",
@@ -31273,7 +31273,7 @@
      }
     ],
     "also": [],
-    "text": "replace it: its registry suggests \"EnglishInflector from the String component\"; it comes in through babdev/pagerfanta-bundle (symfony/property-access requires it), craue/config-bundle, friendsofsymfony/oauth-server-bundle and 14 more: replace or update babdev/pagerfanta-bundle, craue/config-bundle, friendsofsymfony/oauth-server-bundle and 11 more, or replace kphoen/rulerz, kphoen/rulerz-bundle, scheb/2fa-qr-code"
+    "text": "replace it: its registry suggests \"EnglishInflector from the String component\"; it comes in through babdev/pagerfanta-bundle (symfony/property-access requires it), craue/config-bundle, friendsofsymfony/oauth-server-bundle and 14 more: replace or update babdev/pagerfanta-bundle, craue/config-bundle, friendsofsymfony/oauth-server-bundle and 11 more, or replace kphoen/rulerz, kphoen/rulerz-bundle and scheb/2fa-qr-code"
    },
    "security": {
     "status": "clear",
@@ -33555,7 +33555,7 @@
      }
     ],
     "also": [],
-    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move willdurand/jsonp-callback-validator to ^2.0.0 through friendsofsymfony/jsrouting-bundle, friendsofsymfony/rest-bundle — clears old-promise; 2.x needs php >=7.1.0, which require.php allows; the target php 8.4 runs it; stale stays; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of friendsofsymfony/jsrouting-bundle (3.6.1) and friendsofsymfony/rest-bundle (3.9.0) still require it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move willdurand/jsonp-callback-validator to ^2.0.0 through friendsofsymfony/jsrouting-bundle and friendsofsymfony/rest-bundle — clears old-promise; 2.x needs php >=7.1.0, which require.php allows; the target php 8.4 runs it; stale stays; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of friendsofsymfony/jsrouting-bundle (3.6.1) and friendsofsymfony/rest-bundle (3.9.0) still require it"
    },
    "security": {
     "status": "clear",
@@ -36530,7 +36530,7 @@
      }
     ],
     "also": [],
-    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.4, then move lcobucci/clock to ^3.6 through lcobucci/jwt, scheb/2fa-trusted-device — clears left-behind; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of lcobucci/jwt (5.6.0) no longer requires it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.4, then move lcobucci/clock to ^3.6 through lcobucci/jwt and scheb/2fa-trusted-device — clears left-behind; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of lcobucci/jwt (5.6.0) no longer requires it"
    },
    "security": {
     "status": "clear",
@@ -36855,7 +36855,7 @@
      }
     ],
     "also": [],
-    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move pagerfanta/core to ^4.9 through babdev/pagerfanta-bundle, pagerfanta/doctrine-orm-adapter, pagerfanta/twig — clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of babdev/pagerfanta-bundle (v4.6.0), pagerfanta/doctrine-orm-adapter (v4.9.0) and pagerfanta/twig (v4.9.0) still require it"
+    "text": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. raise require.php to >=8.1, then move pagerfanta/core to ^4.9 through babdev/pagerfanta-bundle, pagerfanta/doctrine-orm-adapter and pagerfanta/twig — clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of babdev/pagerfanta-bundle (v4.6.0), pagerfanta/doctrine-orm-adapter (v4.9.0) and pagerfanta/twig (v4.9.0) still require it"
    },
    "security": {
     "status": "clear",

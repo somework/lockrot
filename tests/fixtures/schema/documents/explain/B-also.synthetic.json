@@ -322,7 +322,7 @@
      "text": "require symfony/monolog-bridge ^5.4 — clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
     }
    ],
-   "text": "composer update symfony/monolog-bridge (gets v2.8.52) — clears the advisory; left-behind, old-promise stay"
+   "text": "composer update symfony/monolog-bridge (gets v2.8.52) — clears the advisory; left-behind and old-promise stay"
   },
   "security": {
    "status": "vulnerable",

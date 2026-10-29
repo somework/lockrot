@@ -187,7 +187,7 @@
    "commands": [],
    "through": [],
    "also": [],
-   "text": "require intervention/image ^3.11 — clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (conflicts with >=3.12) and composer.json (no release of ^3.11 can install) and composer.json (requires laravel/framework ^11.0) and intervention/image 3.11.0, its own release (replaces intervention/gif self.version (3.11.0)) and intervention/image 3.11.0, its own release (requires php >=8.4.5); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
+   "text": "require intervention/image ^3.11 — clears left-behind; 3.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (conflicts with >=3.12), composer.json (no release of ^3.11 can install), composer.json (requires laravel/framework ^11.0), intervention/image 3.11.0, its own release (replaces intervention/gif self.version (3.11.0)) and intervention/image 3.11.0, its own release (requires php >=8.4.5); the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock"
   },
   "security": {
    "status": "clear",

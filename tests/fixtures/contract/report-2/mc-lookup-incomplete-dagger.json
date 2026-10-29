@@ -1292,7 +1292,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update 'typo3/html-sanitizer:^2.3.2' (gets v2.3.2) \u2014 clears the advisory; not checked with Composer's solver (the advisory lookup did not cover a package it installs), so it holds only if Composer resolves it"
+                "text": "composer update 'typo3/html-sanitizer:^2.3.2' (gets v2.3.2) \u2014 clears the advisory; not checked with Composer's solver (the advisory lookup did not cover a package in the result), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",

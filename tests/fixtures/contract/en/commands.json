@@ -429,6 +429,17 @@
             "argv": [
                 "composer",
                 "require",
+                "twig/twig:^3.27.0",
+                "--no-interaction"
+            ],
+            "posix": "composer require 'twig/twig:^3.27.0' --no-interaction",
+            "cmd": "composer require \"twig/twig:^3.27.0\" --no-interaction",
+            "powershell": "composer --% require \"twig/twig:^3.27.0\" --no-interaction"
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
                 "vendor/package:>=1.2 <2.0"
             ],
             "posix": "composer require 'vendor/package:>=1.2 <2.0'",

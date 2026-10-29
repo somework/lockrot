@@ -1386,7 +1386,7 @@
      }
     ],
     "also": [],
-    "text": "move league/commonmark to ^2.10.3 through laravel/framework, laravel/nightwatch, spatie/laravel-markdown — clears 3 advisories; 2.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by spatie/laravel-markdown 2.8.0 (conflicts with ~2.10.3); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
+    "text": "move league/commonmark to ^2.10.3 through laravel/framework, laravel/nightwatch and spatie/laravel-markdown — clears 3 advisories; 2.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by spatie/laravel-markdown 2.8.0 (conflicts with ~2.10.3); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
    },
    "security": {
     "status": "vulnerable",

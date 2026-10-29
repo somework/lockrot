@@ -3945,7 +3945,7 @@
      }
     ],
     "also": [],
-    "text": "find a maintained alternative: nothing released for 5.9 years; it comes in through web-auth/webauthn-lib, web-token/signature-pack: replace or update web-auth/webauthn-lib, web-token/signature-pack; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it"
+    "text": "find a maintained alternative: nothing released for 5.9 years; it comes in through web-auth/webauthn-lib and web-token/signature-pack: replace or update web-auth/webauthn-lib and web-token/signature-pack; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it"
    },
    "security": {
     "status": "clear",
@@ -11841,7 +11841,7 @@
      }
     ],
     "also": [],
-    "text": "find a replacement (none named); it comes in through web-auth/webauthn-lib (web-auth/cose-lib requires it), web-token/signature-pack: replace or update web-auth/webauthn-lib, web-token/signature-pack"
+    "text": "find a replacement (none named); it comes in through web-auth/webauthn-lib (web-auth/cose-lib requires it) and web-token/signature-pack: replace or update web-auth/webauthn-lib and web-token/signature-pack"
    },
    "security": {
     "status": "clear",
@@ -16755,7 +16755,7 @@
      }
     ],
     "also": [],
-    "text": "raise require.php to >=8.1, then move brick/math to ^0.12 through web-auth/webauthn-lib, web-token/signature-pack — clears left-behind; 0.12.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new 0.x line (Composer treats 0.x minors as breaking) brings its own requirements, which lockrot does not solve; what requires it must allow it"
+    "text": "raise require.php to >=8.1, then move brick/math to ^0.12 through web-auth/webauthn-lib and web-token/signature-pack — clears left-behind; 0.12.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new 0.x line (Composer treats 0.x minors as breaking) brings its own requirements, which lockrot does not solve; what requires it must allow it"
    },
    "security": {
     "status": "clear",

@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **high** | `typo3/html-sanitizer` | v2.2.0 | vulnerable | `16 = vulnerable 16 [high advisory]`<br>**Do:** `composer update 'typo3/html-sanitizer:^2.3.2'` (gets v2.3.2) — clears the advisory; not checked with Composer's solver (the advisory lookup did not cover a package it installs), so it holds only if Composer resolves it<br>*vulnerable:* 1 advisory: 1 high — all fixed on 2.x; advisory: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting<br>*age:* installed v2.2.0 released 2024-07-12 (2.2 years ago); 2.x last released v2.3.2 2026-07-02 (0.3 years ago), its newest release; last push 2026-07-02 (0.3 years ago) | direct |
+| **high** | `typo3/html-sanitizer` | v2.2.0 | vulnerable | `16 = vulnerable 16 [high advisory]`<br>**Do:** `composer update 'typo3/html-sanitizer:^2.3.2'` (gets v2.3.2) — clears the advisory; not checked with Composer's solver (the advisory lookup did not cover a package in the result), so it holds only if Composer resolves it<br>*vulnerable:* 1 advisory: 1 high — all fixed on 2.x; advisory: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting<br>*age:* installed v2.2.0 released 2024-07-12 (2.2 years ago); 2.x last released v2.3.2 2026-07-02 (0.3 years ago), its newest release; last push 2026-07-02 (0.3 years ago) | direct |
 
 flags: vulnerable 1
 depth: every flagged package is named in composer.json · direct 1
