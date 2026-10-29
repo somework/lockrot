@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
-use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\DependencyResolver\Pool;
 use Composer\DependencyResolver\Request;
 use Composer\Package\BasePackage;
@@ -30,21 +29,8 @@ final class SolverInputs
             array_map($id, array_values($request->getFixedPackages())),
             array_map($id, $request->getLockedPackages()),
             array_map(static fn (ConstraintInterface $constraint): array => [$constraint->__toString(), $constraint->getPrettyString()], $request->getRequires()),
-            self::removed($pool->getAllSecurityRemovedPackageVersions()),
-            self::removed($pool->getAllAbandonedRemovedPackageVersions()),
+            // Composer's problem text names the versions that a policy filter removed, so a pool with other removals gets another answer.
+            PolicyRemovals::of($pool),
         ]);
-    }
-
-    /**
-     * Composer's problem text names the versions that the advisory filter removed, so a pool with
-     * other removals gets another answer.
-     *
-     * @param array<string, array<string, array<PartialSecurityAdvisory>|string>> $removed name => version => the advisories, or the pretty version of an abandoned package
-     *
-     * @return array<string, list<string>>
-     */
-    private static function removed(array $removed): array
-    {
-        return array_map(static fn (array $versions): array => array_map('strval', array_keys($versions)), $removed);
     }
 }

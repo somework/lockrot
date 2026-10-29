@@ -13,6 +13,7 @@ use Composer\Semver\VersionParser;
 use Composer\Util\Platform;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Solver\AdvisoryBlocking;
+use Lockrot\Solver\PolicyRemovals;
 use Lockrot\Solver\PoolAdvisories;
 use Lockrot\Solver\PoolAdvisoryFeed;
 use PHPUnit\Framework\TestCase;
@@ -413,22 +414,14 @@ final class AdvisoryBlockingTest extends TestCase
         $feed = new PoolAdvisoryFeed(new PoolAdvisories($blocking, static fn (array $names): array => array_intersect_key($records, array_flip($names))));
         $filtered = $filter->filter($pool, [$feed], new Request());
 
-        return ['security' => self::versions($filtered->getAllSecurityRemovedPackageVersions()), 'abandoned' => self::versions($filtered->getAllAbandonedRemovedPackageVersions())];
-    }
-
-    /**
-     * @param array<string, array<string, mixed>> $removed name => version => the reason
-     *
-     * @return array<string, list<string>>
-     */
-    private static function versions(array $removed): array
-    {
-        $versions = [];
-        foreach ($removed as $name => $byVersion) {
-            $versions[$name] = array_map('strval', array_keys($byVersion));
+        $removed = ['security' => [], 'abandoned' => []];
+        foreach (PolicyRemovals::of($filtered) as $name => $versions) {
+            foreach ($versions as $version => $policy) {
+                $removed[$policy === PolicyRemovals::ABANDONED ? 'abandoned' : 'security'][$name][] = $version;
+            }
         }
 
-        return $versions;
+        return $removed;
     }
 
     private static function advisory(string $name, string $id, string $affected, string $severity): PartialSecurityAdvisory

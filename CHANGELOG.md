@@ -317,6 +317,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **All formats:** the Composer plugin runs on Composer 2.11. Each move check threw an error there,
+  and the error ended the run. The move check gives the answers of the Composer that runs lockrot.
+  On 2.11, advisory blocking skips a root alias such as `dev-main as 1.0.0` and checks a numeric
+  branch such as `1.x-dev`. The move check does not apply the cooldown policy of Composer 2.11.
+  ([The move check](docs/verdicts.md#the-move-check))
+- **All formats:** a move whose solve throws any error reads `not_checked` with `solver_error`, and
+  the run note `move_check_failed` names the error. The error ended the run.
+  ([The move check](docs/verdicts.md#the-move-check))
+- **All formats:** on Composer 2.11, lockrot still counts the advisories of a `dev-*` version and
+  refuses a partial advisory record, as on 2.10. `composer audit` 2.11 skips the first and reports
+  the second. ([Which advisories count](docs/verdicts.md#which-advisories-count))
 - **sarif:** a message writes each literal `{` as `{{` and each `}` as `}}`, as SARIF 2.1.0
   requires, so a viewer that fills placeholders shows an advisory title such as `{% use %}` as written.
 - **sarif:** `originalUriBaseIds.%SRCROOT%.uri` is `file:///` for a project in `/` and

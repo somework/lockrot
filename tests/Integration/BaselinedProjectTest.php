@@ -82,18 +82,15 @@ final class BaselinedProjectTest extends TestCase
     }
 
     /**
-     * A bump of composer/composer in lockrot's lock fails here and asks for a re-record, so no CI row
-     * compares only the invariants unnoticed. A row that pins an older Composer rewrites the lock.
+     * A bump of the composer/composer that the PHAR bundles fails here and asks for a re-record. The
+     * engine-pages job of ci.yml installs that version, so there the exact files are compared.
      *
      * @dataProvider scenarios
      */
     #[DataProvider('scenarios')]
-    public function testTheRecordingRanOnTheComposerOfLockrotsLock(string $scenario): void
+    public function testTheRecordingRanOnTheComposerOfThePharLock(string $scenario): void
     {
-        if (version_compare(Composer::VERSION, self::recordedComposer($scenario), '<')) {
-            self::markTestSkipped('this row pins a composer/composer older than the recording, in its own composer.lock');
-        }
-        $lock = JsonPath::decodeFile(__DIR__.'/../../composer.lock');
+        $lock = JsonPath::decodeFile(__DIR__.'/../../build/phar/composer.lock');
         $locked = [];
         foreach (array_merge(JsonPath::arrayAt($lock, ['packages']), JsonPath::arrayAt($lock, ['packages-dev'])) as $package) {
             if (\is_array($package) && ($package['name'] ?? null) === 'composer/composer') {

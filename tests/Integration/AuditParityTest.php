@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Integration;
 
 use Composer\Advisory\Auditor;
 use Composer\Config;
+use Composer\DependencyResolver\PolicyRemovalReason;
 use Composer\IO\BufferIO;
 use Composer\Package\AliasPackage;
 use Composer\Package\Loader\ArrayLoader;
@@ -34,6 +35,13 @@ final class AuditParityTest extends TestCase
         ['name' => 'acme/clean', 'version' => '3.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
         ['name' => 'acme/branch', 'version' => 'dev-main', 'notification-url' => 'https://packagist.org/downloads/', 'extra' => ['branch-alias' => ['dev-main' => '4.3.x-dev']]],
     ];
+
+    /**
+     * The records of the table that match only an unversioned branch (`dev-*` or the default
+     * branch alias). Composer 2.11 skips such a version in `composer audit`, and lockrot still
+     * counts it (ruling Q6 of PR #151).
+     */
+    private const UNVERSIONED_BRANCH_RECORDS = ['acme/main' => ['PKSA-m2']];
 
     private static ?FixtureRepositoryServer $server = null;
 
@@ -123,7 +131,7 @@ final class AuditParityTest extends TestCase
             $auditor = new Auditor();
             $composer = self::composerResult(static fn (BufferIO $io, RepositorySet $set, array $packages): int => $auditor->audit($io, $set, PolicyConfig::fromConfig($config), $packages, Auditor::FORMAT_JSON));
 
-            self::assertSame($composer, self::lockrotResult($config), $label);
+            self::assertSame($composer, self::asComposerAudits(self::lockrotResult($config)), $label);
             ++$compared;
         }
         self::assertGreaterThan(0, $compared);
@@ -147,7 +155,7 @@ final class AuditParityTest extends TestCase
                 $composer = self::composerResult(static fn (BufferIO $io, RepositorySet $set, array $packages): int => $auditor->audit($io, $set, PolicyConfig::fromConfig($config), $packages, Auditor::FORMAT_JSON));
                 $ignore = AdvisoryIgnore::fromConfig($config);
 
-                self::assertSame($composer, self::lockrotResult($config), $label);
+                self::assertSame($composer, self::asComposerAudits(self::lockrotResult($config)), $label);
                 self::assertNotSame([], $composer['counted'], $label.': advisories count');
                 self::assertSame($noted, $ignore->disabledBy() !== null, $label.': the note is written');
                 self::assertNull($ignore->whyUnreadable(), $label);
@@ -244,6 +252,44 @@ final class AuditParityTest extends TestCase
         }
 
         return ['counted' => self::sorted($counted), 'ignored' => self::sorted($ignored)];
+    }
+
+    /**
+     * lockrot's result without the records of an unversioned branch when the running Composer skips
+     * such a version in `composer audit`. Each of those records is in lockrot's result.
+     *
+     * @param array{counted: array<string, list<string>>, ignored: array<string, list<string>>} $lockrot
+     *
+     * @return array{counted: array<string, list<string>>, ignored: array<string, list<string>>}
+     */
+    private static function asComposerAudits(array $lockrot): array
+    {
+        if (!class_exists(PolicyRemovalReason::class)) {
+            return $lockrot;
+        }
+        foreach (self::UNVERSIONED_BRANCH_RECORDS as $name => $ids) {
+            self::assertSame($ids, array_values(array_intersect(array_merge($lockrot['counted'][$name] ?? [], $lockrot['ignored'][$name] ?? []), $ids)), 'lockrot counts or ignores each record of an unversioned branch');
+        }
+
+        return ['counted' => self::without($lockrot['counted']), 'ignored' => self::without($lockrot['ignored'])];
+    }
+
+    /**
+     * @param array<string, list<string>> $ids
+     *
+     * @return array<string, list<string>>
+     */
+    private static function without(array $ids): array
+    {
+        foreach (self::UNVERSIONED_BRANCH_RECORDS as $name => $skipped) {
+            $kept = array_values(array_diff($ids[$name] ?? [], $skipped));
+            unset($ids[$name]);
+            if ($kept !== []) {
+                $ids[$name] = $kept;
+            }
+        }
+
+        return self::sorted($ids);
     }
 
     /**

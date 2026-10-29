@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Solver;
 
 use Composer\Advisory\PartialSecurityAdvisory;
+use Composer\Config;
 use Composer\DependencyResolver\Pool;
 use Composer\DependencyResolver\Request;
 use Composer\Package\BasePackage;
@@ -13,10 +14,13 @@ use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\RootPackage;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\VersionParser;
+use Lockrot\Solver\AdvisoryBlocking;
+use Lockrot\Solver\PoolAdvisories;
+use Lockrot\Solver\PoolAdvisoryFeed;
 use Lockrot\Solver\SolverInputs;
 use PHPUnit\Framework\TestCase;
 
-/** @phpstan-type Spec array{pool: list<BasePackage>, unacceptable: list<BasePackage>, fixed: list<BasePackage>, locked: list<BasePackage>, requires: array<string, ConstraintInterface>, security?: array<string, array<string, array<PartialSecurityAdvisory>>>, abandoned?: array<string, array<string, string>>} */
+/** @phpstan-type Spec array{pool: list<BasePackage>, unacceptable: list<BasePackage>, fixed: list<BasePackage>, locked: list<BasePackage>, requires: array<string, ConstraintInterface>, removed?: list<BasePackage>, blocking?: AdvisoryBlocking, records?: array<string, list<PartialSecurityAdvisory>>} */
 final class SolverInputsTest extends TestCase
 {
     public function testTwoCopiesOfTheRootWithTheSamePoolAndRequestGiveTheSameInputs(): void
@@ -67,8 +71,8 @@ final class SolverInputsTest extends TestCase
         yield 'another locked package' => [static fn (array $spec, BasePackage $root): array => ['locked' => [self::package('acme/locked', '1.0.0')]] + $spec];
         yield 'another constraint written the same' => [static fn (array $spec, BasePackage $root): array => ['requires' => ['acme/lib' => self::constraint('^2.0', '^1.0')]] + $spec];
         yield 'the same constraint written another way' => [static fn (array $spec, BasePackage $root): array => ['requires' => ['acme/lib' => self::constraint('1.*')]] + $spec];
-        yield 'a version that the advisory filter removed' => [static fn (array $spec, BasePackage $root): array => ['security' => ['acme/lib' => ['1.1.0.0' => []]]] + $spec];
-        yield 'a version that the abandoned filter removed' => [static fn (array $spec, BasePackage $root): array => ['abandoned' => ['acme/lib' => ['1.1.0.0' => '1.1.0']]] + $spec];
+        yield 'a version that the advisory filter removed' => [static fn (array $spec, BasePackage $root): array => ['removed' => [self::package('acme/lib', '1.1.0')], 'blocking' => AdvisoryBlocking::everyAdvisory(), 'records' => ['acme/lib' => [self::advisory('acme/lib', '==1.1.0')]]] + $spec];
+        yield 'a version that the abandoned filter removed' => [static fn (array $spec, BasePackage $root): array => ['removed' => [self::abandoned('acme/lib', '1.1.0')], 'blocking' => self::abandonedBlocking()] + $spec];
     }
 
     /**
@@ -87,7 +91,36 @@ final class SolverInputsTest extends TestCase
             $request->requireName($name, $constraint);
         }
 
-        return SolverInputs::of(new Pool($spec['pool'], $spec['unacceptable'], [], [], $spec['security'] ?? [], $spec['abandoned'] ?? []), $request, $root);
+        $pool = new Pool(array_merge($spec['pool'], $spec['removed'] ?? []), $spec['unacceptable']);
+        $filter = isset($spec['blocking']) ? $spec['blocking']->poolFilter() : null;
+        if ($filter !== null) {
+            $records = $spec['records'] ?? [];
+            $pool = $filter->filter($pool, [new PoolAdvisoryFeed(new PoolAdvisories($spec['blocking'], static fn (array $names): array => array_intersect_key($records, array_flip($names))))], $request);
+        }
+
+        return SolverInputs::of($pool, $request, $root);
+    }
+
+    private static function abandonedBlocking(): AdvisoryBlocking
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['audit' => ['block-abandoned' => true]]]);
+
+        return AdvisoryBlocking::fromConfig($config);
+    }
+
+    private static function abandoned(string $name, string $version): BasePackage
+    {
+        $package = self::package($name, $version);
+        self::assertInstanceOf(CompletePackage::class, $package);
+        $package->setAbandoned(true);
+
+        return $package;
+    }
+
+    private static function advisory(string $name, string $affected): PartialSecurityAdvisory
+    {
+        return PartialSecurityAdvisory::create($name, ['advisoryId' => 'PKSA-aaaa-bbbb-cccc', 'affectedVersions' => $affected, 'title' => 'A flaw', 'sources' => [['name' => 'GitHub', 'remoteId' => 'GHSA-aaaa-bbbb-cccc']], 'reportedAt' => '2026-01-01 00:00:00', 'cve' => null, 'link' => null, 'severity' => 'high'], new VersionParser());
     }
 
     private static function constraint(string $constraint, ?string $written = null): ConstraintInterface

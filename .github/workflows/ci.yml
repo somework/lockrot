@@ -32,8 +32,10 @@ jobs:
       # rows resolve 9.6 on 7.4 and 8.0, 10.5 on 8.1 only, and 11.5 on 8.2 and later. They also
       # hold both PHPUnit configurations and both ends of the PHP range. A pull request into main and
       # a push run them all. A ruleset requires a check by its job name, so a renamed row drops out
-      # of the ruleset. lockrot supports Composer 2.10 and later (composer.json), so every row runs
-      # the newest composer/composer that require-dev allows.
+      # of the ruleset. lockrot supports Composer 2.10 and later (composer.json). A `latest` row runs
+      # the newest composer/composer that require-dev allows. A `2.10` row runs the newest 2.10
+      # release, the floor, because lockrot reads Composer's internal API and its shape differs
+      # between the minors (src/Solver/PolicyRemovals.php).
       # The covers-nothing tests pin their target PHP, so they run on the two covers_nothing rows,
       # at both ends of PHP. Each row runs the runtime-php group.
       matrix: >-
@@ -42,12 +44,15 @@ jobs:
         {"php": "7.4", "composer": "latest", "covers_nothing": true},
         {"php": "8.0", "composer": "latest"},
         {"php": "8.1", "composer": "latest"},
-        {"php": "8.5", "composer": "latest", "covers_nothing": true}]}' || '{
+        {"php": "8.5", "composer": "latest", "covers_nothing": true},
+        {"php": "8.5", "composer": "2.10"}]}' || '{
         "php": ["7.4", "8.0", "8.1", "8.2", "8.3", "8.4", "8.5"],
         "composer": ["latest"],
         "include": [
         {"php": "7.4", "composer": "latest", "covers_nothing": true},
-        {"php": "8.5", "composer": "latest", "covers_nothing": true}]}') }}
+        {"php": "8.5", "composer": "latest", "covers_nothing": true},
+        {"php": "7.4", "composer": "2.10"},
+        {"php": "8.5", "composer": "2.10"}]}') }}
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
@@ -55,6 +60,8 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: none
           tools: composer:v2
+      - if: matrix.composer != 'latest'
+        run: composer require --dev --no-update "composer/composer:${{ matrix.composer }}.*"
       - run: composer update --no-interaction --prefer-dist
       - name: Run tests with the matrix Composer binary
         run: |
@@ -98,9 +105,10 @@ jobs:
           done
           if [ "$failed" -ne 0 ]; then exit 1; fi
   # The tests rows exclude MoveCheckComposerOracleTest, or skip it on a composer/composer that
-  # recorded none of train 7d's answers. The latest rows follow each new Composer release. This job
-  # runs the oracle test once on each recorded version, so the test runs on every head. A ruleset
-  # requires a check by its job name, so a renamed job drops out of the ruleset.
+  # neither recorded train 7d's answers nor gave the same answers (ComposerOracle::SAME_ANSWERS).
+  # The latest rows follow each new Composer release. This job runs the oracle test once on each of
+  # those versions, so the test runs on every head. A ruleset requires a check by its job name, so a
+  # renamed job drops out of the ruleset.
   move-check-oracle:
     runs-on: ubuntu-latest
     steps:
@@ -108,10 +116,10 @@ jobs:
       - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - uses: ./.github/actions/move-check-oracle
-  # EnginePageCasesTest compares the engine pages only on the composer/composer that recorded them,
-  # and the latest rows follow each new Composer release. This job installs the composer/composer of
-  # build/phar/composer.lock, which the PHAR bundles and the recording must match, so a skip fails
-  # here. A ruleset requires a check by its job name, so a renamed job drops out of the ruleset.
+  # EnginePageCasesTest and BaselinedProjectTest compare their recordings only on the composer/composer
+  # that recorded them, and the latest rows follow each new Composer release. This job installs the
+  # composer/composer of build/phar/composer.lock, which the PHAR bundles and the recordings must
+  # match, so a skip fails here. A ruleset requires a check by its job name, so a renamed job drops out of the ruleset.
   engine-pages:
     runs-on: ubuntu-latest
     steps:
@@ -124,6 +132,7 @@ jobs:
       - run: composer require --dev --no-update "composer/composer:$(jq -r '.packages[] | select(.name == "composer/composer") | .version' build/phar/composer.lock)"
       - run: composer update --no-interaction --prefer-dist
       - run: vendor/bin/phpunit --fail-on-skipped --fail-on-empty-test-suite tests/Integration/EnginePageCasesTest.php
+      - run: vendor/bin/phpunit --fail-on-skipped --fail-on-empty-test-suite tests/Integration/BaselinedProjectTest.php
   quality:
     runs-on: ubuntu-latest
     steps:

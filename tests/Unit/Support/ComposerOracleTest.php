@@ -41,7 +41,7 @@ final class ComposerOracleTest extends TestCase
 
     public function testGuardSkipsAnotherVersionWhereTheRunDoesNotRequireTheOracle(): void
     {
-        $thrown = self::thrownBy('2.10.3', '2.11.0', false, ['2.10.3']);
+        $thrown = self::thrownBy('2.10.3', '2.12.0', false, ['2.10.3']);
 
         self::assertInstanceOf(SkippedTest::class, $thrown);
     }
@@ -57,11 +57,37 @@ final class ComposerOracleTest extends TestCase
 
     public function testGuardFailsAVersionThatNoWorldRecordsWhereTheRunRequiresTheOracle(): void
     {
-        $thrown = self::thrownBy('2.10.3', '2.11.0', true, ['2.3.10', '2.10.3']);
+        $thrown = self::thrownBy('2.10.3', '2.12.0', true, ['2.3.10', '2.10.3']);
 
         self::assertNotInstanceOf(SkippedTest::class, $thrown);
         self::assertStringContainsString('2.10.3', $thrown->getMessage());
-        self::assertStringContainsString('2.11.0', $thrown->getMessage());
+        self::assertStringContainsString('2.12.0', $thrown->getMessage());
+    }
+
+    /** The 2.11.0 CLI gave every answer that the 2.10.3 CLI recorded, so 2.11.0 runs the 2.10.3 worlds. */
+    public function testGuardLetsAVersionThatGaveTheSameAnswersRunTheRecordedWorlds(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        ComposerOracle::guard('2.10.3', '2.11.0', true, ['2.10.3']);
+    }
+
+    public function testGuardSkipsAVersionThatGaveTheSameAnswersAsAnotherRecordedVersion(): void
+    {
+        $thrown = self::thrownBy('2.3.10', '2.11.0', true, ['2.3.10', '2.10.3']);
+
+        self::assertInstanceOf(SkippedTest::class, $thrown);
+    }
+
+    public function testTheVersionsToRunAreTheRecordedOnesAndTheVersionsThatGaveTheirAnswers(): void
+    {
+        self::assertSame(['2.10.3', '2.11.0'], ComposerOracle::versionsToRun(['2.10.3']));
+        self::assertSame(['2.3.10'], ComposerOracle::versionsToRun(['2.3.10']));
+    }
+
+    public function testAVersionThatIsRecordedAndGaveTheAnswersOfAnotherRecordedVersionRunsOnce(): void
+    {
+        self::assertSame(['2.10.3', '2.11.0'], ComposerOracle::versionsToRun(['2.10.3', '2.11.0']));
     }
 
     /** A new install of the same tag at another reference is no change (case mc-joint-retag‡), and a branch moves with its commit. */

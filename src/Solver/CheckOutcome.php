@@ -66,8 +66,8 @@ final class CheckOutcome
      * solve resolves the move when it installs the moved package inside the move's constraint and
      * changes a holder's release. The move then has no hold and lists each changed holder. A new
      * install of the same tag is no change, but a branch version can move to another commit.
-     * A solve that moves a holder from a release to a dev version does not resolve the move: Composer
-     * blocks no advisory of a dev version. Nor does a solve that moves a holder below its release: the
+     * A solve that moves a holder from a release to a dev version does not resolve the move: the
+     * advisory blocking of the Composer that runs lockrot can skip a dev version. Nor does a solve that moves a holder below its release: the
      * step is no update of the holder. A joint refusal gives its own holds. Any other answer keeps
      * this refusal.
      *

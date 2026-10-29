@@ -491,6 +491,15 @@ origin: Packagist, a private repository, vcs, a path or an archive. packages-dev
 - An advisory with no severity counts as `unrated`. An advisory with no affected range counts, with
   the fix `unknown`.
 
+- An advisory whose range names a dev version, such as `dev-main`, counts for that version. From
+  Composer 2.11, `composer audit` skips a `dev-*` version and the default branch alias. lockrot
+  still counts their advisories.
+
+- lockrot asks each repository for full records. When a repository answers with a record that
+  holds only an id and a range, its answer fails with the run note
+  [`advisories_unavailable`](notes.md#advisories_unavailable). From Composer 2.11, `composer audit`
+  reports such a record.
+
 What each repository answered is data. `security.feeds[]` holds one entry per repository with an
 `answer` (`answered`, `failed`, `not_asked`) and the number of `records` it returned for the name,
 for every version. `security.records` counts the distinct advisory ids of every answering
@@ -718,7 +727,7 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
   `composer update <package>` and the holders. When the joint request is refused, `held_by[]`
   names its holds. Any other joint solve keeps the move `refused` with the holds of the first
   refusal. That includes a solve that moves a holder from a release to a dev version, because
-  advisory blocking does not check a dev version. A holder that is a dev version before and after
+  the advisory blocking of the Composer that runs lockrot can skip a dev version. A holder that is a dev version before and after
   the solve still counts. A solve that moves a holder below its locked release also keeps the move
   `refused`, because that step is no update of the holder.
 - **The why-not step.** An `update`, `require`, `raise-php` or `tag` move whose check does not
@@ -837,6 +846,9 @@ Limits of the check:
   list is the `malware` list under `config.policy`, which blocks by default, or a custom list there.
   The check does not read these lists. So a move that resolves in lockrot can fail in Composer, or
   install another version.
+- On Composer 2.11 and later, a cooldown period under `config.policy` withholds the versions that
+  are newer than the period in an update. The check does not apply this policy. So a move that
+  resolves in lockrot can fail in Composer, or install an older version.
 - It stops a chain of refusals after `Analyzer::CHECK_PASSES` passes. A new request after the
   last one is not checked (`check.reason` `pass_cap`).
 - When Composer's solver fails on a request, the move is not checked (`check.reason`

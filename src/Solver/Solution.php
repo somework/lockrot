@@ -71,7 +71,7 @@ final class Solution
     }
 
     /** A solve that Composer failed on with an exception other than a refusal. */
-    public static function failed(\Exception $e): self
+    public static function failed(\Throwable $e): self
     {
         $failed = new self([], [], null, []);
         $failed->error = ['class' => \get_class($e), 'message' => $e->getMessage()];

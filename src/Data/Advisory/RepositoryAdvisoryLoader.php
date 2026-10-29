@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Data\Advisory;
 
 use Composer\Advisory\PartialSecurityAdvisory;
+use Composer\Advisory\SecurityAdvisory;
 use Composer\Downloader\TransportException;
 use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\FilterRepository;
@@ -195,7 +196,11 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
                     $repositories[] = AdvisoryRepository::of($repository->getRepoName(), AdvisoryCoverage::NO_FEED);
                     continue;
                 }
-                $answers[\count($repositories)] = $repository->getSecurityAdvisories($map, $partial)['advisories'];
+                $answer = $repository->getSecurityAdvisories($map, $partial)['advisories'];
+                if (!$partial) {
+                    self::refusePartialRecords($repository->getRepoName(), $answer);
+                }
+                $answers[\count($repositories)] = $answer;
                 $repositories[] = AdvisoryRepository::of($repository->getRepoName(), AdvisoryCoverage::ANSWERED);
             } catch (\Throwable $e) {
                 // ComposerRepository::fetchFile() can throw a ParsingException, a
@@ -210,6 +215,26 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         }
 
         return [$repositories, $answers, $notes];
+    }
+
+    /**
+     * No finding rests on a partial record, which a repository can withdraw after the cache holds
+     * it. Composer 2.10 refuses a partial record when full records are asked, and Composer 2.11
+     * returns it, so lockrot refuses it on each minor.
+     *
+     * @param array<string, array<PartialSecurityAdvisory>> $answer
+     *
+     * @throws \RuntimeException for a record that is not a full advisory
+     */
+    private static function refusePartialRecords(string $repoName, array $answer): void
+    {
+        foreach ($answer as $name => $advisories) {
+            foreach ($advisories as $advisory) {
+                if (!$advisory instanceof SecurityAdvisory) {
+                    throw new \RuntimeException('Advisory for '.$name.' could not be loaded as a full advisory from '.$repoName);
+                }
+            }
+        }
     }
 
     /**

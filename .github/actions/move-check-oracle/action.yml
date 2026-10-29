@@ -1,5 +1,5 @@
 name: Move check oracle
-description: Runs MoveCheckComposerOracleTest once on each composer/composer version that train 7d's answers record, where a version that no world records fails.
+description: Runs MoveCheckComposerOracleTest once on each composer/composer version that train 7d's answers record, and on each version that gave the same answers (ComposerOracle::SAME_ANSWERS). Another version fails.
 runs:
   using: composite
   steps:
@@ -12,11 +12,11 @@ runs:
       shell: bash
       env: {LOCKROT_COMPOSER_ORACLE: '1'}
       run: |
-        versions=$(php -d display_errors=stderr -r 'require "tests/Support/ComposerOracle.php"; echo implode("\n", Lockrot\Tests\Support\ComposerOracle::recordedVersions(json_decode((string) file_get_contents("tests/fixtures/flags/cases.json"), true)));')
+        versions=$(php -d display_errors=stderr -r 'require "tests/Support/ComposerOracle.php"; echo implode("\n", Lockrot\Tests\Support\ComposerOracle::versionsToRun(Lockrot\Tests\Support\ComposerOracle::recordedVersions(json_decode((string) file_get_contents("tests/fixtures/flags/cases.json"), true))));')
         # Composer 2.9 and later block a composer/composer release once an advisory names it. The job tests lockrot against that library and never runs it.
         composer config --json policy.advisories.ignore '["composer/composer"]'
         for version in $versions; do
-          echo "The train 7d answers record composer/composer $version." >> "$GITHUB_STEP_SUMMARY"
+          echo "The oracle test runs the train 7d answers on composer/composer $version." >> "$GITHUB_STEP_SUMMARY"
           composer require --dev --no-update "composer/composer:$version"
           composer update --no-interaction --prefer-dist
           # A group that phpunit.xml.dist excludes leaves no test to run: that run must fail too.
