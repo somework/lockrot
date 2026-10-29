@@ -109,7 +109,7 @@ final class LockLineIndexTest extends TestCase
                 ]
             }
             JSON;
-        $limit = ini_get('pcre.backtrack_limit');
+        $limit = \ini_get('pcre.backtrack_limit');
         // Each run of letters and each escape count against the limit, and the short lines stay under it.
         ini_set('pcre.backtrack_limit', '1000');
         try {

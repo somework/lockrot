@@ -426,8 +426,8 @@ final class ExplainFormatterTest extends TestCase
 
         $text = self::plain(new Explanation($finding, F::facts(F::package(['version' => '1.0.0']), $metadata), new Thresholds(), '8.4', self::report()));
 
-        self::assertSame(2, preg_match_all('/^   [ *] [12]\.x .*$/m', $text, $rows), $text);
-        $offsets = array_map(static fn (string $row): int => mb_strpos($row, '2026-01-01'), $rows[0]);
+        self::assertSame(2, preg_match_all('/^(   [ *] [12]\.x .*?)2026-01-01/mu', $text, $rows), $text);
+        $offsets = array_map(static fn (string $before): int => (int) preg_match_all('/./u', $before), $rows[1]);
         self::assertSame($offsets[0], $offsets[1], $text);
         self::assertStringContainsString('v1.0.0\u{200B}', $text, 'the tag stays neutralised');
     }
