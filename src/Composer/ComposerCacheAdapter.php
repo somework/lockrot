@@ -41,13 +41,12 @@ final class ComposerCacheAdapter implements CacheInterface
     public function set(string $key, HttpResult $result): void
     {
         $json = JsonWriter::encode($result->toEnvelope(), \JSON_UNESCAPED_SLASHES);
-        if ($json === null) {
-            return;
-        }
-        try {
-            $this->cache->write($this->file($key), $json);
-        } catch (\Exception $e) {
-            // A dropped answer costs one refetch in a later run.
+        if ($json !== null) {
+            try {
+                $this->cache->write($this->file($key), $json);
+            } catch (\Exception $e) {
+                // A dropped answer costs one refetch in a later run.
+            }
         }
     }
 
