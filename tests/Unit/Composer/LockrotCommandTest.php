@@ -2720,11 +2720,7 @@ final class LockrotCommandTest extends TestCase
         };
 
         $this->withComposerEnv($this->tempDir('lockrot-composer-baseline-cache-'), $this->tempDir('lockrot-composer-baseline-home-'), function () use ($composer, $run): void {
-            if ($composer === null) {
-                $run();
-            } else {
-                $this->withComposerFile($composer, $run);
-            }
+            $this->withComposerFile($composer ?? 'composer.json', $run);
         });
 
         self::assertSame(2, $code, $stderr);
