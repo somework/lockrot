@@ -309,7 +309,6 @@ final class CoverageTest extends TestCase
             [self::D.'s6/properties/reason', ['no_stable_release'], 'as headline: pinned with no stable release ever'],
             [self::D.'replacement/oneOf/0/properties/named_by', ['lock'], self::NOT_REACHED." (a replacement that composer.lock's abandoned field names)"],
             [self::D.'s8/properties/floor_source/oneOf/0', ['target'], self::NOT_REACHED." (S8's PHP floor taken from the target)"],
-            [self::D.'unverifiedFact/properties/reason', ['no_release_data'], self::NOT_REACHED.' (a move whose release has no release data)'],
             [self::D.'withoutRow/properties/revealed/items/properties/role', ['accepted'], self::NOT_REACHED.' (a without[] row that reveals an accepted flag)'],
             [self::D.'securityVulnerable/properties/partial/oneOf/0/properties/if_applied/properties/assumes/items', ['composer_resolves', 'no_new_advisories'],
                 self::NOT_REACHED.' (a security.partial on a held package). next_step.if_applied.assumes carries each value'],

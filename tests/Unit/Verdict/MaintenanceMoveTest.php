@@ -25,6 +25,7 @@ use Lockrot\Verdict\MoveContext;
 use Lockrot\Verdict\MoveDraft;
 use Lockrot\Verdict\MoveSubject;
 use Lockrot\Verdict\Verdict;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class MaintenanceMoveTest extends TestCase
@@ -183,6 +184,44 @@ final class MaintenanceMoveTest extends TestCase
         $draft = self::capped([], null, null, '8.4', null, [], '4.7.1', false);
 
         self::assertSame([Move::NO_MOVE, 'metadata_not_read'], [$draft->kind(), $draft->reason()]);
+    }
+
+    /** @return iterable<string, array{string, string, ?string, string, ?string}> */
+    public static function unreadRows(): iterable
+    {
+        yield 'the target does not run the row' => ['>=8.2', '8.1', null, Move::BLOCKED, null];
+        yield 'the project php does not run the row' => ['>=8.2', '8.4', '>=7.4', Move::RAISE_PHP, '^9.0'];
+        yield 'the target and the project run the row' => ['>=8.1', '8.4', '>=8.1', Move::REQUIRE, '^9.0'];
+        yield 'no project php' => ['>=8.1', '8.4', null, Move::REQUIRE, '^9.0'];
+    }
+
+    /**
+     * S8 suggests `^9.0` on 5.x, and no release of 5.x that lockrot read matches it: the php of
+     * 5.x's newest release gives the kind.
+     *
+     * @dataProvider unreadRows
+     */
+    #[DataProvider('unreadRows')]
+    public function testARequireThatNoReadReleaseMatchesTakesItsKindFromTheRowPhp(string $rowPhp, string $target, ?string $projectPhp, string $kind, ?string $constraint): void
+    {
+        $packages = [];
+        foreach (['4.7.1' => '>=7.4', '5.0.0' => $rowPhp] as $version => $php) {
+            $release = (new ArrayLoader())->load(['name' => 'a/b', 'version' => $version, 'time' => '2025-01-01T00:00:00+00:00', 'require' => ['php' => $php]]);
+            self::assertInstanceOf(BasePackage::class, $release);
+            $packages[] = $release;
+        }
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '4.7.1', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $locked = $lock->find('a/b');
+        self::assertNotNull($locked);
+        $facts = new PackageFacts($locked, PackageMetadata::fromPackages('a/b', $packages, new \DateTimeImmutable(self::NOW), '4.7.1'), null, []);
+        $floor = new PhpFloor($target, $projectPhp);
+        $s8 = new Signal(Signal::LEVEL_WARN, 'left behind', SignalDataStub::of(Signal::S8, ['branch' => '4.x', 'reachable_branch' => '5.x', 'suggested_constraint' => '^9.0']));
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('4.7.1')->withSignals([$s8])->build();
+        $context = new MoveContext($finding, new MoveSubject('a/b', '4.7.1', true, [], $target, $floor->lowestAsString()), $facts->metadata(), BranchRow::all($facts, $floor, Clock::fixed(self::NOW)), null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true);
+
+        $draft = MaintenanceMove::draft($context, FlagSet::LEFT_BEHIND);
+
+        self::assertSame([$kind, '5.x', $constraint, null], [$draft->kind(), self::branch($draft), $draft->constraint(), $draft->lower()]);
     }
 
     /** @return array{string, string, ?string, ?string, ?string} */

@@ -13,6 +13,7 @@ use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Score\CountedAdvisory;
 use Lockrot\Score\IfApplied;
 use Lockrot\Security\FixFinder;
 use Lockrot\Security\Holder;
@@ -20,11 +21,13 @@ use Lockrot\Security\LinkIndex;
 use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
+use Lockrot\Signal\Signal;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveQuery;
 use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\RecordedMoveChecker;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Latest;
 use Lockrot\Verdict\Move;
@@ -304,6 +307,35 @@ final class MoveBuilderTest extends TestCase
         [$clears] = MoveBuilder::clearsFor($row, $lower, [], ['GHSA-unread', 'GHSA-out'], $context);
 
         self::assertSame([['kind' => 'advisory', 'id' => 'GHSA-out', 'basis' => 'outside_range']], array_map(static fn (MoveFact $fact): array => $fact->jsonSerialize(), $clears));
+    }
+
+    /**
+     * `^9.0` matches no read release of 2.x, so lockrot cannot tell whether the move leaves GHSA-x's
+     * range: the advisory is unverified, and the score after the move is an upper bound.
+     */
+    public function testAnAdvisoryOfAMoveWithNoReleaseReadIsUnverifiedForLackOfReleaseData(): void
+    {
+        $facts = self::factsOf([['2.0.0', '2026-01-01', '>=8.1']]);
+        $floor = new PhpFloor('8.4');
+        $row = BranchRow::all($facts, $floor, Clock::fixed(self::NOW))[0];
+        $advisory = ['id' => 'GHSA-x', 'cve' => null, 'title' => null, 'link' => null, 'reported_at' => null, 'severity' => 'high', 'severity_published' => 'high', 'affected_versions' => '<1.5', 'counted' => true, 'points' => 16, 'fix' => ['kind' => 'upgrade'], 'baseline' => null];
+        $signals = [
+            new Signal(Signal::LEVEL_WARN, 'left behind', SignalDataStub::of(Signal::S8, ['branch' => '1.x'])),
+            new Signal(Signal::LEVEL_HIGH, '1 advisory', SignalDataStub::of(Signal::S9, ['advisories' => [$advisory], 'releases_read' => true, 'complete' => true])),
+        ];
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, null, [new CountedAdvisory('GHSA-x', 'high', 'upgrade')]))->build();
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
+        $context = new MoveContext($finding, new MoveSubject('a/b', '1.0.0', true, [], '8.4', null), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, ['GHSA-x' => (new VersionParser())->parseConstraints('<1.5')], [], true);
+        [$lower] = $context->lowestAdmitted($row, '^9.0');
+        self::assertNull($lower);
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, null, '^9.0'), [], null, $context);
+        $ifApplied = $move->ifApplied();
+
+        self::assertSame([['kind' => 'advisory', 'id' => 'GHSA-x', 'reason' => 'no_release_data']], array_map(static fn (MoveFact $fact): array => $fact->jsonSerialize(), $move->unverified()));
+        self::assertSame([['kind' => 'flag', 'id' => FlagSet::LEFT_BEHIND, 'basis' => 'branch_releasing']], array_map(static fn (MoveFact $fact): array => $fact->jsonSerialize(), $move->clears()));
+        self::assertNotNull($ifApplied);
+        self::assertTrue($ifApplied->atMost());
     }
 
     public function testATransitiveRequireThatIsNotCheckedGetsOnlyItsWhyNotStep(): void
