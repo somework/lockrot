@@ -362,8 +362,8 @@ A global Composer install is the other way to run lockrot outside a project's de
 `composer global update` keeps it current:
 
 ```bash
-composer global require somework/lockrot
 composer global config allow-plugins.somework/lockrot true
+composer global require somework/lockrot
 ```
 
 It is a plugin, not a PHAR, so it prints the [install-time summary](install-time.md) in every

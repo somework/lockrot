@@ -46,8 +46,11 @@ The block is at most ten lines, in this order:
   `… and <n> more` replaces the lines that do not fit.
 - `update now:` with every package that `composer update` fixes, shown or not.
 - The [`gate:` line](ci.md#reading-the-gate-line), when the gate fails.
-- Up to two notes, in the order the run wrote them ([run notes](notes.md)). A note that does not
-  fit is counted in the footer.
+- Up to two notes. When the run reads a baseline and no setting gives the target PHP, the first
+  note is lockrot's own: `target php from the running PHP (<version>); fix changes against the
+  baseline not compared`. It has no code. Set the [target PHP](configuration.md#extralockrot-keys)
+  to compare fix changes. The [run notes](notes.md) follow, in the order the run wrote them. A note
+  that does not fit is counted in the footer.
 - The footer, `Run composer lockrot for details.`
 
 lockrot counts lines as written, not as terminal rows. A long line can wrap in a narrow terminal.
@@ -108,7 +111,7 @@ grade can read milder than the one `composer lockrot` gives for the same package
 
 | The budget ran out before or during | Effect on the block | Note |
 |---|---|---|
-| A package's metadata | The package is `unknown`. When nothing is graded, the [could-not-be-checked header](#never-silent-about-a-package-it-could-not-check) counts it | [`metadata_unavailable`](notes.md#metadata_unavailable), a network failure |
+| A package's metadata | The package carries `libyears_unmeasured` `unavailable`, and a counted advisory still grades it. Without one, it reads `unknown`. When nothing is graded, the [could-not-be-checked header](#never-silent-about-a-package-it-could-not-check) counts it | [`metadata_unavailable`](notes.md#metadata_unavailable), a network failure |
 | The advisory check | The advisories that the lookup did not reach add nothing to the score, and the findings carry S10 `install_time_budget` | [`advisories_not_checked`](notes.md#advisories_not_checked) |
 | A monorepo parent's metadata | Split packages whose own tags have no trusted date stay unmeasured and carry S10 `undated_releases` ([dates from the monorepo](verdicts.md#dates-from-the-monorepo)) | None |
 | The repository activity check, before it began | lockrot does not read S3 and S4. Findings carry S10 `install_time_budget` | [`repository_activity_not_checked`](notes.md#repository_activity_not_checked) |
@@ -160,6 +163,8 @@ transaction before any package operation runs, and Composer exits `1`. The messa
   So does a package whose metadata did not arrive and that carries a counted advisory
   (`releases_unknown`).
 - lockrot never stops a `--dry-run`, since no operation is about to run.
+- The stop works only when Composer runs plugins. `--no-plugins` or `COMPOSER_NO_PLUGINS=1` skips
+  it. To gate CI, run `composer lockrot --fail-on=<value>` or the [PHAR](phar.md).
 
 A stopped `composer require` or `composer update` leaves `composer.lock` updated (and, for
 `require`, `composer.json`) and nothing new in `vendor/`. `composer install` then stops on the same

@@ -89,7 +89,7 @@ packages from a Composer repository
 The move check asks Composer's solver about each move, and the solver loads the metadata of each
 package that a solve needs. A file that the run already fetched comes from Composer's cache, so
 only a package that the run did not read costs a request: a new dependency of a move, or a `~dev`
-file. On Composer 2.9 and later, while Composer's advisory blocking is on, the move check also
+file. While Composer's advisory blocking is on, the move check also
 asks for the advisories of each name that a solve loads and that no earlier lookup covered. It sends the name only, as the run's lookup does. With
 `composer-repositories`, it does not send the name of a locked package from outside a Composer
 repository ([The move check](docs/verdicts.md#the-move-check)).
@@ -102,9 +102,9 @@ Credentials:
   credentials that Composer already holds.
 
 - lockrot sends each credential only to its own host and never writes it anywhere. `self-update`
-  adds its GitHub token to the release-list request only, never to a download. With
-  `LOCKROT_RELEASE_URL` set, that request, and the token with it, goes to the host that the
-  variable names, unless Composer holds credentials of its own for that host.
+  adds its GitHub token to the release-list request only, and only when that request goes to
+  api.github.com. It never adds the token to a download. When `LOCKROT_RELEASE_URL` names another
+  host, the request carries only the credentials that Composer holds for that host.
 
 - Which host takes which credential, and the anonymous limits, are in
   [Repository hosts and credentials](docs/internals.md#repository-hosts-and-credentials).
@@ -127,8 +127,8 @@ repositories publish, and finds no vulnerability of its own.
 - **Two variables replace the trust root.** With `LOCKROT_RELEASE_URL` or `LOCKROT_RELEASE_KEY` set
   ([Testing hooks](docs/configuration.md#testing-hooks)), `self-update` reads the release list, and
   checks signatures, against what they name instead of GitHub and the built-in key. The release-list
-  request carries the GitHub token wherever `LOCKROT_RELEASE_URL` points. Do not set either variable
-  outside a test.
+  request carries the GitHub token only when `LOCKROT_RELEASE_URL` names api.github.com. Do not set
+  either variable outside a test.
 
 - **What is checked before install.** `self-update` checks the checksum and the self-update
   signature, and installs nothing when either fails

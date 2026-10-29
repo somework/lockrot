@@ -23,9 +23,10 @@ only gain values and a field's type only widens.
   install-time check and prints one `lockrot: install-time check skipped: …` line
   ([install-time.md](install-time.md#never-fails-the-install)).
 
-- **Copies.** The PHAR and each [release tag](https://github.com/somework/lockrot/tags) ship the
-  same files as `resources/lockrot-<name>-<number>.schema.json`. The copy in your PHAR, or at your
-  release's tag, describes exactly that release. The URL describes the newest release under the
+- **Copies.** The PHAR and each [release tag](https://github.com/somework/lockrot/tags) from
+  v0.14.0 ship the same files as `resources/lockrot-<name>-<number>.schema.json`. Tags up to v0.13.0
+  ship the unnumbered names, such as `resources/lockrot-report.schema.json`. The copy in your PHAR,
+  or at your release's tag, describes exactly that release. The URL describes the newest release under the
   same number.
 
 - **The `-1` files** (report-1, explain-1, baseline-1 and config-1) stay published at their URLs

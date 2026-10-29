@@ -398,10 +398,11 @@ maintainer.
         4. Let V be the commit of step 3. Tag V `vX.Y.Z-rc.<N+1>` and push the tag. The
            renderer's `node scripts/contract.mjs reachable` accepts a commit on `main` or on a
            lockrot tag, and the rebase merge never puts V on `main`.
-        5. Push V unchanged to `release/full-check-<sha of V>`, and wait for a green full check of
-           the whole tree on that branch. The renderer's `release.yml` gate accepts only that run
-           for its pin. The full check that the rc tag of step 4 starts does not count, because
-           its branch is the tag. Then delete the branch.
+        5. Push V unchanged to `release/full-check-<sha of V>`
+           (`git push origin <V>:refs/heads/release/full-check-<V>`), and wait for a green full
+           check of the whole tree on that branch. The renderer's `release.yml` gate accepts a full
+           check only from such a branch. The full check that the rc tag of step 4 starts does not
+           count, because its branch is the tag. Then delete the branch.
         6. In lockrot-report, run `node scripts/contract.mjs repin <V>`, and set the version in
            `CHANGELOG.md` and `package.json`. Commit only the version and the pin.
         7. Merge that commit into the renderer's `main`, and tag `vX.Y.Z` on `main`.
