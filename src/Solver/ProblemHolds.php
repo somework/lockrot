@@ -13,7 +13,6 @@ use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\PlatformRepository;
 use Composer\Semver\Constraint\ConstraintInterface;
-use Composer\Semver\Intervals;
 use Lockrot\Security\Holder;
 
 /**
@@ -28,9 +27,8 @@ use Lockrot\Security\Holder;
  * | same name | the package or the root that replaces the name: `replace` |
  * | root requirement of a requested name | the root, when the pool holds no release of it and no other rule names a hold: `root-require` on the moved package |
  *
- * A root requirement of a dependency is no rule of its own. The dependency shows as a requirement
- * with no candidate left. The hold names the root's constraint on it as `root-require` when that
- * constraint shares no version with the requirement.
+ * A root requirement of a dependency is no rule of its own: the dependency shows as a requirement
+ * with no candidate left, and the hold names the root's constraint on it as `root-require`.
  *
  * @internal
  */
@@ -151,7 +149,7 @@ final class ProblemHolds
         if (\count($rule->getLiterals()) === 1 && !$platform) {
             $this->wanted[$target] = $target;
             $byRoot = $rootRequires[$target] ?? null;
-            if ($byRoot !== null && $other !== null && !Intervals::haveIntersections($byRoot->getConstraint(), $data->getConstraint())) {
+            if ($byRoot !== null && $other !== null) {
                 $this->holds[] = new Holder(Holder::ROOT, $rootName, null, Holder::ROOT_REQUIRE, $byRoot->getPrettyConstraint(), $target);
             }
         }

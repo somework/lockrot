@@ -25,11 +25,11 @@
   spomky-labs/otphp v10.0.3  via scheb/2fa-google-authenticator  ·  left-behind · vulnerable
       24 = left-behind 16 ÷ 2 transitive + vulnerable 16 [high advisory] (baseline: new package)
       do: move spomky-labs/otphp to ^11.4.3 through scheb/2fa-google-authenticator — clears left-behind and 2
-          advisories; 11.x needs php \>=8.1, which require.php allows; the target php 8.4 runs it; held by
-          scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind) and
-          scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that
-          hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against
-          the lock
+          advisories; 11.x needs php \>=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json
+          (requires scheb/2fa-bundle ^5.13.2), scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself
+          left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev));
+          the packages that hold it may need to move too; a new major brings its own requirements; Composer's solver
+          refuses it against the lock
       left-behind  branch 10.x last released 2022-03-17 (4.6 years ago); 11.x released 11.5.0 (2026-06-06)
       vulnerable   2 advisories: 1 high, 1 medium — none fixed on 10.x; worst: PKSA-kbc7-dq62-pt7d Unbounded digits
                    parameter in a provisioning URI triggers an uncaught DivisionByZeroError in OTP generation
@@ -116,10 +116,10 @@
   lcobucci/jwt 4.3.0  direct  ·  left-behind
       16 = left-behind 16 (baseline: new package)
       do: require lcobucci/jwt ^5.6 — clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, which
-          require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.3),
-          scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself left-behind) and scheb/2fa-trusted-device 5.x-dev
-          (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it may need to move too; a new
-          major brings its own requirements; Composer's solver refuses it against the lock
+          require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.3), composer.json (requires
+          scheb/2fa-bundle ^5.13.2), scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself left-behind) and
+          scheb/2fa-trusted-device 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that hold it
+          may need to move too; a new major brings its own requirements; Composer's solver refuses it against the lock
       left-behind  branch 4.x last released 2023-01-02 (3.8 years ago); 5.x released 5.6.0 (2025-10-17)
       pulls in 1 flagged package: lcobucci/clock (capped)
   scheb/2fa-backup-code v5.13.2  direct  ·  left-behind
@@ -400,11 +400,12 @@
       8 = left-behind 16 ÷ 2 transitive (baseline: known)
       gate 0 = min(8, 2 × 0) (the new facts bound it); new: 0
       do: move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator — clears left-behind; 3.x needs
-          php ^8.1, which require.php allows; the target php 8.4 runs it; held by spomky-labs/otphp v10.0.3 (requires
-          ^0.1.14|^1.0|^2.0; itself left-behind), scheb/2fa-google-authenticator v5.13.2 (requires spomky-labs/otphp
-          ^9.1|^10.0; itself left-behind) and scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle
-          self.version (5.x-dev)); the packages that hold it may need to move too; a new major brings its own
-          requirements; Composer's solver refuses it against the lock
+          php ^8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires
+          scheb/2fa-bundle ^5.13.2), spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind),
+          scheb/2fa-google-authenticator v5.13.2 (requires spomky-labs/otphp ^9.1|^10.0; itself left-behind) and
+          scheb/2fa-google-authenticator 5.x-dev (requires scheb/2fa-bundle self.version (5.x-dev)); the packages that
+          hold it may need to move too; a new major brings its own requirements; Composer's solver refuses it against
+          the lock
       left-behind  branch 2.x last released 2023-04-05 (3.5 years ago); 3.x released v3.4.0 (2026-02-04)
   wallabag/rulerz-bridge dev-master  via wallabag/rulerz-bundle  ·  pinned (baseline)
       8 = pinned 16 ÷ 2 transitive (baseline: known)
