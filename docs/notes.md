@@ -414,7 +414,7 @@ command option. In an install-time run, a package of Composer's transaction can 
 lockrot skips them: they get no finding, and no printed command names them. The text names none of
 them.
 
-- `data`: `packages`, the names as the lock or the transaction writes them.
+- `data`: `packages`, the names from the lock or the transaction, lowercased as Composer reads them.
 - Findings: the entries have none.
 - `sets_network_failures`: no.
 
