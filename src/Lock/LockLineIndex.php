@@ -13,7 +13,9 @@ use Lockrot\Exception\ConfigException;
  * and `extra.thanks.name` hold other names. The depth does not depend on indentation, so a
  * reformatted lock still resolves. A `"name"` member that does not stand alone on its line, as in a
  * minified lock, yields no line: {@see lineOf()} returns null. A line is keyed by Composer's name
- * ({@see PackageName}), and {@see LockFile} refuses a name listed twice, so both read one entry.
+ * ({@see PackageName}). Of two equal names, the last wins, as json_decode() keeps the last of two
+ * equal keys. A line whose strings PCRE cannot blank leaves no line at all, because the depth after
+ * it is unknown.
  *
  * @internal
  */
@@ -62,7 +64,10 @@ final class LockLineIndex
         foreach (preg_split('/\r\n|\n|\r/', $json) ?: [] as $index => $line) {
             // Blank each string literal, so that a brace in a description or a colon in a URL is
             // not read as syntax.
-            $structure = preg_replace('/"(?:[^"\\\\]|\\\\.)*"/', '""', $line) ?? '';
+            $structure = preg_replace('/"(?:[^"\\\\]++|\\\\.)*+"/', '""', $line);
+            if ($structure === null) {
+                return self::empty();
+            }
 
             if ($depth === 1 && preg_match('/^\s*"([^"]+)"\s*:/', $line, $key) === 1) {
                 $section = $key[1];
@@ -73,7 +78,7 @@ final class LockLineIndex
                 && preg_match('/^\s*"name":\s*"([^"]+)"\s*,?\s*$/', $line, $match) === 1
             ) {
                 $name = json_decode('"'.$match[1].'"');
-                if (\is_string($name) && !isset($lines[PackageName::key($name)])) {
+                if (\is_string($name)) {
                     $lines[PackageName::key($name)] = $index + 1;
                 }
             }
