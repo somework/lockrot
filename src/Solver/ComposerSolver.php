@@ -275,11 +275,11 @@ final class ComposerSolver
         $flags = $root->getStabilityFlags();
         $flags[$root->getName()] = BasePackage::$stabilities[VersionParser::parseStability($root->getVersion())];
         $set = new RepositorySet($root->getMinimumStability(), $flags, $root->getAliases(), $root->getReferences(), $requires, $temporary);
-        // A package takes one repository, so each pass gets its own copy of the root.
+        // A package takes one repository, so each pass gets its own copy of the root. Each
+        // RootPackageInterface class of composer/composer 2.10 extends BasePackage:
+        // https://github.com/composer/composer/tree/2.10.3/src/Composer/Package
+        /** @var BasePackage&RootPackageInterface $fixedRoot */
         $fixedRoot = clone $root;
-        if (!$fixedRoot instanceof BasePackage) {
-            throw new \LogicException('the root package is no BasePackage: '.\get_class($fixedRoot));
-        }
         $fixedRoot->setRequires([]);
         $set->addRepository(new RootPackageRepository($fixedRoot));
         if ($this->lockedOnly !== null) {
@@ -311,14 +311,15 @@ final class ComposerSolver
         $filter = $this->advisories->blocking()->poolFilter();
         $error = $this->advisories->blocking()->filterError();
         if ($filter === null) {
-            throw new \RuntimeException('Composer\'s advisory pool filter cannot be built: '.($error === null ? 'unknown error' : $error->getMessage()), 0, $error);
+            throw new \RuntimeException('Composer\'s advisory pool filter cannot be built: '.($error === null ? 'unknown error' : $error->getMessage()));
         }
         $feed = new PoolAdvisoryFeed($this->advisories);
         try {
             $pool = $filter->filter($pool, [$feed], $composerRequest);
         } catch (\Error $e) {
-            // The filter is Composer's internal API: a drift fails this solve, never the run.
-            throw new \RuntimeException('Composer\'s advisory pool filter failed: '.$e->getMessage(), 0, $e);
+            // The filter is Composer's internal API. The `move_check_failed` note names it as the
+            // source of a drift, which an \Error from inside Composer does not.
+            throw new \RuntimeException('Composer\'s advisory pool filter failed: '.$e->getMessage());
         }
 
         return [$set, $composerRequest, $pool, $fixedRoot, $loaded, $feed];

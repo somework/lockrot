@@ -153,6 +153,26 @@ final class ComposerSolverTest extends TestCase
         self::assertSame(['acme/lib'], array_keys($solver->root()->getDevRequires()), 'the solve changes a copy of the root');
     }
 
+    /** A `raise-php` move of a require-dev package: `require --dev` writes the php raise after the package. */
+    public function testARequireDevThatAlsoRaisesPhpSolvesWithBothChanges(): void
+    {
+        $solver = self::solver(['require' => ['php' => '<8.0'], 'require-dev' => ['acme/dev' => '^1.0']], [], ['acme/dev' => [['version' => '1.0.0'], ['version' => '2.0.0']]], [['name' => 'acme/dev', 'version' => '1.0.0']]);
+
+        $solution = $solver->solve(SolveRequest::require('acme/dev', ['acme/dev' => '^2.0', 'php' => '>=8.1'], true));
+
+        self::assertSame(['acme/dev' => '2.0.0'], $solution->installs(), 'the root php requirement <8.0 refuses the solve without the raise');
+    }
+
+    /** The root's own php requirement is a platform hold, not a root requirement of a package. */
+    public function testARootPhpRequirementThatThePlatformMissesIsAPlatformHold(): void
+    {
+        $solver = self::solver(['require' => ['php' => '<7.0', 'acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0']]]);
+
+        $holds = self::rows($solver->solve(SolveRequest::baseline())->holds());
+
+        self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'platform', 'target' => 'php', 'constraint' => '<7.0'], $holds, json_encode($holds) ?: '');
+    }
+
     public function testAnUpdatePastARequireDevConstraintIsRefusedByThatRootRequirement(): void
     {
         $solver = self::solver(['require-dev' => ['acme/dev' => '^1.0']], [], ['acme/dev' => [['version' => '1.0.0'], ['version' => '2.0.0']]], [['name' => 'acme/dev', 'version' => '1.0.0']]);
@@ -593,6 +613,17 @@ final class ComposerSolverTest extends TestCase
 
         self::assertSame(['class' => \RuntimeException::class, 'message' => 'Composer\'s advisory pool filter cannot be built: drift'], $broken->solve(SolveRequest::baseline())->error());
         self::assertTrue($solver->solve(SolveRequest::baseline())->resolves(), 'a solver without advisories runs no filter');
+    }
+
+    /** An \Error inside Composer's filter, here from the advisory lookup that the filter asks, is a failed solve with its message. */
+    public function testAnErrorInsideTheFilterFailsTheSolve(): void
+    {
+        $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]);
+        $broken = $solver->withAdvisories(new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static function (array $names, bool $complete): array {
+            throw new \Error('drift');
+        }));
+
+        self::assertSame(['class' => \RuntimeException::class, 'message' => 'Composer\'s advisory pool filter failed: drift'], $broken->solve(SolveRequest::update(['acme/lib' => '^1.1']))->error());
     }
 
     /**
