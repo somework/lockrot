@@ -206,6 +206,11 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.held_by[].holder.next_step.constraint', 'next_step.held_by[].holder.next_step.to_branch'], self::PHP_STAR],
             ],
         ],
+        'A-php-unsatisfiable‡' => [
+            'held_by' => [
+                [['next_step.held_by[].holder.next_step.constraint', 'next_step.held_by[].holder.next_step.to_branch'], self::PHP_STAR],
+            ],
+        ],
         'tie‡' => [
             'verdict_line' => [
                 [['signals[S5]', 'flags[old-promise]', 'score.total', 'score.terms[].flag', 'score.terms[].part', 'score.terms[].severity'], self::TIE],
@@ -350,7 +355,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
 
     private const MOVE_VERSION = 'The model leaves `version` null on a move whose constraint comes from S8. lockrot names the lowest release that the constraint admits, and the why-not step of a move that does not resolve names it. The move card prints `newest` and reads `version` only when `newest` is null.';
 
-    private const PHP_STAR = 'The case sets the project\'s require.php to `*` (‡). The model keeps the holder\'s own step of case A, and lockrot judges the holder under the case\'s require.php, which admits its newest line.';
+    private const PHP_STAR = 'The case sets the project\'s require.php to `*` or to a constraint that matches no PHP (‡), so the project has no lowest PHP. The model keeps the holder\'s own step of case A. lockrot judges the holder with no project lowest, which admits its newest line.';
 
     private const INSTALLED_COMMIT = 'The model holds the date of a shared commit only for a branch\'s highest tag, so the hydrated lock gives the installed tag no date. lockrot then reads it as undated, not as dated by a commit its tags share.';
 
