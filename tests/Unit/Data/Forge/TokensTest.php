@@ -68,6 +68,30 @@ final class TokensTest extends TestCase
         yield 'empty' => ['', 'b'];
     }
 
+    /**
+     * @param array<string, string> $issuers
+     * @param array<string, string> $withheld
+     *
+     * @dataProvider ghHosts
+     */
+    #[DataProvider('ghHosts')]
+    public function testGithubTokenIsWithheldWhenGhHostNamesAnotherHost(array $issuers, ?string $expected, array $withheld): void
+    {
+        $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b'] + $issuers, null);
+
+        self::assertSame($expected, $tokens->github());
+        self::assertSame($withheld, $tokens->withheld());
+    }
+
+    /** @return iterable<string, array{array<string, string>, ?string, array<string, string>}> */
+    public static function ghHosts(): iterable
+    {
+        yield 'a GHE.com host' => [['GH_HOST' => 'acme.ghe.com'], null, ['GITHUB_TOKEN' => 'acme.ghe.com']];
+        yield 'github.com Actions with a GHE.com gh host' => [['GITHUB_SERVER_URL' => 'https://github.com', 'GH_HOST' => 'acme.ghe.com'], null, ['GITHUB_TOKEN' => 'acme.ghe.com']];
+        yield 'a gh host of github.com' => [['GH_HOST' => 'github.com'], 'b', []];
+        yield 'an empty gh host' => [['GH_HOST' => ''], 'b', []];
+    }
+
     public function testAWithheldGithubTokenFallsThroughToComposersToken(): void
     {
         self::assertSame('c', Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => 'https://ghes.example.com'], 'c')->github());
@@ -102,6 +126,11 @@ final class TokensTest extends TestCase
         yield 'gitlab.com CI with another glab host' => [['CI_SERVER_URL' => 'https://gitlab.com', 'GITLAB_HOST' => 'git.example.com'], null];
         yield 'a glab host of gitlab.com' => [['GITLAB_HOST' => 'gitlab.com'], 'g'];
         yield 'empty issuers' => [['CI_SERVER_URL' => '', 'GITLAB_HOST' => ''], 'g'];
+        yield 'a GL_HOST of a self-managed instance' => [['GL_HOST' => 'https://gitlab.example.com'], null];
+        yield 'a GITLAB_URI of a self-managed instance' => [['GITLAB_URI' => 'https://gitlab.example.com'], null];
+        yield 'a GL_HOST of gitlab.com' => [['GL_HOST' => 'gitlab.com'], 'g'];
+        yield 'a GITLAB_URI of gitlab.com' => [['GITLAB_URI' => 'gitlab.com'], 'g'];
+        yield 'a GITLAB_HOST of gitlab.com with another GITLAB_URI' => [['GITLAB_HOST' => 'gitlab.com', 'GITLAB_URI' => 'https://gitlab.example.com'], null];
     }
 
     public function testAWithheldGitlabTokenNamesItsIssuer(): void
