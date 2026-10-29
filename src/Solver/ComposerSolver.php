@@ -317,7 +317,8 @@ final class ComposerSolver
         try {
             $pool = $filter->filter($pool, [$feed], $composerRequest);
         } catch (\Error $e) {
-            // The filter is Composer's internal API: a drift fails this solve, never the run.
+            // The filter is Composer's internal API. The `move_check_failed` note names it as the
+            // source of a drift, which an \Error from inside Composer does not.
             throw new \RuntimeException('Composer\'s advisory pool filter failed: '.$e->getMessage());
         }
 
