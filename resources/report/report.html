@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-9JycUNC0sxYdpgtcSqLjayfuamkkP/mYoY4Evc+pPQQ='; style-src 'sha256-6s4QfiuLtu9RTXK+WUIKZKK3S/lbIUzFP6vG9olazvA='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Rg2y4Kk7NZyWrfEd/zf9RvLbRmBB5F7QvS3SqyP9ASY='; style-src 'sha256-9eZsZgNtSdrXLBxKRpR+JyrWLH9Tf+KLhp/2bVEpbe4='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -36,6 +36,7 @@
   --surface-3: #dfe7e4;
   --border: #d3ddda;
   --border-strong: #b4c3bf;
+  --control-border: #6f817d;
   --ink: #0f1a19;
   --ink-2: #3a4b49;
   --muted: #536562;
@@ -110,6 +111,7 @@
     --surface-3: #1e2c2a;
     --border: #253331;
     --border-strong: #374846;
+    --control-border: #647874;
     --ink: #e4edea;
     --ink-2: #c3d2ce;
     --muted: #8fa39f;
@@ -145,6 +147,7 @@
   --surface-3: #1e2c2a;
   --border: #253331;
   --border-strong: #374846;
+  --control-border: #647874;
   --ink: #e4edea;
   --ink-2: #c3d2ce;
   --muted: #8fa39f;
@@ -479,11 +482,17 @@ summary:focus-visible::after {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
 }
+:root {
+  --stuck-top: 0px;
+}
 @media (min-width: 760px) {
   .topbar {
     position: sticky;
     top: env(safe-area-inset-top, 0px);
     z-index: 20;
+  }
+  :root {
+    --stuck-top: var(--topbar-h);
   }
 }
 .topbar-in {
@@ -587,7 +596,7 @@ summary:focus-visible::after {
   width: 100%;
   resize: vertical;
   padding: 8px 10px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--control-border);
   border-radius: var(--radius-s);
   background: var(--surface-2);
   color: var(--ink);
@@ -791,13 +800,8 @@ summary:focus-visible::after {
   align-self: flex-start;
 }
 html {
-  scroll-padding-top: 48px;
+  scroll-padding-top: calc(var(--stuck-top) + var(--list-head-h, 0px) + 8px);
   scroll-padding-bottom: 48px;
-}
-@media (min-width: 760px) {
-  html {
-    scroll-padding-top: calc(var(--topbar-h) + 48px);
-  }
 }
 .shell {
   max-width: var(--page-max);
@@ -831,12 +835,6 @@ html {
 }
 .shell-main {
   min-width: 0;
-  scroll-margin-top: 12px;
-}
-@media (min-width: 760px) {
-  .shell-main {
-    scroll-margin-top: calc(var(--topbar-h) + 12px);
-  }
 }
 
 .shell-rail {
@@ -847,9 +845,6 @@ html {
   overscroll-behavior: contain;
   scrollbar-width: thin;
 }
-.shell-rail > .rail {
-  position: static;
-}
 .rail-fold {
   margin-bottom: 12px;
 }
@@ -857,7 +852,6 @@ html {
   margin-bottom: 12px;
 }
 .rail-fold .rail {
-  position: static;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 14px 22px;
@@ -869,6 +863,9 @@ html {
 }
 .shell-detail:empty {
   display: none;
+}
+.shell-detail {
+  scroll-padding-top: calc(var(--detail-head-h, 0px) + 8px);
 }
 .shell-detail.is-side {
   position: sticky;
@@ -923,14 +920,17 @@ body.detail-open:has(.shell-detail.is-sheet > *) {
   width: min(760px, calc(100% - 32px));
   max-width: none;
   max-height: 84vh;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  overflow: hidden;
   padding: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius-l);
   background-color: var(--surface);
   color: var(--ink);
   box-shadow: var(--shadow);
+}
+.glossary[open] {
+  display: flex;
+  flex-direction: column;
 }
 .glossary::backdrop {
   background: var(--backdrop);
@@ -948,9 +948,7 @@ body.detail-open:has(.shell-detail.is-sheet > *) {
   }
 }
 .glossary-head {
-  position: sticky;
-  top: 0;
-  z-index: 1;
+  flex: none;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   padding: 14px 18px;
@@ -964,6 +962,9 @@ body.detail-open:has(.shell-detail.is-sheet > *) {
   margin-right: auto;
 }
 .glossary-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 16px 18px 22px;
   display: flex;
   flex-direction: column;
@@ -2543,10 +2544,6 @@ button.pill {
   font-size: var(--text-s);
   color: var(--muted);
 }
-.d3-row-wide,
-.d2-branches-line {
-  scroll-margin-top: 172px;
-}
 .d3-verdict-line a.lnk,
 .d3-reading a.lnk {
   border-bottom-style: dotted;
@@ -2883,7 +2880,6 @@ button.pill {
   border-bottom: 1px solid var(--border);
   font-size: var(--text-s);
   line-height: 1.45;
-  scroll-margin-top: 172px;
 }
 .d3-adv:last-child {
   border-bottom: 0;
@@ -3495,7 +3491,7 @@ button.pill {
 }
 .fhead {
   position: sticky;
-  top: 0;
+  top: var(--stuck-top);
   z-index: 3;
   display: grid;
   grid-template-columns: var(--fl-verdict) var(--fl-age-x) minmax(0, 1fr);
@@ -3516,11 +3512,6 @@ button.pill {
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--muted);
-}
-@media (min-width: 760px) {
-  .fhead {
-    top: var(--topbar-h);
-  }
 }
 .fhead-col {
   min-width: 0;
@@ -4498,13 +4489,22 @@ span.f2-unit {
 }
 @media (max-width: 759px) {
   .f2-strip {
-    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "figure figure"
+      "chips back";
     padding: 10px 16px;
   }
+  .f2-strip-figure {
+    grid-area: figure;
+  }
+  .f2-strip-chips {
+    grid-area: chips;
+  }
   .f2-strip-back {
-    position: absolute;
-    top: 10px;
-    right: 16px;
+    grid-area: back;
+    align-self: end;
   }
 }
 
@@ -4552,14 +4552,6 @@ span.f2-unit {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  position: sticky;
-  top: 196px;
-}
-
-@media (max-width: 860px) {
-  .rail {
-    position: static;
-  }
 }
 
 .rail-group {
@@ -5869,7 +5861,7 @@ span.f2-unit {
   }
   .al-head {
     position: sticky;
-    top: var(--topbar-h);
+    top: var(--stuck-top);
     z-index: 3;
     width: auto;
     overflow: visible;
@@ -7144,7 +7136,7 @@ a.ov-ex-row:hover {
   font-size: var(--text-s);
   padding: 9px 12px;
   border-radius: var(--radius-m);
-  border: 1px solid var(--border);
+  border: 1px solid var(--control-border);
   background: var(--surface);
   color: var(--ink);
 }
@@ -8450,7 +8442,7 @@ a.ov-ex-row:hover {
 		none: "no fix"
 	};
 	var fixLabel = (id) => wordFor(FIX_LABELS, id);
-	var SIGNAL_NAMES$1 = {
+	var SIGNAL_NAMES = {
 		S1: "marked abandoned",
 		S2: "release age",
 		S3: "archived repository",
@@ -8463,7 +8455,7 @@ a.ov-ex-row:hover {
 		S10: "unchecked",
 		S11: "PHP cap"
 	};
-	var signalName = (id) => wordFor(SIGNAL_NAMES$1, id);
+	var signalName = (id) => wordFor(SIGNAL_NAMES, id);
 	var ALLOWLIST_BY = {
 		builtin: "lockrot's built-in list",
 		project: "your ignore list",
@@ -8525,7 +8517,7 @@ a.ov-ex-row:hover {
 		["no_release_read", "no release of the row was read"],
 		["pass_cap", "Composer refused each move before it"],
 		["solver_error", "Composer's solver failed on it"],
-		["advisory_lookup_incomplete", "the advisory lookup did not cover a package it installs"]
+		["advisory_lookup_incomplete", "the advisory lookup did not cover a package in the result"]
 	];
 	function checkReasonRich(reason) {
 		const words = CHECK_REASON_WORDS.find(([id]) => id === reason)?.[1];
@@ -8537,7 +8529,6 @@ a.ov-ex-row:hover {
 		allowlisted: "allowlisted",
 		anonymous_budget: "anonymous request budget spent",
 		branch_snapshot: "a branch snapshot has no release branch",
-		composer_too_old: "Composer older than 2.4",
 		fetch_failed: "request failed",
 		host_not_supported: "host not supported",
 		install_time_budget: "install-time budget spent",
@@ -8846,10 +8837,10 @@ a.ov-ex-row:hover {
 	}
 	//#endregion
 	//#region src/domain/joinWords.ts
-	function joinAnd(items) {
-		if (items.length < 2) return items.join("");
-		return `${items.slice(0, -1).join(", ")} and ${items.at(-1) ?? ""}`;
+	function listParts(items) {
+		return items.flatMap((item, i) => [...i === 0 ? [] : [i === items.length - 1 ? " and " : ", "], item]);
 	}
+	var joinAnd = (items) => listParts(items).join("");
 	var capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
 	var lowerFirst = (text) => text.charAt(0).toLowerCase() + text.slice(1);
 	var isAre = (n) => pluralNoun(n, "is", "are");
@@ -8953,7 +8944,7 @@ a.ov-ex-row:hover {
 			});
 		}
 		if (groups.length === 0) return null;
-		return groups.map((g) => `${g.checks.join(" and ")} (${g.words})`).join("; ");
+		return groups.map((g) => `${joinAnd(g.checks)} (${g.words})`).join("; ");
 	}
 	function unjudgedChecks(finding) {
 		const ids = [...new Set([...finding.checks_skipped, ...finding.checks_missing].filter((c) => c.check === "release_metadata").flatMap((c) => c.blocks))];
@@ -9095,6 +9086,7 @@ a.ov-ex-row:hover {
 		require: new Set([
 			"--no-update",
 			"--dev",
+			"--no-interaction",
 			"--with-dependencies",
 			"--with-all-dependencies"
 		]),
@@ -9257,7 +9249,7 @@ a.ov-ex-row:hover {
 		const command = fix.command === null ? "" : commandLine(fix.command, "posix");
 		if (fix.check === "resolves") return `${records}: ${answers && fix.platform_step ? `set config.platform.php to your PHP ${target} release, then ` : ""}${command} rewrites it`;
 		if (!answers) return records;
-		if (fix.check === "refused") return `${records}, and Composer's solver at PHP ${target} refuses the update that rewrites it${fix.held_by.length === 0 ? "" : `: ${fix.held_by.map((h) => holdWords(h, fix)).join(" and ")}`}`;
+		if (fix.check === "refused") return `${records}, and Composer's solver at PHP ${target} refuses the update that rewrites it${fix.held_by.length === 0 ? "" : `: ${joinAnd(fix.held_by.map((h) => holdWords(h, fix)))}`}`;
 		return `${records}, and the update that rewrites it is not checked (${reasonWords(fix)})`;
 	}
 	var reasonWords = (fix) => fix.reason === null ? "the run checked no move" : plain(checkReasonRich(fix.reason));
@@ -9280,7 +9272,7 @@ a.ov-ex-row:hover {
 			case "resolves": return [packagesClause(fix, target), fix.platform_step ? `set config.platform.php to your PHP ${target} release, then Composer's solver resolves this update: ${command ?? ""}` : `${solver} resolves this update: ${command ?? ""}`];
 			case "refused": {
 				const their = packageNames(fix).length === 1 ? "its" : "their";
-				const holds = fix.held_by.length === 0 ? "" : `: ${fix.held_by.map((h) => holdWords(h, fix)).join(" and ")}`;
+				const holds = fix.held_by.length === 0 ? "" : `: ${joinAnd(fix.held_by.map((h) => holdWords(h, fix)))}`;
 				return [packagesClause(fix, target), `${solver} refuses ${their} update${holds}`];
 			}
 			default: return [packagesClause(fix, target), `not checked (${reasonWords(fix)})`];
@@ -9526,19 +9518,6 @@ a.ov-ex-row:hover {
 	function vocabTable(entries) {
 		return Object.assign(Object.create(null), entries);
 	}
-	var SIGNAL_NAMES = vocabTable({
-		S1: "marked abandoned",
-		S2: "no recent release",
-		S3: "repository archived",
-		S4: "no push to the repository",
-		S5: "release predates the target PHP",
-		S6: "branch snapshot or never tagged",
-		S7: "pulls in flagged packages",
-		S8: "the installed branch stopped",
-		S9: "security advisories",
-		S10: "a check could not run",
-		S11: "PHP cap"
-	});
 	var SIGNAL_DEFS = vocabTable({
 		S1: "The Composer repository marks the package abandoned, sometimes naming a replacement.",
 		S2: "Time since the newest dated release, pre-releases included, against release-warn-years / release-high-years.",
@@ -9654,6 +9633,8 @@ a.ov-ex-row:hover {
 		const at = a.findIndex((part, index) => part !== b[index]);
 		return at !== -1 && (a[at] ?? 0) < (b[at] ?? 0);
 	}
+	var leavesRequireDev = (name, argvs) => argvs.some(([, subcommand, argument = "", ...options]) => subcommand === "require" && argument.split(":")[0]?.toLowerCase() === name.toLowerCase() && options.includes("--no-interaction") && !options.includes("--dev"));
+	var fromRequireDev = (name, argvs) => leavesRequireDev(name, argvs) ? ", which removes it from require-dev" : "";
 	function moveAction(finding, move, run) {
 		const php = move.php_check;
 		const hasDependents = finding.direct_dependents.length > 0;
@@ -9668,7 +9649,7 @@ a.ov-ex-row:hover {
 				return [`Update to ${move.newest}${on}`];
 			}
 			case "require":
-			case "raise-php": return [capitalize((move.kind === "raise-php" ? `Raise require.php to ${php?.raise_to ?? ""}, then ` : "") + (finding.direct ? `require ${move.constraint ?? ""}` : `move it to ${move.constraint ?? ""}${hasDependents ? ` through ${dependents(finding)}` : ""}`))];
+			case "raise-php": return [capitalize((move.kind === "raise-php" ? `Raise require.php to ${php?.raise_to ?? ""}${fromRequireDev("php", move.commands)}, then ` : "") + (finding.direct ? `require ${move.constraint ?? ""}${fromRequireDev(finding.package, move.commands)}` : `move it to ${move.constraint ?? ""}${hasDependents ? ` through ${dependents(finding)}` : ""}`))];
 			case "replace": {
 				const replacement = move.replacement;
 				if (!replacement?.package) return ["Find a replacement: the suggestion names no package to require"];
@@ -11106,6 +11087,104 @@ a.ov-ex-row:hover {
 		const dev = lastBoolean(terms, "dev");
 		return dev === null || dev === f.dev;
 	}
+	//#endregion
+	//#region src/state/types.ts
+	var FILTER_GROUPS = [
+		"prio",
+		"verdict",
+		"scope",
+		"signal",
+		"sev",
+		"fix",
+		"since",
+		"gate",
+		"flag",
+		"accepted"
+	];
+	var EMPTY_FILTERS = {
+		prio: [],
+		verdict: [],
+		scope: [],
+		signal: [],
+		sev: [],
+		fix: [],
+		since: [],
+		gate: [],
+		flag: [],
+		accepted: []
+	};
+	var INITIAL_STATE = {
+		view: "overview",
+		q: "",
+		pkg: null,
+		sort: "verdict",
+		sortDesc: false,
+		filters: EMPTY_FILTERS,
+		disclosure: {},
+		example: null,
+		section: null
+	};
+	//#endregion
+	//#region src/domain/filters.ts
+	var GROUP_LABELS = {
+		prio: "Priority",
+		verdict: "Grade",
+		scope: "Scope",
+		signal: "Signal",
+		sev: "Severity",
+		fix: "Fix",
+		since: "Since baseline",
+		gate: "This run",
+		flag: "Flag",
+		accepted: "Accepted flags"
+	};
+	var SCOPE_ROWS = [
+		["direct", "Direct"],
+		["transitive", "Transitive"],
+		["prod", "require"],
+		["dev", "require-dev"],
+		["unnamed", "not in composer.json"]
+	];
+	var SINCE_ROWS = [
+		["new", "New"],
+		["worsened", "Worsened"],
+		["known", "Known"]
+	];
+	var READY_KEY = "ready";
+	var HELD_KEY = "held";
+	var WAY_OUT_KEY = "wayout";
+	var FAILS_ROW = ["fails", "Fails this run"];
+	var READY_ROW = [READY_KEY, "Ready to run"];
+	var HELD_ROW = [HELD_KEY, "Held"];
+	var WAY_OUT_ROW = [WAY_OUT_KEY, "Another way out"];
+	var GATE_ROWS = [
+		FAILS_ROW,
+		READY_ROW,
+		HELD_ROW,
+		WAY_OUT_ROW
+	];
+	var rowLabel = (rows, key) => rows.find(([id]) => id === key)?.[1] ?? key;
+	function activeLabel(group, key) {
+		switch (group) {
+			case "scope": return rowLabel(SCOPE_ROWS, key);
+			case "signal": {
+				const name = signalName(key);
+				return name === key ? key : `${key} ${name}`;
+			}
+			case "since": return rowLabel(SINCE_ROWS, key);
+			case "gate": return rowLabel(GATE_ROWS, key);
+			case "fix": return fixLabel(key);
+			default: return key;
+		}
+	}
+	function activeFilters(filters) {
+		return FILTER_GROUPS.filter((group) => group !== "accepted").flatMap((group) => filters[group].map((key) => ({
+			group,
+			key,
+			groupLabel: GROUP_LABELS[group],
+			label: activeLabel(group, key)
+		})));
+	}
 	function isHeld(f) {
 		return f.next_step?.held_by.some((hold) => hold.source !== "root" && hold.package !== f.package) ?? false;
 	}
@@ -11222,22 +11301,7 @@ a.ov-ex-row:hover {
 			rows: shown
 		};
 	}
-	var SINCE_ROWS = [
-		["new", "New"],
-		["worsened", "Worsened"],
-		["known", "Known"]
-	];
-	var READY_KEY = "ready";
-	var HELD_KEY = "held";
-	var WAY_OUT_KEY = "wayout";
 	var HIDE_ACCEPTED = "hide";
-	var SCOPE_ROWS = [
-		["direct", "Direct"],
-		["transitive", "Transitive"],
-		["prod", "require"],
-		["dev", "require-dev"],
-		["unnamed", "not in composer.json"]
-	];
 	function acceptedToggle(scope) {
 		return {
 			group: "accepted",
@@ -11266,10 +11330,10 @@ a.ov-ex-row:hover {
 		return [
 			baseline !== null && here.some((f) => f.baseline !== null) ? groupOf(scope, "since", `Since ${baseline.path}`, SINCE_ROWS) : null,
 			groupOf(scope, "gate", "This run", [
-				...findingsFailGate(report) ? [["fails", "Fails this run"]] : [],
-				[READY_KEY, "Ready to run"],
-				[HELD_KEY, "Held"],
-				...findingsFailGate(report) ? [[WAY_OUT_KEY, "Another way out"]] : []
+				...findingsFailGate(report) ? [FAILS_ROW] : [],
+				READY_ROW,
+				HELD_ROW,
+				...findingsFailGate(report) ? [WAY_OUT_ROW] : []
 			]),
 			groupOf(scope, "verdict", "Grade", report.run.graded_verdicts.map((id) => [id, id])),
 			groupOf(scope, "flag", "Flag", report.run.flag_ids.map((id) => [id, id])),
@@ -11306,6 +11370,35 @@ a.ov-ex-row:hover {
 		const value = x(ReportContext);
 		if (value === null) throw new Error("useReport() outside <ReportContext.Provider>: mount the page through App");
 		return value;
+	}
+	//#endregion
+	//#region src/ui/useMeasuredHeight.ts
+	var LIST_HEAD_H = "--list-head-h";
+	var owners = new Map();
+	function publish(varName) {
+		const height = owners.get(varName)?.at(-1)?.height ?? null;
+		if (height === null) document.documentElement.style.removeProperty(varName);
+		else document.documentElement.style.setProperty(varName, height);
+	}
+	function useMeasuredHeight(varName) {
+		const ref = A(null);
+		_(() => {
+			const node = ref.current;
+			if (node === null || typeof ResizeObserver === "undefined") return void 0;
+			const owner = { height: null };
+			owners.set(varName, [...owners.get(varName) ?? [], owner]);
+			const observer = new ResizeObserver(() => {
+				owner.height = `${Math.ceil(node.getBoundingClientRect().height)}px`;
+				publish(varName);
+			});
+			observer.observe(node);
+			return () => {
+				observer.disconnect();
+				owners.set(varName, (owners.get(varName) ?? []).filter((other) => other !== owner));
+				publish(varName);
+			};
+		}, [varName]);
+		return ref;
 	}
 	//#endregion
 	//#region src/domain/ago.ts
@@ -12084,22 +12177,65 @@ a.ov-ex-row:hover {
 		})] }, i)) });
 	}
 	//#endregion
-	//#region src/ui/report/CopyMove.tsx
-	var COPIED_MS$1 = 1400;
-	var FAILED_MS = 2600;
-	function useCopyStatus() {
+	//#region src/ui/common/useCopy.ts
+	function useCopy({ copiedMs, manualMs }) {
 		const [status, setStatus] = d("idle");
+		const pending = A(void 0);
+		const attempt = A(0);
 		h(() => {
 			if (status === "idle") return void 0;
 			const timer = window.setTimeout(() => {
 				setStatus("idle");
-			}, status === "copied" ? COPIED_MS$1 : FAILED_MS);
+			}, status === "copied" ? copiedMs : manualMs);
 			return () => {
 				window.clearTimeout(timer);
 			};
-		}, [status]);
-		return [status, setStatus];
+		}, [
+			status,
+			copiedMs,
+			manualMs
+		]);
+		h(() => () => {
+			window.clearTimeout(pending.current);
+		}, []);
+		const settle = (outcome, onManual) => {
+			window.clearTimeout(pending.current);
+			pending.current = window.setTimeout(() => {
+				setStatus(outcome);
+				onManual?.();
+			}, 0);
+		};
+		const copy = (text, onManual) => {
+			setStatus("idle");
+			const mine = ++attempt.current;
+			const clipboard = navigator.clipboard;
+			if (clipboard === void 0) {
+				settle("manual", onManual);
+				return;
+			}
+			clipboard.writeText(text).then(() => {
+				if (mine === attempt.current) settle("copied");
+			}, () => {
+				if (mine === attempt.current) settle("manual", onManual);
+			});
+		};
+		const reset = () => {
+			attempt.current++;
+			window.clearTimeout(pending.current);
+			setStatus("idle");
+		};
+		return {
+			status,
+			copy,
+			reset
+		};
 	}
+	//#endregion
+	//#region src/ui/report/CopyMove.tsx
+	var TIMES$1 = {
+		copiedMs: 1400,
+		manualMs: 2600
+	};
 	var LABELS = {
 		idle: DETAIL_WORDS.copy,
 		copied: DETAIL_WORDS.copied,
@@ -12109,10 +12245,12 @@ a.ov-ex-row:hover {
 	function CopyMove({ argvs, label, className }) {
 		const { shell, pickShell } = useReport();
 		const [menuOpen, setMenuOpen] = d(false);
-		const [status, setStatus] = useCopyStatus();
+		const { status, copy: copyText, reset } = useCopy(TIMES$1);
+		const pre = A(null);
 		const menuId = `${g()}-shells`;
 		const shellButton = A(null);
 		const menu = A(null);
+		h(reset, [shell]);
 		h(() => {
 			if (!menuOpen) return void 0;
 			menu.current?.querySelector("[aria-checked=\"true\"]")?.focus();
@@ -12137,15 +12275,11 @@ a.ov-ex-row:hover {
 			closeMenu();
 		};
 		const copy = () => {
-			const clipboard = navigator.clipboard;
-			if (!clipboard) {
-				setStatus("manual");
-				return;
-			}
-			clipboard.writeText(lines.join("\n")).then(() => {
-				setStatus("copied");
-			}, () => {
-				setStatus("manual");
+			copyText(lines.join("\n"), () => {
+				const box = pre.current;
+				if (box === null) return;
+				box.focus();
+				document.getSelection()?.selectAllChildren(box);
 			});
 		};
 		const onMenuKey = (event) => {
@@ -12195,7 +12329,7 @@ a.ov-ex-row:hover {
 						u$1("span", {
 							className: "vh",
 							"aria-live": "polite",
-							children: status === "copied" ? DETAIL_WORDS.copied : ""
+							children: status === "idle" ? "" : LABELS[status]
 						})
 					]
 				}),
@@ -12220,7 +12354,9 @@ a.ov-ex-row:hover {
 					}, option))
 				}),
 				u$1("pre", {
+					ref: pre,
 					className: "d2-copy-cmd",
+					tabIndex: -1,
 					children: printable ? argvs.map((argv, i) => u$1("span", {
 						className: "d2-copy-line",
 						children: (commandWords(argv, shell) ?? []).map((word, at) => u$1(S, { children: [at > 0 && " ", u$1("span", {
@@ -12239,6 +12375,18 @@ a.ov-ex-row:hover {
 		});
 	}
 	//#endregion
+	//#region src/ui/report/jumpInDetail.ts
+	function jumpInDetail(target) {
+		const scroller = target.closest(".shell-detail");
+		if (scroller === null) {
+			if (typeof target.scrollIntoView === "function") target.scrollIntoView({ block: "start" });
+			return;
+		}
+		const padding = parseFloat(getComputedStyle(scroller).scrollPaddingTop) || 0;
+		const top = target.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - padding;
+		scroller.scrollTo({ top });
+	}
+	//#endregion
 	//#region src/ui/report/RichText.tsx
 	function jumpTo(event, id) {
 		event.preventDefault();
@@ -12246,7 +12394,7 @@ a.ov-ex-row:hover {
 			const target = document.getElementById(id);
 			if (target === null) return;
 			if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
-			if (typeof target.scrollIntoView === "function") target.scrollIntoView({ block: "start" });
+			jumpInDetail(target);
 			target.focus({ preventScroll: true });
 		});
 	}
@@ -12810,11 +12958,13 @@ a.ov-ex-row:hover {
 		switch (check.baseline) {
 			case "resolves": {
 				const lock = `checked with the solver of Composer${check.composer === null ? "" : ` ${check.composer}`} against the lock`;
-				const names = check.blocking_disabled_by.flatMap((name, i) => [...i > 0 ? [" and "] : [], { code: name }]);
-				return names.length === 0 ? [`${lock} · ext-* requirements not checked`] : [
+				const names = listParts(check.blocking_disabled_by.map((name) => ({ code: name })));
+				const ignored = check.ignored_platform;
+				const unchecked = ignored.length === 0 ? [] : [` · ${joinAnd(ignored)} requirements not checked`];
+				return names.length === 0 ? [lock, ...unchecked] : [
 					`${lock}, with advisory blocking turned off by `,
 					...names,
-					" · ext-* requirements not checked"
+					...unchecked
 				];
 			}
 			case "refused": return ["not checked, because Composer's solver refuses the lock itself"];
@@ -12884,8 +13034,9 @@ a.ov-ex-row:hover {
 				});
 				requestAnimationFrame(() => {
 					const section = document.getElementById(SCORE_SECTION_ID);
-					section?.scrollIntoView({ block: "start" });
-					section?.focus({ preventScroll: true });
+					if (section === null) return;
+					jumpInDetail(section);
+					section.focus({ preventScroll: true });
 				});
 			},
 			children: RUN_WORDS.scoreLink
@@ -13824,6 +13975,7 @@ a.ov-ex-row:hover {
 		const { report, details } = useReport2();
 		const closeRef = A(null);
 		const sheetRef = A(null);
+		const headRef = useMeasuredHeight("--detail-head-h");
 		usePrintOpen(sheetRef);
 		const base = g();
 		const branchesId = `${base}-branches`;
@@ -13851,6 +14003,7 @@ a.ov-ex-row:hover {
 			"data-surface": "detail",
 			children: [u$1("div", {
 				className: "detail-head",
+				ref: headRef,
 				children: [
 					u$1("div", {
 						className: "detail-head-top",
@@ -14792,10 +14945,12 @@ a.ov-ex-row:hover {
 			]
 		});
 	}
-	function ColumnHead({ run, axis }) {
+	function ColumnHead({ run, axis, onScreen }) {
+		const ref = useMeasuredHeight(LIST_HEAD_H);
 		return u$1("div", {
 			className: "fhead f2-head",
 			role: "row",
+			ref: onScreen ? ref : null,
 			children: [
 				u$1("span", {
 					className: "fhead-col f2-head-score",
@@ -14900,7 +15055,8 @@ a.ov-ex-row:hover {
 				}),
 				printed && u$1(ColumnHead, {
 					run: report.run,
-					axis
+					axis,
+					onScreen: false
 				}),
 				runSegments(findings).map((segment) => {
 					const first = segment.findings[0]?.package ?? "";
@@ -15005,7 +15161,8 @@ a.ov-ex-row:hover {
 				"aria-label": "Findings",
 				children: [!printed && u$1(ColumnHead, {
 					run: report.run,
-					axis
+					axis,
+					onScreen: true
 				}), byGrade(rows).map((group) => u$1(Group$1, {
 					verdict: group.verdict,
 					findings: group.findings,
@@ -15025,35 +15182,29 @@ a.ov-ex-row:hover {
 			children
 		});
 	}
-	function useFooterHeight() {
-		const ref = A(null);
+	function useFooterInView(ref) {
 		_(() => {
 			const node = ref.current;
-			if (node === null || typeof ResizeObserver === "undefined") return void 0;
+			if (node === null || typeof IntersectionObserver === "undefined") return void 0;
 			const root = document.documentElement;
-			const observer = new ResizeObserver(() => {
-				root.style.setProperty("--footer-h", `${Math.ceil(node.getBoundingClientRect().height)}px`);
-			});
-			observer.observe(node);
-			const visible = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver(([entry]) => {
+			const visible = new IntersectionObserver(([entry]) => {
 				root.classList.toggle("footer-in-view", entry?.isIntersecting === true);
 			});
-			visible?.observe(node);
+			visible.observe(node);
 			return () => {
-				observer.disconnect();
-				visible?.disconnect();
-				root.style.removeProperty("--footer-h");
+				visible.disconnect();
 				root.classList.remove("footer-in-view");
 			};
-		}, []);
-		return ref;
+		}, [ref]);
 	}
 	function Footer({ inert = false }) {
 		const { model } = useReport();
 		const { lockrot, generated_at } = model.report;
+		const ref = useMeasuredHeight("--footer-h");
+		useFooterInView(ref);
 		return u$1("footer", {
 			className: "colophon",
-			ref: useFooterHeight(),
+			ref,
 			inert,
 			children: [
 				u$1("p", { children: [
@@ -15396,7 +15547,7 @@ a.ov-ex-row:hover {
 			if (!open || dialog === null) return;
 			const keys = dialog.querySelector(".glossary-keys");
 			if (at === "keys" && typeof keys?.scrollIntoView === "function") keys.scrollIntoView({ block: "start" });
-			else dialog.scrollTop = 0;
+			else dialog.querySelector(".glossary-body")?.scrollTo({ top: 0 });
 		}, [
 			open,
 			at,
@@ -15515,39 +15666,27 @@ a.ov-ex-row:hover {
 	}
 	//#endregion
 	//#region src/ui/CopySummary.tsx
-	var COPIED_MS = 2e3;
+	var TIMES = {
+		copiedMs: 2e3,
+		manualMs: 2600
+	};
+	var ANNOUNCED = {
+		idle: "",
+		copied: "Summary copied to the clipboard",
+		manual: "The clipboard is not available. The summary is selected: press Ctrl+C or Command+C to copy it."
+	};
 	function CopySummary() {
 		const { model } = useReport();
 		const text = T(() => copySummary(model.report).join("\n"), [model]);
-		const [status, setStatus] = d("idle");
+		const { status, copy } = useCopy(TIMES);
 		const popover = A(null);
 		const area = A(null);
 		const popoverId = `${g()}-copy`;
-		h(() => {
-			if (status !== "copied") return void 0;
-			const timer = window.setTimeout(() => {
-				setStatus("idle");
-			}, COPIED_MS);
-			return () => {
-				window.clearTimeout(timer);
-			};
-		}, [status]);
 		const showManual = () => {
-			setStatus("manual");
 			const pop = popover.current;
-			if (pop !== null && typeof pop.showPopover === "function") {
-				if (!pop.matches(":popover-open")) pop.showPopover();
-				area.current?.focus();
-				area.current?.select();
-			}
-		};
-		const copy = async () => {
-			try {
-				await navigator.clipboard.writeText(text);
-				setStatus("copied");
-			} catch {
-				showManual();
-			}
+			if (pop !== null && typeof pop.showPopover === "function" && !pop.matches(":popover-open")) pop.showPopover();
+			area.current?.focus();
+			area.current?.select();
 		};
 		return u$1(S, { children: [
 			u$1("button", {
@@ -15555,14 +15694,14 @@ a.ov-ex-row:hover {
 				type: "button",
 				title: "Copy a three-line summary of this report as plain text",
 				onClick: () => {
-					copy();
+					copy(text, showManual);
 				},
 				children: status === "copied" ? "Copied" : "Copy summary"
 			}),
 			u$1("span", {
 				className: "copy-status",
 				"aria-live": "polite",
-				children: status === "copied" ? "Summary copied to the clipboard" : ""
+				children: ANNOUNCED[status]
 			}),
 			u$1("div", {
 				id: popoverId,
@@ -15661,23 +15800,6 @@ a.ov-ex-row:hover {
 	}
 	//#endregion
 	//#region src/ui/Header.tsx
-	function useHeaderHeight() {
-		const ref = A(null);
-		_(() => {
-			const node = ref.current;
-			if (node === null || typeof ResizeObserver === "undefined") return void 0;
-			const root = document.documentElement;
-			const observer = new ResizeObserver(() => {
-				root.style.setProperty("--topbar-h", `${Math.ceil(node.getBoundingClientRect().height)}px`);
-			});
-			observer.observe(node);
-			return () => {
-				observer.disconnect();
-				root.style.removeProperty("--topbar-h");
-			};
-		}, []);
-		return ref;
-	}
 	function fitGateFact(node) {
 		delete node.dataset["fact"];
 		if (node.querySelector(".gate-fact[data-said] .gate-fact-more") === null) return;
@@ -15705,7 +15827,7 @@ a.ov-ex-row:hover {
 	function Header({ theme, onToggleTheme, onOpenGlossary, children, inert = false }) {
 		const { model } = useReport();
 		const { run, lockrot, data_date } = model.report;
-		const ref = useHeaderHeight();
+		const ref = useMeasuredHeight("--topbar-h");
 		useGateFactFit(ref);
 		const project = run.project ?? run.lock_file ?? "composer.lock";
 		const label = themeButtonLabel(theme);
@@ -15997,7 +16119,6 @@ a.ov-ex-row:hover {
 			type: "button",
 			className: group.group === "gate" ? "opt opt-gate" : "opt",
 			"aria-pressed": row.on,
-			title: group.group === "signal" ? signalDef(row.key) : void 0,
 			onClick: (event) => {
 				event.currentTarget.focus();
 				dispatch({
@@ -16007,11 +16128,7 @@ a.ov-ex-row:hover {
 				});
 			},
 			children: [
-				group.group === "signal" ? u$1("span", {
-					className: "mono",
-					children: row.key
-				}) : null,
-				" " + row.label,
+				row.label,
 				" ",
 				u$1("span", {
 					className: "c",
@@ -16081,43 +16198,6 @@ a.ov-ex-row:hover {
 	function roomBelow(shift, scrollY, maxScroll) {
 		return Math.max(0, shift - (maxScroll - scrollY));
 	}
-	//#endregion
-	//#region src/state/types.ts
-	var FILTER_GROUPS = [
-		"prio",
-		"verdict",
-		"scope",
-		"signal",
-		"sev",
-		"fix",
-		"since",
-		"gate",
-		"flag",
-		"accepted"
-	];
-	var EMPTY_FILTERS = {
-		prio: [],
-		verdict: [],
-		scope: [],
-		signal: [],
-		sev: [],
-		fix: [],
-		since: [],
-		gate: [],
-		flag: [],
-		accepted: []
-	};
-	var INITIAL_STATE = {
-		view: "overview",
-		q: "",
-		pkg: null,
-		sort: "verdict",
-		sortDesc: false,
-		filters: EMPTY_FILTERS,
-		disclosure: {},
-		example: null,
-		section: null
-	};
 	//#endregion
 	//#region src/ui/Tabs.tsx
 	var TABS = [
@@ -17790,6 +17870,35 @@ a.ov-ex-row:hover {
 			})
 		] });
 	}
+	function AdvisoryHead() {
+		return u$1("div", {
+			className: "al-head",
+			role: "row",
+			ref: useMeasuredHeight(LIST_HEAD_H),
+			children: [
+				u$1("span", {
+					className: "al-col al-col-sev",
+					role: "columnheader",
+					children: ADVISORY_HEAD.sev
+				}),
+				u$1("span", {
+					className: "al-col al-col-adv",
+					role: "columnheader",
+					children: ADVISORY_HEAD.adv
+				}),
+				u$1("span", {
+					className: "al-col al-col-aff",
+					role: "columnheader",
+					children: ADVISORY_HEAD.aff
+				}),
+				u$1("span", {
+					className: "al-col al-col-fix",
+					role: "columnheader",
+					children: ADVISORY_HEAD.fix
+				})
+			]
+		});
+	}
 	function AdvisoriesView2() {
 		const { state } = useReport();
 		const { report } = useReport2();
@@ -17835,32 +17944,7 @@ a.ov-ex-row:hover {
 				className: "aledger no-axis",
 				role: "table",
 				"aria-label": "Advisories",
-				children: [u$1("div", {
-					className: "al-head",
-					role: "row",
-					children: [
-						u$1("span", {
-							className: "al-col al-col-sev",
-							role: "columnheader",
-							children: ADVISORY_HEAD.sev
-						}),
-						u$1("span", {
-							className: "al-col al-col-adv",
-							role: "columnheader",
-							children: ADVISORY_HEAD.adv
-						}),
-						u$1("span", {
-							className: "al-col al-col-aff",
-							role: "columnheader",
-							children: ADVISORY_HEAD.aff
-						}),
-						u$1("span", {
-							className: "al-col al-col-fix",
-							role: "columnheader",
-							children: ADVISORY_HEAD.fix
-						})
-					]
-				}), groups.map((group) => u$1(Group, {
+				children: [u$1(AdvisoryHead, {}), groups.map((group) => u$1(Group, {
 					group,
 					run,
 					first
@@ -19548,73 +19632,6 @@ a.ov-ex-row:hover {
 		}, [host]);
 	}
 	//#endregion
-	//#region src/domain/filters.ts
-	var RAIL_SIGNAL_LABELS = vocabTable({
-		S1: "marked abandoned",
-		S2: "no recent release",
-		S3: "repository archived",
-		S4: "no recent push",
-		S5: "predates target PHP",
-		S6: "snapshot or untagged",
-		S7: "pulls in flagged",
-		S8: "branch stopped",
-		S9: "security advisories",
-		S10: "a check did not run"
-	});
-	function signalLabel(id) {
-		return RAIL_SIGNAL_LABELS[id] ?? SIGNAL_NAMES[id] ?? "";
-	}
-	var GROUP_LABELS = {
-		prio: "Priority",
-		verdict: "Verdict",
-		scope: "Scope",
-		signal: "Signal",
-		sev: "Severity",
-		fix: "Fix",
-		since: "Since baseline",
-		gate: "This run",
-		flag: "Flag",
-		accepted: "Accepted flags"
-	};
-	var SCOPE_LABELS = vocabTable({
-		direct: "Direct",
-		transitive: "Transitive",
-		prod: "require",
-		dev: "require-dev",
-		unnamed: "not in composer.json"
-	});
-	var GATE_LABELS = vocabTable({
-		fails: "Fails this run",
-		ready: "Ready to run",
-		held: "Held",
-		wayout: "Another way out"
-	});
-	var SINCE_LABELS = vocabTable({
-		new: "New",
-		worsened: "Worsened",
-		known: "Known"
-	});
-	function activeLabel(group, key) {
-		switch (group) {
-			case "scope": return SCOPE_LABELS[key] ?? key;
-			case "signal": {
-				const label = signalLabel(key);
-				return label === "" ? key : `${key} ${label}`;
-			}
-			case "since": return SINCE_LABELS[key] ?? key;
-			case "gate": return GATE_LABELS[key] ?? key;
-			default: return key;
-		}
-	}
-	function activeFilters(filters) {
-		return FILTER_GROUPS.filter((group) => group !== "accepted").flatMap((group) => filters[group].map((key) => ({
-			group,
-			key,
-			groupLabel: GROUP_LABELS[group],
-			label: activeLabel(group, key)
-		})));
-	}
-	//#endregion
 	//#region src/ui/search/ActiveFilters.tsx
 	function ActiveFilters({ inputRef }) {
 		const { state, dispatch } = useReport();
@@ -19696,7 +19713,7 @@ a.ov-ex-row:hover {
 	}
 	//#endregion
 	//#region src/ui/search/SearchBar.tsx
-	var PLACEHOLDER = "Filter: guzzle, flag:left-behind, verdict:critical, score:>=16";
+	var PLACEHOLDER = "flag:stale score:>=16";
 	function countLine(report, state) {
 		if (state.view === "findings") return countPhrase(applyFilters2(report, state, "findings").length, population2(report, "findings").length, "flagged package", "flagged packages");
 		if (state.view === "packages") return countPhrase(applyFilters2(report, state, "packages").length, population2(report, "packages").length, "package", "packages");
@@ -20432,7 +20449,7 @@ a.ov-ex-row:hover {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.6";
+	var version = "0.14.0-rc.7";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");
