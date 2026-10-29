@@ -514,6 +514,21 @@ final class ComposerSolverTest extends TestCase
         self::assertTrue(self::rootAliasSolver()->withAdvisories(self::advisories(['acme/lib' => ['*']]))->solve(SolveRequest::unlock(['acme/lib']))->resolves());
     }
 
+    /** A listed update keeps a vcs-locked dependency at its lock, as Composer does, so its refusal proves something. */
+    public function testAListedUpdateThatAVcsLockedDependencyRefusesLoadsNoName(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0']],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['name' => 'acme/core', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://git.example.org/acme/core.git', 'reference' => 'abc']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/core' => '^2.0']]], 'acme/core' => [['version' => '2.0.0']]]
+        )->withLockedOnly(['acme/core']);
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']));
+
+        self::assertFalse($solution->resolves());
+        self::assertSame([], $solution->unloaded());
+    }
+
     private static function rootAliasSolver(): ComposerSolver
     {
         $dev = ['version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.com/lib.git', 'reference' => 'abc123']];

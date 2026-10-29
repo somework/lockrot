@@ -162,8 +162,8 @@ final class ComposerSolver
         }
         $preferred = $this->preferredVersions($request);
         $policy = new DefaultPolicy($root->getPreferStable(), false, $preferred);
-        [$set, $composerRequest, $pool, $fixedRoot, $loaded, $feed] = $this->pool($root, $requires, $temporary, $request);
-        [$pool, $answer] = $this->answer($policy, $composerRequest, $pool, $fixedRoot, $preferred);
+        [$set, $composerRequest, $built, $fixedRoot, $loaded, $feed] = $this->pool($root, $requires, $temporary, $request);
+        [$pool, $answer] = $this->answer($policy, $composerRequest, $built, $fixedRoot, $preferred);
         if ($answer instanceof SolverProblemsException) {
             $locked = [];
             foreach ($this->locked->getPackages() as $package) {
@@ -174,7 +174,7 @@ final class ComposerSolver
             // A shadowed name has loaded versions, so the refusal never wants it, yet its hidden releases can change the answer.
             $shadowed = array_intersect($this->failures($loaded->asked()), [VersionSource::SHADOWED]);
 
-            return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $this->failures($holds->wanted()) + $shadowed);
+            return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $this->failures($holds->wanted()) + $shadowed + $this->lockedOnlyWanted($built, $holds->wanted()));
         }
 
         // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
@@ -214,6 +214,26 @@ final class ComposerSolver
         }
 
         return $preferred;
+    }
+
+    /**
+     * The pool builder takes a freed name from the first repository that has it, so it never asks
+     * the source for a name that {@see withLockedOnly()} offers.
+     *
+     * @param array<string, string> $wanted
+     *
+     * @return array<string, string> name => {@see VersionSource::UNREACHED}, for each wanted name that the pool takes from the lock only
+     */
+    private function lockedOnlyWanted(Pool $built, array $wanted): array
+    {
+        $unreached = [];
+        foreach ($built->getPackages() as $package) {
+            if (isset($wanted[$package->getName()]) && $package->getRepository() === $this->lockedOnly) {
+                $unreached[$package->getName()] = VersionSource::UNREACHED;
+            }
+        }
+
+        return $unreached;
     }
 
     /**
