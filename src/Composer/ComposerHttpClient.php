@@ -13,6 +13,7 @@ use Composer\Util\Loop;
 use Composer\Util\RemoteFilesystem;
 use Composer\Util\Url;
 use Lockrot\Clock;
+use Lockrot\Data\Http\CachingHttpClient;
 use Lockrot\Data\Http\HttpClientInterface;
 use Lockrot\Data\Http\HttpResult;
 use Lockrot\Data\Repository\RepositoryUrl;
@@ -126,24 +127,19 @@ final class ComposerHttpClient implements HttpClientInterface
      */
     private static function withoutCredentials(array $headers): array
     {
-        return array_values(array_filter($headers, static fn (string $header): bool => !self::isCredentialHeader($header)));
+        return array_values(array_filter($headers, static fn (string $header): bool => !CachingHttpClient::isCredentialHeader($header)));
     }
 
     /** @param array<mixed> $headers */
     private static function carriesCredentials(array $headers): bool
     {
         foreach ($headers as $header) {
-            if (\is_string($header) && self::isCredentialHeader($header)) {
+            if (\is_string($header) && CachingHttpClient::isCredentialHeader($header)) {
                 return true;
             }
         }
 
         return false;
-    }
-
-    private static function isCredentialHeader(string $header): bool
-    {
-        return stripos($header, 'authorization:') === 0 || stripos($header, 'private-token:') === 0;
     }
 
     public function fetchAll(array $urls, array $headers = []): array

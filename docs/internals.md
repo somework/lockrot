@@ -209,6 +209,12 @@ public Drupal site locks showed both.
   and 429 included. When an older answer for the URL is cached, lockrot uses it, and the footer
   shows its age. A 404 is an answer, and lockrot caches it.
 
+- lockrot keeps the answer to a request with its own credential header apart from the answer to a
+  request without one. So a run with a token asks again for a repository that answered 404 to a
+  run without a token. When lockrot has no token of its own for the host
+  ([Which credentials](#which-credentials)), a run with Composer's credentials and a run without
+  them read one cached answer. After you add such credentials, run `composer clear-cache`.
+
 - With Composer's cache disabled (`composer --no-cache`), lockrot keeps answers in memory for the
   run and writes nothing.
 
@@ -276,6 +282,13 @@ package file at a time, so memory stays flat on a large lock.
 Composer loads a repository without one (a Composer v1-style or static repository, including
 `packages.json`-only Satis output) whole before lockrot can find any name in it. Its full package
 list stays in memory for the run.
+
+The report grows with the number of packages times the direct requirements that reach each one. A
+lock with thousands of packages, each reached from very many direct requirements, can pass PHP's
+`memory_limit`. The run then stops with PHP's "Allowed memory size" error and writes no report. To
+raise the limit, set `COMPOSER_MEMORY_LIMIT`, for example `COMPOSER_MEMORY_LIMIT=4G composer
+lockrot`. For the PHAR, `php -d memory_limit=4G lockrot.phar` also works.
+[Pull request 157](https://github.com/somework/lockrot/pull/157) records the measured lock sizes.
 
 ## Related
 

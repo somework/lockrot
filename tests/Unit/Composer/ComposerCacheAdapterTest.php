@@ -75,4 +75,16 @@ final class ComposerCacheAdapterTest extends TestCase
         $adapter->set('k', new HttpResult('k', 200, 'x', new \DateTimeImmutable('2026-09-14T00:00:00+00:00')));
         self::assertNull($adapter->get('k'));
     }
+
+    /** Composer's Cache::write() rethrows an ErrorException when its retry fails, and a failed read throws one. */
+    public function testAFailingCacheIsAMissAndAFailedWriteIsDropped(): void
+    {
+        $cache = $this->createMock(Cache::class);
+        $cache->method('read')->willThrowException(new \ErrorException('file_get_contents(): read of 8192 bytes failed'));
+        $cache->expects(self::once())->method('write')->willThrowException(new \ErrorException('rename(): Access is denied (code: 5)'));
+        $adapter = new ComposerCacheAdapter($cache);
+
+        self::assertNull($adapter->get('https://a'));
+        $adapter->set('https://a', new HttpResult('https://a', 200, '{}', new \DateTimeImmutable('2026-09-14T00:00:00+00:00')));
+    }
 }

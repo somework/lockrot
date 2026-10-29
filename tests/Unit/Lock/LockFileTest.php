@@ -233,6 +233,31 @@ final class LockFileTest extends TestCase
         self::assertSame('2.0.0', $found->version());
     }
 
+    /** A transaction package that the lock path would skip as no Composer name is skipped here too. */
+    public function testWithPackagesSkipsANameThatIsNoComposerName(): void
+    {
+        $loader = new ArrayLoader();
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => '--bad', 'version' => '1.0.0']]]);
+        $option = LockedPackage::fromPackage(self::complete($loader->load(['name' => '-x/y', 'version' => '1.0.0'])), false);
+        $valid = LockedPackage::fromPackage(self::complete($loader->load(['name' => 'vendor/b', 'version' => '2.0.0'])), false);
+
+        $merged = $lock->withPackages([$option, $valid]);
+        $again = $merged->withPackages([$option]);
+
+        self::assertSame(['acme/lib', 'vendor/b'], array_map(static fn ($package): string => $package->name(), $merged->packages(true)));
+        self::assertSame(['--bad', '-x/y'], $merged->skippedNames());
+        self::assertSame(['--bad', '-x/y'], $again->skippedNames(), 'a name is listed once');
+    }
+
+    public function testIsComposerNameFollowsComposersPattern(): void
+    {
+        self::assertTrue(LockFile::isComposerName('acme/lib'));
+        self::assertTrue(LockFile::isComposerName('a.b_c-d/e--f'));
+        self::assertFalse(LockFile::isComposerName('-x/y'));
+        self::assertFalse(LockFile::isComposerName('Acme/Lib'));
+        self::assertFalse(LockFile::isComposerName("acme/lib\n"));
+    }
+
     public function testReadsThePlatformKeysAndWhetherPackagesDevExists(): void
     {
         $lock = LockFile::fromArray([

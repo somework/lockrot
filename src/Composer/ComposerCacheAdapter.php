@@ -11,7 +11,10 @@ use Lockrot\Json\JsonWriter;
 
 /**
  * A disabled or read-only cache needs no guard here: Composer\Cache::read() and ::write() check
- * isEnabled() themselves, so a read is a miss and a write does nothing.
+ * isEnabled() themselves, so a read is a miss and a write does nothing. The cache is best effort:
+ * a read that throws is a miss and a write that throws is dropped. Composer\Cache::write() rethrows
+ * an ErrorException when its retry fails, as on a rename that another process blocks, and a failed
+ * read throws one through Composer's error handler.
  *
  * @internal
  */
@@ -26,7 +29,11 @@ final class ComposerCacheAdapter implements CacheInterface
 
     public function get(string $key): ?HttpResult
     {
-        $raw = $this->cache->read($this->file($key));
+        try {
+            $raw = $this->cache->read($this->file($key));
+        } catch (\Exception $e) {
+            return null;
+        }
 
         return HttpResult::fromEnvelopeJson($key, \is_string($raw) ? $raw : null);
     }
@@ -35,7 +42,11 @@ final class ComposerCacheAdapter implements CacheInterface
     {
         $json = JsonWriter::encode($result->toEnvelope(), \JSON_UNESCAPED_SLASHES);
         if ($json !== null) {
-            $this->cache->write($this->file($key), $json);
+            try {
+                $this->cache->write($this->file($key), $json);
+            } catch (\Exception $e) {
+                // A dropped answer costs one refetch in a later run.
+            }
         }
     }
 

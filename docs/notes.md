@@ -410,10 +410,11 @@ operator of such a repository can make it advertise one.
 ### Package name invalid {#package_name_invalid}
 
 Some lock entries carry a name that is no Composer package name, such as a name that reads as a
-command option. lockrot skips them: they get no finding, and no printed command names them. The
-text names none of them.
+command option. In an install-time run, a package of Composer's transaction can carry one too.
+lockrot skips them: they get no finding, and no printed command names them. The text names none of
+them.
 
-- `data`: `packages`, the names as the lock writes them.
+- `data`: `packages`, the names from the lock or the transaction, lowercased as Composer reads them.
 - Findings: the entries have none.
 - `sets_network_failures`: no.
 

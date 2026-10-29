@@ -44,7 +44,8 @@ final class LockLineIndexTest extends TestCase
         self::assertNull(LockLineIndex::empty()->lineOf('laravel/framework'));
     }
 
-    public function testFirstOccurrencePerNameWins(): void
+    /** json_decode() keeps the last of two equal keys, so the report reads the second `packages`. */
+    public function testTheLastOccurrenceOfANameWins(): void
     {
         $json = <<<'JSON'
             {
@@ -54,7 +55,7 @@ final class LockLineIndexTest extends TestCase
                         "version": "1.0.0"
                     }
                 ],
-                "packages-dev": [
+                "packages": [
                     {
                         "name": "acme/first",
                         "version": "2.0.0"
@@ -62,7 +63,62 @@ final class LockLineIndexTest extends TestCase
                 ]
             }
             JSON;
-        self::assertSame(4, LockLineIndex::fromString($json)->lineOf('acme/first'));
+        self::assertSame(10, LockLineIndex::fromString($json)->lineOf('acme/first'));
+    }
+
+    /** A string long enough to exhaust a backtracking pattern's JIT stack still counts its line's brace. */
+    public function testAVeryLongStringBesideABraceKeepsTheDepth(): void
+    {
+        $json = <<<JSON
+            {
+                "packages": [
+                    {
+                        "name": "acme/first",
+                        "description": "{$this->longText()}", "x": {
+                        },
+                        "version": "1.0.0"
+                    },
+                    {
+                        "name": "acme/second",
+                        "version": "1.0.0"
+                    }
+                ]
+            }
+            JSON;
+        self::assertSame(10, LockLineIndex::fromString($json)->lineOf('acme/second'));
+    }
+
+    private function longText(): string
+    {
+        return str_repeat('a', 20000);
+    }
+
+    /** A line that the pattern cannot blank would miscount the depth, so no line beats a wrong one. */
+    public function testAFailedStringBlankingYieldsNoLines(): void
+    {
+        $escapes = str_repeat('a\\n', 3000);
+        $json = <<<JSON
+            {
+                "packages": [
+                    {
+                        "name": "acme/first",
+                        "description": "{$escapes}", "x": {
+                        },
+                        "version": "1.0.0"
+                    }
+                ]
+            }
+            JSON;
+        $limit = \ini_get('pcre.backtrack_limit');
+        // Each run of letters and each escape count against the limit, and the short lines stay under it.
+        ini_set('pcre.backtrack_limit', '1000');
+        try {
+            $index = LockLineIndex::fromString($json);
+        } finally {
+            ini_set('pcre.backtrack_limit', (string) $limit);
+        }
+
+        self::assertNull($index->lineOf('acme/first'));
     }
 
     /** A name is found by Composer's lower-case name, whatever the lock's spelling or escape. */

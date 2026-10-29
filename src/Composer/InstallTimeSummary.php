@@ -129,7 +129,7 @@ final class InstallTimeSummary
         // package gets a node to chain through.
         $lockPath = Factory::getLockFile($composerFile);
         $lock = (is_file($lockPath) ? LockFile::fromFile($lockPath) : LockFile::empty())->withPackages($packages);
-        $packages = self::withDevFlagsFrom($lock, $packages);
+        $packages = self::inMergedLock($lock, $packages);
 
         $deadline = Deadline::inSeconds((float) $lockrot->installTimeBudgetSeconds(), $this->monotonicNow);
         $composer = $event->getComposer();
@@ -178,18 +178,21 @@ final class InstallTimeSummary
      * A transaction cannot say which section a package belongs to, so every entry arrives as prod
      * ({@see TransactionPackages::fromTransaction()}). Without this flag a `composer require --dev`
      * package ranks one priority step too high. The merged lock carries the flag. Under `--dry-run`
-     * or in a project with no lock, the package stays prod ({@see LockFile::withPackages()}).
+     * or in a project with no lock, the package stays prod ({@see LockFile::withPackages()}). The
+     * method drops a package that the merged lock skips as no Composer name, as the lock path does.
      *
      * @param list<LockedPackage> $packages
      *
      * @return list<LockedPackage>
      */
-    private static function withDevFlagsFrom(LockFile $lock, array $packages): array
+    private static function inMergedLock(LockFile $lock, array $packages): array
     {
         $out = [];
         foreach ($packages as $package) {
             $merged = $lock->find($package->name());
-            $out[] = $merged === null ? $package : $package->withDev($merged->isDev());
+            if ($merged !== null) {
+                $out[] = $package->withDev($merged->isDev());
+            }
         }
 
         return $out;
