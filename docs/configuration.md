@@ -94,8 +94,8 @@ Exit codes are in [ci.md](ci.md#exit-codes).
 | `LOCKROT_DISABLE` | `1` or `true`: `composer lockrot` and the PHAR print `lockrot disabled via LOCKROT_DISABLE` on stderr and exit `0` before they read anything — the command line, `composer.json` or the lock. lockrot also skips the install-time summary. `lockrot.phar self-update` ignores it |
 | `LOCKROT_FAIL_ON` | Overrides `fail-on` |
 | `LOCKROT_TARGET_PHP` | Overrides `target-php` |
-| `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN` | Token for github.com (S3, S4). `GITHUB_TOKEN` counts only when `GITHUB_SERVER_URL` is unset, empty or names github.com. When Composer holds credentials for github.com, lockrot sends Composer's instead ([credentials](internals.md#repository-hosts-and-credentials)) |
-| `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN` | Personal access token, sent to gitlab.com only. `GITLAB_TOKEN` counts only when `CI_SERVER_URL` and `GITLAB_HOST` are each unset, empty or name gitlab.com. Without credentials, GitLab hides the archived flag (S3). A self-hosted instance uses Composer's `gitlab-token` or `gitlab-oauth` ([credentials](internals.md#repository-hosts-and-credentials)) |
+| `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN` | Token for github.com (S3, S4). `GITHUB_TOKEN` counts only when `GITHUB_SERVER_URL` and `GH_HOST` are each unset, empty or name github.com. When Composer holds credentials for github.com, lockrot sends Composer's instead ([credentials](internals.md#repository-hosts-and-credentials)) |
+| `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN` | Personal access token, sent to gitlab.com only. `GITLAB_TOKEN` counts only when `CI_SERVER_URL`, `GITLAB_HOST`, `GL_HOST` and `GITLAB_URI` are each unset, empty or name gitlab.com. Without credentials, GitLab hides the archived flag (S3). A self-hosted instance uses Composer's `gitlab-token` or `gitlab-oauth` ([credentials](internals.md#repository-hosts-and-credentials)) |
 | `COMPOSER` | The manifest, as for every Composer command: `COMPOSER=alt.json composer lockrot` reads `extra.lockrot` from `alt.json`, analyses `alt.lock` and looks for the baseline next to `alt.json` |
 
 When `COMPOSER_ROOT_VERSION` is unset, lockrot sets it to `1.0.0` for the run, so Composer does not
@@ -404,8 +404,9 @@ on every run ([What `--fail-on=unchecked` fails on](ci.md#what-unchecked-fails-o
   an ssh source as `ssh://host:2222/path`. A URL without a scheme is the scp form, which names its
   user (`git@host:path`). lockrot compares the host and port without case, then the path, without
   the scheme, a trailing `/` and `.git`. A port with leading zeros (`:0443`) or the default port of
-  the scheme (`https://host:443`) matches the same host and URL without it. A package installed from
-  a `file://` URL is accepted only by `package`.
+  the scheme (`https://host:443`, `ssh://host:22`) matches the same host and URL without it. The
+  scp form `git@host:path` matches too. The default ports are 80 for http, 443 for https, 22 for
+  ssh and 9418 for git. A package installed from a `file://` URL is accepted only by `package`.
 - **Accepting `release_metadata` accepts the unknown fixes too.** On a package from vcs or an
   unknown origin, the releases lockrot did not read are also the releases that the fix of each
   advisory needs. Each counted advisory then has the fix `unknown`, which never doubles. If no

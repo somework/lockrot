@@ -158,6 +158,10 @@ final class UncheckedAcceptanceTest extends TestCase
         yield 'another query' => ['https://h.example/p?ref=a', null, null, 'https://h.example/p?ref=b', false];
         yield 'another fragment' => ['https://h.example/p#a', null, null, 'https://h.example/p#b', false];
         yield 'the same query and fragment' => ['https://h.example/p?ref=a#f', null, null, 'https://h.example/p?ref=a#f', true];
+        yield 'the ssh default port against the scp form' => ['ssh://git.example.com:22/acme/fork', null, null, 'git@git.example.com:acme/fork.git', true];
+        yield 'the ssh default port against an ssh URL without it' => ['ssh://git.example.com:22/acme/fork', null, null, 'ssh://git.example.com/acme/fork', true];
+        yield 'another ssh port' => ['ssh://git.example.com:2222/acme/fork', null, null, 'git@git.example.com:acme/fork.git', false];
+        yield 'the git default port written out' => ['git://git.example.com:9418/acme/fork', null, null, 'git://git.example.com/acme/fork', true];
         yield 'an scp URL with an upper-case host' => ['git@GitHub.com:acme/x.git', null, null, 'https://github.com/acme/x', true];
         yield 'a source without a host' => ['https://h.example/acme/x', null, null, 'file:///acme/x', false];
         yield 'the activity host and repo' => ['https://codeberg.org/acme/x', 'codeberg.org', '/acme/x/', null, true];
