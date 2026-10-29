@@ -538,6 +538,34 @@ final class ComposerSolverTest extends TestCase
         yield 'php-ext-zend' => ['php-ext-zend'];
     }
 
+    /** The locked acme/dep alone provides acme/feature, and the root replaces acme/dep: Composer installs one package of a name. */
+    public function testARefusalByAReplaceOfTheRootNamesTheRootAsTheHolder(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0'], 'replace' => ['acme/dep' => '*']],
+            [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/dep', 'version' => '1.0.0', 'provide' => ['acme/feature' => '1.0.0']]],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/feature' => '^1.0']]], 'acme/feature' => []]
+        );
+
+        $holds = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->holds();
+
+        $replaces = array_values(array_filter($holds, static fn (Holder $hold): bool => $hold->link() === Holder::REPLACE));
+        self::assertCount(1, $replaces, 'holds: '.json_encode(self::rows($holds)));
+        self::assertSame([Holder::ROOT, 'acme/app', null, '*', 'acme/dep'], [$replaces[0]->source(), $replaces[0]->package(), $replaces[0]->version(), $replaces[0]->constraint(), $replaces[0]->target()]);
+    }
+
+    /** A `self.version` requirement gives the branch alias a rule of its own: the hold names the branch that the lock and Packagist list. */
+    public function testARequirementOfABranchAliasHoldsTheAliasedBranch(): void
+    {
+        $branch = ['version' => 'dev-main', 'extra' => ['branch-alias' => ['dev-main' => '1.1.x-dev']], 'require' => ['acme/gone' => 'self.version']];
+        $solver = self::pinned(['acme/lib' => '^1.0@dev'], ['acme/lib' => 20], [], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], $branch]]);
+
+        $holds = $solver->solve(SolveRequest::update(['acme/lib' => '1.1.x-dev']))->holds();
+
+        $requires = array_map(static fn (Holder $hold): array => [$hold->source(), $hold->package(), $hold->version(), $hold->link()], array_filter($holds, static fn (Holder $hold): bool => $hold->target() === 'acme/gone'));
+        self::assertSame([[Holder::PACKAGE, 'acme/lib', 'dev-main', Holder::REQUIRE]], array_values(array_unique($requires, \SORT_REGULAR)), 'holds: '.json_encode(self::rows($holds)));
+    }
+
     /** A listed update keeps a vcs-locked dependency at its lock, as Composer does, so its refusal proves something. */
     public function testAListedUpdateThatAVcsLockedDependencyRefusesLoadsNoName(): void
     {

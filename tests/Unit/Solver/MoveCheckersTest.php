@@ -56,6 +56,12 @@ final class MoveCheckersTest extends TestCase
         self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '8.4-dev'));
     }
 
+    /** A pre-release of the target minor is no stable release in it: the solve runs at the newest patch. */
+    public function testAPreReleasePlatformPhpInTheTargetMinorIsNotKept(): void
+    {
+        self::assertSame('8.4.99', MoveCheckers::platformPhp('8.4', '8.4.0-RC1'));
+    }
+
     /** Composer normalises a bare major (`8`) to 8.0.0, so it lies in the target minor 8.0. */
     public function testAPlatformPhpThatComposerNormalisesIntoTheTargetMinorIsKept(): void
     {
