@@ -43,14 +43,14 @@ final class PolicyRemovalsTest extends TestCase
         self::assertSame(['acme/fork' => ['1.0.0.0' => PolicyRemovals::ABANDONED], 'acme/lib' => ['1.0.0.0' => PolicyRemovals::ABANDONED]], PolicyRemovals::of(self::filtered($blocking, new Pool([$fork]), [])));
     }
 
-    public function testEachRemovedVersionKeepsItsOwnPolicy(): void
+    public function testEachRemovedVersionKeepsItsOwnPolicyInNameOrder(): void
     {
-        $old = new CompletePackage('acme/old', '2.0.0.0', '2.0.0');
+        $old = new CompletePackage('acme/abandoned', '2.0.0.0', '2.0.0');
         $old->setAbandoned(true);
         $pool = new Pool([new CompletePackage('acme/lib', '1.0.0.0', '1.0.0'), $old]);
         $blocking = AdvisoryBlocking::fromConfig(self::config(['block-abandoned' => true]));
 
-        self::assertSame(['acme/lib' => ['1.0.0.0' => PolicyRemovals::ADVISORIES], 'acme/old' => ['2.0.0.0' => PolicyRemovals::ABANDONED]], PolicyRemovals::of(self::filtered($blocking, $pool, ['acme/lib' => [self::advisory('acme/lib', '<1.1')]])));
+        self::assertSame(['acme/abandoned' => ['2.0.0.0' => PolicyRemovals::ABANDONED], 'acme/lib' => ['1.0.0.0' => PolicyRemovals::ADVISORIES]], PolicyRemovals::of(self::filtered($blocking, $pool, ['acme/lib' => [self::advisory('acme/lib', '<1.1')]])));
     }
 
     public function testTheRemovedVersionsOfANameAreInVersionOrder(): void

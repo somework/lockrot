@@ -1192,14 +1192,16 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['class' => \UnexpectedValueException::class, 'message' => 'Could not parse version constraint'], $checker->solverError());
     }
 
-    public function testAnErrorOfTheSolveEndsTheCheck(): void
+    /** Composer's internal API can change in a minor, and a removed method throws an \Error at lockrot's own call: the move is not checked, and the run goes on. */
+    public function testAnErrorOfTheSolveLeavesTheMoveNotCheckedAndTheErrorIsKept(): void
     {
-        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/new-dependency' => '^1.0']]]], [], ['acme/new-dependency' => new \TypeError('a defect')]);
+        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/new-dependency' => '^1.0']]]], [], ['acme/new-dependency' => new \Error('Call to undefined method Composer\\DependencyResolver\\Pool::removed()')]);
         $checker = self::checkerWith(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], $source);
 
-        $this->expectException(\TypeError::class);
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
 
-        $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::SOLVER_ERROR, 'installs' => null], $outcome->check()->jsonSerialize());
+        self::assertSame(['class' => \Error::class, 'message' => 'Call to undefined method Composer\\DependencyResolver\\Pool::removed()'], $checker->solverError());
     }
 
     /** The solver stops at its first failing chain: the scan of the target release names the other holds. */

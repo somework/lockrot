@@ -43,32 +43,32 @@ final class PolicyRemovals
         $removals = [];
         foreach ($pool->getAllPolicyRemovedVersions() as $name => $versions) {
             foreach ($versions as $version => $reason) {
-                $removals[$name][(string) $version] = $reason->getType();
+                $removals[$name][$version] = $reason->getType();
             }
         }
 
         return $removals;
     }
 
-    /**
-     * Composer 2.10 keeps one map per policy: name => version => the advisories or the pretty version.
-     *
-     * @return array<string, array<string, string>>
-     */
+    /** @return array<string, array<string, string>> */
     private static function byMap(Pool $pool): array
     {
         $maps = [];
         if (method_exists($pool, 'getAllSecurityRemovedPackageVersions')) {
-            $maps[self::ADVISORIES] = (array) $pool->getAllSecurityRemovedPackageVersions();
+            /** @var array<string, array<string, mixed>> $security name => version => the advisories */
+            $security = $pool->getAllSecurityRemovedPackageVersions();
+            $maps[self::ADVISORIES] = $security;
         }
         if (method_exists($pool, 'getAllAbandonedRemovedPackageVersions')) {
-            $maps[self::ABANDONED] = (array) $pool->getAllAbandonedRemovedPackageVersions();
+            /** @var array<string, array<string, mixed>> $abandoned name => version => the pretty version */
+            $abandoned = $pool->getAllAbandonedRemovedPackageVersions();
+            $maps[self::ABANDONED] = $abandoned;
         }
         $removals = [];
         foreach ($maps as $policy => $map) {
             foreach ($map as $name => $versions) {
-                foreach (array_keys((array) $versions) as $version) {
-                    $removals[(string) $name][(string) $version] = $policy;
+                foreach (array_keys($versions) as $version) {
+                    $removals[$name][$version] = $policy;
                 }
             }
         }

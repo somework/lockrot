@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Solver;
 
 use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Config;
+use Composer\DependencyResolver\PolicyRemovalReason;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
@@ -465,11 +466,35 @@ final class ComposerSolverTest extends TestCase
     }
 
     /**
-     * Ruling R6-36: a root alias of a dev branch (`dev-main as 1.0.0`) is a stable 1.0.0, and the
-     * advisory covers it. Composer asks only about dev-main, so only a range that meets dev-main
-     * reaches the filter. Without the alias, acme/user's `^1.0` meets no release that the root allows.
+     * Ruling R6-36: lockrot blocks what the Composer that runs it blocks. Composer 2.10 reads a root
+     * alias of a dev branch (`dev-main as 1.0.0`) as a stable 1.0.0, and the advisory covers it.
+     * Without the alias, acme/user's `^1.0` meets no release that the root allows.
      */
-    public function testAnAdvisoryBlocksTheRootAliasOfADevBranch(): void
+    public function testOnComposer210AnAdvisoryBlocksTheRootAliasOfADevBranch(): void
+    {
+        if (class_exists(PolicyRemovalReason::class)) {
+            self::markTestSkipped('this Composer checks the advisories of a root alias against its dev branch');
+        }
+        $open = self::rootAliasSolver();
+
+        $refused = $open->withAdvisories(self::advisories(['acme/lib' => ['*']]))->solve(SolveRequest::unlock(['acme/lib']));
+
+        self::assertTrue($open->solve(SolveRequest::unlock(['acme/lib']))->resolves(), 'the alias satisfies acme/user without blocking');
+        self::assertFalse($refused->resolves());
+        self::assertContains('acme/user', array_map(static fn (Holder $hold): ?string => $hold->package(), $refused->holds()));
+    }
+
+    /** Ruling R6-36: Composer 2.11 checks the advisories of a root alias against its aliased dev branch, which no advisory range meets. */
+    public function testFromComposer211AnAdvisoryDoesNotBlockTheRootAliasOfADevBranch(): void
+    {
+        if (!class_exists(PolicyRemovalReason::class)) {
+            self::markTestSkipped('this Composer checks the advisories of a root alias against the alias version');
+        }
+
+        self::assertTrue(self::rootAliasSolver()->withAdvisories(self::advisories(['acme/lib' => ['*']]))->solve(SolveRequest::unlock(['acme/lib']))->resolves());
+    }
+
+    private static function rootAliasSolver(): ComposerSolver
     {
         $dev = ['version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.com/lib.git', 'reference' => 'abc123']];
         $aliases = [['package' => 'acme/lib', 'version' => 'dev-main', 'alias' => '1.0.0', 'alias_normalized' => '1.0.0.0']];
@@ -479,13 +504,8 @@ final class ComposerSolverTest extends TestCase
         $root->setAliases($aliases);
         $locked = LockFile::fromArray(['packages' => [['name' => 'acme/lib'] + $dev, ['name' => 'acme/user', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0']]], 'aliases' => $aliases])->lockedRepository();
         $remote = new ArrayVersionSource(['acme/lib' => [$dev], 'acme/user' => [['version' => '1.0.0', 'require' => ['acme/lib' => '^1.0']]]]);
-        $open = new ComposerSolver($root, $locked, new PlatformRepository([], ['php' => '8.4.99']), $remote);
 
-        $refused = $open->withAdvisories(self::advisories(['acme/lib' => ['*']]))->solve(SolveRequest::unlock(['acme/lib']));
-
-        self::assertTrue($open->solve(SolveRequest::unlock(['acme/lib']))->resolves(), 'the alias satisfies acme/user without blocking');
-        self::assertFalse($refused->resolves());
-        self::assertContains('acme/user', array_map(static fn (Holder $hold): ?string => $hold->package(), $refused->holds()));
+        return new ComposerSolver($root, $locked, new PlatformRepository([], ['php' => '8.4.99']), $remote);
     }
 
     /** Composer prints the problem text without colour: no console markup reaches a report. */

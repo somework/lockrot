@@ -134,12 +134,16 @@ final class ComposerSolver
         return $this->source;
     }
 
-    /** A move check never stops the run: an exception other than a refusal is a failed solve, and an \Error passes up. */
+    /**
+     * A move check never stops the run: any throwable is a failed solve. Composer's solver is its
+     * internal API, so a Composer minor can remove a method that lockrot calls, and that call then
+     * throws an \Error at lockrot's own call site.
+     */
     public function solve(SolveRequest $request): Solution
     {
         try {
             return $this->solveOrThrow($request);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return Solution::failed($e);
         }
     }

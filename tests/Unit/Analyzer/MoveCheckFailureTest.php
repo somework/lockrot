@@ -47,6 +47,23 @@ final class MoveCheckFailureTest extends TestCase
         self::assertSame('solver_error', JsonPath::stringAt($document, ['findings', 0, 'next_step', 'check', 'reason']));
     }
 
+    /** Case `move-check‡`, where the solve threw an \Error: a Composer minor removed a method that lockrot calls. */
+    public function testARunWhoseSolveThrewAnErrorWritesOneNoteWithTheErrorAndTheMoveIsNotChecked(): void
+    {
+        $case = CaseHydrator::case('move-check‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['checks'] = ['*' => ['result' => 'not_checked', 'form' => null, 'reason' => 'solver_error', 'holds' => []]];
+        $inputs['move_check'] = JsonPath::arrayAt($inputs, ['move_check']) + ['error' => ['class' => 'Error', 'message' => 'Call to undefined method Composer\\DependencyResolver\\Pool::removed()']];
+        $case['inputs'] = $inputs;
+
+        $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+        $notes = array_values(array_filter(JsonPath::arrayAt($document, ['note_details']), static fn ($note): bool => \is_array($note) && $note['code'] === 'move_check_failed'));
+
+        self::assertCount(1, $notes);
+        self::assertSame(['class' => 'Error', 'message' => 'Call to undefined method Composer\\DependencyResolver\\Pool::removed()'], JsonPath::arrayAt($notes[0], ['data']));
+        self::assertSame('solver_error', JsonPath::stringAt($document, ['findings', 0, 'next_step', 'check', 'reason']));
+    }
+
     /** Case `move-check‡`, where Composer's solver refuses the lock itself, so it refuses every move. */
     public function testALockThatComposerRefusesWritesOneNoteAndTheRunNamesTheRefusal(): void
     {

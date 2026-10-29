@@ -182,6 +182,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Solver/AdvisoryBlocking.php` FalseValue `return self::blocking(PolicyConfig::fromConfig(new Config(false)));` — only tests call `everyAdvisory()`, and their environment sets no variable that `Config` reads.
 - `src/Solver/ComposerSolver.php` Concat `$inputs = SolverInputs::of($pool, $request, $root).serialize($preferred);` — a cache key. A `serialize()` string ends where its own syntax ends, so either order tells the inputs apart.
 - `src/Solver/ComposerSolver.php` DecrementInteger, IncrementInteger `throw new \RuntimeException('Composer\'s advisory pool filter cannot be built: '.($error === null ? 'unknown error' : $error->getMessage()), 0, $error);` — no code reads the code of this exception.
+- `src/Solver/PolicyRemovals.php` NotCoveredMethod x3 `byReason()` — a Composer-version leg. The mutation gate installs the composer/composer of build/phar/composer.lock, whose `Pool` has the per-policy maps that `byMap()` reads. `PolicyRemovalsTest` runs `byReason()` on the `latest` rows of the ci.yml tests matrix.
 - `src/Solver/MoveCheckers.php` UnwrapArrayUnique `foreach (array_unique(array_filter([$package->getSourceUrl(), $package->getDistUrl()])) as $url) {` — only `in_array()` reads the names that a URL serves, so a name twice in the list changes no answer.
 - `src/Solver/MoveCheckers.php` Ternary `$solver = self::minimalChanges($config) ? $solver->withMinimalChanges() : $solver;` — a move check reads only the moved package's release, and minimal changes changes only the releases of the other names.
 - `src/Solver/MoveCheckers.php` CastBool x2 `return (bool) Platform::getEnv('COMPOSER_MINIMAL_CHANGES') || (bool) $config->get('update-with-minimal-changes');` — `||` returns a bool, and `(bool)` reads `'0'` as PHP's `||` does.
@@ -192,7 +193,6 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Solver/PoolAdvisoryFeed.php` FalseValue `public function getSecurityAdvisories(array $packageConstraintMap, bool $allowPartialAdvisories = false): array` — Composer's `RepositorySet` passes the argument on every call.
 - `src/Solver/PoolAdvisoryFeed.php` ArrayItemRemoval `return ['namesFound' => $answer['namesFound'], 'advisories' => $answer['advisories']];` — `RepositorySet::getSecurityAdvisoriesForConstraints()` reads only `advisories` of the answer.
 - `src/Solver/RepositoryVersions.php` UnwrapArrayFilter, UnwrapArrayValues `$options[$key] = array_values(array_filter($config[$key], 'is_string'));` — Composer builds the repository's `FilterRepository` from the same config, and it fails on an entry that is neither a string nor a number. No number matches a `vendor/name`, and `FilterRepository` reads only the values.
-- `src/Solver/SolverInputs.php` UnwrapArrayMap x2 `return array_map(static fn (array $versions): array => array_map('strval', array_keys($versions)), $removed);` — a cache key. A version key is a normalized version, never an int, and the removal map without the outer map tells the same pools apart.
 
 ## src/Verdict
 
