@@ -28,7 +28,7 @@ final class Tokens
     public const ENV_GITLAB_HOST = 'GITLAB_HOST';
     public const ENV_GL_HOST = 'GL_HOST';
     public const ENV_GITLAB_URI = 'GITLAB_URI';
-    /** gh sends `GITHUB_TOKEN` to this host. */
+    /** gh names its default host here: github.com, or a GHE.com or GitHub Enterprise Server host. */
     public const ENV_GH_HOST = 'GH_HOST';
 
     private ?string $github;

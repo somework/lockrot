@@ -75,7 +75,7 @@ final class TokensTest extends TestCase
      * @dataProvider ghHosts
      */
     #[DataProvider('ghHosts')]
-    public function testGithubTokenIsWithheldWhenGhHostNamesAnotherHost(array $issuers, ?string $expected, array $withheld): void
+    public function testGithubTokenCountsOnlyWhenGhHostNamesGithubCom(array $issuers, ?string $expected, array $withheld): void
     {
         $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b'] + $issuers, null);
 

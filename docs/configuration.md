@@ -29,7 +29,7 @@ then environment variable, then `extra.lockrot`, then the default.
 | `target-php` | string such as `"8.4"` | `config.platform.php`, else the running PHP | The PHP version the project runs on. S5 checks whether the installed release predates this PHP's major ([Old promise](verdicts.md#old-promise)), and S8 names only a branch that can install on it ([Within reach](verdicts.md#within-reach)). An advisory whose fix does not run on it is `blocked` and counts double ([Fix](verdicts.md#fix)). The move check solves at it ([The move check](verdicts.md#the-move-check)), and the PHP window says whether the lock installs on it ([The PHP window](verdicts.md#the-php-window)) | `--target-php`, `LOCKROT_TARGET_PHP` |
 | `format` | string | `table` | What stdout gets: `table`, `json`, `github`, `sarif`, `gitlab`, `markdown` or `html` ([ci.md](ci.md)). The exit code is the same for every format | `--format` |
 | `include-dev` | boolean | `false` | Also check `packages-dev`. A development package's whole [score](verdicts.md#score) is halved | `--dev` (turns it on only) |
-| `baseline` | string | `lockrot-baseline.json` | The [baseline](baseline.md) file, relative to `composer.json` or absolute. A file that this key names must exist, except under `--generate-baseline`. The default file can be missing. Under `--generate-baseline`, a path named `composer.json` or `composer.lock` is exit `2` | `--baseline` |
+| `baseline` | string | `lockrot-baseline.json` | The [baseline](baseline.md) file, relative to `composer.json` or absolute. A file that this key names must exist, except under `--generate-baseline`. The default file can be missing. Under `--generate-baseline`, a path named `composer.json` or `composer.lock`, the manifest or lock that `COMPOSER` names, or a name that Windows reads as another file (a trailing dot or space, a colon) is exit `2` | `--baseline` |
 | `release-warn-years` / `release-high-years` | integer ≥ 1 | `3` / `5` | Years without a stable release at which S2 ("no stable release") and S8 ("no stable release on the installed branch") reach `warn` / `high` ([signals](verdicts.md#the-signals)) | — |
 | `push-warn-years` / `push-high-years` | integer ≥ 1 | `3` / `5` | Years without a push or commit at which S4 reaches `warn` / `high` | — |
 | `ignore` | array | `[]` | Packages whose maintenance flags you accept, all of them or the ones an entry lists ([the allowlist](#the-allowlist)) | — |
@@ -231,7 +231,7 @@ and the score are the report's.
 |---|---|---|
 | Verdict | The verdict, the flags and the score, with each step of the sum | `finding.verdict`, `finding.lead`, `finding.flags`, `finding.score` |
 | Next step | The move, what it clears, what holds it and the score after it | `finding.next_step` |
-| Security | Each counted advisory with its fix, what each advisory repository answered, and the ignored advisories (the text gives only their count) | `finding.security` |
+| Security | Each counted advisory with its fix, what each advisory repository answered, and the ignored advisories (the text does not list them) | `finding.security` |
 | Chain | `direct requirement`, or the shortest `via` chain and the other direct requirements that reach the package, and how many hops below `composer.json` it sits | `finding.direct`, `finding.chain`, `finding.direct_dependents`, `finding.depth`, `finding.named_in` |
 | Allowlist | Who accepts which flags, and why | `finding.allowlist` |
 | Checks | The checks that did not run, as S10 or as skips, and the ones `accept-unchecked` accepted | `finding.checks_missing`, `finding.checks_skipped`, `finding.unchecked_accepted` |
@@ -245,10 +245,11 @@ and the score are the report's.
 | Settings | Thresholds, target PHP, and the project's own `require.php` as composer.json writes it (lockrot tests the branch rows against the lowest stable version it admits) | `run.thresholds`, `run.target_php`, `run.project_php` |
 | Run notes | The run's notes | `notes`, `note_details` |
 
-The text prints the allowlisted flag ids, as `accepted` and as `(allowlisted)` next to an unread
-check. The allowlist entry with its reason, the lock entry and the settings are in `--format=json`
-only. The text shows a value of the lock entry or the settings only on a line that reads it, such
-as a threshold beside an age.
+The text names the flags that the allowlist accepts on the `accepted` line, and writes
+`(allowlisted)` beside a check that the allowlist skips. The allowlist entry with its reason
+(`finding.allowlist`), the lock entry and the settings are in `--format=json` only. The text shows
+an `accept-unchecked` entry with its reason on the `not checked` line. It shows a value of the lock
+entry or the settings only on a line that reads it, such as a threshold beside an age.
 
 The document also carries `lockrot`, `package`, `version` and `generated_at`. The full shape is in
 [the explanation's fields](schema.md#the-explanation).

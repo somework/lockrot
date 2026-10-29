@@ -302,6 +302,7 @@ final class ReportTargetsTest extends TestCase
         mkdir($this->cwd.'/pkg');
         file_put_contents($this->cwd.'/pkg/composer.lock', '{}');
         link($this->cwd.'/pkg/composer.lock', $this->cwd.'/pkg/lock.json');
+        symlink($this->cwd.'/pkg/composer.lock', $this->cwd.'/link.json');
         $refusal = fn (string $path): string => $this->refusal(static function () use ($path): void {
             ReportTargets::refuseComposerFile($path, '--baseline=x');
         });
@@ -311,11 +312,13 @@ final class ReportTargetsTest extends TestCase
             '--baseline=x: lockrot never writes composer.json or composer.lock',
             '--baseline=x: lockrot never writes composer.json or composer.lock',
             '--baseline=x: lockrot never writes composer.json or composer.lock',
+            '--baseline=x: lockrot never writes composer.json or composer.lock',
         ], [
             $refusal($this->cwd.'/composer.json.'),
             $refusal($this->cwd.'/sub/Composer.JSON'),
             $refusal($this->cwd.'/composer.lock'),
             $refusal($this->cwd.'/pkg/lock.json'),
+            $refusal($this->cwd.'/link.json'),
         ]);
         ReportTargets::refuseComposerFile($this->cwd.'/pkg/baseline.json', '--baseline=x');
     }

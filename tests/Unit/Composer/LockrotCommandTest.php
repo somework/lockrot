@@ -2732,6 +2732,55 @@ final class LockrotCommandTest extends TestCase
         self::assertFileDoesNotExist($dir.'/'.$path);
     }
 
+    /** @return iterable<string, array{string, string}> the `--baseline` path, the refusal */
+    public static function composerNamedBaselines(): iterable
+    {
+        yield 'the manifest that COMPOSER names' => ['alt.json', 'that is the manifest COMPOSER names, which lockrot never writes'];
+        yield 'the lock that COMPOSER names' => ['alt.lock', 'that is the lock COMPOSER names, which lockrot never writes'];
+    }
+
+    /**
+     * A lock-only project under COMPOSER=alt.json: Composer reads alt.json as the manifest once it
+     * exists, so a generated baseline must not create it.
+     *
+     * @dataProvider composerNamedBaselines
+     */
+    #[DataProvider('composerNamedBaselines')]
+    public function testAGeneratedBaselineThatIsAFileComposerNamesIsExit2AndWritesNothing(string $baseline, string $reason): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+        unlink($dir.'/composer.json');
+        rename($dir.'/composer.lock', $dir.'/alt.lock');
+        $lock = (string) file_get_contents($dir.'/alt.lock');
+        $code = null;
+        $stderr = '';
+
+        $this->withComposerEnv($this->tempDir('lockrot-composer-named-cache-'), $this->tempDir('lockrot-composer-named-home-'), function () use ($baseline, &$code, &$stderr): void {
+            $this->withComposerFile('alt.json', function () use ($baseline, &$code, &$stderr): void {
+                [$code, , $stderr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--baseline' => $baseline, '--offline' => true, '--target-php' => '8.4'], $this->loader());
+            });
+        });
+
+        self::assertSame(2, $code, $stderr);
+        self::assertStringEndsWith('lockrot: --baseline='.$baseline.': '.$reason."\n", $stderr);
+        self::assertFileDoesNotExist($dir.'/alt.json');
+        self::assertSame($lock, file_get_contents($dir.'/alt.lock'));
+    }
+
+    /** Neither `--baseline` nor `extra.lockrot.baseline` names the default file, so the refusal names neither. */
+    public function testADefaultBaselineThatIsAComposerFileIsRefusedUnderItsOwnName(): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+        symlink($dir.'/composer.lock', $dir.'/lockrot-baseline.json');
+        $lock = (string) file_get_contents($dir.'/composer.lock');
+
+        [$code, , $stderr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--offline' => true, '--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(2, $code, $stderr);
+        self::assertStringEndsWith("lockrot: the baseline lockrot-baseline.json: lockrot never writes composer.json or composer.lock\n", $stderr);
+        self::assertSame($lock, file_get_contents($dir.'/composer.lock'));
+    }
+
     /** Every line lockrot prints on stderr shows a path as it was given, `<` and all. */
     public function testTheBaselineLineShowsAPathThatLooksLikeAConsoleTagAsGiven(): void
     {
