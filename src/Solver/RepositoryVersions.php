@@ -339,7 +339,7 @@ final class RepositoryVersions implements VersionSource
     {
         $key = rtrim(strtolower($url), '/');
         if (substr($key, -4) === '.git') {
-            $key = substr($key, 0, -4);
+            $key = substr_replace($key, '', -4);
         }
 
         return rtrim($key, '/');
