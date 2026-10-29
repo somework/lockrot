@@ -18,6 +18,8 @@ use Lockrot\Verdict\ShellCommand;
 final class ReferenceText
 {
     /** The inputs of each string, as paths of `x-rendered-from`. A string outside the JSON names its own list. */
+    private const REMOVES_DEV = ', which removes it from require-dev';
+
     public const INPUTS = [
         'score.text' => ['score.terms', 'score.modifiers', 'score.accepted', 'score.exact', 'score.total', 'score.rounded_down'],
         'next_step.text' => ['next_step', 'package', 'version', 'signals[].id', 'signals[].data.newest_php', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'],
@@ -424,17 +426,17 @@ final class ReferenceText
 
                 return 'test it on PHP '.$target.($latest !== null && Fields::bool($latest, 'is_installed') ? ' — '.Fields::string($latest, 'version').' is its newest release' : '');
             case 'update':
-                $raise = $check !== null && ($check['project_allows'] ?? null) === false && \is_string($check['raise_to'] ?? null) ? 'raise require.php to '.$check['raise_to'].', then ' : '';
+                $raise = self::raise($move, $check);
 
                 $below = self::below($move, Fields::string($move, 'newest'));
 
                 return $raise.self::update($move).($below === '' ? ' (gets '.Fields::string($move, 'newest').')' : $below).self::clears($move).self::adds($move);
             case 'require':
             case 'raise-php':
-                $raise = $check !== null && ($check['project_allows'] ?? null) === false && \is_string($check['raise_to'] ?? null) ? 'raise require.php to '.$check['raise_to'].', then ' : '';
+                $raise = self::raise($move, $check);
                 $constraint = Fields::string($move, 'constraint');
                 $text = self::listed($in)
-                    ? $raise.'require '.$package.' '.$constraint.(self::inRequireDevWords($in) ? ' in require-dev' : '')
+                    ? $raise.'require '.$package.' '.$constraint.self::sectionWords($in)
                     : $raise.'move '.$package.' to '.$constraint.(self::dependents($in) === '' ? '' : ' through '.self::dependents($in));
                 $text .= self::below($move, Fields::nullableString($move, 'newest')).self::clears($move).self::adds($move);
                 if ($check !== null && \is_string($check['requires'] ?? null)) {
@@ -485,9 +487,9 @@ final class ReferenceText
         $latest = Fields::object($move, 'latest');
         // A tag move's crosses_major is false only on a branch-alias snapshot that stays on its line.
         $word = ($move['to_branch'] ?? null) !== null && ($move['crosses_major'] ?? null) === false ? 'the newest on its own line' : 'the newest';
-        $raise = $check !== null && ($check['project_allows'] ?? null) === false && \is_string($check['raise_to'] ?? null) ? 'raise require.php to '.$check['raise_to'].', then ' : '';
+        $raise = self::raise($move, $check);
         if (self::listed($in)) {
-            $text = $raise.'require a tag'.(self::inRequireDevWords($in) ? ' in require-dev' : '').' — '.$word.' is '.Fields::string($latest, 'version');
+            $text = $raise.'require a tag'.self::sectionWords($in).' — '.$word.' is '.Fields::string($latest, 'version');
         } else {
             $through = self::dependents($in);
             $text = $raise.'move it to a tag — '.$word.' is '.Fields::string($latest, 'version').($through === '' ? '' : ', through '.$through);
@@ -684,11 +686,34 @@ final class ReferenceText
     }
 
     /** @param array<mixed, mixed> $in */
-    private static function inRequireDevWords(array $in): bool
+    private static function sectionWords(array $in): string
     {
         $sections = Fields::strings($in, 'named_in');
+        if (\in_array('require', $sections, true) && \in_array('require-dev', $sections, true)) {
+            return self::REMOVES_DEV;
+        }
 
-        return !Fields::bool($in, 'direct') && !\in_array('require', $sections, true) && \in_array('require-dev', $sections, true);
+        return !Fields::bool($in, 'direct') && \in_array('require-dev', $sections, true) ? ' in require-dev' : '';
+    }
+
+    /**
+     * "raise require.php to X, then ", with the require-dev clause when the `composer require php:…`
+     * command passes `--no-interaction`: lockrot passes it only for a php line in require-dev.
+     *
+     * @param array<mixed, mixed>      $move
+     * @param array<mixed, mixed>|null $check
+     */
+    private static function raise(array $move, ?array $check): string
+    {
+        if ($check === null || ($check['project_allows'] ?? null) !== false || !\is_string($check['raise_to'] ?? null)) {
+            return '';
+        }
+        $phpInRequireDev = false;
+        foreach (Fields::objects($move, 'commands') as $argv) {
+            $phpInRequireDev = $phpInRequireDev || (preg_grep('/^php:/', $argv) !== [] && \in_array('--no-interaction', $argv, true));
+        }
+
+        return 'raise require.php to '.$check['raise_to'].($phpInRequireDev ? self::REMOVES_DEV : '').', then ';
     }
 
     /**
