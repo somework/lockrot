@@ -87,7 +87,7 @@ final class LockFile
                 if ($dev) {
                     $devNames[] = $loaded->getName();
                 }
-                if (preg_match(self::NAME, $loaded->getName()) !== 1) {
+                if (!self::isComposerName($loaded->getName())) {
                     // A name from data can read as a command option: it reaches no finding and no command.
                     $skipped[] = $loaded->getName();
                     continue;
@@ -295,6 +295,11 @@ final class LockFile
         return $out;
     }
 
+    public static function isComposerName(string $name): bool
+    {
+        return preg_match(self::NAME, $name) === 1;
+    }
+
     /** @return list<string> the names of the entries that are no Composer package name, in lock order */
     public function skippedNames(): array
     {
@@ -311,14 +316,22 @@ final class LockFile
      * install-time path uses it to make a Composer transaction's packages part of the dependency
      * chains ({@see \Lockrot\Composer\InstallTimeSummary}). An entry that the lock already lists keeps
      * its `packages` or `packages-dev` membership. A transaction carries no dev flag, and only the
-     * lock knows it.
+     * lock knows it. A package whose name is no Composer name joins {@see skippedNames()}, as in the
+     * lock: Composer loads a path or private repository without a name check.
      *
      * @param list<LockedPackage> $packages
      */
     public function withPackages(array $packages): self
     {
         $merged = $this->packages;
+        $skipped = $this->skipped;
         foreach ($packages as $package) {
+            if (!self::isComposerName($package->name())) {
+                if (!\in_array($package->name(), $skipped, true)) {
+                    $skipped[] = $package->name();
+                }
+                continue;
+            }
             $existing = $merged[$package->name()] ?? null;
             if ($existing !== null && $existing->isDev() !== $package->isDev()) {
                 $package = $package->withDev($existing->isDev());
@@ -327,7 +340,7 @@ final class LockFile
         }
 
         $file = new self($merged, $this->contentHash, $this->locked);
-        $file->skipped = $this->skipped;
+        $file->skipped = $skipped;
         $file->devNames = $this->devNames;
         $file->platform = $this->platform;
         $file->platformDev = $this->platformDev;

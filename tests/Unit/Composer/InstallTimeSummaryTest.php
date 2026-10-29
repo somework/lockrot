@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Composer;
 
 use Composer\Composer;
 use Composer\Config;
+use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Transaction;
 use Composer\Factory;
 use Composer\Installer\InstallerEvent;
@@ -1005,6 +1006,25 @@ final class InstallTimeSummaryTest extends TestCase
 
         $output = $io->getOutput();
         self::assertStringContainsString('  high     [18] phpzip/phpzip 2.0.8: silent · old-promise', $output, 'the chain halves its maintenance: it is transitive');
+    }
+
+    /**
+     * Composer 2.10 loads a path or private repository without a name check, and the lock path
+     * skips such a name. Composer 2.11 refuses it when it builds the transaction, so a stub stands in.
+     */
+    public function testATransactionPackageThatIsNoComposerNameIsNotAnalysed(): void
+    {
+        $this->project([], [], false);
+        $io = new BufferIO();
+        $option = $this->loadPackage(['name' => '-x/y', 'version' => '1.0.0', 'type' => 'library', 'time' => '2015-01-01T00:00:00+00:00']);
+        $transaction = $this->createStub(Transaction::class);
+        $transaction->method('getOperations')->willReturn([new InstallOperation($this->loadPackage(self::PHPZIP)), new InstallOperation($option)]);
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($this->event($io, $transaction));
+
+        $output = $io->getOutput();
+        self::assertStringContainsString('lockrot: 1 of 1 changed package flagged', $output, $output);
+        self::assertStringContainsString('note: lock: lockrot skips 1 entry whose name is no Composer package name', $output, $output);
     }
 
     public function testInstallTimeBudgetComesFromConfig(): void
