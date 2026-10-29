@@ -209,6 +209,12 @@ public Drupal site locks showed both.
   and 429 included. When an older answer for the URL is cached, lockrot uses it, and the footer
   shows its age. A 404 is an answer, and lockrot caches it.
 
+- lockrot keeps the answer to a request with its own credential header apart from the answer to a
+  request without one. So a run with a token asks again for a repository that answered 404 to a
+  run without a token. Where lockrot sends no credential header of its own ([What is
+  sent](#what-is-sent)), a run with Composer's credentials and a run without them read one cached
+  answer. After you add such credentials, run `composer clear-cache`.
+
 - With Composer's cache disabled (`composer --no-cache`), lockrot keeps answers in memory for the
   run and writes nothing.
 
