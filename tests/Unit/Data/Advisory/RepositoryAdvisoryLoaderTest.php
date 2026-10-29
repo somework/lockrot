@@ -8,6 +8,7 @@ use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\FilterRepository;
+use Composer\Semver\VersionParser;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
@@ -368,6 +369,45 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame([], (new RepositoryAdvisoryLoader($unreachable))->load(['doctrine/cache' => '2.2.0'])->asked(), 'a repository failed');
         self::assertIsArray($answered->records(['doctrine/cache'], false));
         self::assertSame(['doctrine/cache'], $answered->load(['doctrine/cache' => '2.2.0'])->asked());
+    }
+
+    /** Ruling Q7 of PR #151: a repository that answers a full request with a partial record, as Composer 2.11 does, fails its answer. */
+    public function testAPartialRecordInTheAnswerToAFullRequestFailsTheAnswerOfThatRepository(): void
+    {
+        $batch = (new RepositoryAdvisoryLoader([self::partialAnswers()]))->load(['acme/lib' => '1.0.0']);
+
+        self::assertSame([], $batch->byName());
+        self::assertSame([RunNote::ADVISORIES_UNAVAILABLE], array_map(static fn (RunNote $note): string => $note->code(), $batch->notes()));
+        self::assertSame(['composer_repository' => 'partial repo', 'message' => 'Advisory for acme/lib could not be loaded as a full advisory from partial repo'], $batch->notes()[0]->data());
+        self::assertSame([false], self::networkFailures($batch));
+    }
+
+    public function testAPartialRecordInTheAnswerToAPartialRequestIsKept(): void
+    {
+        $records = (new RepositoryAdvisoryLoader([self::partialAnswers()]))->records(['acme/lib'], false);
+
+        self::assertSame(['acme/lib' => ['PKSA-partial']], array_map(static fn (array $advisories): array => array_map(static fn (PartialSecurityAdvisory $advisory): string => $advisory->advisoryId, $advisories), $records ?? []));
+    }
+
+    /** @return AdvisoryProviderInterface&\Composer\Repository\RepositoryInterface a repository that answers each request with a partial record of acme/lib */
+    private static function partialAnswers(): AdvisoryProviderInterface
+    {
+        return new class () extends ArrayRepository implements AdvisoryProviderInterface {
+            public function getRepoName(): string
+            {
+                return 'partial repo';
+            }
+
+            public function hasSecurityAdvisories(): bool
+            {
+                return true;
+            }
+
+            public function getSecurityAdvisories(array $packageConstraintMap, bool $allowPartialAdvisories = false): array
+            {
+                return ['namesFound' => ['acme/lib'], 'advisories' => ['acme/lib' => [PartialSecurityAdvisory::create('acme/lib', ['advisoryId' => 'PKSA-partial', 'affectedVersions' => '<2.0'], new VersionParser())]]];
+            }
+        };
     }
 
     /** A lookup that is not complete takes the partial records that Composer's metadata gives, and a complete one does not. */
