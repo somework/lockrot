@@ -85,6 +85,11 @@ final class ComposerOracleTest extends TestCase
         self::assertSame(['2.3.10'], ComposerOracle::versionsToRun(['2.3.10']));
     }
 
+    public function testAVersionThatIsRecordedAndGaveTheAnswersOfAnotherRecordedVersionRunsOnce(): void
+    {
+        self::assertSame(['2.10.3', '2.11.0'], ComposerOracle::versionsToRun(['2.10.3', '2.11.0']));
+    }
+
     /** A new install of the same tag at another reference is no change (case mc-joint-retag‡), and a branch moves with its commit. */
     public function testChangesDropANameThatTheSolveInstallsAgainAtItsLockedTag(): void
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Composer\DependencyResolver\PolicyRemovalReason;
 use Composer\Factory;
 use Composer\IO\NullIO;
 use Composer\Package\Loader\RootPackageLoader;
@@ -44,7 +45,34 @@ final class TargetFixWallabagTest extends TestCase
     private const SITE = BaselinedScenario::FIXTURES.'baselined/wallabag-2.6/after/';
     private const NOW = '2026-10-14T00:00:00+00:00';
 
-    public function testTheRefusalAtPhp84NamesOnlyTheRootRequirementOfTheGuzzle5Adapter(): void
+    public function testOnComposer210TheRefusalAtPhp84NamesOnlyTheRootRequirementOfTheGuzzle5Adapter(): void
+    {
+        if (class_exists(PolicyRemovalReason::class)) {
+            self::markTestSkipped('the solver of this Composer names a longer chain of the refusal');
+        }
+        $fix = self::refusalAtPhp84();
+
+        self::assertSame([['source' => Holder::ROOT, 'link' => Holder::ROOT_REQUIRE, 'target' => 'php-http/guzzle5-adapter', 'constraint' => '^2.0']], self::holds($fix['held_by']));
+    }
+
+    /** Ruling Q8 of PR #151: the holds are the host Composer's, and the 2.11 solver names the whole guzzle 5 chain. */
+    public function testFromComposer211TheRefusalAtPhp84NamesTheGuzzle5ChainWithTheRootRequirementOfTheAdapter(): void
+    {
+        if (!class_exists(PolicyRemovalReason::class)) {
+            self::markTestSkipped('the solver of this Composer names only the root requirement of the adapter');
+        }
+        $fix = self::refusalAtPhp84();
+
+        self::assertSame([
+            ['source' => Holder::ROOT, 'link' => Holder::ROOT_REQUIRE, 'target' => 'bdunogier/guzzle-site-authenticator', 'constraint' => '^1.1.0'],
+            ['source' => Holder::ROOT, 'link' => Holder::ROOT_REQUIRE, 'target' => 'guzzlehttp/guzzle', 'constraint' => '^5.3.4'],
+            ['source' => Holder::ROOT, 'link' => Holder::ROOT_REQUIRE, 'target' => 'php-http/guzzle5-adapter', 'constraint' => '^2.0'],
+            ['source' => Holder::PACKAGE, 'link' => Holder::REQUIRE, 'target' => 'guzzlehttp/guzzle', 'constraint' => '^5.3.1'],
+        ], self::holds($fix['held_by']));
+    }
+
+    /** @return array{packages: list<array{name: ?string}>, check: string, held_by: list<Holder>} */
+    private static function refusalAtPhp84(): array
     {
         $server = BaselinedScenario::repositoryServer(self::SCENARIO);
         $server->start();
@@ -56,10 +84,18 @@ final class TargetFixWallabagTest extends TestCase
 
         self::assertSame(['laminas/laminas-code', 'php-http/guzzle5-adapter', 'friendsoftwig/twigcs'], array_values(array_unique(array_column($fix['packages'], 'name'))));
         self::assertSame('refused', $fix['check']);
-        self::assertSame(
-            [['source' => Holder::ROOT, 'link' => Holder::ROOT_REQUIRE, 'target' => 'php-http/guzzle5-adapter', 'constraint' => '^2.0']],
-            array_map(static fn (Holder $hold): array => ['source' => $hold->source(), 'link' => $hold->link(), 'target' => $hold->target(), 'constraint' => $hold->constraint()], $fix['held_by'])
-        );
+
+        return $fix;
+    }
+
+    /**
+     * @param list<Holder> $holds
+     *
+     * @return list<array{source: string, link: string, target: ?string, constraint: ?string}>
+     */
+    private static function holds(array $holds): array
+    {
+        return array_map(static fn (Holder $hold): array => ['source' => $hold->source(), 'link' => $hold->link(), 'target' => $hold->target(), 'constraint' => $hold->constraint()], $holds);
     }
 
     /** @return array{packages: list<array{name: ?string}>, check: string, held_by: list<Holder>} */

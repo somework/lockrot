@@ -17,7 +17,8 @@ final class ComposerOracle
     public const REQUIRED = 'LOCKROT_COMPOSER_ORACLE';
     /**
      * composer/composer version => the recorded version whose every answer its CLI also gave. The
-     * oracle job on the version keeps the claim true. Evidence: https://github.com/somework/lockrot/pull/151
+     * oracle job runs lockrot on the version against the recorded answers, not the version's CLI.
+     * Evidence for the CLI: https://github.com/somework/lockrot/pull/151
      */
     public const SAME_ANSWERS = ['2.11.0' => '2.10.3'];
 
@@ -59,7 +60,7 @@ final class ComposerOracle
      */
     public static function versionsToRun(array $recordedVersions): array
     {
-        $versions = array_merge($recordedVersions, array_keys(array_intersect(self::SAME_ANSWERS, $recordedVersions)));
+        $versions = array_values(array_unique(array_merge($recordedVersions, array_keys(array_intersect(self::SAME_ANSWERS, $recordedVersions)))));
         usort($versions, static fn (string $a, string $b): int => version_compare($a, $b));
 
         return $versions;

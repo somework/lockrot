@@ -23,7 +23,7 @@ final class PolicyRemovals
 
     /**
      * @return array<string, array<string, string>> name => normalized version => the policy that
-     *                                              removed it, by name and then by version. The
+     *                                              removed it, in key order of name and then of version. The
      *                                              policy is {@see ADVISORIES} or {@see ABANDONED},
      *                                              or another type of Composer's `PolicyRemovalReason`.
      */
