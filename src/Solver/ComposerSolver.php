@@ -229,6 +229,9 @@ final class ComposerSolver
     private function lockedOnlyWanted(Pool $built, array $wanted): array
     {
         $unreached = [];
+        if ($this->lockedOnly === null) {
+            return $unreached;
+        }
         foreach ($built->getPackages() as $package) {
             if (isset($wanted[$package->getName()]) && $package->getRepository() === $this->lockedOnly) {
                 $unreached[$package->getName()] = VersionSource::UNREACHED;
