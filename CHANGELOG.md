@@ -387,6 +387,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** the move check leaves `php-ext` and `php-ext-zend` packages out, as Composer's
   update and require do. ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** a lock URL with a long run of slashes does not stall the run.
+- **CLI:** a cached 404 from a run without a token does not hide a private repository from a later
+  run with a token. The activity cache keeps an answer per credential state, so the first run after
+  the upgrade fetches again each answer that it fetched without a token.
+  ([Caching](docs/internals.md#caching))
+- **CLI, Install-time:** a failed read or write of lockrot's cache in Composer's cache directory is a
+  cache miss, not exit 2. ([Caching](docs/internals.md#caching))
+- **github, gitlab, sarif:** the line annotations are right for a lock with a very long string or a
+  repeated `packages` key.
+- **Install-time:** the block skips a transaction package whose name is no Composer package name,
+  as `composer lockrot` does.
+- **CLI:** the `--explain` branch table keeps its columns in place when a tag holds a control or
+  zero-width character. ([Explaining one package](docs/configuration.md#explaining-one-package))
 
 ## [0.13.0] - 2026-10-01
 
