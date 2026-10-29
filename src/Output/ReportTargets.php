@@ -66,25 +66,36 @@ final class ReportTargets
     /** @param list<array{0: string, 1: string}> $protected */
     private static function refuseProtected(ReportTarget $target, string $canonical, array $protected): void
     {
-        if (Path::isWindowsAlias($target->path())) {
-            throw new ConfigException($target->option().': a file name that ends in a dot or a space, or holds a colon, is another name on Windows');
-        }
-        // The name as Windows folds it, and the file itself when it exists: a symlink, or a Windows
-        // 8.3 short name, to a composer file.
-        $real = realpath($target->path());
-        foreach ([Path::normalize($target->path()), (string) $real] as $name) {
-            if (\in_array(strtolower(basename($name)), self::COMPOSER_FILES, true)) {
-                throw new ConfigException($target->option().': '.self::COMPOSER_REASON);
-            }
-        }
+        self::refuseComposerFile($target->path(), $target->option());
         foreach ($protected as [$path, $reason]) {
             if (Path::canonical($path) === $canonical || Path::sameFile($target->path(), $path)) {
                 throw new ConfigException($target->option().': '.$reason);
             }
         }
+    }
+
+    /**
+     * @param string $option the option and its value, as the refusal names them
+     *
+     * @throws ConfigException when $path is, or on Windows or on disk can be, a composer.json or
+     *                         composer.lock
+     */
+    public static function refuseComposerFile(string $path, string $option): void
+    {
+        if (Path::isWindowsAlias($path)) {
+            throw new ConfigException($option.': a file name that ends in a dot or a space, or holds a colon, is another name on Windows');
+        }
+        // The name as Windows folds it, and the file itself when it exists: a symlink, or a Windows
+        // 8.3 short name, to a composer file.
+        $real = realpath($path);
+        foreach ([Path::normalize($path), (string) $real] as $name) {
+            if (\in_array(strtolower(basename($name)), self::COMPOSER_FILES, true)) {
+                throw new ConfigException($option.': '.self::COMPOSER_REASON);
+            }
+        }
         foreach (self::COMPOSER_FILES as $name) {
-            if (Path::sameFile($target->path(), \dirname($target->path()).'/'.$name)) {
-                throw new ConfigException($target->option().': '.self::COMPOSER_REASON);
+            if (Path::sameFile($path, \dirname($path).'/'.$name)) {
+                throw new ConfigException($option.': '.self::COMPOSER_REASON);
             }
         }
     }

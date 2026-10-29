@@ -247,6 +247,11 @@ final class LockrotCommand extends BaseCommand
             $specs = self::outputSpecs($input);
             // Resolving the path touches nothing, and the files that --output must not name include it.
             $baselineFile = BaselineFile::resolve(\dirname($composerFile), $lockrot->baseline(), Version::STRING);
+            $generate = $input->getOption('generate-baseline') === true;
+            if ($generate) {
+                $baselineOption = \is_string($input->getOption('baseline')) ? '--baseline=' : 'extra.lockrot.baseline ';
+                ReportTargets::refuseComposerFile($baselineFile->path(), $baselineOption.$baselineFile->displayPath());
+            }
             // Checked before the analysis, like the baseline: a typo in a path fails before a
             // full repository round.
             $targets = ReportTargets::resolve($specs, $cwd, $specs === [] ? [] : self::protectedFiles($cwd, $composerFile, $lockPath, $baselineFile, $project));
@@ -261,7 +266,6 @@ final class LockrotCommand extends BaseCommand
             }
             // Read before the analysis, so a missing explicit path or an unreadable file fails before
             // a full repository round. A generate run can name a file that does not exist: it creates it.
-            $generate = $input->getOption('generate-baseline') === true;
             $existingBaseline = $this->readBaseline($baselineFile, $lockrot->baseline() !== null && !$generate, $generate);
             $format = $lockrot->format();
             // Only `html` needs the facts: it draws a release-branch timeline per package.

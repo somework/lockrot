@@ -2685,6 +2685,53 @@ final class LockrotCommandTest extends TestCase
         self::assertFalse($called);
     }
 
+    /** @return iterable<string, array{?string, array<string, mixed>, string, string}> COMPOSER, or null for a lock-only project, the options, the label, the path */
+    public static function composerFileBaselines(): iterable
+    {
+        yield 'composer.json beside a lock-only project' => [null, ['--baseline' => 'composer.json'], '--baseline=composer.json', 'composer.json'];
+        yield 'a composer.lock in a subdirectory' => [null, ['--baseline' => 'sub/composer.lock'], '--baseline=sub/composer.lock', 'sub/composer.lock'];
+        yield 'composer.lock beside the lock that COMPOSER names' => ['alt.json', ['--baseline' => 'composer.lock'], '--baseline=composer.lock', 'composer.lock'];
+        yield 'extra.lockrot.baseline names composer.lock' => ['alt.json', [], 'extra.lockrot.baseline composer.lock', 'composer.lock'];
+    }
+
+    /**
+     * SECURITY.md: lockrot never writes composer.json or composer.lock, even when the file does not
+     * exist yet and `--generate-baseline` would create it.
+     *
+     * @param array<string, mixed> $options
+     *
+     * @dataProvider composerFileBaselines
+     */
+    #[DataProvider('composerFileBaselines')]
+    public function testAGeneratedBaselineNamedAsAComposerFileIsExit2AndWritesNothing(?string $composer, array $options, string $label, string $path): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK, $composer === null ? null : ['baseline' => 'composer.lock']);
+        mkdir($dir.'/sub');
+        if ($composer === null) {
+            unlink($dir.'/composer.json');
+        } else {
+            rename($dir.'/composer.json', $dir.'/'.$composer);
+            rename($dir.'/composer.lock', $dir.'/'.basename($composer, '.json').'.lock');
+        }
+        $code = null;
+        $stderr = '';
+        $run = function () use ($options, &$code, &$stderr): void {
+            [$code, , $stderr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--offline' => true, '--target-php' => '8.4'] + $options, $this->loader());
+        };
+
+        $this->withComposerEnv($this->tempDir('lockrot-composer-baseline-cache-'), $this->tempDir('lockrot-composer-baseline-home-'), function () use ($composer, $run): void {
+            if ($composer === null) {
+                $run();
+            } else {
+                $this->withComposerFile($composer, $run);
+            }
+        });
+
+        self::assertSame(2, $code, $stderr);
+        self::assertStringEndsWith('lockrot: '.$label.": lockrot never writes composer.json or composer.lock\n", $stderr);
+        self::assertFileDoesNotExist($dir.'/'.$path);
+    }
+
     /** Every line lockrot prints on stderr shows a path as it was given, `<` and all. */
     public function testTheBaselineLineShowsAPathThatLooksLikeAConsoleTagAsGiven(): void
     {
