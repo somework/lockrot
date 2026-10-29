@@ -12,7 +12,7 @@ do, what each gap does to findings, and what to do about it.
 | Code | What happened | Network failure | Effect on findings | What to do |
 |---|---|---|---|---|
 | [`offline`](#offline) | `--offline`: metadata came from Composer's cache | no | S10 `offline` where activity is not cached | Run once online to fill the caches ([working offline](internals.md#working-offline)) |
-| [`metadata_unavailable`](#metadata_unavailable) | Metadata did not arrive for some packages | yes | Those packages carry `libyears_unmeasured` `unavailable`. A counted advisory still grades them | Depends on the [`reason`](#metadata_unavailable) |
+| [`metadata_unavailable`](#metadata_unavailable) | Metadata did not arrive for some packages | yes | Those packages carry `libyears_unmeasured` `unavailable`, and read `unknown` when nothing else counts | Depends on the [`reason`](#metadata_unavailable) |
 | [`monorepo_parent_unavailable`](#monorepo_parent_unavailable) | A monorepo's metadata did not arrive | yes | The split packages whose dates need that parent stay unmeasured, with S10 `undated_releases` | Rerun |
 | [`advisory_ignore_unreadable`](#advisory_ignore_unreadable) | Composer rejected the advisory ignore settings | no | Every advisory counts, ignored ones included | Fix `config.policy` or `config.audit`, as the note's `message` says |
 | [`advisories_disabled_by_policy`](#advisories_disabled_by_policy) | Composer's policy turns off Composer's advisory blocking | no | None: lockrot still checks advisories | Nothing for lockrot. Composer does not block an affected version in an update (`composer update`, `require` or `remove`) of this project |

@@ -32,4 +32,5 @@ These scripts connect lockrot with its report renderer,
   pinned in `renderer-commit`.
 - Before the first final renderer tag, check that the renderer repository has a tag ruleset on
   `refs/tags/v*` that blocks deletion and update: `gh api repos/somework/lockrot-report/rulesets`.
-  If it is missing, create it, with lockrot's tag ruleset as the model.
+  If it is missing, create it, with lockrot's tag ruleset as the model. A moved tag gets a second
+  attestation.

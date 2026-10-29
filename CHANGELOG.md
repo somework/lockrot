@@ -77,13 +77,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - **Breaking:** **CLI, PHAR, self-update:** a token goes only to the host that issued it.
-  `GITHUB_TOKEN` is not sent to github.com when `GITHUB_SERVER_URL` or `GH_HOST` names another host
-  (GitHub Enterprise Server, GHE.com, Gitea or Forgejo Actions). `GITLAB_TOKEN` is not sent to
-  gitlab.com when `CI_SERVER_URL`, `GITLAB_HOST`, `GL_HOST` or `GITLAB_URI` names another host. Such a run is anonymous on the public
-  host, also when a lockrot cache from another machine could answer, and `-v` names each token
-  that lockrot keeps back. `self-update` sends its token to api.github.com only, whatever
-  `LOCKROT_RELEASE_URL` names. lockrot cannot stop Composer from sending the runner's token, when a
-  setup step writes it into `github-oauth`. Action: if you put a github.com or gitlab.com token in
+  `GITHUB_TOKEN` is not sent to github.com when `GITHUB_SERVER_URL` or `GH_HOST` names another
+  host (GitHub Enterprise Server, GHE.com, Gitea or Forgejo Actions). `GITLAB_TOKEN` is not sent to
+  gitlab.com when `CI_SERVER_URL`, `GITLAB_HOST`, `GL_HOST` or `GITLAB_URI` names another host.
+  Such a run is anonymous on the public host, also when a lockrot cache from another machine could
+  answer, and `-v` names each token that lockrot keeps back. `self-update` sends its token to
+  api.github.com only, whatever `LOCKROT_RELEASE_URL` names. lockrot cannot stop Composer from
+  sending the runner's token, when a setup step writes it into `github-oauth`. Action: if you put a github.com or gitlab.com token in
   `GITHUB_TOKEN` or `GITLAB_TOKEN` on such a runner, move it to `LOCKROT_GITHUB_TOKEN` or
   `LOCKROT_GITLAB_TOKEN`. ([Which credentials](docs/internals.md#which-credentials))
 - **All formats:** advisories are looked up by name for every package the run checks (packages-dev
@@ -121,7 +121,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** a repository URL with a `.` or `..` path segment names no repository, so a lock
   cannot send the token to another API path of the repository host.
 - **Baseline:** `--generate-baseline` refuses a baseline path named `composer.json` or
-  `composer.lock` with exit 2, so it never writes over the project's Composer files.
+  `composer.lock`, or a file that `COMPOSER` names, with exit 2. So it never writes over the
+  project's Composer files.
   ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 
 ### Added
@@ -140,9 +141,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** lockrot reads no Composer filter list, such as Packagist's malware list. A
   version that `composer audit` reports from such a list is not `vulnerable`, and
-  `security.status` can read `clear`. ([Which advisories count](docs/verdicts.md#which-advisories-count))
-- **All formats:** the move check reads `update-with-minimal-changes` and `COMPOSER_MINIMAL_CHANGES`,
-  as Composer does. It loads no vcs, git or artifact repository. A
+  `security.status` can read `clear`.
+  ([Which advisories count](docs/verdicts.md#which-advisories-count))
+- **All formats:** the move check reads `update-with-minimal-changes` and
+  `COMPOSER_MINIMAL_CHANGES`, as Composer does. It loads no vcs, git or artifact repository. A
   package that the lock records from a vcs repository stays at its locked version, and its move
   reads `not_checked`. ([The move check](docs/verdicts.md#the-move-check))
 - **json:** `security.update_now_command` holds no PHP raise step. Only the `update now:` line says
@@ -269,15 +271,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 - **Breaking:** **CLI:** a repeated `--fail-on`, `--baseline` or `--target-php`, or `--explain`
   with `--generate-baseline`, exits 2 before Composer starts. 0.13 took the last value, and ran
-  `--explain` beside `--generate-baseline`. Action: give each option once, and run `--explain` in
+  the explanation with no baseline written. Action: give each option once, and run `--explain` in
   its own step. ([Exit codes](docs/ci.md#exit-codes))
 - **Breaking:** **CLI:** a lock whose `packages`, `packages-dev`, `platform`, `platform-dev`,
   `platform-overrides` or `aliases` section Composer or lockrot cannot read, or that lists two
-  names equal without case, exits 2. 0.13 read on. Action: run `composer update --lock`, or fix the
-  section that the message names. ([Exit codes](docs/ci.md#exit-codes))
-- **Breaking:** **CLI:** `vendor/bin/lockrot` exits 2 and runs nothing on a Composer older than
-  2.10, and on a non-CLI PHP SAPI with `register_argc_argv=On`. Action: upgrade Composer to 2.10
-  or later, or run the PHAR, with the CLI PHP. ([Exit codes](docs/ci.md#exit-codes))
+  names equal without case, exits 2. 0.13 read on past these sections. Action: run
+  `composer update --lock`, or fix the section that the message names.
+  ([Exit codes](docs/ci.md#exit-codes))
+- **Breaking:** **CLI:** `vendor/bin/lockrot` exits 2 and runs nothing when the composer/composer
+  package that it loads is older than 2.10, and on a non-CLI PHP SAPI with `register_argc_argv=On`.
+  Action: upgrade composer/composer to 2.10 or later, or run the PHAR, with the CLI PHP.
+  ([Exit codes](docs/ci.md#exit-codes))
 - **Baseline:** when a `--generate-baseline` run reads a baseline-2 file, its reports compare
   with that file, as a check run does. They carry the root `baseline` and each finding's `baseline`.
   ([What --generate-baseline does](docs/baseline.md#what-generate-baseline-does))
@@ -293,8 +297,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the `gate:` line. The block shows up to two notes.
   ([Never silent](docs/install-time.md#never-silent-about-a-package-it-could-not-check))
 - **All formats:** findings sort by verdict, then the points of the deciding advisory, then score.
-- **CLI:** the `--explain` text no longer prints the allowlist entry with its `by` and `reason`,
-  which 0.13 printed. `--explain --format=json` keeps those fields.
+- **CLI:** the `--explain` text no longer prints `allowlisted: <reason>`, which 0.13 printed.
+  `--explain --format=json` carries the entry in `finding.allowlist`, with its `by` and `reason`.
   ([Explaining one package](docs/configuration.md#explaining-one-package))
 - **json:** `libyears_unmeasured` and the keys of `libyears.unmeasured` follow `metadata.status`
   and `age`. `metadata_unavailable` is `unavailable` or `not_found`. `no_stable_release_date` is

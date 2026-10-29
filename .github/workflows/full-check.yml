@@ -4,8 +4,8 @@ name: full-check
 # The pull request's own run has checked every other job on that commit. ci.yml ignores these
 # branches. A push of an rc tag runs this workflow too: the whole-tree gate and the oracle run on the
 # rc-tagged commit. This run fails while the commit changes the contract bundle and vendors an older
-# renderer. The renderer's final-tag gate reads only a run on release/full-check-<sha>, never this
-# one (CONTRIBUTING.md, "Cutting a release"). The two workflows share .github/actions/mutation-coverage,
+# renderer. The renderer's final-tag gate accepts a full check only from release/full-check-<sha>,
+# never this run (CONTRIBUTING.md, "Cutting a release"). The two workflows share .github/actions/mutation-coverage,
 # .github/actions/mutation-shard and .github/actions/move-check-oracle, and
 # tools/mutation/tests/test_full_check_matrix.py keeps the shard
 # matrix equal to the one in ci.yml. A branch named release/full-check-<sha>--solver,verdicts runs only

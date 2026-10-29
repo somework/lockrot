@@ -111,7 +111,7 @@ grade can read milder than the one `composer lockrot` gives for the same package
 
 | The budget ran out before or during | Effect on the block | Note |
 |---|---|---|
-| A package's metadata | The package carries `libyears_unmeasured` `unavailable`, and a counted advisory still grades it. Without one, it reads `unknown`. When nothing is graded, the [could-not-be-checked header](#never-silent-about-a-package-it-could-not-check) counts it | [`metadata_unavailable`](notes.md#metadata_unavailable), a network failure |
+| A package's metadata | The package carries `libyears_unmeasured` `unavailable`. It reads `unknown` when nothing else counts, such as a counted advisory or the lock's abandoned marking. When nothing is graded, the [could-not-be-checked header](#never-silent-about-a-package-it-could-not-check) counts it | [`metadata_unavailable`](notes.md#metadata_unavailable), a network failure |
 | The advisory check | The advisories that the lookup did not reach add nothing to the score, and the findings carry S10 `install_time_budget` | [`advisories_not_checked`](notes.md#advisories_not_checked) |
 | A monorepo parent's metadata | Split packages whose own tags have no trusted date stay unmeasured and carry S10 `undated_releases` ([dates from the monorepo](verdicts.md#dates-from-the-monorepo)) | None |
 | The repository activity check, before it began | lockrot does not read S3 and S4. Findings carry S10 `install_time_budget` | [`repository_activity_not_checked`](notes.md#repository_activity_not_checked) |

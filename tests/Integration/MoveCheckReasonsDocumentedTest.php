@@ -30,7 +30,7 @@ final class MoveCheckReasonsDocumentedTest extends TestCase
     #[DataProvider('reasons')]
     public function testTheMoveCheckSectionNamesTheReason(string $reason): void
     {
-        self::assertStringContainsString('`'.$reason.'`', self::moveCheckSection());
+        self::assertStringContainsString('`'.$reason.'`', self::moveCheckSection(), 'docs/verdicts.md#the-move-check does not name the check.reason `'.$reason.'`');
     }
 
     private static function moveCheckSection(): string

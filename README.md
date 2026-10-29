@@ -40,7 +40,7 @@ composer require --dev somework/lockrot
 Run the `composer config` line first. It grants the plugin the permission that Composer asks for,
 and a non-interactive Composer, such as a CI job, stops with an error without it.
 
-Upgrading from 0.13? A 0.13 baseline file exits `2` until you regenerate it:
+A run that reads a 0.13 baseline file exits `2` until you regenerate the file.
 [Upgrading to 0.14](https://lockrot.dev/changes/0.14/) has the steps for each install.
 
 The plugin also prints a short summary of the graded packages that a `composer require`, `update`
