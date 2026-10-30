@@ -511,7 +511,7 @@ holds two decimals at most: a finding's `libyears`, `libyears.total`,
 
 The explanation's `finding` has a report finding's fields. `run` holds the report's `run` keys that
 the explanation reads, `target_php`, `project_php` and `thresholds` among them. Its `php_window`
-holds only `platform_override` and `target`, whose php the move's text names, and is null when the
+holds only `platform_override`, which the move's text names, and `target`, and is null when the
 report has no PHP window. `explain-2.json`
 types its `lock` and its `metadata`, whose `branches[]` carry the PHP test of each branch and its
 `fixes` ([The PHP test](verdicts.md#the-php-test-in-explain)).
