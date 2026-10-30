@@ -23,7 +23,7 @@ final class MoveSubject
     private ?string $projectPhpLowest;
     private ?string $newestPhp;
     private ?string $platformOverride;
-    private ?bool $refusedTargetInside;
+    private bool $baselineRefused;
     private ?string $listedIn = null;
     /** @var array<string, string> section => the key as written ({@see ProjectConfig::listedIn()}) */
     private array $keys = [];
@@ -37,11 +37,11 @@ final class MoveSubject
      * @param ?string      $projectPhpLowest `run.project_php_lowest`
      * @param ?string      $newestPhp        R, the newest PHP minor that the root php allows ({@see \Lockrot\Signal\PhpCap})
      * @param ?string      $platformOverride `run.php_window.platform_override`
-     * @param ?bool        $refusedTargetInside `run.php_window.target.inside` while `run.move_check.baseline` is `refused`, else null
+     * @param bool         $baselineRefused  `run.move_check.baseline` is `refused`
      */
-    public function __construct(string $package, string $version, bool $direct, array $dependents, ?string $targetPhp, ?string $projectPhpLowest, ?string $newestPhp = null, ?string $platformOverride = null, ?bool $refusedTargetInside = null)
+    public function __construct(string $package, string $version, bool $direct, array $dependents, ?string $targetPhp, ?string $projectPhpLowest, ?string $newestPhp = null, ?string $platformOverride = null, bool $baselineRefused = false)
     {
-        $this->refusedTargetInside = $refusedTargetInside;
+        $this->baselineRefused = $baselineRefused;
         $this->platformOverride = $platformOverride;
         $this->newestPhp = $newestPhp;
         $this->package = $package;
@@ -202,8 +202,8 @@ final class MoveSubject
         return $this->platformOverride;
     }
 
-    public function refusedTargetInside(): ?bool
+    public function isBaselineRefused(): bool
     {
-        return $this->refusedTargetInside;
+        return $this->baselineRefused;
     }
 }

@@ -20,6 +20,9 @@ final class MoveText
     /** A sentence names at most this many direct dependents, then "and N more". */
     public const DEPENDENTS_SHOWN = 3;
 
+    /** What the platform step adds while Composer refuses the lock itself. */
+    public const REFUSED_POINTER = ' Composer still refuses the lock itself: the moves_not_checked note names the first cause.';
+
     /** Composer's `require --no-interaction` of a name that both sections list writes `require` and deletes the require-dev line. */
     private const REMOVES_DEV = ', which removes it from require-dev';
 
@@ -75,7 +78,7 @@ final class MoveText
             $text .= '; '.$through;
         }
         $parts[] = [$text.self::checked($move->check()).self::movesWith($move), false];
-        $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride(), $subject->refusedTargetInside());
+        $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride(), $subject->isBaselineRefused());
         array_unshift($parts, [$step, false]);
 
         return self::joined($parts);
@@ -112,19 +115,18 @@ final class MoveText
     /**
      * SPEC §5.6: while the lock records a platform PHP outside the target minor, Composer solves
      * the commands at that PHP, not at the target. The sentence and a space, else an empty string.
-     * While Composer refuses the lock itself, the step alone does not make it install.
+     * While Composer refuses the lock itself, the step alone does not make it install: the sentence
+     * points at the moves_not_checked note.
      *
-     * @param ?string $platformOverride    `run.php_window.platform_override`
-     * @param ?bool   $refusedTargetInside `run.php_window.target.inside` while `run.move_check.baseline` is `refused`, else null
+     * @param ?string $platformOverride `run.php_window.platform_override`
+     * @param bool    $baselineRefused  `run.move_check.baseline` is `refused`
      */
-    public static function platformStep(?string $targetPhp, ?string $platformOverride, ?bool $refusedTargetInside = null): string
+    public static function platformStep(?string $targetPhp, ?string $platformOverride, bool $baselineRefused = false): string
     {
         if ($targetPhp === null || $platformOverride === null || MoveCheckers::platformPhp($targetPhp, $platformOverride) === $platformOverride) {
             return '';
         }
-        $refused = $refusedTargetInside === null ? '' : ' Composer still refuses the lock itself: '.($refusedTargetInside ? 'the Run tab names the cause.' : 'the PHP line names the packages.');
-
-        return 'First set config.platform.php to your PHP '.$targetPhp.' release: the lock records '.$platformOverride.'.'.$refused.' ';
+        return 'First set config.platform.php to your PHP '.$targetPhp.' release: the lock records '.$platformOverride.'.'.($baselineRefused ? self::REFUSED_POINTER : '').' ';
     }
 
     /** D10: what Composer's solver said about the move, or why lockrot did not ask it. */
@@ -339,11 +341,11 @@ final class MoveText
         if ($solve !== null && $solve->isRefused() && ($check === null || $check->targetRuns() !== false)) {
             return 'no move installs '.$where.': Composer names no hold';
         }
-        $text = $requires !== null
-            ? 'no move runs on the target: '.$where.' needs php '.$requires.' and the target php '.$subject->targetPhp().' does not run it'
-            : 'no move runs on the target: the target php '.$subject->targetPhp().' does not run '.$where;
+        if ($requires === null) {
+            throw new \LogicException('A blocked move with no php requirement comes only from a refusal with no hold.');
+        }
 
-        return $text.($move->source() === FlagSet::PINNED ? '; replace it' : '');
+        return 'no move runs on the target: '.$where.' needs php '.$requires.' and the target php '.$subject->targetPhp().' does not run it'.($move->source() === FlagSet::PINNED ? '; replace it' : '');
     }
 
     private static function phpClause(Move $move, MoveSubject $subject, bool $runs): string

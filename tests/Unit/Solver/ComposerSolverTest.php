@@ -603,6 +603,21 @@ final class ComposerSolverTest extends TestCase
         self::assertSame(['acme/core' => VersionSource::UNREACHED], $solution->unloaded());
     }
 
+    /** The root's `*` admits the release that acme/lib wants, so only the vcs repository can tell whether the move resolves. */
+    public function testARefusalThatTheRootConstraintOfAFreedVcsLockedNameAdmitsNamesItUnreached(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/lib' => '^1.0', 'acme/core' => '*']],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['name' => 'acme/core', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://git.example.org/acme/core.git', 'reference' => 'abc']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['acme/core' => '^1.0']], ['version' => '1.1.0', 'require' => ['acme/core' => '^2.0']]], 'acme/core' => [['version' => '2.0.0']]]
+        )->withLockedOnly(['acme/core']);
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.1'])->withTransitive(SolveRequest::WITH_ALL_DEPENDENCIES));
+
+        self::assertFalse($solution->resolves());
+        self::assertSame(['acme/core' => VersionSource::UNREACHED], $solution->unloaded());
+    }
+
     /** Composer reads a path package from its path repository, which serves the one release that the lock records. */
     public function testARefusalThatWantsAnotherReleaseOfALockedPathPackageNamesNoNameUnreached(): void
     {

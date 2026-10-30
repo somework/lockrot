@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Support\Contract;
 
 use Composer\Semver\Comparator;
-use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ScoreLineFromJson;
 use Lockrot\Verdict\ShellCommand;
 
@@ -22,8 +21,8 @@ final class ReferenceText
 
     public const INPUTS = [
         'score.text' => ['score.terms', 'score.modifiers', 'score.accepted', 'score.exact', 'score.total', 'score.rounded_down'],
-        'next_step.text' => ['next_step', 'package', 'version', 'signals[].id', 'signals[].data.newest_php', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'],
-        'also.text' => ['next_step.also[]', 'package', 'version', 'signals[].id', 'signals[].data.newest_php', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.php_window.target.inside', 'run.move_check.baseline'],
+        'next_step.text' => ['next_step', 'package', 'version', 'signals[].id', 'signals[].data.newest_php', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.move_check.baseline'],
+        'also.text' => ['next_step.also[]', 'package', 'version', 'signals[].id', 'signals[].data.newest_php', 'direct', 'direct_dependents', 'chain', 'named_in', 'run.target_php', 'run.project_php_lowest', 'run.php_window.platform_override', 'run.move_check.baseline'],
         'gate.text' => ['gate', 'run.fail_on', 'run.fail_on_source', 'run.gates', 'run.mode', 'run.target_php', 'run.target_php_source'],
         'evidence' => ['flags[].id', 'flags[].summary', 'score.terms[].flag'],
         'gate_line' => ['gate.basis', 'score.total'],
@@ -118,7 +117,7 @@ final class ReferenceText
         }
 
         $check = \is_array($run['move_check'] ?? null) ? $run['move_check'] : [];
-        $refused = ($check['baseline'] ?? null) === 'refused' ? ' Composer still refuses the lock itself: '.(JsonPath::has($window, ['target', 'inside']) && JsonPath::boolAt($window, ['target', 'inside']) === false ? 'the PHP line names the packages.' : 'the Run tab names the cause.') : '';
+        $refused = ($check['baseline'] ?? null) === 'refused' ? ' Composer still refuses the lock itself: the moves_not_checked note names the first cause.' : '';
 
         return 'First set config.platform.php to your PHP '.$target.' release: the lock records '.$override.'.'.$refused.' ';
     }
@@ -452,11 +451,7 @@ final class ReferenceText
                 if ($solve !== null && Fields::string($solve, 'result') === 'refused' && ($check === null || ($check['target_runs'] ?? null) !== false)) {
                     return 'no move installs '.$where.': Composer names no hold';
                 }
-                $text = $check !== null && \is_string($check['requires'] ?? null)
-                    ? 'no move runs on the target: '.$where.' needs php '.Fields::string($check, 'requires').' and the target php '.$target.' does not run it'
-                    : 'no move runs on the target: the target php '.$target.' does not run '.$where;
-
-                return $text.($pinned ? '; replace it' : '');
+                return 'no move runs on the target: '.$where.' needs php '.Fields::string($check, 'requires').' and the target php '.$target.' does not run it'.($pinned ? '; replace it' : '');
             case 'no-fix':
                 return 'no release fixes it';
             case 'no-single-fix':

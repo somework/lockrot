@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\MoveText;
 use Lockrot\Verdict\Verdict;
 
 /**
@@ -79,18 +81,27 @@ final class InstallSummaryFormatter
     }
 
     /**
-     * The runtime-target note first, then the run notes in their order.
+     * `moves_not_checked` first, because each move's platform step points at it. Then the
+     * runtime-target note, then the other run notes in their order.
      *
      * @return list<string>
      */
     private static function notes(Report $report, ?RunSettings $run): array
     {
-        $notes = $report->notes();
-        if ($run !== null && $report->baseline() !== null && $run->targetPhpSource() === RunSettings::SOURCE_RUNTIME) {
-            array_unshift($notes, 'target php from the running PHP ('.$run->targetPhp().'); fix changes against the baseline not compared');
+        $runtime = $run !== null && $report->baseline() !== null && $run->targetPhpSource() === RunSettings::SOURCE_RUNTIME
+            ? ['target php from the running PHP ('.$run->targetPhp().'); fix changes against the baseline not compared']
+            : [];
+        $first = [];
+        $other = [];
+        foreach ($report->runNotes() as $note) {
+            if ($note->code() === RunNote::MOVES_NOT_CHECKED) {
+                $first[] = $note->text();
+            } else {
+                $other[] = $note->text();
+            }
         }
 
-        return $notes;
+        return array_merge($first, $runtime, $other);
     }
 
     /** @return list<string> */
@@ -106,7 +117,7 @@ final class InstallSummaryFormatter
         if ($gateLine !== null) {
             $lines[] = $gateLine;
         }
-        foreach (\array_slice($report->notes(), 0, self::MAX_NOTES) as $note) {
+        foreach (\array_slice(self::notes($report, null), 0, self::MAX_NOTES) as $note) {
             $lines[] = '  note: '.self::text($note);
         }
         $lines[] = self::FOOTER.'.';
@@ -129,9 +140,14 @@ final class InstallSummaryFormatter
         $grade = $finding->verdict();
         $head = \sprintf('%s [%2d] %s %s: %s', str_repeat(' ', 8 - \strlen($grade)), $finding->score()->total(), $finding->package(), $finding->version(), implode(' · ', $flags));
         $parts = array_merge([[$head.($move === null ? '' : ' — '), false]], $move ?? []);
+        $room = self::MAX_FINDING_LINE - 2 - \strlen($grade);
+        if (self::characters($parts) > $room) {
+            // The pointer at moves_not_checked goes before the command: the block lists that note first.
+            $parts = array_map(static fn (array $part): array => [$part[1] ? $part[0] : str_replace(MoveText::REFUSED_POINTER, '', $part[0]), $part[1]], $parts);
+        }
         $colour = FindingBlock::colour($grade);
 
-        return '  '.($colour === null ? $grade : '<fg='.$colour.'>'.$grade.'</fg='.$colour.'>').ConsoleMarkup::escape(self::fitted($parts, self::MAX_FINDING_LINE - 2 - \strlen($grade)));
+        return '  '.($colour === null ? $grade : '<fg='.$colour.'>'.$grade.'</fg='.$colour.'>').ConsoleMarkup::escape(self::fitted($parts, $room));
     }
 
     /**
@@ -163,6 +179,12 @@ final class InstallSummaryFormatter
         }
 
         return $line;
+    }
+
+    /** @param list<array{0: string, 1: bool}> $parts */
+    private static function characters(array $parts): int
+    {
+        return array_sum(array_map(static fn (array $part): int => TerminalText::characters(TerminalText::neutralise($part[0])), $parts));
     }
 
     /** Text lockrot did not write, as markup that prints it as written and obeys nothing in it. */

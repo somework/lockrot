@@ -1663,7 +1663,6 @@
                         "run.target_php",
                         "run.project_php_lowest",
                         "run.php_window.platform_override",
-                        "run.php_window.target.inside",
                         "run.move_check.baseline"
                     ],
                     "minLength": 1
@@ -3586,7 +3585,7 @@
                     ]
                 },
                 "php_window": {
-                    "description": "The keys of report-2's `run.php_window` that `next_step.text` reads; null when report-2's `php_window` is null.",
+                    "description": "The `platform_override` and `target` keys of report-2's `run.php_window`; null when report-2's `php_window` is null.",
                     "oneOf": [
                         {
                             "description": "The platform PHP of the lock and the target PHP against the window.",
@@ -14103,7 +14102,6 @@
                         "run.target_php",
                         "run.project_php_lowest",
                         "run.php_window.platform_override",
-                        "run.php_window.target.inside",
                         "run.move_check.baseline"
                     ],
                     "minLength": 1

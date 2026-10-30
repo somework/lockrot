@@ -149,6 +149,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Output/InstallSummaryFormatter.php` LogicalAnd `$gateLine = $gate !== null && $run !== null && $gate->fails() ? '  '.self::text(RunGateText::render($gate, $run)) : null;` — a report decides its gate only from its run settings, so the gate and the run are null together.
 - `src/Output/InstallSummaryFormatter.php` FalseValue `$afterCommand = false;` — the first piece is the head, which is prose and holds a space, so a head that does not fit keeps a word and the start value never decides the ellipsis.
 - `src/Output/InstallSummaryFormatter.php` IncrementInteger `$cut = TerminalText::neutralise($text, max(0, $room));` — a room of 0 or 1 holds no space after a first character, so both cuts show no word.
+- `src/Output/InstallSummaryFormatter.php` GreaterThan `if (self::characters($parts) > $room) {` — the platform step and `MoveText::REFUSED_POINTER` alone pass `MAX_FINDING_LINE`, so a line that holds the pointer never equals the room.
 - `src/Output/AgeText.php` Coalesce `$key = ReleaseBranch::of($version) ?? ReleaseBranch::aliasLine($version);` — `ReleaseBranch::of()` answers only a release and `aliasLine()` only a branch alias, so at most one of them is not null.
 - `src/Output/HtmlFormatter.php` BitwiseOr `return htmlspecialchars($value, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');` — `title()` is the one caller, and its string holds no quote and no invalid byte.
 - `src/Output/JsonFormatter.php` FalseValue `public function format(Report $report, bool $showAll = false): string` — the JSON document lists every finding and does not read `$showAll`.
@@ -197,3 +198,4 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 
 - `src/Verdict/FindingDetails.php` CastString `$skipped[] = new Check('advisories', (string) $advisoryReason, [Signal::S9]);` — the `in_array()` guard admits two strings only.
 - `src/Verdict/FindingDetails.php` Coalesce `return ($check === null ? null : $check->installsBelow($version) ?? $check->installsAbove($version)) ?? $version;` — a release is below or above the version, never both, so at most one side is not null.
+- `src/Verdict/MoveText.php` Assignment `$text .= self::leaves($move).self::unverified($move);` — `$text` is the empty string before this line, so `=` writes the same text.

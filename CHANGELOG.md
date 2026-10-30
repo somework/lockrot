@@ -121,8 +121,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** a repository URL with a `.` or `..` path segment names no repository, so a lock
   cannot send the token to another API path of the repository host.
 - **Baseline:** `--generate-baseline` refuses a baseline path named `composer.json` or
-  `composer.lock`, or a file that `COMPOSER` names, with exit 2. So it never writes over the
-  project's Composer files.
+  `composer.lock`, a file that `COMPOSER` names, or a name with a colon or a trailing dot or space,
+  with exit 2 on every OS. So it never writes over the project's Composer files.
   ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 
 ### Added
@@ -179,7 +179,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([Reading the gate line](docs/ci.md#reading-the-gate-line))
 - **Config, json:** `extra.lockrot.accept-unchecked` accepts a check that lockrot did not run (a
   host it cannot ask, no advisory feed, a package from vcs or an unknown origin) by host,
-  repository or package, with a reason and an optional `expires`. It hides no flag. json writes
+  repository or package, with a reason and an optional `expires`. A `repository` entry matches a
+  URL with or without the ssh port 22 or the git port 9418. It hides no flag, and json writes
   `unchecked_accepted` and `packages_unchecked_accepted`.
   ([Configuration](docs/configuration.md#accept-unchecked))
 - **json:** a graded finding's `next_step` names one move with its kind, constraint and commands.
@@ -187,13 +188,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Each branch row's `fixes.if_applied` scores a move to that branch. For a package that comes in
   through a dependency, `through[]` says whether that dependency's newest release requires it.
   `--fail-on` and the exit code do not read `next_step`. ([The move](docs/verdicts.md#move))
-- **All formats:** when the lock records a `config.platform.php` outside the minor of the target
-  PHP, the line of each move with commands and the `update now:` line first say to set it to a
-  target PHP release. When Composer also refuses the lock itself, that sentence says where the
-  cause is named.
+- **All formats:** when the lock records a `config.platform.php` that is not a stable release in
+  the minor of the target PHP, each move line with commands and the `update now:` line first say to
+  set it to a target PHP release. When Composer also refuses the lock itself, that sentence says
+  that the run note `moves_not_checked` names the first cause.
   ([The move](docs/verdicts.md#move))
 - **json:** the `--explain` document writes `run.php_window` with `platform_override` and `target`
-  alone, the fields that the move's text reads. It is null when the report has no PHP window.
+  alone, whose php the move's text names. It is null when the report has no PHP window.
   ([The explanation](docs/schema.md#the-explanation))
 - **json:** each finding writes its repository activity lookup (`activity`: read, not found, or
   not read and why), `age` (the installed release, the newest release, the newest release of the
@@ -377,6 +378,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CLI:** the `--explain` branch table prints the php of each branch's highest tag. It printed
   the php of the branch's newest dated release, such as an LTS backport, beside the highest tag.
   ([Explaining one package](docs/configuration.md#explaining-one-package))
+- **Config:** a `LOCKROT_TODAY` value without an offset is UTC. It took the default timezone of the
+  PHP process. ([Testing hooks](docs/configuration.md#testing-hooks))
+- **All formats:** a move whose solve needs another release of a vcs-locked package reads
+  `not_checked` with `unloaded_name`. ([The move check](docs/verdicts.md#the-move-check))
+- **All formats:** a refused move names a `composer.json` hold only when the root constraint
+  excludes the release that the move wants. ([The move check](docs/verdicts.md#the-move-check))
+- **All formats:** the move check leaves `php-ext` and `php-ext-zend` packages out, as Composer's
+  update and require do. ([The move check](docs/verdicts.md#the-move-check))
+- **All formats:** a lock URL with a long run of slashes does not stall the run.
+- **CLI:** a cached 404 from a run without a token does not hide a private repository from a later
+  run with a token. The activity cache keeps an answer per credential state, so the first run after
+  the upgrade fetches again each answer that it fetched without a token.
+  ([Caching](docs/internals.md#caching))
+- **CLI, Install-time:** a failed read or write of lockrot's cache in Composer's cache directory is a
+  cache miss, not exit 2. ([Caching](docs/internals.md#caching))
+- **github, gitlab, sarif:** the line annotations are right for a lock with a very long string or a
+  repeated `packages` key.
+- **Install-time:** the block skips a transaction package whose name is no Composer package name,
+  as `composer lockrot` does.
+- **CLI:** the `--explain` branch table keeps its columns in place when a tag holds a control or
+  zero-width character. ([Explaining one package](docs/configuration.md#explaining-one-package))
 
 ## [0.13.0] - 2026-10-01
 

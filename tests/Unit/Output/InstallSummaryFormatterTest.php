@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\PhpWindow;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
@@ -248,15 +249,46 @@ final class InstallSummaryFormatterTest extends TestCase
         self::assertLessThanOrEqual(InstallSummaryFormatter::MAX_FINDING_LINE + 1, TerminalText::characters($line), $line);
     }
 
+    /** The moves of a refused lock point at moves_not_checked, so the cap of the notes never hides it. */
+    public function testTheMovesNotCheckedNoteIsListedFirst(): void
+    {
+        $note = RunNote::movesNotChecked('8.4.99', "Problem 1\n    - acme/a 1.0.0 requires php <8.0 -> your php version (8.4.99) does not satisfy that requirement.");
+        $report = new Report([(new FindingBuilder())->withPackage('vendor/a')->withVerdict(Verdict::STALE)->build()], array_merge(Notes::texts(['one', 'two']), [$note]), new \DateTimeImmutable(self::NOW), 1, 0);
+
+        $lines = self::lines($report);
+
+        self::assertSame(["  note: moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: acme/a 1.0.0 requires php <8.0.", '  note: one'], \array_slice($lines, 2, 2));
+        self::assertSame('Run composer lockrot for details; 1 more note.', $lines[4]);
+    }
+
+    public function testTheMovesNotCheckedNoteOfAnUncheckedRunIsListedFirst(): void
+    {
+        $note = RunNote::movesNotChecked('8.4.99', 'Problem 1');
+        $report = new Report([(new FindingBuilder())->withPackage('vendor/a')->withVerdict(Verdict::UNKNOWN)->build()], array_merge(Notes::texts(['one', 'two'], true), [$note]), new \DateTimeImmutable(self::NOW), 1, 0);
+
+        self::assertSame(['  note: one'], \array_slice(self::lines($report), 2, 1));
+        self::assertStringStartsWith('  note: moves not checked: ', self::lines($report)[1]);
+    }
+
+    /** The command of a refused lock's move stays on its line: the pointer at the note goes first. */
+    public function testALongRefusedPlatformStepDropsTheNotePointerSoTheCommandShows(): void
+    {
+        $line = self::lines(self::report([self::withMove('acme/lib', '7.4.29', [['composer', 'update', 'acme/lib']], '5.4.0', true)]))[1];
+
+        self::assertStringContainsString(' — First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update acme/lib', $line);
+        self::assertStringNotContainsString('Composer still refuses the lock itself', $line);
+    }
+
     /**
-     * One abandoned finding whose update move runs $commands, with the lock's platform PHP.
+     * One abandoned finding whose update move runs $commands, with the lock's platform PHP, under a
+     * refused baseline when $baselineRefused.
      *
      * @param list<list<string>> $commands
      */
-    private static function withMove(string $package, ?string $platformOverride, array $commands, string $version = '5.4.0'): Finding
+    private static function withMove(string $package, ?string $platformOverride, array $commands, string $version = '5.4.0', bool $baselineRefused = false): Finding
     {
         $finding = (new FindingBuilder())->withPackage($package)->withVersion($version)->withVerdict(Verdict::ABANDONED)->build();
-        $subject = new MoveSubject($package, $version, true, [], '8.4', null, null, $platformOverride);
+        $subject = new MoveSubject($package, $version, true, [], '8.4', null, null, $platformOverride, $baselineRefused);
         $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '5.x', '5.4.9', '5.4.9', null, null, null, false, [], [], [], [], [], null, [], $commands, $subject);
 
         return $finding->withMoves(new Moves($move, null, null, null, []));

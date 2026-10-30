@@ -7123,6 +7123,201 @@
       "sheet_holders": {},
       "sheet_ladder": {}
     },
+    "target-fix-conflict-hole": {
+      "document": "coverage/variants/target-fix-conflict-hole.json",
+      "title": "lockrot: 1 of 1 package flagged",
+      "description": "lockrot flagged 1 of 1 package in composer.lock: 1 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for grokability/snipe-it · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run passes · --fail-on=high",
+        "1 of 1 package flagged (100%): 1 graded low. Flags: vulnerable 1.",
+        "In production · required directly · 1 security advisory on 1 package (severity: 1 low) · fix by package: 1 composer update · 0.1 libyears behind."
+      ],
+      "grade_line": "Project grade: low · 1 low finding · 0 of 1 package high or worse",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
+      "load_line": "2 points on 1 flagged package · 0 (0 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": null,
+      "gate_link_rows": null,
+      "state_lines": [
+        "PHP: this lock installs on PHP 8.2 to 8.5, but not on your target, 8.4.5 · 1 package excludes 8.4: acme/conflict-hole · Composer's solver at PHP 8.4 resolves this update: composer update acme/conflict-hole. The PHP window"
+      ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
+      ],
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
+      "lead_scope": "1 in production · 1 required directly",
+      "grade_chips": [
+        "low 1"
+      ],
+      "waffle": [
+        {
+          "verdict": "low",
+          "word": "low",
+          "mark": "fill",
+          "count": 1
+        }
+      ],
+      "ready": {
+        "note": "checked commands no other package holds, in lockrot's rank order",
+        "moves": [
+          {
+            "package": "laravel/framework",
+            "link": "#view=findings&pkg=laravel%2Fframework",
+            "grade": "low",
+            "major": null,
+            "command": "composer update 'laravel/framework:^12.69.0'",
+            "clears": "the advisory",
+            "after": {
+              "result": "0, ok",
+              "conditions": [
+                "checked with Composer"
+              ]
+            },
+            "also_holds": null,
+            "moves_with": null
+          }
+        ],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": null,
+        "held_link": null,
+        "held_link_rows": null,
+        "way_out": null,
+        "way_out_link": null,
+        "way_out_link_rows": null,
+        "none": null
+      },
+      "security": {
+        "figure": "1",
+        "unit": "advisory on 1 package",
+        "note": null,
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "low",
+            "package": "laravel/framework",
+            "link": "#view=findings&pkg=laravel%2Fframework",
+            "reach": "",
+            "total": 2,
+            "terms": "vulnerable 2",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "0 carry more than one flag · score model 1",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": {
+        "head": [
+          "Direct requirement",
+          "flagged, of 1"
+        ],
+        "rows": [
+          {
+            "package": "laravel/framework",
+            "flagged": 1,
+            "link": "#view=radius&pkg=laravel%2Fframework"
+          }
+        ],
+        "count": null,
+        "overlap": null,
+        "more": null,
+        "shared": null
+      },
+      "depth": {
+        "rows": [
+          "direct 1"
+        ],
+        "sentence": "The flagged package is named by a line of composer.json."
+      },
+      "libyears": {
+        "figure": "0.10",
+        "bound": "",
+        "sub": "over 1 package · 0.10 from direct requirements",
+        "unmeasured": null,
+        "top": [
+          [
+            "laravel/framework v12.68.0",
+            "0.1",
+            "v11.57.0 (2026-09-29)"
+          ]
+        ],
+        "heading": "Furthest behind",
+        "none": null
+      },
+      "radius_lead": [
+        "The flagged package is named by a line of composer.json."
+      ],
+      "advisories_lead": {
+        "figure": "1",
+        "unit": "advisory on 1 package",
+        "note": null,
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "findings_groups": [
+        {
+          "grade": "low",
+          "count": "1 package",
+          "gate": null,
+          "major": null
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "laravel/framework",
+          "fails_gate": false,
+          "reach": "direct",
+          "held": null,
+          "command": "composer update 'laravel/framework:^12.69.0'",
+          "raise_words": null,
+          "after": "after it: 0, ok",
+          "major": null,
+          "blocked": null,
+          "ready": true,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 1,
+      "gate_partition": null,
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S7 pulled-in packages",
+        "S9 advisories"
+      ],
+      "advisory_groups": [
+        {
+          "package": "laravel/framework",
+          "same_cve_as": [],
+          "fix_notes": []
+        }
+      ],
+      "run_notes": [],
+      "php_line": "php: the lock installs on PHP 8.2 to 8.5, but not on your target, 8.4.5; Composer's solver at PHP 8.4 resolves: composer update acme/conflict-hole",
+      "php_rows": [
+        "PHP window, with require-dev: 8.2 to 8.5 · lowest 8.2.0, set by require.php ^8.2 and laravel/framework ^8.2",
+        "PHP window, without require-dev: 8.2 to 8.5 · lowest 8.2.0, set by require.php ^8.2 and laravel/framework ^8.2"
+      ],
+      "platform_step": null,
+      "sheet_moves": {},
+      "sheet_provenance": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
+    },
     "composite.php-empty-with-dev‡": {
       "document": "page/composite.php-empty-with-dev-dagger.json",
       "title": "lockrot: 9 of 9 packages flagged",
@@ -11473,7 +11668,9 @@
         "S11 PHP cap"
       ],
       "advisory_groups": [],
-      "run_notes": [],
+      "run_notes": [
+        "moves not checked: Composer's solver refuses the lock itself at php 8.5.99, so it would refuse every move: acme/legacy-barcode 1.4.0 requires php >=7.4 <8.3."
+      ],
       "php_line": "php: the lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded; Composer's solver at PHP 8.5 resolves: composer update moneyphp/money nette/schema brianium/paratest --with-all-dependencies",
       "php_rows": [
         "PHP window, with require-dev: 8.3 to 8.4 · lowest 8.3.0, set by require.php ^8.3 · 8.5 excluded by brianium/paratest ~8.2.0 || ~8.3.0 || ~8.4.0, moneyphp/money ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and nette/schema 8.1 - 8.4",
@@ -11798,7 +11995,9 @@
         "S11 PHP cap"
       ],
       "advisory_groups": [],
-      "run_notes": [],
+      "run_notes": [
+        "moves not checked: Composer's solver refuses the lock itself at php 8.5.99, so it would refuse every move: acme/legacy-barcode 1.4.0 requires php >=7.4 <8.3."
+      ],
       "php_line": "php: the lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded; the update of the 3 packages that exclude it is not checked (the advisory lookup did not cover a package in the result)",
       "php_rows": [
         "PHP window, with require-dev: 8.3 to 8.4 · lowest 8.3.0, set by require.php ^8.3 · 8.5 excluded by brianium/paratest ~8.2.0 || ~8.3.0 || ~8.4.0, moneyphp/money ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and nette/schema 8.1 - 8.4",
@@ -12707,7 +12906,9 @@
       "data_column": false,
       "signals_key": [],
       "advisory_groups": [],
-      "run_notes": [],
+      "run_notes": [
+        "moves not checked: Composer's solver refuses the lock itself at php 8.3.99, so it would refuse every move: acme/legacy-barcode 1.4.0 requires php >=7.4 <8.3."
+      ],
       "php_line": "php: the lock installs on PHP 7.3 to 8.1, so your target, 8.3, is excluded; Composer's solver at PHP 8.3 refuses the update of the 4 packages that exclude it: composer.json requires drupal/core-recommended ^9.3, composer.json requires drupal/trusted_redirect ^1.9, drupal/core 9.3.14 requires laminas/laminas-diactoros ^2.1, drupal/core-recommended 9.3.14 requires laminas/laminas-diactoros 2.8.0 and drupal/trusted_redirect 1.9.0 requires drupal/core ^8 || ^9",
       "php_rows": [
         "PHP window, with require-dev: 7.3 to 8.1 · lowest 7.3.0, set by drupal/core >=7.3.0, drupal/core-composer-scaffold >=7.3.0, drupal/core-project-message >=7.3.0 and 4 more · 8.2 excluded by laminas/laminas-diactoros ^7.3 || ~8.0.0 || ~8.1.0, laminas/laminas-escaper ^7.3 || ~8.0.0 || ~8.1.0, laminas/laminas-feed ^7.3 || ~8.0.0 || ~8.1.0 and 1 more",
@@ -15057,7 +15258,9 @@
         "S11 PHP cap"
       ],
       "advisory_groups": [],
-      "run_notes": [],
+      "run_notes": [
+        "moves not checked: Composer's solver refuses the lock itself at php 8.5.99, so it would refuse every move: acme/legacy-barcode 1.4.0 requires php >=7.4 <8.3."
+      ],
       "php_line": "php: the lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded; set config.platform.php to your PHP 8.5 release, then Composer's solver resolves: composer update moneyphp/money nette/schema brianium/paratest --with-all-dependencies",
       "php_rows": [
         "PHP window, with require-dev: 8.3 to 8.4 · lowest 8.3.0, set by require.php ^8.3 · 8.5 excluded by brianium/paratest ~8.2.0 || ~8.3.0 || ~8.4.0, moneyphp/money ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and nette/schema 8.1 - 8.4",
@@ -19725,13 +19928,13 @@
         "Composer checks the lock at: 7.4.29 (config.platform.php)",
         "composer install reads 7.4.29, and the move check solves at the target PHP 8.4.99."
       ],
-      "platform_step": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages.",
+      "platform_step": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line in the Overview names the packages.",
       "sheet_moves": {
         "twig/twig": [
           {
             "heading": "The move",
             "action": "Raise require.php to >=8.1, then require ^3.27.0",
-            "platform_step": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line names the packages.",
+            "platform_step": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line in the Overview names the packages.",
             "command_note": null,
             "moves_with": null,
             "commands": [

@@ -57,6 +57,18 @@ final class ContractBundleIsCurrentTest extends TestCase
         self::assertSame(array_keys($withoutInputs), $capped, 'a capped case without inputs needs a reason here, and a hydrated one leaves the list');
     }
 
+    /** A committed provenance.json with a count below its floor did not come from a passing recording. */
+    public function testTheCommittedComparedCountsMeetTheFloors(): void
+    {
+        $provenance = JsonPath::decodeFile(ContractBundle::DIRECTORY.'/provenance.json');
+        $compared = JsonPath::arrayAt($provenance, ['model_goldens', 'compared']);
+
+        self::assertSame(array_keys(ContractBundle::COMPARED_FLOOR), array_keys($compared));
+        foreach (ContractBundle::COMPARED_FLOOR as $key => $floor) {
+            self::assertGreaterThanOrEqual($floor, $compared[$key], $key.': a recording compares fewer goldens than its floor');
+        }
+    }
+
     public function testTheBundleHashIsTheHashOfTheCommittedFiles(): void
     {
         self::assertSame(trim((string) file_get_contents(ContractBundle::DIRECTORY.'/bundle_sha256')), ContractBundle::sha256(ContractBundle::bundleFiles()));

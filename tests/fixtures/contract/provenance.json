@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "27be7df6edee7317e18ac256236bc74589937178c5f6f3410b26f85dbee0c450",
+        "tests/fixtures/flags/cases.json": "02fc410a81b232d40708ac73f99cf73de139fda49f2cd93922e44a85bfa3adc9",
         "tests/fixtures/flags/composite.json": "931aa288bfbfee92d7103d91a1d3c78a9d0d5625dd044f214ca72e1c9c73a6e7",
-        "tests/fixtures/flags/provenance.json": "bdfdfdab167108f92f70d5a64aaa78f855d6246d6e0ade25d844be309b8315f5"
+        "tests/fixtures/flags/provenance.json": "f8ddbb228c4530fb72833f2883573c555ee947e8dacbf62aaea2463e7ee908e6"
     },
     "version_mask": {
         "paths": [
@@ -72,7 +72,7 @@
     "page_goldens": {
         "file": "page-goldens.json",
         "source": "the model's page goldens (security-axis/r3/page-goldens.json in the private model), copied byte for byte and not recorded",
-        "sha256": "f4be5d5be4744afd6d86bc8e357564375b32415dec8c8ac5f2d84509e25a8c0d",
+        "sha256": "0aeb93b15a692df6860c05468d49e361628d12274683125dc13b7d238c8234c6",
         "read_by": "tests/Integration/PageGoldensTest.php validates each page document against the report-2 schema and reads title, description, grade_line, figure_line, load_line, gate_partition, ready, run_notes, flags_notes, advisory_groups, sheet_moves, sheet_holders and sheet_ladder. The other keys are the renderer's"
     },
     "engine_pages": "page/ holds the report-2 that bin/lockrot writes for each case of Lockrot\\Tests\\Support\\Contract\\EnginePage::CASES. tools/report/record --engine-pages records them",
