@@ -19,13 +19,14 @@ REPORT2 = os.path.join(RESOURCES, 'lockrot-report-2.schema.json')
 # the 0.13.0 -1 files from committed, hash-pinned copies (inputs/, tools/schema/inputs/ in the repository), read
 # relative to this script; a later widening of a -1 file never changes a -2 rebuild
 import hashlib
+from guard import require
 INPUTS = os.path.join(HERE, 'inputs')
 PINNED = json.load(open(os.path.join(INPUTS, 'SHA256SUMS.json')))
 
 
 def pinned(name):
     raw = open(os.path.join(INPUTS, name), 'rb').read()
-    assert hashlib.sha256(raw).hexdigest() == PINNED[name], ('a pinned input changed', name)
+    require(hashlib.sha256(raw).hexdigest() == PINNED[name], 'a pinned input changed', name)
     return json.loads(raw)
 
 
@@ -321,7 +322,7 @@ def relate(node, desc, *branches_lists):
     (two entries never share a description, so each describes the relation it holds)."""
     node.setdefault('allOf', [])
     descs = desc if isinstance(desc, list) else [desc] * len(branches_lists)
-    assert len(descs) == len(branches_lists) and (isinstance(desc, list) or len(branches_lists) == 1), (desc, len(branches_lists))
+    require(len(descs) == len(branches_lists) and (isinstance(desc, list) or len(branches_lists) == 1), desc, len(branches_lists))
     for d_, branches in zip(descs, branches_lists):
         node['allOf'].append({'description': d_, 'anyOf': branches} if len(branches) > 1 else dict(branches[0], description=d_))
 
@@ -683,14 +684,14 @@ def explain_schema():
     D['metadata'] = explain_metadata()
     D['repositoryMetadata'] = D.pop('metadata')
     for k in D:
-        assert k in EXPLAIN_ONLY, k
-        assert k not in RD, ('an explain-only definition collides with report-2', k)
+        require(k in EXPLAIN_ONLY, k)
+        require(k not in RD, 'an explain-only definition collides with report-2', k)
     need = refs_in(D, set()) | {'finding', 'envelope', 'packageName', 'dateTime', 'noteDetail'}
     shared = closure(RD, [n for n in need if n in RD])
     for k in sorted(shared):
         D[k] = copy.deepcopy(RD[k])
     missing = refs_in(D, set()) - set(D)
-    assert not missing, missing
+    require(not missing, missing)
     root = {
         '$schema': DRAFT,
         'id': 'https://lockrot.dev/schema/explain-2.json',
@@ -798,7 +799,7 @@ def baseline_schema():
 # config-2
 def ci(word):
     """a case-insensitive spelling of one fail-on token in an ECMA-262 pattern (draft-04 patterns have no inline flags)."""
-    assert re.fullmatch('[a-z-]+', word), word
+    require(re.fullmatch('[a-z-]+', word), word)
     return ''.join('[%s%s]' % (c.lower(), c.upper()) if c.isalpha() else c for c in word)
 
 
@@ -970,7 +971,7 @@ def main():
         describe_members(doc)
         ship_schema(doc)  # the shipping pass
         lo = leftovers(doc)
-        assert not lo, lo[:5]
+        require(not lo, lo[:5])
     for name, doc in out.items():
         with open(os.path.join(RESOURCES, name), 'w') as fh:
             json.dump(doc, fh, indent=4, ensure_ascii=False)

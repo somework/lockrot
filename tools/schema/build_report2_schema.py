@@ -18,6 +18,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.normpath(os.path.join(HERE, '..', '..'))
 OUT = os.path.join(REPO, 'resources', 'lockrot-report-2.schema.json')
 import hashlib
+from guard import require
 # the report-1 file is read from a committed, hash-pinned copy of the 0.13.0 file (tools/schema/inputs/ in the
 # repository; inputs/ here), never from the live resources/ file, so a later widening of report-1 cannot change a report-2 rebuild
 INPUTS = os.path.join(HERE, 'inputs')
@@ -26,7 +27,7 @@ PINNED = json.load(open(os.path.join(INPUTS, 'SHA256SUMS.json')))
 
 def pinned(name):
     raw = open(os.path.join(INPUTS, name), 'rb').read()
-    assert hashlib.sha256(raw).hexdigest() == PINNED[name], ('a pinned input changed', name)
+    require(hashlib.sha256(raw).hexdigest() == PINNED[name], 'a pinned input changed', name)
     return json.loads(raw)
 
 
@@ -141,7 +142,7 @@ for k in ('dateTime', 'date', 'packageName', 'level', 'years', 'datedBy', 'forge
     defs[k] = copy.deepcopy(R1['definitions'][k])
 defs['signalId']['x-known-values'] = defs['signalId']['x-known-values'] + ['S11']  # CAPPED (§5.10)
 defs['forgeId']['description'] = defs['forgeId']['description'].replace(" The display name (`GitHub`) is the explanation's `activity.forge`, which is not this set.", '')
-assert 'display name' not in defs['forgeId']['description']
+require('display name' not in defs['forgeId']['description'], 'forgeId names a display name')
 defs['dateTime']['description'] = 'An ISO 8601 date-time with its offset, as lockrot writes every instant (`2026-10-01T17:39:31+00:00`).'
 defs['date']['description'] = 'A calendar date, `YYYY-MM-DD`.'
 defs['level']['description'] = "A signal's own level, as report-1 (`info`, `warn`, `high`); kept for consumers, never printed beside a grade (§2.1). Closed."
@@ -1056,7 +1057,7 @@ UNMEASURED_BY_KEY = {
                            "(the id of `age.installed_unmeasured`). Or the release end has none (the id of `age.release_unmeasured`)."),
     'depthUnmeasured': (['unreached', 'no_composer_json'], "Why `depth` is null: no path from the requirements that the run walked (`unreached`), or the run read no composer.json (`no_composer_json`)."),
 }
-assert sorted({v for vals, _ in UNMEASURED_BY_KEY.values() for v in vals}) == sorted(UNMEASURED), 'the per-key lists cover the words table ids'
+require(sorted({v for vals, _ in UNMEASURED_BY_KEY.values() for v in vals}) == sorted(UNMEASURED), 'the per-key lists cover the words table ids')
 for _name, (_vals, _what) in UNMEASURED_BY_KEY.items():
     defs[_name] = open_set(_vals, _UN_INTRO + _what + _UN_OPEN)
 defs['ageLevel'] = nul(("The threshold of `run.thresholds` that the reading passes (`warn` or `high`), from the exact ratio, as the signal decides it. Null below the warn "
@@ -1726,7 +1727,7 @@ LIBY['description'] = LIBY['description'].replace(' Absent from documents writte
 # report-2 sums the published values, so a total row equals the column above it (report-1 summed the unrounded ones)
 _old_rule = ("`total` is the sum of the unrounded per-finding values (so the sum of the printed two-decimal values agrees with it to within 0.005 per "
              "measured finding), `direct_requirements` the same over `direct: true`")
-assert _old_rule in LIBY['description'], 'report-1 libyears wording changed'
+require(_old_rule in LIBY['description'], 'report-1 libyears wording changed')
 LIBY['required'] = ['total', 'direct_requirements', 'measured', 'at_least_count', 'unmeasured', 'furthest_behind', 'packages']
 LIBY['properties'] = {k: LIBY['properties'][k] for k in ('total', 'direct_requirements', 'measured')} | {
     'at_least_count': d(("Findings whose `libyears_at_least` is true. Above 0, `total` is a lower bound, and so is `direct_requirements` when a direct finding "
@@ -2126,7 +2127,7 @@ if __name__ == '__main__':
     from ship_text import ship_schema, leftovers
     ship_schema(schema)
     lo = leftovers(schema)
-    assert not lo, lo[:5]
+    require(not lo, lo[:5])
     out = OUT
     with open(out, 'w') as fh:
         json.dump(schema, fh, indent=2, ensure_ascii=False)
