@@ -131,6 +131,14 @@ class ACaseWithoutBranchRowsHydratesFromItsRunReleases(unittest.TestCase):
 
         self.assertEqual('2015-06-25T11:21:15+00:00', inputs['lock'][0]['time'])
 
+    def test_a_lock_entry_that_the_model_reads_as_undated_stays_without_a_time(self):
+        finding = dict(self.FINDING, age={'installed_unmeasured': 'undated'})
+        given = [{'version': '4.7.1', 'time': '2015-06-25T11:21:15+00:00', 'php': '^7.4 || ~8.0.0'}]
+
+        inputs = project_fixtures.inputs_of({'finding': finding, 'run': self.RUN, 'run_inputs': {'_releases': given}})
+
+        self.assertIsNone(inputs['lock'][0]['time'])
+
     def test_a_lock_entry_with_a_time_keeps_it_over_its_merged_release(self):
         finding = dict(self.FINDING, age={'installed': {'at': '2021-08-30T10:00:00+00:00'}})
         given = [{'version': '4.7.1', 'time': '2015-06-25T11:21:15+00:00', 'php': '^7.4 || ~8.0.0'}]

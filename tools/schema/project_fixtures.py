@@ -546,8 +546,9 @@ def inputs_of(case):
         base = inputs['releases'] if rows else [r for r in inputs['releases'] if r['version'] == f['version']]
         inputs['releases'] = run_releases(run_inputs['_releases'], base)
     own_release = next((r for r in inputs.get('releases') or [] if r['version'] == f['version']), None)
-    if inputs['lock'][0]['time'] is None and own_release is not None:
-        # Composer copies the release's `time` into composer.lock.
+    undated = (f.get('age') or {}).get('installed_unmeasured') == 'undated'
+    if inputs['lock'][0]['time'] is None and own_release is not None and not undated:
+        # Composer copies the release's `time` into composer.lock. A lock that the model reads as `undated` has none.
         inputs['lock'][0]['time'] = own_release['time']
     if checks:
         inputs['checks'] = checks

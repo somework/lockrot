@@ -910,7 +910,8 @@ Composer does not show the window, and these facts hide it:
   the `config.platform.php` of the last update. A change of `config.platform.php` in composer.json
   does not change that check until the next update.
 - `platform_override` holds `config.platform.php` from Composer's merged config: composer.json, then
-  the global `config.json`. `composer update` and the move check solve at that PHP.
+  the global `config.json`. `composer update` solves at that PHP. The move check solves at it only
+  when it is a stable release in the minor of the target PHP, else at `target.php`.
 - The platform check that the Composer autoloader runs checks only the lower bound of `php` and
   `php-64bit`. It checks only the packages without require-dev.
 
