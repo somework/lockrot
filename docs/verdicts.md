@@ -763,7 +763,8 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
   [`update_now_not_checked`](notes.md#update_now_not_checked) says why. When the baseline does not
   resolve, `update now:` is empty too.
 - **The baseline.** First, lockrot solves a partial update of a name outside the lock. When Composer
-  refuses it, the lock itself does not install on the target PHP. Then no move is checked
+  refuses it, the lock itself does not install: the target PHP is outside the
+  [PHP window](#the-php-window), or another conflict in the lock stops it. Then no move is checked
   (`check.reason` `baseline_refused`), and the run note
   [`moves_not_checked`](notes.md#moves_not_checked) gives Composer's problem text. When that refusal
   needs a package that could not be loaded, `run.move_check.baseline` is `not_checked` with the load

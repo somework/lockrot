@@ -67,9 +67,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   for `ocramius/proxy-manager`), so its maintenance is no longer halved as `unreached`, and its
   grade can rise one band. ([The score](docs/verdicts.md#score))
 - **All formats:** S8 reads the project's lowest PHP as a full version: an inclusive bound gives
-  `X.Y.Z` (`>=8.2` now admits a branch that needs `8.2.0`), an exclusive bound the next patch
-  (`>7.1` no longer admits a branch that needs exactly `7.1.0`). S8 can then name another branch
-  to follow. ([Within reach](docs/verdicts.md#within-reach))
+  `X.Y.Z` (`>=8.2` now admits a branch that needs `8.2.0`), an exclusive or post-release bound the
+  next patch (`>7.1` no longer admits a branch that needs exactly `7.1.0`, `>=7.4.0-p1` gives
+  `7.4.1`). S8 can then name another branch to follow. ([Within reach](docs/verdicts.md#within-reach))
 - **All formats:** a repository that answers 404 no longer carries S10 `rate_limit` when the same
   host also rate-limits: the 404 is an answer.
   ([Not found](docs/notes.md#repository_activity_not_found))
@@ -134,7 +134,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** Composer's solver checks each move against the lock, and the move
   writes `check` with the release it `installs`. A refused move asks once more with its holders, and
   `moves_with[]` names the holders that move. A move still refused names its holds in `held_by[]`
-  and prints only `composer why-not --locked`. ([The move check](docs/verdicts.md#the-move-check))
+  and prints only `composer why-not --locked`. A `composer.json` hold is one whose root constraint
+  excludes the release that the move wants. ([The move check](docs/verdicts.md#the-move-check))
+- **All formats:** the move check gives the answers of the Composer that runs lockrot. On Composer
+  2.11, advisory blocking skips a root alias such as `dev-main as 1.0.0`. It checks a numeric branch
+  such as `1.x-dev`. The move check does not apply the cooldown policy of Composer 2.11.
+  ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** the move check runs no Composer plugin. In a project with symfony/flex,
   `extra.symfony.require` or `SYMFONY_REQUIRE` limits Composer's `symfony/*` versions, so a move
   that resolves in lockrot can fail in Composer, or install an older version.
@@ -144,9 +149,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `security.status` can read `clear`.
   ([Which advisories count](docs/verdicts.md#which-advisories-count))
 - **All formats:** the move check reads `update-with-minimal-changes` and
-  `COMPOSER_MINIMAL_CHANGES`, as Composer does. It loads no vcs, git or artifact repository. A
-  package that the lock records from a vcs repository stays at its locked version, and its move
-  reads `not_checked`. ([The move check](docs/verdicts.md#the-move-check))
+  `COMPOSER_MINIMAL_CHANGES`, as Composer does. It leaves `php-ext` and `php-ext-zend` packages
+  out, and loads no vcs, git or artifact repository. A move whose solve needs another release of a
+  package that the lock records from a vcs repository reads `not_checked` with `unloaded_name`.
+  ([The move check](docs/verdicts.md#the-move-check))
 - **json:** `security.update_now_command` holds no PHP raise step. Only the `update now:` line says
   to raise `require.php` first. ([Security](docs/schema.md#advisories-with-no-fix-expected))
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
@@ -160,7 +166,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([The update that admits the target](docs/verdicts.md#the-update-that-admits-the-target))
 - **All formats:** the run notes `moves_not_checked`, `move_check_failed`, `update_now_reduced`,
   `update_now_refused`, `update_now_not_checked` and `package_name_invalid` say what the move check
-  and `update now:` did. lockrot skips a lock entry whose name is no Composer package name.
+  and `update now:` did. A move whose solve throws an error reads `not_checked` with
+  `solver_error`. lockrot skips a lock entry whose name is no Composer package name.
   ([Run notes](docs/notes.md#moves_not_checked))
 - **All formats:** the run notes `baseline_target_differs`, `baseline_fix_model_differs` and
   `ignore_does_not_cover_advisories` say when the baseline does not compare fix changes, and when an
@@ -234,7 +241,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** **gitlab, sarif:** one record per flag, plus one per advisory in SARIF. 0.13
   identities stay. SARIF `properties.verdict` is the grade, `signals` is `signal_ids`, `baseline` is
   `baseline_status`. A baseline-covered result carries `suppressions`. Action: guard on
-  `run.properties.lockrot_schema == 2`, then read `properties.lead`.
+  `runs[0].properties.lockrot_schema == 2`, then read `properties.lead`.
   ([Marks](docs/ci.md#how-each-format-marks-a-finding))
 - **Breaking:** **github:** the title reads `lockrot: <verdict> — <flags>`, with `(<severity>
   advisory)` after `vulnerable`. Action: key on the annotation's file and line, not its title.
@@ -279,9 +286,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   names equal without case, exits 2. 0.13 read on past these sections. Action: run
   `composer update --lock`, or fix the section that the message names.
   ([Exit codes](docs/ci.md#exit-codes))
-- **Breaking:** **CLI:** `vendor/bin/lockrot` exits 2 and runs nothing when the composer/composer
-  package that it loads is older than 2.10, and on a non-CLI PHP SAPI with `register_argc_argv=On`.
-  Action: upgrade composer/composer to 2.10 or later, or run the PHAR, with the CLI PHP.
+- **Breaking:** **CLI:** `vendor/somework/lockrot/bin/lockrot` exits 2 and runs nothing when the
+  composer/composer package that it loads is older than 2.10. So does a non-CLI PHP SAPI with
+  `register_argc_argv=On`. Action: upgrade composer/composer to 2.10 or later, or run the PHAR, with
+  the CLI PHP.
   ([Exit codes](docs/ci.md#exit-codes))
 - **Baseline:** when a `--generate-baseline` run reads a baseline-2 file, its reports compare
   with that file, as a check run does. They carry the root `baseline` and each finding's `baseline`.
@@ -325,8 +333,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Breaking:** **CLI, Install-time:** the Composer plugin needs Composer 2.10 or later
   (`composer-plugin-api` `^2.9`). Composer 2.8 and older do not install lockrot 0.14. On Composer
-  2.9 the plugin does nothing and prints one line that names the version it needs. Action: upgrade
-  Composer to 2.10 or later, or run the PHAR.
+  2.9 the plugin does nothing, and prints one `lockrot:` line that names the version it needs and
+  the PHAR. Action: upgrade Composer to 2.10 or later, or run the PHAR.
   ([Install](docs/index.md#install))
 - **Breaking:** **json, PHAR:** the unnumbered schema files in `resources/` are gone. Each file
   carries its number: `lockrot-report.schema.json` is `lockrot-report-1.schema.json`, and the same
@@ -348,14 +356,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **All formats:** the Composer plugin runs on Composer 2.11. Each move check threw an error there,
-  and the error ended the run. The move check gives the answers of the Composer that runs lockrot.
-  On 2.11, advisory blocking skips a root alias such as `dev-main as 1.0.0` and checks a numeric
-  branch such as `1.x-dev`. The move check does not apply the cooldown policy of Composer 2.11.
-  ([The move check](docs/verdicts.md#the-move-check))
-- **All formats:** a move whose solve throws any error reads `not_checked` with `solver_error`, and
-  the run note `move_check_failed` names the error. The error ended the run.
-  ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** on Composer 2.11, lockrot still counts the advisories of a `dev-*` version and
   refuses a partial advisory record, as on 2.10. `composer audit` 2.11 skips the first and reports
   the second. ([Which advisories count](docs/verdicts.md#which-advisories-count))
@@ -364,12 +364,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **sarif:** `originalUriBaseIds.%SRCROOT%.uri` is `file:///` for a project in `/` and
   `file://server/share/proj/` for one on a UNC share. It read `file:////` and `file:///server/…`.
 - **All formats:** the anonymous cap note counts one package in the singular ("1 candidate package").
-- **All formats:** `run.project_php_lowest` of a post-release `require.php` bound, such as
-  `>=7.4.0-p1`, is the next patch, `7.4.1`. It read `7.4.0`, which the bound excludes.
-  ([The PHP test in explain](docs/verdicts.md#the-php-test-in-explain))
-- **All formats:** lockrot no longer proposes an `update` move that Composer refuses. On Composer
-  2.9 and later, the plain `composer update <package>` of such a move installed a dev snapshot, and
-  `update now:` held it beside the moves that resolve. ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** Symfony's extension polyfills keep their place on the built-in finished list
   under their own reason, because "intentionally frozen" was false for them.
 - **CLI:** `--explain` prints "archived flag not read" for a repository whose host did not send the
@@ -380,12 +374,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([Explaining one package](docs/configuration.md#explaining-one-package))
 - **Config:** a `LOCKROT_TODAY` value without an offset is UTC. It took the default timezone of the
   PHP process. ([Testing hooks](docs/configuration.md#testing-hooks))
-- **All formats:** a move whose solve needs another release of a vcs-locked package reads
-  `not_checked` with `unloaded_name`. ([The move check](docs/verdicts.md#the-move-check))
-- **All formats:** a refused move names a `composer.json` hold only when the root constraint
-  excludes the release that the move wants. ([The move check](docs/verdicts.md#the-move-check))
-- **All formats:** the move check leaves `php-ext` and `php-ext-zend` packages out, as Composer's
-  update and require do. ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** a lock URL with a long run of slashes does not stall the run.
 - **CLI:** a cached 404 from a run without a token does not hide a private repository from a later
   run with a token. The activity cache keeps an answer per credential state, so the first run after

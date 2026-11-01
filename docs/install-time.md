@@ -130,7 +130,8 @@ a lock, or lower it to spend less time on the check.
 | Symptom | Cause | Install | What to do |
 |---|---|---|---|
 | A note in the block | Something the run could not see: an unreachable repository, an exhausted budget, a missing token | Continues, unless `install-time-strict` is on with `fail-on: unchecked` and a finding carries S10 | Look up its code in [run notes](notes.md) |
-| One `lockrot: install-time check skipped: …` line | lockrot could not run the check: a malformed `extra.lockrot` or lockrot environment variable, an unreadable `composer.lock`, an unreadable [baseline](baseline.md#install-time) file, an `extra.lockrot.baseline` that names a missing one, or a defect in lockrot | Continues, and `install-time-strict` does not apply | Run `composer lockrot`. For a configuration problem, it names the problem and exits `2` ([exit codes](ci.md#exit-codes)) |
+| One `lockrot: install-time check skipped: …` line | lockrot could not run the check. Causes: a malformed `extra.lockrot` or lockrot environment variable. A value that Composer refuses in a blocking or policy variable, `config.policy` or `config.audit`. An unreadable `composer.lock`. An unreadable [baseline](baseline.md#install-time) file, a baseline-1 file included. An `extra.lockrot.baseline` that names a missing file. A defect in lockrot | Continues, and `install-time-strict` does not apply | Run `composer lockrot`. For a configuration problem, it names the problem and exits `2` ([exit codes](ci.md#exit-codes)) |
+| One `lockrot: Composer <version> is older than 2.10, so lockrot does nothing. …` line | The plugin runs on a Composer older than 2.10 | Continues, and `install-time-strict` does not apply | Upgrade Composer to 2.10 or later. To gate CI, run the [PHAR](phar.md) |
 | `lockrot: install-time-strict stopped the install; gate: fails …` and Composer exits `1` | [`install-time-strict`](#install-time-strict) is on and the gate fails | Stopped | See [after a stop](#install-time-strict) |
 
 ## <a name="install-time-strict"></a>`install-time-strict` {#install-time-strict}
@@ -153,10 +154,11 @@ transaction before any package operation runs, and Composer exits `1`. The messa
 
 - A finding in the [baseline](baseline.md#install-time) does not stop the install unless its new
   facts reach `fail-on`. The block lists both kinds.
-- A committed baseline-1 file is a baseline that lockrot cannot read: the check is skipped with one
-  `install-time check skipped` line, and the install continues. Until you run
-  `--generate-baseline` ([baseline.md](baseline.md#moving-from-a-baseline-1-file)),
-  `install-time-strict` stops nothing.
+- While `composer lockrot` exits `2`, `install-time-strict` stops nothing. lockrot skips the
+  check with one `install-time check skipped` line, and the install continues. A committed baseline-1
+  file, a value that Composer refuses in a blocking or policy variable, and an `extra.lockrot`
+  value that config-2 refuses each do this. Run `composer lockrot` after an upgrade, and fix what it names. For a
+  baseline-1 file, run `--generate-baseline` ([baseline.md](baseline.md#moving-from-a-baseline-1-file)).
 - A gap in what the run could see stops the install only through `fail-on: unchecked`, which
   matches every finding that carries S10 ([what was not checked](verdicts.md#what-was-not-checked)).
   Such a finding can be `ok` and missing from the block. `--strict-network` has no install-time
