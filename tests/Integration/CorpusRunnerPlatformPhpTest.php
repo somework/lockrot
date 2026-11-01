@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Lockrot\Tests\Support\FixtureCliRun;
+use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
@@ -57,12 +58,14 @@ final class CorpusRunnerPlatformPhpTest extends TestCase
 
         // Assert
         self::assertContains($process->getExitCode(), [0, 1], $process->getErrorOutput());
-        $report = json_decode($process->getOutput(), true);
+        $report = JsonPath::decoded(json_decode($process->getOutput(), true));
         $capped = [];
-        foreach (\is_array($report) ? (array) $report['findings'] : [] as $finding) {
-            foreach ($finding['package'] === self::CAPPED ? $finding['signals'] : [] as $signal) {
-                if ($signal['id'] === 'S11') {
-                    $capped[] = [$signal['data']['newest_php'], $signal['data']['newest_php_source']];
+        foreach (JsonPath::arrayAt($report, ['findings']) as $finding) {
+            $finding = JsonPath::decoded($finding);
+            foreach (JsonPath::stringAt($finding, ['package']) === self::CAPPED ? JsonPath::arrayAt($finding, ['signals']) : [] as $signal) {
+                $signal = JsonPath::decoded($signal);
+                if (JsonPath::stringAt($signal, ['id']) === 'S11') {
+                    $capped[] = [JsonPath::stringAt($signal, ['data', 'newest_php']), JsonPath::stringAt($signal, ['data', 'newest_php_source'])];
                 }
             }
         }
