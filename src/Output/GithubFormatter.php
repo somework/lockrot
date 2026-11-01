@@ -6,7 +6,6 @@ namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Config\Gate;
-use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Lock\LockLineIndex;
 use Lockrot\Score\Standing;
 use Lockrot\Verdict\Finding;
