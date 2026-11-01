@@ -129,7 +129,7 @@ final class PhpWindow implements \JsonSerializable
             'host_requires' => $hosts,
             'with_dev' => $windows['with_dev'],
             'without_dev' => $windows['without_dev'],
-            'target' => ['php' => $targetPoint, 'inside' => $targetFailing === []],
+            'target' => ['php' => self::releaseOf($targetPoint), 'inside' => $targetFailing === []],
             'target_fix' => null,
         ], $targetMinor, $knownMinors, $targetFailing, array_values(array_filter($targetFailing, static fn (array $req): bool => \in_array($req, $lockOnly, true))), $lock->skippedNames(), $project->platformPhp());
     }
@@ -169,6 +169,12 @@ final class PhpWindow implements \JsonSerializable
     private static function normalized(string $php): string
     {
         return (new VersionParser())->normalize($php);
+    }
+
+    /** The `X.Y.Z` release of a stable platform php: `v8.4.1` and `8.4.1-p1` give 8.4.1. */
+    private static function releaseOf(string $php): string
+    {
+        return implode('.', \array_slice(explode('.', self::normalized($php)), 0, 3));
     }
 
     /**
@@ -443,11 +449,6 @@ final class PhpWindow implements \JsonSerializable
     public function target(): array
     {
         return $this->data['target'];
-    }
-
-    public function isTargetInside(): bool
-    {
-        return $this->data['target']['inside'];
     }
 
     /** @return list<string> the known minors that the window was read on, oldest first */

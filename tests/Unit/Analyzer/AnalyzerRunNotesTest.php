@@ -121,6 +121,24 @@ final class AnalyzerRunNotesTest extends TestCase
         );
     }
 
+    /**
+     * GitHub's rate-limit docs: a secondary limit can answer 403 with neither `retry-after` nor
+     * `x-ratelimit-remaining: 0`, and its body names the limit.
+     */
+    public function testAGitHubSecondaryLimitWithoutLimitHeadersIsARateLimit(): void
+    {
+        $packages = [self::locked('vendor/limited')];
+        $metadata = new MetadataBatch(['vendor/limited' => self::metadata('vendor/limited', 'https://github.com/owner/limited.git')], [], []);
+        $http = $this->http([
+            'https://api.github.com/repos/owner/limited' => [403, '{"message":"You have exceeded a secondary rate limit. Please wait a few minutes before you try again.","documentation_url":"https://docs.github.com/rest/overview/rate-limits-for-the-rest-api#about-secondary-rate-limits"}'],
+        ]);
+
+        $analysis = $this->analyze($packages, $metadata, $http, true);
+
+        self::assertSame([RunNote::REPOSITORY_ACTIVITY_RATE_LIMITED], array_map(static fn (RunNote $note): string => $note->code(), $analysis->report()->runNotes()));
+        self::assertSame(['vendor/limited' => NotCheckedRule::RATE_LIMIT], self::activityReasons($analysis, ['vendor/limited']));
+    }
+
     public function testUnreachableRepositoriesKeepEveryMessageAndMatchFetchFailed(): void
     {
         $packages = [self::locked('vendor/one'), self::locked('vendor/two'), self::locked('vendor/fine')];

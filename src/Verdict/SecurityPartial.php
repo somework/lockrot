@@ -39,11 +39,6 @@ final class SecurityPartial implements \JsonSerializable
         return $this->version;
     }
 
-    public function ifApplied(): IfApplied
-    {
-        return $this->ifApplied;
-    }
-
     /** @return array{version: string, clears: list<MoveFact>, unverified: list<MoveFact>, clears_all: bool, if_applied: IfApplied} */
     public function jsonSerialize(): array
     {
