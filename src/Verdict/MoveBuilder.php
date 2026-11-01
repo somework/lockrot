@@ -43,16 +43,17 @@ final class MoveBuilder
         $clears = [];
         $unverified = [];
         $adds = [];
-        $phpCheck = null;
-        if ($row !== null && (\in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED], true) || $draft->source() === FlagSet::PINNED)) {
-            // A blocked move names the PHP of the release that keeps it off the target, the others the release at the top of their constraint.
-            $phpCheck = PhpCheck::of($kind === Move::BLOCKED ? ($lower === null ? $row->php() : $lower->php()) : $row->highestPhp(), $context->floor());
-        }
         $latest = $draft->latest();
         $subject = $context->subject();
         $constraint = \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $draft->constraint() : null;
         $version = \in_array($kind, Move::ROW_KINDS, true) ? ($lower === null ? null : $lower->release()->pretty()) : ($kind === Move::TAG && $latest !== null ? $latest->version() : null);
         $newest = $row === null ? null : ($kind === Move::UPDATE ? $context->updateTarget($row) : (\in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $context->rowTarget($row, $lower) : ($kind === Move::BLOCKED ? $context->rowTarget($row) : null)));
+        $phpCheck = null;
+        if ($row !== null && (\in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED], true) || $draft->source() === FlagSet::PINNED)) {
+            // A blocked move names the PHP of the release that keeps it off the target, a tag the branch top, the others the release that the target installs.
+            $php = $kind === Move::BLOCKED ? ($lower === null ? $row->php() : $lower->php()) : ($kind === Move::TAG ? $row->highestPhp() : $context->phpAtTarget($row, $lower, $newest));
+            $phpCheck = PhpCheck::of($php, $context->floor());
+        }
         $checks = $context->checks();
         $query = $checks === null ? null : self::query($kind, $subject, $constraint, $version, $phpCheck, $newest, $checks);
         $outcome = $query === null || $checks === null ? null : $checks->check($query);

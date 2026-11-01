@@ -266,7 +266,7 @@ final class MoveText
         if ($latest !== null && $latest->relation() === 'older') {
             $text .= ', older than your snapshot ('.substr((string) $latest->snapshotTime(), 0, 10).'); review, or replace';
         }
-        return $text.self::phpClause($move, $subject, false).self::adds($move);
+        return $text.self::phpClause($move, $subject).self::adds($move);
     }
 
     private static function requirement(Move $move, MoveSubject $subject): string
@@ -279,7 +279,7 @@ final class MoveText
             $text = $raise.'move '.$subject->package().' to '.$move->constraint().($via === '' ? '' : ' through '.$via);
         }
 
-        return $text.self::below($move, $move->newest()).self::clears($move).self::adds($move).self::phpClause($move, $subject, true);
+        return $text.self::below($move, $move->newest()).self::clears($move).self::adds($move).self::phpClause($move, $subject).self::targetRuns($move, $subject);
     }
 
     /**
@@ -348,7 +348,7 @@ final class MoveText
         return 'no move runs on the target: '.$where.' needs php '.$requires.' and the target php '.$subject->targetPhp().' does not run it'.($move->source() === FlagSet::PINNED ? '; replace it' : '');
     }
 
-    private static function phpClause(Move $move, MoveSubject $subject, bool $runs): string
+    private static function phpClause(Move $move, MoveSubject $subject): string
     {
         $check = $move->phpCheck();
         $requires = $check === null ? null : $check->requires();
@@ -362,7 +362,14 @@ final class MoveText
             $text .= ', require.php allows '.self::php((string) $subject->projectPhpLowest()).' (a '.$check->raiseSize().' raise)';
         }
 
-        return $text.($runs ? '; the target php '.$subject->targetPhp().' runs it' : '');
+        return $text;
+    }
+
+    private static function targetRuns(Move $move, MoveSubject $subject): string
+    {
+        $check = $move->phpCheck();
+
+        return $check !== null && $check->requires() !== null && $check->targetRuns() === true ? '; the target php '.$subject->targetPhp().' runs it' : '';
     }
 
     private static function clears(Move $move): string
