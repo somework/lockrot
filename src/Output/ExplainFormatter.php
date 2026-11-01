@@ -125,10 +125,10 @@ final class ExplainFormatter
         $lookup = $finding->details()->activity();
         $where = $lookup->where();
         $ref = $where->ref();
-        $reason = CauseWords::of((string) $lookup->reason());
+        $reason = FindingBlock::checkWords($finding, (string) $lookup->reason());
         if ($lookup->status() === ActivityLookup::NOT_READ) {
             if ($lookup->reason() === ActivityLookup::HOST_NOT_SUPPORTED) {
-                return 'lockrot cannot ask '.$where->host().' about repository activity';
+                return $where->host().': lockrot cannot ask this host about activity';
             }
 
             return $ref === null ? 'activity not asked ('.$reason.')' : $ref->host().'/'.$ref->path().': not asked ('.$reason.')';

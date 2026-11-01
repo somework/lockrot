@@ -62,6 +62,14 @@ final class SarifRecordsTest extends TestCase
         self::assertSame('Security advisory PKSA-[x]\\(https://evil.example/) affects the installed version', $rule['shortDescription']['text']);
     }
 
+    /** Code scanning shows the rule text decoded: an ESC or a bidi control in an advisory id prints as its escape. */
+    public function testAControlCharacterInAnAdvisoryIdPrintsAsAnEscapeInItsRule(): void
+    {
+        $rule = SarifRecords::rule("lockrot/advisory/PKSA-x\x1B[31mRED\u{202E}", 'high', new Thresholds());
+
+        self::assertSame('Security advisory PKSA-x\\x1B[31mRED\\u{202E} affects the installed version', $rule['shortDescription']['text']);
+    }
+
     public function testTheAdvisoriesAreKnownOnlyWhenNoneIsNewReRatedOrWithALostFix(): void
     {
         $known = ['PKSA-1' => ['high', 'update'], 'PKSA-2' => ['medium', 'update']];

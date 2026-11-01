@@ -4938,7 +4938,7 @@ age       installed  3.7.1     not read (no date)
           newest               not read (not from a Composer repository)
           last push            not read (not from a Composer repository)
           libyears not measured: not from a Composer repository
-repository github.com/jquery/jquery-dist: not asked (not from a Composer repository)
+repository github.com/jquery/jquery-dist: not asked (origin unknown)
 
 score     0
   reach        via yiisoft/yii2, yiisoft/yii2-bootstrap5 and yiisoft/yii2-symfonymailer: maintenance would be halved (none counts); security is never halved for reach

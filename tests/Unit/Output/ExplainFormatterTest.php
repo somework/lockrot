@@ -180,28 +180,31 @@ final class ExplainFormatterTest extends TestCase
         $archived = new RepositoryActivity(new RepoRef(RepoRef::GITHUB, 'github.com', 'a/b'), true, null, new \DateTimeImmutable('2026-10-01T10:00:00+00:00'));
         yield 'read, archived, no push' => [ActivityLookup::read($archived), $none, 'GitHub github.com/a/b: no push reported, archived · fetched 2026-10-01'];
         yield 'not found' => [ActivityLookup::notFound(new RepoRef(RepoRef::GITHUB, 'github.com', 'hoaproject/Consistency')), $none, 'GitHub github.com/hoaproject/Consistency: the host answered 404 (private, renamed or removed)'];
-        yield 'host not supported' => [ActivityLookup::notRead(ActivityLookup::HOST_NOT_SUPPORTED, LocatedRepository::unsupported('codeberg.org', null)), $none, 'lockrot cannot ask codeberg.org about repository activity'];
+        yield 'host not supported' => [ActivityLookup::notRead(ActivityLookup::HOST_NOT_SUPPORTED, LocatedRepository::unsupported('codeberg.org', null)), $none, 'codeberg.org: lockrot cannot ask this host about activity'];
         yield 'not asked, with a repository' => [ActivityLookup::notRead(ActivityLookup::ALLOWLISTED, LocatedRepository::located(new RepoRef(RepoRef::GITHUB, 'github.com', 'symfony/polyfill-intl-idn'))), $none, 'github.com/symfony/polyfill-intl-idn: not asked (allowlisted)'];
         yield 'not asked, no repository' => [ActivityLookup::notRead(ActivityLookup::NO_REPOSITORY, LocatedRepository::none(null)), $none, 'activity not asked (no repository found)'];
     }
 
     /** @dataProvider notFromAComposerRepository */
     #[DataProvider('notFromAComposerRepository')]
-    public function testTheRepositoryLineOfAPackageNotFromAComposerRepositoryPrintsItsLabelOnce(OriginFacts $facts, LocatedRepository $where, string $expected): void
+    public function testTheRepositoryLineOfAPackageNotFromAComposerRepositoryPrintsItsLabelOnce(string $kind, OriginFacts $facts, ConfiguredRepositories $repositories, LocatedRepository $where, string $expected): void
     {
-        $origin = PackageOrigin::of('acme/lib', '1.0.0', $facts, ConfiguredRepositories::none());
+        $origin = PackageOrigin::of('acme/lib', '1.0.0', $facts, $repositories);
         $finding = self::withAge((new FindingBuilder())->withOrigin($origin)->build(), ActivityLookup::notRead(ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, $where), AgeReading::unmeasuredBecause(AgeMeasure::UNDATED));
+        $text = self::plain(self::explain($finding));
 
-        self::assertStringContainsString("\n".$expected."\n", self::plain(self::explain($finding)));
-        self::assertStringNotContainsString('repository repository', self::plain(self::explain($finding)));
+        self::assertSame($kind, $origin->kind());
+        self::assertStringContainsString("\n".$expected."\n", $text);
+        self::assertStringNotContainsString('repository repository', $text);
     }
 
-    /** @return iterable<string, array{OriginFacts, LocatedRepository, string}> */
+    /** @return iterable<string, array{string, OriginFacts, ConfiguredRepositories, LocatedRepository, string}> */
     public static function notFromAComposerRepository(): iterable
     {
-        yield 'path' => [new OriginFacts('', 'path', '../lib', null, null), LocatedRepository::none(null), 'repository activity not asked (not from a Composer repository)'];
-        yield 'vcs' => [new OriginFacts('', null, null, 'git', 'https://github.com/acme/lib.git'), LocatedRepository::located(new RepoRef(RepoRef::GITHUB, 'github.com', 'acme/lib')), 'repository github.com/acme/lib: not asked (not from a Composer repository)'];
-        yield 'unknown origin' => [new OriginFacts('', null, null, null, null), LocatedRepository::none(null), 'repository activity not asked (not from a Composer repository)'];
+        $vcs = ConfiguredRepositories::fromManifest([['type' => 'vcs', 'url' => 'https://github.com/acme/lib']]);
+        yield 'path' => [PackageOrigin::PATH, new OriginFacts('', 'path', '../lib', null, null), ConfiguredRepositories::none(), LocatedRepository::none(null), 'repository activity not asked (not from a Composer repository)'];
+        yield 'vcs' => [PackageOrigin::VCS, new OriginFacts('', null, null, 'git', 'https://github.com/acme/lib'), $vcs, LocatedRepository::located(new RepoRef(RepoRef::GITHUB, 'github.com', 'acme/lib')), 'repository github.com/acme/lib: not asked (not from a Composer repository)'];
+        yield 'unknown origin' => [PackageOrigin::UNKNOWN, new OriginFacts('', null, null, null, null), ConfiguredRepositories::none(), LocatedRepository::none(null), 'repository activity not asked (origin unknown)'];
     }
 
     public function testTheNotCheckedLineJoinsTheMissingAndSkippedChecksByTheirWords(): void
