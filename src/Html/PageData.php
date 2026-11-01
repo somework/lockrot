@@ -8,8 +8,9 @@ use Lockrot\Analyzer\Analysis;
 use Lockrot\Signal\Thresholds;
 
 /**
- * Every field is optional: the install-time path holds none of it and still renders a page. Without
- * `projectPhp`, the project column of the branch rows has no answer ({@see \Lockrot\Signal\PhpFloor}).
+ * Every field is optional. Without the analysis, the thresholds or the target PHP, the page holds the
+ * report and an empty `details`. Without `projectPhp`, the project column of the branch rows has no
+ * answer ({@see \Lockrot\Signal\PhpFloor}).
  *
  * @internal
  */

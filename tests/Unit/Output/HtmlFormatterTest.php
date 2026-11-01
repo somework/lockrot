@@ -225,6 +225,14 @@ final class HtmlFormatterTest extends TestCase
         self::assertSame([], J::arrayAt($payload, ['details']), 'no facts were passed, so there is nothing to explain');
     }
 
+    /** A reader of the page indexes `details` by package name, so it is a JSON object on a clean run too. */
+    public function testTheDetailsAreAJsonObjectWhenNoPackageIsExplained(): void
+    {
+        $page = $this->page($this->report([$this->finding('vendor/pkg', Verdict::OK)]));
+
+        self::assertStringContainsString(',"details":{}}</script>', $page);
+    }
+
     /**
      * Without `--all` the page explains the flagged packages and leaves the rest as rows, which keeps
      * the page small.
