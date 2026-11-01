@@ -162,11 +162,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `security.status` can read `clear`.
   ([Which advisories count](docs/verdicts.md#which-advisories-count))
 - **All formats:** the move check reads `update-with-minimal-changes` and
-  `COMPOSER_MINIMAL_CHANGES`, as Composer does. It leaves `php-ext` and `php-ext-zend` packages
-  out, and loads no vcs, git or artifact repository. A move that needs another release of a name
-  that such a repository serves reads `not_checked` with `unloaded_name`, unless the repository's
-  `only`, `exclude` or `canonical: false` leaves the name out.
-  ([The move check](docs/verdicts.md#the-move-check))
+  `COMPOSER_MINIMAL_CHANGES`, as Composer does. It skips `php-ext` and `php-ext-zend` packages, and
+  loads no vcs, git or artifact repository. A move that needs another release of a name that
+  such a repository serves reads `not_checked` with `unloaded_name`, unless its `only`, `exclude`
+  or `canonical: false` leaves the name out. ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** a `config.platform` value that Composer refuses (`php: false`, a value that is no
   string and not false, a name that is no platform package) makes the move check and `target_fix`
   `not_checked` with `platform_config_invalid`. Composer stops every `composer update` on it.
@@ -236,15 +235,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** the run notes `abandoned_markings_ignored`, `abandoned_not_audited_by_composer`
   and `abandoned_ignore_unreadable` say what Composer's abandoned ignore list and its audit setting
   did. ([Run notes](docs/notes.md#abandoned_markings_ignored))
-- **All formats:** the run note `advisories_disabled_by_policy` names the Composer setting
-  (`config.policy: false`, `policy.advisories: false` or `COMPOSER_POLICY=0`) that turns off
-  Composer's advisory blocking in an update (`composer update`, `require` or `remove`). With
-  `COMPOSER_POLICY` set, it names that variable, which Composer reads in place of `config.policy`.
-  lockrot still asks, and every advisory still counts.
-  ([Run notes](docs/notes.md#advisories_disabled_by_policy))
+- **All formats:** the run note `advisories_disabled_by_policy` names the setting that turns off
+  Composer's advisory blocking in `composer update`, `require` or `remove`: `config.policy: false`,
+  `policy.advisories: false` or `COMPOSER_POLICY=0`, which wins over `config.policy`. lockrot still
+  asks, and every advisory still counts. ([Run notes](docs/notes.md#advisories_disabled_by_policy))
 - **markdown:** `--markdown-max-bytes` keeps a report written through `--output` within a byte
   budget. The report ends at a whole row, and a last row counts the rows it left out.
   ([In CI](docs/ci.md))
+- **github, gitlab, sarif:** when advisories were not checked, one run-level record
+  (`lockrot/advisories-unchecked`) names each advisory repository that failed or that lockrot did
+  not ask, with the reason. sarif adds a `note` notification per repository that lockrot did not
+  ask. ([Marks](docs/ci.md#how-each-format-marks-a-finding))
 - **sarif:** `invocations[0]` carries `exitCode` and `exitCodeDescription`.
   ([SARIF exit code](docs/ci.md#sarif-exit-code))
 - **json:** each `--explain` branch row and each branch row of the html page's details block write

@@ -79,6 +79,7 @@ final class PhpWindow implements \JsonSerializable
      *                                  config; null reads $configuredPhp as the check does
      * @param ?string      $configuredPhp `config.platform.php` of Composer's merged config, which
      *                                    `platform_override` holds; null reads composer.json's
+     *                                    `config.platform.php`
      */
     public static function of(LockFile $lock, ProjectConfig $project, string $targetMinor, array $knownMinors, ?string $solvePhp = null, ?string $configuredPhp = null): ?self
     {

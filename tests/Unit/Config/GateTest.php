@@ -318,6 +318,20 @@ final class GateTest extends TestCase
         self::assertFalse($gate->fails());
     }
 
+    public function testAWorsenedEntryLeavesAFindingWithS10FailingUnchecked(): void
+    {
+        $signals = array_merge(ScoreSweep::signalsOf('abandoned'), [self::s10('repository_activity', 'host_not_supported', ['S3', 'S4'])]);
+        $finding = (new FindingBuilder())->withPackage('a/worse')->withChain(['a/worse'])->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, null, []))->build();
+        $report = self::report($finding);
+        $baseline = BaselineEntries::baseline([BaselineEntries::of('a/worse', '1.0.0', 'stale', '2026-01-01')]);
+        $compared = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'b.json', ['a/worse']));
+
+        $gate = self::gate($compared, 'unchecked');
+
+        self::assertSame([true, true, null], self::standing($gate, 'a/worse'));
+        self::assertSame(['known' => 0, 'new' => 0, 'worsened' => 1, 'none' => 0], $gate->toArray(self::runSettings('unchecked'))['standing']);
+    }
+
     public function testAFindingWithoutS10DoesNotReachUnchecked(): void
     {
         $report = self::report(self::vulnerable('a/stale', ['stale'], []), FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true));

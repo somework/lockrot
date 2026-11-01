@@ -47,7 +47,6 @@ final class PhpFloorTest extends TestCase
         self::assertNull((new PhpFloor('8.4.7'))->blocking('~8.4.0'), 'a patch-level target is read as its minor');
     }
 
-    /** Both hold the branch back: the project's requirement is the reason named, being the one the maintainer wrote. */
     public function testATargetSolvedAtAPatchAdmitsNoReleaseAboveThatPatch(): void
     {
         $floor = new PhpFloor('8.0', '>=7.2');
@@ -63,6 +62,7 @@ final class PhpFloorTest extends TestCase
         self::assertTrue((new PhpFloor('8.0', '>=7.2'))->solvedAt('not a version')->admitsTarget('>=8.0.2'));
     }
 
+    /** Both hold the branch back: the project's requirement is the reason named, being the one the maintainer wrote. */
     public function testTheProjectIsNamedBeforeTheTargetWhenBothBlock(): void
     {
         self::assertSame(PhpFloor::PROJECT, (new PhpFloor('7.4', '>=7.2.5'))->blocking('>=8.1'));
