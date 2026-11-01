@@ -236,7 +236,7 @@ final class RepositoryVersions implements VersionSource
     /**
      * Drops what the names loaded so far: a name without all its versions has no answer.
      *
-     * @param array<string, mixed> $names
+     * @param array<string, null> $names
      *
      * @return list<BasePackage> none
      */
