@@ -146,7 +146,7 @@ final class SarifRecords
             return [
                 'id' => $ruleId,
                 'name' => $name,
-                'shortDescription' => ['text' => self::noLink('Security advisory '.substr($name, \strlen('advisory/')).' affects the installed version')],
+                'shortDescription' => ['text' => self::noLink(TerminalText::neutralise('Security advisory '.substr($name, \strlen('advisory/')).' affects the installed version'))],
                 'fullDescription' => ['text' => 'A counted security advisory affects the installed version: '.$bucket->bucket().' severity.'],
                 'defaultConfiguration' => ['level' => FormatContext::LEVEL_WARNING],
                 'helpUri' => self::HELP_URI.'#security-advisories',
@@ -187,7 +187,7 @@ final class SarifRecords
      */
     public static function message(string $text): array
     {
-        return ['text' => self::noLink(strtr($text, ['{' => '{{', '}' => '}}']))];
+        return ['text' => self::noLink(strtr(TerminalText::neutralise($text), ['{' => '{{', '}' => '}}']))];
     }
 
     /**

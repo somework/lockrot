@@ -117,7 +117,7 @@ final class GitlabFormatter implements FormatterInterface
         return [
             'type' => 'issue',
             'check_name' => 'lockrot/'.$check,
-            'description' => $description,
+            'description' => TerminalText::neutralise($description),
             'categories' => $categories,
             'severity' => $severity,
             'fingerprint' => hash('sha256', 'lockrot|'.$package.'|'.$check),

@@ -292,6 +292,9 @@ mark.
   one record for the run: `lockrot/advisories-unchecked`. It is `error` (`major`) only when
   `unchecked` is a failing value and a finding fails it on an advisory gap. Otherwise it is
   `warning` (`minor`).
+- **Text from the lock or a repository** in a `sarif` or `gitlab` message prints a control
+  character, a bidi control or another character that prints as nothing as an escape, such as
+  `\x1B`.
 - **A finding with S10 and nothing counted** (score 0, whatever its verdict) gets its own
   `lockrot/unchecked` record when `unchecked` is active. `sarif` and `gitlab` also write it under
   `--all`.
