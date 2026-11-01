@@ -48,6 +48,9 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Analyzer/Analyzer.php` LogicalAnd `if ($fixes !== null && $facts->advisories() !== []) {` — a package with no advisory gets an empty scan, which writes the same finding as no scan: no row, no branch fix, no gets.
 - `src/Analyzer/Report.php` AssignCoalesce `$gate ??= $this->gate();` — the gate is derived from the report alone, so computing it again gives the gate that the caller passed.
 - `src/Analyzer/Report.php` UnwrapArraySlice ``$rows[$finding->package()] = \array_slice($row, 0, $lead, true) + ['rank' => $at + 1] + \array_slice($row, $lead, null, true) + [`` — in findingRows(): the union keeps the first of each key, so the whole row in place of its tail adds the same keys in the same order.
+- `src/Analyzer/Report.php` NotCovered x1 `throw new \LogicException(\sprintf('%s has a verdict outside the verdict order: %s', $finding->package(), $finding->verdict()));` — unreachable code. A finding's verdict comes from `ScoreBasis::verdict()`, which returns a value of `ScoreModel::VERDICT_ORDER`.
+- `src/Analyzer/PhpWindow.php` FalseValue `$named = self::byName($project->platformConstraints(ProjectConfig::REQUIRE), false);` — in lockOnlyLinks(): `array_diff_key()` reads only the keys of `$named`, so no code reads its dev mark.
+- `src/Analyzer/PhpWindow.php` TrueValue `$named = array_merge($named, self::byName($project->platformConstraints(ProjectConfig::REQUIRE_DEV), true));` — in lockOnlyLinks(): `array_diff_key()` reads only the keys of `$named`, so no code reads its dev mark.
 - `src/Analyzer/RunNote.php` CastString `$host = (string) $where->host();` — every entry of the host note comes from `LocatedRepository::unsupported()`, which always names a host.
 - `src/Analyzer/UpdateNow.php` CastString `return self::resolved($kept, $findings, RunNote::updateNowReduced(self::inReportOrder(array_keys(array_diff_key($inline, $kept)), $findings), (string) $outcome->problem()));` — a refused combined outcome always carries its problem text.
 
@@ -85,6 +88,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Composer/SelfUpdateCommand.php` FalseValue `$phar = $this->runningPhar ?? \Phar::running(false);` — the two calls differ only inside a running PHAR. Infection does not run the e2e `PharTest`.
 - `src/Composer/SelfUpdateCommand.php` FunctionCallRemoval `class_exists(TerminalText::class);` — the call loads the class before the archive is replaced. From the source tree the autoloader also finds it later.
 - `src/Composer/LockrotCommand.php` Coalesce `$lockrot->project() ?? $project->name(),` — in explain(): explain-2 writes no `run.project`, so no output reads the project name of this run.
+- `src/Composer/LockrotCommand.php` NotCovered x1 `throw new \LogicException('the report carries no run, so it has no gate');` — in gateText(): unreachable code. The caller gets the gate from `gateOf()`, which throws the same exception first when the report carries no run.
 - `src/Composer/RejectsUnreadableInput.php` ProtectedVisibility `protected function inputRefusal(InputInterface $input): ?string` — `LockrotCommand` declares its own `inputRefusal()`, which wins over the trait's. `SelfUpdateCommand` calls the trait's from the same class, where `private` works too.
 - `src/Composer/RejectsUnreadableInput.php` CloneRemoval `$copy = clone $input;` — both commands call `parent::run()` next, and Symfony's `run()` binds the input again with the command's own definition.
 
@@ -136,6 +140,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Graph/DependencyGraph.php` TrueValue `$present[$package->name()] = true;` — a set. Only `isset()` reads it.
 - `src/Graph/DependencyGraph.php` ArrayItemRemoval `foreach (self::satisfying($name, $first) ?? self::satisfying($name, $then) ?? [$name] as $package) {` — a name that no locked package satisfies has no edges: a walk follows only an existing edge, and `namedIn()` answers only for a package with edges.
 - `src/Graph/DependencyGraph.php` TrueValue `$resolved[$package] = true;` — a set. Only its keys are read.
+- `src/Graph/DependencyGraph.php` UnwrapStrToLower `$name = strtolower($name);` — every name arrives in lower case. `LockedPackage::fromPackage()` reads the keys of Composer's links, which `ArrayLoader` lowercases, and `ProjectConfig` lowercases the root's names.
 - `src/Html/ReportDocument.php` Continue_ `continue;` — in details(): the skipped packages are the end of the sorted list, so `break` selects the same packages.
 - `src/Json/JsonReader.php` ReturnRemoval `return false;` — for an empty array, `array_keys([]) === range(0, -1)` is false, so the method returns false too.
 - `src/Lock/ConfiguredRepositories.php` CastString `$host = (string) preg_replace('{:\d+$}', '', strtolower($parts[0]));` — the pattern is a literal, so `preg_replace()` never returns null.
@@ -162,6 +167,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Output/TerminalWidth.php` Coalesce `$width = self::fromEnv($env) ?? self::fromConsoleTerminal($env) ?? FormatContext::DEFAULT_WIDTH;` — `fromConsoleTerminal()` gives null when `COLUMNS` is set, so the order of the first two steps does not matter.
 - `src/Output/HtmlFormatter.php` UnwrapArrayFilter and UnwrapArrayValues `return \is_array($reads) ? array_values(array_filter($reads, 'is_int')) : [];` — the vendored manifest lists its report numbers as a JSON list of integers, so the filter keeps every item and the keys stay `0..n-1`.
 - `src/Output/SarifFormatter.php` CastString `return TerminalText::breakJsonLogCommands((string) preg_replace('{^( {20}"rank": -?\d+)(,?)$}m', '$1.0$2', $json))."\n";` — the pattern is a constant that compiles, so `preg_replace()` returns a string and never null.
+- `src/Output/TableFormatter.php` NotCovered x1 `continue;` — unreachable code. `MoveText::parts()` gives no piece that is empty or only whitespace.
 
 ## src/Security
 - `src/Security/FixFinder.php` UnwrapArrayValues `$onBranch = array_values(array_filter($this->candidates($package, $releases), static fn (Candidate $candidate): bool => $candidate->branchKey() === $for->branchKey()));` — `newestAllowed()` reads the candidates in order and never by key.
