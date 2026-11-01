@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Signal\Rule;
 
 use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Signal\ConstraintOpenness;
 use Lockrot\Signal\Data\OldPromiseData;
 use Lockrot\Signal\PackageFacts;
@@ -38,7 +39,9 @@ final class OldPromiseRule implements SignalRule
     public function evaluate(PackageFacts $facts): ?Signal
     {
         $package = $facts->package();
-        $released = $package->time();
+        $installed = InstalledRelease::of($package, $facts->metadata());
+        // A branch snapshot is the code of its commit's day, so that commit's date is the one to judge.
+        $released = $installed->kind() === InstalledRelease::BRANCH_SNAPSHOT ? $installed->lockTime() : $installed->at();
         $constraint = $package->requirePhp();
         $ga = $this->dates->gaDate($this->targetMajor);
         if ($released === null || $constraint === null || $ga === null || $released >= $ga) {
@@ -67,5 +70,27 @@ final class OldPromiseRule implements SignalRule
             $writtenFor === null || $writtenFor === 0 ? null : $writtenFor,
             $released->format(\DATE_ATOM)
         ));
+    }
+
+    /**
+     * Whether S5 stays undecided because the installed release has no date that lockrot trusts.
+     * A lock date at or after the GA clears S5 anyway: a split's shared commit predates its release.
+     */
+    public function missesATrustedDate(PackageFacts $facts): bool
+    {
+        $package = $facts->package();
+        $metadata = $facts->metadata();
+        if ($metadata === null) {
+            return false;
+        }
+        $installed = InstalledRelease::of($package, $metadata);
+        $constraint = $package->requirePhp();
+        $ga = $this->dates->gaDate($this->targetMajor);
+        if ($installed->isDated() || $package->isBranchSnapshot() || $constraint === null || $ga === null) {
+            return false;
+        }
+        $lockTime = $installed->lockTime();
+
+        return ($lockTime === null || $lockTime < $ga) && $this->openness->isOpenEndedFor($constraint, $this->targetPhp);
     }
 }

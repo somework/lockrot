@@ -1,6 +1,6 @@
 {
     "words": {
-        "above_listed_releases": "installed above every listed release",
+        "above_listed_releases": "installed above every listed stable release",
         "accepted_by_config": "accepted by your accept-unchecked list",
         "allowlisted": "allowlisted",
         "anonymous_budget": "anonymous request budget spent",

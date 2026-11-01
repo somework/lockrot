@@ -423,8 +423,9 @@ final class RootRecount
     }
 
     /**
-     * Every rule of the score model in model order. `sort` changes no number. A finding's numbers
-     * show no gate rule, so each gate rule stays at 0.
+     * Every rule of the score model in model order. `sort` changes no number. `gate-bounded-new`
+     * counts a graded finding whose gate basis the cap limits, `baseline-cover` a finding with a
+     * covered flag.
      *
      * @param list<array<mixed, mixed>> $findings
      *
@@ -435,6 +436,12 @@ final class RootRecount
         $used = array_fill_keys(['counted', 'lead-first', 'corroborating-share', 'advisory-points', 'no-reachable-fix-multiplier', 'security-max', 'divide-reach', 'security-exempt-from-reach', 'sum', 'divide-dev', 'floor-once', 'band-floors', 'zero-verdicts'], 0)
             + ['sort' => null, 'gate-bounded-new' => 0, 'baseline-cover' => 0];
         foreach ($findings as $finding) {
+            $used['gate-bounded-new'] += isset($finding['score']['terms']) && self::str(self::map(self::map($finding, 'gate'), 'basis'), 'limited_by') === 'cap' ? 1 : 0;
+            $covered = false;
+            foreach (self::rows($finding, 'flags') as $flag) {
+                $covered = $covered || self::str(self::map($flag, 'baseline'), 'state') === 'covered';
+            }
+            $used['baseline-cover'] += $covered ? 1 : 0;
             $score = self::map($finding, 'score');
             $accepted = self::rows($score, 'accepted');
             if ($accepted !== []) {

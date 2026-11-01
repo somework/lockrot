@@ -49,16 +49,17 @@ final class SignalSet
         $floor = new PhpFloor($targetPhp, $projectPhp);
         $cap = new PhpCap($dates->minors($clock), $projectPhp, $platformPhp);
 
+        $oldPromise = new OldPromiseRule(new ConstraintOpenness(), $dates, $targetPhp);
         $set = new self([
             new AbandonedRule(),
             new NoReleaseRule($clock, $thresholds),
             new ArchivedRule(),
             new NoPushRule($clock, $thresholds),
-            new OldPromiseRule(new ConstraintOpenness(), $dates, $targetPhp),
+            $oldPromise,
             new PinnedRule(),
             new LeftBehindRule($clock, $thresholds, $floor),
             new AdvisoryRule(),
-            new NotCheckedRule(new LeftBehindRule($clock, $thresholds, $floor), new CappedRule($cap, $floor)),
+            new NotCheckedRule(new LeftBehindRule($clock, $thresholds, $floor), new CappedRule($cap, $floor), $oldPromise),
             new CappedRule($cap, $floor),
         ], $floor);
         $set->thresholds = $thresholds;

@@ -292,7 +292,9 @@ Each branch row in the JSON carries:
 S5 fires when all of these hold:
 
 1. The installed release was published before the GA of the target PHP's major: 8.0 for any 8.x
-   target, not the target minor.
+   target, not the target minor. The release date is the [trusted date](#dates-from-the-monorepo)
+   of the installed version, and a branch snapshot's date is its commit's. Without a trusted date,
+   S5 does not fire, and S10 names S5 when the lock's date is before that GA or absent.
 
 2. Its `require.php` has no upper bound.
 
@@ -406,7 +408,8 @@ list names. lockrot cannot date a split that no package replaces as `self.versio
 request on it.
 
 - The parent dates the installed version too. Where it lists the same version, its date replaces
-  the lock's shared-commit `time` for [libyears](#libyears) and `age.installed`. `--explain` prints
+  the lock's shared-commit `time` for [libyears](#libyears), `age.installed` and
+  [S5](#old-promise). `--explain` prints
   it as `installed release` (`installed_release_dated_by` in JSON). Where it does not, the
   package is unmeasured.
 
@@ -1203,7 +1206,7 @@ formats print only under `--all`, keeps its verdict and adds the same `checks mi
 | `repository_activity` | `host_not_supported` | The repository is on a host that lockrot cannot ask ([host note](notes.md#repository_activity_host_not_supported)) | S3, S4 |
 | `repository_activity` | `not_from_composer_repository` | The package comes from vcs, or from an origin that lockrot cannot tell: lockrot asks no host for it | S3, S4 |
 | `release_metadata` | `not_from_composer_repository` | The same origins: no Composer repository serves its releases | S2, S8 |
-| `release_dates` | `undated_releases` | A release that S2 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it | S2 when the highest tag is undated. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
+| `release_dates` | `undated_releases` | A release that S2, S5 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it | S2 when the highest tag is undated. S5 when the installed release is undated, its lock date is before the GA of the target's major or absent, and the other two [S5 conditions](#old-promise) hold. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
 | `advisories` | `offline`, `install_time_budget`, `lookup_failed`, `no_feed` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
 | `releases` | `releases_unknown` | A counted advisory's fix is unknown because the package's release data did not come | S9 |
 
