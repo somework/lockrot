@@ -881,8 +881,9 @@ Limits of the check:
   `composer_json_invalid`). Composer refuses such a file, for example for a requirement name that
   is no package name.
 - A run whose `config.platform` holds a value that Composer refuses checks no move (`check.reason`
-  `platform_config_invalid`). Composer refuses `php: false` and a value that is no string and not
-  false, so each `composer update` stops. The run still writes its report.
+  `platform_config_invalid`). Composer refuses `php: false`, a value that is no string and not
+  false, and a name that is no platform package. Each `composer update` then stops. The run still
+  writes its report.
 - The check does not read whether the lock has a `packages-dev` key. A lock without that key can
   get a move that resolves and its command, but Composer refuses an update with require-dev on
   such a lock.

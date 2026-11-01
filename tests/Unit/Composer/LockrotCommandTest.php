@@ -1378,6 +1378,26 @@ final class LockrotCommandTest extends TestCase
         });
     }
 
+    /** Ruling R8-37: a config.platform value that Composer refuses checks no move, and the exit code stays that of the findings. */
+    public function testAConfigPlatformValueThatComposerRefusesLeavesEveryMoveUncheckedForThatReason(): void
+    {
+        $project = $this->tempDir('lockrot-invalid-platform-');
+        file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/invalid-platform-test', 'require' => ['acme/kept' => '1.0.0'], 'config' => ['platform' => ['ext-intl' => true]]]));
+        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));
+        chdir($project);
+        $loader = $this->emptyLoader();
+        $command = $this->buildCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?\Closure $checks = null): Analyzer => self::withChecks(self::testAnalyzer($loader, $lockrot, $clock), $checks));
+
+        $this->withComposerEnv($this->tempDir('lockrot-invalid-platform-cache-'), $this->tempDir('lockrot-invalid-platform-home-'), function () use ($command): void {
+            [$code, $stdout, $stderr] = $this->runCommandWithSplitStreams($command, ['--format' => 'json', '--target-php' => '8.4']);
+
+            self::assertSame(0, $code, $stderr);
+            $json = json_decode($stdout, true);
+            self::assertIsArray($json);
+            self::assertSame(['not_checked', MoveCheck::PLATFORM_CONFIG_INVALID], [JsonPath::stringAt($json, ['run', 'move_check', 'baseline']), JsonPath::stringAt($json, ['run', 'move_check', 'reason'])]);
+        });
+    }
+
     /**
      * A lock name that looks like markup is no Composer package name: lockrot skips the entry and
      * says so in a run note whose text names no package. lockrot writes the table past Symfony's

@@ -41,14 +41,12 @@ final class MoveCheckers
     {
         $overrides = [];
         $configured = $config->get('platform');
-        // Composer's PlatformRepository refuses a value that is no string and not false, and `php` (as written) of false, then lower-cases each name.
+        // Composer's PlatformRepository refuses a value that is no string and not false, `php` (as written) of false and a name that is no platform package.
         foreach (\is_array($configured) ? $configured : [] as $name => $version) {
-            if ((!\is_string($version) && $version !== false) || ($name === 'php' && $version === false)) {
+            if ((!\is_string($version) && $version !== false) || ($name === 'php' && $version === false) || !PlatformRepository::isPlatformPackage((string) $name)) {
                 return new UncheckedMoves(MoveCheck::PLATFORM_CONFIG_INVALID);
             }
-            if (\is_string($name)) {
-                $overrides[strtolower($name)] = $version;
-            }
+            $overrides[strtolower((string) $name)] = $version;
         }
         $platformNames = array_keys($overrides);
         $configured = self::configuredPhp($config);

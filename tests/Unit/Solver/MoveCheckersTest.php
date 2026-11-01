@@ -97,7 +97,8 @@ final class MoveCheckersTest extends TestCase
 
     /**
      * Ruling R8-37: Composer's PlatformRepository refuses each `config.platform` value that is no
-     * string and not false, and a php of false, so every `composer update` stops. No move resolves.
+     * string and not false, a php of false and a name that is no platform package, so every
+     * `composer update` stops. No move resolves.
      *
      * @dataProvider platformsThatComposerRefuses
      *
@@ -124,6 +125,7 @@ final class MoveCheckersTest extends TestCase
         yield 'php false' => [['php' => false]];
         yield 'an extension true' => [['php' => '8.4.3', 'ext-intl' => true]];
         yield 'a library as a number' => [['lib-lockrot-test' => 1]];
+        yield 'a name that is no platform package' => [['php' => '8.4.3', 'acme/lib' => '1.0.0']];
     }
 
     /** Composer lower-cases each `config.platform` name, so `PHP` is the project's php. */
