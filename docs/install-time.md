@@ -91,10 +91,14 @@ cap ([run notes](notes.md)) prints nothing on its own. The unknown-key line stil
 
 ## Time budget
 
-Once `install-time-budget` seconds have passed, the install-time check starts no new metadata or
-advisory request, and it cuts repository-activity requests to the time left. A request that is
-already running finishes first, so an install can take somewhat longer than the budget.
-`composer lockrot` has no budget.
+Once `install-time-budget` seconds have passed, the install-time check starts no new metadata,
+advisory or repository-activity request. A repository-activity request gets the time left as its
+timeout. Composer sets the timeout of a metadata or advisory request, and lockrot cannot shorten it.
+So a metadata or advisory request that is already running can hold the install for Composer's
+timeout, and Composer can retry a failed transfer. With curl, the timeout of one request is
+`default_socket_timeout` or 300 seconds, whichever is larger
+([Composer 2.10.0](https://github.com/composer/composer/blob/2.10.0/src/Composer/Util/Http/CurlDownloader.php)).
+A warm Composer cache sends fewer requests. `composer lockrot` has no budget.
 
 ```json
 {
