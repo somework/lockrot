@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
@@ -26,7 +27,7 @@ final class SweepWorkflowPathsTest extends TestCase
     {
         $patterns = self::pullRequestPaths();
         $files = array_merge(
-            array_filter(self::phpFiles('tests'), static fn (string $path): bool => preg_match("/^\\s*#\\[Group\\('sweep'\\)\\]/m", (string) file_get_contents(self::ROOT.'/'.$path)) === 1),
+            array_filter(self::phpFiles('tests'), static fn (string $path): bool => self::declaresTheSweepGroup((string) file_get_contents(self::ROOT.'/'.$path))),
             array_filter(self::phpFiles('tests/Support'), static fn (string $path): bool => strpos(basename($path), 'Sweep') !== false),
         );
         sort($files);
@@ -44,6 +45,28 @@ final class SweepWorkflowPathsTest extends TestCase
         }));
 
         self::assertSame([], $unmatched, 'add each file to the pull_request paths of .github/workflows/sweep.yml');
+    }
+
+    /** @dataProvider groupDeclarations */
+    #[DataProvider('groupDeclarations')]
+    public function testASweepGroupDeclarationIsFoundInEachFormThatPhpunitReads(string $source, bool $sweep): void
+    {
+        self::assertSame($sweep, self::declaresTheSweepGroup($source), $source);
+    }
+
+    /** @return iterable<string, array{string, bool}> */
+    public static function groupDeclarations(): iterable
+    {
+        yield 'attribute' => ["#[Group('sweep')]\nfinal class A", true];
+        yield 'qualified attribute' => ["#[\\PHPUnit\\Framework\\Attributes\\Group('sweep')]\nfinal class A", true];
+        yield 'annotation' => ["/**\n * @group sweep\n */\nfinal class A", true];
+        yield 'another group' => ["/**\n * @group sweeper\n */\n#[Group('sweeper')]\nfinal class A", false];
+        yield 'a string' => ['$x = "#[Group(\'sweep\')]";', false];
+    }
+
+    private static function declaresTheSweepGroup(string $source): bool
+    {
+        return preg_match("/^\\s*(?:\\*\\s*@group\\s+sweep\\s*$|#\\[(?:\\\\?PHPUnit\\\\Framework\\\\Attributes\\\\)?Group\\('sweep'\\)\\])/m", $source) === 1;
     }
 
     /**
