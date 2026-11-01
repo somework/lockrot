@@ -683,6 +683,7 @@ def explain_schema():
         "metadata, activity or libyears. It asks for its advisories by name, except under `advisory-lookup: composer-repositories`. True does not mean "
         "packagist.org. Stays a boolean for 1.x: the finer account of where an entry came from is `origin`, and this key is true exactly when `origin.kind` is "
         "`packagist` or `composer`. Same value as the finding's `from_composer_repository`.")
+    lock['properties']['released']['description'] += ' Null when the lock entry has no `time`.'
     D['lock'] = lock
     D['metadata'] = explain_metadata()
     D['repositoryMetadata'] = D.pop('metadata')
@@ -946,9 +947,9 @@ MEMBER_DESCRIPTIONS = {
     ('properties', 'install-time-budget'): 'Seconds the install-time pass may take, 1–120 (default 5). config-1 unchanged.',
     ('properties', 'baseline'): 'The baseline file, relative to composer.json (§6.4). lockrot 0.14 reads baseline-2 only; a baseline-1 file exits 2 until --generate-baseline overwrites it.',
     ('properties', 'release-warn-years'): 'Years without a stable release at which S2 (no stable release) and S8 (none on the installed branch) reach `warn` (default 3). config-1 unchanged.',
-    ('properties', 'release-high-years'): 'Years without a stable release at which S2 and S8 reach `high` (default 5). config-1 unchanged.',
+    ('properties', 'release-high-years'): 'Years without a stable release at which S2 and S8 reach `high` (default 5). A value below `release-warn-years` is refused: the run exits 2. config-1 unchanged.',
     ('properties', 'push-warn-years'): 'Years without a push or commit at which S4 reaches `warn` (default 3). config-1 unchanged.',
-    ('properties', 'push-high-years'): 'Years without a push or commit at which S4 reaches `high` (default 5). config-1 unchanged.',
+    ('properties', 'push-high-years'): 'Years without a push or commit at which S4 reaches `high` (default 5). A value below `push-warn-years` is refused: the run exits 2. config-1 unchanged.',
 }
 
 

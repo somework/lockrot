@@ -491,6 +491,23 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertNotSame([], $this->errors(Schemas::REPORT, $json, true));
     }
 
+    /**
+     * lockrot always writes the thresholds, and S2 fires only on a dated release, so neither value
+     * has a null meaning.
+     */
+    public function testRunThresholdsAndTheS2LastVersionAreNeverNull(): void
+    {
+        $noThresholds = self::wallabagReport();
+        self::object($noThresholds->run)->thresholds = null;
+        $noLastVersion = self::wallabagReport();
+        self::object(self::firstSignal($noLastVersion, Signal::S2)->data)->last_version = null;
+
+        foreach ([false, true] as $strict) {
+            self::assertNotSame([], $this->errors(Schemas::REPORT, (string) json_encode($noThresholds), $strict), 'run.thresholds');
+            self::assertNotSame([], $this->errors(Schemas::REPORT, (string) json_encode($noLastVersion), $strict), 'S2 last_version');
+        }
+    }
+
     public function testTheExplanationAcceptsASignalIdALaterReleaseOrAnExtensionAdds(): void
     {
         $analysis = self::analysis('apps/wallabag_wallabag');

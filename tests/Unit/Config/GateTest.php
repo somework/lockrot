@@ -302,14 +302,20 @@ final class GateTest extends TestCase
         self::assertSame([true, true, null], self::standing($gate, 'a/new'));
     }
 
-    /** docs/baseline.md, "Graded findings only": an entry that an incomplete lookup carried forward exempts no score-0 finding. */
-    public function testABaselineEntryDoesNotExemptAnUngradedFindingFromUnchecked(): void
+    /** docs/baseline.md, "Whichever value": a `known` finding fails no value, `unchecked` included, also at score 0. */
+    public function testAKnownEntryExemptsAScoreZeroFindingFromUnchecked(): void
     {
         $report = self::report(self::unread('a/unread'));
         $baseline = BaselineEntries::baseline([BaselineEntries::of('a/unread', '1.0.0', 'abandoned', '2026-01-01')]);
         $compared = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'b.json', ['a/unread']));
 
-        self::assertSame([true, true, null], self::standing(self::gate($compared, 'unchecked'), 'a/unread'));
+        $gate = self::gate($compared, 'unchecked');
+
+        self::assertSame([true, false, 'baseline'], self::standing($gate, 'a/unread'));
+        $root = $gate->toArray(self::runSettings('unchecked'));
+        self::assertSame(['known' => 1, 'new' => 0, 'worsened' => 0, 'none' => 0], $root['standing']);
+        self::assertSame([], $root['failing_packages']);
+        self::assertFalse($gate->fails());
     }
 
     public function testAFindingWithoutS10DoesNotReachUnchecked(): void

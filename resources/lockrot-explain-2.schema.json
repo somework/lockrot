@@ -3008,7 +3008,7 @@
             "minLength": 1
         },
         "branchReleaseUnmeasured": {
-            "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.branch_release` is null. The metadata was not read (the `metadata.status` value, which comes first). Or the installed line has no dated release: a snapshot names no line, the branch has no release, or its releases have no date. Or the installed version is above every listed release. An open set: read an unknown reason as another reason.",
+            "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.branch_release` is null. The metadata was not read (the `metadata.status` value, which comes first). Or the installed line has no dated release: a snapshot names no line, the branch has no release, or its releases have no date. Or a stable installed version is above every listed stable release (`above_listed_releases`). An installed pre-release above the newest stable release of its branch is read against that release. An open set: read an unknown reason as another reason.",
             "type": "string",
             "pattern": "^[a-z][a-z0-9_]*$",
             "x-known-values": [
@@ -3233,7 +3233,7 @@
             }
         },
         "depth": {
-            "description": "The fewest hops from a composer.json requirement that the run walked to the package: the length of `chain` minus one. No score, gate, sort or baseline reads it.",
+            "description": "The fewest hops from a composer.json requirement that the run walked to the package: the length of `chain` minus one. No score, gate, sort or baseline reads it. Null exactly when `depth_unmeasured` is set: the run walked no path to the package.",
             "type": [
                 "integer",
                 "null"
@@ -3313,7 +3313,7 @@
                     ]
                 },
                 "project_php": {
-                    "description": "The project's `require.php` as written (report-1); never parse it.",
+                    "description": "The project's `require.php` as written (report-1); never parse it. Null when composer.json has no `require.php`, an empty one, or no composer.json was read.",
                     "type": [
                         "string",
                         "null"
@@ -3338,34 +3338,27 @@
                 },
                 "thresholds": {
                     "description": "The ages, in years, that raise `silent`, `left-behind` and `stale`: each flag of `score_model.flags` names the keys that it reads in `thresholds`.",
-                    "oneOf": [
-                        {
-                            "type": "object",
-                            "required": [
-                                "release-warn-years",
-                                "release-high-years",
-                                "push-warn-years",
-                                "push-high-years"
-                            ],
-                            "properties": {
-                                "release-warn-years": {
-                                    "$ref": "#/definitions/years"
-                                },
-                                "release-high-years": {
-                                    "$ref": "#/definitions/years"
-                                },
-                                "push-warn-years": {
-                                    "$ref": "#/definitions/years"
-                                },
-                                "push-high-years": {
-                                    "$ref": "#/definitions/years"
-                                }
-                            }
+                    "type": "object",
+                    "required": [
+                        "release-warn-years",
+                        "release-high-years",
+                        "push-warn-years",
+                        "push-high-years"
+                    ],
+                    "properties": {
+                        "release-warn-years": {
+                            "$ref": "#/definitions/years"
                         },
-                        {
-                            "type": "null"
+                        "release-high-years": {
+                            "$ref": "#/definitions/years"
+                        },
+                        "push-warn-years": {
+                            "$ref": "#/definitions/years"
+                        },
+                        "push-high-years": {
+                            "$ref": "#/definitions/years"
                         }
-                    ]
+                    }
                 },
                 "flag_ids": {
                     "description": "The eight flag ids in flag order (the vocabulary used, not a setting).",
@@ -3442,7 +3435,7 @@
                     "$ref": "#/definitions/advisoryLookup"
                 },
                 "move_check": {
-                    "description": "How Composer's solver checked the run's moves. `composer lockrot` always writes it. A run that checks no move says why in `baseline` and `reason`.",
+                    "description": "How Composer's solver checked the run's moves. `composer lockrot` always writes it. A run that checks no move says why in `baseline` and `reason`. Null means a report built without the move check, such as the contract fixtures.",
                     "oneOf": [
                         {
                             "description": "The move check of the run.",
@@ -3597,7 +3590,7 @@
                             ],
                             "properties": {
                                 "platform_override": {
-                                    "description": "The lock's `platform-overrides.php`: the PHP at which `composer install` checks the lock.",
+                                    "description": "`config.platform.php` from Composer's merged config (composer.json, then the global `config.json`): the PHP at which `composer update` solves, which the move check and `target_fix` read. Null when no config sets it. The lock's `platform-overrides` records the value of the last update, and `composer install` checks the lock at that value.",
                                     "type": [
                                         "string",
                                         "null"
@@ -3613,7 +3606,7 @@
                                     ],
                                     "properties": {
                                         "php": {
-                                            "description": "The php that the move check solves at: `config.platform.php` when it lies in the target minor, else the minor at patch 99.",
+                                            "description": "The php that the move check solves at: `config.platform.php` when it is a stable release in the target minor, in its normalized `X.Y.Z` form (`v8.4.1` and `8.4.1-p1` give `8.4.1`), else the minor at patch 99.",
                                             "type": "string",
                                             "pattern": "^[0-9]+(\\.[0-9]+)*$"
                                         },
@@ -3664,7 +3657,7 @@
                     ]
                 },
                 {
-                    "description": "`run.php_window.target_fix.reason` is null on a `not_checked` fix exactly when `move_check` is null: a run that checks no move names no reason.",
+                    "description": "`run.php_window.target_fix.reason` is null on a `not_checked` fix exactly when `move_check` is null: a report built without the move check names no reason. A run that checks no move writes `move_check` and names its reason.",
                     "anyOf": [
                         {
                             "not": {
@@ -11971,7 +11964,7 @@
                     "type": "boolean"
                 },
                 "exempt_by": {
-                    "description": "What keeps a reaching finding from failing: `baseline` when the finding reaches a value and the baseline is why it fails none. A grade value does not fail while the gate score stays below it. A flag value does not fail while the baseline entry covers each counted flag that reaches it, and a `vulnerable` value while the entry knows each counted advisory that reaches it. An `unchecked` value does not fail while the gate score is 0. So a `known` finding is exempt from every value. Set only under a baseline entry. An open set.",
+                    "description": "What keeps a reaching finding from failing: `baseline` when the finding reaches a value and the baseline is why it fails none. A grade value does not fail while the gate score stays below it. A flag value does not fail while the baseline entry covers each counted flag that reaches it, and a `vulnerable` value while the entry knows each counted advisory that reaches it. An `unchecked` value does not fail while the gate score is 0. So a `known` finding is exempt from every value, `unchecked` included, also when its score is 0. Set only under a baseline entry. Null when nothing exempts the finding. An open set.",
                     "oneOf": [
                         {
                             "type": "string",
@@ -13166,7 +13159,7 @@
                             "$ref": "#/definitions/verdict"
                         },
                         "lead": {
-                            "description": "The holder's `lead`.",
+                            "description": "The holder's `lead`; null when no flag of the holder counts.",
                             "oneOf": [
                                 {
                                     "$ref": "#/definitions/maintenanceFlag"
@@ -13189,7 +13182,7 @@
                             "type": "boolean"
                         },
                         "replacement": {
-                            "description": "The holder's `replacement` (a Composer package name), so an abandoned holder reads \"held by abandoned symfony/x (replacement: …)\".",
+                            "description": "The holder's `replacement` (a Composer package name), null when the holder's is null, so an abandoned holder reads \"held by abandoned symfony/x (replacement: …)\".",
                             "oneOf": [
                                 {
                                     "$ref": "#/definitions/packageName"
@@ -13232,7 +13225,7 @@
                                             ]
                                         },
                                         "to_branch": {
-                                            "description": "The holder's `next_step.to_branch`.",
+                                            "description": "The holder's `next_step.to_branch`; null when the holder's is null.",
                                             "oneOf": [
                                                 {
                                                     "$ref": "#/definitions/branchLabel"
@@ -13243,7 +13236,7 @@
                                             ]
                                         },
                                         "constraint": {
-                                            "description": "The holder's `next_step.constraint`.",
+                                            "description": "The holder's `next_step.constraint`; null when the holder's is null.",
                                             "type": [
                                                 "string",
                                                 "null"
@@ -13442,7 +13435,7 @@
                     ]
                 },
                 "title": {
-                    "description": "Its title, without a leading `<cve>: `.",
+                    "description": "Its title, without a leading `<cve>: `; null when the repository serves only the partial advisory form (id and affected range).",
                     "type": [
                         "string",
                         "null"
@@ -13606,7 +13599,7 @@
                     ]
                 },
                 "released": {
-                    "description": "The lock's `time` for the installed version, as Composer wrote it. A release's date only where the repository dated the version by one: for a branch snapshot it is the commit's (`branch_snapshot` is then true), and for a subtree split's tag it can be the date of a commit the tag shares with others. `metadata.installed_release` is the date lockrot reads as the release's.",
+                    "description": "The lock's `time` for the installed version, as Composer wrote it. A release's date only where the repository dated the version by one: for a branch snapshot it is the commit's (`branch_snapshot` is then true), and for a subtree split's tag it can be the date of a commit the tag shares with others. `metadata.installed_release` is the date lockrot reads as the release's. Null when the lock entry has no `time`.",
                     "oneOf": [
                         {
                             "$ref": "#/definitions/dateTime"
@@ -15102,7 +15095,7 @@
                             ]
                         },
                         "reason": {
-                            "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note). An open set.",
+                            "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), `platform_config_invalid` (Composer refuses a `config.platform` value of its merged config: `php: false`, or a value that is neither a string nor false), `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note). An open set.",
                             "oneOf": [
                                 {
                                     "type": "string",
@@ -15305,7 +15298,7 @@
             ],
             "properties": {
                 "policy_key": {
-                    "description": "The full Composer config key, or the environment variable `COMPOSER_POLICY`. Open.",
+                    "description": "The full Composer config key, or the environment variable `COMPOSER_POLICY`. Open. When `COMPOSER_POLICY` is set, Composer reads it in place of `config.policy`, so the key is `COMPOSER_POLICY`, as in `run.move_check.blocking_disabled_by`.",
                     "type": "string",
                     "pattern": "^([a-z][a-z0-9_.-]*|[A-Z][A-Z0-9_]*)$",
                     "x-known-values": [
@@ -16698,7 +16691,7 @@
             ]
         },
         "releaseUnmeasured": {
-            "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.release` is null: the metadata was not read (the `metadata.status` value), no stable release, or no dated stable release. An open set: read an unknown reason as another reason.",
+            "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.release` is null: the metadata was not read (the `metadata.status` value), no stable release (`no_stable_release`), or the highest stable tag has no trusted date (`undated_releases`): it has no date, or its date is a commit that the split's tags share, also when lower releases are dated. An open set: read an unknown reason as another reason.",
             "type": "string",
             "pattern": "^[a-z][a-z0-9_]*$",
             "x-known-values": [
@@ -16776,7 +16769,7 @@
                                             "$ref": "#/definitions/grade"
                                         },
                                         "lead": {
-                                            "description": "Its lead.",
+                                            "description": "Its lead; null when no maintenance flag counts.",
                                             "oneOf": [
                                                 {
                                                     "$ref": "#/definitions/maintenanceFlag"
@@ -17196,7 +17189,7 @@
                     ]
                 },
                 "replacement": {
-                    "description": "The replacement as the registry or the lock wrote it: free text, a package name or a URL (data; `next_step.replacement` classifies it). Text, never markup.",
+                    "description": "The replacement as the registry or the lock wrote it: free text, a package name or a URL (data; `next_step.replacement` classifies it). Text, never markup. Null when the package is abandoned with no replacement named (`abandoned: true`).",
                     "type": [
                         "string",
                         "null"
@@ -17342,11 +17335,8 @@
                     "$ref": "#/definitions/dateTime"
                 },
                 "last_version": {
-                    "description": "The version `last_release` dates.",
-                    "type": [
-                        "string",
-                        "null"
-                    ]
+                    "description": "The version `last_release` dates. S2 fires only on a dated release, so it is never null.",
+                    "type": "string"
                 },
                 "years": {
                     "$ref": "#/definitions/years"
@@ -17620,7 +17610,7 @@
                                 "$ref": "#/definitions/grade"
                             },
                             "lead": {
-                                "description": "Its lead.",
+                                "description": "Its lead; null when no maintenance flag counts.",
                                 "oneOf": [
                                     {
                                         "$ref": "#/definitions/maintenanceFlag"
@@ -18097,7 +18087,7 @@
                     ]
                 },
                 "title": {
-                    "description": "Its title without a leading `<cve>: `, so `{cve} {title}` never prints the CVE twice; trimmed, runs of whitespace collapsed. Text, never markup: a page that styles backticks escapes them here.",
+                    "description": "Its title without a leading `<cve>: `, so `{cve} {title}` never prints the CVE twice; trimmed, runs of whitespace collapsed. Text, never markup: a page that styles backticks escapes them here. Null when the repository serves only the partial advisory form (id and affected range).",
                     "type": [
                         "string",
                         "null"
@@ -19193,7 +19183,7 @@
                                 "minimum": 1
                             },
                             "max_maintenance": {
-                                "description": "The most corroboration can add under it as lead.",
+                                "description": "The most corroboration can add under it as lead; null for the security flag `vulnerable`.",
                                 "type": [
                                     "integer",
                                     "null"
@@ -19201,7 +19191,7 @@
                                 "minimum": 1
                             },
                             "max_maintenance_flags": {
-                                "description": "The flag set that reaches `max_maintenance`.",
+                                "description": "The flag set that reaches `max_maintenance`; null exactly when `max_maintenance` is null.",
                                 "oneOf": [
                                     {
                                         "description": "Flags.",

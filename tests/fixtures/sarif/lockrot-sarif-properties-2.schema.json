@@ -643,7 +643,7 @@
       "minLength": 1
     },
     "branchReleaseUnmeasured": {
-      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.branch_release` is null. The metadata was not read (the `metadata.status` value, which comes first). Or the installed line has no dated release: a snapshot names no line, the branch has no release, or its releases have no date. Or the installed version is above every listed release. An open set: read an unknown reason as another reason.",
+      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.branch_release` is null. The metadata was not read (the `metadata.status` value, which comes first). Or the installed line has no dated release: a snapshot names no line, the branch has no release, or its releases have no date. Or a stable installed version is above every listed stable release (`above_listed_releases`). An installed pre-release above the newest stable release of its branch is read against that release. An open set: read an unknown reason as another reason.",
       "type": "string",
       "pattern": "^[a-z][a-z0-9_]*$",
       "x-known-values": [
@@ -662,7 +662,7 @@
       "description": "An ISO 8601 date-time with its offset, as lockrot writes every instant (`2026-10-01T17:39:31+00:00`)."
     },
     "depth": {
-      "description": "The fewest hops from a composer.json requirement that the run walked to the package: the length of `chain` minus one. No score, gate, sort or baseline reads it.",
+      "description": "The fewest hops from a composer.json requirement that the run walked to the package: the length of `chain` minus one. No score, gate, sort or baseline reads it. Null exactly when `depth_unmeasured` is set: the run walked no path to the package.",
       "type": [
         "integer",
         "null"
@@ -1356,7 +1356,7 @@
               "$ref": "#/definitions/verdict"
             },
             "lead": {
-              "description": "The holder's `lead`.",
+              "description": "The holder's `lead`; null when no flag of the holder counts.",
               "oneOf": [
                 {
                   "$ref": "#/definitions/maintenanceFlag"
@@ -1379,7 +1379,7 @@
               "type": "boolean"
             },
             "replacement": {
-              "description": "The holder's `replacement` (a Composer package name), so an abandoned holder reads \"held by abandoned symfony/x (replacement: …)\".",
+              "description": "The holder's `replacement` (a Composer package name), null when the holder's is null, so an abandoned holder reads \"held by abandoned symfony/x (replacement: …)\".",
               "oneOf": [
                 {
                   "$ref": "#/definitions/packageName"
@@ -1422,7 +1422,7 @@
                       ]
                     },
                     "to_branch": {
-                      "description": "The holder's `next_step.to_branch`.",
+                      "description": "The holder's `next_step.to_branch`; null when the holder's is null.",
                       "oneOf": [
                         {
                           "$ref": "#/definitions/branchLabel"
@@ -1433,7 +1433,7 @@
                       ]
                     },
                     "constraint": {
-                      "description": "The holder's `next_step.constraint`.",
+                      "description": "The holder's `next_step.constraint`; null when the holder's is null.",
                       "type": [
                         "string",
                         "null"
@@ -1653,7 +1653,7 @@
               ]
             },
             "reason": {
-              "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note). An open set.",
+              "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), `platform_config_invalid` (Composer refuses a `config.platform` value of its merged config: `php: false`, or a value that is neither a string nor false), `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note). An open set.",
               "oneOf": [
                 {
                   "type": "string",
@@ -1776,7 +1776,7 @@
       ]
     },
     "releaseUnmeasured": {
-      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.release` is null: the metadata was not read (the `metadata.status` value), no stable release, or no dated stable release. An open set: read an unknown reason as another reason.",
+      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.release` is null: the metadata was not read (the `metadata.status` value), no stable release (`no_stable_release`), or the highest stable tag has no trusted date (`undated_releases`): it has no date, or its date is a commit that the split's tags share, also when lower releases are dated. An open set: read an unknown reason as another reason.",
       "type": "string",
       "pattern": "^[a-z][a-z0-9_]*$",
       "x-known-values": [

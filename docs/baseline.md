@@ -147,11 +147,10 @@ Matching rules:
   the fix comparison and says so in a note
   ([`baseline_target_differs`](notes.md#baseline_target_differs),
   [`baseline_fix_model_differs`](notes.md#baseline_fix_model_differs)).
-- **Whichever value.** A `known` finding fails no `--fail-on` value, `unchecked` included. A
-  `worsened` finding fails `unchecked` on whatever S10 it carries.
-- **Graded findings only.** An entry covers graded findings only. An `ok`, `finished` or `unknown`
-  finding that carries [S10](verdicts.md#what-was-not-checked) fails `--fail-on=unchecked`, also
-  when an incomplete lookup carried its entry forward.
+- **Whichever value.** A `known` finding fails no `--fail-on` value, `unchecked` included. This
+  is also true at score 0: an `ok`, `finished` or `unknown` finding with an entry that an
+  incomplete lookup carried forward is `known`, and its [S10](verdicts.md#what-was-not-checked)
+  fails nothing. A `worsened` finding fails `unchecked` on whatever S10 it carries.
 - **Stale entries stay.** A normal run never edits the file. Regenerate the file to drop them.
 
 ### The gate score
