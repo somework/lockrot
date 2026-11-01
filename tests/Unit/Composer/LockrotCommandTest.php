@@ -1356,6 +1356,28 @@ final class LockrotCommandTest extends TestCase
         });
     }
 
+    /** Composer's merge puts composer.json's `config.platform` over the global one, also when Composer cannot load the file. */
+    public function testThePlatformPhpOfAComposerJsonThatComposerCannotLoadWinsOverTheGlobalOne(): void
+    {
+        $project = $this->tempDir('lockrot-invalid-platform-');
+        file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/invalid-manifest-test', 'require' => ['acme/<<fg=red>>' => '1.0.0'], 'config' => ['platform' => ['php' => '8.2.3']]]));
+        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));
+        chdir($project);
+        $home = $this->tempDir('lockrot-invalid-platform-home-');
+        file_put_contents($home.'/config.json', '{"config": {"platform": {"php": "8.1.5"}}}');
+        $loader = $this->emptyLoader();
+        $command = $this->buildCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?\Closure $checks = null): Analyzer => self::withChecks(self::testAnalyzer($loader, $lockrot, $clock), $checks));
+
+        $this->withComposerEnv($this->tempDir('lockrot-invalid-platform-cache-'), $home, function () use ($command): void {
+            [$code, $stdout, $stderr] = $this->runCommandWithSplitStreams($command, ['--format' => 'json']);
+
+            self::assertSame(0, $code, $stderr);
+            $json = json_decode($stdout, true);
+            self::assertIsArray($json);
+            self::assertSame(['8.2', MoveCheck::COMPOSER_JSON_INVALID], [JsonPath::stringAt($json, ['run', 'target_php']), JsonPath::stringAt($json, ['run', 'move_check', 'reason'])]);
+        });
+    }
+
     /**
      * A lock name that looks like markup is no Composer package name: lockrot skips the entry and
      * says so in a run note whose text names no package. lockrot writes the table past Symfony's
