@@ -67,6 +67,18 @@ final class MoveBuilderTargetPhpTest extends TestCase
         self::assertSame(Fix::UPDATE, $installed->fixKind());
     }
 
+    /** A move without a lowest admitted release reads the php of its newest release when the target runs it, not the branch top's 8.1. */
+    public function testAnUpdateWithoutALowerReleaseReadsThePhpOfItsNewestRelease(): void
+    {
+        $releases = [['1.0.0', '>=7.2'], ['1.2.0', '>=7.2'], ['1.8.0', '>=7.2'], ['1.9.0', '>=8.1']];
+        [$move] = self::updateMove($releases, '8.0', '>=7.4', Move::UPDATE, '1.x', null);
+        $phpCheck = $move->phpCheck();
+
+        self::assertSame('1.8.0', $move->newest());
+        self::assertNotNull($phpCheck);
+        self::assertSame(['>=7.2', true, null], [$phpCheck->requires(), $phpCheck->targetRuns(), $phpCheck->raiseTo()]);
+    }
+
     /** The release that the target installs needs 8.0.2, above require.php 7.4: the raise writes 8.0.2, not the branch top's 8.1. */
     public function testARaiseWritesThePhpOfTheReleaseThatTheTargetInstalls(): void
     {

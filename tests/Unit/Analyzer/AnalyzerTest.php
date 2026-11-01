@@ -806,6 +806,18 @@ final class AnalyzerTest extends TestCase
         self::assertSame('7.1.99', $window->toArray()['target']['php']);
     }
 
+    public function testARunWithoutAMoveCheckReadsTheTargetAtComposerJsonsPlatformPhp(): void
+    {
+        $project = ProjectConfig::fromArray(['config' => ['platform' => ['php' => '7.1.3']]]);
+
+        $report = $this->analyzer($this->loader(), $this->http([]), true, new Allowlist([]), false, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, null, null, '7.1')
+            ->analyze(LockFile::fromArray(['packages' => []]), $project, false);
+
+        $window = $report->phpWindow();
+        self::assertNotNull($window);
+        self::assertSame(['7.1.3', '7.1.3'], [$window->toArray()['target']['php'], $window->platformOverride()]);
+    }
+
     public function testPackagesNotFromAComposerRepositoryAreCountedInOneNote(): void
     {
         $one = self::unlocked('private/one', 'https://git.example.com/private/one.git');
