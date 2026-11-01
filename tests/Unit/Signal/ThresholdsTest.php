@@ -77,4 +77,34 @@ final class ThresholdsTest extends TestCase
     {
         self::assertSame(['release-warn-years' => 2, 'release-high-years' => 6, 'push-warn-years' => 3, 'push-high-years' => 7], (new Thresholds(2, 6, 3, 7))->toArray());
     }
+
+    /** A high threshold below its warn threshold would make a release `high` before it is `warn`. */
+    public function testAReleaseHighBelowItsWarnIsRefusedWithBothKeys(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('extra.lockrot.release-high-years (2) must not be below extra.lockrot.release-warn-years (5)');
+        Thresholds::fromArray(['release-warn-years' => 5, 'release-high-years' => 2]);
+    }
+
+    public function testAPushHighBelowItsWarnIsRefusedWithBothKeys(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('extra.lockrot.push-high-years (3) must not be below extra.lockrot.push-warn-years (4)');
+        Thresholds::fromArray(['push-warn-years' => 4, 'push-high-years' => 3]);
+    }
+
+    public function testAWarnAboveTheDefaultHighIsRefused(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('extra.lockrot.release-high-years (5) must not be below extra.lockrot.release-warn-years (6)');
+        Thresholds::fromArray(['release-warn-years' => 6]);
+    }
+
+    public function testAHighEqualToItsWarnIsAccepted(): void
+    {
+        $thresholds = Thresholds::fromArray(['release-warn-years' => 4, 'release-high-years' => 4, 'push-warn-years' => 2, 'push-high-years' => 2]);
+
+        self::assertSame(Signal::LEVEL_HIGH, Thresholds::levelFor(4.0, $thresholds->releaseWarnYears(), $thresholds->releaseHighYears()));
+        self::assertSame(2, $thresholds->pushHighYears());
+    }
 }

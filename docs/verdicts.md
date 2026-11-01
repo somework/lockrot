@@ -17,8 +17,8 @@ each flag's rule, its signals, and what you and the package's maintainer can do 
 | `high` | The score is 16 to 31 | |
 | `medium` | The score is 8 to 15 | |
 | `low` | The score is 1 to 7 | |
-| `unknown` | The score is 0, no allowlist entry applies, and lockrot read no release metadata for the package | Nothing counts, but lockrot did not judge its release age (S2) or its release branch (S8). The run's [notes](notes.md) say what failed |
-| `finished` | The score is 0, and an allowlist entry applies to the package | Nothing counts, and the [allowlist](configuration.md#the-allowlist) says why: the [built-in list](configuration.md#the-built-in-list), a package type or your own entry |
+| `unknown` | The score is 0, no allowlist entry accepts the package or one of its fired flags, and lockrot read no release metadata for the package | Nothing counts, but lockrot did not judge its release age (S2) or its release branch (S8). The run's [notes](notes.md) say what failed |
+| `finished` | The score is 0, and an allowlist entry accepts the whole package or a flag that fired | Nothing counts, and the [allowlist](configuration.md#the-allowlist) says why: the [built-in list](configuration.md#the-built-in-list), a package type or your own entry |
 | `ok` | The score is 0 | No flag counts |
 
 Verdict order, used by the grade values of [`--fail-on`](ci.md) and the report's sort order:
@@ -222,13 +222,15 @@ S8 is not measured for:
 
 - A branch the repository lists no stable release on.
 
-- An installed version above the highest tag the repository lists on its branch: a private fork,
-  or a lock written against a tag since deleted.
+- An installed stable version above the highest stable tag the repository lists on its branch: a
+  private fork, or a lock written against a tag since deleted. An installed pre-release above that
+  tag is still on the branch, and S8 judges the branch's newest stable release.
 
 - A branch whose highest tag has no [trusted date](#dates-from-the-monorepo).
 
 The same rule applies to S2: if the package's highest tag has no trusted date, lockrot does not
-measure S2, and [S10](#what-was-not-checked) says so.
+measure S2, and [S10](#what-was-not-checked) says so. `age.release` is then null with
+`age.release_unmeasured` `undated_releases`, also when older tags have a trusted date.
 
 ### Within reach
 
@@ -1045,7 +1047,8 @@ The score line writes the sum, and it evaluates to the score:
   to the next grade, and `decided_by` (`maintenance`, `security`, `combination` or `either`).
 
 - `score.without[]` gives the score without each counted flag, and `score.accepted[]` the score if
-  an accepted flag counted. Both are new runs of the rules, not a subtraction: when the lead goes,
+  an accepted flag counted. `without[]` has flag rows only when the score has two or more terms.
+  It has a row for the deciding advisory only when two or more advisories count. Both are new runs of the rules, not a subtraction: when the lead goes,
   the next flag takes the lead in full. A row reads `at least` when a check that did not run could
   raise it, or when the `tag` move lands on a line that S8's rule can leave behind.
 
@@ -1137,8 +1140,9 @@ Limits:
 
 - The graph is the lock's `require` edges. A requirement on a name that no locked package carries
   leads to each package that replaces or provides it (a virtual package such as
-  `psr/log-implementation`), whatever version that package provides. The `via` column reads `?`
-  when nothing reaches the package.
+  `psr/log-implementation`), whatever version that package provides. A `require` line and the
+  requirement of a production package resolve to a production package first, also with `--dev`.
+  The `via` column reads `unreached` when nothing reaches the package.
 
 - At install time, lockrot analyses only the packages that the transaction touches. A direct
   requirement gets S7 only when it is in the transaction, and the [compact block](install-time.md)
@@ -1286,7 +1290,7 @@ applies:
 | `branch_snapshot` | The installed version is a branch (`dev-main`, `2.x-dev`): it has a commit date, not a release date, and `pinned` already says what there is to say |
 | `shared_commit`, `undated` | The installed release has no date lockrot trusts: its commit carries other tags, or the lock entry has no `time`. The same ids as `age.installed_unmeasured` |
 | `no_stable_release` | The package has no tagged release |
-| `undated_releases` | The package has tagged releases, and none has a trusted date. The same id as `age.release_unmeasured` |
+| `undated_releases` | The package has tagged releases, and no release above the installed one has a trusted date. `age.release_unmeasured` uses the same id when the highest stable tag has no trusted date, also when older tags have one |
 
 The keys are an [open set](schema.md#open-sets): read one you do not know as another way a package
 went unmeasured ([compatibility.md](compatibility.md#open-sets)).

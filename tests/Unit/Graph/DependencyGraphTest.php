@@ -436,6 +436,51 @@ final class DependencyGraphTest extends TestCase
         self::assertSame([ProjectConfig::REQUIRE], $direct->namedIn('vendor/p'));
     }
 
+    /**
+     * With `--dev`, the `require` section and the prod packages still resolve as Composer's prod
+     * solve does: the prod provider satisfies the root line, not the dev package of that name.
+     */
+    public function testWithDevTheRootRequireStillResolvesToTheProdProvider(): void
+    {
+        $lock = LockFile::fromArray([
+            'packages' => [
+                ['name' => 'app/a', 'version' => '1.0.0', 'require' => ['vendor/x' => '^1']],
+                ['name' => 'vendor/p', 'version' => '1.0.0', 'provide' => ['vendor/x' => '1.0.0']],
+            ],
+            'packages-dev' => [
+                ['name' => 'dev/d', 'version' => '1.0.0', 'require' => ['vendor/p' => '^1', 'vendor/x' => '^2']],
+                ['name' => 'vendor/x', 'version' => '2.0.0'],
+            ],
+        ]);
+
+        $direct = DependencyGraph::fromLock($lock, ProjectConfig::fromArray(['require' => ['vendor/x' => '^1'], 'require-dev' => ['dev/d' => '^1']]), true);
+        self::assertSame(['vendor/p'], $direct->shortestChain('vendor/p'));
+        self::assertSame([ProjectConfig::REQUIRE], $direct->namedIn('vendor/p'));
+        self::assertSame([], $direct->namedIn('vendor/x'), 'the dev vendor/x is reached through dev/d, and no root line names it');
+        self::assertSame(['dev/d', 'vendor/x'], $direct->shortestChain('vendor/x'));
+
+        $transitive = DependencyGraph::fromLock($lock, ProjectConfig::fromArray(['require' => ['app/a' => '^1'], 'require-dev' => ['dev/d' => '^1']]), true);
+        self::assertSame(['app/a', 'vendor/p'], $transitive->shortestChain('vendor/p'), 'a prod package\'s require reads the prod provider too');
+    }
+
+    /** A lock out of step with `composer.json` can hold a prod requirement only in packages-dev. */
+    public function testWithDevAProdNameThatOnlyADevPackageProvidesReachesTheDevProvider(): void
+    {
+        $lock = LockFile::fromArray([
+            'packages' => [
+                ['name' => 'app/a', 'version' => '1.0.0', 'require' => ['vendor/x' => '^1']],
+            ],
+            'packages-dev' => [
+                ['name' => 'dev/p', 'version' => '1.0.0', 'provide' => ['vendor/x' => '1.0.0']],
+            ],
+        ]);
+
+        $graph = DependencyGraph::fromLock($lock, ProjectConfig::fromArray(['require' => ['app/a' => '^1', 'vendor/x' => '^1']]), true);
+
+        self::assertSame([ProjectConfig::REQUIRE], $graph->namedIn('dev/p'));
+        self::assertSame(['app/a' => ['app/a', 'dev/p'], 'dev/p' => ['dev/p']], $graph->chainsTo('dev/p'));
+    }
+
     /** Both sections are read whatever `--dev` says, in the order require, require-dev. */
     public function testNamedInListsEverySectionThatNamesThePackage(): void
     {

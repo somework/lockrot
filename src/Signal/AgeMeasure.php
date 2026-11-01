@@ -103,7 +103,8 @@ final class AgeMeasure
     /**
      * The newest dated stable release on the installed version's branch ({@see ReleaseBranch}):
      * the release S8 judges. An undated highest tag hides how much newer the branch's last release
-     * is, so that branch has no reading, and neither has an installed version above every listed tag. See docs/verdicts.md#left-behind.
+     * is, so that branch has no reading, and neither has an installed stable version above the
+     * branch's highest stable tag. See docs/verdicts.md#left-behind.
      *
      * @param ?string $metadataStatus as for {@see release()}
      */
@@ -127,7 +128,8 @@ final class AgeMeasure
         if ($at === null || $own['highest']['at'] === null) {
             return AgeReading::unmeasuredBecause(self::UNDATED_RELEASES);
         }
-        if ($aliasLine === null && $this->isAhead($version, $own['highest']['normalized'])) {
+        // A pre-release above the branch's newest stable release is still on that branch: S8 judges that release.
+        if ($aliasLine === null && VersionParser::parseStability($version) === 'stable' && $this->isAhead($version, $own['highest']['normalized'])) {
             return AgeReading::unmeasuredBecause(self::ABOVE_LISTED_RELEASES);
         }
 

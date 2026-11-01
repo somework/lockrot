@@ -378,7 +378,7 @@ A graded finding's `score` holds every number of the sum, so a reader never repe
 | `terms` | One per counted flag, in flag order, the lead first and the security term last. The security term stands for every counted advisory. Each term holds `weight`, `divisor` or `multiplier`, `points` and `contribution`. The contributions add up to `exact` |
 | `modifiers` | Each halving in order: `reason` (`transitive`, `unreached`, `dev`), `applies_to`, `divide_by`, `before` and `after` |
 | `accepted` | Each accepted flag, with `if_counted`: the score if it counted |
-| `without` | The score without each counted flag, and without the deciding advisory: new runs of the rules |
+| `without` | The score without each counted flag, and without the deciding advisory: new runs of the rules. Flag rows exist only when the score has two or more terms, and the advisory row only when two or more advisories count |
 | `text` | The [score line](verdicts.md#score): prose |
 
 A score-0 finding has `{model, total: 0, exact: 0, accepted, text}`. `terms` is present exactly on

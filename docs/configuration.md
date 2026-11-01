@@ -30,8 +30,8 @@ then environment variable, then `extra.lockrot`, then the default.
 | `format` | string | `table` | What stdout gets: `table`, `json`, `github`, `sarif`, `gitlab`, `markdown` or `html` ([ci.md](ci.md)). The exit code is the same for every format | `--format` |
 | `include-dev` | boolean | `false` | Also check `packages-dev`. A development package's whole [score](verdicts.md#score) is halved | `--dev` (turns it on only) |
 | `baseline` | string | `lockrot-baseline.json` | The [baseline](baseline.md) file, relative to `composer.json` or absolute. A file that this key names must exist, except under `--generate-baseline`. The default file can be missing. Under `--generate-baseline`, a path named `composer.json` or `composer.lock`, the manifest or lock that `COMPOSER` names, or a name that Windows reads as another file (a trailing dot or space, a colon) is exit `2` | `--baseline` |
-| `release-warn-years` / `release-high-years` | integer ≥ 1 | `3` / `5` | Years without a stable release at which S2 ("no stable release") and S8 ("no stable release on the installed branch") reach `warn` / `high` ([signals](verdicts.md#the-signals)) | — |
-| `push-warn-years` / `push-high-years` | integer ≥ 1 | `3` / `5` | Years without a push or commit at which S4 reaches `warn` / `high` | — |
+| `release-warn-years` / `release-high-years` | integer ≥ 1 | `3` / `5` | Years without a stable release at which S2 ("no stable release") and S8 ("no stable release on the installed branch") reach `warn` / `high` ([signals](verdicts.md#the-signals)). lockrot refuses a high value below its warn value (exit 2) | — |
+| `push-warn-years` / `push-high-years` | integer ≥ 1 | `3` / `5` | Years without a push or commit at which S4 reaches `warn` / `high`. lockrot refuses a high value below its warn value (exit 2) | — |
 | `ignore` | array | `[]` | Packages whose maintenance flags you accept, all of them or the ones an entry lists ([the allowlist](#the-allowlist)) | — |
 | `accept-unchecked` | array | `[]` | Checks that lockrot cannot run on a package and that no rerun can close, accepted with a reason ([accept-unchecked](#accept-unchecked)) | — |
 | `advisory-lookup` | `all` / `composer-repositories` | `all` | Which packages lockrot asks for security advisories: every package the run checks, or only the ones installed from a Composer repository ([Which advisories count](verdicts.md#which-advisories-count)) | — |
@@ -239,7 +239,7 @@ and the score are the report's.
 | Libyears | The package's [libyears](verdicts.md#libyears), or why they were not measured | `finding.libyears`, `finding.libyears_unmeasured` |
 | Origin | Where the package came from and, for an abandoned package whose replacement packagist.org names, the replacement's page ([Where a package came from](schema.md#where-a-package-came-from)). JSON only | `finding.origin`, `finding.replacement_url` |
 | Signals | Every signal with its summary and raw data: the dates behind each age, and for S9 each advisory with what fixes it (the text gives the summaries of the fired signals only) | `finding.signals` |
-| Lock entry | Version, `php` constraint, source, and the entry's date with what it is dated by: a release, a branch snapshot's commit, or a commit a subtree split's tags share | `lock` |
+| Lock entry | Version, `php` constraint, source, and the lock's own `time`, with `branch_snapshot` for a branch's commit date. For a subtree split's tag, that `time` can be a commit date that other tags share. `metadata.installed_release` and `installed_release_dated_by` give the date that lockrot reads as the release's ([dates from the monorepo](verdicts.md#dates-from-the-monorepo)) | `lock`, `metadata` |
 | Repository metadata | Number of versions (JSON only), whether the package is abandoned and what replaces it, the last stable release, and the release-branch table S8 reads, with what each branch fixes | `metadata` |
 | Repository activity | What S3 and S4 read, or why nothing was read | `finding.activity` |
 | Settings | Thresholds, target PHP, and the project's own `require.php` as composer.json writes it (lockrot tests the branch rows against the lowest stable version it admits) | `run.thresholds`, `run.target_php`, `run.project_php` |
@@ -280,7 +280,8 @@ long they keep an answer.
 
 An allowlist entry accepts a package's maintenance flags. An accepted flag stays listed with the role
 `accepted`, adds nothing to the score and reaches no gate. A package with nothing else that counts
-reads `finished`.
+reads `finished`. An entry with `flags` that accepted no flag that fired changes no verdict. With
+nothing else that counts, the package reads `ok`, or `unknown` without release metadata.
 
 ### The built-in list {#the-built-in-list}
 
