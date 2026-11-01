@@ -189,10 +189,10 @@ the running file exactly as it was.
 - **What `--force` takes.** Only that one release. If the
   [release rules](#which-release-it-installs) hold it back, or the running major version has none,
   it exits `2` and looks no further down. A build whose release was withdrawn goes back to the
-  newest release left in its major version, never to an older major version. That release can be
-  an older minor version. In 0.x, it can be an archive from before 0.13.0, and its own
-  `self-update` does not apply the [release rules](#which-release-it-installs). The release
-  metadata is not signed, so a doctored copy cannot walk a reinstall further down.
+  newest release left in its major version, never to an older major version. The release metadata
+  is not signed, so a doctored copy cannot walk a reinstall further down. The release that
+  `--force` takes can be an older minor version. In 0.x, it can be an archive from before 0.13.0,
+  and its own `self-update` does not apply the [release rules](#which-release-it-installs).
 
 - **Where it writes.** Only the PHAR's own directory, which must be writable. `self-update` checks
   it before it downloads the archive (`--check` does not need it).

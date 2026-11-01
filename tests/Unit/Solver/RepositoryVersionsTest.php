@@ -463,7 +463,7 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([[['acme/good', 'acme/bad'], 'stable']], $repository->asked);
     }
 
-    /** Each request to a repository takes 3s here, so the second repository is asked after a 5s budget ends. */
+    /** Each request to a repository takes 3s here, so the 5s budget ends before the second repository is asked. */
     public function testALaterRepositoryIsNotAskedOnceTheBudgetEnds(): void
     {
         $first = self::recording([]);
@@ -492,6 +492,14 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame(['acme/tagged' => ['1.0.0'], 'acme/admitted' => [], 'acme/dev-only' => []], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
         self::assertSame([null, VersionSource::BUDGET, VersionSource::BUDGET], [$versions->failure('acme/tagged'), $versions->failure('acme/admitted'), $versions->failure('acme/dev-only')]);
         self::assertSame([[['acme/tagged', 'acme/admitted', 'acme/dev-only'], 'stable']], $repository->asked);
+    }
+
+    /** The budget limits requests: a run with no repository to read sends none, so its names are not over the budget. */
+    public function testANameThatNoRepositoryIsReadForIsNotOverTheBudget(): void
+    {
+        $versions = new RepositoryVersions([new ArrayRepository()], [], false, Deadline::inSeconds(0.0, static fn (): float => 0.0));
+
+        self::assertSame([[], VersionSource::UNREACHED], [$versions->versions('acme/private'), $versions->failure('acme/private')]);
     }
 
     /** A name that loads alone after a failed request sends its dev request only while the budget lasts. */

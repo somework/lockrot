@@ -95,10 +95,13 @@ Once `install-time-budget` seconds have passed, the install-time check starts no
 advisory or repository-activity request. A repository-activity request gets the time left as its
 timeout. Composer sets the timeout of a metadata or advisory request, and lockrot cannot shorten it.
 So a metadata or advisory request that is already running can hold the install for Composer's
-timeout, and Composer can retry a failed transfer. With curl, the timeout of one request is
+timeout, and Composer can retry a failed transfer. With curl, the timeout of one metadata request is
 `default_socket_timeout` or 300 seconds, whichever is larger
 ([Composer 2.10.0](https://github.com/composer/composer/blob/2.10.0/src/Composer/Util/Http/CurlDownloader.php)).
-A warm Composer cache sends fewer requests. `composer lockrot` has no budget.
+An advisory that a repository publishes in its metadata takes that timeout too. A request to a
+repository's advisory API times out after 10 seconds
+([Composer 2.10.0](https://github.com/composer/composer/blob/2.10.0/src/Composer/Repository/ComposerRepository.php)).
+With a warm cache, Composer sends fewer requests. `composer lockrot` has no budget.
 
 ```json
 {
