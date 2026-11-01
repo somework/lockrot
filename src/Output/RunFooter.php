@@ -488,6 +488,19 @@ final class RunFooter
         return $text;
     }
 
+    /** The run-level record's message: each repository that failed or was not asked, with its words. */
+    public static function advisoriesNotChecked(Report $report): string
+    {
+        $parts = [];
+        foreach ($report->advisoryLookup()->repositories() as $repository) {
+            if ($repository->outcome() === AdvisoryRepository::FAILED || $repository->outcome() === AdvisoryRepository::NOT_ASKED) {
+                $parts[] = self::repository($repository);
+            }
+        }
+
+        return 'advisories not checked: '.($parts === [] ? 'the gate could not read the advisories of every package' : implode('; ', $parts));
+    }
+
     /** A repository's clause of the `advisories:` line: its name and what it answered. */
     public static function repository(AdvisoryRepository $repository): string
     {

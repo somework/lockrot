@@ -34,7 +34,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/advisories-unchecked",
-        "description": "advisories not checked: the gate could not read the advisories of every package",
+        "description": "advisories not checked: packagist.org not asked (offline)",
         "categories": [
             "Bug Risk"
         ],

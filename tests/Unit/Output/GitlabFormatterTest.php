@@ -7,6 +7,8 @@ namespace Lockrot\Tests\Unit\Output;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
+use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
@@ -355,6 +357,33 @@ final class GitlabFormatterTest extends TestCase
             'fingerprint' => hash('sha256', 'lockrot|advisories-unchecked'),
             'location' => ['path' => 'composer.lock', 'lines' => ['begin' => 1]],
         ], $issues[\count($issues) - 1]);
+    }
+
+    public function testTheRunLevelIssueNamesEachRepositoryThatFailedOrWasNotAsked(): void
+    {
+        $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, [
+            AdvisoryRepository::of('composer repo (https://repo.packagist.org)', AdvisoryRepository::FAILED, AdvisoryCoverage::TRANSPORT, 'timeout'),
+            AdvisoryRepository::of('composer repo (https://repo.example.test)', AdvisoryRepository::NOT_ASKED, AdvisoryCoverage::OFFLINE),
+            AdvisoryRepository::of('composer repo (https://other.example.test)', AdvisoryRepository::NO_FEED),
+        ], 0, []);
+        $report = new Report([FindingBuilder::advisoriesUnchecked('acme/offline', 'offline', true)], [], new \DateTimeImmutable(self::AT), 1, 0, null, null, false, $coverage);
+
+        $descriptions = array_column($this->decode($this->formatter('unchecked', null)->format($report)), 'description', 'check_name');
+
+        self::assertSame('advisories not checked: packagist.org lookup failed (network error: timeout); composer repo (https://repo.example.test) not asked (offline)', $descriptions['lockrot/advisories-unchecked'] ?? null);
+    }
+
+    /** A repository's error message reaches the run-level issue: an ESC or a bidi control in it prints as its escape. */
+    public function testAControlCharacterInARepositoryMessagePrintsAsAnEscapeInTheRunLevelIssue(): void
+    {
+        $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, [
+            AdvisoryRepository::of('composer repo (https://repo.packagist.org)', AdvisoryRepository::FAILED, AdvisoryCoverage::TRANSPORT, "x\x1B[31mRED\u{202E}"),
+        ], 0, []);
+        $report = new Report([FindingBuilder::advisoriesUnchecked('acme/offline', 'offline', true)], [], new \DateTimeImmutable(self::AT), 1, 0, null, null, false, $coverage);
+
+        $descriptions = array_column($this->decode($this->formatter('unchecked', null)->format($report)), 'description', 'check_name');
+
+        self::assertSame('advisories not checked: packagist.org lookup failed (network error: x\\x1B[31mRED\\u{202E})', $descriptions['lockrot/advisories-unchecked'] ?? null);
     }
 
     /** The MR widget shows the decoded description: an ESC or a bidi control from the lock prints as its escape. */
