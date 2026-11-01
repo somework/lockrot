@@ -289,6 +289,34 @@ final class TargetFixTest extends TestCase
         self::assertSame('lock_platform', array_keys($fix)[1], 'lock_platform follows packages');
     }
 
+    public function testALockPlatformLinkThatComposerJsonRequireDevAlsoNamesIsNoLockOnlyLink(): void
+    {
+        $lock = ['packages' => [], 'packages-dev' => [], 'platform-dev' => ['php' => '<8.1']];
+
+        $fix = self::fix($lock, ['require-dev' => ['php' => '<8.1']], self::resolving());
+
+        self::assertSame([], $fix['lock_platform']);
+        self::assertSame([['root', 'require-dev', 'php', '<8.1']], self::rootHolds($fix));
+    }
+
+    public function testALockPlatformLinkThatComposerJsonRequireNamesIsNoLockOnlyLinkBesideARequireDevLink(): void
+    {
+        $lock = ['packages' => [], 'packages-dev' => [], 'platform' => ['php' => '<8.1']];
+
+        $fix = self::fix($lock, ['require' => ['php' => '<8.1'], 'require-dev' => ['php-64bit' => '<9']], self::resolving());
+
+        self::assertSame([], $fix['lock_platform']);
+    }
+
+    public function testTheLockOnlyLinksAreAListWhenAnEarlierFailingLinkIsNotLockOnly(): void
+    {
+        $lock = ['packages' => [], 'packages-dev' => [], 'platform' => ['php-64bit' => '<8.1']];
+
+        $fix = self::fix($lock, ['require' => ['php' => '<8.1']], self::resolving());
+
+        self::assertSame([['name' => null, 'version' => null, 'link' => 'require', 'target' => 'php-64bit', 'constraint' => '<8.1', 'dev' => false]], $fix['lock_platform']);
+    }
+
     public function testAnUpdateThatNamesNoPackageSolvesWithComposer(): void
     {
         $lock = ['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['php' => '>=7.4']]], 'packages-dev' => [], 'platform' => ['php' => '<8.1']];

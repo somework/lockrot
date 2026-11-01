@@ -161,6 +161,15 @@ final class FormatContextTest extends TestCase
         self::assertSame(FormatContext::LEVEL_ERROR, FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($oneKnown), 'a known gap before a failing one');
     }
 
+    public function testTheAdvisoriesRecordIsAnErrorWhenAFindingAfterTheExemptOneFailsUnchecked(): void
+    {
+        $exempt = FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true)->withFlags($this->finding('a/offline', Verdict::STALE)->flags(), true);
+        $report = $this->report($exempt, FindingBuilder::advisoriesUnchecked('b/offline', 'offline', true));
+        $withBaseline = $report->withBaseline($this->comparison([['a/offline', 'stale']], $report));
+
+        self::assertSame(FormatContext::LEVEL_ERROR, FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($withBaseline));
+    }
+
     /** SPEC §7.10: the own `lockrot/unchecked` record needs `unchecked` active, a missing check and no counted fact. */
     public function testAFindingGetsTheUncheckedRecordOnlyWhileUncheckedIsActive(): void
     {

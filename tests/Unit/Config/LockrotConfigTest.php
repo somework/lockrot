@@ -164,6 +164,13 @@ final class LockrotConfigTest extends TestCase
         self::assertSame(LockrotConfig::fromSources([], [], [], '8.5.10', null)->failOn()->value(), LockrotConfig::fromSources(['fail-on' => []], [], [], '8.5.10', null)->failOn()->value());
     }
 
+    public function testAFailOnListWithAnItemThatIsNoStringIsRejected(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('extra.lockrot.fail-on: every item of the list must be a string');
+        LockrotConfig::fromSources(['fail-on' => ['high', 5]], [], [], '8.5.10', null);
+    }
+
     public function testPlatformPhpBeatsRuntime(): void
     {
         self::assertSame('8.1', LockrotConfig::fromSources([], [], [], '8.5.10', '8.1.0')->targetPhp());

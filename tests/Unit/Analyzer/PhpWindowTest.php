@@ -486,6 +486,19 @@ final class PhpWindowTest extends TestCase
         self::assertSame('^7.0', $adapter->requirePhp(), 'the installed php link stays the package\'s own');
     }
 
+    public function testIsTargetInsideAnswersWhetherTheTargetLiesInTheWindow(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [self::package('acme/a', ['php' => '<8.1'])], 'packages-dev' => []]);
+
+        $outside = PhpWindow::of($lock, ProjectConfig::empty(), '8.4', self::minors());
+        $inside = PhpWindow::of($lock, ProjectConfig::empty(), '8.0', self::minors());
+
+        self::assertNotNull($outside);
+        self::assertNotNull($inside);
+        self::assertFalse($outside->isTargetInside());
+        self::assertTrue($inside->isTargetInside());
+    }
+
     /** @return list<string> */
     private static function minors(): array
     {

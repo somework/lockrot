@@ -535,6 +535,17 @@ final class RunNoteTest extends TestCase
         self::assertStringEndsWith(': acme/b 3.0.0 requires php >=8.2.', RunNote::updateNowRefused($problem)->text());
     }
 
+    public function testTheCauseOfAProblemWithOnlySatisfiedRulesIsNotTakenFromTheNextProblem(): void
+    {
+        $problem = "Problem 1\n"
+            ."    - acme/a 1.0.0 requires acme/b ^2.0 -> satisfiable by acme/b[2.0.0].\n"
+            ."    - acme/b 2.0.0 conflicts with acme/c 1.0.0.\n"
+            ."  Problem 2\n"
+            ."    - acme/d 1.0.0 conflicts with acme/e 1.0.0.";
+
+        self::assertStringEndsWith(': acme/b 2.0.0 conflicts with acme/c 1.0.0.', RunNote::updateNowRefused($problem)->text());
+    }
+
     public function testAProblemWithoutAMarkerIsQuotedWithoutItsOuterWhitespace(): void
     {
         self::assertStringEndsWith('own command: Your requirements could not be resolved.', RunNote::updateNowRefused("  Your requirements could not be resolved.\n")->text());
@@ -553,6 +564,9 @@ final class RunNoteTest extends TestCase
             'a reason advisories are not checked for that is not one' => static fn () => RunNote::advisoriesNotChecked('tired', 0),
             'a checked count below zero' => static fn () => RunNote::advisoriesNotChecked(RunNote::INSTALL_TIME_BUDGET, -1),
             'a cap on GitLab, which has none' => static fn () => RunNote::repositoryActivityAnonymousCap(RepoRef::GITLAB, 1, 0, 0),
+            'no invalid package name' => static fn () => RunNote::packageNameInvalid([]),
+            'no ignore entry that misses an advisory' => static fn () => RunNote::ignoreDoesNotCoverAdvisories([]),
+            'no package that the update now command leaves out' => static fn () => RunNote::updateNowReduced([], self::CONFLICT),
         ];
         foreach ($refused as $what => $build) {
             try {
