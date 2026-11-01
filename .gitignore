@@ -3,7 +3,8 @@
 /build/phar/box.phar
 /build/phar/box.build.json
 /build/*.phar
-/build/infection.log
+/build/infection*.log
+/build/infection*.json
 /build/clover*.xml
 /build/junit*.xml
 /.phpunit.cache
