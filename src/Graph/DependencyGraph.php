@@ -48,28 +48,22 @@ final class DependencyGraph
     /**
      * A required name resolves to the locked package of that name, else to every locked package that
      * replaces or provides it, as Composer's solver reads the lock. Root names are compared in lower
-     * case, as Composer compares them. Names resolve against the packages that the run installs:
-     * without $includeDev, a prod provider wins over a dev package of the name. `namedIn()` reads
-     * both root sections whatever $includeDev says.
+     * case, as Composer compares them. The `require` section and the prod packages resolve as
+     * Composer's prod solve does: a prod package of the name or a prod provider wins over a dev
+     * package of the name, with or without $includeDev. `namedIn()` reads both root sections
+     * whatever $includeDev says.
      */
     public static function fromLock(LockFile $lock, ProjectConfig $project, bool $includeDev): self
     {
-        $packages = $lock->packages($includeDev);
-        $present = [];
-        $satisfiedBy = [];
-        foreach ($packages as $package) {
-            $present[$package->name()] = true;
-            foreach (array_keys($package->replaces() + $package->provides()) as $name) {
-                $satisfiedBy[$name][] = $package->name();
-            }
-        }
+        $prod = self::index($lock->packages(false));
+        $all = $includeDev ? self::index($lock->packages(true)) : $prod;
         $edges = [];
-        foreach ($packages as $package) {
-            $edges[$package->name()] = self::resolve($package->requires(), $present, $satisfiedBy);
+        foreach ($lock->packages($includeDev) as $package) {
+            $edges[$package->name()] = self::resolve($package->requires(), $package->isDev() ? $all : $prod, $all);
         }
         $sections = [
-            ProjectConfig::REQUIRE => self::resolve($project->directRequires(), $present, $satisfiedBy),
-            ProjectConfig::REQUIRE_DEV => self::resolve($project->directDevRequires(), $present, $satisfiedBy),
+            ProjectConfig::REQUIRE => self::resolve($project->directRequires(), $prod, $all),
+            ProjectConfig::REQUIRE_DEV => self::resolve($project->directDevRequires(), $all, $all),
         ];
         $roots = $sections[ProjectConfig::REQUIRE];
         if ($includeDev) {
@@ -86,23 +80,52 @@ final class DependencyGraph
     }
 
     /**
-     * @param list<string>                $names
-     * @param array<string, true>         $present
-     * @param array<string, list<string>> $satisfiedBy name => the packages that replace or provide it
+     * @param iterable<\Lockrot\Lock\LockedPackage> $packages
+     *
+     * @return array{present: array<string, true>, satisfiedBy: array<string, list<string>>} satisfiedBy: name => the packages that replace or provide it
+     */
+    private static function index(iterable $packages): array
+    {
+        $present = [];
+        $satisfiedBy = [];
+        foreach ($packages as $package) {
+            $present[$package->name()] = true;
+            foreach (array_keys($package->replaces() + $package->provides()) as $name) {
+                $satisfiedBy[$name][] = $package->name();
+            }
+        }
+
+        return ['present' => $present, 'satisfiedBy' => $satisfiedBy];
+    }
+
+    /**
+     * @param list<string>                                                                 $names
+     * @param array{present: array<string, true>, satisfiedBy: array<string, list<string>>} $first the packages that satisfy a name before $then is asked
+     * @param array{present: array<string, true>, satisfiedBy: array<string, list<string>>} $then
      *
      * @return list<string> the packages that satisfy the names, a name that nothing satisfies kept as it is
      */
-    private static function resolve(array $names, array $present, array $satisfiedBy): array
+    private static function resolve(array $names, array $first, array $then): array
     {
         $resolved = [];
         foreach ($names as $name) {
             $name = strtolower($name);
-            foreach (isset($present[$name]) ? [$name] : ($satisfiedBy[$name] ?? [$name]) as $package) {
+            foreach (self::satisfying($name, $first) ?? self::satisfying($name, $then) ?? [$name] as $package) {
                 $resolved[$package] = true;
             }
         }
 
         return array_keys($resolved);
+    }
+
+    /**
+     * @param array{present: array<string, true>, satisfiedBy: array<string, list<string>>} $index
+     *
+     * @return list<string>|null
+     */
+    private static function satisfying(string $name, array $index): ?array
+    {
+        return isset($index['present'][$name]) ? [$name] : ($index['satisfiedBy'][$name] ?? null);
     }
 
     /**
