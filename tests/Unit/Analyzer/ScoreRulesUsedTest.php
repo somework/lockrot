@@ -5,12 +5,19 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Allowlist\AllowlistEntry;
+use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\ScoreRulesUsed;
+use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Baseline\BaselineEntry;
+use Lockrot\Config\Gate;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
+use Lockrot\Tests\Support\ScoreSweep;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\ScoreModel;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -32,6 +39,46 @@ final class ScoreRulesUsedTest extends TestCase
     public function testEachRuleCountsTheFindingsItActsOn(Finding $finding, array $used): void
     {
         self::assertSame(array_merge(ScoreModel::rulesUnused(), $used), ScoreRulesUsed::of([$finding]));
+    }
+
+    /**
+     * `gate-bounded-new` counts a graded finding whose gate score the cap limits: a `known` entry
+     * (new 0) or a cap below the score. `baseline-cover` counts a finding with a flag below the
+     * recorded lead, not a flag that the entry records itself (docs/verdicts/model-1.md#score-baseline-cover).
+     *
+     * @param list<string>       $flags    the finding's flags
+     * @param ?string            $recorded the flag that the entry records, null for no entry
+     * @param array<string, int> $used     the two baseline rules
+     *
+     * @dataProvider baselined
+     */
+    #[DataProvider('baselined')]
+    public function testTheBaselineRulesCountTheFindingsThatTheEntryLimitsOrCovers(array $flags, ?string $recorded, array $used): void
+    {
+        $signals = [];
+        foreach ($flags as $flag) {
+            $signals = array_merge($signals, ScoreSweep::signalsOf($flag));
+        }
+        $finding = (new FindingBuilder())->withPackage('vendor/pkg')->withChain(self::DIRECT)->withFlags(FlagSet::fromSignals($signals, null, []))->build();
+        $report = new Report([$finding], [], new \DateTimeImmutable('2026-10-01T00:00:00+00:00'), 1, 0);
+        $entries = $recorded === null ? [] : [new BaselineEntry('vendor/pkg', '1.0.0', '2026-01-01', [$recorded => '2026-01-01'], [])];
+        $comparison = BaselineComparison::compare(BaselineEntries::baseline($entries), $report, 'b.json', ['vendor/pkg']);
+        $compared = $report->withBaseline($comparison);
+        $gate = Gate::decide($compared, FailOn::parse('high'), false, Gate::MODE_CHECK);
+
+        $counts = ScoreRulesUsed::of($compared->findings(), $comparison, $gate);
+
+        self::assertSame($used, ['gate-bounded-new' => $counts['gate-bounded-new'], 'baseline-cover' => $counts['baseline-cover']]);
+    }
+
+    /** @return iterable<string, array{list<string>, ?string, array<string, int>}> */
+    public static function baselined(): iterable
+    {
+        yield 'a known entry that records the lead: new 0, so the cap limits the gate score' => [['left-behind'], 'left-behind', ['gate-bounded-new' => 1, 'baseline-cover' => 0]];
+        yield 'a recorded lead that covers a flag below it' => [['left-behind', 'stale'], 'left-behind', ['gate-bounded-new' => 1, 'baseline-cover' => 1]];
+        yield 'a flag above the recorded one: the score is all new, below its cap' => [['abandoned'], 'stale', ['gate-bounded-new' => 0, 'baseline-cover' => 0]];
+        yield 'no entry: no gate basis and nothing covered' => [['left-behind', 'stale'], null, ['gate-bounded-new' => 0, 'baseline-cover' => 0]];
+        yield 'score 0 under a known entry: not graded, so the cap bounds nothing' => [[], 'stale', ['gate-bounded-new' => 0, 'baseline-cover' => 0]];
     }
 
     /** @return iterable<string, array{Finding, array<string, int>}> */
