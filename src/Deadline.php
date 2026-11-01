@@ -42,6 +42,7 @@ final class Deadline
         return $this->expiresAt === null;
     }
 
+    /** @phpstan-impure */
     public function isPast(): bool
     {
         return $this->expiresAt !== null && ($this->now)() >= $this->expiresAt;

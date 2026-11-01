@@ -105,33 +105,39 @@ final class VersionMaskTest extends TestCase
         return new Report([$finding], [], new \DateTimeImmutable('2026-10-14T00:00:00+00:00'), 1, 0);
     }
 
-    /** @param non-empty-list<string> $path */
+    /**
+     * Decodes to objects, so an empty JSON object stays `{}`.
+     *
+     * @param non-empty-list<string> $path
+     */
     private static function rewritten(string $json, array $path, string $version = self::OTHER): string
     {
-        $data = json_decode($json, true);
-        self::assertIsArray($data);
+        $data = json_decode($json);
+        self::assertInstanceOf(\stdClass::class, $data);
 
         return JsonWriter::encode(self::replaced($data, $path, $version), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION).(substr($json, -1) === "\n" ? "\n" : '');
     }
 
     /**
-     * @param array<mixed, mixed>    $data
-     * @param non-empty-list<string> $path
+     * @param \stdClass|array<mixed, mixed> $data
+     * @param non-empty-list<string>        $path
      *
-     * @return array<mixed, mixed>
+     * @return \stdClass|array<mixed, mixed>
      */
-    private static function replaced(array $data, array $path, string $version): array
+    private static function replaced($data, array $path, string $version)
     {
         $key = $path[0];
         $rest = \array_slice($path, 1);
-        if ($rest === []) {
-            $data[$key] = $version;
-
-            return $data;
+        $node = \is_array($data) ? ($data[$key] ?? null) : ($data->{$key} ?? null);
+        if ($rest !== []) {
+            self::assertTrue(\is_array($node) || $node instanceof \stdClass);
         }
-        $node = $data[$key] ?? null;
-        self::assertIsArray($node);
-        $data[$key] = self::replaced($node, $rest, $version);
+        $value = $rest === [] ? $version : self::replaced($node, $rest, $version);
+        if (\is_array($data)) {
+            $data[$key] = $value;
+        } else {
+            $data->{$key} = $value;
+        }
 
         return $data;
     }

@@ -18,7 +18,7 @@ use Lockrot\Version;
  * This array is the contract with the renderer in https://github.com/somework/lockrot-report, which
  * lives in another repository. The decisions are made here and asserted in
  * {@see \Lockrot\Tests\Unit\Html\ReportDocumentTest}. The `report` key validates against the
- * published report schema. `details` is the `--explain` document of the packages worth explaining.
+ * published report schema. `details` holds the `--explain` facts of the packages worth explaining.
  *
  * @internal
  */
@@ -45,14 +45,14 @@ final class ReportDocument
             // document the published schema describes. The page reads the run's settings and baseline
             // standing from it: a second copy could disagree.
             'report' => ['$schema' => Schemas::url(Schemas::REPORT, JsonFormatter::SCHEMA), 'lockrot' => ['version' => Version::STRING, 'schema' => JsonFormatter::SCHEMA]] + $this->report->toArray(),
-            'details' => $this->details($showAll),
+            'details' => $this->details($showAll) ?: new \stdClass(),
         ];
     }
 
 
     /**
-     * The `--explain` document per package, minus `finding`, `notes` and `note_details`: the report
-     * already carries them.
+     * Per package, the `metadata` and `lock` of its `--explain` document and a `repository_link`.
+     * The report carries the rest.
      *
      * @return array<string, array<string, mixed>>
      */

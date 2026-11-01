@@ -132,12 +132,18 @@ final class ClockTest extends TestCase
     {
         yield 'a date' => ['2026-09-14', '2026-09-14T00:00:00+00:00'];
         yield 'a date-time without an offset' => ['2026-09-14T10:30:00', '2026-09-14T10:30:00+00:00'];
-        yield 'an explicit offset wins' => ['2026-09-14T00:00:00+03:00', '2026-09-14T00:00:00+03:00'];
+        yield 'an explicit offset sets the instant' => ['2026-09-14T00:00:00+03:00', '2026-09-13T21:00:00+00:00'];
+        yield 'an offset that ends the year a day early' => ['2026-12-31T23:30:00-05:00', '2027-01-01T04:30:00+00:00'];
     }
 
-    /** @dataProvider lockrotTodays */
+    /**
+     * The expiry checks read the UTC day, so the clock runs in UTC: an offset must not date the
+     * report a day apart from its expiry checks.
+     *
+     * @dataProvider lockrotTodays
+     */
     #[DataProvider('lockrotTodays')]
-    public function testLockrotTodayWithoutAnOffsetIsUtcAndAnOffsetWins(string $today, string $instant): void
+    public function testLockrotTodayWithoutAnOffsetIsUtcAndAnOffsetMovesToUtc(string $today, string $instant): void
     {
         date_default_timezone_set('Europe/Kyiv');
 

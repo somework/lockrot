@@ -21,7 +21,8 @@ use Lockrot\Deadline;
  * ({@see \Composer\Repository\AdvisoryProviderInterface}: `MatchAllConstraint`), then attributes them
  * locally as {@see \Composer\Repository\RepositorySet::getMatchingSecurityAdvisories()} does. Full
  * records only: a partial cached record holds an id and a range, and can be withdrawn. Composer
- * hard-codes a ten-second POST timeout, so the deadline is checked before each repository.
+ * sets the timeout of each advisory request, so the deadline is checked before each repository,
+ * and a repository that is already asked runs to Composer's timeout (docs/install-time.md#time-budget).
  * Scope and records: docs/verdicts.md#which-advisories-count.
  *
  * @internal

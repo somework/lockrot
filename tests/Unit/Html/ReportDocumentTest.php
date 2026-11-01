@@ -176,8 +176,8 @@ final class ReportDocumentTest extends TestCase
         $noThresholds = new ReportDocument($report, new PageData($analysis, null, '8.4'));
         $noTarget = new ReportDocument($report, new PageData($analysis, new Thresholds(), null));
 
-        self::assertSame([], J::arrayAt($noThresholds->toArray(), ['details']));
-        self::assertSame([], J::arrayAt($noTarget->toArray(), ['details']));
+        self::assertSame('{}', json_encode($noThresholds->toArray()['details']));
+        self::assertSame('{}', json_encode($noTarget->toArray()['details']));
     }
 
     /** A package the run could not analyse is stepped over, not a full stop for the ones behind it. */
@@ -263,7 +263,7 @@ final class ReportDocumentTest extends TestCase
 
         $document = (new ReportDocument($report))->toArray();
 
-        self::assertSame([], J::arrayAt($document, ['details']), 'the install-time path keeps no facts');
+        self::assertSame('{}', json_encode($document['details']), 'no facts, and the details stay a JSON object');
         self::assertNotSame([], J::arrayAt($document, ['report', 'findings']));
     }
 

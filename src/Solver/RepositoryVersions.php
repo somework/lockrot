@@ -131,11 +131,6 @@ final class RepositoryVersions implements VersionSource
     /** @param array<string, null> $pending */
     private function loadTogether(array $pending): void
     {
-        if ($this->deadline->isPast()) {
-            $this->failures += array_fill_keys(array_keys($pending), self::BUDGET);
-
-            return;
-        }
         $hidden = [];
         foreach ($this->repositories as $repository) {
             if (!self::isRead($repository)) {
@@ -148,6 +143,13 @@ final class RepositoryVersions implements VersionSource
             $found = [];
             foreach ([self::STABLE, self::DEV] as $stabilities) {
                 $asked = array_diff_key($pending, $listed) + $tagged;
+                if ($asked !== [] && $this->deadline->isPast()) {
+                    // A name that this repository's tags answered and that needs no dev versions is loaded.
+                    $this->overBudget(array_diff_key($pending, array_diff_key($found, $asked)));
+                    $this->failures += array_fill_keys(array_keys($hidden), self::SHADOWED);
+
+                    return;
+                }
                 $result = self::ask($repository, $asked, $stabilities);
                 $found += array_fill_keys($result['namesFound'], null);
                 $answered = [];
@@ -179,11 +181,6 @@ final class RepositoryVersions implements VersionSource
     /** @return list<BasePackage> */
     private function loadOne(string $name): array
     {
-        if ($this->deadline->isPast()) {
-            $this->failures[$name] = self::BUDGET;
-
-            return [];
-        }
         $failed = false;
         $hidden = false;
         $loaded = [];
@@ -193,12 +190,18 @@ final class RepositoryVersions implements VersionSource
 
                 continue;
             }
+            if ($this->deadline->isPast()) {
+                return $this->overBudget([$name => null]);
+            }
             $versions = [];
             try {
                 $tags = $repository->loadPackages([$name => null], self::STABLE, []);
                 $versions = self::named($tags, $name);
                 $found = $tags['namesFound'];
                 if ($versions === [] || $this->admitsDev($name)) {
+                    if ($this->deadline->isPast()) {
+                        return $this->overBudget([$name => null]);
+                    }
                     $dev = $repository->loadPackages([$name => null], self::DEV, []);
                     if ($versions !== [] && $this->failOfflineWithoutDevFile($name, $dev, $repository)) {
                         return [];
@@ -229,6 +232,23 @@ final class RepositoryVersions implements VersionSource
         }
 
         return $this->shadowedIf($hidden, $name, $loaded);
+    }
+
+    /**
+     * Drops what the names loaded so far: a name without all its versions has no answer.
+     *
+     * @param array<string, null> $names
+     *
+     * @return list<BasePackage> none
+     */
+    private function overBudget(array $names): array
+    {
+        foreach (array_keys($names) as $name) {
+            $this->loaded[$name] = [];
+            $this->failures[$name] = self::BUDGET;
+        }
+
+        return [];
     }
 
     /**

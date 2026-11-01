@@ -16,10 +16,15 @@ final class Clock
         $this->now = $now ?? new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
     }
 
-    /** A value without an offset is UTC, whatever the default timezone of the process. */
+    /**
+     * A value without an offset is UTC, whatever the default timezone of the process. A value with
+     * one moves to UTC: the expiry checks read the UTC day, so every printed date reads it too.
+     */
     public static function fixed(string $iso8601): self
     {
-        return new self(new \DateTimeImmutable($iso8601, new \DateTimeZone('UTC')));
+        $utc = new \DateTimeZone('UTC');
+
+        return new self((new \DateTimeImmutable($iso8601, $utc))->setTimezone($utc));
     }
 
     /**

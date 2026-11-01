@@ -17,6 +17,7 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\BranchFixes;
 use Lockrot\Security\PackageFixes;
+use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
@@ -33,9 +34,20 @@ use PHPUnit\Framework\TestCase;
 
 final class ExplanationTest extends TestCase
 {
-    private function report(): Report
+    /** An explanation from a report that holds the finding, as both command paths build it. */
+    private function explanation(Finding $finding, PackageFacts $facts, string $targetPhp, ?string $projectPhp = null, ?Thresholds $thresholds = null): Explanation
     {
-        return new Report([], Notes::texts(['a note']), new \DateTimeImmutable(F::NOW), 1, 0);
+        return new Explanation($finding, $facts, $thresholds ?? new Thresholds(), $targetPhp, new Report([$finding], Notes::texts(['a note']), new \DateTimeImmutable(F::NOW), 1, 0), $projectPhp);
+    }
+
+    public function testAReportThatDoesNotHoldTheFindingIsRefused(): void
+    {
+        $explanation = new Explanation($this->finding('1.0.0', Verdict::STALE), F::facts(F::package()), new Thresholds(), '8.4', new Report([], [], new \DateTimeImmutable(F::NOW), 1, 0));
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The report does not hold the finding of vendor/pkg');
+
+        $explanation->toArray();
     }
 
     /** @param list<Signal> $signals */
@@ -48,7 +60,7 @@ final class ExplanationTest extends TestCase
     {
         $finding = (new FindingBuilder())->withVersion('1.4.0')->withVerdict(Verdict::LEFT_BEHIND)->withChain(['root/app', 'vendor/pkg'])->withDataDate(new \DateTimeImmutable(F::NOW))->withLibyears(LibyearsMeasurement::of(2.345))->build();
         $metadata = F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00'], ['1.4.0', '2020-01-01T00:00:00+00:00']]);
-        $explanation = new Explanation($finding, F::facts(F::package(['version' => '1.4.0']), $metadata), new Thresholds(), '8.4', $this->report());
+        $explanation = $this->explanation($finding, F::facts(F::package(['version' => '1.4.0']), $metadata), '8.4');
 
         self::assertSame(2.35, JsonPath::arrayAt($explanation->toArray(), ['finding'])['libyears']);
     }
@@ -57,7 +69,7 @@ final class ExplanationTest extends TestCase
     {
         // Listed out of order and with a two-digit major: the rows come out as versions order them, not as strings do.
         $metadata = F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00'], ['0.3.1', '2018-01-01T00:00:00+00:00'], ['10.0.0', '2026-01-01T00:00:00+00:00'], ['2.1.0', '2026-01-01T00:00:00+00:00'], ['1.4.0', '2020-01-01T00:00:00+00:00']]);
-        $explanation = new Explanation($this->finding('1.4.0', Verdict::LEFT_BEHIND), F::facts(F::package(['version' => '1.4.0']), $metadata), new Thresholds(), '8.4', $this->report());
+        $explanation = $this->explanation($this->finding('1.4.0', Verdict::LEFT_BEHIND), F::facts(F::package(['version' => '1.4.0']), $metadata), '8.4');
 
         $branches = $explanation->branches();
 
@@ -72,7 +84,7 @@ final class ExplanationTest extends TestCase
     public function testAnUndatedHighestTagOnTheInstalledBranchIsReportedAsSuch(): void
     {
         $metadata = F::metadata([['13.0.0', '2026-01-01T00:00:00+00:00'], ['10.49.0', null], ['10.13.1', '2023-03-17T00:00:00+00:00']]);
-        $explanation = new Explanation($this->finding('10.48.28', Verdict::OK), F::facts(F::package(['version' => '10.48.28']), $metadata), new Thresholds(), '8.4', $this->report());
+        $explanation = $this->explanation($this->finding('10.48.28', Verdict::OK), F::facts(F::package(['version' => '10.48.28']), $metadata), '8.4');
 
         self::assertTrue($explanation->installedBranchIsUndated());
         $installed = $explanation->branches()[1];
@@ -98,7 +110,7 @@ final class ExplanationTest extends TestCase
             $loader->load($on('10.13.1', 'split', '2023-06-05T12:46:42+00:00')),
             $loader->load($on('9.0.0', null, null)),
         ], new \DateTimeImmutable(F::NOW));
-        $explanation = new Explanation($this->finding('10.48.28', Verdict::OK), F::facts(F::package(['version' => '10.48.28']), $metadata), new Thresholds(), '8.4', $this->report());
+        $explanation = $this->explanation($this->finding('10.48.28', Verdict::OK), F::facts(F::package(['version' => '10.48.28']), $metadata), '8.4');
 
         [$shared, $undated] = $explanation->branches();
 
@@ -131,7 +143,7 @@ final class ExplanationTest extends TestCase
             $loader->load($on('3.8.0', null, '2023-04-15T16:39:14+00:00')),
         ], new \DateTimeImmutable(F::NOW));
         $s8 = new Signal(Signal::LEVEL_WARN, 'branch 3.x', SignalDataStub::of(Signal::S8, ['branch' => '3.x', 'newest_branch' => '4.x', 'newest_version' => '4.9.0', 'newest_release' => '2025-03-08T02:17:34+00:00']));
-        $explanation = new Explanation($this->finding('3.8.0', Verdict::LEFT_BEHIND, [$s8]), F::facts(F::package(['version' => '3.8.0']), $metadata), new Thresholds(), '8.4', $this->report());
+        $explanation = $this->explanation($this->finding('3.8.0', Verdict::LEFT_BEHIND, [$s8]), F::facts(F::package(['version' => '3.8.0']), $metadata), '8.4');
 
         $higher = JsonPath::arrayAt($explanation->toArray(), ['metadata', 'branches', 0]);
 
@@ -148,7 +160,7 @@ final class ExplanationTest extends TestCase
         $at = new \DateTimeImmutable('2026-01-01T00:00:00+00:00');
         $branch = ['version' => '2.2.30', 'at' => new \DateTimeImmutable('2026-02-01T00:00:00+00:00'), 'highest' => ['normalized' => '2.10.3.0', 'pretty' => '2.10.3', 'at' => $at, 'php' => '^7.2.5 || ^8.0'], 'php' => '^5.3.2 || ^7.0 || ^8.0'];
         $metadata = new PackageMetadata('composer/composer', false, null, true, $at, '2.10.3', 2, null, 'library', new \DateTimeImmutable(F::NOW), ['2' => $branch]);
-        $explanation = new Explanation($this->finding('2.2.1', Verdict::OK), F::facts(F::package(['version' => '2.2.1']), $metadata), new Thresholds(), '8.4', $this->report());
+        $explanation = $this->explanation($this->finding('2.2.1', Verdict::OK), F::facts(F::package(['version' => '2.2.1']), $metadata), '8.4');
 
         $explained = JsonPath::arrayAt($explanation->toArray(), ['metadata', 'branches', 0]);
         $details = $explanation->toDetailsArray()['metadata'];
@@ -170,7 +182,7 @@ final class ExplanationTest extends TestCase
     {
         $branch = ['version' => 'v5.5.7', 'at' => new \DateTimeImmutable('2020-09-05T14:06:05+00:00'), 'highest' => ['normalized' => '5.6.1.0', 'pretty' => 'v5.6.1', 'at' => new \DateTimeImmutable('2020-08-25T19:10:18+00:00'), 'php' => '>=7.2.5'], 'php' => '>=7.1.3'];
         $metadata = new PackageMetadata('sensio/framework-extra-bundle', false, null, true, new \DateTimeImmutable('2020-09-05T14:06:05+00:00'), 'v5.5.7', 2, null, 'symfony-bundle', new \DateTimeImmutable(F::NOW), ['5' => $branch]);
-        $explanation = new Explanation($this->finding('v5.4.0', Verdict::OK), F::facts(F::package(['version' => 'v5.4.0']), $metadata), new Thresholds(), '7.2', $this->report(), '>=7.2.0');
+        $explanation = $this->explanation($this->finding('v5.4.0', Verdict::OK), F::facts(F::package(['version' => 'v5.4.0']), $metadata), '7.2', '>=7.2.0');
 
         $row = JsonPath::arrayAt($explanation->toArray(), ['metadata', 'branches', 0]);
 
@@ -180,7 +192,7 @@ final class ExplanationTest extends TestCase
 
     public function testABranchSnapshotBelongsToNoBranch(): void
     {
-        $explanation = new Explanation($this->finding('dev-main', Verdict::PINNED), F::facts(F::package(['version' => 'dev-main']), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])), new Thresholds(), '8.4', $this->report());
+        $explanation = $this->explanation($this->finding('dev-main', Verdict::PINNED), F::facts(F::package(['version' => 'dev-main']), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])), '8.4');
 
         self::assertNull($explanation->installedBranch());
         self::assertFalse($explanation->installedBranchIsUndated());
@@ -201,7 +213,7 @@ final class ExplanationTest extends TestCase
             $facts = F::facts(F::package(['version' => 'dev-main', 'time' => '2025-03-04T05:06:07+00:00']), $metadata);
             $s6 = (new PinnedRule())->evaluate($facts);
             self::assertNotNull($s6, $what);
-            $array = JsonPath::decoded((new Explanation($this->finding('dev-main', Verdict::PINNED, [$s6]), $facts, new Thresholds(), '8.4', $this->report()))->toArray());
+            $array = JsonPath::decoded(($this->explanation($this->finding('dev-main', Verdict::PINNED, [$s6]), $facts, '8.4'))->toArray());
 
             $data = JsonPath::arrayAt($array, ['finding', 'signals', 0, 'data']);
             $meta = JsonPath::arrayAt($array, ['metadata']);
@@ -217,7 +229,7 @@ final class ExplanationTest extends TestCase
         $signal = new Signal(Signal::LEVEL_WARN, 'branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)', SignalDataStub::of(Signal::S8, ['branch' => '1.x']));
         $metadata = F::metadata([['2.1.0', '2026-01-01T00:00:00+00:00'], ['1.5.0', '2021-06-01T00:00:00+00:00']]);
         $package = F::package(['version' => '1.5.0', 'php' => '>=7.1', 'time' => '2021-06-01T00:00:00+00:00']);
-        $explanation = new Explanation($this->finding('1.5.0', Verdict::LEFT_BEHIND, [$signal]), F::facts($package, $metadata, F::activity(false, '2026-02-01T00:00:00+00:00')), new Thresholds(2, 4, 3, 5), '8.3', $this->report());
+        $explanation = $this->explanation($this->finding('1.5.0', Verdict::LEFT_BEHIND, [$signal]), F::facts($package, $metadata, F::activity(false, '2026-02-01T00:00:00+00:00')), '8.3', null, new Thresholds(2, 4, 3, 5));
 
         $array = $explanation->toArray();
 
@@ -266,8 +278,8 @@ final class ExplanationTest extends TestCase
         $remote = new PackageMetadata('vendor/pkg', false, null, true, $at, '1.0.0', 1, 'https://ci:t0k3n@git.acme.test/pkg.git?private_token=t0k3n', 'library', new \DateTimeImmutable(F::NOW));
         $local = new PackageMetadata('vendor/pkg', false, null, true, $at, '1.0.0', 1, 'file:///Users/igor/client-x/pkg', 'library', new \DateTimeImmutable(F::NOW));
 
-        $onTheMachine = (new Explanation($this->finding('1.0.0', Verdict::STALE), F::facts(F::package(['source' => '/Users/igor/client-x/pkg']), $local), new Thresholds(), '8.4', $this->report()))->toArray();
-        $elsewhere = (new Explanation($this->finding('1.0.0', Verdict::STALE), F::facts(F::package(['source' => 'igor@git.acme.test:pkg.git']), $remote), new Thresholds(), '8.4', $this->report()))->toArray();
+        $onTheMachine = ($this->explanation($this->finding('1.0.0', Verdict::STALE), F::facts(F::package(['source' => '/Users/igor/client-x/pkg']), $local), '8.4'))->toArray();
+        $elsewhere = ($this->explanation($this->finding('1.0.0', Verdict::STALE), F::facts(F::package(['source' => 'igor@git.acme.test:pkg.git']), $remote), '8.4'))->toArray();
 
         self::assertSame('.../pkg', JsonPath::arrayAt($onTheMachine, ['lock'])['repository']);
         self::assertSame('.../pkg', JsonPath::arrayAt($onTheMachine, ['metadata'])['repository']);
@@ -278,7 +290,7 @@ final class ExplanationTest extends TestCase
 
     public function testMissingMetadataIsNullNotEmpty(): void
     {
-        $explanation = new Explanation($this->finding('1.0.0', Verdict::UNKNOWN), F::facts(F::package(['fromComposerRepository' => false])), new Thresholds(), '8.4', $this->report());
+        $explanation = $this->explanation($this->finding('1.0.0', Verdict::UNKNOWN), F::facts(F::package(['fromComposerRepository' => false])), '8.4');
 
         $array = $explanation->toArray();
 
@@ -303,7 +315,8 @@ final class ExplanationTest extends TestCase
             $loader->load($on('laravel/framework', 'v10.48.28', 'f10-48', '2024-11-21T14:44:37+00:00')),
             $loader->load($on('laravel/framework', 'v9.52.22', 'f9', '2026-08-12T03:46:05+00:00')),
         ], new \DateTimeImmutable(F::NOW));
-        $explanation = new Explanation($this->finding('v10.48.28', Verdict::OK), F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v10.48.28', 'time' => '2023-06-05T12:46:42+00:00']), $child->datedBy($parent)), new Thresholds(), '8.4', $this->report());
+        $finding = (new FindingBuilder())->withPackage('illuminate/contracts')->withVersion('v10.48.28')->withVerdict(Verdict::OK)->withChain(['root/app', 'illuminate/contracts'])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
+        $explanation = $this->explanation($finding, F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v10.48.28', 'time' => '2023-06-05T12:46:42+00:00']), $child->datedBy($parent)), '8.4');
 
         [$ten, $nine] = $explanation->branches();
 
@@ -331,7 +344,7 @@ final class ExplanationTest extends TestCase
 
     public function testNoBranchDatedByAParentIsNull(): void
     {
-        $explanation = new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package(), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])), new Thresholds(), '8.4', $this->report());
+        $explanation = $this->explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package(), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])), '8.4');
 
         self::assertNull($explanation->branchesDatedBy());
     }
@@ -371,7 +384,7 @@ final class ExplanationTest extends TestCase
     public function testTheInstalledRowIsTestedLikeAnyOther(): void
     {
         $metadata = F::metadata([['3.12.0', '2026-09-09T00:00:00+00:00', '>=8.1']]);
-        $explanation = new Explanation($this->finding('3.12.0', Verdict::OK), F::facts(F::package(['version' => '3.12.0']), $metadata), new Thresholds(), '8.4', $this->report(), '>=7.2.5');
+        $explanation = $this->explanation($this->finding('3.12.0', Verdict::OK), F::facts(F::package(['version' => '3.12.0']), $metadata), '8.4', '>=7.2.5');
 
         $meta = $explanation->toArray()['metadata'];
         self::assertIsArray($meta);
@@ -391,7 +404,7 @@ final class ExplanationTest extends TestCase
     public function testTheInstalledRowSaysItsBranchStopsBeforeTheTarget(): void
     {
         $metadata = F::metadata([['3.2.10', '2024-08-07T00:00:00+00:00', '>=7.2 <8.4']]);
-        $explanation = new Explanation($this->finding('3.2.10', Verdict::OK), F::facts(F::package(['version' => '3.2.10']), $metadata), new Thresholds(), '8.4', $this->report(), '^7.4 || ^8.0');
+        $explanation = $this->explanation($this->finding('3.2.10', Verdict::OK), F::facts(F::package(['version' => '3.2.10']), $metadata), '8.4', '^7.4 || ^8.0');
 
         $row = JsonPath::arrayAt($explanation->toArray(), ['metadata', 'branches', 0]);
         self::assertTrue($row['installed']);
@@ -432,7 +445,7 @@ final class ExplanationTest extends TestCase
             ['3.10.0', '2025-01-01T00:00:00+00:00', '^7.2|^8.0'],
         ]);
         $package = F::package(['version' => '3.10.0', 'php' => '^7.2|^8.0', 'time' => '2025-01-01T00:00:00+00:00']);
-        $explanation = new Explanation($this->finding('3.10.0', Verdict::OK), F::facts($package, $metadata), new Thresholds(), '8.4', $this->report(), '>=7.2.5');
+        $explanation = $this->explanation($this->finding('3.10.0', Verdict::OK), F::facts($package, $metadata), '8.4', '>=7.2.5');
 
         $document = $explanation->toArray();
         self::assertSame('^7.2|^8.0', JsonPath::stringAt($document, ['lock', 'php']), 'the locked version admits 7.2.5');
@@ -445,11 +458,11 @@ final class ExplanationTest extends TestCase
     /** The project php the rows were held against is in the document, as composer.json writes it. */
     public function testTheProjectPhpIsCarriedAsWritten(): void
     {
-        $explanation = new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package()), new Thresholds(), '8.4', $this->report(), '^7.2.5 || ^8.0');
+        $explanation = $this->explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package()), '8.4', '^7.2.5 || ^8.0');
 
         self::assertSame('^7.2.5 || ^8.0', $explanation->projectPhp());
         self::assertSame('^7.2.5 || ^8.0', JsonPath::stringAt($explanation->toArray(), ['run', 'project_php']));
-        self::assertNull((new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package()), new Thresholds(), '8.4', $this->report()))->projectPhp());
+        self::assertNull(($this->explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package()), '8.4'))->projectPhp());
     }
 
     /**
@@ -459,7 +472,7 @@ final class ExplanationTest extends TestCase
      */
     private function sides(string $target, ?string $project, array $releases): array
     {
-        $explanation = new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package(['version' => '1.0.0']), F::metadata($releases)), new Thresholds(), $target, $this->report(), $project);
+        $explanation = $this->explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package(['version' => '1.0.0']), F::metadata($releases)), $target, $project);
         $rows = [];
         foreach (JsonPath::arrayAt($explanation->toArray(), ['metadata', 'branches']) as $row) {
             self::assertIsArray($row);
@@ -477,7 +490,7 @@ final class ExplanationTest extends TestCase
      */
     private function admission(string $target, ?string $project, array $releases): array
     {
-        $explanation = new Explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package(['version' => '1.0.0']), F::metadata($releases)), new Thresholds(), $target, $this->report(), $project);
+        $explanation = $this->explanation($this->finding('1.0.0', Verdict::OK), F::facts(F::package(['version' => '1.0.0']), F::metadata($releases)), $target, $project);
         $meta = $explanation->toArray()['metadata'];
         self::assertIsArray($meta);
         self::assertIsArray($meta['branches']);
@@ -501,7 +514,7 @@ final class ExplanationTest extends TestCase
         $finding = $finding->withDetails($details);
         $metadata = F::metadata([['3.0.0', '2026-01-01T00:00:00+00:00'], ['2.1.0', '2024-01-01T00:00:00+00:00'], ['1.5.0', '2021-06-01T00:00:00+00:00'], ['1.4.0', '2020-01-01T00:00:00+00:00']]);
 
-        $branches = JsonPath::arrayAt((new Explanation($finding, F::facts(F::package(['version' => '1.4.0']), $metadata), new Thresholds(), '8.4', $this->report()))->toArray(), ['metadata', 'branches']);
+        $branches = JsonPath::arrayAt(($this->explanation($finding, F::facts(F::package(['version' => '1.4.0']), $metadata), '8.4'))->toArray(), ['metadata', 'branches']);
 
         self::assertSame(['3.x' => null, '2.x' => FindingDetails::branchFixes($two, null, null, false), '1.x' => FindingDetails::branchFixes($one, null, null, false)], array_column($branches, 'fixes', 'branch'));
     }
