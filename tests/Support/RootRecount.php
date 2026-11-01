@@ -436,7 +436,7 @@ final class RootRecount
         $used = array_fill_keys(['counted', 'lead-first', 'corroborating-share', 'advisory-points', 'no-reachable-fix-multiplier', 'security-max', 'divide-reach', 'security-exempt-from-reach', 'sum', 'divide-dev', 'floor-once', 'band-floors', 'zero-verdicts'], 0)
             + ['sort' => null, 'gate-bounded-new' => 0, 'baseline-cover' => 0];
         foreach ($findings as $finding) {
-            $used['gate-bounded-new'] += isset($finding['score']['terms']) && self::str(self::map(self::map($finding, 'gate'), 'basis'), 'limited_by') === 'cap' ? 1 : 0;
+            $used['gate-bounded-new'] += (self::map($finding, 'score')['terms'] ?? null) !== null && self::str(self::map(self::map($finding, 'gate'), 'basis'), 'limited_by') === 'cap' ? 1 : 0;
             $covered = false;
             foreach (self::rows($finding, 'flags') as $flag) {
                 $covered = $covered || self::str(self::map($flag, 'baseline'), 'state') === 'covered';
