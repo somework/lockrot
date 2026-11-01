@@ -6,6 +6,8 @@ files.
 """
 import re
 
+from guard import require
+
 # revision-3 with a hyphen, measured counts ("79 of 79"), "generated", lockrot.dev's, and a parenthesis opened by a
 # verb whose subject the token pass removed ("(calls them …")
 SHIP_BANNED = re.compile(r'§|SPEC|\bround \d|attack round|schema round|critic round|revision[- ]?\d|‡|r3/|\bcorpus\b|\bI\d+[a-c]?\b'
@@ -132,7 +134,7 @@ def ship_schema(node):
                 if node[k] != v and not any(rx.search(v) for rx, _ in MANUAL) and _stripped_words(v, node[k]):
                     CHANGED.append((v, node[k]))
                     import hashlib
-                    assert hashlib.sha256(node[k].encode()).hexdigest()[:16] in HAND_SHIPPED, ('a description lost words to the shipping pass: rewrite it', node[k][:120])
+                    require(hashlib.sha256(node[k].encode()).hexdigest()[:16] in HAND_SHIPPED, 'a description lost words to the shipping pass: rewrite it', node[k][:120])
             else:
                 ship_schema(v)
     elif isinstance(node, list):

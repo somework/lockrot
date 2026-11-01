@@ -20,6 +20,8 @@ python3 tools/schema/make_negatives.py
 python3 tools/schema/make_negatives_other.py explain-2
 python3 tools/schema/make_negatives_other.py baseline-2
 python3 tools/schema/make_negatives_other.py config-2
+python3 tools/schema/build_sarif_properties_schema.py
+python3 tools/schema/make_negatives_sarif.py
 ```
 
 | Script | Reads | Writes |
@@ -30,10 +32,12 @@ python3 tools/schema/make_negatives_other.py config-2
 | `make_negatives_other.py explain-2` | `tests/fixtures/schema/documents/explain/B.json` | `tests/fixtures/schema/negative/explain-2/` |
 | `make_negatives_other.py baseline-2` | `tests/fixtures/schema/documents/baseline/corpus/matomo-v4.json` | `tests/fixtures/schema/negative/baseline-2/` |
 | `make_negatives_other.py config-2` | none: each fixture is written whole | `tests/fixtures/schema/negative/config-2/` |
+| `build_sarif_properties_schema.py` | `resources/lockrot-report-2.schema.json` | `tests/fixtures/sarif/lockrot-sarif-properties-2.schema.json` |
+| `make_negatives_sarif.py` | `tests/fixtures/sarif/documents/B.sarif.json` | `tests/fixtures/sarif/negative/` |
 | `ts/emit_dts.py` | `resources/lockrot-report-2.schema.json` | `types/` |
 | `project_fixtures.py` | the reference model's `cases.json`, `docs/` and `page-goldens.json` | `tests/fixtures/flags/`, `tests/fixtures/schema/documents/`, `tests/fixtures/contract/page-goldens.json` |
 
-`ship_text.py` is the shipping pass that both builders apply to every description: it removes the
+`ship_text.py` is the shipping pass that the builders apply to every description: it removes the
 references a published description must not hold. A unit test applies its expression `SHIP_BANNED`
 to every generated file (`CONTRIBUTING.md`, "Changing a schema").
 

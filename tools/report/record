@@ -25,6 +25,7 @@ use Lockrot\Tests\Support\Contract\BaselinedScenario;
 use Lockrot\Tests\Support\Contract\ContractBundle;
 use Lockrot\Tests\Support\Contract\EnginePage;
 use Lockrot\Tests\Support\Contract\GoldenMismatch;
+use Lockrot\Tests\Support\Contract\StagedRecording;
 use Lockrot\Tests\Support\VersionMask;
 use Lockrot\Verdict\ScoreModel;
 
@@ -77,21 +78,18 @@ if (($argv[1] ?? null) === '--engine-pages') {
 }
 if (\in_array($argv[1] ?? null, ['--baselined', '--all-baselined'], true)) {
     $scenarios = $argv[1] === '--all-baselined' ? array_keys(BaselinedScenario::SCENARIOS) : [$argv[2] ?? ''];
-    foreach ($scenarios as $scenario) {
+    $roots = array_combine($scenarios, array_map(static fn (string $scenario): string => FIXTURES.'baselined/'.$scenario.'/', $scenarios));
+    $record = static function (string $scenario): array {
         $files = twice(static fn (string $dir): string => '--emit-baselined '.escapeshellarg($scenario).' '.escapeshellarg($dir));
-        $missed = BaselinedFloors::missed($scenario, $files);
-        if ($missed !== []) {
-            fwrite(STDERR, "record: $scenario misses the floors: ".implode(', ', $missed)."\n");
-            exit(1);
-        }
-        $root = FIXTURES.'baselined/'.$scenario.'/';
-        foreach (['t0', 'check', 'regenerate', 'lockrot-baseline.json', 'provenance.json'] as $path) {
-            removeTree($root.$path);
-        }
-        foreach ($files as $path => $contents) {
-            write($root.$path, $contents);
-        }
         fwrite(STDOUT, \sprintf("record: %s, %d files\n", $scenario, \count($files)));
+
+        return $files;
+    };
+    try {
+        StagedRecording::replace($roots, $record, [BaselinedFloors::class, 'missed'], ['t0', 'check', 'regenerate', 'lockrot-baseline.json', 'provenance.json']);
+    } catch (UnexpectedValueException $missed) {
+        fwrite(STDERR, 'record: '.$missed->getMessage()."\n");
+        exit(1);
     }
     // bundle_sha256 covers each scenario's check/report.bundle.json.
     write(FIXTURES.'contract/bundle_sha256', ContractBundle::sha256(ContractBundle::bundleFiles())."\n");
@@ -191,16 +189,5 @@ function write(string $path, string $contents): void
 
 function removeTree(string $path): void
 {
-    if (is_file($path)) {
-        unlink($path);
-
-        return;
-    }
-    if (!is_dir($path)) {
-        return;
-    }
-    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST) as $file) {
-        $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
-    }
-    rmdir($path);
+    StagedRecording::removeTree($path);
 }

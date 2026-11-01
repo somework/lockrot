@@ -21,6 +21,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from ship_text import ship_schema, leftovers  # noqa: E402
+from guard import require  # noqa: E402
 
 ROOT = os.path.join(HERE, '..', '..')
 R = json.load(open(os.path.join(ROOT, 'resources', 'lockrot-report-2.schema.json')))
@@ -205,9 +206,9 @@ schema = {
 }
 ship_schema({k: v for k, v in schema['definitions'].items() if k not in COPIED})
 for n in COPIED:
-    assert json.dumps(schema['definitions'][n], sort_keys=True) == json.dumps(RD[n], sort_keys=True), n
+    require(json.dumps(schema['definitions'][n], sort_keys=True) == json.dumps(RD[n], sort_keys=True), n)
 lo = leftovers(schema)
-assert not lo, lo[:3]
+require(not lo, lo[:3])
 out = os.path.join(ROOT, 'tests', 'fixtures', 'sarif', 'lockrot-sarif-properties-2.schema.json')
 os.makedirs(os.path.dirname(out), exist_ok=True)
 with open(out, 'w') as fh:

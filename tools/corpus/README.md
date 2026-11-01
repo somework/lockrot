@@ -84,7 +84,9 @@ against a report-2 run prints `report-1 vs report-2: verdicts not compared`. It 
 `tests/fixtures/apps`, because the model records no Composer check. The entry
 `tools/corpus/lockrot-without-move-check` is the lockrot command with an Analyzer that checks no
 move, so `run.move_check` is null. The differential compares each finding of report-2 with the
-model's document for the same lock. drupal runs twice:
+model's document for the same lock. `Lockrot\Tests\Support\CorpusDifferential::FIELDS` names the
+compared fields. They include each finding's gate decision at `--fail-on=high`, the value that both
+sides run with. drupal runs twice:
 once with its packages.drupal.org answers, and once with that advisory lookup failed. Both sides read
 only the answers in `tests/fixtures/corpus/cache/`, at one clock.
 
