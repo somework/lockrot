@@ -39,6 +39,16 @@ class FullCheckMatrixTest(unittest.TestCase):
     def test_an_rc_tag_runs_the_full_check(self):
         self.assertIn("tags: ['v*-rc.*']", read('full-check.yml'))
 
+    def test_the_release_rehearsal_gates_the_changes_since_main_on_the_shard_results(self):
+        job = mutation_job(read('full-check.yml'))
+        (call,) = [line for line in job.splitlines() if '--changed' in line]
+
+        self.assertIn('base=$(git merge-base origin/main HEAD)', job)
+        self.assertIn('fetch-depth: 0', job)
+        self.assertIn('python3 tools/mutation/pr_gate.py --paths "$FILTER" --changed "$base" build/infection.json tests/infection-equivalents.md', call)
+        self.assertNotIn('--report-only', call)
+        self.assertIn('exit $status', job[job.index(call):])
+
     def test_a_changed_shard_is_seen(self):
         changed = mutation_job(read('full-check.yml')).replace('min_msi: 98}', 'min_msi: 97}', 1)
 

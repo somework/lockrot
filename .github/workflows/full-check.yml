@@ -1,6 +1,7 @@
 name: full-check
 # A full check pushes a pull request's head unchanged to release/full-check-<sha>. This workflow runs
-# there the whole-tree mutation gate that ci.yml runs on a push, and ci.yml's move-check-oracle job.
+# there the whole-tree mutation gate that ci.yml runs on a push, its release rehearsal against main,
+# and ci.yml's move-check-oracle job.
 # The pull request's own run has checked every other job on that commit. ci.yml ignores these
 # branches. A push of an rc tag runs this workflow too: the whole-tree gate and the oracle run on the
 # rc-tagged commit. This run fails while the commit changes the contract bundle and vendors an older
@@ -63,11 +64,23 @@ jobs:
     steps:
       - if: "!contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)"
         run: echo "The branch name leaves this shard out of the full check, so it mutates nothing." >> "$GITHUB_STEP_SUMMARY"
+      # The release rehearsal diffs the commit against main: it needs the history down to the merge base.
       - if: contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)
         uses: actions/checkout@v7
+        with: {fetch-depth: 0}
       - if: contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)
         uses: ./.github/actions/mutation-shard
         with: {filter: '${{ matrix.shard.filter }}', min-msi: '${{ matrix.shard.min_msi }}', full: 'true'}
+      # The release pull request into main mutates the lines that it changes against main, and ci.yml's
+      # ledger check fails on each mutant there that tests/infection-equivalents.md does not account for.
+      # This step reads the full run as that check will, so an unlisted escape fails here before release day.
+      - name: Release rehearsal (the changes since main against tests/infection-equivalents.md)
+        if: always() && contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name) && hashFiles('build/infection.json') != ''
+        env: {FILTER: '${{ matrix.shard.filter }}'}
+        run: |
+          base=$(git merge-base origin/main HEAD)
+          status=0; python3 tools/mutation/pr_gate.py --paths "$FILTER" --changed "$base" build/infection.json tests/infection-equivalents.md > rehearsal.md || status=$?
+          cat rehearsal.md >> "$GITHUB_STEP_SUMMARY"; cat rehearsal.md; exit $status
       - if: always() && contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)
         uses: actions/upload-artifact@v7
         with: {name: 'infection (${{ matrix.shard.name }})', path: 'build/infection*.*', if-no-files-found: ignore}
