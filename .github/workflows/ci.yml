@@ -151,6 +151,15 @@ jobs:
         if: github.event_name == 'pull_request' && github.base_ref == 'main'
         env: {GH_TOKEN: '${{ github.token }}'}
         run: tools/report/check-vendored
+      # VersionTest passes while Version::STRING and the newest dated CHANGELOG heading both name the
+      # previous release, so only the base of the pull request shows a missing bump.
+      - name: The release pull request bumps the version
+        if: github.event_name == 'pull_request' && github.base_ref == 'main'
+        env: {BASE_SHA: '${{ github.event.pull_request.base.sha }}'}
+        run: |
+          git fetch --no-tags --depth=1 origin "$BASE_SHA"
+          git show "$BASE_SHA:src/Version.php" > "$RUNNER_TEMP/base-Version.php"
+          python3 tools/release/version_bump.py "$RUNNER_TEMP/base-Version.php"
       # tools/schema writes the -2 schemas and their negative fixtures (tools/schema/README.md). An edit
       # of a generated file, or a builder change committed without its output, fails here.
       - name: The generated schemas and negatives match tools/schema
@@ -369,6 +378,9 @@ jobs:
       # The pull-request mutation gate and its shard configuration, also stdlib-only Python.
       - run: python -m compileall -q tools/mutation
       - run: python -m unittest discover -s tools/mutation/tests -t tools/mutation/tests
+      # The version-bump check of a release pull request, also stdlib-only Python.
+      - run: python -m compileall -q tools/release
+      - run: python -m unittest discover -s tools/release/tests -t tools/release/tests
   # The TypeScript contract of report-2 (types/, tools/schema/ts/emit_dts.py) and a second JSON
   # Schema validator. npm ci installs only what tools/schema/node/package-lock.json pins.
   typescript:
