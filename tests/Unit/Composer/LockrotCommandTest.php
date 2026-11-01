@@ -2137,7 +2137,7 @@ final class LockrotCommandTest extends TestCase
 
         self::assertSame(2, $code, $stderr);
         self::assertSame('', $stdout);
-        self::assertStringContainsString('lockrot '.$major.'.'.$minor.' reads baseline-2 only. Review the findings, then run --generate-baseline.', $stderr);
+        self::assertStringContainsString('lockrot '.$major.'.'.$minor.' reads baseline-2 only, and lockrot-baseline.json is a baseline-1 file. Move it aside to review the findings, then run --generate-baseline: https://lockrot.dev/baseline/#moving-from-a-baseline-1-file', $stderr);
     }
 
     /** `--generate-baseline` over a baseline-1 file writes a fresh baseline-2 and carries nothing forward. */

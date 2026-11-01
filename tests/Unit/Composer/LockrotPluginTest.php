@@ -62,7 +62,7 @@ final class LockrotPluginTest extends TestCase
 
         $plugin->activate(new Composer(), $io);
 
-        self::assertSame('lockrot needs Composer 2.10 or later and does nothing on Composer '.$version.'.'.\PHP_EOL, $io->getOutput());
+        self::assertSame('lockrot: Composer '.$version.' is older than 2.10, so lockrot does nothing. Upgrade Composer, or run the PHAR: https://lockrot.dev/phar/'.\PHP_EOL, $io->getOutput());
         self::assertSame([], $plugin->getCapabilities());
     }
 

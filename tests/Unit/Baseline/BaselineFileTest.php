@@ -24,9 +24,9 @@ final class BaselineFileTest extends TestCase
     /** @return iterable<string, array{string, string}> */
     public static function releases(): iterable
     {
-        yield 'a 0.14 release' => ['0.14.0', 'lockrot 0.14 reads baseline-2 only. Review the findings, then run --generate-baseline.'];
-        yield 'a later release' => ['0.15.2', 'lockrot 0.15 reads baseline-2 only. Review the findings, then run --generate-baseline.'];
-        yield 'a build that is no release' => ['dev-main 1.2', 'lockrot dev-main 1.2 reads baseline-2 only. Review the findings, then run --generate-baseline.'];
+        yield 'a 0.14 release' => ['0.14.0', 'lockrot 0.14 reads baseline-2 only, and lockrot-baseline.json is a baseline-1 file. Move it aside to review the findings, then run --generate-baseline: https://lockrot.dev/baseline/#moving-from-a-baseline-1-file'];
+        yield 'a later release' => ['0.15.2', 'lockrot 0.15 reads baseline-2 only, and lockrot-baseline.json is a baseline-1 file. Move it aside to review the findings, then run --generate-baseline: https://lockrot.dev/baseline/#moving-from-a-baseline-1-file'];
+        yield 'a build that is no release' => ['dev-main 1.2', 'lockrot dev-main 1.2 reads baseline-2 only, and lockrot-baseline.json is a baseline-1 file. Move it aside to review the findings, then run --generate-baseline: https://lockrot.dev/baseline/#moving-from-a-baseline-1-file'];
     }
 
     /**
