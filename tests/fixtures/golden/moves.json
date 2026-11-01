@@ -3682,6 +3682,311 @@
             "text": "require a tag \u2014 the newest is 1.6.2 (2019-01-23); 1.x needs php >=5.5, which require.php allows; it was released before your target PHP's major, so old-promise would count; stale stays"
         }
     },
+    "S5-parent-after-ga\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "vulnerable",
+            "merged": [
+                "left-behind"
+            ],
+            "fix_kind": "upgrade",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "5.x",
+            "version": "v5.4.52",
+            "newest": "v5.4.52",
+            "constraint": "^5.4.52",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2.5",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "target": null,
+                    "constraint": "^2.6",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-4wjj-gy1p-ft3r",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "symfony/monolog-bridge:^5.4.52"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "symfony/monolog-bridge",
+                    "v5.4.52",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "v2.8.52",
+            "held_by": [],
+            "if_applied": null,
+            "check": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "S5-untrusted\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "vulnerable",
+            "merged": [
+                "left-behind"
+            ],
+            "fix_kind": "upgrade",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "5.x",
+            "version": "v5.4.52",
+            "newest": "v5.4.52",
+            "constraint": "^5.4.52",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2.5",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "target": null,
+                    "constraint": "^2.6",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-4wjj-gy1p-ft3r",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "symfony/monolog-bridge:^5.4.52"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "symfony/monolog-bridge",
+                    "v5.4.52",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "v2.8.52",
+            "held_by": [],
+            "if_applied": null,
+            "check": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "S8-prerelease-installed\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "left-behind",
+            "merged": [
+                "vulnerable"
+            ],
+            "fix_kind": "upgrade",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "5.x",
+            "version": "v5.4.52",
+            "newest": "v5.4.52",
+            "constraint": "^5.4.52",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2.5",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "target": null,
+                    "constraint": "^2.6",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-4wjj-gy1p-ft3r",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "symfony/monolog-bridge:^5.4.52"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "symfony/monolog-bridge",
+                    "v5.4.52",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "v2.8.52",
+            "held_by": [],
+            "if_applied": null,
+            "check": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
     "abandoned-audit-ignore\u2021": {
         "next_step": {
             "kind": "replace",
@@ -11684,6 +11989,96 @@
                 "form": null,
                 "reason": "pass_cap",
                 "installs": null
+            }
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "mc-php-newest\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "update",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "v2.3.2",
+            "newest": "v2.3.2",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-7jn3-yc49-35c6",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "resolves",
+                "form": "inline",
+                "reason": null,
+                "installs": "v2.3.2"
+            },
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "typo3/html-sanitizer:^2.3.2"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update 'typo3/html-sanitizer:^2.3.2' (gets v2.3.2) \u2014 clears the advisory; Composer's solver checked it against the lock"
+        },
+        "fix_kind": "update",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": "update",
+            "lowest": "v2.3.2",
+            "newest": "v2.3.2",
+            "held_by": [],
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "resolves",
+                "form": "inline",
+                "reason": null,
+                "installs": "v2.3.2"
             }
         },
         "move_in": "next_step",
