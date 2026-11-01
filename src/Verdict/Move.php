@@ -217,12 +217,6 @@ final class Move implements \JsonSerializable
         return $this->source;
     }
 
-    /** @return list<string> */
-    public function merged(): array
-    {
-        return $this->merged;
-    }
-
     /** Whether the move comes from `vulnerable`, alone or merged. */
     public function isSecurity(): bool
     {

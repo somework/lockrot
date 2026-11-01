@@ -30,11 +30,6 @@ final class MoveCheckRun implements \JsonSerializable
         $this->baseline = $baseline;
     }
 
-    public function baseline(): MoveCheck
-    {
-        return $this->baseline;
-    }
-
     /** @return list<string> */
     public function blockingDisabledBy(): array
     {
