@@ -124,6 +124,21 @@ class ACaseWithoutBranchRowsHydratesFromItsRunReleases(unittest.TestCase):
 
         self.assertEqual({'laminas/laminas-code': '~4.7.0'}, inputs['root']['require'])
 
+    def test_a_lock_entry_without_a_time_takes_the_time_of_its_merged_release(self):
+        given = self.RELEASES + [{'version': '4.7.1', 'time': '2015-06-25T11:21:15+00:00', 'php': '^7.4 || ~8.0.0', 'shared_commit': True}]
+
+        inputs = project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN, 'run_inputs': {'_releases': given}})
+
+        self.assertEqual('2015-06-25T11:21:15+00:00', inputs['lock'][0]['time'])
+
+    def test_a_lock_entry_with_a_time_keeps_it_over_its_merged_release(self):
+        finding = dict(self.FINDING, age={'installed': {'at': '2021-08-30T10:00:00+00:00'}})
+        given = [{'version': '4.7.1', 'time': '2015-06-25T11:21:15+00:00', 'php': '^7.4 || ~8.0.0'}]
+
+        inputs = project_fixtures.inputs_of({'finding': finding, 'run': self.RUN, 'run_inputs': {'_releases': given}})
+
+        self.assertEqual('2021-08-30T10:00:00+00:00', inputs['lock'][0]['time'])
+
     def test_a_case_without_branch_rows_and_without_run_releases_gets_none(self):
         self.assertIsNone(project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN}))
 

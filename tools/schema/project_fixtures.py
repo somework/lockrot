@@ -545,6 +545,10 @@ def inputs_of(case):
         # Without branch rows the run inputs list every release: a release that only the finding names is not one of them.
         base = inputs['releases'] if rows else [r for r in inputs['releases'] if r['version'] == f['version']]
         inputs['releases'] = run_releases(run_inputs['_releases'], base)
+    own_release = next((r for r in inputs.get('releases') or [] if r['version'] == f['version']), None)
+    if inputs['lock'][0]['time'] is None and own_release is not None:
+        # Composer copies the release's `time` into composer.lock.
+        inputs['lock'][0]['time'] = own_release['time']
     if checks:
         inputs['checks'] = checks
         inputs['move_check'] = move_check_of(run['move_check'], world, run.get('php_window'))
