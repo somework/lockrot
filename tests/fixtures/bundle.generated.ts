@@ -205628,7 +205628,7 @@ export const d_mc_newest_above_row_dagger = {
                 "constraint": null,
                 "latest": null,
                 "php_check": {
-                    "requires": ">=8.1",
+                    "requires": ">=8.1 <8.5",
                     "project_allows": true,
                     "target_runs": true,
                     "raise_to": null,

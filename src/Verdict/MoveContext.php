@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\Constraint\MultiConstraint;
@@ -247,6 +248,31 @@ final class MoveContext
     public function isReleasing(?\DateTimeImmutable $at): bool
     {
         return $at !== null && $at > $this->now->modify('-'.$this->warnYears.' years');
+    }
+
+    /**
+     * The php of the release that Composer installs at the target for a move from $lower to
+     * $newest (ruling R8-1): $newest when the target runs it, else the highest release on $lower's
+     * branch at or above $lower that the target runs. The branch top when the target runs no such release.
+     */
+    public function phpAtTarget(BranchRow $row, ?Candidate $lower, ?string $newest): ?string
+    {
+        $release = $newest === null ? null : $this->release($newest);
+        if ($release !== null && $this->floor->admitsTarget($release->php()) !== false) {
+            return $release->php();
+        }
+        if ($lower === null) {
+            return $row->highestPhp();
+        }
+        $runs = null;
+        foreach ($this->releases ?? [] as $candidate) {
+            if (ReleaseBranch::of($candidate->pretty()) === $lower->branchKey() && !Comparator::lessThan($candidate->normalized(), $lower->release()->normalized())
+                && $this->floor->admitsTarget($candidate->php()) !== false) {
+                $runs = $candidate;
+            }
+        }
+
+        return $runs === null ? $row->highestPhp() : $runs->php();
     }
 
     /** A release above the installed one, by its version as the repository writes it. */
