@@ -135,9 +135,25 @@ final class HtmlFormatterTest extends TestCase
         self::assertStringNotContainsString('</script><script>alert(1)', $page);
         $matched = preg_match('{<script id="lockrot-data" type="application/json">(.*?)</script>}s', $page, $m);
         self::assertSame(1, $matched);
-        self::assertStringNotContainsString('<!--', $m[1], 'a comment opener inside the payload would end parsing too');
         $payload = self::payloadOf($page);
         self::assertSame($nasty, J::stringAt($payload, ['report', 'findings', 0, 'package']), 'and it still reads back unchanged');
+    }
+
+    /**
+     * `<!--` followed by `<script` puts the data element into the double-escaped state, where its
+     * `</script>` no longer ends it and the element swallows the rest of the page. U+2028 and U+2029
+     * end a line in a JavaScript string literal before ES2019.
+     */
+    public function testACommentOpenerAndTheLineSeparatorsAreEscapedInThePayload(): void
+    {
+        $nasty = "evil/x<!--<script>a\u{2028}b\u{2029}c";
+        $page = $this->page($this->report([$this->finding($nasty)]));
+
+        $matched = preg_match('{<script id="lockrot-data" type="application/json">(.*?)</script>}s', $page, $m);
+        self::assertSame(1, $matched);
+        self::assertStringContainsString('x<\\u0021--<script>a\\u2028b\\u2029c', $m[1]);
+        self::assertStringNotContainsString('<!--', $m[1]);
+        self::assertSame($nasty, J::stringAt(self::payloadOf($page), ['report', 'findings', 0, 'package']));
     }
 
     /** The GitHub Actions runner reads `##[` anywhere in a line of a log, and `--format=html` can go to stdout. */
