@@ -523,7 +523,7 @@ final class ExplanationTest extends TestCase
     public function testTheRunCarriesThePlatformPhpAndTheTargetOfTheWindowAndNothingElse(): void
     {
         $finding = $this->finding('1.0.0', Verdict::STALE);
-        $window = PhpWindow::of(LockFile::fromArray(['packages' => [], 'packages-dev' => [], 'platform-overrides' => ['php' => '7.4.29']]), ProjectConfig::empty(), '8.4', PhpReleaseDates::load()->minors(Clock::fixed(F::NOW)));
+        $window = PhpWindow::of(LockFile::fromArray(['packages' => [], 'packages-dev' => []]), ProjectConfig::fromArray(['config' => ['platform' => ['php' => '7.4.29']]]), '8.4', PhpReleaseDates::load()->minors(Clock::fixed(F::NOW)));
         $report = (new Report([$finding], [], new \DateTimeImmutable(F::NOW), 1, 0))->withPhpWindow($window);
 
         $array = (new Explanation($finding, F::facts(F::package()), new Thresholds(), '8.4', $report))->toArray();

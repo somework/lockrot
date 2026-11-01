@@ -4807,7 +4807,7 @@ score     16 = left-behind 16     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the moves_not_checked note names the first cause. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it
+do        First set config.platform.php to your PHP 8.4 release: Composer's config sets 7.4.29. Composer still refuses the lock itself: the moves_not_checked note names the first cause. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it
           clears left-behind
 
 flags
@@ -4841,7 +4841,7 @@ score     16 = left-behind 16     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the moves_not_checked note names the first cause. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it
+do        First set config.platform.php to your PHP 8.4 release: Composer's config sets 7.4.29. Composer still refuses the lock itself: the moves_not_checked note names the first cause. raise require.php to >=8.0, then require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below the newest PHP, so capped would count; 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it
           clears left-behind
 
 flags
@@ -4874,7 +4874,7 @@ score     2 = vulnerable 2 [low advisory]     low from 1
   reach        via incenteev/composer-parameter-handler, nelmio/api-doc-bundle and php-amqplib/rabbitmq-bundle: maintenance would be halved (none counts); security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle and php-amqplib/rabbitmq-bundle — clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (requires 5.3.*); the packages that hold it may need to move too; Composer's solver refuses it against the lock
+do        First set config.platform.php to your PHP 8.4 release: Composer's config sets 7.4.29. move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle and php-amqplib/rabbitmq-bundle — clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (requires 5.3.*); the packages that hold it may need to move too; Composer's solver refuses it against the lock
           clears PKSA-b14r-zh1d-vdrc, PKSA-ft77-7h5f-p3r6 and PKSA-v5yj-8nmz-sk2q
 
 flags

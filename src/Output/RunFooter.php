@@ -246,7 +246,7 @@ final class RunFooter
 
     /**
      * The `php:` line of `run.php_window`: the minors the lock installs on, then the update that
-     * admits an excluded target (`target_fix`), or else the PHP that Composer checks the lock at
+     * admits an excluded target (`target_fix`), or else the PHP that Composer solves at
      * and the links that set the edge which matters. Null when the window is null.
      *
      * @param callable(string): string $name marks a package name or a command as the format marks code
@@ -280,7 +280,7 @@ final class RunFooter
         }
         $parts = [$clause];
         if ($data['platform_override'] !== null) {
-            $parts[] = 'Composer checks it at '.$data['platform_override'].' from config.platform.php';
+            $parts[] = 'Composer solves at '.$data['platform_override'].' from config.platform.php';
         }
         $edge = self::edgeWords($window, $report->includesDev(), $name);
         if ($edge !== null) {

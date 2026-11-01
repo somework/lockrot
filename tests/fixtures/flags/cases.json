@@ -290575,7 +290575,8 @@
      "platform-overrides": {
       "php": "7.4.29"
      }
-    }
+    },
+    "config_platform_php": "7.4.29"
    }
   },
   {
@@ -292218,7 +292219,8 @@
      "platform-overrides": {
       "php": "7.4.29"
      }
-    }
+    },
+    "config_platform_php": "7.4.29"
    }
   },
   {
@@ -294777,7 +294779,8 @@
      "platform-overrides": {
       "php": "7.4.29"
      }
-    }
+    },
+    "config_platform_php": "7.4.29"
    }
   },
   {
@@ -296252,7 +296255,8 @@
      "platform-overrides": {
       "php": "7.4.29"
      }
-    }
+    },
+    "config_platform_php": "7.4.29"
    }
   },
   {

@@ -77,8 +77,10 @@ final class PhpWindow implements \JsonSerializable
      * @param list<string> $knownMinors {@see \Lockrot\Data\Php\PhpReleaseDates::minors()}
      * @param ?string      $solvePhp    the php that the move check solves at, from Composer's merged
      *                                  config; null reads composer.json's `config.platform.php`
+     * @param ?string      $configuredPhp `config.platform.php` of Composer's merged config, which
+     *                                    `platform_override` holds; null reads composer.json's
      */
-    public static function of(LockFile $lock, ProjectConfig $project, string $targetMinor, array $knownMinors, ?string $solvePhp = null): ?self
+    public static function of(LockFile $lock, ProjectConfig $project, string $targetMinor, array $knownMinors, ?string $solvePhp = null, ?string $configuredPhp = null): ?self
     {
         $rootProvides = $project->platformConstraints(ProjectConfig::PROVIDE) + $project->platformConstraints(ProjectConfig::REPLACE);
         if (array_intersect(array_keys($rootProvides), self::VERSIONED) !== []) {
@@ -125,7 +127,7 @@ final class PhpWindow implements \JsonSerializable
         $lockOnly = self::lockOnlyLinks($lock, $project, $sets['with_dev'] !== null);
 
         return new self([
-            'platform_override' => $lock->platformOverridePhp(),
+            'platform_override' => $configuredPhp ?? $project->platformPhp(),
             'host_requires' => $hosts,
             'with_dev' => $windows['with_dev'],
             'without_dev' => $windows['without_dev'],

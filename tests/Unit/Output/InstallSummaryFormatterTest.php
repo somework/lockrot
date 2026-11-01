@@ -145,11 +145,11 @@ final class InstallSummaryFormatterTest extends TestCase
     {
         $composite = CaseHydrator::composite();
         $findings = array_values(array_filter($composite->findings(), static fn (Finding $finding): bool => \in_array($finding->package(), ['symfony/yaml', 'symfony/polyfill-intl-idn'], true)));
-        $window = PhpWindow::of(LockFile::fromArray(['packages' => [], 'packages-dev' => [], 'platform-overrides' => ['php' => '7.4.29']]), ProjectConfig::empty(), '8.4', PhpReleaseDates::load()->minors(Clock::fixed(self::NOW)));
+        $window = PhpWindow::of(LockFile::fromArray(['packages' => [], 'packages-dev' => []]), ProjectConfig::fromArray(['config' => ['platform' => ['php' => '7.4.29']]]), '8.4', PhpReleaseDates::load()->minors(Clock::fixed(self::NOW)));
 
         $lines = self::lines(self::report($findings)->withPhpWindow($window));
 
-        self::assertContains('  update now: First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/yaml symfony/polyfill-intl-idn', $lines);
+        self::assertContains('  update now: First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29. composer update symfony/yaml symfony/polyfill-intl-idn', $lines);
     }
 
     public function testTheUpdateLineCountsOnlyThePackagesThatTheBlockDoesNotShow(): void
@@ -198,7 +198,7 @@ final class InstallSummaryFormatterTest extends TestCase
     {
         $line = self::lines(self::report([self::withMove('symfony/http-client', '7.4.29', [['composer', 'update', 'symfony/http-client', '--with-dependencies']])]))[1];
 
-        self::assertStringEndsWith(' — First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/http-client --with-dependencies …', $line);
+        self::assertStringEndsWith(' — First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29. composer update symfony/http-client --with-dependencies …', $line);
     }
 
     /**
@@ -275,7 +275,7 @@ final class InstallSummaryFormatterTest extends TestCase
     {
         $line = self::lines(self::report([self::withMove('acme/lib', '7.4.29', [['composer', 'update', 'acme/lib']], '5.4.0', true)]))[1];
 
-        self::assertStringContainsString(' — First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update acme/lib', $line);
+        self::assertStringContainsString(' — First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29. composer update acme/lib', $line);
         self::assertStringNotContainsString('Composer still refuses the lock itself', $line);
     }
 

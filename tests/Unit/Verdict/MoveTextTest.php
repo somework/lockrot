@@ -95,7 +95,7 @@ final class MoveTextTest extends TestCase
 
         $text = MoveText::render($move);
 
-        self::assertSame($step ? 'First set config.platform.php to your PHP '.$target.' release: the lock records '.$override.'. composer update acme/lib (gets 2.0.0)' : 'composer update acme/lib (gets 2.0.0)', $text);
+        self::assertSame($step ? 'First set config.platform.php to your PHP '.$target.' release: Composer\'s config sets '.$override.'. composer update acme/lib (gets 2.0.0)' : 'composer update acme/lib (gets 2.0.0)', $text);
     }
 
     /**
@@ -109,7 +109,7 @@ final class MoveTextTest extends TestCase
 
         $text = MoveText::render($move);
 
-        self::assertSame('First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the moves_not_checked note names the first cause. composer update acme/lib (gets 2.0.0)', $text);
+        self::assertSame('First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29. Composer still refuses the lock itself: the moves_not_checked note names the first cause. composer update acme/lib (gets 2.0.0)', $text);
         self::assertStringNotContainsString('Run tab', $text);
         self::assertStringNotContainsString('PHP line', $text);
     }
@@ -136,7 +136,7 @@ final class MoveTextTest extends TestCase
         $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, '7.4.29');
         $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', null, null, null, false, [], [], [], [], [], null, [], [['composer', 'why-not', 'acme/lib', '2.0.0', '--locked']], $subject);
 
-        self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. ', MoveText::render($move->withCheck(MoveCheck::refused())));
+        self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29. ', MoveText::render($move->withCheck(MoveCheck::refused())));
     }
 
     /** monica's firebase/php-jwt: the joint request resolves the move with an update of its two holders. */
@@ -377,7 +377,7 @@ final class MoveTextTest extends TestCase
     {
         $update = ['composer', 'update', 'acme/lib'];
         yield 'the command first' => [Move::UPDATE, FlagSet::VULNERABLE, null, [$update], [['composer update acme/lib', true], [' (gets 2.0.0)', false]]];
-        yield 'a platform step before the command' => [Move::UPDATE, FlagSet::VULNERABLE, '7.4.29', [$update], [['First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. ', false], ['composer update acme/lib', true], [' (gets 2.0.0)', false]]];
+        yield 'a platform step before the command' => [Move::UPDATE, FlagSet::VULNERABLE, '7.4.29', [$update], [['First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29. ', false], ['composer update acme/lib', true], [' (gets 2.0.0)', false]]];
         yield 'a command that no shell takes, before the named one' => [Move::UPDATE, FlagSet::VULNERABLE, null, [['composer', 'update', 'acme/lib;x'], $update], [['composer update acme/lib', true], [' (gets 2.0.0)', false]]];
         yield 'no command that a shell takes' => [Move::UPDATE, FlagSet::VULNERABLE, null, [['composer', 'update', 'acme/lib;x']], [['update it with Composer (gets 2.0.0)', false]]];
         yield 'no command in the text' => [Move::FIND_ALTERNATIVE, FlagSet::ABANDONED, null, [], [['find a replacement (none named)', false]]];
@@ -394,7 +394,7 @@ final class MoveTextTest extends TestCase
         $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '1.x', '1.0.3', '1.0.3', null, null, null, false, [], [], [], [], [], null, [], [['composer', 'update', 'acme/c0ffee12', '--with-dependencies']], $subject);
 
         self::assertSame([
-            ['First set config.platform.php to your PHP 8.4 release: the lock records '.$override.'. ', false],
+            ['First set config.platform.php to your PHP 8.4 release: Composer\'s config sets '.$override.'. ', false],
             ['composer update acme/c0ffee12 --with-dependencies', true],
             [' (gets 1.0.3)', false],
         ], MoveText::parts($move));

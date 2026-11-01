@@ -120,7 +120,7 @@ final class ReferenceText
         $check = \is_array($run['move_check'] ?? null) ? $run['move_check'] : [];
         $refused = ($check['baseline'] ?? null) === 'refused' ? ' Composer still refuses the lock itself: the moves_not_checked note names the first cause.' : '';
 
-        return 'First set config.platform.php to your PHP '.$target.' release: the lock records '.$override.'.'.$refused.' ';
+        return 'First set config.platform.php to your PHP '.$target.' release: Composer\'s config sets '.$override.'.'.$refused.' ';
     }
 
     /** @param array<mixed, mixed>|null $check */

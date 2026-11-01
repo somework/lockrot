@@ -233,9 +233,9 @@ final class RunFooterTest extends TestCase
     public function testThePhpLineNamesTheOverrideAndAtMostThreeSettersOfTheUpperEdge(): void
     {
         $packages = array_map(static fn (string $name): array => self::package($name, ['php' => '<8.4']), ['acme/a', 'acme/b', 'acme/c', 'acme/d']);
-        $line = self::phpLine(['packages' => $packages, 'packages-dev' => [], 'platform-overrides' => ['php' => '8.2.0']], ['require' => ['php' => '<8.4']], '8.3');
+        $line = self::phpLine(['packages' => $packages, 'packages-dev' => []], ['require' => ['php' => '<8.4'], 'config' => ['platform' => ['php' => '8.2.0']]], '8.3');
 
-        self::assertSame('php: the lock installs on PHP 5.3 to 8.3; Composer checks it at 8.2.0 from config.platform.php; require.php, acme/a, acme/b and 2 more exclude 8.4', $line);
+        self::assertSame('php: the lock installs on PHP 5.3 to 8.3; Composer solves at 8.2.0 from config.platform.php; require.php, acme/a, acme/b and 2 more exclude 8.4', $line);
     }
 
     public function testThePhpLineOfAnEmptyWindowSaysOnNoPhp(): void
@@ -303,9 +303,9 @@ final class RunFooterTest extends TestCase
     /** @return iterable<string, array{string, string}> */
     public static function updateNowFormats(): iterable
     {
-        yield 'table' => ['table', 'update now: First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/yaml symfony/polyfill-intl-idn'];
-        yield 'markdown' => ['markdown', '**Update now:** First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. `composer update symfony/yaml symfony/polyfill-intl-idn`'];
-        yield 'github' => ['github', "\nupdate now: First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. composer update symfony/yaml symfony/polyfill-intl-idn\n"];
+        yield 'table' => ['table', 'update now: First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29. composer update symfony/yaml symfony/polyfill-intl-idn'];
+        yield 'markdown' => ['markdown', '**Update now:** First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29. `composer update symfony/yaml symfony/polyfill-intl-idn`'];
+        yield 'github' => ['github', "\nupdate now: First set config.platform.php to your PHP 8.4 release: Composer's config sets 7.4.29. composer update symfony/yaml symfony/polyfill-intl-idn\n"];
     }
 
     /**
@@ -316,7 +316,7 @@ final class RunFooterTest extends TestCase
     #[DataProvider('updateNowFormats')]
     public function testTheUpdateNowLineFirstSetsAPlatformPhpOutsideTheTargetMinor(string $format, string $line): void
     {
-        $window = PhpWindow::of(LockFile::fromArray(['packages' => [], 'packages-dev' => [], 'platform-overrides' => ['php' => '7.4.29']]), ProjectConfig::empty(), '8.4', PhpReleaseDates::load()->minors(new Clock(new \DateTimeImmutable(self::AT))));
+        $window = PhpWindow::of(LockFile::fromArray(['packages' => [], 'packages-dev' => []]), ProjectConfig::fromArray(['config' => ['platform' => ['php' => '7.4.29']]]), '8.4', PhpReleaseDates::load()->minors(new Clock(new \DateTimeImmutable(self::AT))));
         $report = CaseHydrator::composite()->withPhpWindow($window);
 
         $text = Formatters::for($format, FormatContext::create(null, 'high'))->format($report);
