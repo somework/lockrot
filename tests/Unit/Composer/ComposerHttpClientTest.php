@@ -406,6 +406,30 @@ final class ComposerHttpClientTest extends TestCase
         self::assertIsArray($options['http']);
         self::assertSame(3, $options['http']['timeout'], '5s budget, 2.6s gone -> 2.4s left, rounded up');
     }
+
+    /**
+     * Without curl, add() runs each request to its end before it returns. So a request without
+     * lockrot's credentials must check the budget and read its timeout when it starts.
+     */
+    public function testWithoutCurlEachRequestStartsOnlyInsideTheBudgetWithTheTimeLeft(): void
+    {
+        $urls = ['https://gitlab.com/api/v4/projects/a', 'https://gitlab.com/api/v4/projects/b', 'https://gitlab.com/api/v4/projects/c'];
+        $held = new \stdClass();
+        $now = static function () use ($held): float {
+            return ($held->downloader ?? null) instanceof ScriptedDownloader ? 3.0 * \count($held->downloader->requests) : 0.0;
+        };
+        $io = new NullIO();
+        $config = new Config(false, sys_get_temp_dir());
+        $downloader = new ScriptedDownloader($io, $config, [$urls[0] => [200, 'a'], $urls[1] => [200, 'b'], $urls[2] => [200, 'c']]);
+        $held->downloader = $downloader;
+        $client = new ComposerHttpClient($downloader, $io, $config, Clock::fixed(self::NOW), Deadline::inSeconds(5.0, $now), false);
+
+        $results = $client->fetchAll($urls, self::WITHOUT_AUTHORIZATION);
+
+        self::assertSame([$urls[0], $urls[1]], array_column($downloader->requests, 'url'), 'each request takes 3s of a 5s budget');
+        self::assertSame([5, 2], array_map(static fn (array $request): int => $request['options']['http']['timeout'], $downloader->requests));
+        self::assertSame([0, null, 'install-time budget spent'], self::summarize($results)[$urls[2]]);
+    }
     /**
      * Composer replays a request's headers to the target of each redirect, so lockrot's token must
      * not reach a target on another origin. That request goes out again without the token.

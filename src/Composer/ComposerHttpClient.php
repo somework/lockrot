@@ -160,10 +160,15 @@ final class ComposerHttpClient implements HttpClientInterface
 
             return true;
         };
-        $timeout = $this->timeoutSeconds();
         foreach (array_unique($urls) as $url) {
+            // Without curl, add() blocks until the request ends, so each request starts inside the budget.
+            if ($this->deadline->isPast()) {
+                $stopped[$url] = $url;
+
+                continue;
+            }
             $sent = self::withoutRedundantAuthorization($this->io, $this->config, $url, $headers);
-            $options = self::options($timeout, $sent);
+            $options = self::options($this->timeoutSeconds(), $sent);
             if (!$this->refusesRedirects && self::carriesCredentials($sent)) {
                 $this->fetchHolding($url, $options, $results, $redirects);
                 continue;
@@ -186,14 +191,13 @@ final class ComposerHttpClient implements HttpClientInterface
         $this->downloader->wait();
         // Composer replays the request's own headers to a redirect's target, so the request goes
         // again to that target without lockrot's credentials.
-        $timeout = $this->timeoutSeconds();
         foreach ($redirects as $url => $target) {
             if ($this->deadline->isPast()) {
                 $stopped[$url] = $url;
 
                 continue;
             }
-            $options = self::options($timeout, self::withoutCredentials($headers));
+            $options = self::options($this->timeoutSeconds(), self::withoutCredentials($headers));
             if ($this->refusesRedirects) {
                 $options['prevent_url_access_callable'] = static fn (): bool => $budgetEnded($url);
             }
