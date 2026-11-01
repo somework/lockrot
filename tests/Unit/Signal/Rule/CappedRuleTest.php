@@ -16,6 +16,7 @@ use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\CappedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Unit\Signal\FactsBuilder;
 use PHPUnit\Framework\TestCase;
 
 /** S11, the PHP cap: docs/verdicts.md#capped. */
@@ -83,6 +84,14 @@ final class CappedRuleTest extends TestCase
         self::assertNotNull($inside);
         self::assertTrue(JsonPath::decoded($outside->data())['excludes_target']);
         self::assertFalse(JsonPath::decoded($inside->data())['excludes_target']);
+    }
+
+    public function testAnInstalledVersionThatDoesNotParseHasNoReleaseAboveIt(): void
+    {
+        $signal = self::rule()->evaluate(new PackageFacts(FactsBuilder::package(['version' => 'not a version', 'php' => '^7.0']), null, null, []));
+
+        self::assertNotNull($signal);
+        self::assertNull(JsonPath::decoded($signal->data())['admits_newest']);
     }
 
     public function testTheNewestReleaseThatAdmitsTheNewestPhpOnTheInstalledBranchIsAdmitsNewest(): void

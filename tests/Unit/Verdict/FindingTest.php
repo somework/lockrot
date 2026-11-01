@@ -134,6 +134,24 @@ final class FindingTest extends TestCase
         (new FindingBuilder())->withoutFlags()->build()->flags();
     }
 
+    public function testAFindingBuiltWithoutItsDetailsRefusesToGiveThem(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The finding of vendor/pkg was built without its details.');
+
+        (new FindingBuilder())->withoutFlags()->build()->details();
+    }
+
+    public function testAFindingBuiltWithoutTheComposerJsonSectionsRefusesToNameThem(): void
+    {
+        $finding = new Finding('vendor/pkg', '1.0.0', [], ['vendor/pkg'], null, null);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('vendor/pkg was built without the composer.json sections that name it.');
+
+        $finding->namedIn();
+    }
+
     /** The finding writes its typed score, worded with the checks that did not run. */
     public function testTheWrittenScoreIsWordedWithTheChecksThatDidNotRun(): void
     {

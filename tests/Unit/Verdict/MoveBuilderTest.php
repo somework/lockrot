@@ -61,6 +61,15 @@ final class MoveBuilderTest extends TestCase
         self::assertSame(['result' => MoveCheck::NOT_CHECKED, 'form' => null, 'reason' => MoveCheck::NO_RELEASE_READ, 'installs' => null], $check->jsonSerialize());
     }
 
+    public function testAMoveNamesTheFlagsThatItAbsorbed(): void
+    {
+        [$row, $context] = self::checked([]);
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, null, '^2.0'), [FlagSet::PINNED], null, $context);
+
+        self::assertSame([FlagSet::PINNED], $move->merged());
+    }
+
     public function testARefusedMoveKeepsTheHoldsOfItsReleaseAddsTheRefusalsAndPrintsNoStep(): void
     {
         $refusal = ['source' => 'package', 'package' => 'c/d', 'version' => '1.0.0', 'link' => 'conflict', 'target' => null, 'constraint' => '>=2.0', 'holder' => null];
