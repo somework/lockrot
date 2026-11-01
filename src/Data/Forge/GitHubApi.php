@@ -51,13 +51,18 @@ final class GitHubApi implements ForgeApi
 
     /**
      * GitHub answers a primary or a secondary limit with 403 or 429. A 403 is a limit only with
-     * `x-ratelimit-remaining: 0` or `retry-after`: a blocked or SAML-protected repository also gets 403.
+     * `x-ratelimit-remaining: 0`, `retry-after` or a body that names the secondary limit: a blocked
+     * or SAML-protected repository also gets 403.
      * https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api
      */
     public function isRateLimited(HttpResult $result): bool
     {
         return $result->status() === 429
-            || ($result->status() === 403 && ($result->header('x-ratelimit-remaining') === '0' || $result->header('retry-after') !== null));
+            || ($result->status() === 403 && (
+                $result->header('x-ratelimit-remaining') === '0'
+                || $result->header('retry-after') !== null
+                || stripos((string) $result->body(), 'secondary rate limit') !== false
+            ));
     }
 
     public function activity(RepoRef $repo, array $json, \DateTimeImmutable $fetchedAt, ?\DateTimeImmutable $cachedAt): RepositoryActivity
