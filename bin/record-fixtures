@@ -20,8 +20,8 @@ declare(strict_types=1);
 // directory, and the monorepo parents' p2 answers go to <dir>/p2 too. --into records no `~dev` answer and
 // no packages-dev name, because the corpus runs read neither. It also records, in <dir>/repos, each
 // further `composer` repository of a fixture's composer.json: its packages.json, the p2 answers of the
-// locked names that it lists and its advisory answer. It reuses an envelope on disk only when its recorded `status` is not 0: status
-// 0 is a transport failure (a timeout or a DNS error), so the script fetches that answer again.
+// locked names that it lists and its advisory answer. It writes no answer that Lockrot\Tests\Support\RecordedStatus refuses
+// (a transport failure, a 429, a 5xx, GitHub's 403 rate limit), fetches such an envelope on disk again, and then exits 1.
 // It records a GitLab answer only with the status 200 or 404, and it stops on a 429.
 // With --names=<name[~dev],…> and --into, it records only the p2 answers that it lists into <dir>, and appends
 // each name to <dir>/names.json, which Lockrot\Tests\Support\FixtureCliRun::forRecording serves after the cache:
@@ -42,6 +42,7 @@ use Lockrot\Data\Http\HttpResult;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Repository\MonorepoParents;
 use Lockrot\Lock\LockFile;
+use Lockrot\Tests\Support\RecordedStatus;
 
 const KEEP = ['name', 'version', 'version_normalized', 'time', 'abandoned', 'source', 'require', 'conflict', 'provide', 'replace', 'type', 'extra'];
 const REPOSITORY_BASE_URL = 'https://repo.packagist.org/p2/';
@@ -110,17 +111,19 @@ $trim = static function (string $body, string $name): string {
     unset($json['security-advisories']);
     return json_encode($json, \JSON_UNESCAPED_SLASHES);
 };
-$isRecorded = static function (string $path): bool {
-    if (!is_file($path) || !is_readable($path)) {
-        return false;
-    }
-    $body = file_get_contents($path);
-    if ($body === false) {
-        return false;
-    }
-    $envelope = json_decode($body, true);
+$isRecorded = static fn (string $path): bool => RecordedStatus::isRecorded($path, false);
+$unrecorded = 0;
+$store = static function (string $path, HttpResult $result, ?string $body, bool $github = false) use (&$unrecorded): void {
+    if (!RecordedStatus::keeps($result->status(), $github)) {
+        ++$unrecorded;
+        fwrite(STDERR, \sprintf("not recorded: %s %d\n", $result->url(), $result->status()));
 
-    return \is_array($envelope) && ($envelope['status'] ?? 0) !== 0;
+        return;
+    }
+    if (!is_dir(\dirname($path))) {
+        mkdir(\dirname($path), 0777, true);
+    }
+    file_put_contents($path, json_encode((new HttpResult($result->url(), $result->status(), $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
 };
 $io = new NullIO();
 $composerConfig = Factory::createConfig($io);
@@ -130,11 +133,8 @@ $githubHeaders = GitHubApi::headersFor(getenv('GITHUB_TOKEN') ?: null);
 $locator = new RepoLocator($gitlabDomains);
 $gitlab = new GitLabApi();
 $gitlabTokens = $composerConfig->get('gitlab-token');
-$record = static function (string $dir, HttpResult $result, ?string $body): void {
-    if (!is_dir($dir)) {
-        mkdir($dir, 0777, true);
-    }
-    file_put_contents(RecordedHttpClient::pathFor($dir, $result->url()), json_encode((new HttpResult($result->url(), $result->status(), $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
+$record = static function (string $dir, HttpResult $result, ?string $body) use ($store): void {
+    $store(RecordedHttpClient::pathFor($dir, $result->url()), $result, $body);
 };
 $keep = static function (?string $body, array $keys, bool $list): ?string {
     $json = $body === null ? null : json_decode($body, true);
@@ -145,7 +145,7 @@ $keep = static function (?string $body, array $keys, bool $list): ?string {
 
     return (string) json_encode($trimmed, \JSON_UNESCAPED_SLASHES);
 };
-$recordP2 = static function (string $name, ?string $ownDir = null) use ($p2Dir, $repositoryHttp, $trim, $isRecorded, $into): void {
+$recordP2 = static function (string $name, ?string $ownDir = null) use ($p2Dir, $repositoryHttp, $trim, $isRecorded, $into, $store): void {
     foreach ($into === null ? [false, true] : [false] as $dev) {
         $url = REPOSITORY_BASE_URL.$name.($dev ? '~dev' : '').'.json';
         $path = RecordedHttpClient::pathFor($ownDir ?? $p2Dir, $url);
@@ -153,8 +153,7 @@ $recordP2 = static function (string $name, ?string $ownDir = null) use ($p2Dir, 
             continue;
         }
         $result = $repositoryHttp->fetchAll([$url])[$url];
-        $body = $result->body() === null ? null : $trim($result->body(), $name);
-        file_put_contents($path, json_encode((new HttpResult($url, $result->status(), $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
+        $store($path, $result, $result->body() === null ? null : $trim($result->body(), $name));
         fwrite(STDERR, \sprintf("p2 %s%s %d\n", $name, $dev ? '~dev' : '', $result->status()));
     }
 };
@@ -200,7 +199,7 @@ if ($names !== null) {
         }
         $result = $repositoryHttp->fetchAll([$url])[$url];
         [$body, $dropped] = $result->body() === null ? [null, []] : $trimBefore($result->body(), $name);
-        file_put_contents($path, json_encode((new HttpResult($url, $result->status(), $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
+        $store($path, $result, $body);
         fwrite(STDERR, \sprintf("p2 %s %d\n", $entry, $result->status()));
         foreach ($dropped as $line) {
             echo 'dropped '.$line."\n";
@@ -210,7 +209,7 @@ if ($names !== null) {
     sort($listed);
     file_put_contents($into.'/names.json', json_encode($listed, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)."\n");
     echo "recorded into $into\n";
-    exit(0);
+    exit(unrecorded($unrecorded));
 }
 /**
  * @param list<array{string, string}> $answers [p2 URL, recording directory], the first recorded one wins
@@ -251,7 +250,7 @@ $recordRepositories = static function (string $fixtureDir, LockFile $lock, strin
             $record($dir, $result, $result->body());
             fwrite(STDERR, \sprintf("repository %s %d\n", $root, $result->status()));
         }
-        $result = HttpResult::fromEnvelopeJson($root, (string) file_get_contents(RecordedHttpClient::pathFor($dir, $root)));
+        $result = HttpResult::fromEnvelopeJson($root, (string) @file_get_contents(RecordedHttpClient::pathFor($dir, $root)));
         $packages = $result === null || $result->body() === null ? null : json_decode($result->body(), true);
         if (!\is_array($packages)) {
             continue;
@@ -304,7 +303,7 @@ foreach ($fixtures as $fixture) {
     if (!$isRecorded($advisoryPath)) {
         $names = array_map(static fn ($package): string => $package->name(), $lock->packages(true));
         $result = $fetch(ADVISORY_API_URL, ['Content-Type: application/x-www-form-urlencoded'], http_build_query(['packages' => $names]));
-        file_put_contents($advisoryPath, json_encode($result->toEnvelope(), \JSON_UNESCAPED_SLASHES));
+        $store($advisoryPath, $result, $result->body());
         fwrite(STDERR, \sprintf("advisories %s (%d names) %d\n", $fixture, \count($names), $result->status()));
     }
     if ($into !== null) {
@@ -368,16 +367,13 @@ foreach ($gitlabRepos as [$ref, $dir]) {
 foreach ($repos as [$ref, $dir]) {
     $url = $github->requests($ref, false)['repo'];
     $path = RecordedHttpClient::pathFor($dir, $url);
-    if ($isRecorded($path) || $isRecorded(RecordedHttpClient::pathFor($ghDir, $url))) {
+    if (RecordedStatus::isRecorded($path, true) || RecordedStatus::isRecorded(RecordedHttpClient::pathFor($ghDir, $url), true)) {
         continue;
-    }
-    if (!is_dir($dir)) {
-        mkdir($dir, 0777, true);
     }
     $result = $fetch($url, $githubHeaders);
     $json = $result->body() === null ? null : json_decode($result->body(), true);
     $body = \is_array($json) ? json_encode(array_intersect_key($json, array_flip(['full_name', 'archived', 'disabled', 'pushed_at', 'default_branch'])), \JSON_UNESCAPED_SLASHES) : $result->body();
-    file_put_contents($path, json_encode((new HttpResult($url, $result->status(), $body === false ? null : $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
+    $store($path, $result, $body === false ? null : $body, true);
     fwrite(STDERR, \sprintf("github %s %d\n", $ref->path(), $result->status()));
     if ($result->status() === 403) {
         fwrite(STDERR, "rate limited; set GITHUB_TOKEN and re-run\n");
@@ -385,3 +381,15 @@ foreach ($repos as [$ref, $dir]) {
     }
 }
 echo "recorded into $httpDir\n";
+exit(unrecorded($unrecorded));
+
+/** The exit code of a run that left $count answers unrecorded. */
+function unrecorded(int $count): int
+{
+    if ($count === 0) {
+        return 0;
+    }
+    fwrite(STDERR, \sprintf("%d answers not recorded; re-run to fetch them again\n", $count));
+
+    return 1;
+}
