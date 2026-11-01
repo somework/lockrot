@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Lockrot\Tests\Support\CorpusDifferential;
+use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -18,10 +19,9 @@ final class CorpusDifferentialFieldsTest extends TestCase
     public function testTheDifferentialComparesEveryGateKeyOfTheModelFindings(): void
     {
         $gateKeys = [];
-        foreach (glob(self::MODEL.'/*.json') ?: [] as $path) {
-            $document = json_decode((string) file_get_contents($path), true);
-            foreach (is_array($document) && is_array($document['findings'] ?? null) ? $document['findings'] : [] as $finding) {
-                foreach (array_keys((array) ($finding['gate'] ?? [])) as $key) {
+        foreach (array_diff(glob(self::MODEL.'/*.json') ?: [], [self::MODEL.'/provenance.json']) as $path) {
+            foreach (JsonPath::arrayAt(JsonPath::decodeFile($path), ['findings']) as $finding) {
+                foreach (\is_array($finding) && \is_array($finding['gate'] ?? null) ? array_keys($finding['gate']) : [] as $key) {
                     $gateKeys['gate.'.$key] = true;
                 }
             }
