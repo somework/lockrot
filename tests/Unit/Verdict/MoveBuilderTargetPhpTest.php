@@ -113,6 +113,25 @@ final class MoveBuilderTargetPhpTest extends TestCase
     }
 
     /**
+     * `config.platform.php` 8.0.1 lies in the target minor, so Composer solves at 8.0.1 and cannot
+     * install 1.8.5 (`>=8.0.2`). The update reads 1.8.0, the newest release that 8.0.1 runs.
+     */
+    public function testAConfiguredPatchInTheTargetMinorReadsTheNewestReleaseThatThePatchRuns(): void
+    {
+        $releases = [['1.0.0', '>=7.2'], ['1.2.0', '>=7.2'], ['1.8.0', '>=7.2'], ['1.8.5', '>=8.0.2']];
+        [$move] = self::updateMove($releases, '8.0', '>=7.2', Move::UPDATE, '1.x', '^1.2.0', [], '8.0.1');
+        $phpCheck = $move->phpCheck();
+        $check = $move->check();
+
+        self::assertSame('1.8.0', $move->newest());
+        self::assertNotNull($phpCheck);
+        self::assertSame(['>=7.2', true, null], [$phpCheck->requires(), $phpCheck->targetRuns(), $phpCheck->raiseTo()]);
+        self::assertNotNull($check);
+        self::assertSame(MoveCheck::RESOLVES, $check->result(), 'Composer resolves the update at 8.0.1');
+        self::assertSame([['composer', 'update', self::PACKAGE.':^1.2.0']], $move->commands());
+    }
+
+    /**
      * SPEC §5.6 L4: no release on 2.x runs on 8.0, and lockrot read no release the move takes, so
      * `php_check` reads the branch top. The text does not say that the target runs it.
      */
@@ -130,14 +149,15 @@ final class MoveBuilderTargetPhpTest extends TestCase
     /**
      * A move of acme/lib, checked by Composer's solver at the target: by default the update to the
      * fix 1.2.0 on the installed branch. With $constraint, the move to the lowest release on
-     * $branch that it admits, else to $branch with no release read.
+     * $branch that it admits, else to $branch with no release read. Composer solves at $platform,
+     * else at the target minor's newest patch.
      *
      * @param list<array{string, string}> $releases each release of acme/lib: its version and php
      * @param list<array<string, mixed>>   $others   further lock entries beside acme/lib 1.0.0
      *
      * @return array{0: Move, 1: MoveChecks, 2: FixFinder, 3: PackageFacts}
      */
-    private static function updateMove(array $releases, string $target, string $projectPhp, string $kind = Move::UPDATE, string $branch = '1.x', ?string $constraint = '^1.2.0', array $others = []): array
+    private static function updateMove(array $releases, string $target, string $projectPhp, string $kind = Move::UPDATE, string $branch = '1.x', ?string $constraint = '^1.2.0', array $others = [], ?string $platform = null): array
     {
         $packages = [];
         $remote = [];
@@ -154,10 +174,10 @@ final class MoveBuilderTargetPhpTest extends TestCase
         self::assertNotNull($locked);
         $facts = new PackageFacts($locked, PackageMetadata::fromPackages(self::PACKAGE, $packages, new \DateTimeImmutable(self::NOW), '1.0.0.0'), null, [new Advisory('A', null, null, null, 'high', null, (new VersionParser())->parseConstraints('<1.2.0'))]);
         $require = ['php' => $projectPhp, self::PACKAGE => '^1.0'];
-        $floor = new PhpFloor($target, $projectPhp);
+        $platform ??= $target.'.'.PhpFloor::NEWEST_PATCH;
+        $floor = (new PhpFloor($target, $projectPhp))->solvedAt($platform);
         $finder = new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::fromArray(['require' => $require])));
         $fixes = $finder->find($facts);
-        $platform = $target.'.99';
         $solver = new ComposerSolver(self::root($require), $lock->lockedRepository(), new PlatformRepository([], ['php' => $platform]), new ArrayVersionSource([self::PACKAGE => $remote]));
         $checks = MoveChecks::of(new SolverChecker($solver, [], $platform, false, Deadline::never()));
         $finding = (new FindingBuilder())->withPackage(self::PACKAGE)->withVersion('1.0.0')->build();

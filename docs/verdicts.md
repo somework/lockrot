@@ -786,7 +786,8 @@ Limits of the check:
   versions of the Composer that runs lockrot.
 - It solves at `config.platform.php` when that version is a stable release in the target PHP's minor, else at the
   newest patch of the target minor (`8.4.99`). Composer reads `8.4` as `8.4.0`. It keeps every
-  other `config.platform` override.
+  other `config.platform` override. The `target_runs` of `installed_php` and of a move's
+  `php_check`, and the `newest` of a move, test the target at the same PHP.
 - It offers the tagged releases of a package. It offers the dev versions too when the package has
   no tagged release. Composer also offers them when composer.json's
   [`minimum-stability`](https://getcomposer.org/doc/04-schema.md#minimum-stability) or a

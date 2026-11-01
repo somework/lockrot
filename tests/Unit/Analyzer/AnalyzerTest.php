@@ -171,6 +171,30 @@ final class AnalyzerTest extends TestCase
         self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29. ', JsonPath::stringAt($document, ['findings', 0, 'next_step', 'text']));
     }
 
+    /**
+     * Case `move-check‡` at target 8.0, where `config.platform.php` 8.0.1 sets the PHP that Composer
+     * solves at. v2.3.5 needs 8.0.2, so the update reads v2.3.2, the newest release that 8.0.1 runs.
+     */
+    public function testAConfiguredPatchInTheTargetMinorSetsThePhpThatTheMoveIsReadAt(): void
+    {
+        $case = CaseHydrator::case('move-check‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['config_platform_php'] = '8.0.1';
+        $inputs['root'] = ['require' => ['php' => '>=7.2'] + JsonPath::arrayAt($inputs, ['root', 'require'])] + JsonPath::arrayAt($inputs, ['root']);
+        $inputs['run'] = ['target_php' => '8.0', 'project_php' => '>=7.2'] + JsonPath::arrayAt($inputs, ['run']);
+        $inputs['releases'] = array_merge(JsonPath::arrayAt($inputs, ['releases']), [['version' => 'v2.3.5', 'time' => '2026-07-01T00:00:00+00:00', 'php' => '>=8.0.2']]);
+        $inputs['move_check'] = ['php' => '8.0.1', 'config_php' => '8.0.1'] + JsonPath::arrayAt($inputs, ['move_check']);
+        $case['inputs'] = $inputs;
+
+        $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+
+        $step = JsonPath::arrayAt($document, ['findings', 0, 'next_step']);
+        $phpCheck = JsonPath::arrayAt($step, ['php_check']);
+
+        self::assertSame(['v2.3.2', true, null], [$step['newest'] ?? null, $phpCheck['target_runs'] ?? null, $phpCheck['raise_to'] ?? null]);
+        self::assertSame('resolves', JsonPath::stringAt($step, ['check', 'result']));
+    }
+
     /** @return iterable<string, array{list<string>, bool, string}> the lock's php of each package, whether Composer refuses the lock itself, and the step */
     public static function refusedBaselines(): iterable
     {

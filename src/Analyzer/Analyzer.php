@@ -227,8 +227,10 @@ final class Analyzer
         $notes = array_merge($notes, $activityNotes, self::hostNotes($lookups));
         $activity = $activityBatch->activity();
 
-        $finder = new FixFinder($this->signals->phpFloor(), LinkIndex::of($lock, $project));
         $checks = $this->checks === null ? null : $this->checks->withAdvisories($advisories->records(), $advisories->asked());
+        $solved = $checks === null ? null : $checks->checker()->platformPhp();
+        $floor = $solved === null ? $this->signals->phpFloor() : $this->signals->phpFloor()->solvedAt($solved);
+        $finder = new FixFinder($floor, LinkIndex::of($lock, $project));
         $baseline = $checks === null ? null : $checks->checker()->baseline();
         $window = PhpWindow::of($lock, $project, $this->signals->phpFloor()->php(PhpFloor::TARGET) ?? PhpReleaseDates::minorOf(\PHP_VERSION), PhpReleaseDates::load()->minors($this->clock), $checks === null ? null : $checks->checker()->platformPhp(), $checks === null ? null : $checks->checker()->configuredPhp());
         $findings = [];
@@ -246,8 +248,8 @@ final class Analyzer
             // The pass after the cap takes the refusals of the pass before it for the class and the verdict. Its new moves are not asked.
             do {
                 $scan = $finder->withRefused($refused);
-                $finding = $this->buildFinding($facts, $entry, $graph, $project->isRead(), $batch, $advisories->byName() === [] ? null : $scan, $advisories->ignored($package->name()), $every);
-                $moves = $this->moves($finding, $facts, $scan, $lock, $project, $metadata, $every, $checks === null || $pass < $this->checkPasses ? $checks : $checks->answeredOnly(), $window, $baseline !== null && $baseline->check()->isRefused());
+                $finding = $this->buildFinding($facts, $entry, $graph, $project->isRead(), $batch, $advisories->byName() === [] ? null : $scan, $advisories->ignored($package->name()), $every, $floor);
+                $moves = $this->moves($finding, $facts, $scan, $floor, $lock, $project, $metadata, $every, $checks === null || $pass < $this->checkPasses ? $checks : $checks->answeredOnly(), $window, $baseline !== null && $baseline->check()->isRefused());
                 $known = $refused->count();
                 $refused = $checks === null ? $refused : $checks->refused($package->name());
                 if ($refused->count() === $known) {
@@ -552,8 +554,9 @@ final class Analyzer
     /**
      * @param list<IgnoredAdvisory> $ignored
      * @param list<Advisory>        $every   every advisory of the package on any version
+     * @param PhpFloor              $floor   the target tested where the move check solves
      */
-    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, bool $composerJsonRead, MetadataBatch $batch, ?FixFinder $fixes, array $ignored, array $every): Finding
+    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, bool $composerJsonRead, MetadataBatch $batch, ?FixFinder $fixes, array $ignored, array $every, PhpFloor $floor): Finding
     {
         $counted = [];
         if ($fixes !== null && $facts->advisories() !== []) {
@@ -601,7 +604,7 @@ final class Analyzer
         return $finding
             ->withComposerJson($composerJsonRead, $graph->namedIn($package->name()))
             ->withFlags($flags, $facts->metadataStatus() === PackageFacts::METADATA_READ)
-            ->withDetails(FindingDetails::of($facts, $entry, $this->signals->phpFloor(), $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts), $accepted));
+            ->withDetails(FindingDetails::of($facts, $entry, $floor, $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts), $accepted));
     }
 
     /**
@@ -664,13 +667,13 @@ final class Analyzer
      *
      * @param array<string, PackageMetadata> $metadata by package name, what the run read
      * @param list<Advisory>                 $every    every advisory of the package on any version
+     * @param PhpFloor                       $floor    the target tested where the move check solves
      */
-    private function moves(Finding $finding, PackageFacts $facts, FixFinder $finder, LockFile $lock, ProjectConfig $project, array $metadata, array $every, ?MoveChecks $checks, ?PhpWindow $window, bool $baselineRefused): Moves
+    private function moves(Finding $finding, PackageFacts $facts, FixFinder $finder, PhpFloor $floor, LockFile $lock, ProjectConfig $project, array $metadata, array $every, ?MoveChecks $checks, ?PhpWindow $window, bool $baselineRefused): Moves
     {
         if (!$finding->isGraded()) {
             return Moves::none();
         }
-        $floor = $this->signals->phpFloor();
         $details = $finding->details();
         $ranges = [];
         foreach ($facts->advisories() as $advisory) {

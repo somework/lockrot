@@ -48,6 +48,21 @@ final class PhpFloorTest extends TestCase
     }
 
     /** Both hold the branch back: the project's requirement is the reason named, being the one the maintainer wrote. */
+    public function testATargetSolvedAtAPatchAdmitsNoReleaseAboveThatPatch(): void
+    {
+        $floor = new PhpFloor('8.0', '>=7.2');
+        $solved = $floor->solvedAt('8.0.1');
+
+        self::assertSame([true, false, '8.0'], [$floor->admitsTarget('>=8.0.2'), $solved->admitsTarget('>=8.0.2'), $solved->php(PhpFloor::TARGET)]);
+        self::assertTrue($solved->admitsTarget('>=8.0.1'));
+    }
+
+    public function testAFloorWithoutATargetOrAPhpThatIsNoVersionKeepsItsTargetPoint(): void
+    {
+        self::assertNull((new PhpFloor(null, '>=7.2'))->solvedAt('8.0.1')->admitsTarget('>=8.0.2'));
+        self::assertTrue((new PhpFloor('8.0', '>=7.2'))->solvedAt('not a version')->admitsTarget('>=8.0.2'));
+    }
+
     public function testTheProjectIsNamedBeforeTheTargetWhenBothBlock(): void
     {
         self::assertSame(PhpFloor::PROJECT, (new PhpFloor('7.4', '>=7.2.5'))->blocking('>=8.1'));
