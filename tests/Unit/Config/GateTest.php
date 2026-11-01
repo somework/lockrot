@@ -318,6 +318,27 @@ final class GateTest extends TestCase
         self::assertFalse($gate->fails());
     }
 
+    /** SPEC §6.2, "Fail-open, visibly": a known entry exempts the finding from `unchecked`, and the gap of its advisories stays named. */
+    public function testTheAdvisoryGapOfABaselineExemptFindingJoinsNotApplied(): void
+    {
+        $report = self::report(FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true));
+        $baseline = BaselineEntries::baseline([BaselineEntries::of('a/offline', '1.0.0', 'abandoned', '2026-01-01')]);
+        $compared = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'b.json', ['a/offline']));
+
+        $gate = self::gate($compared, 'high,unchecked');
+
+        self::assertSame([true, false, 'baseline'], self::standing($gate, 'a/offline'));
+        self::assertSame([['check' => 'advisories', 'packages' => 1, 'reason' => 'offline']], JsonPath::decoded($gate->notAppliedEntries()));
+    }
+
+    public function testTheAdvisoryGapOfAFindingThatFailsUncheckedStaysOutOfNotApplied(): void
+    {
+        $gate = self::gate(self::report(FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true)), 'high,unchecked');
+
+        self::assertSame([true, true, null], self::standing($gate, 'a/offline'));
+        self::assertSame([], $gate->notAppliedEntries());
+    }
+
     public function testAWorsenedEntryLeavesAFindingWithS10FailingUnchecked(): void
     {
         $signals = array_merge(ScoreSweep::signalsOf('abandoned'), [self::s10('repository_activity', 'host_not_supported', ['S3', 'S4'])]);
