@@ -18,7 +18,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.normpath(os.path.join(HERE, '..', '..'))
 OUT = os.path.join(REPO, 'resources', 'lockrot-report-2.schema.json')
 import hashlib
-from guard import require
+import sys
+
+sys.path.insert(0, HERE)
+from guard import require  # noqa: E402
 # the report-1 file is read from a committed, hash-pinned copy of the 0.13.0 file (tools/schema/inputs/ in the
 # repository; inputs/ here), never from the live resources/ file, so a later widening of report-1 cannot change a report-2 rebuild
 INPUTS = os.path.join(HERE, 'inputs')

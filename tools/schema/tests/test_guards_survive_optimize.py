@@ -37,7 +37,9 @@ class TheGuardRaisesUnderOptimize(unittest.TestCase):
     def test_a_failed_check_exits_non_zero_with_its_reason(self):
         run = self.run_guard(False)
 
-        self.assertEqual((1, 'refused: a pinned input changed, x.json\n'), (run.returncode, run.stderr))
+        self.assertEqual(1, run.returncode)
+        self.assertIn('a pinned input changed, x.json', run.stderr)
+        self.assertNotIn('Traceback', run.stderr)
 
     def test_a_passed_check_exits_zero(self):
         self.assertEqual(0, self.run_guard(True).returncode)

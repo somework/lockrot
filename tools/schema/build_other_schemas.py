@@ -19,7 +19,10 @@ REPORT2 = os.path.join(RESOURCES, 'lockrot-report-2.schema.json')
 # the 0.13.0 -1 files from committed, hash-pinned copies (inputs/, tools/schema/inputs/ in the repository), read
 # relative to this script; a later widening of a -1 file never changes a -2 rebuild
 import hashlib
-from guard import require
+import sys
+
+sys.path.insert(0, HERE)
+from guard import require  # noqa: E402
 INPUTS = os.path.join(HERE, 'inputs')
 PINNED = json.load(open(os.path.join(INPUTS, 'SHA256SUMS.json')))
 
