@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Lockrot\Tests\Support\CaseHydrator;
+use Lockrot\Tests\Support\Contract\ModelBounds;
 use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -405,6 +406,18 @@ final class MoveContractTest extends TestCase
         foreach ($skipped as $field) {
             $others = array_values(array_diff($skipped, [$field]));
             self::assertNotSame(self::reference($golden, $goldenRows, $others), self::reference($lockrot, $lockrotRows, $others), $id.': '.$field.' agrees again: take it off DIFFERENCES');
+        }
+        foreach (self::DIFFERENCES[$id] ?? [] as [$fields, $reason]) {
+            if ($reason === self::VERSION) {
+                $moves = \in_array('version', $fields, true) ? [$lockrot['next_step']] : JsonPath::arrayAt($lockrot, ['next_step', 'also']);
+                self::assertNotSame([], $moves, $id);
+                foreach ($moves as $move) {
+                    ModelBounds::assertTheLowestAdmittedRelease(JsonPath::decoded($move), JsonPath::arrayAt(CaseHydrator::case($id), ['inputs', 'releases']), $id);
+                }
+            }
+            if ($reason === self::DATED) {
+                ModelBounds::assertWithinTheModelsBound($goldenRows, $lockrotRows, $id);
+            }
         }
     }
 
