@@ -249,6 +249,18 @@ final class AdvisoryBlockingTest extends TestCase
         self::assertSame([true, []], [$blocking->blocks(), $blocking->disabledBy()], '`audit: ignore` is no blocking switch');
     }
 
+    /** Both switches off: Composer's Config::get('policy') lets the variable win, so lockrot names it, as the advisories_disabled_by_policy note does. */
+    public function testComposerPolicyOffBesideAPolicyKeyOffNamesTheVariable(): void
+    {
+        Platform::putEnv('COMPOSER_POLICY', '0');
+        $config = new Config(false);
+        $config->merge(['config' => ['policy' => false]]);
+
+        $blocking = AdvisoryBlocking::fromConfig($config);
+
+        self::assertSame([false, ['COMPOSER_POLICY']], [$blocking->blocks(), $blocking->disabledBy()]);
+    }
+
     public function testOnComposer210ComposerPolicyOffTurnsTheBlockingOffAndOverridesThePolicyKey(): void
     {
         Platform::putEnv('COMPOSER_POLICY', '0');
