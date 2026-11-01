@@ -4,6 +4,7 @@
 # Records the report-2 twin of each claims report from a directory of report-2 documents, one per project:
 #   tools/corpus/record --report-2 <dir>
 # The first form removes the report-2 twins, so run the second after it: the diff tests read both.
+# When the run lacks a wanted shape or its cached p2 document, the first form changes nothing and exits 1.
 # Run it when lockrot changes a sentence that a check reads, or when a new check needs a document.
 # Never edit a recorded fixture: one that does not match its source is worth less than none.
 # Keep the p2 documents minified, `__unset` sentinels included: the reader under test must get
@@ -46,14 +47,21 @@ def main(argv: 'list[str]') -> int:
     explains = os.path.join(options.work, 'explains', options.explain_out)
     repo_root = os.path.dirname(os.path.dirname(HERE))
 
-    _clear()
     claims, _ = load.load_claims(reports, projects, cache, repo_root,
                                  runner.load_manifest(reports))
-    chosen = _choose_claims(claims, cache)
-    _write_claims(chosen, cache)
-
+    chosen, missing = _choose_claims(claims, cache)
     pairs, _ = load.load_pairs(explains, runner.load_manifest(explains))
-    _write_pairs(_choose_pairs(pairs), explains)
+    chosen_pairs, missing_pairs = _choose_pairs(pairs)
+    missing += missing_pairs
+    missing += ['no cached p2 for %s' % package for package in _providers(chosen) if _provider(package, cache) is None]
+    if missing:
+        print('!! nothing recorded, the fixtures stay as they were:\n' + '\n'.join(missing), file=sys.stderr)
+
+        return 1
+
+    _clear()
+    _write_claims(chosen, cache)
+    _write_pairs(chosen_pairs, explains)
 
     if options.semver_oracle:
         _write_semver_oracle(cache)
@@ -140,7 +148,7 @@ def _clear() -> None:
             os.remove(os.path.join(explain, name))
 
 
-def _choose_claims(claims: 'list', cache: str) -> dict:
+def _choose_claims(claims: 'list', cache: str) -> 'tuple[dict, list[str]]':
     wanted = {
         'a tag on a commit its siblings share, left unmeasured':
             lambda c: c.metadata and c.shares_commit and c.libyears is None and c.parent_date is None,
@@ -170,12 +178,10 @@ def _choose_claims(claims: 'list', cache: str) -> dict:
                     break
             except Exception:  # noqa: BLE001 - a predicate over real data, not an assertion
                 continue
-        if label not in chosen:
-            print('!! nothing in this run has: %s' % label, file=sys.stderr)
     for label, claim in chosen.items():
         print('%-58s %s %s' % (label, claim.finding['package'], claim.finding.get('version')))
 
-    return chosen
+    return chosen, ['nothing in this run has: %s' % label for label in wanted if label not in chosen]
 
 
 def _has_unset(package: str, cache: str) -> bool:
@@ -269,14 +275,18 @@ def _write_report_2(documents: str) -> int:
     return 0
 
 
-def _copy_provider(package: str, cache: str) -> None:
-    source = os.path.join(cache, 'repo', PACKAGIST_HOST,
-                          'provider-%s.json' % package.replace('/', '~'))
-    document = read_json(source)
-    if document is None:
-        print('!! no cached p2 for %s' % package, file=sys.stderr)
+def _providers(chosen: dict) -> 'list[str]':
+    """The packages whose cached p2 document a claims recording copies."""
+    return [package for claim in chosen.values()
+            for package in [claim.finding['package']] + ([claim.parent] if claim.parent else [])]
 
-        return
+
+def _provider(package: str, cache: str) -> 'dict | None':
+    return read_json(os.path.join(cache, 'repo', PACKAGIST_HOST, 'provider-%s.json' % package.replace('/', '~')))
+
+
+def _copy_provider(package: str, cache: str) -> None:
+    document = _provider(package, cache)
     entries = document.get('packages', {}).get(package)
     if not isinstance(entries, list):
         return
@@ -292,7 +302,7 @@ def _copy_provider(package: str, cache: str) -> None:
         {'packages': {package: trimmed}}, pretty=False)
 
 
-def _choose_pairs(pairs: 'list') -> dict:
+def _choose_pairs(pairs: 'list') -> 'tuple[dict, list[str]]':
     """One explain pair per rendered shape, so every catalog phrase with a minimum has a document."""
     wanted = {
         'a parent dates the installed release': lambda p: p.dated_by is not None,
@@ -324,10 +334,8 @@ def _choose_pairs(pairs: 'list') -> dict:
                     break
             except Exception:  # noqa: BLE001
                 continue
-        if label not in chosen:
-            print('!! nothing in this run has: %s' % label, file=sys.stderr)
 
-    return chosen
+    return chosen, ['nothing in this run has: %s' % label for label in wanted if label not in chosen]
 
 
 def _write_pairs(chosen: dict, explains: str) -> None:
