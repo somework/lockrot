@@ -21,6 +21,8 @@ final class Thresholds
                 throw new ConfigException('Threshold years must be positive integers');
             }
         }
+        self::refuseHighBelowWarn('release', $releaseWarnYears, $releaseHighYears);
+        self::refuseHighBelowWarn('push', $pushWarnYears, $pushHighYears);
         $this->releaseWarnYears = $releaseWarnYears;
         $this->releaseHighYears = $releaseHighYears;
         $this->pushWarnYears = $pushWarnYears;
@@ -87,5 +89,13 @@ final class Thresholds
         }
 
         return null;
+    }
+
+    /** A high level below its warn level makes an age `high` before it is `warn`, and the exclusive groups of the score model stop holding. */
+    private static function refuseHighBelowWarn(string $what, int $warn, int $high): void
+    {
+        if ($high < $warn) {
+            throw new ConfigException(\sprintf('extra.lockrot.%1$s-high-years (%3$d) must not be below extra.lockrot.%1$s-warn-years (%2$d)', $what, $warn, $high));
+        }
     }
 }
