@@ -154,11 +154,12 @@ transaction before any package operation runs, and Composer exits `1`. The messa
 
 - A finding in the [baseline](baseline.md#install-time) does not stop the install unless its new
   facts reach `fail-on`. The block lists both kinds.
-- While `composer lockrot` exits `2`, `install-time-strict` stops nothing. lockrot skips the
-  check with one `install-time check skipped` line, and the install continues. A committed baseline-1
-  file, a value that Composer refuses in a blocking or policy variable, and an `extra.lockrot`
-  value that config-2 refuses each do this. Run `composer lockrot` after an upgrade, and fix what it names. For a
-  baseline-1 file, run `--generate-baseline` ([baseline.md](baseline.md#moving-from-a-baseline-1-file)).
+- A refused configuration value or baseline file skips the check: `install-time-strict` stops
+  nothing, and the install continues with one `install-time check skipped` line. A committed
+  baseline-1 file and an `extra.lockrot` value that config-2 refuses do this. So does a value that
+  Composer refuses in a blocking or policy variable. Run `composer lockrot` after an upgrade, and
+  fix what it names. For a baseline-1 file, run `--generate-baseline`
+  ([baseline.md](baseline.md#moving-from-a-baseline-1-file)).
 - A gap in what the run could see stops the install only through `fail-on: unchecked`, which
   matches every finding that carries S10 ([what was not checked](verdicts.md#what-was-not-checked)).
   Such a finding can be `ok` and missing from the block. `--strict-network` has no install-time

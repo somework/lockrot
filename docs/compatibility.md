@@ -279,11 +279,10 @@ when a finding reaches `fail-on`, are frozen with the rest of the [configuration
   `somework/lockrot-action` run the same lockrot code and write documents to the same schemas.
 - The PHAR, and the image and the Action that run it, bundle a Composer new enough for every check.
   The plugin and the source script `vendor/somework/lockrot/bin/lockrot` run on the project's
-  Composer. The plugin needs Composer 2.10 or newer. Its `composer-plugin-api` `^2.9` keeps 2.8 and
-  older from installing it, and on 2.9 it does nothing. The source script checks the composer/composer package that
-  the project loads, and on a version older than 2.10 it
-  exits `2` and runs nothing
-  ([install requirements](index.md#install), [exit codes](ci.md#exit-codes)).
+  Composer. The plugin needs Composer 2.10 or newer. Its `composer-plugin-api` `^2.9` keeps 2.8
+  and older from installing it, and on 2.9 it does nothing. The source script checks the
+  composer/composer package that it loads. On a version older than 2.10, it exits `2` and runs
+  nothing ([install requirements](index.md#install), [exit codes](ci.md#exit-codes)).
 - The PHAR's asset names and the [verification path](phar.md#verifying-the-download) are stable.
 - lockrot-action's inputs follow Semantic Versioning. Before 1.0, lockrot promises nothing about
   the action's major lines. From 1.0, this page names the action line that follows lockrot 1.x.

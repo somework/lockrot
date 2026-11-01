@@ -27,8 +27,8 @@ RELEASED = {
 
 
 class AReleasePullRequest(unittest.TestCase):
-    def check(self, base, head, changelog_text=RELEASED['changelog'], schemas=RELEASED['schemas']):
-        return version_bump.problems(version_php(base), version_php(head), changelog_text, schemas)
+    def check(self, base, head, changelog_text=RELEASED['changelog'], schemas=RELEASED['schemas'], changed=('src/Version.php', 'src/Analyzer/Analyzer.php')):
+        return version_bump.problems(version_php(base), version_php(head), changelog_text, schemas, list(changed))
 
     def test_a_correct_minor_release_passes(self):
         self.assertEqual([], self.check('0.13.0', '0.14.0'))
@@ -41,9 +41,20 @@ class AReleasePullRequest(unittest.TestCase):
 
     def test_a_release_without_the_bump_fails(self):
         self.assertEqual(
-            ['Version::STRING is 0.13.0 on both sides: a release pull request bumps it'],
-            self.check('0.13.0', '0.13.0', changelog('[Unreleased]', '[0.13.0] - 2026-10-01'), schema_test('0.13.0')),
+            ['Version::STRING is 0.13.0 on both sides, but the pull request changes src/Analyzer/Analyzer.php, which the release ships: bump the version'],
+            self.check('0.13.0', '0.13.0', changelog('[Unreleased]', '[0.13.0] - 2026-10-01'), schema_test('0.13.0'), ['src/Analyzer/Analyzer.php', 'CHANGELOG.md']),
         )
+
+    def test_each_shipped_path_needs_the_bump(self):
+        for path in ('src/Version.php', 'resources/lockrot-report-2.schema.json', 'bin/lockrot', 'composer.json'):
+            self.assertEqual(1, len(self.check('0.13.0', '0.13.0', changed=[path])), path)
+
+    def test_a_pull_request_that_ships_no_code_needs_no_bump(self):
+        # CONTRIBUTING, "Cutting a release": a moved tag day goes to main as a pull request that
+        # changes only that date and docs/example-run.md. Dependabot bumps workflow actions.
+        self.assertEqual([], self.check('0.13.0', '0.13.0', changed=['CHANGELOG.md', 'docs/example-run.md']))
+        self.assertEqual([], self.check('0.13.0', '0.13.0', changed=['.github/workflows/ci.yml']))
+        self.assertEqual([], self.check('0.13.0', '0.13.0', changed=['composer.lock', 'build/phar/composer.lock', 'tests/Unit/VersionTest.php']))
 
     def test_a_skipped_or_backward_version_fails(self):
         self.assertEqual(['Version::STRING 0.15.0 is no bump of 0.13.0: take the next patch, minor or major'], self.check('0.13.0', '0.15.0', changelog('[0.15.0] - 2026-11-20'), schema_test('0.15.0')))
@@ -65,7 +76,7 @@ class AReleasePullRequest(unittest.TestCase):
     def test_an_unreadable_version_fails(self):
         self.assertEqual(
             ['src/Version.php of the head holds no X.Y.Z STRING'],
-            version_bump.problems(version_php('0.13.0'), version_php('0.14.0-rc.9'), RELEASED['changelog'], RELEASED['schemas']),
+            version_bump.problems(version_php('0.13.0'), version_php('0.14.0-rc.9'), RELEASED['changelog'], RELEASED['schemas'], ['src/Version.php']),
         )
 
 

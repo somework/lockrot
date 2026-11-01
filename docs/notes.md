@@ -27,7 +27,7 @@ do, what each gap does to findings, and what to do about it.
 | [`abandoned_markings_ignored`](#abandoned_markings_ignored) | Composer's abandoned ignore list matched some packages | no | Their abandoned marking (S1) does not count. Each carries `abandoned_ignored` | Nothing, unless the list matches a package by mistake |
 | [`abandoned_not_audited_by_composer`](#abandoned_not_audited_by_composer) | A Composer setting stops `composer audit` from reporting abandoned packages | no | None: lockrot still counts the marking | To stop counting it for one package, list the package in `config.policy.abandoned.ignore` |
 | [`abandoned_ignore_unreadable`](#abandoned_ignore_unreadable) | Composer rejected the abandoned ignore list | no | Every abandoned marking counts | Fix the list, as the note's `message` says |
-| [`moves_not_checked`](#moves_not_checked) | Composer's solver refuses the lock itself, so it refuses every move. The note names the first problem: a PHP exclusion or another conflict in the lock | no | Each move's `check.reason` reads `baseline_refused` | Fix the problem that the note names. When `run.php_window.target.inside` is false, read `run.php_window.target_fix` ([the update that admits the target](verdicts.md#the-update-that-admits-the-target)) |
+| [`moves_not_checked`](#moves_not_checked) | Composer's solver refuses the lock itself, so it refuses every move. The note names the first problem: a PHP exclusion or another conflict in the lock | no | Each move's `check.reason` reads `baseline_refused` | Fix the problem that the note names. When the target PHP lies outside the PHP window, read `run.php_window.target_fix` ([the update that admits the target](verdicts.md#the-update-that-admits-the-target)) |
 | [`update_now_reduced`](#update_now_reduced) | Composer's solver refuses some members of `update now:` together | no | The command leaves those members out | Update each member that it leaves out with its own move |
 | [`update_now_refused`](#update_now_refused) | Composer's solver refuses the members of `update now:` together | no | No `update now:` command | Update each member with its own move |
 | [`update_now_not_checked`](#update_now_not_checked) | Composer's solver did not check `update now:`, such as when the budget ran out | no | No `update now:` command, and `security.update_now` is empty | Update each candidate with its own move |
@@ -306,16 +306,15 @@ Composer rejected the project's abandoned ignore list, so every abandoned markin
 ### <a name="moves_not_checked"></a>Moves not checked {#moves_not_checked}
 
 Composer's solver refuses a partial update of a name outside the lock: the lock itself does not
-install. Composer would refuse every move for the same reason, so lockrot checks none, and each
-move's `check.reason` reads `baseline_refused`. The text and `data.problem` name the first problem that
-Composer gives. That problem can be a PHP version that the lock excludes. It can also be another
-conflict in the lock, such as a locked version that a requirement of a package does not admit.
+install. Composer refuses every move for the same reason, so lockrot checks none, and each move's
+`check.reason` reads `baseline_refused`. The text names the first problem that Composer gives, and
+`data.problem` holds Composer's whole problem text. That problem can be a PHP version that the lock
+excludes. It can also be another conflict in the lock, such as a locked version that a requirement
+of a package does not admit.
 
-`run.php_window.target_fix` applies only when `run.php_window.target.inside` is false: the target
-PHP lies outside the PHP window. It names the packages that exclude the target PHP. When
-Composer's solver resolves their update, it also names the update that admits the target
-([the update that admits the target](verdicts.md#the-update-that-admits-the-target)). When the
-target lies inside the window, `target_fix` is null: fix the conflict that the note names.
+`run.php_window.target_fix` names the update that admits the target PHP
+([the update that admits the target](verdicts.md#the-update-that-admits-the-target)). It is null
+when the target lies inside the PHP window or under its lowest edge.
 
 The text quotes the first rule line of Composer's first problem whose reply after ` -> ` is not
 "satisfiable by", cut before ` -> `. Composer does not always list that rule last. If no rule line

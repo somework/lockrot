@@ -69,7 +69,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** S8 reads the project's lowest PHP as a full version: an inclusive bound gives
   `X.Y.Z` (`>=8.2` now admits a branch that needs `8.2.0`), an exclusive or post-release bound the
   next patch (`>7.1` no longer admits a branch that needs exactly `7.1.0`, `>=7.4.0-p1` gives
-  `7.4.1`). S8 can then name another branch to follow. ([Within reach](docs/verdicts.md#within-reach))
+  `7.4.1`). S8 can then name another branch to follow.
+  ([Within reach](docs/verdicts.md#within-reach))
 - **All formats:** a repository that answers 404 no longer carries S10 `rate_limit` when the same
   host also rate-limits: the 404 is an answer.
   ([Not found](docs/notes.md#repository_activity_not_found))
@@ -164,10 +165,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the holds of a refusal, or the root links that no update can change. The `php:` line prints it,
   and marks a root hold on a packages-dev package " in require-dev".
   ([The update that admits the target](docs/verdicts.md#the-update-that-admits-the-target))
-- **All formats:** the run notes `moves_not_checked`, `move_check_failed`, `update_now_reduced`,
-  `update_now_refused`, `update_now_not_checked` and `package_name_invalid` say what the move check
-  and `update now:` did. A move whose solve throws an error reads `not_checked` with
-  `solver_error`. lockrot skips a lock entry whose name is no Composer package name.
+- **All formats, Install-time:** the run notes `moves_not_checked`, `move_check_failed`,
+  `update_now_reduced`, `update_now_refused`, `update_now_not_checked` and `package_name_invalid`
+  say what the move check and `update now:` did. A move whose solve throws an error reads
+  `not_checked` with `solver_error`. lockrot skips a lock entry or a transaction package whose name
+  is no Composer package name.
   ([Run notes](docs/notes.md#moves_not_checked))
 - **All formats:** the run notes `baseline_target_differs`, `baseline_fix_model_differs` and
   `ignore_does_not_cover_advisories` say when the baseline does not compare fix changes, and when an
@@ -287,9 +289,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `composer update --lock`, or fix the section that the message names.
   ([Exit codes](docs/ci.md#exit-codes))
 - **Breaking:** **CLI:** `vendor/somework/lockrot/bin/lockrot` exits 2 and runs nothing when the
-  composer/composer package that it loads is older than 2.10. So does a non-CLI PHP SAPI with
-  `register_argc_argv=On`. Action: upgrade composer/composer to 2.10 or later, or run the PHAR, with
-  the CLI PHP.
+  composer/composer package that it loads is older than 2.10. It also exits 2 on a non-CLI PHP SAPI
+  with `register_argc_argv=On`. Action: upgrade composer/composer to 2.10 or later, or run the
+  PHAR, with the CLI PHP.
   ([Exit codes](docs/ci.md#exit-codes))
 - **Baseline:** when a `--generate-baseline` run reads a baseline-2 file, its reports compare
   with that file, as a check run does. They carry the root `baseline` and each finding's `baseline`.
@@ -383,8 +385,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   cache miss, not exit 2. ([Caching](docs/internals.md#caching))
 - **github, gitlab, sarif:** the line annotations are right for a lock with a very long string or a
   repeated `packages` key.
-- **Install-time:** the block skips a transaction package whose name is no Composer package name,
-  as `composer lockrot` does.
 - **CLI:** the `--explain` branch table keeps its columns in place when a tag holds a control or
   zero-width character. ([Explaining one package](docs/configuration.md#explaining-one-package))
 

@@ -303,7 +303,7 @@ shapes leave out the parts that do not apply. A score of 0 carries only `model`,
 | `root_package` | string or null | The `name` of the manifest Composer reads, exactly as written: the key to match a report to its repository |
 | `target_php`, `target_php_source` | string | The target PHP minor, and where it came from: `option`, `env`, `config`, `platform` or `runtime` ([`target-php`](configuration.md#extralockrot-keys)) |
 | `project_php` | string or null | The manifest's `require.php` exactly as written (`>=8.2`): a constraint, not a version |
-| `project_php_lowest` | string or null | The lowest PHP that `require.php` admits, as `MAJOR.MINOR.PATCH` (`>=8.2` is `8.2.0`, `>7.1` is `7.1.1`) |
+| `project_php_lowest` | string or null | The lowest PHP that `require.php` admits, as `MAJOR.MINOR.PATCH` (`>=8.2` is `8.2.0`, `>7.1` is `7.1.1`, `>=7.4.0-p1` is `7.4.1`) |
 | `lock_file` | string or null | The lock's file name, never its path |
 | `fail_on`, `fail_on_source` | string | The `--fail-on` list in kind order (`"left-behind,vulnerable-high"`), and where it came from: `option`, `env`, `config` or `default` |
 | `gates` | array | `{value, kind, threshold}` per value of the list. `kind` is `grade`, `flag`, `vulnerable` or `unchecked`, an open set. `[]` for `none` |
