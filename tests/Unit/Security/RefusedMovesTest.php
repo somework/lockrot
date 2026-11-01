@@ -52,4 +52,12 @@ final class RefusedMovesTest extends TestCase
 
         self::assertSame([true, false, false], [$refused->blocks('2.1.0.0'), $refused->blocks('3.0.0.0'), $refused->blocks('1.0.0.0')]);
     }
+
+    public function testAConstraintThatDoesNotParseHoldsNothing(): void
+    {
+        $refused = RefusedMoves::none()->with('not a constraint', []);
+
+        self::assertSame(0, $refused->count());
+        self::assertFalse($refused->blocks('2.0.0.0'));
+    }
 }

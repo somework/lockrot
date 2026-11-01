@@ -371,6 +371,11 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame(['doctrine/cache'], $answered->load(['doctrine/cache' => '2.2.0'])->asked());
     }
 
+    public function testALookupOfNoNamesReadsNoneAndNeverFails(): void
+    {
+        self::assertSame([], (new RepositoryAdvisoryLoader($this->server()->repositories(), true))->records([], true));
+    }
+
     /** Ruling Q7 of PR #151: a repository that answers a full request with a partial record, as Composer 2.11 does, fails its answer. */
     public function testAPartialRecordInTheAnswerToAFullRequestFailsTheAnswerOfThatRepository(): void
     {

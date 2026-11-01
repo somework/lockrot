@@ -115,6 +115,23 @@ final class UncheckedAcceptanceTest extends TestCase
         UncheckedAcceptance::fromConfig([['check' => 'advisories', 'package' => 'a/*', 'reason' => 'valid'], $entry]);
     }
 
+    public function testAnEntryThatIsNotAnObjectIsRefusedByItsIndex(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('extra.lockrot.accept-unchecked[1] must be an object');
+
+        UncheckedAcceptance::fromConfig([['check' => 'advisories', 'package' => 'a/*', 'reason' => 'valid'], 'advisories']);
+    }
+
+    public function testTheEchoedEntryReadsBackWhatTheProjectWrote(): void
+    {
+        $list = UncheckedAcceptance::fromConfig([['check' => 'release_metadata', 'package' => 'acme/*', 'reason' => 'ours', 'expires' => '2027-01-01']]);
+        $entry = $list->acceptedBy(new Check('release_metadata', 'no_feed', ['S2', 'S8']), 'acme/x', null, null, null, [], new \DateTimeImmutable(self::NOW));
+
+        self::assertNotNull($entry);
+        self::assertSame(['release_metadata', 'package', 'acme/*', 'ours', '2027-01-01'], [$entry->check(), $entry->scope(), $entry->value(), $entry->reason(), $entry->expiresOn()]);
+    }
+
     /** @return iterable<string, array{string}> */
     public static function edgeValues(): iterable
     {
@@ -164,6 +181,7 @@ final class UncheckedAcceptanceTest extends TestCase
         yield 'the git default port written out' => ['git://git.example.com:9418/acme/fork', null, null, 'git://git.example.com/acme/fork', true];
         yield 'an scp URL with an upper-case host' => ['git@GitHub.com:acme/x.git', null, null, 'https://github.com/acme/x', true];
         yield 'a source without a host' => ['https://h.example/acme/x', null, null, 'file:///acme/x', false];
+        yield 'a source that is neither a URL nor the scp form' => ['https://h.example/acme/x', null, null, 'h.example/acme/x', false];
         yield 'the activity host and repo' => ['https://codeberg.org/acme/x', 'codeberg.org', '/acme/x/', null, true];
         yield 'a placed GitLab prefix' => ['https://git.example.com/group/sub/x', 'git.example.com/group', 'sub/x', null, true];
         yield 'an activity host without a repo' => ['https://codeberg.org', 'codeberg.org', null, null, false];
