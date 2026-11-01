@@ -55,6 +55,8 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 
 - `src/Baseline/BaselineSchema.php` ReturnRemoval `return self::$schema;` — a memo. Without it the method decodes the same bundled file again.
 - `src/Baseline/BaselineSchema.php` LogicalOr `if (!is_file($path) || !is_readable($path)) {` — the bundled schema file exists and is readable, so both operands are false.
+- `src/Baseline/Baseline.php` NotCovered x1 `throw new ConfigException('baseline file is invalid: an entry must hold objects');` — unreachable code. `fromArray()` validates the data against `BaselineSchema` first, and the schema types each entry, flag fact and advisory fact as an object.
+- `src/Baseline/Baseline.php` NotCovered x6 `throw new ConfigException('baseline file is invalid: '.$key.' must be an integer');` — unreachable code. `fromArray()` validates the data against `BaselineSchema` first, and the schema types `score_model_id` and `fix_model` as integers.
 
 ## src/Clock.php
 
@@ -120,6 +122,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Data/Advisory/AdvisoryIgnore.php` TrueValue `return new self([], [], true, null, ['policy_key' => $policyKey, 'value' => $value]);` — the flag sets only the `by` of a match, and an empty list matches nothing.
 - `src/Data/Advisory/AdvisoryIgnore.php` UnwrapArrayFilter `return array_filter($config, 'is_string', \ARRAY_FILTER_USE_KEY);` — Composer's policy readers look up named keys only, so an integer key that the filter drops changes nothing.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` TrueValue `$ids[$advisory->advisoryId] = true;` — only the keys are counted.
+- `src/Data/Advisory/RepositoryAdvisoryLoader.php` ReturnRemoval `return null;` — in normalized(): `VersionParser::normalize()` reads null as `""` and throws, and the `catch` returns the same null.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in attribute(): a package name holds a `/`, so PHP never stores it as an integer key.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in coverage(): a package name holds a `/`, so PHP never stores it as an integer key.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` UnwrapArrayValues `return array_values(array_filter($copies, static function (PartialSecurityAdvisory $advisory) use ($versions): bool {` — the caller only iterates the result with `foreach`.
@@ -137,6 +140,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Json/JsonReader.php` ReturnRemoval `return false;` — for an empty array, `array_keys([]) === range(0, -1)` is false, so the method returns false too.
 - `src/Lock/ConfiguredRepositories.php` CastString `$host = (string) preg_replace('{:\d+$}', '', strtolower($parts[0]));` — the pattern is a literal, so `preg_replace()` never returns null.
 - `src/Lock/ConfiguredRepositories.php` CastString `$path = (string) preg_replace('{\.git$}', '', trim(strtolower($parts[1]), '/'));` — the pattern is a literal, so `preg_replace()` never returns null.
+- `src/Lock/LockFile.php` NotCovered x8 `throw new ConfigException($refusal.'loader returned '.\get_class($loaded).' instead of a CompletePackage');` — unreachable code. `ArrayLoader::load()` with its default class returns a `CompletePackage` or an alias of one, and the method unwraps the alias before the check.
 
 ## src/Output
 
@@ -173,6 +177,8 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 
 ## src/Signal
 
+- `src/Signal/AgeMeasure.php` NotCovered x1 `return true;` — unreachable code. `branchRelease()` calls `isAhead()` only when `ReleaseBranch::of()` gave a branch, and `of()` returns null when `VersionParser::normalize()` throws on the same version.
+- `src/Signal/Rule/AdvisoryRule.php` NotCovered x3 `return ['', false];` — unreachable code. `evaluate()` returns null on no advisory before it calls `summary()`, which counts the same `advisories()`.
 - `src/Signal/PhpFloor.php` CastString `return ($kind === self::PROJECT ? 'the project\'s php ' : 'the target PHP ').(string) $this->php($kind);` — `php($kind)` is null only for an absent floor, and no caller describes one.
 - `src/Signal/PhpFloor.php` ReturnRemoval `return null;` — in parse(): composer/semver reads null as `""` and throws, and the `catch` returns the same value.
 - `src/Signal/PhpFloor.php` CastInt `foreach ([$point, $major.'.'.$minor.'.'.((int) $patch + 1)] as $candidate) {` — `startPoint()` writes the patch as digits, and PHP adds a digit string as the integer it spells. The cast is for the type.
