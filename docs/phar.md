@@ -189,8 +189,10 @@ the running file exactly as it was.
 - **What `--force` takes.** Only that one release. If the
   [release rules](#which-release-it-installs) hold it back, or the running major version has none,
   it exits `2` and looks no further down. A build whose release was withdrawn goes back to the
-  newest release left in its major version, never to an older major version. The release metadata
-  is not signed, so a doctored copy cannot walk a reinstall further down.
+  newest release left in its major version, never to an older major version. That release can be
+  an older minor version. In 0.x, it can be an archive from before 0.13.0, and its own
+  `self-update` does not apply the [release rules](#which-release-it-installs). The release
+  metadata is not signed, so a doctored copy cannot walk a reinstall further down.
 
 - **Where it writes.** Only the PHAR's own directory, which must be writable. `self-update` checks
   it before it downloads the archive (`--check` does not need it).
@@ -199,8 +201,9 @@ the running file exactly as it was.
   `<name>.<pid>-<id>.tmp.phar` file beside the PHAR. It is inert. The next `self-update` that
   downloads a release and verifies it deletes any such file older than an hour.
 
-- **No rollback.** `self-update` cannot pin a version or go back. Every earlier release stays
-  downloadable from GitHub: [go back by hand](#reinstalling-by-hand).
+- **No rollback.** `self-update` cannot pin a version. It goes back only with `--force`, and
+  only to the release that `--force` takes. Every earlier release stays downloadable from GitHub:
+  [go back by hand](#reinstalling-by-hand).
 
 - **Rate limit.** `LOCKROT_GITHUB_TOKEN`, `GITHUB_TOKEN` or Composer's `github-oauth` lifts GitHub's
   anonymous rate limit
@@ -321,8 +324,8 @@ unique prefix such as `self-up` runs `self-update`.
 - it predates the [release rules](#which-release-it-installs) and the release it takes was signed
   after a key rotation, or it is the 0.6.0 archive (Older releases under
   [Which release it installs](#which-release-it-installs))
-- you go back to a release: `self-update` never installs an older minor. Download that release's
-  files from its tag, such as
+- you go back to a release of your choice: `self-update` goes back only with `--force`, to the one
+  release that `--force` takes. Download that release's files from its tag, such as
   `https://github.com/somework/lockrot/releases/download/v0.13.0/lockrot.phar` and the
   `lockrot.phar.sha256` beside it
 
