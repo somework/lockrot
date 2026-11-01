@@ -3629,4 +3629,19 @@ final class LockrotCommandTest extends TestCase
         self::assertStringStartsWith('lockrot: extra.lockrot is invalid:', $stderr);
         self::assertStringContainsString($reason, $stderr);
     }
+
+    public function testAHighThresholdBelowItsWarnThresholdIsExitTwo(): void
+    {
+        $dir = $this->tempDir('lockrot-threshold-order-');
+        file_put_contents($dir.'/composer.json', '{"extra": {"lockrot": {"release-warn-years": 5, "release-high-years": 2}}}');
+        copy(self::LARAVEL_LOCK, $dir.'/composer.lock');
+        chdir($dir);
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(2, $code, $stderr);
+        self::assertSame('', $stdout);
+        self::assertStringContainsString('release-high-years', $stderr);
+        self::assertStringContainsString('release-warn-years', $stderr);
+    }
 }
