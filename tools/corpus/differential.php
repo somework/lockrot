@@ -28,6 +28,7 @@ declare(strict_types=1);
 // whole lock (docs/verdicts.md#the-php-window), and tests/Integration/PhpWindowComposerOracleTest holds lockrot's window to Composer.
 require __DIR__.'/../../vendor/autoload.php';
 
+use Lockrot\Tests\Support\CorpusDifferential;
 use Lockrot\Tests\Support\FiredSignalsUnblocked;
 use Lockrot\Tests\Support\FixtureCliRun;
 use Lockrot\Tests\Support\VersionMask;
@@ -49,16 +50,7 @@ const FEED_FAILED = 'drupal_drupal.feed-failed';
 const ABSENT = ['$absent' => true];
 /** The keys of each entry of DIVERGENCES, and its only keys. */
 const ENTRY_KEYS = ['app', 'package', 'path', 'lockrot', 'model', 'reason'];
-/** The fields of a finding that the differential compares. Beside them: each flag's FLAG_FIELDS as `flags.<id>.<key>`, and each key of each S9 row's `fix` as `S9.fix.<key>[<advisory id>]`. */
-const FIELDS = [
-    'verdict', 'lead', 'direct', 'reach', 'installed_php', 'checks_missing', 'checks_skipped', 'age', 'activity', 'gate.basis',
-    'score.total', 'score.exact', 'score.band', 'score.decided_by', 'score.rounded_down', 'score.parts', 'score.terms', 'score.modifiers', 'score.without', 'score.accepted',
-    'next_step.kind', 'next_step.constraint', 'next_step.version', 'next_step.to_branch', 'next_step.clears', 'next_step.leaves',
-    'next_step.adds', 'next_step.clears_all', 'next_step.through', 'next_step.unverified', 'next_step.php_check', 'next_step.commands', 'next_step.crosses_major',
-    'next_step.composer_moves_because', 'next_step.if_applied', 'next_step.held_by',
-    'security.status', 'security.check', 'security.complete', 'security.unchecked_reason',
-    'security.fix_kind', 'security.gets', 'security.partial', 'security.move_in', 'security.installed_branch_fixes',
-];
+const FIELDS = CorpusDifferential::FIELDS;
 /** The move check's key inside a compared object, by path: the model records no check, so a null one is not compared. */
 const CHECK_KEYS = ['security.installed_branch_fixes' => 'check'];
 /** The fields of each flag, by flag id. */
