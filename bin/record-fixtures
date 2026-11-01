@@ -20,8 +20,8 @@ declare(strict_types=1);
 // directory, and the monorepo parents' p2 answers go to <dir>/p2 too. --into records no `~dev` answer and
 // no packages-dev name, because the corpus runs read neither. It also records, in <dir>/repos, each
 // further `composer` repository of a fixture's composer.json: its packages.json, the p2 answers of the
-// locked names that it lists and its advisory answer. It writes no answer that Lockrot\Tests\Support\RecordedStatus refuses
-// (a transport failure, a 429, a 5xx, GitHub's 403 rate limit), fetches such an envelope on disk again, and then exits 1.
+// locked names that it lists and its advisory answer. It writes no answer that Lockrot\Tests\Support\RecordedStatus::keeps()
+// refuses, and it fetches such an envelope on disk again. It exits 1 when an answer stays unrecorded.
 // It records a GitLab answer only with the status 200 or 404, and it stops on a 429.
 // With --names=<name[~dev],…> and --into, it records only the p2 answers that it lists into <dir>, and appends
 // each name to <dir>/names.json, which Lockrot\Tests\Support\FixtureCliRun::forRecording serves after the cache:
@@ -115,6 +115,7 @@ $isRecorded = static fn (string $path): bool => RecordedStatus::isRecorded($path
 $unrecorded = 0;
 $store = static function (string $path, HttpResult $result, ?string $body, bool $github = false) use (&$unrecorded): void {
     if (!RecordedStatus::keeps($result->status(), $github)) {
+        @unlink($path);
         ++$unrecorded;
         fwrite(STDERR, \sprintf("not recorded: %s %d\n", $result->url(), $result->status()));
 

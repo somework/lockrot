@@ -22,6 +22,8 @@ final class RecordedStatusTest extends TestCase
         yield 'a transport failure' => [0, false, false];
         yield 'a GitHub transport failure' => [0, true, false];
         yield 'a GitHub 403, its rate limit' => [403, true, false];
+        yield 'a GitHub 401, a token that GitHub refuses' => [401, true, false];
+        yield 'a 401 of a repository that asks for credentials' => [401, false, true];
         yield 'a 403 of a repository that refuses anonymous access' => [403, false, true];
         yield 'a 429' => [429, false, false];
         yield 'a GitHub 429' => [429, true, false];
