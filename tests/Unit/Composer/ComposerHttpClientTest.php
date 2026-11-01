@@ -294,10 +294,12 @@ final class ComposerHttpClientTest extends TestCase
      * a plugin that listens on PRE_FILE_DOWNLOAD and throws, say. Any other value there reads as a
      * status the server never sent.
      */
-    public function testAFailedRequestKeepsItsStatusAndMessage(): void
+    /** GitHub names a secondary rate limit only in the body of its 403 ({@see \Lockrot\Data\Forge\GitHubApi::isRateLimited()}). */
+    public function testAFailedRequestKeepsItsStatusBodyAndMessage(): void
     {
         $rateLimited = new TransportException('HTTP 403 rate limit exceeded');
         $rateLimited->setStatusCode(403);
+        $rateLimited->setResponse('{"message":"You have exceeded a secondary rate limit."}');
         [$client] = self::clientWith([
             'https://a.example.com/rate-limited' => $rateLimited,
             'https://a.example.com/refused' => new TransportException('connection refused'),
@@ -311,7 +313,7 @@ final class ComposerHttpClientTest extends TestCase
         ]);
 
         self::assertSame([
-            'https://a.example.com/rate-limited' => [403, null, 'HTTP 403 rate limit exceeded'],
+            'https://a.example.com/rate-limited' => [403, '{"message":"You have exceeded a secondary rate limit."}', 'HTTP 403 rate limit exceeded'],
             'https://a.example.com/refused' => [0, null, 'connection refused'],
             'https://a.example.com/not-a-transport-error' => [0, null, 'a download listener blew up'],
         ], self::summarize($results));

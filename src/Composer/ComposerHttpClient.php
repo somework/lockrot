@@ -246,7 +246,9 @@ final class ComposerHttpClient implements HttpClientInterface
         $status = $e instanceof TransportException ? (int) ($e->getStatusCode() ?? 0) : 0;
         $headers = $e instanceof TransportException ? $e->getHeaders() ?? [] : [];
 
-        return new HttpResult($url, $status, null, $this->clock->now(), RepositoryUrl::inText($e->getMessage()), array_values(array_filter($headers, 'is_string')));
+        $body = $e instanceof TransportException ? $e->getResponse() : null;
+
+        return new HttpResult($url, $status, $body, $this->clock->now(), RepositoryUrl::inText($e->getMessage()), array_values(array_filter($headers, 'is_string')));
     }
 
     /**

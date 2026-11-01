@@ -229,8 +229,8 @@ final class LockrotCommand extends BaseCommand
             // LOCKROT_DISABLE needs no check here: run() answered it before any of this was read.
             $composer = $this->resolveComposer($hasComposerJson);
             $config = $composer instanceof Composer ? $composer->getConfig() : Factory::createConfig($io);
-            // A composer.json that Composer cannot load leaves only its own platform php to read.
-            $platformPhp = $composer instanceof Composer || !$hasComposerJson ? MoveCheckers::configuredPhp($config) : $project->platformPhp();
+            // Without a Composer instance, composer.json's value wins over the global config, as in Composer's merge.
+            $platformPhp = $composer instanceof Composer ? MoveCheckers::configuredPhp($config) : $project->platformPhp() ?? MoveCheckers::configuredPhp($config);
             $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), $env, $this->cliOptions($input), \PHP_VERSION, $platformPhp);
             [$repositories, $root] = $this->composerBootstrap($io, $composer, $config, $lockrot->offline());
             if (self::wantsUpgradeNotice($input, $lockrot)) {

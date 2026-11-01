@@ -303,7 +303,7 @@ final class InstallTimeSummaryTest extends TestCase
         };
     }
 
-    /** docs/configuration.md: the default target is `config.platform.php` of Composer's merged config. */
+    /** The default target is `config.platform.php` of Composer's merged config, the global `config.json` included. */
     public function testTheDefaultTargetReadsThePlatformPhpOfTheGlobalComposerConfig(): void
     {
         $server = self::$server;
@@ -319,17 +319,10 @@ final class InstallTimeSummaryTest extends TestCase
         $composer->setConfig($config);
         $composer->setPackage(new RootPackage('__root__', '1.0.0.0', '1.0.0'));
         $composer->setRepositoryManager(RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config)));
-        $targets = [];
-        $inner = $this->analyzerFactory();
-        $factory = static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline) use ($inner, &$targets): Analyzer {
-            $targets[] = $lockrot->targetPhp();
 
-            return $inner($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline);
-        };
+        (new InstallTimeSummary(\Closure::fromCallable([$this, 'targetRecordingAnalyzerFactory'])))->onPreOperationsExec(new InstallerEvent(InstallerEvents::PRE_OPERATIONS_EXEC, $composer, $io, false, true, new Transaction([], [$this->loadPackage(self::PHPZIP)])));
 
-        (new InstallTimeSummary($factory))->onPreOperationsExec(new InstallerEvent(InstallerEvents::PRE_OPERATIONS_EXEC, $composer, $io, false, true, new Transaction([], [$this->loadPackage(self::PHPZIP)])));
-
-        self::assertSame(['8.1'], $targets);
+        self::assertSame(['8.1'], $this->targetsAtHandOver);
     }
 
     public function testAFlaggedTransactionPackagePrintsTheCompactBlock(): void
@@ -1077,6 +1070,9 @@ final class InstallTimeSummaryTest extends TestCase
 
     private ?float $remainingAtHandOver = null;
 
+    /** @var list<string> the target minor of each LockrotConfig that reaches the factory */
+    private array $targetsAtHandOver = [];
+
     /** The seconds the deadline has left when the factory gets it, read before the analysis runs. */
     private function remainingAtHandOver(InstallerEvent $event): ?float
     {
@@ -1084,6 +1080,14 @@ final class InstallTimeSummaryTest extends TestCase
         (new InstallTimeSummary(\Closure::fromCallable([$this, 'recordingAnalyzerFactory']), $monotonicNow))->onPreOperationsExec($event);
 
         return $this->remainingAtHandOver;
+    }
+
+    /** @param list<RepositoryInterface> $repositories */
+    private function targetRecordingAnalyzerFactory(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline): Analyzer
+    {
+        $this->targetsAtHandOver[] = $lockrot->targetPhp();
+
+        return ($this->analyzerFactory())($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline);
     }
 
     /** @param list<RepositoryInterface> $repositories */

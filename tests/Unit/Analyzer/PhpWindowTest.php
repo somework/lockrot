@@ -229,8 +229,8 @@ final class PhpWindowTest extends TestCase
     }
 
     /**
-     * Composer reads each of these as 8.4.1, and report-2 and explain-2 set `target.php` to the
-     * pattern of the assertion.
+     * Composer accepts each of these as a stable 8.4.1 platform php. report-2 and explain-2 set
+     * `target.php` to the pattern of the assertion.
      *
      * @dataProvider composerPlatformForms
      */

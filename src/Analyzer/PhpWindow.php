@@ -171,7 +171,7 @@ final class PhpWindow implements \JsonSerializable
         return (new VersionParser())->normalize($php);
     }
 
-    /** `X.Y.Z` of a stable platform php, as Composer reads it: `v8.4.1-p1` is 8.4.1. */
+    /** The `X.Y.Z` release of a stable platform php: `v8.4.1` and `8.4.1-p1` give 8.4.1. */
     private static function releaseOf(string $php): string
     {
         return implode('.', \array_slice(explode('.', self::normalized($php)), 0, 3));

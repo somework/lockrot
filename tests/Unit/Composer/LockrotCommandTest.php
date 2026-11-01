@@ -3295,8 +3295,8 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * docs/configuration.md: the default target is `config.platform.php` of Composer's merged
-     * config. A lock-only run reads the global config alone.
+     * The default target is `config.platform.php` of Composer's merged config, the global
+     * `config.json` included. A lock-only run reads the global config alone.
      *
      * @dataProvider manifestProvider
      */
