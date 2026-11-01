@@ -63,6 +63,10 @@ final class ComposerHttpClientRedirectTest extends TestCase
             header('Location: http://:'.$port.'/headers', true, 302);
             exit;
         }
+        if ($path === '/other-host-upper-case') {
+            header('Location: HTTP://localhost:'.$port.'/headers', true, 302);
+            exit;
+        }
         if ($path === '/no-host') {
             header('Location: http:/headers', true, 302);
             exit;
@@ -260,6 +264,22 @@ final class ComposerHttpClientRedirectTest extends TestCase
         $result = $this->fetch($path, false);
 
         self::assertSame([0, null, 'redirect to a URL that is not http or https with a host'], [$result->status(), $result->body(), $result->error()]);
+    }
+
+    /** URL schemes are case-insensitive (RFC 3986, section 3.1). */
+    public function testARedirectToAnUpperCaseHttpSchemeIsFollowedWithoutCurl(): void
+    {
+        self::assertSame('/headers', $this->headersSeenAfter('/other-host-upper-case', false)['path']);
+    }
+
+    /** One redirect that fails leaves the other requests of the batch alone. */
+    public function testARedirectToAUrlWithoutAHostFailsOnlyItsOwnRequestWithoutCurl(): void
+    {
+        $urls = [$this->server->url().'/unparsable', $this->server->url().'/other-host'];
+
+        $results = $this->client(false)->fetchAll($urls, self::HEADERS);
+
+        self::assertSame([0, 200], [$results[$urls[0]]->status(), $results[$urls[1]]->status()]);
     }
 
     /** curl reads such a `Location` as a path on the host that answered. */

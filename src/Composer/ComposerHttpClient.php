@@ -326,10 +326,7 @@ final class ComposerHttpClient implements HttpClientInterface
 
     private static function origin(string $url): string
     {
-        $parts = parse_url($url);
-        if (!\is_array($parts)) {
-            return '';
-        }
+        $parts = parse_url($url) ?: [];
 
         return strtolower(($parts['scheme'] ?? '').'://'.($parts['host'] ?? '')).':'.(string) ($parts['port'] ?? '');
     }

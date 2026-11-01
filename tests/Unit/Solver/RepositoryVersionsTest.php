@@ -502,6 +502,19 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([[], VersionSource::UNREACHED], [$versions->versions('acme/private'), $versions->failure('acme/private')]);
     }
 
+    public function testANameThatItsTagsAnsweredBeforeTheBudgetEndedStaysShadowed(): void
+    {
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://github.com/acme/lib']);
+        $repository = self::recording(['acme/lib' => ['1.0.0'], 'acme/dev-only' => ['dev-main']]);
+        $now = static fn (): float => 6.0 * \count($repository->asked);
+        $versions = new RepositoryVersions([$vcs, $repository], [], false, Deadline::inSeconds(5.0, $now), 'stable', [], [RepositoryVersions::urlKey('https://github.com/acme/lib') => ['acme/lib']]);
+
+        $versions->versionsOf(['acme/lib', 'acme/dev-only']);
+
+        self::assertSame([['1.0.0'], VersionSource::SHADOWED], [self::pretty($versions->versions('acme/lib')), $versions->failure('acme/lib')]);
+        self::assertSame([[], VersionSource::BUDGET], [$versions->versions('acme/dev-only'), $versions->failure('acme/dev-only')]);
+    }
+
     /** A name that loads alone after a failed request sends its dev request only while the budget lasts. */
     public function testANameThatLoadsAloneSendsNoDevRequestOnceTheBudgetEnds(): void
     {

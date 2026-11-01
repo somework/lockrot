@@ -146,8 +146,9 @@ final class RepositoryVersions implements VersionSource
                 if ($asked !== [] && $this->deadline->isPast()) {
                     // A name that this repository's tags answered and that needs no dev versions is loaded.
                     $this->overBudget(array_diff_key($pending, array_diff_key($found, $asked)));
+                    $this->failures += array_fill_keys(array_keys($hidden), self::SHADOWED);
 
-                    break 2;
+                    return;
                 }
                 $result = self::ask($repository, $asked, $stabilities);
                 $found += array_fill_keys($result['namesFound'], null);

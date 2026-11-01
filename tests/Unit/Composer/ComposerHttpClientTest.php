@@ -413,7 +413,7 @@ final class ComposerHttpClientTest extends TestCase
      */
     public function testWithoutCurlEachRequestStartsOnlyInsideTheBudgetWithTheTimeLeft(): void
     {
-        $urls = ['https://gitlab.com/api/v4/projects/a', 'https://gitlab.com/api/v4/projects/b', 'https://gitlab.com/api/v4/projects/c'];
+        $urls = ['https://gitlab.com/api/v4/projects/a', 'https://gitlab.com/api/v4/projects/b', 'https://gitlab.com/api/v4/projects/c', 'https://gitlab.com/api/v4/projects/d'];
         $held = new \stdClass();
         $now = static function () use ($held): float {
             return ($held->downloader ?? null) instanceof ScriptedDownloader ? 3.0 * \count($held->downloader->requests) : 0.0;
@@ -429,6 +429,7 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame([$urls[0], $urls[1]], array_column($downloader->requests, 'url'), 'each request takes 3s of a 5s budget');
         self::assertSame([['timeout' => 5], ['timeout' => 2]], array_map(static fn (array $request): array => array_intersect_key((array) $request['options']['http'], ['timeout' => true]), $downloader->requests));
         self::assertSame([0, null, 'install-time budget spent'], self::summarize($results)[$urls[2]]);
+        self::assertSame([0, null, 'install-time budget spent'], self::summarize($results)[$urls[3]], 'every request after the budget');
     }
     /**
      * Composer replays a request's headers to the target of each redirect, so lockrot's token must
