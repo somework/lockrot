@@ -53,6 +53,7 @@ use Lockrot\Signal\Rule\AbandonedRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
+use Lockrot\Solver\MoveCheckers;
 use Lockrot\Verdict\Age;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
@@ -228,11 +229,15 @@ final class Analyzer
         $activity = $activityBatch->activity();
 
         $checks = $this->checks === null ? null : $this->checks->withAdvisories($advisories->records(), $advisories->asked());
-        $solved = $checks === null ? null : $checks->checker()->platformPhp();
-        $floor = $solved === null ? $this->signals->phpFloor() : $this->signals->phpFloor()->solvedAt($solved);
+        $checker = $checks === null ? null : $checks->checker();
+        $targetMinor = $this->signals->phpFloor()->php(PhpFloor::TARGET) ?? PhpReleaseDates::minorOf(\PHP_VERSION);
+        $configured = ($checker === null ? null : $checker->configuredPhp()) ?? $project->platformPhp();
+        // A run that checks no move reads the target where the check would solve.
+        $solvePhp = ($checker === null ? null : $checker->platformPhp()) ?? MoveCheckers::platformPhp($targetMinor, $configured);
+        $floor = $this->signals->phpFloor()->solvedAt($solvePhp);
         $finder = new FixFinder($floor, LinkIndex::of($lock, $project));
-        $baseline = $checks === null ? null : $checks->checker()->baseline();
-        $window = PhpWindow::of($lock, $project, $this->signals->phpFloor()->php(PhpFloor::TARGET) ?? PhpReleaseDates::minorOf(\PHP_VERSION), PhpReleaseDates::load()->minors($this->clock), $checks === null ? null : $checks->checker()->platformPhp(), $checks === null ? null : $checks->checker()->configuredPhp());
+        $baseline = $checker === null ? null : $checker->baseline();
+        $window = PhpWindow::of($lock, $project, $targetMinor, PhpReleaseDates::load()->minors($this->clock), $solvePhp, $configured);
         $findings = [];
         $factsByPackage = [];
         $notInRepository = 0;
