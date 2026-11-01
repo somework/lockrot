@@ -32,12 +32,12 @@ final class PhpFloor
     /**
      * The patch at which lockrot tests a PHP minor: its newest one. The move check solves at the
      * same point unless `config.platform.php` is in that minor ({@see \Lockrot\Solver\MoveCheckers::platformPhp()},
-     * docs/verdicts.md#the-move-check).
+     * docs/verdicts.md#the-move-check). The moves test the target where the check solves ({@see solvedAt()}).
      */
     public const NEWEST_PATCH = '99';
 
     private VersionParser $parser;
-    /** The target minor's newest patch, as `== 8.4.99.0`, or null with no target or a non-version. */
+    /** The target minor's newest patch, as `== 8.4.99.0`, or the PHP of {@see solvedAt()}. Null with no target or a non-version. */
     private ?Constraint $targetPoint;
     private ?string $targetLabel;
     /** The lowest PHP the project promises to run on, as `== 7.2.5.0`, or null with no readable promise. */
@@ -57,6 +57,27 @@ final class PhpFloor
         [$this->projectPoint, $this->projectPhp] = $this->project($projectPhp);
         $this->projectAny = $projectPhp !== null && trim($projectPhp) === '*';
         $this->projectLowest = $this->projectPoint === null ? null : new Constraint('==', $this->projectPoint.'.0');
+    }
+
+    /**
+     * A copy that tests the target at $php, the PHP at which the move check solves
+     * ({@see \Lockrot\Solver\MoveChecker::platformPhp()}). Without a target, or when $php is no
+     * version, the copy keeps the target minor's newest patch.
+     */
+    public function solvedAt(string $php): self
+    {
+        if ($this->targetPoint === null) {
+            return $this;
+        }
+        try {
+            $point = new Constraint('==', $this->parser->normalize($php));
+        } catch (\UnexpectedValueException $e) {
+            return $this;
+        }
+        $clone = clone $this;
+        $clone->targetPoint = $point;
+
+        return $clone;
     }
 
     /**
