@@ -228,6 +228,29 @@ final class PhpWindowTest extends TestCase
         self::assertSame(['excludes' => '8.5', 'links' => ['require']], self::upper($window['without_dev']));
     }
 
+    /**
+     * Composer reads each of these as 8.4.1, and report-2 and explain-2 set `target.php` to the
+     * pattern of the assertion.
+     *
+     * @dataProvider composerPlatformForms
+     */
+    #[DataProvider('composerPlatformForms')]
+    public function testTargetPhpIsTheNormalizedFormOfAComposerPlatformValue(string $platform): void
+    {
+        $window = self::window(['packages' => [self::package('acme/a', ['php' => '>=8.1'])], 'packages-dev' => []], ['config' => ['platform' => ['php' => $platform]]]);
+
+        self::assertSame('8.4.1', $window['target']['php']);
+        self::assertMatchesRegularExpression('/^[0-9]+(\.[0-9]+)*$/', $window['target']['php']);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function composerPlatformForms(): iterable
+    {
+        foreach (['v8.4.1', '8.4.1-p1', '8.4.1-pl1', '8.4.1-stable', '8.4.1.0'] as $form) {
+            yield $form => [$form];
+        }
+    }
+
     /** R3-6: config.platform.php 8.2.0 and a floor of 8.2.1. PHP 8.2.1 installs the lock, so 8.2 is in and is the lower edge. */
     public function testAPatchFloorInsideTheTargetMinorIsTheLowerEdge(): void
     {

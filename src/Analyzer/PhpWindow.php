@@ -129,7 +129,7 @@ final class PhpWindow implements \JsonSerializable
             'host_requires' => $hosts,
             'with_dev' => $windows['with_dev'],
             'without_dev' => $windows['without_dev'],
-            'target' => ['php' => $targetPoint, 'inside' => $targetFailing === []],
+            'target' => ['php' => self::releaseOf($targetPoint), 'inside' => $targetFailing === []],
             'target_fix' => null,
         ], $targetMinor, $knownMinors, $targetFailing, array_values(array_filter($targetFailing, static fn (array $req): bool => \in_array($req, $lockOnly, true))), $lock->skippedNames(), $project->platformPhp());
     }
@@ -169,6 +169,12 @@ final class PhpWindow implements \JsonSerializable
     private static function normalized(string $php): string
     {
         return (new VersionParser())->normalize($php);
+    }
+
+    /** `X.Y.Z` of a stable platform php, as Composer reads it: `v8.4.1-p1` is 8.4.1. */
+    private static function releaseOf(string $php): string
+    {
+        return implode('.', \array_slice(explode('.', self::normalized($php)), 0, 3));
     }
 
     /**
