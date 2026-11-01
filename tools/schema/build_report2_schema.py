@@ -217,9 +217,9 @@ defs['factBaseline'] = nul("A fact's state against the baseline entry (§6.4 \"P
 
 # holders and php checks
 MOVE_CHECK_REASONS = ['baseline_refused', 'unloaded_name', 'offline', 'install_time_budget', 'not_from_composer_repository', 'no_composer_json',
-                      'composer_json_invalid', 'no_release_read', 'pass_cap', 'solver_error', 'advisory_lookup_incomplete']
+                      'composer_json_invalid', 'platform_config_invalid', 'no_release_read', 'pass_cap', 'solver_error', 'advisory_lookup_incomplete']
 # The reasons that leave the baseline itself unchecked: the budget, a run that cannot solve at all, or a solve that Composer failed on.
-BASELINE_CHECK_REASONS = ['unloaded_name', 'offline', 'install_time_budget', 'no_composer_json', 'composer_json_invalid', 'solver_error']
+BASELINE_CHECK_REASONS = ['unloaded_name', 'offline', 'install_time_budget', 'no_composer_json', 'composer_json_invalid', 'platform_config_invalid', 'solver_error']
 BLOCKING_SWITCHES = ['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING', 'COMPOSER_POLICY', 'COMPOSER_POLICY_ADVISORIES_BLOCK', 'config.policy',
                      'config.policy.advisories', 'config.policy.advisories.block', 'config.audit.block-insecure']
 defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether the move's `composer update` or `composer require` installs from the lock. "
@@ -1623,7 +1623,7 @@ defs['targetFix'] = obj("`run.php_window.target_fix` (§5.9): one update that un
     'reason': nul(("Why the update was not checked, from the reasons of `next_step.check.reason`. Null on `resolves` and `refused`, and on `not_checked` "
                    "exactly when `run.move_check` is null (a run that checks no move)."), {'type': 'string', 'pattern': SNAKE,
                   'x-known-values': ['unloaded_name', 'offline', 'install_time_budget', 'not_from_composer_repository', 'no_composer_json', 'composer_json_invalid',
-                                     'solver_error', 'advisory_lookup_incomplete']}),
+                                     'platform_config_invalid', 'solver_error', 'advisory_lookup_incomplete']}),
     'held_by': arr(("On `refused`, the holds that the refusal names, as a move's `held_by[]`, less the `platform` holds on php of the listed "
                     "packages. `[]` when the refusal names no hold. At the root ceiling, which lockrot decides without a solve, the holds are "
                     "the root links that fail at `target.php`: `link` is the link's section, `require`, `require-dev` or `conflict`, and "

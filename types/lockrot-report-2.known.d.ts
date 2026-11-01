@@ -46,7 +46,7 @@ export type MoveCheckResult = "resolves" | "refused" | "not_checked";
 /** closed set at #/definitions/moveCheck/oneOf/0/properties/form/oneOf/0 */
 export type MoveCheckForm = "inline" | "with-dependencies" | "with-all-dependencies";
 /** open set at #/definitions/moveCheck/oneOf/0/properties/reason/oneOf/0 */
-export type MoveCheckReason = "baseline_refused" | "unloaded_name" | "offline" | "install_time_budget" | "not_from_composer_repository" | "no_composer_json" | "composer_json_invalid" | "no_release_read" | "pass_cap" | "solver_error" | "advisory_lookup_incomplete" | (string & {});
+export type MoveCheckReason = "baseline_refused" | "unloaded_name" | "offline" | "install_time_budget" | "not_from_composer_repository" | "no_composer_json" | "composer_json_invalid" | "platform_config_invalid" | "no_release_read" | "pass_cap" | "solver_error" | "advisory_lookup_incomplete" | (string & {});
 /** open set at #/definitions/holder/oneOf/0/properties/next_step/oneOf/0/properties/kind */
 export type HolderNextStepKind = "replace" | "find-alternative" | "tag" | "require" | "update" | "raise-php" | "test" | "blocked" | "no-tag" | "no-move" | "no-fix" | "no-single-fix" | (string & {});
 /** closed set at #/definitions/heldBy/properties/source */
@@ -404,7 +404,7 @@ export type RunMoveCheckBlockingDisabledByItem = "COMPOSER_NO_BLOCKING" | "COMPO
 /** closed set at #/definitions/run/properties/move_check/oneOf/0/properties/baseline */
 export type RunMoveCheckBaseline = "resolves" | "refused" | "not_checked";
 /** open set at #/definitions/run/properties/move_check/oneOf/0/properties/reason/oneOf/0 */
-export type RunMoveCheckReason = "unloaded_name" | "offline" | "install_time_budget" | "no_composer_json" | "composer_json_invalid" | "solver_error" | (string & {});
+export type RunMoveCheckReason = "unloaded_name" | "offline" | "install_time_budget" | "no_composer_json" | "composer_json_invalid" | "platform_config_invalid" | "solver_error" | (string & {});
 /** closed set at #/definitions/run/properties/php_window/oneOf/0/properties/host_requires/items */
 export type RunPhpWindowHostRequiresItem = "php-debug" | "php-ipv6" | "php-zts";
 /** open set at #/definitions/noteAdvisoriesDisabledByPolicy/properties/policy_key */
@@ -420,7 +420,7 @@ export type NoteBaselineTargetDiffersRunTargetPhpSource = "option" | "env" | "co
 /** open set at #/definitions/noteMovesNotChecked/properties/reason */
 export type NoteMovesNotCheckedReason = "baseline_refused" | (string & {});
 /** open set at #/definitions/noteUpdateNowNotChecked/properties/reason */
-export type NoteUpdateNowNotCheckedReason = "baseline_refused" | "unloaded_name" | "offline" | "install_time_budget" | "not_from_composer_repository" | "no_composer_json" | "composer_json_invalid" | "no_release_read" | "pass_cap" | "solver_error" | "advisory_lookup_incomplete" | (string & {});
+export type NoteUpdateNowNotCheckedReason = "baseline_refused" | "unloaded_name" | "offline" | "install_time_budget" | "not_from_composer_repository" | "no_composer_json" | "composer_json_invalid" | "platform_config_invalid" | "no_release_read" | "pass_cap" | "solver_error" | "advisory_lookup_incomplete" | (string & {});
 /** closed set at #/definitions/phpWindowReq/properties/link */
 export type PhpWindowReqLink = "require" | "conflict";
 /** closed set at #/definitions/phpWindowReq/properties/target */
@@ -428,7 +428,7 @@ export type PhpWindowReqTarget = "php" | "php-64bit";
 /** closed set at #/definitions/targetFix/properties/check */
 export type TargetFixCheck = "resolves" | "refused" | "not_checked";
 /** open set at #/definitions/targetFix/properties/reason/oneOf/0 */
-export type TargetFixReason = "unloaded_name" | "offline" | "install_time_budget" | "not_from_composer_repository" | "no_composer_json" | "composer_json_invalid" | "solver_error" | "advisory_lookup_incomplete" | (string & {});
+export type TargetFixReason = "unloaded_name" | "offline" | "install_time_budget" | "not_from_composer_repository" | "no_composer_json" | "composer_json_invalid" | "platform_config_invalid" | "solver_error" | "advisory_lookup_incomplete" | (string & {});
 /** closed set at #/definitions/targetFix/anyOf/0/properties/check */
 export type TargetFixCheck2 = "resolves";
 /** closed set at #/definitions/targetFix/anyOf/1/properties/check */

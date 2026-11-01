@@ -85,15 +85,45 @@ final class MoveCheckersTest extends TestCase
         self::assertSame('8.1.99', MoveCheckers::platformPhp('8.1', '801.2'));
     }
 
-    /** Composer refuses a platform version that is no string and not false: the move check leaves it out. */
     public function testTheProjectsMoveCheckSolvesAtTheConfiguredPlatformPhpOfTheTargetMinor(): void
     {
         $config = new Config(false);
-        $config->merge(['config' => ['platform' => ['php' => '8.4.3', 'ext-lockrot-test' => false, 'lib-lockrot-test' => 1]]]);
+        $config->merge(['config' => ['platform' => ['php' => '8.4.3', 'ext-lockrot-test' => false]]]);
 
         $checker = MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]]), ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
 
         self::assertSame('8.4.3', $checker->platformPhp());
+    }
+
+    /**
+     * Ruling R8-37: Composer's PlatformRepository refuses each `config.platform` value that is no
+     * string and not false, and a php of false, so every `composer update` stops. No move resolves.
+     *
+     * @dataProvider platformsThatComposerRefuses
+     *
+     * @param array<string, mixed> $platform
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('platformsThatComposerRefuses')]
+    public function testAConfigPlatformValueThatComposerRefusesChecksNoMove(array $platform): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['platform' => $platform]]);
+        $repository = new RecordingComposerRepository([(new ArrayLoader())->load(['name' => 'acme/lib', 'version' => '1.1.0'])]);
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+
+        $checker = MoveCheckers::forProject(self::root(), $lock, ProjectConfig::empty(), $config, [$repository], '8.4', false, Deadline::never());
+
+        $unchecked = ['result' => MoveCheck::NOT_CHECKED, 'form' => null, 'reason' => MoveCheck::PLATFORM_CONFIG_INVALID, 'installs' => null];
+        self::assertSame($unchecked, $checker->baseline()->check()->jsonSerialize(), 'baseline');
+        self::assertSame($unchecked, $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize(), 'move');
+    }
+
+    /** @return iterable<string, array{array<string, mixed>}> */
+    public static function platformsThatComposerRefuses(): iterable
+    {
+        yield 'php false' => [['php' => false]];
+        yield 'an extension true' => [['php' => '8.4.3', 'ext-intl' => true]];
+        yield 'a library as a number' => [['lib-lockrot-test' => 1]];
     }
 
     /** Composer lower-cases each `config.platform` name, so `PHP` is the project's php. */

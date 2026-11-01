@@ -54,6 +54,7 @@ final class ReferenceText
         'not_from_composer_repository' => 'no Composer repository serves it',
         'no_composer_json' => 'the project has no composer.json',
         'composer_json_invalid' => 'Composer cannot load composer.json',
+        'platform_config_invalid' => 'Composer refuses a config.platform value',
         'no_release_read' => 'no release of the row was read',
         'pass_cap' => 'Composer refused each move before it',
         'solver_error' => "Composer's solver failed on it",

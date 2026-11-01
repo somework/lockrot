@@ -354,6 +354,7 @@
    "not_from_composer_repository",
    "no_composer_json",
    "composer_json_invalid",
+   "platform_config_invalid",
    "no_release_read",
    "pass_cap",
    "solver_error",
@@ -2984,6 +2985,7 @@
    "install_time_budget",
    "no_composer_json",
    "composer_json_invalid",
+   "platform_config_invalid",
    "solver_error"
   ],
   "open": true,
@@ -3105,6 +3107,7 @@
    "not_from_composer_repository",
    "no_composer_json",
    "composer_json_invalid",
+   "platform_config_invalid",
    "no_release_read",
    "pass_cap",
    "solver_error",
@@ -3172,6 +3175,7 @@
    "not_from_composer_repository",
    "no_composer_json",
    "composer_json_invalid",
+   "platform_config_invalid",
    "solver_error",
    "advisory_lookup_incomplete"
   ],
