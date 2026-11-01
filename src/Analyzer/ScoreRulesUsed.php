@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
+use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Config\Gate;
 use Lockrot\Score\Accepted;
+use Lockrot\Score\FactState;
+use Lockrot\Score\GateScore;
 use Lockrot\Score\MaintenanceTerm;
 use Lockrot\Score\Modifier;
 use Lockrot\Verdict\Finding;
@@ -13,7 +17,8 @@ use Lockrot\Verdict\ScoreModel;
 /**
  * `run.score_rules_used`: per rule of the score model, the findings on which it changed or decided
  * a number. `zero-verdicts` counts the score-0 findings, `counted` every finding with an accepted
- * flag, and `sort`, which changes no number, is null.
+ * flag, and `sort`, which changes no number, is null. `gate-bounded-new` counts a graded finding
+ * whose gate basis the cap limits, and `baseline-cover` a finding whose entry covers a flag.
  *
  * @internal
  */
@@ -24,11 +29,15 @@ final class ScoreRulesUsed
      *
      * @return array<string, int|null>
      */
-    public static function of(array $findings): array
+    public static function of(array $findings, ?BaselineComparison $baseline = null, ?Gate $gate = null): array
     {
         $used = ScoreModel::rulesUnused();
         foreach ($findings as $finding) {
+            $standing = $gate === null ? null : $gate->standingOf($finding->package());
+            $basis = $standing === null ? null : $standing->basis();
             $score = $finding->scoreBasis();
+            $used['gate-bounded-new'] += $score->isGraded() && $basis !== null && $basis->limitedBy() === GateScore::LIMITED_BY_CAP ? 1 : 0;
+            $used['baseline-cover'] += self::coversAFlag($finding, $baseline) ? 1 : 0;
             $accepted = $score->accepted();
             $used['counted'] += $accepted === [] ? 0 : 1;
             if (!$score->isGraded()) {
@@ -74,6 +83,22 @@ final class ScoreRulesUsed
                 if ($isKind($modifier) && $modifier->changes()) {
                     return true;
                 }
+            }
+        }
+
+        return false;
+    }
+
+    private static function coversAFlag(Finding $finding, ?BaselineComparison $baseline): bool
+    {
+        $standing = $baseline === null ? null : $baseline->standingOf($finding->package());
+        if ($standing === null) {
+            return false;
+        }
+        foreach ($finding->flags()->fired() as $flag) {
+            $state = $standing->flagState($flag);
+            if ($state !== null && $state->state() === FactState::COVERED) {
+                return true;
             }
         }
 

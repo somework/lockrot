@@ -114,4 +114,10 @@ final class CauseVocabularyTest extends TestCase
 
         self::assertGreaterThan(0, $checked, 'some fixture finding has an undated end');
     }
+
+    /** S8 compares with the branch's stable releases, and a listed pre-release can be higher. */
+    public function testAboveListedReleasesNamesTheStableReleasesOfTheBranch(): void
+    {
+        self::assertSame('installed above every listed stable release', CauseWords::of('above_listed_releases'));
+    }
 }

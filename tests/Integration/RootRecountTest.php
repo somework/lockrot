@@ -9,6 +9,7 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
@@ -47,8 +48,8 @@ use PHPUnit\Framework\TestCase;
 final class RootRecountTest extends TestCase
 {
     private const FAIL_ON = ['low', 'abandoned', 'unchecked'];
-    /** A finding shows no gate rule, and `sort` changes no number, so the recount writes each as 0 or null. */
-    private const NEVER_COUNTED = ['run.score_rules_used.sort', 'run.score_rules_used.gate-bounded-new', 'run.score_rules_used.baseline-cover'];
+    /** `sort` changes no number, so the recount writes it as null. */
+    private const NEVER_COUNTED = ['run.score_rules_used.sort'];
 
     public function testEveryRootBlockOfEveryCaseRecountsFromItsFindings(): void
     {
@@ -94,8 +95,10 @@ final class RootRecountTest extends TestCase
         $facts = new Report(self::factsNoCaseHas(), [], new \DateTimeImmutable('2026-01-02T00:00:00+00:00'), 6, 0);
         yield 'the facts that no case has' => self::decode($facts->withRun($run));
         // acme/abandoned stands worsened over its recorded stale, and acme/forgotten has no entry, so it is new.
-        $earlier = BaselineEntries::baseline([BaselineEntries::of('acme/abandoned', '1.0.0', 'stale', '2026-01-01')]);
-        yield 'the facts under a baseline that knows less' => self::decode($facts->withBaseline(BaselineComparison::compare($earlier, $facts, 'lockrot-baseline.json', ['acme/abandoned']))->withRun($run));
+        // acme/kept's recorded abandoned covers its old-promise, which comes after it in flag order.
+        // acme/quiet scores 0 under an entry carried forward: the cap changes no number of it.
+        $earlier = BaselineEntries::baseline([BaselineEntries::of('acme/abandoned', '1.0.0', 'stale', '2026-01-01'), new BaselineEntry('acme/kept', '1.0.0', '2026-01-01', ['abandoned' => '2026-01-01'], []), BaselineEntries::of('acme/quiet', '1.0.0', 'stale', '2026-01-01')]);
+        yield 'the facts under a baseline that knows less' => self::decode($facts->withBaseline(BaselineComparison::compare($earlier, $facts, 'lockrot-baseline.json', ['acme/abandoned', 'acme/kept', 'acme/quiet']))->withRun($run));
     }
 
     /**
