@@ -71,6 +71,25 @@ final class ScoreRulesUsedTest extends TestCase
         self::assertSame($used, ['gate-bounded-new' => $counts['gate-bounded-new'], 'baseline-cover' => $counts['baseline-cover']]);
     }
 
+    public function testTheBaselineRulesAddUpOverEveryFinding(): void
+    {
+        $signals = array_merge(ScoreSweep::signalsOf('left-behind'), ScoreSweep::signalsOf('stale'));
+        $findings = [];
+        $entries = [];
+        foreach (['vendor/a', 'vendor/b'] as $package) {
+            $findings[] = (new FindingBuilder())->withPackage($package)->withChain([$package])->withFlags(FlagSet::fromSignals($signals, null, []))->build();
+            $entries[] = new BaselineEntry($package, '1.0.0', '2026-01-01', ['left-behind' => '2026-01-01'], []);
+        }
+        $report = new Report($findings, [], new \DateTimeImmutable('2026-10-01T00:00:00+00:00'), 2, 0);
+        $comparison = BaselineComparison::compare(BaselineEntries::baseline($entries), $report, 'b.json', ['vendor/a', 'vendor/b']);
+        $compared = $report->withBaseline($comparison);
+        $gate = Gate::decide($compared, FailOn::parse('high'), false, Gate::MODE_CHECK);
+
+        $counts = ScoreRulesUsed::of($compared->findings(), $comparison, $gate);
+
+        self::assertSame(['gate-bounded-new' => 2, 'baseline-cover' => 2], ['gate-bounded-new' => $counts['gate-bounded-new'], 'baseline-cover' => $counts['baseline-cover']]);
+    }
+
     /** @return iterable<string, array{list<string>, ?string, array<string, int>}> */
     public static function baselined(): iterable
     {
