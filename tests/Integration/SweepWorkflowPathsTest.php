@@ -52,7 +52,9 @@ final class SweepWorkflowPathsTest extends TestCase
     private static function pullRequestPaths(): array
     {
         $workflow = (string) file_get_contents(self::ROOT.'/.github/workflows/sweep.yml');
-        self::assertSame(1, preg_match('/^  pull_request:\n    paths:\n((?:      - .+\n)+)/m', $workflow, $block));
+        if (preg_match('/^  pull_request:\n    paths:\n((?:      - .+\n)+)/m', $workflow, $block) !== 1) {
+            self::fail('sweep.yml has no pull_request paths list');
+        }
         preg_match_all("/^      - '([^']+)'$/m", $block[1], $paths);
         self::assertNotSame([], $paths[1]);
 
