@@ -463,6 +463,49 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([[['acme/good', 'acme/bad'], 'stable']], $repository->asked);
     }
 
+    /** Each request to a repository takes 3s here, so the second repository is asked after a 5s budget ends. */
+    public function testALaterRepositoryIsNotAskedOnceTheBudgetEnds(): void
+    {
+        $first = self::recording([]);
+        $second = self::recording(['acme/lib' => ['1.0.0']]);
+        $now = static fn (): float => 3.0 * (\count($first->asked) + \count($second->asked));
+        $versions = new RepositoryVersions([$first, $second], [], false, Deadline::inSeconds(5.0, $now));
+
+        self::assertSame(['acme/lib' => []], $versions->versionsOf(['acme/lib']));
+        self::assertSame(VersionSource::BUDGET, $versions->failure('acme/lib'));
+        self::assertSame([[['acme/lib'], 'stable'], [['acme/lib'], 'dev']], $first->asked);
+        self::assertSame([], $second->asked);
+    }
+
+    /**
+     * The budget ends between the tags request and the dev request of one repository. A name that
+     * its tags answered keeps them. A name that still needs its dev versions is over the budget.
+     */
+    public function testTheDevRequestIsNotSentOnceTheBudgetEndsAndTheTaggedNamesKeepTheirAnswer(): void
+    {
+        $repository = self::recording(['acme/tagged' => ['1.0.0'], 'acme/admitted' => ['1.0.0', 'dev-main'], 'acme/dev-only' => ['dev-main']]);
+        $now = static fn (): float => 6.0 * \count($repository->asked);
+        $versions = new RepositoryVersions([$repository], [], false, Deadline::inSeconds(5.0, $now), 'stable', ['acme/admitted' => BasePackage::STABILITY_DEV]);
+
+        $loaded = $versions->versionsOf(['acme/tagged', 'acme/admitted', 'acme/dev-only']);
+
+        self::assertSame(['acme/tagged' => ['1.0.0'], 'acme/admitted' => [], 'acme/dev-only' => []], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
+        self::assertSame([null, VersionSource::BUDGET, VersionSource::BUDGET], [$versions->failure('acme/tagged'), $versions->failure('acme/admitted'), $versions->failure('acme/dev-only')]);
+        self::assertSame([[['acme/tagged', 'acme/admitted', 'acme/dev-only'], 'stable']], $repository->asked);
+    }
+
+    /** A name that loads alone after a failed request sends its dev request only while the budget lasts. */
+    public function testANameThatLoadsAloneSendsNoDevRequestOnceTheBudgetEnds(): void
+    {
+        $repository = self::recording(['acme/dev-only' => ['dev-main']], ['acme/bad']);
+        $now = static fn (): float => 2.5 * \count($repository->asked);
+        $versions = new RepositoryVersions([$repository], [], false, Deadline::inSeconds(5.0, $now));
+
+        self::assertSame(['acme/dev-only' => [], 'acme/bad' => []], $versions->versionsOf(['acme/dev-only', 'acme/bad']));
+        self::assertSame([VersionSource::BUDGET, VersionSource::BUDGET], [$versions->failure('acme/dev-only'), $versions->failure('acme/bad')]);
+        self::assertSame([[['acme/dev-only', 'acme/bad'], 'stable'], [['acme/dev-only'], 'stable']], $repository->asked);
+    }
+
     public function testTheFailureOfANameStaysWhenALaterNameIsOffline(): void
     {
         $versions = new RepositoryVersions([self::recording([])], [], true, Deadline::never());

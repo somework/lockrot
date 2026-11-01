@@ -427,7 +427,7 @@ final class ComposerHttpClientTest extends TestCase
         $results = $client->fetchAll($urls, self::WITHOUT_AUTHORIZATION);
 
         self::assertSame([$urls[0], $urls[1]], array_column($downloader->requests, 'url'), 'each request takes 3s of a 5s budget');
-        self::assertSame([5, 2], array_map(static fn (array $request): int => $request['options']['http']['timeout'], $downloader->requests));
+        self::assertSame([['timeout' => 5], ['timeout' => 2]], array_map(static fn (array $request): array => array_intersect_key((array) $request['options']['http'], ['timeout' => true]), $downloader->requests));
         self::assertSame([0, null, 'install-time budget spent'], self::summarize($results)[$urls[2]]);
     }
     /**
