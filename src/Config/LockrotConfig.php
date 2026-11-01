@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Config;
 
+use Composer\Semver\VersionParser;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Php\PhpReleaseDates;
@@ -246,13 +247,23 @@ final class LockrotConfig
             RunSettings::SOURCE_OPTION => $cli['target-php'] ?? null,
             RunSettings::SOURCE_ENV => $env['LOCKROT_TARGET_PHP'] ?? null,
             RunSettings::SOURCE_CONFIG => $extra['target-php'] ?? null,
-            RunSettings::SOURCE_PLATFORM => $platformPhp,
+            RunSettings::SOURCE_PLATFORM => $platformPhp === null ? null : self::asComposerReads($platformPhp),
         ], $runtimePhp, RunSettings::SOURCE_RUNTIME);
         if (!self::looksLikePhpVersion($target)) {
             throw new ConfigException('target-php must look like "8.4"; got "'.$target.'"');
         }
 
         return [PhpReleaseDates::minorOf($target), $source];
+    }
+
+    /** Composer accepts `v8.4.1` in `config.platform.php`. A value that it refuses stays as written. */
+    private static function asComposerReads(string $platformPhp): string
+    {
+        try {
+            return (new VersionParser())->normalize($platformPhp);
+        } catch (\UnexpectedValueException $e) {
+            return $platformPhp;
+        }
     }
 
     private static function looksLikePhpVersion(string $value): bool

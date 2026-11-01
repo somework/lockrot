@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Config;
 
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Exception\ConfigException;
@@ -166,6 +167,21 @@ final class LockrotConfigTest extends TestCase
     public function testPlatformPhpBeatsRuntime(): void
     {
         self::assertSame('8.1', LockrotConfig::fromSources([], [], [], '8.5.10', '8.1.0')->targetPhp());
+    }
+
+    /** Composer reads `v8.4.1` and `V8.4` as 8.4 releases, so the default target reads them too. */
+    public function testAVPrefixedPlatformPhpSetsTheDefaultTargetMinor(): void
+    {
+        self::assertSame('8.4', LockrotConfig::fromSources([], [], [], '8.5.10', 'v8.4.1')->targetPhp());
+        self::assertSame('8.4', LockrotConfig::fromSources([], [], [], '8.5.10', 'V8.4')->targetPhp());
+        self::assertSame(RunSettings::SOURCE_PLATFORM, LockrotConfig::fromSources([], [], [], '8.5.10', 'v8.4.1')->targetPhpSource());
+    }
+
+    public function testAVPrefixedTargetPhpOptionIsStillRefused(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('target-php must look like "8.4"; got "v8.4"');
+        LockrotConfig::fromSources([], [], ['target-php' => 'v8.4'], '8.5.10', 'v8.4.1');
     }
 
     public function testFailOnAcceptsAPriorityFromEverySource(): void
