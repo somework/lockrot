@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Support\Contract;
 use Composer\Semver\Comparator;
 use Composer\Semver\Semver;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Verdict\ScoreModel;
 use PHPUnit\Framework\Assert;
 
 /**
@@ -37,8 +38,9 @@ final class ModelBounds
     }
 
     /**
-     * Where the model marks a branch row's score as an upper bound (`at_most`), lockrot's exact score
-     * of that row is at most the bound. At least one row of the model is a bound.
+     * Where the model marks a branch row's score as an upper bound (`at_most`), lockrot's score of that
+     * row is at most the bound, and its verdict is the band of its total. At least one row of
+     * the model is a bound.
      *
      * @param array<mixed, mixed> $modelRows
      * @param array<mixed, mixed> $lockrotRows
@@ -56,11 +58,12 @@ final class ModelBounds
             Assert::assertCount(1, $lockrotRow, $message.': branch '.$branch);
             ++$bounds;
 
-            Assert::assertLessThanOrEqual(
-                JsonPath::intAt($row, ['fixes', 'if_applied', 'total']),
-                JsonPath::intAt(JsonPath::decoded($lockrotRow[0]), ['fixes', 'if_applied', 'total']),
-                $message.': branch '.$branch
-            );
+            $lockrotIfApplied = JsonPath::arrayAt(JsonPath::decoded($lockrotRow[0]), ['fixes', 'if_applied']);
+            Assert::assertLessThanOrEqual(JsonPath::intAt($row, ['fixes', 'if_applied', 'total']), JsonPath::intAt($lockrotIfApplied, ['total']), $message.': branch '.$branch);
+            $band = ScoreModel::band(JsonPath::intAt($lockrotIfApplied, ['total']));
+            if ($band !== null) {
+                Assert::assertSame($band, $lockrotIfApplied['verdict'], $message.': branch '.$branch);
+            }
         }
         Assert::assertGreaterThan(0, $bounds, $message.': no row of the model is an upper bound');
     }

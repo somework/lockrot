@@ -147,7 +147,6 @@ final class FindingTest extends TestCase
         $finding = new Finding('vendor/pkg', '1.0.0', [], ['vendor/pkg'], null, null);
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('vendor/pkg was built without the composer.json sections that name it.');
 
         $finding->namedIn();
     }

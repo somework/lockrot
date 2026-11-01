@@ -103,10 +103,16 @@ final class BranchRowTest extends TestCase
     public function testAReleaseOfNoBranchGivesNoRow(): void
     {
         $dev = new StableRelease('dev-main', 'dev-main', null, null, false);
-        $stable = new StableRelease('2.1.0.0', 'v2.1.0', null, '>=8.2', false);
 
         self::assertNull(BranchRow::ofRelease($dev, false, new PhpFloor('8.4')));
+    }
+
+    public function testAStableReleaseGivesTheRowOfItsBranch(): void
+    {
+        $stable = new StableRelease('2.1.0.0', 'v2.1.0', null, '>=8.2', false);
+
         $row = BranchRow::ofRelease($stable, false, new PhpFloor('8.4'));
+
         self::assertNotNull($row);
         self::assertSame(['2.x', 'v2.1.0'], [$row->branch(), $row->highest()]);
     }
