@@ -20998,7 +20998,6 @@
             "direct_dependents": [
                 "guzzlehttp/psr7",
                 "j0k3r/graby",
-                "php-http/httplug-bundle",
                 "php-http/mock-client",
                 "sentry/sentry-symfony"
             ],
@@ -38016,9 +38015,7 @@
                 "require-dev"
             ],
             "direct_dependents": [
-                "php-http/httplug-bundle",
-                "php-http/mock-client",
-                "sentry/sentry-symfony"
+                "php-http/mock-client"
             ],
             "signals": [],
             "evidence": "",
@@ -50295,7 +50292,6 @@
             "named_in": [],
             "direct_dependents": [
                 "j0k3r/graby",
-                "php-http/httplug-bundle",
                 "php-http/mock-client",
                 "sentry/sentry-symfony"
             ],
@@ -55185,7 +55181,6 @@
             "direct_dependents": [
                 "guzzlehttp/psr7",
                 "j0k3r/graby",
-                "php-http/httplug-bundle",
                 "php-http/mock-client",
                 "sentry/sentry-symfony"
             ],
