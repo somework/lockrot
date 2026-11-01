@@ -510,4 +510,16 @@ final class LeftBehindRuleTest extends TestCase
 
         return $data;
     }
+
+    /** A lock on 1.10.0-RC1, a pre-release that never went final, on a 1.x whose last stable release is 7.5 years old. */
+    public function testAnInstalledPreReleaseAboveTheNewestStableIsLeftBehind(): void
+    {
+        $metadata = F::metadata([['2.4.0', '2026-06-01T00:00:00+00:00'], ['2.0.0', '2023-06-01T00:00:00+00:00'], ['1.10.0-RC1', '2020-03-01T00:00:00+00:00'], ['1.9.2', '2019-03-02T00:00:00+00:00']]);
+
+        $signal = (new LeftBehindRule(Clock::fixed(F::NOW), new Thresholds()))->evaluate(F::facts(F::package(['version' => '1.10.0-RC1']), $metadata));
+
+        self::assertNotNull($signal);
+        self::assertSame(Signal::S8, $signal->id());
+        self::assertSame('1.9.2', JsonPath::decoded($signal->data())['branch_last_version'] ?? null);
+    }
 }
