@@ -104,7 +104,9 @@ final class InstallTimeSummary
         }
         $composerFile = Factory::getComposerFile();
         $project = ProjectConfig::fromFile($composerFile);
-        $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), $env, [], \PHP_VERSION, $project->platformPhp());
+        $composer = $event->getComposer();
+        $config = $composer->getConfig();
+        $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), $env, [], \PHP_VERSION, MoveCheckers::configuredPhp($config));
         if ($lockrot->isDisabled() || !$lockrot->installTime()) {
             return;
         }
@@ -132,8 +134,6 @@ final class InstallTimeSummary
         $packages = self::inMergedLock($lock, $packages);
 
         $deadline = Deadline::inSeconds((float) $lockrot->installTimeBudgetSeconds(), $this->monotonicNow);
-        $composer = $event->getComposer();
-        $config = $composer->getConfig();
         $repositories = array_values($composer->getRepositoryManager()->getRepositories());
 
         // The check counts against the same budget: a move that it reaches too late is not checked.

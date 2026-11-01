@@ -227,8 +227,12 @@ final class LockrotCommand extends BaseCommand
             $project = ProjectConfig::fromFile($composerFile);
             $hasComposerJson = is_file($composerFile);
             // LOCKROT_DISABLE needs no check here: run() answered it before any of this was read.
-            $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), $env, $this->cliOptions($input), \PHP_VERSION, $project->platformPhp());
-            [$config, $repositories, $root] = $this->composerBootstrap($io, $hasComposerJson, $lockrot->offline());
+            $composer = $this->resolveComposer($hasComposerJson);
+            $config = $composer instanceof Composer ? $composer->getConfig() : Factory::createConfig($io);
+            // A composer.json that Composer cannot load leaves only its own platform php to read.
+            $platformPhp = $composer instanceof Composer || !$hasComposerJson ? MoveCheckers::configuredPhp($config) : $project->platformPhp();
+            $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), $env, $this->cliOptions($input), \PHP_VERSION, $platformPhp);
+            [$repositories, $root] = $this->composerBootstrap($io, $composer, $config, $lockrot->offline());
             if (self::wantsUpgradeNotice($input, $lockrot)) {
                 $this->writeError($output, self::UPGRADE_NOTICE);
             }
@@ -675,30 +679,28 @@ final class LockrotCommand extends BaseCommand
     }
 
     /**
-     * Reuses the project's Composer configuration and its repositories, in their order. Without a
-     * Composer instance (a lock-only directory, the standalone PHAR) it uses Composer's defaults.
+     * Reuses the project's Composer repositories, in their order. Without a Composer instance (a
+     * lock-only directory, the standalone PHAR) it uses Composer's defaults.
      * The repositories are those of the instance's RepositoryManager, which `update` and `audit`
      * read, with the ones that plugins add. Offline they are rebuilt from Config: in plugin mode
      * the instance's HttpDownloader predates this command, so --offline could not reach it.
      *
      * The root package is Composer's, null without composer.json: then no move is checked.
      *
-     * @return array{0: Config, 1: list<RepositoryInterface>, 2: ?RootPackageInterface}
+     * @return array{0: list<RepositoryInterface>, 1: ?RootPackageInterface}
      */
-    private function composerBootstrap(IOInterface $io, bool $hasComposerJson, bool $offline): array
+    private function composerBootstrap(IOInterface $io, ?Composer $composer, Config $config, bool $offline): array
     {
-        $composer = $this->resolveComposer($hasComposerJson);
         if ($composer instanceof Composer && !$offline) {
-            return [$composer->getConfig(), array_values($composer->getRepositoryManager()->getRepositories()), $composer->getPackage()];
+            return [array_values($composer->getRepositoryManager()->getRepositories()), $composer->getPackage()];
         }
-        $config = $composer instanceof Composer ? $composer->getConfig() : Factory::createConfig($io);
         // Pass the project's EventDispatcher so plugins on PRE_FILE_DOWNLOAD/POST_FILE_DOWNLOAD
         // (mirror, proxy, CDN) still see lockrot's metadata requests. The lock-only path has no
         // plugins.
         $eventDispatcher = $composer instanceof Composer ? $composer->getEventDispatcher() : null;
         $manager = RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config), $eventDispatcher);
 
-        return [$config, array_values(RepositoryFactory::defaultRepos($io, $config, $manager)), $composer instanceof Composer ? $composer->getPackage() : null];
+        return [array_values(RepositoryFactory::defaultRepos($io, $config, $manager)), $composer instanceof Composer ? $composer->getPackage() : null];
     }
 
     /**

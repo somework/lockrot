@@ -3294,6 +3294,39 @@ final class LockrotCommandTest extends TestCase
         });
     }
 
+    /**
+     * docs/configuration.md: the default target is `config.platform.php` of Composer's merged
+     * config. A lock-only run reads the global config alone.
+     *
+     * @dataProvider manifestProvider
+     */
+    #[DataProvider('manifestProvider')]
+    public function testTheDefaultTargetReadsThePlatformPhpOfTheGlobalComposerConfig(bool $manifest): void
+    {
+        $dir = $this->fixtureCopy(self::LARAVEL_LOCK);
+        if (!$manifest) {
+            unlink($dir.'/composer.json');
+        }
+        $home = $this->tempDir('lockrot-global-platform-home-');
+        file_put_contents($home.'/config.json', '{"config": {"platform": {"php": "8.1.5"}}}');
+
+        $this->withComposerEnv($this->tempDir('lockrot-global-platform-cache-'), $home, function (): void {
+            [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader());
+
+            self::assertSame(0, $code, $stderr);
+            $json = json_decode($stdout, true);
+            self::assertIsArray($json);
+            self::assertSame(['8.1', 'platform'], [JsonPath::stringAt($json, ['run', 'target_php']), JsonPath::stringAt($json, ['run', 'target_php_source'])]);
+        });
+    }
+
+    /** @return iterable<string, array{bool}> */
+    public static function manifestProvider(): iterable
+    {
+        yield 'composer.json beside the lock' => [true];
+        yield 'a lock-only directory' => [false];
+    }
+
     /** @return iterable<string, array{0: bool, 1: mixed, 2: null|string}> */
     public static function projectPhpProvider(): iterable
     {

@@ -48,7 +48,7 @@ final class MoveCheckers
             }
         }
         $platformNames = array_keys($overrides);
-        $configured = \is_string($overrides['php'] ?? null) ? $overrides['php'] : null;
+        $configured = self::configuredPhp($config);
         $php = self::platformPhp($targetPhp, $configured);
         $overrides['php'] = $php;
         $notFromComposerRepository = [];
@@ -74,6 +74,15 @@ final class MoveCheckers
         $keptOut = $advisoryScope === AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES ? $notFromComposerRepository : [];
 
         return new SolverChecker($solver, $notFromComposerRepository, $php, $blocking->blocks(), $deadline, new PoolAdvisories($blocking, static fn (array $names, bool $complete): ?array => $lookup->records($names, $complete), $keptOut), $configured);
+    }
+
+    /** `config.platform.php` of Composer's merged config: null when it is unset or `false`. */
+    public static function configuredPhp(Config $config): ?string
+    {
+        $platform = $config->get('platform');
+        $php = \is_array($platform) ? array_change_key_case($platform, \CASE_LOWER)['php'] ?? null : null;
+
+        return \is_string($php) ? $php : null;
     }
 
     /** Whether the printed `composer update` and `composer require` run with `--minimal-changes`, as UpdateCommand and RequireCommand read it. */

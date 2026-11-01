@@ -42,6 +42,7 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\ColdConfigSchema;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\HermeticComposerConfig;
 use Lockrot\Tests\Support\MarkupRefusingFormatter;
 use Lockrot\Tests\Support\RecordingIO;
 use Lockrot\Verdict\FailOn;
@@ -300,6 +301,35 @@ final class InstallTimeSummaryTest extends TestCase
                 $lockrot->offline()
             );
         };
+    }
+
+    /** docs/configuration.md: the default target is `config.platform.php` of Composer's merged config. */
+    public function testTheDefaultTargetReadsThePlatformPhpOfTheGlobalComposerConfig(): void
+    {
+        $server = self::$server;
+        self::assertNotNull($server);
+        $dir = $this->project();
+        file_put_contents($dir.'/composer.json', '{"name": "lockrot/install-time-test", "require": {"phpzip/phpzip": "2.0.8"}}');
+        $home = $this->tempDir('lockrot-install-time-home-');
+        file_put_contents($home.'/config.json', '{"config": {"platform": {"php": "8.1.5"}}}');
+        $io = new BufferIO();
+        $config = HermeticComposerConfig::create($home);
+        $config->merge(['repositories' => ['packagist.org' => false, 'fixture' => ['type' => 'composer', 'url' => $server->url()]]]);
+        $composer = new Composer();
+        $composer->setConfig($config);
+        $composer->setPackage(new RootPackage('__root__', '1.0.0.0', '1.0.0'));
+        $composer->setRepositoryManager(RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config)));
+        $targets = [];
+        $inner = $this->analyzerFactory();
+        $factory = static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline) use ($inner, &$targets): Analyzer {
+            $targets[] = $lockrot->targetPhp();
+
+            return $inner($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline);
+        };
+
+        (new InstallTimeSummary($factory))->onPreOperationsExec(new InstallerEvent(InstallerEvents::PRE_OPERATIONS_EXEC, $composer, $io, false, true, new Transaction([], [$this->loadPackage(self::PHPZIP)])));
+
+        self::assertSame(['8.1'], $targets);
     }
 
     public function testAFlaggedTransactionPackagePrintsTheCompactBlock(): void
