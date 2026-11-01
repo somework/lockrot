@@ -1378,6 +1378,46 @@ final class LockrotCommandTest extends TestCase
         });
     }
 
+    /**
+     * Without a move check, the PHP window reads the same `config.platform.php` as the check:
+     * Composer's merged config, here the global `config.json`.
+     *
+     * @param ?array<string, mixed> $manifest composer.json, null for a lock-only run
+     *
+     * @dataProvider uncheckedManifestProvider
+     */
+    #[DataProvider('uncheckedManifestProvider')]
+    public function testAnUncheckedRunReadsThePhpWindowAtTheGlobalPlatformPhp(?array $manifest, string $reason): void
+    {
+        $project = $this->tempDir('lockrot-unchecked-platform-');
+        if ($manifest !== null) {
+            file_put_contents($project.'/composer.json', (string) json_encode($manifest));
+        }
+        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));
+        chdir($project);
+        $home = $this->tempDir('lockrot-unchecked-platform-home-');
+        file_put_contents($home.'/config.json', '{"config": {"platform": {"php": "8.1.5"}}}');
+        $loader = $this->emptyLoader();
+        $command = $this->buildCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?\Closure $checks = null): Analyzer => self::withChecks(self::testAnalyzer($loader, $lockrot, $clock), $checks));
+
+        $this->withComposerEnv($this->tempDir('lockrot-unchecked-platform-cache-'), $home, function () use ($command, $reason): void {
+            [$code, $stdout, $stderr] = $this->runCommandWithSplitStreams($command, ['--format' => 'json']);
+
+            self::assertSame(0, $code, $stderr);
+            $json = json_decode($stdout, true);
+            self::assertIsArray($json);
+            self::assertSame(['8.1', $reason], [JsonPath::stringAt($json, ['run', 'target_php']), JsonPath::stringAt($json, ['run', 'move_check', 'reason'])]);
+            self::assertSame(['8.1.5', '8.1.5'], [JsonPath::stringAt($json, ['run', 'php_window', 'target', 'php']), JsonPath::stringAt($json, ['run', 'php_window', 'platform_override'])]);
+        });
+    }
+
+    /** @return iterable<string, array{?array<string, mixed>, string}> */
+    public static function uncheckedManifestProvider(): iterable
+    {
+        yield 'a lock-only run' => [null, MoveCheck::NO_COMPOSER_JSON];
+        yield 'a composer.json that Composer cannot load' => [['name' => 'lockrot/invalid-manifest-test', 'require' => ['acme/<<fg=red>>' => '1.0.0']], MoveCheck::COMPOSER_JSON_INVALID];
+    }
+
     /** Ruling R8-37: a config.platform value that Composer refuses checks no move, and the exit code stays that of the findings. */
     public function testAConfigPlatformValueThatComposerRefusesLeavesEveryMoveUncheckedForThatReason(): void
     {

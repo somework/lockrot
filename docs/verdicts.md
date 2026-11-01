@@ -922,8 +922,8 @@ How lockrot reads the window:
 - A known minor is a PHP minor whose GA date is on or before the run's date. A known minor is in
   `minors` when every requirement admits its newest patch (`8.4.99`) and no conflict matches it.
 - lockrot reads the target's minor at the PHP that [the move check](#the-move-check) solves at
-  instead, and `target.php` holds that PHP. The move check reads `config.platform.php` from
-  Composer's config, the global `config.json` included. A cap inside a minor, such as `<8.4.5`, leaves that minor out.
+  instead, and `target.php` holds that PHP. lockrot reads `config.platform.php` from Composer's
+  config, the global `config.json` included, also in a run that checks no move. A cap inside a minor, such as `<8.4.5`, leaves that minor out.
 - When the set does not admit that PHP, the target's minor stays in the window if the set admits
   a later patch of that minor. So with `config.platform.php` 8.4.0, a patch floor such as
   `>=8.4.2` keeps 8.4 in the window, and `lower_edge.php` reads 8.4.2. A cap below that PHP leaves
