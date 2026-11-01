@@ -318,6 +318,10 @@ final class CoverageTest extends TestCase
                 "the note's reason is a value of check.reason, which the move-check documents carry each. A document carries install_time_budget"],
             [self::D.'targetFix/properties/reason/oneOf/0', ['advisory_lookup_incomplete'],
                 'R6-1: a target fix whose resolving solve holds a name that the advisory lookup did not read. The model documents predate the reason'],
+            ...array_map(static fn (string $pointer): array => [self::D.$pointer, ['platform_config_invalid'], 'R8-37: a config.platform value that Composer refuses. The model documents predate the reason'], [
+                'moveCheck/oneOf/0/properties/reason/oneOf/0', 'run/properties/move_check/oneOf/0/properties/reason/oneOf/0',
+                'explainRun/properties/move_check/oneOf/0/properties/reason/oneOf/0', 'targetFix/properties/reason/oneOf/0', 'noteUpdateNowNotChecked/properties/reason',
+            ]),
             [self::D.'noteAdvisoriesDisabledByPolicy/properties/policy_key', ['COMPOSER_POLICY'],
                 'the variable that switches the policy off. The documents run under policy and policy.advisories'],
             [self::D.'noteAbandonedNotAuditedByComposer/properties/policy_key', ['COMPOSER_POLICY'],

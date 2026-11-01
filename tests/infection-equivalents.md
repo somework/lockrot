@@ -193,7 +193,6 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Solver/PoolAdvisoryFeed.php` MethodCallRemoval `parent::__construct();` — `ArrayRepository::__construct()` with no packages adds none, and its first read creates the empty list.
 - `src/Solver/PoolAdvisoryFeed.php` FalseValue `public function getSecurityAdvisories(array $packageConstraintMap, bool $allowPartialAdvisories = false): array` — Composer's `RepositorySet` passes the argument on every call.
 - `src/Solver/PoolAdvisoryFeed.php` ArrayItemRemoval `return ['namesFound' => $answer['namesFound'], 'advisories' => $answer['advisories']];` — `RepositorySet::getSecurityAdvisoriesForConstraints()` reads only `advisories` of the answer.
-- `src/Solver/RepositoryVersions.php` UnwrapArrayFilter, UnwrapArrayValues `$options[$key] = array_values(array_filter($config[$key], 'is_string'));` — Composer builds the repository's `FilterRepository` from the same config, and it fails on an entry that is neither a string nor a number. No number matches a `vendor/name`, and `FilterRepository` reads only the values.
 
 ## src/Verdict
 
