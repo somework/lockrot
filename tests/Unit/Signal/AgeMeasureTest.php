@@ -194,6 +194,17 @@ final class AgeMeasureTest extends TestCase
         self::assertUnmeasured(AgeMeasure::UNDATED_RELEASES, $measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.3.1']), $undatedHighest)));
     }
 
+    /** A pre-release above the branch's newest stable release is not above the branch: S8 reads that stable release. */
+    public function testAnInstalledPreReleaseAboveTheNewestStableReadsTheNewestStable(): void
+    {
+        $metadata = FactsBuilder::metadata([['2.4.0', '2026-06-01T00:00:00+00:00'], ['2.0.0', '2023-06-01T00:00:00+00:00'], ['1.10.0-RC1', '2020-03-01T00:00:00+00:00'], ['1.9.2', '2019-03-02T00:00:00+00:00']]);
+
+        $reading = $this->measure()->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.10.0-RC1']), $metadata));
+
+        self::assertTrue($reading->isMeasured(), (string) $reading->unmeasured());
+        self::assertSame('1.9.2', $reading->version());
+    }
+
     public function testThePushReading(): void
     {
         $facts = FactsBuilder::facts(FactsBuilder::package(), null, FactsBuilder::activity(false, self::ago(5 * Clock::SECONDS_PER_YEAR - 1)));
