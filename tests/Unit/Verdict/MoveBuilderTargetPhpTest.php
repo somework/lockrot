@@ -98,6 +98,21 @@ final class MoveBuilderTargetPhpTest extends TestCase
     }
 
     /**
+     * acme/other's link `<2.4` excludes 2.4.0, the highest 2.x release that 8.0 runs. Composer
+     * installs 2.3.0, so the require reads its php and writes no raise for 2.4.0's `>=7.3`.
+     */
+    public function testARequireReadsNoReleaseThatALockLinkExcludes(): void
+    {
+        $releases = [['1.0.0', '>=7.2'], ['2.0.0', '>=7.2'], ['2.3.0', '>=7.2'], ['2.4.0', '>=7.3'], ['2.5.0', '>=8.1']];
+        $other = ['name' => 'acme/other', 'version' => '1.0.0', 'require' => [self::PACKAGE => '<2.4'], 'notification-url' => 'https://packagist.org/downloads/'];
+        [$move] = self::updateMove($releases, '8.0', '>=7.2', Move::REQUIRE, '2.x', '^2.0.0', [$other]);
+        $phpCheck = $move->phpCheck();
+
+        self::assertNotNull($phpCheck);
+        self::assertSame(['>=7.2', true, null], [$phpCheck->requires(), $phpCheck->targetRuns(), $phpCheck->raiseTo()]);
+    }
+
+    /**
      * SPEC §5.6 L4: no release on 2.x runs on 8.0, and lockrot read no release the move takes, so
      * `php_check` reads the branch top. The text does not say that the target runs it.
      */
@@ -118,10 +133,11 @@ final class MoveBuilderTargetPhpTest extends TestCase
      * $branch that it admits, else to $branch with no release read.
      *
      * @param list<array{string, string}> $releases each release of acme/lib: its version and php
+     * @param list<array<string, mixed>>   $others   further lock entries beside acme/lib 1.0.0
      *
      * @return array{0: Move, 1: MoveChecks, 2: FixFinder, 3: PackageFacts}
      */
-    private static function updateMove(array $releases, string $target, string $projectPhp, string $kind = Move::UPDATE, string $branch = '1.x', ?string $constraint = '^1.2.0'): array
+    private static function updateMove(array $releases, string $target, string $projectPhp, string $kind = Move::UPDATE, string $branch = '1.x', ?string $constraint = '^1.2.0', array $others = []): array
     {
         $packages = [];
         $remote = [];
@@ -133,7 +149,7 @@ final class MoveBuilderTargetPhpTest extends TestCase
             $remote[] = $entry;
         }
         $lockEntry = ['name' => self::PACKAGE, 'version' => '1.0.0', 'require' => ['php' => '>=7.2'], 'notification-url' => 'https://packagist.org/downloads/'];
-        $lock = LockFile::fromArray(['packages' => [$lockEntry]]);
+        $lock = LockFile::fromArray(['packages' => array_merge([$lockEntry], $others)]);
         $locked = $lock->find(self::PACKAGE);
         self::assertNotNull($locked);
         $facts = new PackageFacts($locked, PackageMetadata::fromPackages(self::PACKAGE, $packages, new \DateTimeImmutable(self::NOW), '1.0.0.0'), null, [new Advisory('A', null, null, null, 'high', null, (new VersionParser())->parseConstraints('<1.2.0'))]);
