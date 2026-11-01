@@ -1,6 +1,7 @@
 """`tools/corpus/record` refuses a run that lacks a wanted shape, and then leaves the recorded fixtures as they were."""
 
 import importlib.machinery
+import json
 import importlib.util
 import os
 import tempfile
@@ -40,7 +41,28 @@ class AShapeThatTheRunLacks(unittest.TestCase):
             code = record.main(['--work', work, '--out', 'run', '--explain-out', 'run'])
 
             self.assertEqual(1, code)
-            self.assertEqual(kept, {path: open(path).read() for path in kept if os.path.exists(path)})
+            self.assertEqual(kept, {path: _read(path) for path in kept if os.path.exists(path)})
+
+
+class ACachedP2DocumentThatTheRecordingCannotCopy(unittest.TestCase):
+    def test_is_named_when_it_is_missing_or_lacks_the_package(self):
+        with tempfile.TemporaryDirectory() as work:
+            host = os.path.join(work, 'repo', 'https---repo.packagist.org')
+            os.makedirs(host)
+            for name, document in {'a~good': {'packages': {'a/good': []}}, 'a~other': {'packages': {'a/else': []}}}.items():
+                with open(os.path.join(host, 'provider-%s.json' % name), 'w') as handle:
+                    json.dump(document, handle)
+            chosen = {'one': types.SimpleNamespace(finding={'package': 'a/good'}, parent='a/missing'),
+                      'two': types.SimpleNamespace(finding={'package': 'a/other'}, parent=None)}
+
+            missing = _record(work, [], []).uncopyable_providers(chosen, work)
+
+            self.assertEqual(['no cached p2 for a/missing', 'no cached p2 for a/other'], missing)
+
+
+def _read(path):
+    with open(path) as handle:
+        return handle.read()
 
 
 if __name__ == '__main__':
