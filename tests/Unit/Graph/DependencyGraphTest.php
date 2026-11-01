@@ -463,6 +463,24 @@ final class DependencyGraphTest extends TestCase
         self::assertSame(['app/a', 'vendor/p'], $transitive->shortestChain('vendor/p'), 'a prod package\'s require reads the prod provider too');
     }
 
+    /** A lock out of step with `composer.json` can hold a prod requirement only in packages-dev. */
+    public function testWithDevAProdNameThatOnlyADevPackageProvidesReachesTheDevProvider(): void
+    {
+        $lock = LockFile::fromArray([
+            'packages' => [
+                ['name' => 'app/a', 'version' => '1.0.0', 'require' => ['vendor/x' => '^1']],
+            ],
+            'packages-dev' => [
+                ['name' => 'dev/p', 'version' => '1.0.0', 'provide' => ['vendor/x' => '1.0.0']],
+            ],
+        ]);
+
+        $graph = DependencyGraph::fromLock($lock, ProjectConfig::fromArray(['require' => ['app/a' => '^1', 'vendor/x' => '^1']]), true);
+
+        self::assertSame([ProjectConfig::REQUIRE], $graph->namedIn('dev/p'));
+        self::assertSame(['app/a' => ['app/a', 'dev/p'], 'dev/p' => ['dev/p']], $graph->chainsTo('dev/p'));
+    }
+
     /** Both sections are read whatever `--dev` says, in the order require, require-dev. */
     public function testNamedInListsEverySectionThatNamesThePackage(): void
     {
