@@ -348,18 +348,19 @@ final class MarkdownFormatterTest extends TestCase
         self::assertStringContainsString('requires \\~0.4@dev, (@&#8203;octocat), a@&#8203;b.example and ^1.0@&#8203;beta.1', $out);
     }
 
-    public function testEveryKindOfLineBreakInACellFoldsIntoOneSpace(): void
+    /** docs/ci.md: a control character prints as an escape, a line break from the lock included, as in table and explain. */
+    public function testALineBreakFromTheLockPrintsAsAnEscape(): void
     {
         $at = new \DateTimeImmutable(self::AT);
         $package = "acme/pk\r\ng|x";
         $report = new Report([
             (new FindingBuilder())->withPackage($package)->withVerdict(Verdict::ABANDONED)->withChain([$package])->withDataDate($at)->build(),
-        ], Notes::texts(["note\r\nline"]), $at, 1, 0);
+        ], Notes::texts(["##[error]bad\n::error::x"]), $at, 1, 0);
 
         $out = self::formatter()->format($report);
 
-        self::assertStringContainsString('| critical | `acme/pk g\|x` | 1.0.0 |', $out);
-        self::assertStringContainsString('- note: note line', $out);
+        self::assertStringContainsString('| critical | `acme/pk\r\ng\|x` | 1.0.0 |', $out);
+        self::assertStringContainsString("\n- note: \\#\\#\\[error\\]bad\\\\n::&#8203;error::x\n", $out);
     }
 
     public function testABudgetKeepsTheHeadAndTheFooterAndCutsRowsWholeInRankOrder(): void

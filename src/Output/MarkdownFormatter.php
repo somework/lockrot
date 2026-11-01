@@ -217,7 +217,7 @@ final class MarkdownFormatter implements FormatterInterface
     /** Plain text for a table cell or a bullet: one line, nothing that renders as markup. */
     private static function text(string $value): string
     {
-        $value = TerminalText::neutralise(str_replace(["\r\n", "\r", "\n"], ' ', $value));
+        $value = TerminalText::neutralise($value);
         foreach (self::ESCAPED as $character) {
             $value = str_replace($character, '\\'.$character, $value);
         }
@@ -248,7 +248,7 @@ final class MarkdownFormatter implements FormatterInterface
      */
     private static function code(string $value): string
     {
-        $value = TerminalText::neutralise(str_replace(["\r\n", "\r", "\n"], ' ', $value));
+        $value = TerminalText::neutralise($value);
         $value = str_replace(['|', '##['], ['\\|', '##\\x5B'], $value);
         $longest = 0;
         preg_match_all('/`+/', $value, $runs);
