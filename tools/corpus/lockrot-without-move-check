@@ -38,7 +38,7 @@ $application = new class () extends Application {
     /** @return list<Command> */
     protected function getDefaultCommands(): array
     {
-        return [new LockrotCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null): Analyzer => ServiceFactory::createAnalyzer($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline, $projectPhp))];
+        return [new LockrotCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?Closure $checks = null, ?string $platformPhp = null): Analyzer => ServiceFactory::createAnalyzer($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline, $projectPhp, null, $platformPhp))];
     }
 
     public function add(Command $command): ?Command
