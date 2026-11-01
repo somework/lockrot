@@ -194,6 +194,16 @@ final class AdvisoryIgnoreTest extends TestCase
         self::assertNull($ignore->whyUnreadable());
     }
 
+    /** Composer's Config::get('policy') lets the variable win, so the note names it as `blocking_disabled_by` does. */
+    public function testComposerPolicyZeroBesideAPolicyOffNamesTheVariable(): void
+    {
+        putenv('COMPOSER_POLICY=0');
+
+        $ignore = self::read(['policy' => false]);
+
+        self::assertSame(['policy_key' => 'COMPOSER_POLICY', 'value' => false], $ignore->disabledBy());
+    }
+
     public function testThePolicyTurnsAdvisoriesOffByItsKeysAndNeverByTheAuditMode(): void
     {
 

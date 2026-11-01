@@ -6,9 +6,7 @@ namespace Lockrot\Solver;
 
 use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
-use Composer\Package\CompletePackage;
 use Composer\Package\Version\StabilityFilter;
-use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
 use Composer\Repository\ConfigurableRepositoryInterface;
 use Composer\Repository\FilterRepository;
@@ -368,8 +366,7 @@ final class RepositoryVersions implements VersionSource
     /**
      * Whether a repository that the source does not load serves $name and hides it: the lock
      * records $name from its URL, the repository is canonical, and its `only` or `exclude` admits
-     * the name. A copy that holds only $name answers with those options, because asking the
-     * repository itself loads it.
+     * the name. Asking the repository itself loads it.
      */
     private function canHide(RepositoryInterface $repository, string $name): bool
     {
@@ -379,18 +376,17 @@ final class RepositoryVersions implements VersionSource
         if (!\is_string($url) || !\in_array($name, $this->served[self::urlKey($url)] ?? [], true)) {
             return false;
         }
-        $options = [];
-        foreach (['only', 'exclude'] as $key) {
-            if (isset($config[$key]) && \is_array($config[$key])) {
-                $options[$key] = array_values(array_filter($config[$key], 'is_string'));
-            }
-        }
-        if (\is_bool($config['canonical'] ?? null)) {
-            $options['canonical'] = $config['canonical'];
-        }
-        $probe = new FilterRepository(new ArrayRepository([new CompletePackage($name, '1.0.0.0', '1.0.0')]), $options);
 
-        return $probe->loadPackages([$name => null], self::STABLE, [])['namesFound'] !== [];
+        return !$repository instanceof FilterRepository || self::filterAdmits($repository, $name);
+    }
+
+    /**
+     * RepositoryManager::createRepository() moves `only`, `exclude` and `canonical` out of the
+     * repository config into FilterRepository's private state, which has no getter.
+     */
+    private static function filterAdmits(FilterRepository $repository, string $name): bool
+    {
+        return \Closure::bind(fn (): bool => $this->canonical && $this->isAllowed($name), $repository, FilterRepository::class)();
     }
 
     private static function base(BasePackage $package): BasePackage

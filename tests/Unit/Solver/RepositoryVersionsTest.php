@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Solver;
 
 use Composer\Config;
 use Composer\Downloader\TransportException;
+use Composer\Factory;
 use Composer\IO\NullIO;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
@@ -14,6 +15,8 @@ use Composer\Repository\ComposerRepository;
 use Composer\Repository\FilterRepository;
 use Composer\Repository\PackageRepository;
 use Composer\Repository\PathRepository;
+use Composer\Repository\RepositoryFactory;
+use Composer\Repository\RepositoryInterface;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Deadline;
 use Lockrot\Solver\RepositoryVersions;
@@ -776,10 +779,24 @@ final class RepositoryVersionsTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('repositoriesThatHideNoName')]
     public function testARepositoryThatTheSourceDoesNotLoadHidesNoNameThatItsFilterLeavesOut(array $options): void
     {
-        $vcs = new FilterRepository(new ConfiguredRepository(['url' => 'https://github.com/acme/lib'] + $options), $options);
+        $vcs = self::vcs($options);
         $versions = new RepositoryVersions([$vcs, self::repository(['acme/lib' => ['1.0.0']])], [], false, Deadline::never(), 'stable', [], ['https://github.com/acme/lib' => ['acme/lib']]);
 
         self::assertSame([['1.0.0'], null], [self::pretty($versions->versions('acme/lib')), $versions->failure('acme/lib')]);
+    }
+
+    /**
+     * A vcs repository of acme/lib as Composer builds it from composer.json: RepositoryManager keeps
+     * `only`, `exclude` and `canonical` in a FilterRepository around the vcs repository.
+     *
+     * @param array{only?: list<string>, exclude?: list<string>, canonical?: bool} $options
+     */
+    private static function vcs(array $options): RepositoryInterface
+    {
+        $io = new NullIO();
+        $config = new Config(false);
+
+        return RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config))->createRepository('vcs', ['url' => 'https://github.com/acme/lib'] + $options);
     }
 
     /** @return iterable<string, array{array{only?: list<string>, exclude?: list<string>, canonical?: bool}}> */
@@ -792,8 +809,7 @@ final class RepositoryVersionsTest extends TestCase
 
     public function testARepositoryThatTheSourceDoesNotLoadAndWhoseFilterAdmitsTheNameHidesIt(): void
     {
-        $options = ['only' => ['acme/*']];
-        $vcs = new FilterRepository(new ConfiguredRepository(['url' => 'https://github.com/acme/lib'] + $options), $options);
+        $vcs = self::vcs(['only' => ['acme/*']]);
         $versions = new RepositoryVersions([$vcs, self::repository(['acme/lib' => ['1.0.0']])], [], false, Deadline::never(), 'stable', [], ['https://github.com/acme/lib' => ['acme/lib']]);
 
         self::assertSame([['1.0.0'], VersionSource::SHADOWED], [self::pretty($versions->versions('acme/lib')), $versions->failure('acme/lib')]);

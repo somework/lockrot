@@ -9,6 +9,7 @@ use Composer\Advisory\SecurityAdvisory;
 use Composer\Config;
 use Composer\Policy\AdvisoriesPolicyConfig;
 use Composer\Semver\VersionParser;
+use Composer\Util\Platform;
 
 /**
  * The advisories that the project told Composer to ignore, matched as `composer audit` matches
@@ -83,7 +84,7 @@ final class AdvisoryIgnore
     {
         $raw = $config->get('policy');
         if ($raw === false) {
-            return self::disabled(($config->raw()['config']['policy'] ?? null) === false ? 'policy' : 'COMPOSER_POLICY', false);
+            return self::disabled(\in_array(Platform::getEnv('COMPOSER_POLICY'), [false, ''], true) ? 'policy' : 'COMPOSER_POLICY', false);
         }
         $policy = \is_array($raw) ? $raw : [];
         $audit = $config->get('audit');
