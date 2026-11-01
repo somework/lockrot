@@ -59,6 +59,14 @@ final class ComposerHttpClientRedirectTest extends TestCase
             header('Location: http://localhost:'.$port.'/headers', true, 302);
             exit;
         }
+        if ($path === '/unparsable') {
+            header('Location: http://:'.$port.'/headers', true, 302);
+            exit;
+        }
+        if ($path === '/local-file') {
+            header('Location: file://'.__DIR__.'/requests.log', true, 302);
+            exit;
+        }
         if ($path === '/same-host') {
             header('Location: /headers', true, 302);
             exit;
@@ -220,6 +228,37 @@ final class ComposerHttpClientRedirectTest extends TestCase
         $result = $this->fetch('/limited', false);
 
         self::assertSame([403, '0'], [$result->status(), $result->header('X-RateLimit-Remaining')]);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function locationsWithoutAHost(): iterable
+    {
+        yield 'a URL that does not parse' => ['/unparsable'];
+        yield 'a local file' => ['/local-file'];
+    }
+
+    /**
+     * A repository host's `Location` that names no host is a failed request. Composer's downloader
+     * throws a TypeError on a URL that does not parse, and a run must not read a local file.
+     *
+     * @dataProvider locationsWithoutAHost
+     */
+    #[DataProvider('locationsWithoutAHost')]
+    public function testARedirectToAUrlWithoutAHostIsAFailedRequestWithoutCurl(string $path): void
+    {
+        $result = $this->fetch($path, false);
+
+        self::assertSame([0, null, 'redirect to a URL without a host'], [$result->status(), $result->body(), $result->error()]);
+    }
+
+    /** curl reads such a `Location` as a path on the host that answered. */
+    public function testARedirectToAUrlWithoutAHostStaysOnTheSameHostWithCurl(): void
+    {
+        if (!HttpDownloader::isCurlEnabled()) {
+            self::markTestSkipped('curl resolves the Location');
+        }
+
+        self::assertSame('/http://:'.parse_url($this->server->url(), \PHP_URL_PORT).'/headers', $this->headersSeenAfter('/unparsable')['path']);
     }
 
     public function testEachRequestWithLockrotsCredentialsGetsItsAnswerWithoutCurl(): void

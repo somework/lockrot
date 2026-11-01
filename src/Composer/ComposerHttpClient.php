@@ -197,6 +197,12 @@ final class ComposerHttpClient implements HttpClientInterface
 
                 continue;
             }
+            // Composer's downloader throws a TypeError on a URL without a host, which would end the run.
+            if ((string) parse_url($target, \PHP_URL_HOST) === '') {
+                $results[$url] = HttpResult::failure($url, 'redirect to a URL without a host', $this->clock->now());
+
+                continue;
+            }
             $options = self::options($this->timeoutSeconds(), self::withoutCredentials($headers));
             if ($this->refusesRedirects) {
                 $options['prevent_url_access_callable'] = static fn (): bool => $budgetEnded($url);
