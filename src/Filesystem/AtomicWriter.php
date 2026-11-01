@@ -36,6 +36,10 @@ final class AtomicWriter
             throw new ConfigException('Cannot write '.$displayPath.': '.self::reason());
         }
         $written = @fwrite($handle, $contents);
+        // Data on disk before the rename: else a power loss can leave the target empty (PHP 8.1+).
+        if (\function_exists('fsync')) {
+            @fsync($handle);
+        }
         $closed = @fclose($handle);
         if ($written !== \strlen($contents) || !$closed || !self::keepPermissions($path, $temporary) || !@rename($temporary, $path)) {
             // Read before the cleanup: unlink() can record a failure of its own, which

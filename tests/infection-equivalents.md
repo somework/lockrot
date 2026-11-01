@@ -61,7 +61,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Clock.php` DecrementInteger, IncrementInteger `$seconds = max(0, $seconds);` — in tenthsOf(): one second either side of 0 rounds to 0 tenths of a year on both paths.
 
 ## src/Composer
-- `src/Composer/LockrotCommand.php` UnwrapArrayValues `return [$composer->getConfig(), array_values($composer->getRepositoryManager()->getRepositories()), $composer->getPackage()];` — Composer's `RepositoryManager` holds its repositories as a list.
+- `src/Composer/LockrotCommand.php` UnwrapArrayValues `return [array_values($composer->getRepositoryManager()->getRepositories()), $composer->getPackage()];` — Composer's `RepositoryManager` holds its repositories as a list.
 
 - `src/Composer/ComposerHttpClient.php` CastString `$origin = (string) substr($origin, 4);` — the `in_array()` before it admits only hosts longer than 4 characters, so `substr()` never returns false.
 - `src/Composer/ComposerHttpClient.php` CastInt `$status = $e instanceof TransportException ? (int) ($e->getStatusCode() ?? 0) : 0;` — `getStatusCode() ?? 0` is already an int.
@@ -127,6 +127,8 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 ## src/Filesystem, src/Graph, src/Html, src/Json, src/Lock
 
 - `src/Filesystem/AtomicWriter.php` FunctionCallRemoval `error_clear_last();` — every failing call records its own warning, which replaces the last one.
+- `src/Filesystem/AtomicWriter.php` FunctionCallRemoval `@fsync($handle);` — it orders the data before the rename only for a power loss, which no test can cause.
+- `src/Filesystem/AtomicWriter.php` IfNegation `if (\function_exists('fsync')) {` — on PHP 8.1 and later the negated condition only skips the fsync call, which no test can observe.
 - `src/Filesystem/Path.php` CastString `return strpos($path, $root) === 0 ? (string) substr($path, \strlen($root)) : null;` — `$root` ends in `/` and `$path` does not, so `$path` is longer and `substr()` never returns false.
 - `src/Filesystem/Path.php` LogicalOr, DecrementInteger x2 `if ($a['ino'] === 0 || $b['ino'] === 0) {` — the filesystems of CI and of developers report an inode. Only a Windows filesystem without a file index reaches the fallback.
 - `src/Graph/DependencyGraph.php` TrueValue `$present[$package->name()] = true;` — a set. Only `isset()` reads it.
