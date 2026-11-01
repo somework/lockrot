@@ -665,10 +665,12 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 
 - **A new major.** A move to a higher branch says that a new major brings its own requirements.
 
-- **A PHP that the lock records.** When `run.php_window.platform_override` is not a stable release
-  in the minor of the target PHP, Composer solves the commands of a move at that PHP, not at the target. The
-  line of each move with commands then starts with "First set config.platform.php to your PHP
-  <target> release: the lock records <version>." So does the `update now:` line. The commands
+- **A PHP that Composer's config sets.** When `run.php_window.platform_override` is set and is
+  not a stable release in the minor of the target PHP, Composer solves the commands of a move at
+  that PHP, not at the target. `platform_override` is `config.platform.php` from Composer's merged
+  config, the global `config.json` included. The line of each move with commands then starts with
+  "First set config.platform.php to your PHP <target> release: Composer's config sets <version>."
+  So does the `update now:` line. The commands
   stay the same. When `run.move_check.baseline` is `refused`, the sentence goes on with "Composer
   still refuses the lock itself: the moves_not_checked note names the first cause." The run note
   [`moves_not_checked`](notes.md#moves_not_checked) names the cause of Composer's first problem.
@@ -904,9 +906,11 @@ the packages and the root without `require-dev`. `with_dev` is null when the loc
 
 Composer does not show the window, and these facts hide it:
 
-- `composer install` checks the lock against the lock's own `platform-overrides`. A change of
-  `config.platform.php` in composer.json does not change that check. `platform_override` holds the
-  lock's `platform-overrides.php`. Composer checks the lock at that PHP on every machine.
+- `composer install` checks the lock against the lock's own `platform-overrides`, which records
+  the `config.platform.php` of the last update. A change of `config.platform.php` in composer.json
+  does not change that check until the next update.
+- `platform_override` holds `config.platform.php` from Composer's merged config: composer.json, then
+  the global `config.json`. `composer update` and the move check solve at that PHP.
 - The platform check that the Composer autoloader runs checks only the lower bound of `php` and
   `php-64bit`. It checks only the packages without require-dev.
 
