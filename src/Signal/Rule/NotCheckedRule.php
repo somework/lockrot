@@ -227,13 +227,7 @@ final class NotCheckedRule implements SignalRule
             return 'security advisories not checked ('.(self::ADVISORY_CAUSES[$entry->reason()] ?? $entry->reason()).'), so S9 could not be read';
         }
         if ($entry->check() === 'release_dates') {
-            $ages = array_values(array_diff($entry->blocks(), [Signal::S5]));
-            $words = $ages === [] ? [] : ['the age of the package was not read (its newest releases are dated by a commit their tags share), so '.ListWords::of($ages).' could not measure it'];
-            if (\in_array(Signal::S5, $entry->blocks(), true)) {
-                $words[] = 'the installed release has no trusted date, so S5 could not judge it';
-            }
-
-            return implode('; ', $words);
+            return 'the age of the package was not read (its newest releases are dated by a commit their tags share), so '.ListWords::of($entry->blocks()).' could not measure it';
         }
 
         throw new \LogicException('S10 has no words for the check '.$entry->check().'.');

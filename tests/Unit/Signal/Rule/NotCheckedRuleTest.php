@@ -479,7 +479,7 @@ final class NotCheckedRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S5]]], JsonPath::decoded($signal->data())['unchecked']);
-        self::assertSame('the installed release has no trusted date, so S5 could not judge it', $signal->summary());
+        self::assertSame('the age of the package was not read (its newest releases are dated by a commit their tags share), so S5 could not measure it', $signal->summary());
     }
 
     public function testATrustedInstalledDateBlocksNothing(): void
@@ -490,8 +490,8 @@ final class NotCheckedRuleTest extends TestCase
         self::assertNull($rule->evaluate($facts));
     }
 
-    /** S2, S5 and S8 all lose their input. S5 misses the installed release's date, not the package's age. */
-    public function testS5IsWordedApartFromTheAgeSignals(): void
+    /** S2, S5 and S8 all lose their input, and one sentence names the three (the S10 words of the model's S5-untrusted‡). */
+    public function testS5IsNamedWithTheAgeSignals(): void
     {
         $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
         $metadata = self::newestUndated(F::metadata([['v2.0.0', null], ['v1.2.0', null]]));
@@ -501,6 +501,6 @@ final class NotCheckedRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2, Signal::S5, Signal::S8]]], JsonPath::decoded($signal->data())['unchecked']);
-        self::assertSame('the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it; the installed release has no trusted date, so S5 could not judge it', $signal->summary());
+        self::assertSame('the age of the package was not read (its newest releases are dated by a commit their tags share), so S2, S5 and S8 could not measure it', $signal->summary());
     }
 }
