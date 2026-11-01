@@ -73,12 +73,16 @@ jobs:
         with: {filter: '${{ matrix.shard.filter }}', min-msi: '${{ matrix.shard.min_msi }}', full: 'true'}
       # The release pull request into main mutates the lines that it changes against main, and ci.yml's
       # ledger check fails on each mutant there that tests/infection-equivalents.md does not account for.
-      # This step reads the full run as that check will, so an unlisted escape fails here before release day.
+      # This step keeps each mutant of the full run whose node can touch a changed line, so an unlisted
+      # escape fails here before release day. It runs on every full check: a pull request into an
+      # integration branch keeps the whole diff against main listed. Its lines match the release pull
+      # request's only while main is an ancestor of the commit.
       - name: Release rehearsal (the changes since main against tests/infection-equivalents.md)
         if: always() && contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name) && hashFiles('build/infection.json') != ''
         env: {FILTER: '${{ matrix.shard.filter }}'}
         run: |
           base=$(git merge-base origin/main HEAD)
+          if ! git merge-base --is-ancestor origin/main HEAD; then echo "::warning::main holds commits that this commit does not, so the release pull request mutates other lines. Merge main first."; fi
           status=0; python3 tools/mutation/pr_gate.py --paths "$FILTER" --changed "$base" build/infection.json tests/infection-equivalents.md > rehearsal.md || status=$?
           cat rehearsal.md >> "$GITHUB_STEP_SUMMARY"; cat rehearsal.md; exit $status
       - if: always() && contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)

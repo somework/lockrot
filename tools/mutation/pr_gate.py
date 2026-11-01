@@ -10,7 +10,8 @@ fails on an escaped or uncovered mutant that no entry of tests/infection-equival
 for, on any ignored mutant, and on a skipped one. Every such mutant goes to the step summary.
 --paths, the shard filter of the diff mode, keeps only the mutants and the entries of those files
 and directories. --changed <base> keeps only the mutants that a pull request against base mutates:
-the full-check release rehearsal reads a full run as the release pull request into main will.
+the full-check release rehearsal reads a full run as the release pull request into main will. The
+log names no line of a skipped mutant, so --changed keeps the whole skipped count.
 
 An escape is keyed on its file, its mutator and the line Infection mutated, whitespace-normalised,
 so that a line added or removed above it leaves the key alone. When that text occurs more than once
@@ -116,6 +117,7 @@ class Source:
     def __init__(self, root: str):
         self.root = root
         self.cache: Dict[str, List[str]] = {}
+        self.code_cache: Dict[str, List[str]] = {}
 
     def lines(self, path: str) -> List[str]:
         if path not in self.cache:
@@ -125,6 +127,11 @@ class Source:
             except OSError:
                 self.cache[path] = []
         return self.cache[path]
+
+    def code(self, path: str) -> List[str]:
+        if path not in self.code_cache:
+            self.code_cache[path] = code_lines(self.lines(path))
+        return self.code_cache[path]
 
     def text(self, path: str, line: int) -> str:
         lines = self.lines(path)
@@ -183,32 +190,71 @@ def changed_since(base: str, root: str) -> Ranges:
     return {**found, **{p: None for p in list(found) + renamed if p in renamed or os.path.dirname(p) == 'src'}}
 
 
-def code_only(line: str) -> str:
-    """The line without its string literals and its trailing // comment."""
-    out, quote, escaped = [], '', False
-    for n, char in enumerate(line):
-        if quote:
-            escaped, quote = (not escaped and char == '\\'), ('' if char == quote and not escaped else quote)
+CASE = re.compile(r'(case\b|default\s*:)')
+HEREDOC = re.compile(r'<<<[ \t]*([\'"]?)([A-Za-z_]\w*)\1')
+
+
+def code_lines(lines: List[str]) -> List[str]:
+    """Each line's code, without string literals, comments, docblocks and heredoc bodies. A line
+    keeps its place, so line n of the result is line n of the source."""
+    text = '\n'.join(lines)
+    out: List[str] = []
+    state, n, heredoc = '', 0, ''
+    while n < len(text):
+        char = text[n]
+        if char == '\n':
+            out.append(char)
+            if state == '//':
+                state = ''
+            elif state == '<<<':
+                line_end = text.find('\n', n + 1)
+                if re.match(r'[ \t]*' + heredoc + r'\b', text[n + 1:len(text) if line_end < 0 else line_end]):
+                    state = ''
+                    n = text.index(heredoc, n + 1) + len(heredoc) - 1
+        elif state in ("'", '"'):
+            if char == '\\':
+                n += 1
+                out.append('\n' if text[n:n + 1] == '\n' else '')
+            elif char == state:
+                state = ''
+        elif state == '/*':
+            if text.startswith('*/', n):
+                state, n = '', n + 1
+        elif state in ('//', '<<<'):
+            pass
         elif char in '\'"':
-            quote = char
-        elif line.startswith('//', n):
-            break
+            state = char
+        elif text.startswith('/*', n):
+            state, n = '/*', n + 1
+        elif text.startswith('//', n) or (char == '#' and not text.startswith('#[', n)):
+            state = '//'
+        elif text.startswith('<<<', n) and HEREDOC.match(text, n):
+            state, heredoc = '<<<', HEREDOC.match(text, n).group(2)
+            n = HEREDOC.match(text, n).end() - 1
         else:
             out.append(char)
-    return ''.join(out)
+        n += 1
+    return ''.join(out).split('\n')
 
 
-def node_end(lines: List[str], start: int) -> int:
-    """The last line of the statement or block that opens at line start, read from its brackets.
-    shortcut: the span is the statement's, not the node's, so it can hold a few lines more than
-    Infection's node; parse PHP if the rehearsal flags a mutant that the pull request gate does not."""
+def node_end(code: List[str], start: int) -> int:
+    """A line at or after the last line of each node that opens at line start, read from the brackets
+    of code_lines(). The span ends on a `;` or a closing `}` that brings the depth back to where it
+    started, or on a bracket that closes one opened before start. The `}` that opens a start line of
+    `} else {` or `} catch (…) {` closes the block before the node. A `case` spans to the next `case`
+    or `default`. A span never ends early, so the rehearsal can keep a mutant that the pull request
+    gate does not mutate, never the reverse."""
     depth = 0
-    for number in range(start, len(lines) + 1):
-        code = code_only(lines[number - 1]).strip()
-        depth += sum(code.count(c) for c in OPENS) - sum(code.count(c) for c in CLOSES)
-        if depth < 0 or (depth == 0 and code.endswith((';', ',', '}', ']'))):
+    first = re.sub(r'^[\s)\]}]+', '', code[start - 1]).strip() if start <= len(code) else ''
+    case = CASE.match(first) is not None
+    for number in range(start, len(code) + 1):
+        line = first if number == start else code[number - 1].strip()
+        if case and number > start and depth == 0 and CASE.match(line):
+            return number - 1
+        depth += sum(line.count(c) for c in OPENS) - sum(line.count(c) for c in CLOSES)
+        if depth < 0 or (not case and depth == 0 and line.endswith((';', '}'))):
             return number
-    return start
+    return len(code)
 
 
 def touched(found: Mutant, ranges: Ranges, source: Source) -> bool:
@@ -217,7 +263,7 @@ def touched(found: Mutant, ranges: Ranges, source: Source) -> bool:
     spans = ranges[found.path]
     if spans is None:
         return True
-    end = node_end(source.lines(found.path), found.line)
+    end = node_end(source.code(found.path), found.line)
     return any(first <= end and found.line <= last for first, last in spans)
 
 
