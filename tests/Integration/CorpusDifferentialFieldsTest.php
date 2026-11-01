@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The corpus differential runs with `--fail-on=high`, and the model documents carry each finding's gate decision at that
- * value. A gate key that the differential leaves out lets a regression of lockrot's gate pass the only comparison on real locks.
+ * value. A gate key that the differential leaves out lets a regression of lockrot's gate pass the comparison on real locks.
  */
 final class CorpusDifferentialFieldsTest extends TestCase
 {

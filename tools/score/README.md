@@ -12,7 +12,7 @@ stream with the PHP engine row by row.
 | `python3 tools/score/sweep.py > rows.txt` | the stream |
 | `python3 tools/score/sweep.py --sha256` | the rows per axis and the sha256 of the uncompressed stream |
 | `python3 tools/score/sweep.py --sample` | every 1,000th row of the stream |
-| `python3 tools/score/sweep.py --axis gate` | the stream of the gate axis. `--sha256` and `--sample` also take `--axis gate` |
+| `python3 tools/score/sweep.py --axis gate` | the stream of the gate axis. `--axis gate --sha256` and `--axis gate --sample` read that axis: put `--axis gate` first |
 
 `tests/fixtures/score/sweep-rows.txt.gz` holds the stream (`gzip -9n`). `sweep-rows.txt.sha256` holds
 the sha256 of the uncompressed stream, never of the `.gz`: two gzip builds can write different bytes.
@@ -52,7 +52,7 @@ per evaluated score.
 
 ## The fields of a row
 
-A row has 14 fields joined by `|`, in this order. No field holds `|`, `,` or `:`, except as a
+A row of every axis except `gate` has 14 fields joined by `|`, in this order. No field holds `|`, `,` or `:`, except as a
 separator of a list. Every empty list and every null is `-`. Lines end in LF, the stream ends in LF,
 and every byte is ASCII.
 

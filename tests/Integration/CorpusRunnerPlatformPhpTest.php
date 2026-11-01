@@ -10,8 +10,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 /**
- * tools/corpus/lockrot-without-move-check differs from bin/lockrot only in the move check. Without a `require.php`,
- * lockrot reads R off the lock's `platform.php` (docs/verdicts.md#capped), so the corpus runner must pass it too.
+ * Without a `require.php`, lockrot reads R off the lock's `platform.php` (docs/verdicts.md#capped). The corpus runner
+ * tools/corpus/lockrot-without-move-check must pass that value to the analyzer, as LockrotCommand does.
  */
 final class CorpusRunnerPlatformPhpTest extends TestCase
 {

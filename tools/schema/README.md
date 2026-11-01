@@ -37,7 +37,7 @@ python3 tools/schema/make_negatives_sarif.py
 | `ts/emit_dts.py` | `resources/lockrot-report-2.schema.json` | `types/` |
 | `project_fixtures.py` | the reference model's `cases.json`, `docs/` and `page-goldens.json` | `tests/fixtures/flags/`, `tests/fixtures/schema/documents/`, `tests/fixtures/contract/page-goldens.json` |
 
-`ship_text.py` is the shipping pass that both builders apply to every description: it removes the
+`ship_text.py` is the shipping pass that the builders apply to every description: it removes the
 references a published description must not hold. A unit test applies its expression `SHIP_BANNED`
 to every generated file (`CONTRIBUTING.md`, "Changing a schema").
 
