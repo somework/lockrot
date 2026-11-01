@@ -280,8 +280,8 @@ long they keep an answer.
 
 An allowlist entry accepts a package's maintenance flags. An accepted flag stays listed with the role
 `accepted`, adds nothing to the score and reaches no gate. A package with nothing else that counts
-reads `finished`. An entry with `flags` that accepted no flag that fired changes no verdict: the
-package reads `ok`, or `unknown` without release metadata.
+reads `finished`. An entry with `flags` that accepted no flag that fired changes no verdict. With
+nothing else that counts, the package reads `ok`, or `unknown` without release metadata.
 
 ### The built-in list {#the-built-in-list}
 
