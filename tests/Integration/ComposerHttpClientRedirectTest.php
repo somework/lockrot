@@ -63,8 +63,16 @@ final class ComposerHttpClientRedirectTest extends TestCase
             header('Location: http://:'.$port.'/headers', true, 302);
             exit;
         }
+        if ($path === '/no-host') {
+            header('Location: http:/headers', true, 302);
+            exit;
+        }
         if ($path === '/local-file') {
             header('Location: file://'.__DIR__.'/requests.log', true, 302);
+            exit;
+        }
+        if ($path === '/local-file-on-localhost') {
+            header('Location: file://localhost'.__DIR__.'/requests.log', true, 302);
             exit;
         }
         if ($path === '/same-host') {
@@ -234,21 +242,24 @@ final class ComposerHttpClientRedirectTest extends TestCase
     public static function locationsWithoutAHost(): iterable
     {
         yield 'a URL that does not parse' => ['/unparsable'];
+        yield 'an http URL without a host' => ['/no-host'];
         yield 'a local file' => ['/local-file'];
+        yield 'a local file on a named host' => ['/local-file-on-localhost'];
     }
 
     /**
-     * A repository host's `Location` that names no host is a failed request. Composer's downloader
-     * throws a TypeError on a URL that does not parse, and a run must not read a local file.
+     * A repository host's `Location` that is not an http or https URL with a host is a failed request.
+     * Composer's downloader throws a TypeError on a URL that does not parse, and a run must not read
+     * a local file.
      *
      * @dataProvider locationsWithoutAHost
      */
     #[DataProvider('locationsWithoutAHost')]
-    public function testARedirectToAUrlWithoutAHostIsAFailedRequestWithoutCurl(string $path): void
+    public function testARedirectToAnythingButAnHttpHostIsAFailedRequestWithoutCurl(string $path): void
     {
         $result = $this->fetch($path, false);
 
-        self::assertSame([0, null, 'redirect to a URL without a host'], [$result->status(), $result->body(), $result->error()]);
+        self::assertSame([0, null, 'redirect to a URL that is not http or https with a host'], [$result->status(), $result->body(), $result->error()]);
     }
 
     /** curl reads such a `Location` as a path on the host that answered. */

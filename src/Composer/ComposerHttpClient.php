@@ -197,9 +197,10 @@ final class ComposerHttpClient implements HttpClientInterface
 
                 continue;
             }
-            // Composer's downloader throws a TypeError on a URL without a host, which would end the run.
-            if ((string) parse_url($target, \PHP_URL_HOST) === '') {
-                $results[$url] = HttpResult::failure($url, 'redirect to a URL without a host', $this->clock->now());
+            // Composer's downloader throws a TypeError on a URL without a host, which would end the run,
+            // and without curl it reads a file:// URL from the disk.
+            if (!\in_array(strtolower((string) parse_url($target, \PHP_URL_SCHEME)), ['http', 'https'], true) || (string) parse_url($target, \PHP_URL_HOST) === '') {
+                $results[$url] = HttpResult::failure($url, 'redirect to a URL that is not http or https with a host', $this->clock->now());
 
                 continue;
             }
