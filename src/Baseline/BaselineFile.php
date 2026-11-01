@@ -112,7 +112,7 @@ final class BaselineFile
     {
         $line = preg_match('/^(\d+)\.(\d+)/', $this->release, $m) === 1 ? $m[1].'.'.$m[2] : $this->release;
 
-        return \sprintf('lockrot %s reads baseline-2 only. Review the findings, then run --generate-baseline.', $line);
+        return \sprintf('lockrot %s reads baseline-2 only, and %s is a baseline-1 file. Move it aside to review the findings, then run --generate-baseline: https://lockrot.dev/baseline/#moving-from-a-baseline-1-file', $line, $this->displayPath);
     }
 
     /**

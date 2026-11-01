@@ -621,7 +621,7 @@ final class InstallTimeSummaryTest extends TestCase
 
         (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
-        self::assertStringContainsString('lockrot: install-time check skipped: lockrot '.$major.'.'.$minor.' reads baseline-2 only.', $io->getOutput());
+        self::assertStringContainsString('lockrot: install-time check skipped: lockrot '.$major.'.'.$minor.' reads baseline-2 only, and lockrot-baseline.json is a baseline-1 file.', $io->getOutput());
     }
 
     /** @param array<string, string> $verdicts package => verdict */

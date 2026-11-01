@@ -37,7 +37,7 @@ final class BaselinedProjectTest extends TestCase
     public function testTheReal013BaselineIsRefused(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('lockrot 0.14 reads baseline-2 only. Review the findings, then run --generate-baseline.');
+        $this->expectExceptionMessage('lockrot 0.14 reads baseline-2 only, and lockrot-baseline-1.json is a baseline-1 file. Move it aside to review the findings, then run --generate-baseline: https://lockrot.dev/baseline/#moving-from-a-baseline-1-file');
 
         BaselineFile::resolve(\dirname(self::BASELINE_1), basename(self::BASELINE_1), '0.14.0')->read();
     }

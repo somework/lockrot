@@ -93,8 +93,8 @@ with `lockrot:`, any other failure with `lockrot failed:`. `-v` adds the stack t
       also has the strings `alias` and `alias_normalized`.
     - Each `name` is a string, and no name is listed twice, case ignored.
 
-- `vendor/bin/lockrot` when the composer/composer package that it loads is older than 2.10, or on
-  a non-CLI PHP SAPI with `register_argc_argv=On`. It runs nothing.
+- `vendor/somework/lockrot/bin/lockrot` when the composer/composer package that it loads is older
+  than 2.10, or on a non-CLI PHP SAPI with `register_argc_argv=On`. It runs nothing.
 - A value the configuration rejects: in `extra.lockrot`, in an environment variable, or on the
   command line ([configuration.md](configuration.md#extralockrot-keys)). That includes two values
   of one kind in `--fail-on`, `none` beside another value, and `vulnerable-low`.
@@ -139,6 +139,7 @@ Composer or Symfony can stop before lockrot runs, with their own exit `1`:
 |---|---|---|
 | Exit `1` with a report and a `gate: fails` line, or under `--generate-baseline` with a `lockrot: baseline written` line | lockrot's own exit `1`: a finding failed `--fail-on`, or `--strict-network` | Read the `gate:` line. This exit is the gate at work |
 | Exit `1`, Composer's error box or Symfony's message, no `lockrot:` line | An unknown command: `composer lokrot`, `php lockrot.phar nope` | Fix the command name |
+| Exit `1`, `Command "lockrot" is not defined`, after a `lockrot: Composer <version> is older than 2.10` line | The plugin runs on a Composer older than 2.10, so it adds no `lockrot` command | Upgrade Composer to 2.10 or later, or run the [PHAR](phar.md) |
 | Exit `1`, `There are no commands defined in the "json" namespace` | `php lockrot.phar --output json:r.json`: before the command name, Symfony reads a value after a space as the command | Join the value with `=`: `--output=json:r.json` |
 | Exit `1`, Composer's error box about `composer.json`, in plugin mode | Composer cannot parse or validate `composer.json` | Fix the file. The PHAR reads the file itself and exits `2` for it |
 

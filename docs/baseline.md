@@ -220,7 +220,7 @@ error. That run has no baseline.
 | `lockrot: baseline file is invalid:` and one `  - <field>: <message>` line per problem | The file does not match the [schema](schema.md): a field of the wrong type or a missing key | Fix the named field, or delete the file and generate a new one |
 | `lockrot: baseline file is invalid: findings lists <package> twice, as <key> and <key>` | Two `findings` keys name one package: lockrot reads a key in lower case, as Composer reads a package name | Merge the two entries into one |
 | `lockrot: Cannot read <path>: …` | The file exists, but lockrot cannot read it | Fix its permissions |
-| `lockrot: lockrot <major>.<minor> reads baseline-2 only. Review the findings, then run --generate-baseline.`, such as `lockrot: lockrot 0.14 reads …` | The file is a baseline-1 file, written by lockrot 0.13 or earlier | [Move to baseline-2](#moving-from-a-baseline-1-file) |
+| `lockrot: lockrot <major>.<minor> reads baseline-2 only, and <path> is a baseline-1 file. Move it aside to review the findings, then run --generate-baseline: <link>`, such as `lockrot: lockrot 0.14 reads …` | The file is a baseline-1 file, written by lockrot 0.13 or earlier | [Move to baseline-2](#moving-from-a-baseline-1-file) |
 
 `--generate-baseline` reads an existing file to keep its `first_seen` dates, so it stops on a
 damaged file too. Delete the file first. A baseline-1 file is the exception: `--generate-baseline`

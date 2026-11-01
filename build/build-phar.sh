@@ -17,7 +17,9 @@
 #    (https://reproducible-builds.org/specs/source-date-epoch/), else the commit date of HEAD.
 #  - Box compiles the files in sorted order and is itself pinned by version and sha256.
 #  - Only an allowlist of the lockrot package goes in (src, resources, bin/lockrot,
-#    composer.json), so an untracked file in the checkout cannot end up in the archive.
+#    composer.json). The path repository copies the working tree and drops only export-ignore
+#    paths, so an untracked or ignored file under src/ or resources/ does enter the archive and
+#    changes its sha256. Build a release from a clean checkout, such as a fresh clone of the tag.
 # Composer writes vendor/composer/*.php from its own source, so the Composer version is part of the
 # recipe. The release workflow pins it with `tools: composer:<version>` in .github/workflows/phar.yml,
 # and the script prints the version that it ran with. PHP only runs Box: the phar-reproducible job

@@ -361,7 +361,7 @@ final class SchemaEvolutionTest extends TestCase
             BaselineFile::resolve(self::DIR.$version, self::BASELINE, '0.14.0')->read();
             self::fail('a baseline-1 file is read');
         } catch (ConfigException $e) {
-            self::assertSame('lockrot 0.14 reads baseline-2 only. Review the findings, then run --generate-baseline.', $e->getMessage());
+            self::assertSame('lockrot 0.14 reads baseline-2 only, and lockrot-schema-evolution-baseline.json is a baseline-1 file. Move it aside to review the findings, then run --generate-baseline: https://lockrot.dev/baseline/#moving-from-a-baseline-1-file', $e->getMessage());
         }
         self::assertSame(self::BASELINE, JsonPath::stringAt(self::decode($version, 'report.json'), ['baseline', 'path']), 'the report was compared against it');
     }

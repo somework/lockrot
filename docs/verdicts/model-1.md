@@ -140,7 +140,9 @@ lockrot computes the score in half points and rounds it down once, at the end. `
 the value before the floor, and `score.rounded_down` says whether the floor changed it.
 
 Example: `left-behind` with a corroborating `stale` on a transitive development package is exactly
-4.5, and the score is 4.
+4.5, and the score is 4. The two flags fire together only when `push-warn-years` is lower than
+`release-warn-years` ([configuration](../configuration.md#extralockrot-keys)), as
+`run.score_model.exclusive_groups` says.
 
 ## Bands {#score-band-floors}
 

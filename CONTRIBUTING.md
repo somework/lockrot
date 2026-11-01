@@ -257,9 +257,10 @@ fix that only moves packages to `finished` or `ok` can ship in a patch.
 
 ## The PHAR
 
-`build/build-phar.sh` builds `build/lockrot.phar` reproducibly. Its header comment lists what it
-pins. It needs the network to fetch Box, which it checks against a pinned sha256. CI rebuilds the
-archive on a second PHP version (`phar-reproducible` in `ci.yml`) and fails when the bytes differ.
+`build/build-phar.sh` builds `build/lockrot.phar` reproducibly from a clean checkout. Its header
+comment lists what it pins. It needs the network to fetch Box, which it checks against a pinned
+sha256. CI rebuilds the archive on a second PHP version (`phar-reproducible` in `ci.yml`) and
+fails when the bytes differ.
 
 The archive's dependencies are locked in `build/phar/composer.lock`, which is committed:
 
@@ -410,8 +411,14 @@ maintainer.
         7. Merge that commit into the renderer's `main`. Then tag `vX.Y.Z` on `main`.
         8. Run `tools/report/update-renderer vX.Y.Z`, and commit only the files that it writes. This
            commit must not change the contract bundle.
+        9. If `Version::STRING` still names the previous release, add one commit for the bump. It
+           holds the version, the dated CHANGELOG heading, the schema copies with their
+           `RELEASED_SCHEMAS` row and the golden pins of step 1. The contract bundle masks the tool
+           version, so this commit changes no file of the bundle. Without it, the release pull
+           request fails (step 4).
 
-2. Build the PHAR and check that `php build/lockrot.phar --version` prints the new version.
+2. Build the PHAR from a clean checkout of the release branch, and check that
+   `php build/lockrot.phar --version` prints the new version.
 3. Before the merge, check what the tag needs outside this repository:
 
     - Main's ruleset requires each job of the release pull request's `ci.yml` run, by its job
@@ -420,13 +427,20 @@ maintainer.
     - When the release changes the flag set, a schema number or the score model, the lockrot.dev
       change that reads it is merged. The lockrot.dev build stops on a set that it does not know.
     - A lockrot-action release that `@v1` jobs need on the tag day is published.
-    - Before the first final renderer tag, `gh api repos/somework/lockrot-report/rulesets`
-      lists a ruleset on `refs/tags/v*` that blocks deletion and update. If it is missing, create
-      it, with lockrot's tag ruleset as the model. A moved tag gets a second attestation, and
+    - Before the first final renderer tag, list the renderer's rulesets with
+      `gh api repos/somework/lockrot-report/rulesets`. The list leaves out each ruleset's
+      conditions and rules, so read each one with
+      `gh api repos/somework/lockrot-report/rulesets/<id>`. Confirm that a tag ruleset on
+      `refs/tags/v*` has the `deletion` and `update` rules. If no such ruleset exists, create it,
+      with lockrot's tag ruleset as the model. A moved tag gets a second attestation, and
       `update-renderer` then cannot name one source commit for the release.
 
 4. Merge the release pull request into `main` with CI green. On a pull request into `main`, the
-   `quality` job also runs `tools/report/check-vendored`, the renderer check of the tag.
+   `quality` job also runs `tools/report/check-vendored`, the renderer check of the tag. It also
+   runs `tools/release/version_bump.py`. When the pull request changes a file that the release
+   ships (`src/`, `resources/`, `bin/lockrot`, `composer.json`), that check fails unless
+   `Version::STRING` is the next patch, minor or major of the base. That version also needs its
+   dated CHANGELOG heading and its `RELEASED_SCHEMAS` row.
 5. When a schema file changes, `.github/workflows/schemas.yml` asks lockrot.dev to publish it.
    Approve the `schemas` environment of the lockrot.dev run, then check that each new schema URL
    answers (`curl -fsI https://lockrot.dev/schema/<document>-<number>.json`).
