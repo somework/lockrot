@@ -16,6 +16,7 @@ use Lockrot\Security\BranchFixes;
 use Lockrot\Security\Holder;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Data\AdvisoryRow;
+use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Signal;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Verdict\Finding;
@@ -124,13 +125,13 @@ final class ExplainFormatter
         $lookup = $finding->details()->activity();
         $where = $lookup->where();
         $ref = $where->ref();
-        $reason = CauseWords::of((string) $lookup->reason());
+        $reason = FindingBlock::checkWords($finding, (string) $lookup->reason());
         if ($lookup->status() === ActivityLookup::NOT_READ) {
             if ($lookup->reason() === ActivityLookup::HOST_NOT_SUPPORTED) {
-                return 'lockrot cannot ask '.$where->host().' about repository activity';
+                return $where->host().': lockrot cannot ask this host about activity';
             }
 
-            return $ref === null ? 'repository activity not asked ('.$reason.')' : $ref->host().'/'.$ref->path().': not asked ('.$reason.')';
+            return $ref === null ? 'activity not asked ('.$reason.')' : $ref->host().'/'.$ref->path().': not asked ('.$reason.')';
         }
         $name = $ref === null ? $where->host() : $ref->forgeLabel().' '.$ref->host().'/'.$ref->path();
         if ($lookup->status() === ActivityLookup::NOT_FOUND) {
@@ -355,15 +356,11 @@ final class ExplainFormatter
         return $line;
     }
 
-    /** `checks_missing[]` and `checks_skipped[]` with their words; an accepted check names its entry. */
+    /** `checks_missing[]` and `checks_skipped[]` grouped by their words; an accepted check names its entry. */
     private static function notChecked(Finding $finding): string
     {
-        $parts = [];
-        foreach (array_merge($finding->checksMissing(), $finding->details()->skipped()) as $check) {
-            if ($check->reason() !== 'accepted_by_config') {
-                $parts[] = implode(', ', $check->blocks()).' ('.FindingBlock::checkWords($finding, $check->reason()).')';
-            }
-        }
+        $checks = array_filter(array_merge($finding->checksMissing(), $finding->details()->skipped()), static fn (Check $check): bool => $check->reason() !== 'accepted_by_config');
+        $parts = FindingBlock::checkGroups($finding, $checks);
         foreach ($finding->details()->uncheckedAccepted() as $accepted) {
             $entry = $accepted->entry();
             $check = $accepted->unchecked();

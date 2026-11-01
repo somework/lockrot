@@ -357,6 +357,18 @@ final class GitlabFormatterTest extends TestCase
         ], $issues[\count($issues) - 1]);
     }
 
+    /** The MR widget shows the decoded description: an ESC or a bidi control from the lock prints as its escape. */
+    public function testAControlCharacterFromTheLockPrintsAsAnEscapeInTheDescription(): void
+    {
+        $package = "vendor/x\x1B[31mRED\u{202E}";
+        $report = new Report([(new FindingBuilder())->withPackage($package)->withVerdict(Verdict::ABANDONED)->withChain([$package])->build()], [], new \DateTimeImmutable(self::AT), 1, 0);
+
+        $description = JsonPath::stringAt($this->decode($this->formatter('high', null)->format($report)), [0, 'description']);
+
+        self::assertStringStartsWith('vendor/x\\x1B[31mRED\\u{202E} 1.0.0 — finding critical', $description);
+        self::assertSame(0, preg_match('/[\x00-\x1F\x7F]|\xE2\x80\xAE/', $description), $description);
+    }
+
     /** SPEC §7.10: a finding with S10 and no counted fact gets one `lockrot/unchecked` issue while `unchecked` is active. */
     public function testAFindingWithS10AndNoCountedFactGetsAnUncheckedIssue(): void
     {

@@ -703,6 +703,21 @@ final class SarifFormatterTest extends TestCase
         self::assertSame([['level' => 'warning', 'message' => ['text' => 'packagist.org lookup failed (network error: timeout)']]], JsonPath::arrayAt($run, ['invocations', 0, 'toolExecutionNotifications']));
     }
 
+    /**
+     * Code scanning shows the decoded message: an ESC or a bidi control from the lock prints as its
+     * escape. SARIF 2.1.0 §3.11.5 doubles each brace of the escape, and a consumer reads `{{` as `{`.
+     */
+    public function testAControlCharacterFromTheLockPrintsAsAnEscapeInEveryMessage(): void
+    {
+        $package = "vendor/x\x1B[31mRED\u{202E}";
+        $report = new Report([(new FindingBuilder())->withPackage($package)->withVerdict(Verdict::ABANDONED)->withChain([$package])->build()], Notes::texts(["note x\x1B[31mRED\u{202E}"]), new \DateTimeImmutable(self::AT), 1, 0);
+
+        $run = $this->singleRun($this->formatter('high', null)->format($report));
+
+        self::assertStringStartsWith('vendor/x\\x1B[31mRED\\u{{202E}} 1.0.0', JsonPath::stringAt($run, ['results', 0, 'message', 'text']));
+        self::assertSame('note x\\x1B[31mRED\\u{{202E}}', JsonPath::stringAt($run, ['invocations', 0, 'toolExecutionNotifications', 0, 'message', 'text']));
+    }
+
     /** @return array<mixed, mixed> the run-level result, or [] when the run has none */
     private function runLevel(string $sarif): array
     {
