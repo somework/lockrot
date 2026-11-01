@@ -966,8 +966,8 @@
             "band-floors": 72,
             "zero-verdicts": 199,
             "sort": null,
-            "gate-bounded-new": 0,
-            "baseline-cover": 0
+            "gate-bounded-new": 44,
+            "baseline-cover": 1
         }
     },
     "activity_cache_oldest_at": null,

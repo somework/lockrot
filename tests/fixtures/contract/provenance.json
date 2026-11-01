@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "2016f626aaa3d5caa0ccd6d812fd7eb61c1c9f3ba35a28f1ffeec106f5b79abf",
-        "tests/fixtures/flags/composite.json": "931aa288bfbfee92d7103d91a1d3c78a9d0d5625dd044f214ca72e1c9c73a6e7",
-        "tests/fixtures/flags/provenance.json": "f8ddbb228c4530fb72833f2883573c555ee947e8dacbf62aaea2463e7ee908e6"
+        "tests/fixtures/flags/cases.json": "47b028cf1e8d3c405337c9c67530db6a3e736c9ddf42c570cbed7841adce097f",
+        "tests/fixtures/flags/composite.json": "c025ac9442d234c2eb95d5a8964efa7ec0483ba265af928e461035ac6578c1b7",
+        "tests/fixtures/flags/provenance.json": "adb4d44761784fd8535774187dda17a5c8864ba2c049c26d0882a8c107a03100"
     },
     "version_mask": {
         "paths": [
@@ -50,17 +50,17 @@
     "case_lock": "each case is formatted beside a composer.lock of its lock entries, as tests/Support/CaseHydrator.php lockJson() lays it out",
     "model_goldens": {
         "compared": {
-            "age_line": 173,
-            "baseline_suffix": 175,
-            "commands_cmd": 157,
-            "commands_posix": 157,
-            "gate_line": 176,
-            "next_step_text": 130,
-            "run_gate_line": 177,
-            "score_text": 176
+            "age_line": 175,
+            "baseline_suffix": 179,
+            "commands_cmd": 161,
+            "commands_posix": 161,
+            "gate_line": 180,
+            "next_step_text": 134,
+            "run_gate_line": 181,
+            "score_text": 180
         },
         "inputs_differ": {
-            "age_line": 4,
+            "age_line": 6,
             "baseline_suffix": 2,
             "commands_cmd": 20,
             "commands_posix": 20,
@@ -72,7 +72,7 @@
     "page_goldens": {
         "file": "page-goldens.json",
         "source": "the model's page goldens (security-axis/r3/page-goldens.json in the private model), copied byte for byte and not recorded",
-        "sha256": "0aeb93b15a692df6860c05468d49e361628d12274683125dc13b7d238c8234c6",
+        "sha256": "c7f9e75f9ee096a3ae323d122633450ac0a1235993f99df8f9fea24974c14110",
         "read_by": "tests/Integration/PageGoldensTest.php validates each page document against the report-2 schema and reads title, description, grade_line, figure_line, load_line, gate_partition, ready, run_notes, flags_notes, advisory_groups, sheet_moves, sheet_holders and sheet_ladder. The other keys are the renderer's"
     },
     "engine_pages": "page/ holds the report-2 that bin/lockrot writes for each case of Lockrot\\Tests\\Support\\Contract\\EnginePage::CASES. tools/report/record --engine-pages records them",

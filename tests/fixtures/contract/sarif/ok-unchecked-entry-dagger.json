@@ -128,7 +128,7 @@
                 {
                     "ruleId": "lockrot/unchecked",
                     "ruleIndex": 1,
-                    "level": "error",
+                    "level": "note",
                     "message": {
                         "text": "scheb/2fa-google-authenticator v8.6.1: the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it. checks missing: S2 (undated releases)."
                     },
@@ -149,9 +149,7 @@
                         "dev": false,
                         "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": "known",
-                        "error_by": [
-                            "unchecked"
-                        ]
+                        "error_by": []
                     },
                     "locations": [
                         {
@@ -171,19 +169,17 @@
             "invocations": [
                 {
                     "executionSuccessful": true,
-                    "exitCode": 1,
-                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high,unchecked \u00b7 1 finding fails it (unchecked 1) \u00b7 target php 8.4 (--target-php)",
+                    "exitCode": 0,
+                    "exitCodeDescription": "gate: passes \u00b7 --fail-on=high,unchecked \u00b7 no finding fails it; 1 reaches it and is known to the baseline \u00b7 target php 8.4 (--target-php)",
                     "properties": {
                         "gate": {
-                            "fails": true,
-                            "tripped_by": [
-                                "fail_on"
-                            ],
+                            "fails": false,
+                            "tripped_by": [],
                             "fail_on_applied": true,
                             "reaching": 1,
-                            "failing": 1,
+                            "failing": 0,
                             "exempt": {
-                                "baseline": 0
+                                "baseline": 1
                             },
                             "standing": {
                                 "known": 1,
@@ -191,9 +187,7 @@
                                 "worsened": 0,
                                 "none": 0
                             },
-                            "failing_packages": [
-                                "scheb/2fa-google-authenticator"
-                            ],
+                            "failing_packages": [],
                             "failing_by": [
                                 {
                                     "value": "high",
@@ -201,11 +195,11 @@
                                 },
                                 {
                                     "value": "unchecked",
-                                    "failing": 1
+                                    "failing": 0
                                 }
                             ],
                             "not_applied": [],
-                            "text": "gate: fails \u00b7 --fail-on=high,unchecked \u00b7 1 finding fails it (unchecked 1) \u00b7 target php 8.4 (--target-php)"
+                            "text": "gate: passes \u00b7 --fail-on=high,unchecked \u00b7 no finding fails it; 1 reaches it and is known to the baseline \u00b7 target php 8.4 (--target-php)"
                         },
                         "fail_on": "high,unchecked",
                         "fail_on_source": "option",

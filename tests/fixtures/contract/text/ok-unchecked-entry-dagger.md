@@ -1,6 +1,6 @@
 ### lockrot: nothing flagged in 5 packages
 
-**gate: fails** · --fail-on=high,unchecked · 1 finding fails it (unchecked 1) · target php 8.4 (--target-php)
+**gate: passes** · --fail-on=high,unchecked · no finding fails it; 1 reaches it and is known to the baseline · target php 8.4 (--target-php)
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|

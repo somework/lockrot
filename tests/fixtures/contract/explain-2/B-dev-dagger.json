@@ -521,7 +521,7 @@
     },
     "lock": {
         "php": ">=5.3.3",
-        "released": "2015-06-25T11:21:15+00:00",
+        "released": "2016-01-14T10:11:35+00:00",
         "repository": "https://github.com/symfony/monolog-bridge.git",
         "from_composer_repository": true,
         "dev": true,
