@@ -79,6 +79,10 @@ final class ComposerHttpClientRedirectTest extends TestCase
             header('Location: file://localhost'.__DIR__.'/requests.log', true, 302);
             exit;
         }
+        if ($path === '/protocol-relative') {
+            header('Location: //localhost:'.$port.'/headers', true, 302);
+            exit;
+        }
         if ($path === '/same-host') {
             header('Location: /headers', true, 302);
             exit;
@@ -152,6 +156,17 @@ final class ComposerHttpClientRedirectTest extends TestCase
         );
     }
 
+    public function testAProtocolRelativeRedirectToAnotherHostArrivesWithoutLockrotsCredentials(): void
+    {
+        if (!HttpDownloader::isCurlEnabled()) {
+            self::markTestSkipped('Composer takes prevent_url_access_callable through curl only');
+        }
+        self::assertSame(
+            ['authorization' => null, 'private_token' => null, 'user_agent' => 'lockrot', 'path' => '/headers'],
+            $this->headersSeenAfter('/protocol-relative')
+        );
+    }
+
     public function testARedirectOnTheSameHostKeepsLockrotsCredentials(): void
     {
         self::assertSame(
@@ -185,6 +200,15 @@ final class ComposerHttpClientRedirectTest extends TestCase
         $result = $client->fetchAll([$url], self::HEADERS)[$url];
 
         self::assertSame([0, null], [$result->status(), $result->body()]);
+    }
+
+    /** A Location that starts with `//` names a host and keeps the request's scheme. */
+    public function testAProtocolRelativeRedirectToAnotherHostArrivesWithoutLockrotsCredentialsWithoutCurl(): void
+    {
+        self::assertSame(
+            ['authorization' => null, 'private_token' => null, 'user_agent' => 'lockrot', 'path' => '/headers'],
+            $this->headersSeenAfter('/protocol-relative', false)
+        );
     }
 
     public function testARedirectOnTheSameHostKeepsLockrotsCredentialsWithoutCurl(): void
