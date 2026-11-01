@@ -58,14 +58,14 @@ final class ExplainFormatterTest extends TestCase
     }
 
     /** @param list<string> $notes */
-    private static function report(array $notes = []): Report
+    private static function report(array $notes = [], Finding ...$findings): Report
     {
-        return new Report([], Notes::texts($notes), new \DateTimeImmutable(F::NOW), 3, 0);
+        return new Report(array_values($findings), Notes::texts($notes), new \DateTimeImmutable(F::NOW), 3, 0);
     }
 
     private static function explain(Finding $finding): Explanation
     {
-        return new Explanation($finding, F::facts(F::package(['version' => $finding->version()]), F::metadata([[$finding->version(), '2020-01-01T00:00:00+00:00']])), new Thresholds(), '8.4', self::report(['run note']));
+        return new Explanation($finding, F::facts(F::package(['version' => $finding->version()]), F::metadata([[$finding->version(), '2020-01-01T00:00:00+00:00']])), new Thresholds(), '8.4', self::report(['run note'], $finding));
     }
 
     /** A CI runner reads `##[` anywhere in a line as a workflow command. */
@@ -369,7 +369,7 @@ final class ExplainFormatterTest extends TestCase
     public function testJsonCarriesTheEnvelopeAndTheExplanation(): void
     {
         $finding = (new FindingBuilder())->withDataDate(new \DateTimeImmutable(F::NOW))->build();
-        $explanation = new Explanation($finding, F::facts(F::package(), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])), new Thresholds(), '8.4', self::report());
+        $explanation = new Explanation($finding, F::facts(F::package(), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])), new Thresholds(), '8.4', self::report([], $finding));
 
         $encoded = (new ExplainFormatter())->json($explanation);
         $json = json_decode($encoded, true);

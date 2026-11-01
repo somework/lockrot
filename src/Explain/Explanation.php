@@ -162,17 +162,23 @@ final class Explanation
      * {@see self::branches()}: the text table does not print them and reads the rows more than once.
      *
      * @return array<string, mixed>
+     *
+     * @throws \LogicException when the report does not hold the finding: its row carries the rank, baseline and gate
      */
     public function toArray(): array
     {
         $package = $this->facts->package();
+        $row = $this->report->findingRows()[$package->name()] ?? null;
+        if ($row === null) {
+            throw new \LogicException('The report does not hold the finding of '.$package->name());
+        }
         // Both command paths give the report its run. A caller that skips them passed the target PHP to the constructor.
         $run = $this->report->run() ?? new RunSettings(null, null, $this->targetPhp, RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, $this->thresholds, $this->projectPhp);
 
         return [
             'package' => $package->name(),
             'version' => $package->version(),
-            'finding' => $this->report->findingRows()[$package->name()] ?? $this->finding->toArray(),
+            'finding' => $row,
             'lock' => $this->lock(),
             'metadata' => $this->metadata(),
             'run' => $run->toExplainArray($this->report->advisoryLookup(), $this->report->moveCheck()) + ['php_window' => $this->phpWindow()],
