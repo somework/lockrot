@@ -113,12 +113,12 @@ final class MoveText
     }
 
     /**
-     * SPEC §5.6: while the lock records a platform PHP outside the target minor, Composer solves
-     * the commands at that PHP, not at the target. The sentence and a space, else an empty string.
-     * While Composer refuses the lock itself, the step alone does not make it install: the sentence
-     * points at the moves_not_checked note.
+     * SPEC §5.6: while Composer's config sets a platform PHP outside the target minor, Composer
+     * solves the commands at that PHP, not at the target. The sentence and a space, else an empty
+     * string. While Composer refuses the lock itself, the step alone does not make it install: the
+     * sentence points at the moves_not_checked note.
      *
-     * @param ?string $platformOverride `run.php_window.platform_override`
+     * @param ?string $platformOverride `run.php_window.platform_override`, the configured `config.platform.php`
      * @param bool    $baselineRefused  `run.move_check.baseline` is `refused`
      */
     public static function platformStep(?string $targetPhp, ?string $platformOverride, bool $baselineRefused = false): string
@@ -126,7 +126,7 @@ final class MoveText
         if ($targetPhp === null || $platformOverride === null || MoveCheckers::platformPhp($targetPhp, $platformOverride) === $platformOverride) {
             return '';
         }
-        return 'First set config.platform.php to your PHP '.$targetPhp.' release: the lock records '.$platformOverride.'.'.($baselineRefused ? self::REFUSED_POINTER : '').' ';
+        return 'First set config.platform.php to your PHP '.$targetPhp.' release: Composer\'s config sets '.$platformOverride.'.'.($baselineRefused ? self::REFUSED_POINTER : '').' ';
     }
 
     /** D10: what Composer's solver said about the move, or why lockrot did not ask it. */

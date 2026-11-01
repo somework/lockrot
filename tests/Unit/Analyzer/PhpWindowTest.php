@@ -430,12 +430,26 @@ final class PhpWindowTest extends TestCase
         self::assertSame(['acme/a'], array_column($set['lower_edge']['set_by'], 'name'), 'read at 8.4.99, where acme/b admits');
     }
 
-    public function testTheLockOverrideIsReportedAndDoesNotMoveTheWindow(): void
+    public function testTheConfiguredPlatformPhpIsReportedAndDoesNotMoveTheWindow(): void
     {
-        $window = self::window(['packages' => [self::package('acme/a', ['php' => '>=8.0'])], 'packages-dev' => [], 'platform-overrides' => ['php' => '7.4.29']]);
+        $window = self::window(['packages' => [self::package('acme/a', ['php' => '>=8.0'])], 'packages-dev' => []], ['config' => ['platform' => ['php' => '7.4.29']]]);
 
         self::assertSame('7.4.29', $window['platform_override']);
         self::assertSame('8.0', $window['without_dev']['minors'][0]);
+    }
+
+    /** Ruling R8-3: `composer update` reads Composer's merged config, not the lock's `platform-overrides`. */
+    public function testThePlatformOverrideIsTheConfiguredPhpNotTheLocksOverride(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [self::package('acme/a', ['php' => '>=7.4'])], 'packages-dev' => [], 'platform-overrides' => ['php' => '8.4.1']]);
+        $project = ProjectConfig::fromArray(['config' => ['platform' => ['php' => '8.4.1']]]);
+
+        $merged = PhpWindow::of($lock, $project, '8.4', self::minors(), null, '7.4.29');
+        $unset = PhpWindow::of(LockFile::fromArray(['packages' => [], 'packages-dev' => [], 'platform-overrides' => ['php' => '7.4.29']]), ProjectConfig::empty(), '8.4', self::minors());
+
+        self::assertNotNull($merged);
+        self::assertNotNull($unset);
+        self::assertSame(['7.4.29', null], [$merged->platformOverride(), $unset->platformOverride()]);
     }
 
     public function testTheRootAliasOfALockedPackageAddsNoLink(): void

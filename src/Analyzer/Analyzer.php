@@ -230,7 +230,7 @@ final class Analyzer
         $finder = new FixFinder($this->signals->phpFloor(), LinkIndex::of($lock, $project));
         $checks = $this->checks === null ? null : $this->checks->withAdvisories($advisories->records(), $advisories->asked());
         $baseline = $checks === null ? null : $checks->checker()->baseline();
-        $window = PhpWindow::of($lock, $project, $this->signals->phpFloor()->php(PhpFloor::TARGET) ?? PhpReleaseDates::minorOf(\PHP_VERSION), PhpReleaseDates::load()->minors($this->clock), $checks === null ? null : $checks->checker()->platformPhp());
+        $window = PhpWindow::of($lock, $project, $this->signals->phpFloor()->php(PhpFloor::TARGET) ?? PhpReleaseDates::minorOf(\PHP_VERSION), PhpReleaseDates::load()->minors($this->clock), $checks === null ? null : $checks->checker()->platformPhp(), $checks === null ? null : $checks->checker()->configuredPhp());
         $findings = [];
         $factsByPackage = [];
         $notInRepository = 0;

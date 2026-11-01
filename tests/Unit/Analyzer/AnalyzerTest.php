@@ -157,24 +157,24 @@ final class AnalyzerTest extends TestCase
         };
     }
 
-    /** Case `move-check‡`, whose lock records a platform PHP outside the minor of its target 8.4. */
-    public function testAMoveWithCommandsFirstSetsThePlatformPhpThatTheLockRecords(): void
+    /** Case `move-check‡`, whose composer.json sets a platform PHP outside the minor of its target 8.4. */
+    public function testAMoveWithCommandsFirstSetsThePlatformPhpThatComposersConfigSets(): void
     {
         $case = CaseHydrator::case('move-check‡');
         $inputs = JsonPath::arrayAt($case, ['inputs']);
-        $inputs['php_lock'] = ['platform-overrides' => ['php' => '7.4.29']];
+        $inputs['config_platform_php'] = '7.4.29';
         $case['inputs'] = $inputs;
 
         $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
 
         self::assertNotSame([], JsonPath::arrayAt($document, ['findings', 0, 'next_step', 'commands']));
-        self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. ', JsonPath::stringAt($document, ['findings', 0, 'next_step', 'text']));
+        self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29. ', JsonPath::stringAt($document, ['findings', 0, 'next_step', 'text']));
     }
 
     /** @return iterable<string, array{list<string>, bool, string}> the lock's php of each package, whether Composer refuses the lock itself, and the step */
     public static function refusedBaselines(): iterable
     {
-        $step = 'First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29.';
+        $step = 'First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29.';
         $refused = $step.' Composer still refuses the lock itself: the moves_not_checked note names the first cause. ';
         yield 'a lock that Composer installs' => [[], false, $step.' '];
         yield 'a refused lock with the target inside the window' => [[], true, $refused];
@@ -195,7 +195,7 @@ final class AnalyzerTest extends TestCase
     {
         $case = CaseHydrator::case('move-check‡');
         $inputs = JsonPath::arrayAt($case, ['inputs']);
-        $inputs['php_lock'] = ['platform-overrides' => ['php' => '7.4.29']];
+        $inputs['config_platform_php'] = '7.4.29';
         $lock = JsonPath::arrayAt($inputs, ['lock']);
         $first = JsonPath::arrayAt($lock, [0]);
         foreach ($phps as $index => $php) {
