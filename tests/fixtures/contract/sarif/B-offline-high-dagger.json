@@ -231,7 +231,7 @@
                     "ruleIndex": 2,
                     "level": "warning",
                     "message": {
-                        "text": "advisories not checked: the gate could not read the advisories of every package"
+                        "text": "advisories not checked: packagist.org not asked (offline)"
                     },
                     "locations": [
                         {
@@ -300,7 +300,15 @@
                         ],
                         "mode": "check",
                         "strict_network": false
-                    }
+                    },
+                    "toolExecutionNotifications": [
+                        {
+                            "level": "note",
+                            "message": {
+                                "text": "packagist.org not asked (offline)"
+                            }
+                        }
+                    ]
                 }
             ],
             "properties": {

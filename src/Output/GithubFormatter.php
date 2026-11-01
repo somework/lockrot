@@ -45,7 +45,7 @@ final class GithubFormatter implements FormatterInterface
         $lines = array_merge(...array_values($byMark));
         $gap = $this->context->advisoriesNotCheckedLevel($report);
         if ($gap !== null) {
-            $lines[] = '::'.$gap.' title=lockrot::'.self::escapeData(self::gapText($report));
+            $lines[] = '::'.$gap.' title=lockrot::'.self::escapeData(RunFooter::advisoriesNotChecked($report));
         }
         foreach ($this->notes($report) as $note) {
             $lines[] = '::notice title=lockrot::'.self::escapeData($note);
@@ -91,19 +91,6 @@ final class GithubFormatter implements FormatterInterface
         }
 
         return $notes;
-    }
-
-    /** The run-level record's message: each repository that failed or was not asked, with its words. */
-    private static function gapText(Report $report): string
-    {
-        $parts = [];
-        foreach ($report->advisoryLookup()->repositories() as $repository) {
-            if ($repository->outcome() === AdvisoryRepository::FAILED || $repository->outcome() === AdvisoryRepository::NOT_ASKED) {
-                $parts[] = RunFooter::repository($repository);
-            }
-        }
-
-        return 'advisories not checked: '.($parts === [] ? 'the gate could not read the advisories of every package' : implode('; ', $parts));
     }
 
     private function annotation(Finding $finding, string $mark, ?int $line, Report $report): string

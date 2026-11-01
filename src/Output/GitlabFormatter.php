@@ -55,7 +55,7 @@ final class GitlabFormatter implements FormatterInterface
             $issues[] = [
                 'type' => 'issue',
                 'check_name' => 'lockrot/advisories-unchecked',
-                'description' => 'advisories not checked: the gate could not read the advisories of every package',
+                'description' => TerminalText::neutralise(RunFooter::advisoriesNotChecked($report)),
                 'categories' => self::CATEGORIES,
                 'severity' => $gap === FormatContext::LEVEL_ERROR ? 'major' : 'minor',
                 'fingerprint' => hash('sha256', 'lockrot|advisories-unchecked'),
