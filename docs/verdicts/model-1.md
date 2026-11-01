@@ -165,7 +165,7 @@ A finding with no counted flag scores 0. The first row that holds gives its verd
 
 | Verdict | When |
 |---|---|
-| `finished` | an allowlist entry applies to the package |
+| `finished` | an allowlist entry accepts the whole package or a flag that fired |
 | `unknown` | lockrot read no release metadata for the package |
 | `ok` | otherwise |
 
