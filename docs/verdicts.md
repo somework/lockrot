@@ -1047,8 +1047,8 @@ The score line writes the sum, and it evaluates to the score:
   to the next grade, and `decided_by` (`maintenance`, `security`, `combination` or `either`).
 
 - `score.without[]` gives the score without each counted flag, and `score.accepted[]` the score if
-  an accepted flag counted. `without[]` has a flag row only when the score has two or more terms,
-  and a row for the deciding advisory only when two or more advisories count. Both are new runs of the rules, not a subtraction: when the lead goes,
+  an accepted flag counted. `without[]` has flag rows only when the score has two or more terms.
+  It has a row for the deciding advisory only when two or more advisories count. Both are new runs of the rules, not a subtraction: when the lead goes,
   the next flag takes the lead in full. A row reads `at least` when a check that did not run could
   raise it, or when the `tag` move lands on a line that S8's rule can leave behind.
 
