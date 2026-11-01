@@ -160,11 +160,11 @@ final class GateAgreementTest extends TestCase
     }
 
     /**
-     * I15b under a baseline: an entry exempts only a graded finding (docs/baseline.md), so an
-     * ungraded finding with S10 still fails `--fail-on=unchecked`, and the run-level record stays
-     * at `error`.
+     * I15b under a baseline: a `known` entry exempts a finding from `--fail-on=unchecked` at score
+     * 0 too (docs/baseline.md, "Whichever value"). No finding fails, so no format writes a run-level
+     * `error` record.
      */
-    public function testAnOfflineRunThatTheBaselineKnowsFailsUncheckedOnlyOnItsUngradedFindings(): void
+    public function testAnOfflineRunThatTheBaselineKnowsFailsNoFindingUnderUnchecked(): void
     {
         $server = FixtureRepositoryServer::fromLockFiles([self::FIXTURES.'mini/composer.lock']);
         $server->start();
@@ -186,9 +186,10 @@ final class GateAgreementTest extends TestCase
         self::assertSame([], $this->mismatches);
         self::assertNotNull($gate);
         self::assertNotSame([], $ungradedUnchecked, 'the fixture must hold an ungraded finding with S10');
-        self::assertSame($ungradedUnchecked, array_values(array_filter($names, static fn (string $name): bool => $gate->packageFails($name))));
+        self::assertSame([], array_values(array_filter($names, static fn (string $name): bool => $gate->packageFails($name))));
+        self::assertFalse($gate->fails());
         foreach (['github', 'gitlab', 'sarif'] as $format) {
-            self::assertArrayHasKey($format.' run-level error', $this->seen);
+            self::assertArrayNotHasKey($format.' run-level error', $this->seen);
         }
     }
 
