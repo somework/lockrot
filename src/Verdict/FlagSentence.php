@@ -178,6 +178,6 @@ final class FlagSentence
 
     private static function ago(string $date, ?float $years, ?string $datedBy): string
     {
-        return substr($date, 0, 10).' ('.($years === null ? '' : \sprintf('%.1f', $years)).' years ago'.($datedBy === null ? ')' : ', dated by '.$datedBy.')');
+        return substr($date, 0, 10).' ('.($years === null ? '' : \sprintf('%.1F', $years)).' years ago'.($datedBy === null ? ')' : ', dated by '.$datedBy.')');
     }
 }

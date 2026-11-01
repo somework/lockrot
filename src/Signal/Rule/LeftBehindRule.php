@@ -96,7 +96,7 @@ final class LeftBehindRule implements SignalRule
         // date from a monorepo parent says so ({@see PackageMetadata::datedBy()}).
         $datedBy = $reading->datedBy();
         $summary = \sprintf(
-            'branch %s last released %s (%.1f years ago%s); %s released %s (%s)',
+            'branch %s last released %s (%.1F years ago%s); %s released %s (%s)',
             ReleaseBranch::label($branch),
             $ownAt->format('Y-m-d'),
             $reading->years(),
