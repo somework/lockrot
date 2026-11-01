@@ -445,7 +445,7 @@ These variables exist for lockrot's own tests and are not part of the configurat
 
 | Variable | Effect |
 |---|---|
-| `LOCKROT_TODAY` | An ISO 8601 date or date-time, such as `2026-09-14`, used as "now": every age (S2, S4, S8), `generated_at` and the `expires` check of `ignore` and `accept-unchecked` entries. A value without an offset is UTC. Libyears do not depend on it |
+| `LOCKROT_TODAY` | An ISO 8601 date or date-time, such as `2026-09-14`, used as "now": every age (S2, S4, S8), `generated_at` and the `expires` check of `ignore` and `accept-unchecked` entries. A value without an offset is UTC, and a value with one moves to UTC, so every printed date is the UTC day. Libyears do not depend on it |
 | `LOCKROT_RELEASE_URL` | The release list `lockrot.phar self-update` reads, in the shape of GitHub's `GET /repos/{owner}/{repo}/releases`, instead of GitHub's |
 | `LOCKROT_RELEASE_KEY` | A PEM file whose public key `lockrot.phar self-update` verifies release signatures with, instead of the key built into the archive |
 

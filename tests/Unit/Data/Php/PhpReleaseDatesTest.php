@@ -29,7 +29,7 @@ final class PhpReleaseDatesTest extends TestCase
 
         self::assertSame(['8.3', '8.4'], \array_slice($dates->minors(Clock::fixed('2024-11-21T00:00:00+00:00')), -2));
         self::assertSame(['8.2', '8.3'], \array_slice($dates->minors(Clock::fixed('2024-11-20T23:59:59+00:00')), -2));
-        self::assertSame('8.4', \array_slice($dates->minors(Clock::fixed('2024-11-21T01:00:00+08:00')), -1)[0]);
+        self::assertSame('8.3', \array_slice($dates->minors(Clock::fixed('2024-11-21T07:59:59+08:00')), -1)[0], 'the UTC day, 2024-11-20');
         self::assertSame('5.3', $dates->minors(Clock::fixed('2026-10-01T00:00:00+00:00'))[0]);
     }
 
