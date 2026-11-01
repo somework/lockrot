@@ -12,6 +12,7 @@ use Lockrot\Score\ScoreText;
 use Lockrot\Score\Standing;
 use Lockrot\Score\WorsenedFact;
 use Lockrot\Signal\Data\AdvisoryData;
+use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\ListWords;
@@ -262,20 +263,29 @@ final class FindingBlock
     /** `checks missing: {ids} ({reason words})`, grouped by reason words in first-seen order. */
     public static function checksMissing(Finding $finding): ?string
     {
+        $groups = self::checkGroups($finding, $finding->checksMissing());
+
+        return $groups === [] ? null : 'checks missing: '.implode(' · ', $groups);
+    }
+
+    /**
+     * @param iterable<Check> $checks
+     *
+     * @return list<string> `{ids} ({reason words})`, one per reason words in first-seen order, each id once in signal order
+     */
+    public static function checkGroups(Finding $finding, iterable $checks): array
+    {
         $groups = [];
-        foreach ($finding->checksMissing() as $check) {
+        foreach ($checks as $check) {
             $words = self::checkWords($finding, $check->reason());
             $groups[$words] = array_merge($groups[$words] ?? [], $check->blocks());
-        }
-        if ($groups === []) {
-            return null;
         }
         $parts = [];
         foreach ($groups as $words => $ids) {
             $parts[] = implode(', ', self::signalOrder($ids)).' ('.$words.')';
         }
 
-        return 'checks missing: '.implode(' · ', $parts);
+        return $parts;
     }
 
     /** `checks accepted: …`, one group per `unchecked_accepted[]` entry, in entry order. */

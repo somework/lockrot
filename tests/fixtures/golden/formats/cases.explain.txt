@@ -773,7 +773,7 @@ flags
   pinned       S6 · pinned to branch snapshot dev-joomla-backports
   feeds        packagist.org: none on record
   accepted     none
-  not checked  S2, S8 (not from a Composer repository) · S3, S4 (not from a Composer repository)
+  not checked  S2, S3, S4, S8 (not from a Composer repository)
 
 repository metadata
   none — not from a Composer repository, not checked
@@ -1173,7 +1173,7 @@ flags
   feeds        packagist.org: 112 on record, 0 affect 10.6.18
   pulls in     pulls in 3 flagged packages: guzzlehttp/guzzle (vulnerable), pear/console_getopt (silent), pear/pear_exception (stale)
   accepted     none
-  not checked  S3, S4 (not from a Composer repository) · S2, S8 (not from a Composer repository)
+  not checked  S2, S3, S4, S8 (not from a Composer repository)
 
 repository metadata
   none — not from a Composer repository, not checked
@@ -2161,7 +2161,7 @@ flags
   abandoned    S1 high · marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago)
   old-promise  S5 · released 2020-10-24 for PHP 5 (php "^5.5.9|>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   accepted     none
-  not checked  S9 (offline) · S3, S4 (offline)
+  not checked  S3, S4, S9 (offline)
 
 repository metadata
      branch   highest tag   released          php            fixes
@@ -3643,7 +3643,7 @@ age       installed  4.3.x-dev not read (a branch snapshot has no release branch
           newest               not read (not from a Composer repository)
           last push            not read (not from a Composer repository)
           libyears not measured: not from a Composer repository
-repository repository activity not asked (not from a Composer repository)
+repository activity not asked (not from a Composer repository)
 
 score     34 = pinned 16 + capped 2 [¼ of 8] + vulnerable 16 [high advisory]     critical from 32
   maintenance  pinned 16 (lead) · capped 2 (¼ of 8)
@@ -3670,7 +3670,7 @@ flags
   feeds        packagist.org: 5 on record, 5 affect 4.3.x-dev
   pulls in     pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise · vulnerable), symfony/http-foundation (left-behind · vulnerable) and 114 more
   accepted     none
-  not checked  S3, S4 (not from a Composer repository) · S2, S8, S11 (not from a Composer repository)
+  not checked  S2, S3, S4, S8, S11 (not from a Composer repository)
 
 repository metadata
   none — not from a Composer repository, not checked
@@ -4100,7 +4100,7 @@ age       installed  4.3.x-dev not read (a branch snapshot has no release branch
           newest               not read (not from a Composer repository)
           last push            not read (not from a Composer repository)
           libyears not measured: not from a Composer repository
-repository repository activity not asked (not from a Composer repository)
+repository activity not asked (not from a Composer repository)
 
 score     24 = capped 8 + vulnerable 16 [high advisory] (pinned accepted)     high from 16
   maintenance  capped 8 (lead)
@@ -4127,7 +4127,7 @@ flags
   feeds        packagist.org: 5 on record, 5 affect 4.3.x-dev
   pulls in     pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise · vulnerable), symfony/http-foundation (left-behind · vulnerable) and 114 more
   accepted     pinned
-  not checked  S3, S4 (not from a Composer repository) · S2, S8, S11 (not from a Composer repository)
+  not checked  S2, S3, S4, S8, S11 (not from a Composer repository)
 
 repository metadata
   none — not from a Composer repository, not checked
@@ -4949,7 +4949,7 @@ do        nothing to do: nothing counts
 flags
   feeds        packagist.org: none on record
   accepted     none
-  not checked  S2, S8 (origin unknown) · S3, S4 (origin unknown)
+  not checked  S2, S3, S4, S8 (origin unknown)
 
 repository metadata
   none — not from a Composer repository, not checked
