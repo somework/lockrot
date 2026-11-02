@@ -234,7 +234,8 @@ final class Analyzer
         $configured = ($checker === null ? null : $checker->configuredPhp()) ?? $project->platformPhp();
         // A run that checks no move reads the target where the check would solve.
         $solvePhp = ($checker === null ? null : $checker->platformPhp()) ?? MoveCheckers::platformPhp($targetMinor, $configured);
-        $floor = $this->signals->phpFloor()->solvedAt($solvePhp);
+        $signals = $this->signals->solvedAt($solvePhp);
+        $floor = $signals->phpFloor();
         $finder = new FixFinder($floor, LinkIndex::of($lock, $project));
         $baseline = $checker === null ? null : $checker->baseline();
         $window = PhpWindow::of($lock, $project, $targetMinor, PhpReleaseDates::load()->minors($this->clock), $solvePhp, $configured);
@@ -253,7 +254,7 @@ final class Analyzer
             // The pass after the cap takes the refusals of the pass before it for the class and the verdict. Its new moves are not asked.
             do {
                 $scan = $finder->withRefused($refused);
-                $finding = $this->buildFinding($facts, $entry, $graph, $project->isRead(), $batch, $advisories->byName() === [] ? null : $scan, $advisories->ignored($package->name()), $every, $floor);
+                $finding = $this->buildFinding($facts, $entry, $graph, $project->isRead(), $batch, $advisories->byName() === [] ? null : $scan, $advisories->ignored($package->name()), $every, $signals);
                 $moves = $this->moves($finding, $facts, $scan, $floor, $lock, $project, $metadata, $every, $checks === null || $pass < $this->checkPasses ? $checks : $checks->answeredOnly(), $window, $baseline !== null && $baseline->check()->isRefused());
                 $known = $refused->count();
                 $refused = $checks === null ? $refused : $checks->refused($package->name());
@@ -281,7 +282,8 @@ final class Analyzer
         }
         $findings = array_map(static fn (Finding $finding): Finding => $finding->withHolders($graded), $findings);
         $report = (new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($activity), $includeDev, $advisories->coverage()))
-            ->withPhpWindow($window === null ? null : $window->withTargetFix($checks === null ? null : $checks->checker()));
+            ->withPhpWindow($window === null ? null : $window->withTargetFix($checks === null ? null : $checks->checker()))
+            ->withSolvePhp($solvePhp);
         if ($checks !== null) {
             $report = $report->withMoveChecks(new MoveCheckRun($checks->checker()->composerVersion(), $checks->checker()->blocksAdvisories(), $checks->checker()->blockingDisabledBy(), $checks->checker()->baseline()->check()), UpdateNow::of($report->sorted(), $checks));
             $error = $checks->checker()->solverError();
@@ -559,10 +561,11 @@ final class Analyzer
     /**
      * @param list<IgnoredAdvisory> $ignored
      * @param list<Advisory>        $every   every advisory of the package on any version
-     * @param PhpFloor              $floor   the target tested where the move check solves
+     * @param SignalSet             $signalSet the signals that test the target where the move check solves
      */
-    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, bool $composerJsonRead, MetadataBatch $batch, ?FixFinder $fixes, array $ignored, array $every, PhpFloor $floor): Finding
+    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, bool $composerJsonRead, MetadataBatch $batch, ?FixFinder $fixes, array $ignored, array $every, SignalSet $signalSet): Finding
     {
+        $floor = $signalSet->phpFloor();
         $counted = [];
         if ($fixes !== null && $facts->advisories() !== []) {
             $found = $fixes->find($facts, $every);
@@ -572,7 +575,7 @@ final class Analyzer
         $package = $facts->package();
         $meta = $facts->metadata();
         $activity = $facts->activity();
-        $signals = $this->signals->evaluate($facts);
+        $signals = $signalSet->evaluate($facts);
         // A maintenance gap cannot change a verdict that an entry accepts whole, or one that a
         // raised S1 already makes `abandoned`. It reads the raised S1, never the metadata's
         // abandoned bit: a marking that Composer's list ignores leaves S3 to decide.

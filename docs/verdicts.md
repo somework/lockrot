@@ -241,10 +241,10 @@ both of these floors:
   it admits: `>=8.2` is `8.2.0`, `>7.1` is `7.1.1`. `run.project_php_lowest` writes that version.
 
 - the target PHP ([`target-php`](configuration.md#extralockrot-keys) or its option and environment
-  override, else `config.platform.php`, else the running PHP), at its minor's newest patch
-  (`8.4.99`): a branch that does not admit it will not install. The move check solves there
-  too, unless `config.platform.php` is a stable release in that minor
-  ([limits of the check](#the-move-check)).
+  override, else `config.platform.php`, else the running PHP): a branch that does not admit it
+  will not install. S8 tests the target at the PHP where the move check solves: at
+  `config.platform.php` when that is a stable release in the target minor, else at the minor's
+  newest patch (`8.4.99`) ([limits of the check](#the-move-check)).
 
 When that is not the newest branch, the evidence says which floor blocks the newest branch, then
 names the branch within reach. Abridged from the [example run](example-run.md):
@@ -346,7 +346,7 @@ S11's `data`:
 | `newest_php` | R |
 | `newest_php_source` | `known` when R is the newest known minor, `require_php` when composer.json's `require.php` limits it, `platform_php` when the lock's `platform.php` limits it |
 | `requires`, `stops_at` | The installed `require.php`, and the newest known minor that it admits |
-| `excludes_target` | True when the target PHP's minor is outside `requires`: exactly `installed_php.target_runs` false |
+| `excludes_target` | True when `requires` excludes the target PHP at the point that S8 tests ([Within reach](#within-reach)): exactly `installed_php.target_runs` false |
 | `admits_newest` | The newest release of the lowest branch whose newest release admits R or states no php, with its `branch` and `blocking` (`project`, `target` or null). Null when no release admits R, or when the release metadata was not read |
 
 - **Which releases count.** `admits_newest` reads the stable releases above the installed one. Above
