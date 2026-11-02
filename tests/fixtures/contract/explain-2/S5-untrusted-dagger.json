@@ -311,7 +311,7 @@
         "replacement": null,
         "replacement_url": null,
         "note": null,
-        "libyears_unmeasured": "undated",
+        "libyears_unmeasured": "shared_commit",
         "libyears_at_least": false,
         "direct": true,
         "dev": false,
@@ -431,7 +431,7 @@
         "libyears": null,
         "age": {
             "installed": null,
-            "installed_unmeasured": "undated",
+            "installed_unmeasured": "shared_commit",
             "release": {
                 "version": "v6.4.45",
                 "at": "2026-08-30T01:18:12+00:00",
@@ -481,7 +481,7 @@
     },
     "lock": {
         "php": ">=5.3.3",
-        "released": null,
+        "released": "2015-06-25T11:21:15+00:00",
         "repository": "https://github.com/symfony/monolog-bridge.git",
         "from_composer_repository": true,
         "dev": false,

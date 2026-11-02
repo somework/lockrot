@@ -752,7 +752,7 @@
                 "newest_dated": "v2.6.13",
                 "newest_dated_released": "2021-08-30T10:00:00+00:00",
                 "dated_by": "symfony/symfony",
-                "php": ">=5.3.3",
+                "php": ">=5.3.9",
                 "highest_php": ">=5.3.9",
                 "admits_target_php": true,
                 "admits_project_php": true,

@@ -63524,8 +63524,8 @@ export const d_S5_untrusted_dagger = {
             "unavailable": 0,
             "not_found": 0,
             "branch_snapshot": 0,
-            "shared_commit": 0,
-            "undated": 1,
+            "shared_commit": 1,
+            "undated": 0,
             "no_stable_release": 0,
             "undated_releases": 0
         },
@@ -63902,7 +63902,7 @@ export const d_S5_untrusted_dagger = {
             "replacement": null,
             "replacement_url": null,
             "note": null,
-            "libyears_unmeasured": "undated",
+            "libyears_unmeasured": "shared_commit",
             "libyears_at_least": false,
             "direct": true,
             "dev": false,
@@ -64022,7 +64022,7 @@ export const d_S5_untrusted_dagger = {
             "libyears": null,
             "age": {
                 "installed": null,
-                "installed_unmeasured": "undated",
+                "installed_unmeasured": "shared_commit",
                 "release": {
                     "version": "v6.4.45",
                     "at": "2026-08-30T01:18:12+00:00",
