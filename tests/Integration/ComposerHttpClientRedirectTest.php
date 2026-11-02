@@ -202,6 +202,28 @@ final class ComposerHttpClientRedirectTest extends TestCase
         self::assertSame([0, null], [$result->status(), $result->body()]);
     }
 
+    /** Without curl, lockrot follows a same-host hop itself, so the budget can end between two hops. */
+    public function testASameHostHopAfterTheBudgetRanOutIsNotSentWithoutCurl(): void
+    {
+        $log = $this->dir.'/root/requests.log';
+        $before = \count(file($log) ?: []);
+        $now = static function () use ($log, $before): float {
+            clearstatcache();
+
+            return \count(file($log) ?: []) > $before ? 10.0 : 0.0;
+        };
+        $io = new NullIO();
+        $config = HermeticComposerConfig::create($this->dir.'/home', $io);
+        $config->merge(['config' => ['secure-http' => false]]);
+        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, Clock::fixed('2026-09-14T00:00:00+00:00'), Deadline::inSeconds(5.0, $now), false);
+        $url = $this->server->url().'/same-host';
+
+        $result = $client->fetchAll([$url], self::HEADERS)[$url];
+
+        self::assertSame([0, null], [$result->status(), $result->body()]);
+        self::assertSame($before + 1, \count(file($log) ?: []), 'only the first hop reaches the server');
+    }
+
     /** A Location that starts with `//` names a host and keeps the request's scheme. */
     public function testAProtocolRelativeRedirectToAnotherHostArrivesWithoutLockrotsCredentialsWithoutCurl(): void
     {
