@@ -47,6 +47,8 @@ final class Report
     private ?MoveCheckRun $moveCheck = null;
     private ?UpdateNow $updateNow = null;
     private ?PhpWindow $phpWindow = null;
+    /** The PHP at which the run tests the target ({@see \Lockrot\Signal\PhpFloor::solvedAt()}), null when no run set it. */
+    private ?string $solvePhp = null;
 
     /**
      * @param list<Finding> $findings
@@ -109,6 +111,7 @@ final class Report
         $copy->moveCheck = $this->moveCheck;
         $copy->updateNow = $this->updateNow;
         $copy->phpWindow = $this->phpWindow;
+        $copy->solvePhp = $this->solvePhp;
 
         return $copy;
     }
@@ -137,6 +140,7 @@ final class Report
         $copy->moveCheck = $this->moveCheck;
         $copy->updateNow = $this->updateNow;
         $copy->phpWindow = $this->phpWindow;
+        $copy->solvePhp = $this->solvePhp;
 
         return $copy;
     }
@@ -169,6 +173,19 @@ final class Report
         $copy->phpWindow = $phpWindow;
 
         return $copy;
+    }
+
+    public function withSolvePhp(string $solvePhp): self
+    {
+        $copy = clone $this;
+        $copy->solvePhp = $solvePhp;
+
+        return $copy;
+    }
+
+    public function solvePhp(): ?string
+    {
+        return $this->solvePhp;
     }
 
     /** `run.php_window`, null when the window is unknowable or the run did not compute it. */

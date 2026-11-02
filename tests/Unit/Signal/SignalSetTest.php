@@ -12,6 +12,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
 use PHPUnit\Framework\TestCase;
 
@@ -69,6 +70,48 @@ final class SignalSetTest extends TestCase
         self::assertSame(['8.3', 'require_php'], [$required->newest(), $required->source()]);
         self::assertSame(['8.1', 'platform_php'], [$platform->newest(), $platform->source()]);
         self::assertSame('8.4', $before->newest(), 'PHP 8.5 reached its GA on 2025-11-20');
+    }
+
+    /** `~8.4.6` excludes the solve PHP 8.4.5 and admits 8.4.99, the target minor's newest patch. */
+    public function testASetSolvedAtAPatchTestsTheTargetOfS11AtThatPatch(): void
+    {
+        $set = SignalSet::default(Clock::fixed('2026-10-01T00:00:00+00:00'), new Thresholds(), '8.4', PhpReleaseDates::load());
+        $facts = FactsBuilder::facts(FactsBuilder::package(['version' => '1.0.0', 'php' => '~8.4.6']));
+
+        $pinned = self::cappedData($set->solvedAt('8.4.5')->evaluate($facts));
+        $newest = self::cappedData($set->evaluate($facts));
+
+        self::assertSame([true, false], [$pinned['excludes_target'] ?? null, $set->solvedAt('8.4.5')->phpFloor()->admitsTarget('~8.4.6')]);
+        self::assertFalse($newest['excludes_target'] ?? null);
+    }
+
+    public function testASetSolvedAtAPatchKeepsItsRulesWithoutTheDefaultSet(): void
+    {
+        $rule = new class () implements SignalRule {
+            public function evaluate(PackageFacts $facts): Signal
+            {
+                return new Signal(Signal::LEVEL_WARN, 'six', SignalDataStub::of(Signal::S6, []));
+            }
+        };
+        $set = new SignalSet([$rule], new PhpFloor('8.4'));
+
+        $solved = $set->solvedAt('8.4.5');
+
+        self::assertFalse($solved->phpFloor()->admitsTarget('~8.4.6'));
+        self::assertSame([Signal::S6], array_map(static fn (Signal $s): string => $s->id(), $solved->evaluate(FactsBuilder::facts(FactsBuilder::package()))));
+    }
+
+    /**
+     * @param list<Signal> $signals
+     *
+     * @return array<mixed, mixed>
+     */
+    private static function cappedData(array $signals): array
+    {
+        $capped = array_values(array_filter($signals, static fn (Signal $signal): bool => $signal->id() === Signal::S11));
+        self::assertCount(1, $capped);
+
+        return JsonPath::decoded($capped[0]->data());
     }
 
     public function testASetBuiltWithoutAFloorHasNoNewestPhp(): void

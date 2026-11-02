@@ -26,6 +26,8 @@ final class SignalSet
     private PhpCap $cap;
     private Thresholds $thresholds;
     private ?\DateTimeImmutable $targetMajorGa = null;
+    /** @var ?\Closure(PhpFloor): list<SignalRule> the rules of {@see default()} on a floor */
+    private ?\Closure $rulesOn = null;
 
     /**
      * @param list<SignalRule> $rules
@@ -48,25 +50,44 @@ final class SignalSet
     {
         $floor = new PhpFloor($targetPhp, $projectPhp);
         $cap = new PhpCap($dates->minors($clock), $projectPhp, $platformPhp);
+        $rulesOn = static function (PhpFloor $floor) use ($clock, $thresholds, $dates, $targetPhp, $cap): array {
+            $oldPromise = new OldPromiseRule(new ConstraintOpenness(), $dates, $targetPhp);
 
-        $oldPromise = new OldPromiseRule(new ConstraintOpenness(), $dates, $targetPhp);
-        $set = new self([
-            new AbandonedRule(),
-            new NoReleaseRule($clock, $thresholds),
-            new ArchivedRule(),
-            new NoPushRule($clock, $thresholds),
-            $oldPromise,
-            new PinnedRule(),
-            new LeftBehindRule($clock, $thresholds, $floor),
-            new AdvisoryRule(),
-            new NotCheckedRule(new LeftBehindRule($clock, $thresholds, $floor), new CappedRule($cap, $floor), $oldPromise),
-            new CappedRule($cap, $floor),
-        ], $floor);
+            return [
+                new AbandonedRule(),
+                new NoReleaseRule($clock, $thresholds),
+                new ArchivedRule(),
+                new NoPushRule($clock, $thresholds),
+                $oldPromise,
+                new PinnedRule(),
+                new LeftBehindRule($clock, $thresholds, $floor),
+                new AdvisoryRule(),
+                new NotCheckedRule(new LeftBehindRule($clock, $thresholds, $floor), new CappedRule($cap, $floor), $oldPromise),
+                new CappedRule($cap, $floor),
+            ];
+        };
+        $set = new self($rulesOn($floor), $floor);
+        $set->rulesOn = $rulesOn;
         $set->thresholds = $thresholds;
         $set->cap = $cap;
         $set->targetMajorGa = $dates->gaDate(explode('.', PhpReleaseDates::minorOf($targetPhp))[0].'.0');
 
         return $set;
+    }
+
+    /**
+     * A copy whose floor, and the S8 and S11 rules of {@see default()}, test the target at $php, the
+     * PHP at which the move check solves ({@see PhpFloor::solvedAt()}, docs/verdicts.md#within-reach).
+     */
+    public function solvedAt(string $php): self
+    {
+        $copy = clone $this;
+        $copy->floor = $this->floor->solvedAt($php);
+        if ($this->rulesOn !== null) {
+            $copy->rules = ($this->rulesOn)($copy->floor);
+        }
+
+        return $copy;
     }
 
     public function thresholds(): Thresholds

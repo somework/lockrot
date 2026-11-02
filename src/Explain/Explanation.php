@@ -38,7 +38,7 @@ final class Explanation
     private string $targetPhp;
     private Report $report;
     private ?string $projectPhp;
-    /** Must be built from the same target and project php as S8's floor ({@see \Lockrot\Signal\SignalSet::default()}). */
+    /** S8's floor: the same target and project php, with the target tested at the report's {@see Report::solvePhp()}. */
     private PhpFloor $floor;
 
     /**
@@ -53,7 +53,9 @@ final class Explanation
         $this->targetPhp = $targetPhp;
         $this->report = $report;
         $this->projectPhp = $projectPhp;
-        $this->floor = new PhpFloor($targetPhp, $projectPhp);
+        $floor = new PhpFloor($targetPhp, $projectPhp);
+        $solvePhp = $report->solvePhp();
+        $this->floor = $solvePhp === null ? $floor : $floor->solvedAt($solvePhp);
     }
 
     public function finding(): Finding

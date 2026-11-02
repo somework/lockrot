@@ -401,6 +401,26 @@ final class ReportTest extends TestCase
         self::assertNotNull($windowed->phpWindow());
     }
 
+    public function testTheSolvePhpSurvivesTheRunAndTheBaselineCopies(): void
+    {
+        $report = new Report([$this->finding('vendor/a', Verdict::SILENT)], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 1, 0);
+        $solved = $report->withSolvePhp('8.4.5');
+        $comparison = BaselineComparison::compare(
+            BaselineEntries::baseline([BaselineEntries::of('vendor/a', '1.0.0', Verdict::SILENT, '2026-01-15')], '2026-09-14T00:00:00+00:00'),
+            $solved,
+            'lockrot-baseline.json',
+            ['vendor/a']
+        );
+
+        $copies = [
+            $solved->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null)),
+            $solved->withBaseline($comparison),
+        ];
+
+        self::assertNull($report->solvePhp());
+        self::assertSame(['8.4.5', '8.4.5'], array_map(static fn (Report $copy): ?string => $copy->solvePhp(), $copies));
+    }
+
     public function testWithBaselineLeavesTheOriginalReportUntouched(): void
     {
         $report = new Report(

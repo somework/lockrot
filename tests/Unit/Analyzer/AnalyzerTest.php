@@ -30,11 +30,14 @@ use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Deadline;
+use Lockrot\Explain\Explanation;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\TableFormatter;
+use Lockrot\Signal\Data\CappedData;
+use Lockrot\Signal\Data\LeftBehindData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
@@ -193,6 +196,61 @@ final class AnalyzerTest extends TestCase
 
         self::assertSame(['v2.3.2', true, null], [$step['newest'] ?? null, $phpCheck['target_runs'] ?? null, $phpCheck['raise_to'] ?? null]);
         self::assertSame('resolves', JsonPath::stringAt($step, ['check', 'result']));
+    }
+
+    /**
+     * Case `gets-below-clears-left-behind‡` with no move check and no project php, where `config.platform.php` 8.4.5
+     * sets the PHP that Composer would solve at for target 8.4. The installed `~8.4.6` and the 8.x
+     * branch's `>=8.4.6` exclude 8.4.5 and admit 8.4.99: S11, `installed_php`, S8 and the explain
+     * rows test the target at 8.4.5. Without the pin, they test it at 8.4.99.
+     *
+     * @return iterable<string, array{?string, bool, bool, ?string, string, ?bool, ?string}> the pin, S11
+     *         `excludes_target`, `installed_php.target_runs`, S8 `floor_source` and `reachable_branch`, the 8.x
+     *         row's `admits_target_php` and `php_blocked_by`
+     */
+    public static function pinnedTargetPatches(): iterable
+    {
+        yield 'pin inside the target minor' => ['8.4.5', true, false, 'target', '7.x', false, 'target'];
+        yield 'no pin' => [null, false, true, null, '8.x', true, null];
+    }
+
+    /** @dataProvider pinnedTargetPatches */
+    #[DataProvider('pinnedTargetPatches')]
+    public function testAPinInsideTheTargetMinorSetsTheTargetPointOfS11S8AndExplain(?string $pin, bool $excludesTarget, bool $targetRuns, ?string $floorSource, string $reachableBranch, ?bool $rowAdmitsTarget, ?string $rowBlockedBy): void
+    {
+        $case = CaseHydrator::case('gets-below-clears-left-behind‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        unset($inputs['checks'], $inputs['move_check']);
+        $inputs['root'] = ['name' => 'wallabag/wallabag', 'require' => ['symfony/google-mailer' => '*']];
+        $inputs['run'] = ['project_php' => null] + JsonPath::arrayAt($inputs, ['run']);
+        $lock = JsonPath::arrayAt($inputs, ['lock']);
+        $lock[0] = ['php' => '~8.4.6'] + JsonPath::arrayAt($lock, [0]);
+        $inputs['lock'] = $lock;
+        $inputs['releases'] = array_map(static function ($release): array {
+            self::assertIsArray($release);
+            $php = ['v4.4.41' => '~8.4.6', 'v8.1.0' => '>=8.4.6'][JsonPath::stringAt($release, ['version'])] ?? null;
+
+            return $php === null ? $release : ['php' => $php] + $release;
+        }, JsonPath::arrayAt($inputs, ['releases']));
+        if ($pin !== null) {
+            $inputs['config_platform_php'] = $pin;
+        }
+        $case['inputs'] = $inputs;
+
+        $analysis = CaseHydrator::analysisOf($case);
+        $finding = $analysis->finding('symfony/google-mailer');
+        $facts = $analysis->facts('symfony/google-mailer');
+        self::assertNotNull($finding);
+        self::assertNotNull($facts);
+        $document = JsonPath::decoded($finding->toArray());
+        $capped = JsonPath::decoded($finding->signalData(CappedData::class));
+        $leftBehind = JsonPath::decoded($finding->signalData(LeftBehindData::class));
+        $explanation = JsonPath::decoded((new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report()))->toArray());
+        $rows = array_values(array_filter(JsonPath::arrayAt($explanation, ['metadata', 'branches']), static fn ($row): bool => \is_array($row) && ($row['branch'] ?? null) === '8.x'));
+
+        self::assertSame([$excludesTarget, $targetRuns], [$capped['excludes_target'] ?? null, JsonPath::arrayAt($document, ['installed_php'])['target_runs'] ?? null]);
+        self::assertSame([$floorSource, $reachableBranch, ['project' => null, 'target' => true]], [$leftBehind['floor_source'] ?? null, $leftBehind['reachable_branch'] ?? null, $leftBehind['reachable_admits'] ?? null]);
+        self::assertSame([$rowAdmitsTarget, $rowBlockedBy], [JsonPath::arrayAt($rows, [0])['admits_target_php'] ?? null, JsonPath::arrayAt($rows, [0])['php_blocked_by'] ?? null]);
     }
 
     /** @return iterable<string, array{list<string>, bool, string}> the lock's php of each package, whether Composer refuses the lock itself, and the step */
