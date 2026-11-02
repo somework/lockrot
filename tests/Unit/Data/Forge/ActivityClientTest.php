@@ -189,6 +189,17 @@ final class ActivityClientTest extends TestCase
         self::assertSame('2026-09-13T01:00:00+00:00', self::atom($client->fetch([self::gitlab()])->activity()['gitlab.com/group/sub/project']->cachedAt()));
     }
 
+    public function testACachedNotFoundKeepsItsFetchTimeAndALiveOneHasNone(): void
+    {
+        $gone = (new HttpResult(self::GH_URL, 404, '', new \DateTimeImmutable('2026-09-13T02:00:00+00:00')))->asCached();
+        $cached = (new ActivityClient($this->http([self::GH_URL => $gone], new \ArrayObject()), ForgeAuth::anonymous()))->fetch([self::github()]);
+        $live = (new ActivityClient($this->http([self::GH_URL => [404, '']], new \ArrayObject()), ForgeAuth::anonymous()))->fetch([self::github()]);
+
+        self::assertSame(['github.com/Grandt/PHPZip'], $cached->notFound());
+        self::assertSame('2026-09-13T02:00:00+00:00', self::atom($cached->notFoundCachedAt('github.com/Grandt/PHPZip')));
+        self::assertNull($live->notFoundCachedAt('github.com/Grandt/PHPZip'));
+    }
+
     private static function atom(?\DateTimeImmutable $date): ?string
     {
         return $date === null ? null : $date->format(\DATE_ATOM);

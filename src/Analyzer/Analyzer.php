@@ -281,7 +281,7 @@ final class Analyzer
             $graded[$finding->package()] = GradedPackage::of($finding);
         }
         $findings = array_map(static fn (Finding $finding): Finding => $finding->withHolders($graded), $findings);
-        $report = (new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($activity), $includeDev, $advisories->coverage()))
+        $report = (new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($lookups), $includeDev, $advisories->coverage()))
             ->withPhpWindow($window === null ? null : $window->withTargetFix($checks === null ? null : $checks->checker()))
             ->withSolvePhp($solvePhp);
         if ($checks !== null) {
@@ -296,17 +296,17 @@ final class Analyzer
     }
 
     /**
-     * Fetch time of the oldest activity answer from lockrot's cache, null when every answer was
-     * fetched in this run.
+     * Fetch time of the oldest activity answer from lockrot's cache, a 404 included, null when
+     * every answer was fetched in this run.
      *
-     * @param array<string, RepositoryActivity> $activity
+     * @param array<string, ActivityLookup> $lookups
      */
-    private static function oldestCachedActivity(array $activity): ?\DateTimeImmutable
+    private static function oldestCachedActivity(array $lookups): ?\DateTimeImmutable
     {
         $cachedAt = [];
-        foreach ($activity as $record) {
-            if ($record->cachedAt() !== null) {
-                $cachedAt[] = $record->cachedAt();
+        foreach ($lookups as $lookup) {
+            if ($lookup->cachedAt() !== null) {
+                $cachedAt[] = $lookup->cachedAt();
             }
         }
 
@@ -442,7 +442,7 @@ final class Analyzer
             if ($read !== null) {
                 $lookups[$name] = ActivityLookup::read($read);
             } elseif (\in_array($repo->key(), $batch->notFoundOn($repo->forge()), true)) {
-                $lookups[$name] = ActivityLookup::notFound($repo);
+                $lookups[$name] = ActivityLookup::notFound($repo, $batch->notFoundCachedAt($repo->key()));
             } else {
                 $lookups[$name] = ActivityLookup::notRead($this->networkCause((string) $name, $repo, $batch, $plan), LocatedRepository::located($repo));
             }
