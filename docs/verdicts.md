@@ -418,6 +418,11 @@ request on it.
 
 - S2 and S8 carry the parent as `dated_by`, and `--explain` marks the branch rows it supplied.
 
+- S8 still reads a higher branch whose highest tag has no trusted date, because a release is never
+  older than its commit. The branch's date is then a lower bound: the summary says "on or after"
+  the date, `newest_release_at_least` or `reachable_release_at_least` is true, and
+  `newest_years` or `reachable_years` is an upper bound.
+
 ## Security advisories
 
 `composer audit` reports the vulnerability. lockrot adds the advisory to the package's score, says

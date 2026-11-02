@@ -158,7 +158,7 @@ final class FlagSentence
     private static function s8(LeftBehindData $d): string
     {
         $out = 'branch '.$d->branch().' last released '.self::ago($d->branchLastRelease(), $d->years(), $d->datedBy());
-        $newest = \sprintf('%s released %s (%s)', $d->newestBranch(), $d->newestVersion(), substr($d->newestRelease(), 0, 10));
+        $newest = LeftBehindData::releasedWords($d->newestBranch(), $d->newestVersion(), substr($d->newestRelease(), 0, 10), $d->isNewestAtLeast());
         if ($d->newestWithinReach()) {
             return $out.'; '.$newest;
         }
@@ -168,7 +168,7 @@ final class FlagSentence
         $out .= \sprintf('; %s, needs php %s%s', $newest, (string) $d->newestPhp(), $words);
         $reachable = $d->reachable();
         if ($reachable !== null) {
-            return $out.\sprintf('; %s released %s (%s)', $reachable->branch(), $reachable->version(), substr($reachable->release(), 0, 10));
+            return $out.'; '.LeftBehindData::releasedWords($reachable->branch(), $reachable->version(), substr($reachable->release(), 0, 10), $reachable->isAtLeast());
         }
 
         return $out.'; no releasing branch within reach';

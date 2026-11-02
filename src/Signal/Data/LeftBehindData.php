@@ -28,11 +28,13 @@ final class LeftBehindData implements SignalData
     private ?string $floorPhp;
     private ?string $floorSource;
     private ?ReachableBranch $reachable;
+    private bool $newestAtLeast;
 
     /**
      * Each date is an ISO 8601 date and time, and each age is in years on the run clock.
      *
-     * @param ?string $floorSource `project` or `target`: the floor that the newest branch's php is above, null when it is within reach
+     * @param ?string $floorSource   `project` or `target`: the floor that the newest branch's php is above, null when it is within reach
+     * @param bool    $newestAtLeast the newest branch's highest tag has no trusted date: $newestRelease is a lower bound, $newestYears an upper one
      */
     public function __construct(
         string $branch,
@@ -48,7 +50,8 @@ final class LeftBehindData implements SignalData
         bool $newestWithinReach,
         ?string $floorPhp,
         ?string $floorSource,
-        ?ReachableBranch $reachable
+        ?ReachableBranch $reachable,
+        bool $newestAtLeast = false
     ) {
         $this->branch = $branch;
         $this->branchLastRelease = $branchLastRelease;
@@ -64,6 +67,7 @@ final class LeftBehindData implements SignalData
         $this->floorPhp = $floorPhp;
         $this->floorSource = $floorSource;
         $this->reachable = $reachable;
+        $this->newestAtLeast = $newestAtLeast;
     }
 
     public function signalId(): string
@@ -142,7 +146,23 @@ final class LeftBehindData implements SignalData
         return $this->reachable;
     }
 
-    /** @return array{branch: string, branch_last_release: string, branch_last_version: ?string, years: ?float, newest_branch: string, newest_version: string, newest_release: string, newest_php: ?string, newest_within_reach: bool, floor_php: ?string, floor_source: ?string, reachable_branch: ?string, reachable_version: ?string, reachable_release: ?string, suggested_constraint: ?string, dated_by: ?string, reachable_php: ?string, reachable_admits: array{project: ?bool, target: ?bool}|null, newest_years: float, reachable_years: ?float} */
+    /**
+     * S8's words for a branch's release. A lower bound says so, because a commit that the tags
+     * share dates it.
+     *
+     * @param string $date `Y-m-d`
+     */
+    public static function releasedWords(string $branch, string $version, string $date, bool $atLeast): string
+    {
+        return \sprintf('%s released %s (%s)', $branch, $version, $atLeast ? 'on or after '.$date.', the date of a commit its tags share' : $date);
+    }
+
+    public function isNewestAtLeast(): bool
+    {
+        return $this->newestAtLeast;
+    }
+
+    /** @return array{branch: string, branch_last_release: string, branch_last_version: ?string, years: ?float, newest_branch: string, newest_version: string, newest_release: string, newest_php: ?string, newest_within_reach: bool, floor_php: ?string, floor_source: ?string, reachable_branch: ?string, reachable_version: ?string, reachable_release: ?string, suggested_constraint: ?string, dated_by: ?string, reachable_php: ?string, reachable_admits: array{project: ?bool, target: ?bool}|null, newest_years: float, reachable_years: ?float, newest_release_at_least: bool, reachable_release_at_least: ?bool} */
     public function jsonSerialize(): array
     {
         $reachable = $this->reachable;
@@ -168,6 +188,8 @@ final class LeftBehindData implements SignalData
             'reachable_admits' => $reachable === null ? null : $reachable->admits(),
             'newest_years' => $this->newestYears,
             'reachable_years' => $reachable === null ? null : $reachable->years(),
+            'newest_release_at_least' => $this->newestAtLeast,
+            'reachable_release_at_least' => $reachable === null ? null : $reachable->isAtLeast(),
         ];
     }
 }
