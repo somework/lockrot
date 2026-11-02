@@ -34,7 +34,7 @@ final class LeftBehindData implements SignalData
      * Each date is an ISO 8601 date and time, and each age is in years on the run clock.
      *
      * @param ?string $floorSource   `project` or `target`: the floor that the newest branch's php is above, null when it is within reach
-     * @param bool    $newestAtLeast the newest branch's highest tag has no trusted date: $newestRelease is a lower bound, $newestYears an upper one
+     * @param bool    $newestAtLeast $newestVersion is the branch's highest tag, dated only by a commit its tags share: $newestRelease is a lower bound, $newestYears an upper one
      */
     public function __construct(
         string $branch,

@@ -418,10 +418,10 @@ request on it.
 
 - S2 and S8 carry the parent as `dated_by`, and `--explain` marks the branch rows it supplied.
 
-- S8 still reads a higher branch whose highest tag has no trusted date, because a release is never
-  older than its commit. The branch's date is then a lower bound: the summary says "on or after"
-  the date, `newest_release_at_least` or `reachable_release_at_least` is true, and
-  `newest_years` or `reachable_years` is an upper bound.
+- S8 can quote a branch's highest tag that only a commit shared with other tags dates. A release is
+  never older than its commit, so that date is a lower bound. The summary then says "on or after"
+  the date. `newest_release_at_least` or `reachable_release_at_least` is true. `newest_years` or
+  `reachable_years` is an upper bound.
 
 ## Security advisories
 
@@ -1222,7 +1222,7 @@ formats print only under `--all`, keeps its verdict and adds the same `checks mi
 | `repository_activity` | `host_not_supported` | The repository is on a host that lockrot cannot ask ([host note](notes.md#repository_activity_host_not_supported)) | S3, S4 |
 | `repository_activity` | `not_from_composer_repository` | The package comes from vcs, or from an origin that lockrot cannot tell: lockrot asks no host for it | S3, S4 |
 | `release_metadata` | `not_from_composer_repository` | The same origins: no Composer repository serves its releases | S2, S8. S11 too when S11 fires: a [capped](#capped) package then has `admits_newest` unread |
-| `release_dates` | `undated_releases` | A release that S2, S5 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it. The summary gives one clause per cause: the lock entry has no date, the installed tag shares a commit with other tags, a tag has no date, or a commit that the tags share dates them | S2 when the highest tag is undated. S5 when the installed release is undated, its lock date is before the GA of the target's major or absent, and the other two [S5 conditions](#old-promise) hold. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
+| `release_dates` | `undated_releases` | A release that S2, S5 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it. The summary gives one clause per cause. A cause is an undated lock entry, an installed tag on a shared commit, an undated tag, or tags dated by a shared commit | S2 when the highest tag is undated. S5 when the installed release is undated, its lock date is before the GA of the target's major or absent, and the other two [S5 conditions](#old-promise) hold. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
 | `advisories` | `offline`, `install_time_budget`, `lookup_failed`, `no_feed` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
 | `releases` | `releases_unknown` | A counted advisory's fix is unknown because the package's release data did not come | S9 |
 
@@ -1250,7 +1250,7 @@ The skips of `checks_skipped[]`:
 | `repository_archived` | `no_token`, `fetch_failed` | The host answered, without the archived flag: anonymous GitLab, or a failed GitLab project request. S3 cannot fire |
 | `release_metadata` | `unavailable`, `not_found` | The metadata did not come. The package reads `unknown` when nothing else counts, and [`--strict-network`](ci.md#exit-codes) fails on the fetch |
 | `release_branch` | `branch_snapshot` | A branch snapshot has no release branch for S8 |
-| `release_dates` | `undated_releases` | The S1 and allowlist filter below dropped the S10 `release_dates` entry. The skip keeps that entry's `blocks` |
+| `release_dates` | `undated_releases` | The [S1 and allowlist filter](#what-was-not-checked) dropped the S10 `release_dates` entry. The skip keeps that entry's `blocks` |
 | `advisories` | `not_from_composer_repository` | `advisory-lookup: composer-repositories`, and the package is not from a Composer repository |
 | `advisories` | `unparseable_version` | Composer cannot parse the installed version |
 | any | `accepted_by_config` | An [`accept-unchecked`](configuration.md#accept-unchecked) entry accepted the S10 entry. `unchecked_accepted[]` holds it |

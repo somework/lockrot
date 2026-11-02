@@ -525,10 +525,13 @@ final class AnalyzerTest extends TestCase
     public function testS10IsLeftOffAnAllowlistedPackageAndAnAbandonedOne(): void
     {
         $undated = static fn (string $name, bool $abandoned): PackageMetadata => new PackageMetadata($name, $abandoned, null, true, null, '1.0.0', 1, null, 'library', new \DateTimeImmutable(F::NOW));
-        $metadata = ['vendor/allowlisted' => $undated('vendor/allowlisted', false), 'vendor/abandoned' => $undated('vendor/abandoned', true), 'vendor/plain' => $undated('vendor/plain', false)];
-        $allowlist = new Allowlist([new AllowlistEntry('vendor/allowlisted', null, 'complete', null, 'builtin')]);
+        $metadata = ['vendor/allowlisted' => $undated('vendor/allowlisted', false), 'vendor/abandoned' => $undated('vendor/abandoned', true), 'vendor/ignored' => $undated('vendor/ignored', true), 'vendor/plain' => $undated('vendor/plain', false)];
+        $allowlist = new Allowlist([
+            new AllowlistEntry('vendor/allowlisted', null, 'complete', null, 'builtin'),
+            new AllowlistEntry('vendor/ignored', null, 'replaced next sprint', null, AllowlistEntry::BY_PROJECT, ['abandoned']),
+        ]);
 
-        $byName = self::byName($this->analyzeLock([self::locked('vendor/allowlisted'), self::locked('vendor/abandoned'), self::locked('vendor/plain')], $this->loader($metadata), $this->http([]), true, $allowlist));
+        $byName = self::byName($this->analyzeLock([self::locked('vendor/allowlisted'), self::locked('vendor/abandoned'), self::locked('vendor/ignored'), self::locked('vendor/plain')], $this->loader($metadata), $this->http([]), true, $allowlist));
         $ids = static fn (string $name): array => array_map(static fn ($s) => $s->id(), $byName[$name]->signals());
 
         self::assertSame(['S10'], $ids('vendor/plain'), 'the control: undated releases raise S10');
@@ -542,15 +545,19 @@ final class AnalyzerTest extends TestCase
     public function testADroppedReleaseDatesGapIsASkip(): void
     {
         $undated = static fn (string $name, bool $abandoned): PackageMetadata => new PackageMetadata($name, $abandoned, null, true, null, '1.0.0', 1, null, 'library', new \DateTimeImmutable(F::NOW));
-        $metadata = ['vendor/allowlisted' => $undated('vendor/allowlisted', false), 'vendor/abandoned' => $undated('vendor/abandoned', true), 'vendor/plain' => $undated('vendor/plain', false)];
-        $allowlist = new Allowlist([new AllowlistEntry('vendor/allowlisted', null, 'complete', null, 'builtin')]);
+        $metadata = ['vendor/allowlisted' => $undated('vendor/allowlisted', false), 'vendor/abandoned' => $undated('vendor/abandoned', true), 'vendor/ignored' => $undated('vendor/ignored', true), 'vendor/plain' => $undated('vendor/plain', false)];
+        $allowlist = new Allowlist([
+            new AllowlistEntry('vendor/allowlisted', null, 'complete', null, 'builtin'),
+            new AllowlistEntry('vendor/ignored', null, 'replaced next sprint', null, AllowlistEntry::BY_PROJECT, ['abandoned']),
+        ]);
 
-        $byName = self::byName($this->analyzeLock([self::locked('vendor/allowlisted'), self::locked('vendor/abandoned'), self::locked('vendor/plain')], $this->loader($metadata), $this->http([]), true, $allowlist));
+        $byName = self::byName($this->analyzeLock([self::locked('vendor/allowlisted'), self::locked('vendor/abandoned'), self::locked('vendor/ignored'), self::locked('vendor/plain')], $this->loader($metadata), $this->http([]), true, $allowlist));
         $dateSkips = static fn (string $name): array => array_values(array_filter(JsonPath::decoded($byName[$name]->details()->skipped()), static fn ($skip): bool => \is_array($skip) && $skip['check'] === 'release_dates'));
 
         $skip = ['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => ['S2']];
         self::assertSame([$skip], $dateSkips('vendor/allowlisted'));
         self::assertSame([$skip], $dateSkips('vendor/abandoned'));
+        self::assertSame([$skip], $dateSkips('vendor/ignored'), 'the filter reads the raised S1, also when an entry ignores abandoned');
         self::assertSame([], $dateSkips('vendor/plain'), 'S10 holds the gap of a package that the filter keeps');
     }
 

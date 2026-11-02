@@ -26,7 +26,7 @@ final class ReachableBranch
      * @param string                               $release an ISO 8601 date and time
      * @param float                                $years   the age of the release in years on the run clock
      * @param array{project: ?bool, target: ?bool} $admits  whether each floor admits the branch's php, null for a floor lockrot could not compare
-     * @param bool                                 $atLeast the branch's highest tag has no trusted date: $release is a lower bound, $years an upper one
+     * @param bool                                 $atLeast $version is the branch's highest tag, dated only by a commit its tags share: $release is a lower bound, $years an upper one
      */
     public function __construct(string $branch, string $version, string $release, float $years, ?string $php, array $admits, ?string $suggestedConstraint, bool $atLeast = false)
     {

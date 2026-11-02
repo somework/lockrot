@@ -292,9 +292,11 @@ final class NotCheckedRule implements SignalRule
             return 'security advisories not checked ('.(self::ADVISORY_CAUSES[$entry->reason()] ?? $entry->reason()).'), so S9 could not be read';
         }
         if ($entry->check() === 'release_dates') {
-            $causes = $entry->causes() === [] ? [self::CAUSE_SHARED_COMMIT => $entry->blocks()] : $entry->causes();
+            if ($entry->causes() === []) {
+                throw new \LogicException('S10 has no cause for the release_dates entry.');
+            }
 
-            return implode('; ', array_map(static fn (string $cause, array $blocks): string => self::DATE_CAUSES[$cause].', so '.ListWords::of($blocks).(\in_array($cause, [self::CAUSE_LOCK_UNDATED, self::CAUSE_INSTALLED_SHARED_COMMIT], true) ? ' could not judge it' : ' could not measure it'), array_keys($causes), $causes));
+            return implode('; ', array_map(static fn (string $cause, array $blocks): string => self::DATE_CAUSES[$cause].', so '.ListWords::of($blocks).(\in_array($cause, [self::CAUSE_LOCK_UNDATED, self::CAUSE_INSTALLED_SHARED_COMMIT], true) ? ' could not judge it' : ' could not measure it'), array_keys($entry->causes()), $entry->causes()));
         }
 
         throw new \LogicException('S10 has no words for the check '.$entry->check().'.');
