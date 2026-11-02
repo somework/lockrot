@@ -96,6 +96,25 @@ final class MoveCheckWallabagTest extends TestCase
         self::assertSame(['resolves', ['ext-*', 'lib-*', 'php-debug', 'php-ipv6', 'php-zts']], [JsonPath::stringAt($report, ['run', 'move_check', 'baseline']), JsonPath::arrayAt($report, ['run', 'move_check'])['ignored_platform']]);
     }
 
+    /**
+     * Ruling R8-37 on a lock with graded moves: a `config.platform.php` that Composer refuses
+     * leaves every move unchecked, so no move reads resolves and no `update now` command prints.
+     */
+    public function testAConfigPlatformPhpThatComposerRefusesLeavesNoCommandThatComposerResolves(): void
+    {
+        $report = JsonPath::decoded(WallabagSite::analyze('7.4', ['php' => '^8.2'])->toArray());
+
+        $checks = [];
+        foreach (JsonPath::arrayAt($report, ['findings']) as $finding) {
+            if (\is_array($finding) && \is_array($finding['next_step'] ?? null) && \is_array($finding['next_step']['check'] ?? null)) {
+                $checks[] = $finding['next_step']['check'];
+            }
+        }
+        self::assertNotSame([], $checks);
+        self::assertSame([['result' => MoveCheck::NOT_CHECKED, 'form' => null, 'reason' => MoveCheck::PLATFORM_CONFIG_INVALID, 'installs' => null]], array_values(array_unique($checks, \SORT_REGULAR)));
+        self::assertNull(JsonPath::arrayAt($report, ['security'])['update_now_command']);
+    }
+
     /** The relations of the move check hold on every move of the lock. */
     public function testNoMovePrintsAStepThatItsCheckRefuses(): void
     {
