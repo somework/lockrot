@@ -136,6 +136,7 @@ final class ClockTest extends TestCase
         yield 'a day-first date' => ['14.09.2026'];
         yield 'a day that the month does not have' => ['2026-02-30'];
         yield 'a leap day in a common year' => ['2027-02-29'];
+        yield 'a time that PHP cannot read' => ['2026-09-14Tnoon'];
     }
 
     /**

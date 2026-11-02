@@ -128,6 +128,29 @@ final class BaselineSchemaTest extends TestCase
         self::fail('an empty '.$key.' map was read');
     }
 
+    public function testAnEntryThatIsNoObjectIsRefused(): void
+    {
+        $document = [
+            '$schema' => 'https://lockrot.dev/schema/baseline-2.json',
+            'lockrot' => ['version' => '0.14.0', 'schema' => 2],
+            'generated_at' => '2026-06-01T00:00:00+00:00',
+            'target_php' => '8.4',
+            'target_php_source' => 'option',
+            'score_model_id' => 1,
+            'fix_model' => 1,
+            'findings' => ['twilio/sdk' => '1.0.0'],
+        ];
+
+        try {
+            BaselineSchema::validate($document);
+        } catch (ConfigException $e) {
+            self::assertStringContainsString('findings.twilio/sdk:', $e->getMessage()."\n".implode("\n", $e->details()));
+
+            return;
+        }
+        self::fail('a string entry was read');
+    }
+
     /** @return array<string, mixed> */
     private static function read(string $path): array
     {

@@ -61,19 +61,18 @@ final class BaselineSchema
             $baseline['findings'] = new \stdClass();
         } elseif (\is_array($findings)) {
             foreach ($findings as $package => $entry) {
-                if (!\is_array($entry)) {
-                    continue;
+                if (\is_array($entry)) {
+                    if (($entry['flags'] ?? null) === []) {
+                        $entry['flags'] = new \stdClass();
+                    }
+                    $advisories = $entry['advisories'] ?? null;
+                    if ($advisories === []) {
+                        $entry['advisories'] = new \stdClass();
+                    } elseif (\is_array($advisories) && JsonReader::isList($advisories)) {
+                        $entry['advisories'] = SchemaPayload::of($advisories, 'baseline file');
+                    }
+                    $findings[$package] = $entry;
                 }
-                if (($entry['flags'] ?? null) === []) {
-                    $entry['flags'] = new \stdClass();
-                }
-                $advisories = $entry['advisories'] ?? null;
-                if ($advisories === []) {
-                    $entry['advisories'] = new \stdClass();
-                } elseif (\is_array($advisories) && JsonReader::isList($advisories)) {
-                    $entry['advisories'] = SchemaPayload::of($advisories, 'baseline file');
-                }
-                $findings[$package] = $entry;
             }
             $baseline['findings'] = $findings;
         }
