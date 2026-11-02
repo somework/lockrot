@@ -152,6 +152,24 @@ final class DependencyGraphTest extends TestCase
         }
     }
 
+    public function testRootsReachingAreTheSortedRootsOfAPerRootWalkOnSeededGraphs(): void
+    {
+        foreach (self::seededGraphs() as $seed => [$packages, $require, $requireDev]) {
+            foreach ([false, true] as $dev) {
+                [$graph, $edges, $roots] = self::built($packages, $require, $requireDev, $dev);
+                foreach (array_merge(array_keys($packages), ['vendor/not-in-lock']) as $target) {
+                    self::assertSame(array_keys(self::perRootChains($edges, $roots, $target)), $graph->rootsReaching($target), "seed $seed, dev ".var_export($dev, true).", $target");
+                }
+            }
+        }
+    }
+
+    public function testRootsReachingTransitiveNamesEveryRootThatReachesIt(): void
+    {
+        self::assertSame(array_keys($this->graph(true)->chainsTo('vendor/transitive')), $this->graph(true)->rootsReaching('vendor/transitive'));
+        self::assertSame([], $this->graph(false)->rootsReaching('vendor/snapshot'));
+    }
+
     /**
      * Random plain-require graphs of lower-case names, with no replace or provide, so that the test
      * owns the edges and roots. Each graph has cycles, a self-require, a root and a requirement that
