@@ -425,6 +425,17 @@ final class NotCheckedRuleTest extends TestCase
         self::assertSame([$s2, $s8], NotCheckedRule::keeping([$s2, $s10, $s8], [], null, null), 'S10 goes with no entry left');
     }
 
+    public function testAReleaseDatesEntryWithoutItsCausesIsRefused(): void
+    {
+        $dates = new Check('release_dates', 'undated_releases', [Signal::S2]);
+        $s10 = new Signal(Signal::LEVEL_INFO, 'not checked', new NotCheckedData([$dates]));
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('S10 has no cause for the release_dates entry.');
+
+        NotCheckedRule::keeping([$s10], [$dates], null, null);
+    }
+
     public function testKeepingRefusesAnEntryOfACheckThatS10HasNoWordsFor(): void
     {
         $releases = new Check('releases', 'releases_unknown', [Signal::S9]);
@@ -627,6 +638,7 @@ final class NotCheckedRuleTest extends TestCase
         self::assertNotNull($signal);
         self::assertSame([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S8], NotCheckedRule::CAUSE_TAG_UNDATED => [Signal::S8]], self::releaseDatesCauses($signal), 'the highest branch first, whatever order the repository lists');
         self::assertSame([Signal::S8], JsonPath::arrayAt(JsonPath::decoded($signal->data()), ['unchecked', 0, 'blocks']));
+        self::assertSame('the age of the package was not read (its newest releases are dated by a commit their tags share), so S8 could not measure it; the age of the package was not read (its newest releases carry no date), so S8 could not measure it', $signal->summary());
     }
 
     public function testTheCausesOfS8FollowTheBranchesHighestFirst(): void
@@ -665,10 +677,9 @@ final class NotCheckedRuleTest extends TestCase
     {
         $dates = new Check('release_dates', 'undated_releases', [Signal::S2, Signal::S8], [NotCheckedRule::CAUSE_TAG_UNDATED => [Signal::S2, Signal::S8]]);
         $activity = new Check('repository_activity', 'offline', [Signal::S3, Signal::S4]);
-        $s10 = static fn (Check ...$checks): Signal => new Signal(Signal::LEVEL_INFO, 'not checked', new NotCheckedData($checks));
 
-        self::assertEquals(new Check('release_dates', 'undated_releases', [Signal::S2, Signal::S8]), NotCheckedRule::releaseDatesSkip([$s10($activity, $dates)]));
-        self::assertNull(NotCheckedRule::releaseDatesSkip([$s10($activity)]));
+        self::assertEquals(new Check('release_dates', 'undated_releases', [Signal::S2, Signal::S8]), NotCheckedRule::releaseDatesSkip([new Signal(Signal::LEVEL_INFO, 'not checked', new NotCheckedData([$activity, $dates]))]));
+        self::assertNull(NotCheckedRule::releaseDatesSkip([new Signal(Signal::LEVEL_INFO, 'not checked', new NotCheckedData([$activity]))]));
         self::assertNull(NotCheckedRule::releaseDatesSkip([]));
     }
 

@@ -538,6 +538,20 @@ final class LeftBehindRuleTest extends TestCase
         self::assertTrue($data['reachable_release_at_least']);
     }
 
+    /** The quoted release is a lower tag with a date of its own: that date is exact, whatever the undated highest tag. */
+    public function testALowerDatedTagOfABranchWithAnUndatedHighestTagIsQuotedExactly(): void
+    {
+        $date = new \DateTimeImmutable('2026-01-10T00:00:00+00:00');
+        $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), self::branches([
+            '2' => ['version' => '2.0.0', 'at' => $date, 'highest' => ['normalized' => '2.1.0.0', 'pretty' => '2.1.0', 'at' => null, 'php' => null], 'php' => null],
+            '1' => self::row('1.9.2', '2019-03-02', '2019-03-02', null),
+        ])));
+
+        self::assertNotNull($signal);
+        self::assertStringEndsWith('; 2.x released 2.0.0 (2026-01-10)', $signal->summary());
+        self::assertFalse(JsonPath::decoded($signal->data())['newest_release_at_least']);
+    }
+
     public function testAHigherBranchWithATrustedDateIsQuotedExactly(): void
     {
         $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), F::metadata([['2.0.0', '2026-01-10'], ['1.9.2', '2019-03-02']])));
