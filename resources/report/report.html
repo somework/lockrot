@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ano69/n8Bnz/SlxrFyVYNAfDtIDX/RcVxWRglVIOsg4='; style-src 'sha256-qzmCGVXOo4uw+ipwPqbGIcVK0901Vk1hzXQBNlYdNlY='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ukmDnVz0YqsI05eOVv2hKt876pTI6FHIos3zs2Pb2k8='; style-src 'sha256-Um98l8mqWjAtgwLVCYOrDsy55YHcx4vOeeQhq1JF3pg='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -3413,6 +3413,7 @@ button.pill {
   border: 0;
   padding: 0;
   margin: 0;
+  min-block-size: 24px;
   cursor: pointer;
   font: inherit;
   letter-spacing: inherit;
@@ -8291,116 +8292,42 @@ a.ov-ex-row:hover {
 		return "function" == typeof t ? t(n) : t;
 	}
 	//#endregion
-	//#region src/domain/advisoryRows.ts
-	function advisoryRows(finding) {
-		return (finding.signals.find(({ id }) => id === "S9")?.data)?.advisories ?? [];
-	}
-	//#endregion
-	//#region src/domain/format.ts
-	function day(iso) {
-		return iso ? iso.slice(0, 10) : "—";
-	}
-	function pluralNoun(n, one, many) {
-		return n === 1 ? one : many;
-	}
-	function plural(n, one, many) {
-		return `${n} ${pluralNoun(n, one, many)}`;
-	}
-	function fixed(value, digits) {
-		return typeof value === "number" && Number.isFinite(value) ? decimal(value, digits) : null;
-	}
-	function exactParts(value) {
-		const view = new DataView(new ArrayBuffer(8));
-		view.setFloat64(0, Math.abs(value));
-		const bits = view.getBigUint64(0);
-		const biased = Number(bits >> 52n);
-		const fraction = bits & (1n << 52n) - 1n;
-		return biased === 0 ? {
-			mantissa: fraction,
-			exponent: -1074
-		} : {
-			mantissa: fraction | 1n << 52n,
-			exponent: biased - 1075
-		};
-	}
-	function decimal(value, digits) {
-		const { mantissa, exponent } = exactParts(value);
-		const scaled = mantissa * 10n ** BigInt(digits);
-		let units;
-		if (exponent >= 0) units = scaled << BigInt(exponent);
-		else {
-			const divisor = 1n << BigInt(-exponent);
-			const twiceRest = 2n * (scaled % divisor);
-			units = scaled / divisor;
-			if (twiceRest > divisor || twiceRest === divisor && units % 2n === 1n) units += 1n;
-		}
-		const text = units.toString().padStart(digits + 1, "0");
-		const whole = digits === 0 ? text : `${text.slice(0, -digits)}.${text.slice(-digits)}`;
-		return value < 0 ? `-${whole}` : whole;
-	}
-	function countPhrase(n, of, noun1, nounN) {
-		return `${n} of ${of} ${of === 1 ? noun1 : nounN}`;
-	}
-	//#endregion
-	//#region src/domain/gate.ts
-	function gateFlag(cause, failOn) {
-		if (cause === "fail_on") return {
-			text: `--fail-on=${failOn}`,
-			known: true
-		};
-		if (cause === "strict_network") return {
-			text: "--strict-network",
-			known: true
-		};
-		return {
-			text: cause,
-			known: false
-		};
-	}
-	function gateHeadline({ gate, run }) {
-		if (!gate.fails && run.fail_on === "none") return null;
-		const who = run.mode === "generate_baseline" ? "baseline run" : "this run";
-		if (gate.fails) {
-			const causes = [...new Set(gate.tripped_by)];
-			return {
-				who,
-				verb: "fails",
-				flags: causes.map((cause) => gateFlag(cause, run.fail_on)),
-				unapplied: null,
-				said: gate.failing === 0 && causes.length > 0 && causes.every((cause) => cause !== "fail_on")
-			};
-		}
-		if (gate.fail_on_applied) return {
-			who: "this run",
-			verb: "passes",
-			flags: [gateFlag("fail_on", run.fail_on)],
-			unapplied: null,
-			said: false
-		};
-		return {
-			who,
-			verb: "passes",
-			flags: [],
-			unapplied: "--fail-on",
-			said: false
-		};
-	}
-	function gateHeadlineLine({ who, verb, flags, unapplied }) {
-		const tail = [...flags.map((flag) => flag.text), ...unapplied === null ? [] : [`${unapplied} not applied`]];
-		return [`${who} ${verb}`, ...tail].join(" · ");
-	}
-	var HINT = "Pass --fail-on=<grade> in CI to make the run fail on findings graded at or above that grade.";
-	function gateFact(report) {
-		if (gateHeadline(report) !== null) return null;
-		const opening = "This run was told --fail-on=none: it fails on no finding";
-		return report.run.strict_network ? {
-			label: "gate: strict network",
-			text: `${opening}, but --strict-network fails the run when a network lookup fails. This page lists what it saw. ${HINT}`
-		} : {
-			label: "no gate",
-			text: `${opening}, and this page lists what it saw. ${HINT}`
-		};
-	}
+	//#region src/state/types.ts
+	var FILTER_GROUPS = [
+		"prio",
+		"verdict",
+		"scope",
+		"signal",
+		"sev",
+		"fix",
+		"since",
+		"gate",
+		"flag",
+		"accepted"
+	];
+	var EMPTY_FILTERS = {
+		prio: [],
+		verdict: [],
+		scope: [],
+		signal: [],
+		sev: [],
+		fix: [],
+		since: [],
+		gate: [],
+		flag: [],
+		accepted: []
+	};
+	var INITIAL_STATE = {
+		view: "overview",
+		q: "",
+		pkg: null,
+		sort: "verdict",
+		sortDesc: false,
+		filters: EMPTY_FILTERS,
+		disclosure: {},
+		example: null,
+		section: null
+	};
 	//#endregion
 	//#region src/domain/rich.ts
 	function pieceText(piece) {
@@ -8521,6 +8448,7 @@ a.ov-ex-row:hover {
 		["not_from_composer_repository", "no Composer repository serves it"],
 		["no_composer_json", "the project has no composer.json"],
 		["composer_json_invalid", "Composer cannot load composer.json"],
+		["platform_config_invalid", "Composer refuses a config.platform value"],
 		["no_release_read", "no release of the row was read"],
 		["pass_cap", "Composer refused each move before it"],
 		["solver_error", "Composer's solver failed on it"],
@@ -8531,7 +8459,7 @@ a.ov-ex-row:hover {
 		return words === void 0 ? [{ code: reason }] : [words];
 	}
 	var CAUSE_WORDS = {
-		above_listed_releases: "installed above every listed release",
+		above_listed_releases: "installed above every listed stable release",
 		accepted_by_config: "accepted by your accept-unchecked list",
 		allowlisted: "allowlisted",
 		anonymous_budget: "anonymous request budget spent",
@@ -8832,6 +8760,178 @@ a.ov-ex-row:hover {
 		if (check.result === "refused") return "Composer refuses the move";
 		if (check.result === "not_checked") return `not checked: ${plain(checkReasonRich(check.reason ?? ""))}`;
 		return null;
+	}
+	//#endregion
+	//#region src/domain/filters.ts
+	var GROUP_LABELS = {
+		prio: "Priority",
+		verdict: "Grade",
+		scope: "Scope",
+		signal: "Signal",
+		sev: "Severity",
+		fix: "Fix",
+		since: "Since baseline",
+		gate: "This run",
+		flag: "Flag",
+		accepted: "Accepted flags"
+	};
+	var SCOPE_ROWS = [
+		["direct", "Direct"],
+		["transitive", "Transitive"],
+		["prod", "require"],
+		["dev", "require-dev"],
+		["unnamed", "not in composer.json"]
+	];
+	var SINCE_ROWS = [
+		["new", "New"],
+		["worsened", "Worsened"],
+		["known", "Known"]
+	];
+	var READY_KEY = "ready";
+	var HELD_KEY = "held";
+	var WAY_OUT_KEY = "wayout";
+	var FAILS_ROW = ["fails", "Fails this run"];
+	var READY_ROW = [READY_KEY, "Ready to run"];
+	var HELD_ROW = [HELD_KEY, "Held"];
+	var WAY_OUT_ROW = [WAY_OUT_KEY, "Another way out"];
+	var GATE_ROWS = [
+		FAILS_ROW,
+		READY_ROW,
+		HELD_ROW,
+		WAY_OUT_ROW
+	];
+	var rowLabel = (rows, key) => rows.find(([id]) => id === key)?.[1] ?? key;
+	function activeLabel(group, key) {
+		switch (group) {
+			case "scope": return rowLabel(SCOPE_ROWS, key);
+			case "signal": {
+				const name = signalName(key);
+				return name === key ? key : `${key} ${name}`;
+			}
+			case "since": return rowLabel(SINCE_ROWS, key);
+			case "gate": return rowLabel(GATE_ROWS, key);
+			case "fix": return fixLabel(key);
+			default: return key;
+		}
+	}
+	function activeFilters(filters) {
+		return FILTER_GROUPS.filter((group) => group !== "accepted").flatMap((group) => filters[group].map((key) => ({
+			group,
+			key,
+			groupLabel: GROUP_LABELS[group],
+			label: activeLabel(group, key)
+		})));
+	}
+	//#endregion
+	//#region src/domain/advisoryRows.ts
+	function advisoryRows(finding) {
+		return (finding.signals.find(({ id }) => id === "S9")?.data)?.advisories ?? [];
+	}
+	//#endregion
+	//#region src/domain/format.ts
+	function day(iso) {
+		return iso ? iso.slice(0, 10) : "—";
+	}
+	function pluralNoun(n, one, many) {
+		return n === 1 ? one : many;
+	}
+	function plural(n, one, many) {
+		return `${n} ${pluralNoun(n, one, many)}`;
+	}
+	function fixed(value, digits) {
+		return typeof value === "number" && Number.isFinite(value) ? decimal(value, digits) : null;
+	}
+	function exactParts(value) {
+		const view = new DataView(new ArrayBuffer(8));
+		view.setFloat64(0, Math.abs(value));
+		const bits = view.getBigUint64(0);
+		const biased = Number(bits >> 52n);
+		const fraction = bits & (1n << 52n) - 1n;
+		return biased === 0 ? {
+			mantissa: fraction,
+			exponent: -1074
+		} : {
+			mantissa: fraction | 1n << 52n,
+			exponent: biased - 1075
+		};
+	}
+	function decimal(value, digits) {
+		const { mantissa, exponent } = exactParts(value);
+		const scaled = mantissa * 10n ** BigInt(digits);
+		let units;
+		if (exponent >= 0) units = scaled << BigInt(exponent);
+		else {
+			const divisor = 1n << BigInt(-exponent);
+			const twiceRest = 2n * (scaled % divisor);
+			units = scaled / divisor;
+			if (twiceRest > divisor || twiceRest === divisor && units % 2n === 1n) units += 1n;
+		}
+		const text = units.toString().padStart(digits + 1, "0");
+		const whole = digits === 0 ? text : `${text.slice(0, -digits)}.${text.slice(-digits)}`;
+		return value < 0 ? `-${whole}` : whole;
+	}
+	function countPhrase(n, of, noun1, nounN) {
+		return `${n} of ${of} ${of === 1 ? noun1 : nounN}`;
+	}
+	//#endregion
+	//#region src/domain/gate.ts
+	function gateFlag(cause, failOn) {
+		if (cause === "fail_on") return {
+			text: `--fail-on=${failOn}`,
+			known: true
+		};
+		if (cause === "strict_network") return {
+			text: "--strict-network",
+			known: true
+		};
+		return {
+			text: cause,
+			known: false
+		};
+	}
+	function gateHeadline({ gate, run }) {
+		if (!gate.fails && run.fail_on === "none") return null;
+		const who = run.mode === "generate_baseline" ? "baseline run" : "this run";
+		if (gate.fails) {
+			const causes = [...new Set(gate.tripped_by)];
+			return {
+				who,
+				verb: "fails",
+				flags: causes.map((cause) => gateFlag(cause, run.fail_on)),
+				unapplied: null,
+				said: gate.failing === 0 && causes.length > 0 && causes.every((cause) => cause !== "fail_on")
+			};
+		}
+		if (gate.fail_on_applied) return {
+			who: "this run",
+			verb: "passes",
+			flags: [gateFlag("fail_on", run.fail_on)],
+			unapplied: null,
+			said: false
+		};
+		return {
+			who,
+			verb: "passes",
+			flags: [],
+			unapplied: "--fail-on",
+			said: false
+		};
+	}
+	function gateHeadlineLine({ who, verb, flags, unapplied }) {
+		const tail = [...flags.map((flag) => flag.text), ...unapplied === null ? [] : [`${unapplied} not applied`]];
+		return [`${who} ${verb}`, ...tail].join(" · ");
+	}
+	var HINT = "Pass --fail-on=<grade> in CI to make the run fail on findings graded at or above that grade.";
+	function gateFact(report) {
+		if (gateHeadline(report) !== null) return null;
+		const opening = "This run was told --fail-on=none: it fails on no finding";
+		return report.run.strict_network ? {
+			label: "gate: strict network",
+			text: `${opening}, but --strict-network fails the run when a network lookup fails. This page lists what it saw. ${HINT}`
+		} : {
+			label: "no gate",
+			text: `${opening}, and this page lists what it saw. ${HINT}`
+		};
 	}
 	//#endregion
 	//#region src/domain/countedFlags.ts
@@ -9212,9 +9312,9 @@ a.ov-ex-row:hover {
 				value: setCells(window.without_dev)
 			}],
 			...window.platform_override === null ? [] : [{
-				key: "Composer checks the lock at",
-				value: `${window.platform_override} (config.platform.php)`,
-				...solvesApart ? { note: `composer install reads ${window.platform_override}, and the move check solves at the target PHP ${window.target.php}.` } : {}
+				key: "Composer's config.platform.php",
+				value: window.platform_override,
+				...solvesApart ? { note: `composer update solves at ${window.platform_override}, and the move check solves at the target PHP ${window.target.php}.` } : {}
 			}],
 			...window.host_requires.length === 0 ? [] : [{
 				key: "Host features required",
@@ -9311,7 +9411,7 @@ a.ov-ex-row:hover {
 		const s11 = capped.map((f) => signalData(f, "S11")).find((data) => data !== null) ?? null;
 		return [
 			head,
-			...window.platform_override === null ? [] : [`Composer checks it at ${window.platform_override}, the PHP that the lock records from config.platform.php, not the PHP of the machine`],
+			...window.platform_override === null ? [] : [`Composer solves at ${window.platform_override}, the PHP that config.platform.php sets in Composer's config, not the PHP of the machine`],
 			...s11 === null ? [] : [`${plural(capped.length, "package stops", "packages stop")} below ${newestPhpWords(s11)}`]
 		];
 	}
@@ -9964,7 +10064,7 @@ a.ov-ex-row:hover {
 	function platformStep(run) {
 		const override = overrideOutsideTarget(run);
 		if (override === null) return null;
-		return `First set config.platform.php to your PHP ${run.target_php} release: the lock records ${override}.${stillRefused(run)}`;
+		return `First set config.platform.php to your PHP ${run.target_php} release: Composer's config sets ${override}.${stillRefused(run)}`;
 	}
 	function commandLines(argvs) {
 		if (argvs.length === 0) return [];
@@ -10333,7 +10433,6 @@ a.ov-ex-row:hover {
 	];
 	function ageReading(f, run) {
 		const thresholds = run.thresholds;
-		if (thresholds === null) return null;
 		for (const kind of AGE_KINDS) {
 			const reading = f.age[kind];
 			if (reading === null || reading.level === null) continue;
@@ -10631,8 +10730,7 @@ a.ov-ex-row:hover {
 		if (flagged === 0 || total === 0) return [];
 		const { direct, transitive, unreached } = depth.by_reach;
 		const reached = direct + transitive;
-		const unreachedShown = unreached > 0 && (!numbered || reached > 0);
-		const reach = [...reached === 0 ? [] : [split(reached, direct, "required directly", "pulled in", numbered)], ...unreachedShown ? [`${unreached} unreached`] : []].join(", ");
+		const reach = [...reached === 0 ? [] : [split(reached, direct, "required directly", "pulled in", numbered)], ...unreached === 0 ? [] : [`${unreached} unreached`]].join(", ");
 		return [split(total, depth.production, "in production", "dev-only", numbered), ...reach === "" ? [] : [reach]];
 	}
 	function advisoryListPartial({ security }) {
@@ -11104,104 +11202,6 @@ a.ov-ex-row:hover {
 		const dev = lastBoolean(terms, "dev");
 		return dev === null || dev === f.dev;
 	}
-	//#endregion
-	//#region src/state/types.ts
-	var FILTER_GROUPS = [
-		"prio",
-		"verdict",
-		"scope",
-		"signal",
-		"sev",
-		"fix",
-		"since",
-		"gate",
-		"flag",
-		"accepted"
-	];
-	var EMPTY_FILTERS = {
-		prio: [],
-		verdict: [],
-		scope: [],
-		signal: [],
-		sev: [],
-		fix: [],
-		since: [],
-		gate: [],
-		flag: [],
-		accepted: []
-	};
-	var INITIAL_STATE = {
-		view: "overview",
-		q: "",
-		pkg: null,
-		sort: "verdict",
-		sortDesc: false,
-		filters: EMPTY_FILTERS,
-		disclosure: {},
-		example: null,
-		section: null
-	};
-	//#endregion
-	//#region src/domain/filters.ts
-	var GROUP_LABELS = {
-		prio: "Priority",
-		verdict: "Grade",
-		scope: "Scope",
-		signal: "Signal",
-		sev: "Severity",
-		fix: "Fix",
-		since: "Since baseline",
-		gate: "This run",
-		flag: "Flag",
-		accepted: "Accepted flags"
-	};
-	var SCOPE_ROWS = [
-		["direct", "Direct"],
-		["transitive", "Transitive"],
-		["prod", "require"],
-		["dev", "require-dev"],
-		["unnamed", "not in composer.json"]
-	];
-	var SINCE_ROWS = [
-		["new", "New"],
-		["worsened", "Worsened"],
-		["known", "Known"]
-	];
-	var READY_KEY = "ready";
-	var HELD_KEY = "held";
-	var WAY_OUT_KEY = "wayout";
-	var FAILS_ROW = ["fails", "Fails this run"];
-	var READY_ROW = [READY_KEY, "Ready to run"];
-	var HELD_ROW = [HELD_KEY, "Held"];
-	var WAY_OUT_ROW = [WAY_OUT_KEY, "Another way out"];
-	var GATE_ROWS = [
-		FAILS_ROW,
-		READY_ROW,
-		HELD_ROW,
-		WAY_OUT_ROW
-	];
-	var rowLabel = (rows, key) => rows.find(([id]) => id === key)?.[1] ?? key;
-	function activeLabel(group, key) {
-		switch (group) {
-			case "scope": return rowLabel(SCOPE_ROWS, key);
-			case "signal": {
-				const name = signalName(key);
-				return name === key ? key : `${key} ${name}`;
-			}
-			case "since": return rowLabel(SINCE_ROWS, key);
-			case "gate": return rowLabel(GATE_ROWS, key);
-			case "fix": return fixLabel(key);
-			default: return key;
-		}
-	}
-	function activeFilters(filters) {
-		return FILTER_GROUPS.filter((group) => group !== "accepted").flatMap((group) => filters[group].map((key) => ({
-			group,
-			key,
-			groupLabel: GROUP_LABELS[group],
-			label: activeLabel(group, key)
-		})));
-	}
 	function isHeld(f) {
 		return f.next_step?.held_by.some((hold) => hold.source !== "root" && hold.package !== f.package) ?? false;
 	}
@@ -11579,7 +11579,7 @@ a.ov-ex-row:hover {
 		const dated = lanes.flatMap((l) => l.years === null ? [] : [l.years]);
 		const span = Math.max(1, Math.ceil(Math.max(0, ...dated)));
 		const thresholds = run.thresholds;
-		const guides = thresholds === null ? [] : [{
+		const guides = [{
 			years: thresholds["release-warn-years"],
 			level: "warn"
 		}, {
@@ -11622,7 +11622,7 @@ a.ov-ex-row:hover {
 			s8.newest_years
 		];
 		if (higher === null) return [mine];
-		return [mine, `${higher === finding.next_step?.to_branch ? "The move's branch" : reached ? "The highest branch within reach" : "The newest branch"}, ${higher}, released ${version ?? ""}${years === null ? "" : ` ${ago(years)}`}.`];
+		return [mine, `${higher === finding.next_step?.to_branch ? "The move's branch" : reached ? "The newest releasing branch within reach" : "The newest branch"}, ${higher}, released ${version ?? ""}${years === null ? "" : ` ${ago(years)}`}.`];
 	}
 	var TIMELINE_WORDS = {
 		branch: "branch",
@@ -13039,7 +13039,6 @@ a.ov-ex-row:hover {
 		};
 	}
 	function thresholdRows({ thresholds }) {
-		if (thresholds === null) return [];
 		return Object.entries(thresholds).map(([key, years]) => ({
 			key,
 			value: plural(years, "year", "years")
@@ -15180,8 +15179,7 @@ a.ov-ex-row:hover {
 		const { state } = useReport();
 		const { report } = useReport2();
 		const rows = applyFilters2(report, state, "findings");
-		const thresholds = report.run.thresholds;
-		const axis = thresholds === null ? null : ageAxis(Object.entries(thresholds));
+		const axis = ageAxis(Object.entries(report.run.thresholds));
 		const printed = usePrinted();
 		const platform = platformStep(report.run);
 		const hintId = `${g()}-hint`;
@@ -15385,7 +15383,7 @@ a.ov-ex-row:hover {
 		});
 	}
 	function thresholdPairs(run) {
-		return run.thresholds === null ? [] : Object.entries(run.thresholds);
+		return Object.entries(run.thresholds);
 	}
 	function flagEntries(report) {
 		const { run } = report;
@@ -16528,10 +16526,18 @@ a.ov-ex-row:hover {
 	//#endregion
 	//#region src/domain/print.ts
 	var packages = (n) => plural(n, "package", "packages");
+	function printedRadius(report) {
+		const all = population2(report, "radius");
+		return radiusLayout2(report, all, all);
+	}
 	function printHasBody2(section, report) {
 		if (section === "summary") return report.packages_checked > 0;
 		if (section === "findings") return population2(report, "findings").length > 0;
 		if (section === "advisories") return population2(report, "advisories").length > 0;
+		if (section === "radius") {
+			const layout = printedRadius(report);
+			return layout.rows.length + layout.unlisted.length + layout.unattributed.length > 0 || radiusAnswer2(report, layout).length > 0;
+		}
 		return true;
 	}
 	function printLede2(section, report) {
@@ -16544,7 +16550,10 @@ a.ov-ex-row:hover {
 				return checked === 0 ? "No packages in this lock." : `Nothing flagged in ${packages(checked)}.`;
 			}
 			case "advisories": return population2(report, "advisories").length > 0 ? null : noAdvisoryLine(report);
-			case "radius": return population2(report, "radius").length === 0 ? null : "The ranked rows from the top of the tab; the folded groups under them print as their counts.";
+			case "radius":
+				if (printedRadius(report).rows.length > 0) return "Each direct requirement that pulls in a flagged package, in lockrot's order, with every flagged package listed under it.";
+				if (population2(report, "radius").length > 0) return "No direct requirement lists a flagged package.";
+				return checked === 0 ? "No packages in this lock." : "Nothing flagged, so no direct requirement pulls in a flagged package.";
 			case "run": return null;
 			case "packages": return `Printed because the page was open on All packages: ${packages(report.findings.length)}, in the order the table had them.`;
 		}
@@ -17003,7 +17012,7 @@ a.ov-ex-row:hover {
 				continue;
 			}
 			if (key === "pkg") {
-				pkg = value;
+				pkg = value.trim() === "" ? null : value;
 				continue;
 			}
 			if (isFilterGroup(key)) {
@@ -17984,6 +17993,7 @@ a.ov-ex-row:hover {
 		const { state } = useReport();
 		const { report } = useReport2();
 		const printed = usePrinted();
+		const hintId = `${g()}-hint`;
 		const { run } = report;
 		if (population2(report, "advisories").length === 0) return u$1("section", {
 			className: "advisories2",
@@ -18014,23 +18024,28 @@ a.ov-ex-row:hover {
 						counted: answer.narrowed === null
 					}) : void 0
 				})
-			}), !listed ? u$1(EmptyState, { reason: "filtered" }) : u$1(S, { children: [printed && u$1("div", {
-				className: "al-top",
-				children: u$1(Answer, {
-					report,
-					answer,
-					counted: false
+			}), !listed ? u$1(EmptyState, { reason: "filtered" }) : u$1(S, { children: [
+				printed && u$1("div", {
+					className: "al-top",
+					children: u$1(Answer, {
+						report,
+						answer,
+						counted: false
+					})
+				}),
+				u$1(RowHint, { id: hintId }),
+				u$1("div", {
+					className: "aledger no-axis",
+					role: "table",
+					"aria-label": "Advisories",
+					"aria-describedby": hintId,
+					children: [u$1(AdvisoryHead, {}), groups.map((group) => u$1(Group, {
+						group,
+						run,
+						first
+					}, group.finding.package))]
 				})
-			}), u$1("div", {
-				className: "aledger no-axis",
-				role: "table",
-				"aria-label": "Advisories",
-				children: [u$1(AdvisoryHead, {}), groups.map((group) => u$1(Group, {
-					group,
-					run,
-					first
-				}, group.finding.package))]
-			})] })]
+			] })]
 		});
 	}
 	//#endregion
@@ -20203,8 +20218,7 @@ a.ov-ex-row:hover {
 			inert,
 			children: u$1(Rail, {})
 		});
-		const { verdict, scope, signal, sev, fix, since, gate, flag, accepted } = state.filters;
-		const on = verdict.length + scope.length + signal.length + sev.length + fix.length + since.length + gate.length + flag.length + accepted.length;
+		const on = activeFilters(state.filters).length;
 		return u$1("details", {
 			className: "rail-fold",
 			inert,
@@ -20564,7 +20578,7 @@ a.ov-ex-row:hover {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.8";
+	var version = "0.14.0-rc.9";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");
