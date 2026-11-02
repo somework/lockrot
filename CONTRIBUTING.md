@@ -356,7 +356,7 @@ maintainer.
     - Rename `## [Unreleased]` in `CHANGELOG.md` to `## [X.Y.Z] - YYYY-MM-DD`, and write its
       summary (`.claude/rules/changelog.md`). Then open a new empty `## [Unreleased]` above it. In
       the compare links at the end of the file, point `[Unreleased]` to `vX.Y.Z...HEAD` and add an
-      `[X.Y.Z]` link.
+      `[X.Y.Z]` link. The release pull request fails without the two links.
 
     - The heading carries the day of the final `vX.Y.Z` tag, not the day of the rc tag. Write the
       planned tag day. If the final tag falls on another day, add a commit to the release pull
@@ -418,6 +418,7 @@ maintainer.
            `CHANGELOG.md`. Run `npm version X.Y.Z --no-git-tag-version`, which sets `version` in
            `package.json` and both `version` fields of `package-lock.json` (the root and
            `packages[""]`). Commit only the version and the pin.
+           The release pull request fails when `package-lock.json` names another version.
         7. Merge that commit into the renderer's `main`. Then tag `vX.Y.Z` on `main`.
         8. Run `tools/report/update-renderer vX.Y.Z`, and commit only the files that it writes. This
            commit must not change the contract bundle.
