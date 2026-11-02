@@ -3563,7 +3563,7 @@ age       installed  1.17.05.022017-05-02   9.4 years ago
           newest     2.17.08.292017-08-29   9.1 years ago                 past release-high-years 5
           last push            not read (repository not found)
           libyears 0.3 behind the newest stable release
-repository GitHub github.com/hoaproject/Consistency: the host answered 404 (private, renamed or removed)
+repository GitHub github.com/hoaproject/Consistency: the host answered 404 (private, renamed or removed) (cached 2026-09-28)
 
 score     18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive     high from 16
   maintenance  abandoned 32 (lead) · old-promise 4 (¼ of 16)

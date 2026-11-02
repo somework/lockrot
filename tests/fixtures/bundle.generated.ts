@@ -245894,8 +245894,8 @@ export const d_not_found_cached_dagger = {
             "baseline-cover": 0
         }
     },
-    "activity_cache_oldest_at": null,
-    "activity_cache_age_hours": null,
+    "activity_cache_oldest_at": "2026-09-28T08:00:00+00:00",
+    "activity_cache_age_hours": 81.7,
     "packages_checked": 3,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
@@ -246442,7 +246442,7 @@ export const d_not_found_cached_dagger = {
                 "event": null,
                 "archived": null,
                 "fetched_at": null,
-                "cached_at": null
+                "cached_at": "2026-09-28T08:00:00+00:00"
             },
             "allowlist": null,
             "abandoned_ignored": null,
