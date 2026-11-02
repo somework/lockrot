@@ -121,6 +121,14 @@ final class Explanation
         return $rows;
     }
 
+    /** How many releases the read metadata lists, null when lockrot read none for the package. */
+    public function releasesListed(): ?int
+    {
+        $metadata = $this->facts->metadata();
+
+        return $metadata === null || $this->finding->details()->metadataStatus() !== PackageFacts::METADATA_READ ? null : $metadata->releaseCount();
+    }
+
     /** @return list<BranchRow> */
     private function rows(): array
     {
