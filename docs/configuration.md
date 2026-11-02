@@ -54,9 +54,9 @@ one value of each kind. The key also takes a JSON array. lockrot trims and lower
 | No value | `none`, the default | Never. `none` stands alone |
 
 - The highest source that sets the list replaces the others whole. They never merge.
-- The [baseline](baseline.md) applies after the reach. A finding that reaches a value fails it,
-  unless its baseline entry exempts it. A finding's `gate.reaches_fail_on` holds the reach,
-  and its `gate.exempt_by` holds the exemption ([The gate](schema.md#the-gate)).
+- The [baseline](baseline.md) applies after the reach. A finding's `gate.reaches_fail_on` holds
+  the reach, and its `gate.by` holds the values that it fails after the baseline
+  ([The gate](schema.md#the-gate)).
 - `vulnerable-low` is an error: use `vulnerable`, which every counted advisory reaches.
 - The report writes the list as `run.fail_on`, in kind order (`"left-behind,vulnerable-high"`),
   and each value with its kind in `run.gates[]`.

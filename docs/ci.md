@@ -190,9 +190,10 @@ A package installed from a path is the project's own code: its release and activ
 skips. An advisory lookup that did not complete is S10 for it too. Under a baseline, a `known`
 finding is exempt, and a `worsened` one fails on whatever S10 it carries.
 
-An advisory gap stays out of `gate.not_applied` only when the finding fails on `unchecked` and its
-S10 names the advisories. The `advisories not applied` clause of the gate line then does not count
-the package. A finding that the baseline exempts keeps its gap in `gate.not_applied`.
+When the list also holds a grade or `vulnerable` value, an advisory gap stays out of
+`gate.not_applied` only when the finding fails on `unchecked` and its S10 names the advisories.
+The `advisories not applied` clause of the gate line then does not count the package. A finding
+that the baseline exempts keeps its gap in `gate.not_applied`.
 
 Most gaps close on a rerun. For a self-hosted GitLab, list the host in `gitlab-domains`
 ([Self-hosted GitLab](internals.md#self-hosted-gitlab)). Three gaps stay on every run. Accept each
@@ -577,8 +578,9 @@ one CI artifact and attaches to a ticket.
 ```
 
 The page is [lockrot-report](https://github.com/somework/lockrot-report), vendored at the version
-that the [changelog](changelog.md) names. Its README lists the files of a release, and says how to
-embed the page in a site and how to publish a report that someone else ran. The page carries the run as JSON in
+that the [changelog](changelog.md) names. Its README lists the files of a release. It also says
+how to embed the page in a site and how to publish a report that someone else ran. The page
+carries the run as JSON in
 `<script id="lockrot-data" type="application/json">`, and that document's `report` key is the
 [report-2 document](schema.md), the part of the page that is
 [contract](compatibility.md#what-is-not-contract). A script that extracts it guards on its
@@ -590,9 +592,9 @@ wrote keeps opening as it did.
 Without `--all` the page carries release detail for graded packages. `--all` adds that detail for
 every package, so the file grows with the lock.
 
-**Content-Security-Policy.** The page carries its own policy in a `<meta>` tag
-([DESIGN.md, Content-Security-Policy](https://github.com/somework/lockrot-report/blob/main/DESIGN.md#13-content-security-policy)),
-and the `manifest.json` of a renderer release holds its hashes. A host
+**Content-Security-Policy.** The page carries its own policy in a
+`<meta http-equiv="Content-Security-Policy">` tag, and the `manifest.json` of a renderer release
+holds its hashes. A host
 that adds its own policy header gets the intersection of the two. `script-src 'unsafe-inline'` and
 `style-src 'unsafe-inline'` in that header are enough.
 

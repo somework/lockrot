@@ -33,7 +33,7 @@ final class PhpReleaseDatesTest extends TestCase
         self::assertSame('5.3', $dates->minors(Clock::fixed('2026-10-01T00:00:00+00:00'))[0]);
     }
 
-    public function testShippedGaDateOfPhp86CountsFromItsDayOnly(): void
+    public function testPhp86CountsFromItsScheduledGaDayOnly(): void
     {
         $dates = PhpReleaseDates::load();
 

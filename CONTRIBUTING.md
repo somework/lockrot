@@ -367,8 +367,10 @@ maintainer.
     - Check `resources/php-ga-dates.json` against the PHP release schedule on php.net: the
       schedule page of the next minor (`https://wiki.php.net/todo/php<major><minor>`) and
       `https://www.php.net/releases/`. If php.net gives the GA date of a minor that the file does
-      not hold, add the date. lockrot counts a minor from its GA day on, so a later date changes no
-      output before that day. Check the file before you record `docs/example-run.md`.
+      not hold, add the date. If a date in the file differs from the schedule or the release,
+      correct it. lockrot counts a minor such as 8.6 from its GA day on. S5 reads the GA date of
+      an X.0 release before its day, so add an X.0 date only after that release. Check the file
+      before you record `docs/example-run.md`.
 
     - Re-record `docs/example-run.md` with the command and the environment that the top of the
       page names (`GITHUB_TOKEN`, `COLUMNS`, the snapshot). Run a PHAR that you build from the
@@ -413,7 +415,7 @@ maintainer.
            check that the rc tag of step 4 starts does not count, because its branch is the tag.
            Then delete the branch.
         6. In lockrot-report, run `node scripts/contract.mjs repin <V>`. Set the version in
-           `CHANGELOG.md`, and run `npm version X.Y.Z --no-git-tag-version`. It sets `version` in
+           `CHANGELOG.md`. Run `npm version X.Y.Z --no-git-tag-version`, which sets `version` in
            `package.json` and both `version` fields of `package-lock.json` (the root and
            `packages[""]`). Commit only the version and the pin.
         7. Merge that commit into the renderer's `main`. Then tag `vX.Y.Z` on `main`.
@@ -477,8 +479,8 @@ maintainer.
    schemas changed has no recording, unless it is the newest release and waits in
    `RECORDING_PENDING`.
 8. After the GitHub release of step 6, release [lockrot-action](https://github.com/somework/lockrot-action)
-   when its `@v1` jobs need the new lockrot. For 0.14.0 that release is v1.2.0, which carries the
-   branch `feat/one-run-output`. Each merge and the release need the maintainer's approval.
+   when its `@v1` jobs need the new lockrot. For lockrot 0.14.0, the action release is v1.2.0 from
+   the branch `feat/one-run-output`. Each merge and the release need the maintainer's approval.
 
     1. Merge the branch of the action release into the action's `main`, with the release's
        `CHANGELOG.md` section.

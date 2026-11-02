@@ -96,7 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `LOCKROT_GITLAB_TOKEN`. ([Which credentials](docs/internals.md#which-credentials))
 - **Breaking:** **Baseline:** `--generate-baseline` refuses a baseline path named `composer.json`
   or `composer.lock`, a file that `COMPOSER` names, or a name with a colon or a trailing dot or
-  space, with exit 2 on every OS. So it never writes over the project's Composer files. Action: if
+  space. It exits 2 on every OS, so it never writes over the project's Composer files. Action: if
   your baseline has such a name, rename the file and set `baseline` or `--baseline` to the new name.
   ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 - **All formats:** advisories are looked up by name for every package the run checks (packages-dev
