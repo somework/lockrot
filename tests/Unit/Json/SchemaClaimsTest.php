@@ -78,7 +78,6 @@ final class SchemaClaimsTest extends TestCase
         'headline.value' => 'per unit (headline anyOf); the years reading is engine',
         'findingFlag.role' => 'PROSE: "never this word" (the join rule)',
         'findingFlag.degree' => 'per flag id (findingFlag anyOf)',
-        'checkMissing.check' => 'PROSE',
         'allowlist/oneOf/0.reason' => 'PROSE: "never entered into a machine string"',
         'allowlist/oneOf/0.reason_id' => 'encoded (allowlist relation: by builtin/type ⇒ reason_id, project ⇒ null)',
         'allowlist/oneOf/0.flag_ids' => 'the config file is outside the document',
