@@ -128,14 +128,27 @@ final class ClockTest extends TestCase
         );
     }
 
-    public function testAMalformedLockrotTodayIsAConfigErrorThatNamesTheVariableAndTheValue(): void
+    /** @return iterable<string, array{string}> */
+    public static function malformedTodays(): iterable
+    {
+        yield 'no date' => ['not-a-date'];
+        yield 'a relative date that PHP reads' => ['tomorrow'];
+        yield 'a day-first date' => ['14.09.2026'];
+        yield 'a day that the month does not have' => ['2026-02-30'];
+    }
+
+    /**
+     * @dataProvider malformedTodays
+     */
+    #[DataProvider('malformedTodays')]
+    public function testAMalformedLockrotTodayIsAConfigErrorThatNamesTheVariableAndTheValue(string $today): void
     {
         try {
-            Clock::fromEnvironment(['LOCKROT_TODAY' => 'not-a-date']);
+            Clock::fromEnvironment(['LOCKROT_TODAY' => $today]);
             self::fail('a malformed LOCKROT_TODAY must be refused');
         } catch (ConfigException $e) {
             self::assertStringContainsString('LOCKROT_TODAY', $e->getMessage());
-            self::assertStringContainsString('"not-a-date"', $e->getMessage());
+            self::assertStringContainsString('"'.$today.'"', $e->getMessage());
         }
     }
 
