@@ -87,10 +87,18 @@ final class SignalSetTest extends TestCase
 
     public function testASetSolvedAtAPatchKeepsItsRulesWithoutTheDefaultSet(): void
     {
-        $set = new SignalSet([], new PhpFloor('8.4'));
+        $rule = new class () implements SignalRule {
+            public function evaluate(PackageFacts $facts): Signal
+            {
+                return new Signal(Signal::LEVEL_WARN, 'six', SignalDataStub::of(Signal::S6, []));
+            }
+        };
+        $set = new SignalSet([$rule], new PhpFloor('8.4'));
 
-        self::assertFalse($set->solvedAt('8.4.5')->phpFloor()->admitsTarget('~8.4.6'));
-        self::assertSame([], $set->solvedAt('8.4.5')->evaluate(FactsBuilder::facts(FactsBuilder::package())));
+        $solved = $set->solvedAt('8.4.5');
+
+        self::assertFalse($solved->phpFloor()->admitsTarget('~8.4.6'));
+        self::assertSame([Signal::S6], array_map(static fn (Signal $s): string => $s->id(), $solved->evaluate(FactsBuilder::facts(FactsBuilder::package()))));
     }
 
     /**

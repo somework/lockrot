@@ -32,7 +32,7 @@ final class PhpFloor
     /**
      * The patch at which lockrot tests a PHP minor: its newest one. The move check solves at the
      * same point unless `config.platform.php` is in that minor ({@see \Lockrot\Solver\MoveCheckers::platformPhp()},
-     * docs/verdicts.md#the-move-check). The moves test the target where the check solves ({@see solvedAt()}).
+     * docs/verdicts.md#the-move-check). A run tests the target where the check solves ({@see solvedAt()}).
      */
     public const NEWEST_PATCH = '99';
 
@@ -93,7 +93,7 @@ final class PhpFloor
     /**
      * What holds a branch with this php requirement back. It is {@see self::PROJECT} when the
      * project's lowest PHP is outside the requirement, else {@see self::TARGET} when the target
-     * minor's {@see self::NEWEST_PATCH} is, else null. A branch that requires no PHP, or whose requirement cannot
+     * point is, else null. A branch that requires no PHP, or whose requirement cannot
      * be parsed, is not held back.
      */
     public function blocking(?string $constraint): ?string

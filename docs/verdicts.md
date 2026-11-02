@@ -241,10 +241,10 @@ both of these floors:
   it admits: `>=8.2` is `8.2.0`, `>7.1` is `7.1.1`. `run.project_php_lowest` writes that version.
 
 - the target PHP ([`target-php`](configuration.md#extralockrot-keys) or its option and environment
-  override, else `config.platform.php`, else the running PHP): a branch that does not admit it
-  will not install. S8 tests the target at the PHP where the move check solves: at
-  `config.platform.php` when that is a stable release in the target minor, else at the minor's
-  newest patch (`8.4.99`) ([limits of the check](#the-move-check)).
+  override, else `config.platform.php`, else the running PHP). A branch that does not admit it
+  will not install. S8 tests the target at the PHP where the move check solves
+  ([limits of the check](#the-move-check)). That PHP is `config.platform.php` when it is a stable
+  release in the target minor, else the minor's newest patch (`8.4.99`).
 
 When that is not the newest branch, the evidence says which floor blocks the newest branch, then
 names the branch within reach. Abridged from the [example run](example-run.md):
@@ -792,7 +792,8 @@ Limits of the check:
 - It solves at `config.platform.php` when that version is a stable release in the target PHP's minor, else at the
   newest patch of the target minor (`8.4.99`). Composer reads `8.4` as `8.4.0`. It keeps every
   other `config.platform` override. The `target_runs` of `installed_php` and of a move's
-  `php_check`, and the `newest` of a move, test the target at the same PHP.
+  `php_check` test the target at the same PHP. So do the `newest` of a move, S8, S11
+  `excludes_target` and the branch rows of `--explain`.
 - It offers the tagged releases of a package. It offers the dev versions too when the package has
   no tagged release. Composer also offers them when composer.json's
   [`minimum-stability`](https://getcomposer.org/doc/04-schema.md#minimum-stability) or a

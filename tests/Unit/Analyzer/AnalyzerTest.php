@@ -202,7 +202,7 @@ final class AnalyzerTest extends TestCase
      * Case `gets-below-clears-left-behind‡` with no move check and no project php, where `config.platform.php` 8.4.5
      * sets the PHP that Composer would solve at for target 8.4. The installed `~8.4.6` and the 8.x
      * branch's `>=8.4.6` exclude 8.4.5 and admit 8.4.99: S11, `installed_php`, S8 and the explain
-     * rows test the target at 8.4.5 (SPEC I40, I46). Without the pin, they test it at 8.4.99.
+     * rows test the target at 8.4.5. Without the pin, they test it at 8.4.99.
      *
      * @return iterable<string, array{?string, bool, bool, ?string, string, ?bool, ?string}> the pin, S11
      *         `excludes_target`, `installed_php.target_runs`, S8 `floor_source` and `reachable_branch`, the 8.x
