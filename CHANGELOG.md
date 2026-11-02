@@ -418,6 +418,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **sarif:** `originalUriBaseIds.%SRCROOT%.uri` is `file:///` for a project in `/` and
   `file://server/share/proj/` for one on a UNC share. It read `file:////` and `file:///server/…`.
 - **All formats:** the anonymous cap note counts one package in the singular ("1 candidate package").
+- **All formats:** on two releases with the same date, the age readings and the branch rows name
+  the higher version. A Composer repository that lists its versions in ascending order gave the
+  lower one.
 - **All formats:** Symfony's extension polyfills keep their place on the built-in finished list
   under their own reason, because "intentionally frozen" was false for them.
 - **CLI:** `--explain` prints "archived flag not read" for a repository whose host did not send the

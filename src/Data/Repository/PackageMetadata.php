@@ -166,11 +166,14 @@ final class PackageMetadata
         $hasStableRelease = false;
         $lastStableReleaseAt = null;
         $lastStableVersion = null;
+        $lastStableNormalized = null;
         $highestStable = null;
         $type = null;
         $byBranch = [];
         $tagsOnCommit = [];
         $highestCommitByBranch = [];
+        /** @var array<array-key, string> $newestDatedByBranch the normalized version that each branch's `version` names */
+        $newestDatedByBranch = [];
         $highestCommit = null;
         $replaces = [];
         // Kept past this method only for a monorepo parent, and only for tags whose commit is a
@@ -205,9 +208,10 @@ final class PackageMetadata
                 $releaseDate = $version->getReleaseDate();
                 if ($releaseDate !== null) {
                     $releaseDate = self::toImmutable($releaseDate);
-                    if ($lastStableReleaseAt === null || $releaseDate > $lastStableReleaseAt) {
+                    if (self::newer($releaseDate, $version->getVersion(), $lastStableReleaseAt, $lastStableNormalized)) {
                         $lastStableReleaseAt = $releaseDate;
                         $lastStableVersion = $version->getPrettyVersion();
+                        $lastStableNormalized = $version->getVersion();
                     }
                 }
                 // The branch view keeps the newest dated stable release per branch. A backport on a
@@ -238,15 +242,17 @@ final class PackageMetadata
                     if ($entry === null) {
                         $byBranch[$branch] = ['version' => $pretty, 'at' => $releaseDate, 'highest' => $tag, 'php' => $php];
                         $highestCommitByBranch[$branch] = $commit;
+                        $newestDatedByBranch[$branch] = $normalized;
                     } else {
                         if (Comparator::greaterThan($normalized, $entry['highest']['normalized'])) {
                             $entry['highest'] = $tag;
                             $highestCommitByBranch[$branch] = $commit;
                         }
-                        if ($releaseDate !== null && ($entry['at'] === null || $releaseDate > $entry['at'])) {
+                        if ($releaseDate !== null && self::newer($releaseDate, $normalized, $entry['at'], $newestDatedByBranch[$branch] ?? null)) {
                             $entry['version'] = $pretty;
                             $entry['at'] = $releaseDate;
                             $entry['php'] = $php;
+                            $newestDatedByBranch[$branch] = $normalized;
                         } elseif ($entry['at'] === null && $entry['highest']['normalized'] === $normalized) {
                             $entry['version'] = $pretty;
                             $entry['php'] = $php;
@@ -531,6 +537,20 @@ final class PackageMetadata
         $link = $version->getRequires()['php'] ?? null;
 
         return $link === null ? null : $link->getPrettyConstraint();
+    }
+
+    /**
+     * Whether a release at $at is newer than the one at $than: a later date, or on the same date a
+     * higher version. The answer must not depend on the order in which a repository lists its
+     * versions.
+     */
+    private static function newer(\DateTimeImmutable $at, string $normalized, ?\DateTimeImmutable $than, ?string $thanNormalized): bool
+    {
+        if ($than === null || $at > $than) {
+            return true;
+        }
+
+        return $at >= $than && $thanNormalized !== null && Comparator::greaterThan($normalized, $thanNormalized);
     }
 
     private static function commitOf(BasePackage $version): ?string
