@@ -87,6 +87,47 @@ final class BaselineSchemaTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    /** @return iterable<string, array{string}> */
+    public static function emptiedKeys(): iterable
+    {
+        yield 'flags' => ['flags'];
+        yield 'advisories' => ['advisories'];
+    }
+
+    /**
+     * `json_decode()` reads a hand-emptied `{}` as `[]`. The refusal names the entry's key and the
+     * rule that the key holds at least one item, not "an object is required".
+     *
+     * @dataProvider emptiedKeys
+     */
+    #[DataProvider('emptiedKeys')]
+    public function testAnEmptiedMapIsRefusedForHoldingNoItem(string $key): void
+    {
+        $document = json_decode((string) json_encode([
+            '$schema' => 'https://lockrot.dev/schema/baseline-2.json',
+            'lockrot' => ['version' => '0.14.0', 'schema' => 2],
+            'generated_at' => '2026-06-01T00:00:00+00:00',
+            'target_php' => '8.4',
+            'target_php_source' => 'option',
+            'score_model_id' => 1,
+            'fix_model' => 1,
+            'findings' => ['twilio/sdk' => ['version' => '1.0.0', 'first_seen' => '2026-06-01', $key => new \stdClass()]],
+        ]), true);
+        self::assertIsArray($document);
+
+        try {
+            /** @var array<string, mixed> $document */
+            BaselineSchema::validate($document);
+        } catch (ConfigException $e) {
+            $message = $e->getMessage()."\n".implode("\n", $e->details());
+            self::assertStringContainsString('findings.twilio/sdk.'.$key.': Must contain a minimum of 1 properties', $message);
+            self::assertStringNotContainsString('an object is required', $message);
+
+            return;
+        }
+        self::fail('an empty '.$key.' map was read');
+    }
+
     /** @return array<string, mixed> */
     private static function read(string $path): array
     {
