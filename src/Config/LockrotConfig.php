@@ -256,17 +256,20 @@ final class LockrotConfig
         return [PhpReleaseDates::minorOf($target), $source];
     }
 
-    /** Composer accepts `v8.4.1` in `config.platform.php`. A value that it refuses stays as written. */
-    private static function asComposerReads(string $platformPhp): string
+    /**
+     * Composer accepts `v8.4.1` in `config.platform.php`. A value that it refuses sets no target,
+     * and the move check reports it (ruling R8-37).
+     */
+    private static function asComposerReads(string $platformPhp): ?string
     {
         try {
             return (new VersionParser())->normalize($platformPhp);
         } catch (\UnexpectedValueException $e) {
-            return $platformPhp;
+            return null;
         }
     }
 
-    /** The running PHP and `config.platform.php` can carry a suffix after the version, such as a distribution build's. */
+    /** The running PHP can carry a suffix after the version, such as a distribution build's. */
     private static function looksLikePhpVersion(string $value): bool
     {
         return preg_match('{^\d+(\.\d+)?}', $value) === 1;

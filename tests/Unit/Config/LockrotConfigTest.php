@@ -184,6 +184,27 @@ final class LockrotConfigTest extends TestCase
         self::assertSame(RunSettings::SOURCE_PLATFORM, LockrotConfig::fromSources([], [], [], '8.5.10', 'v8.4.1')->targetPhpSource());
     }
 
+    /**
+     * Ruling R8-37: Composer refuses such a `config.platform.php`, so the run continues at the
+     * running PHP and the move check reads `platform_config_invalid`.
+     *
+     * @dataProvider platformPhpsThatComposerRefuses
+     */
+    #[DataProvider('platformPhpsThatComposerRefuses')]
+    public function testAPlatformPhpThatComposerRefusesLeavesTheDefaultTargetToTheRunningPhp(string $platformPhp): void
+    {
+        $config = LockrotConfig::fromSources([], [], [], '8.5.10', $platformPhp);
+
+        self::assertSame(['8.5', RunSettings::SOURCE_RUNTIME], [$config->targetPhp(), $config->targetPhpSource()]);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function platformPhpsThatComposerRefuses(): iterable
+    {
+        yield 'a constraint' => ['^8.2'];
+        yield 'a word' => ['eight'];
+    }
+
     public function testAVPrefixedTargetPhpOptionIsStillRefused(): void
     {
         $this->expectException(ConfigException::class);
