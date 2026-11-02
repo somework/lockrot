@@ -240,7 +240,7 @@ final class LockrotConfig
     {
         // Whenever it is set, like LOCKROT_FAIL_ON in resolveFailOn().
         $fromEnv = $env['LOCKROT_TARGET_PHP'] ?? null;
-        if (\is_string($fromEnv) && $fromEnv !== '' && !self::looksLikePhpVersion($fromEnv)) {
+        if (\is_string($fromEnv) && $fromEnv !== '' && !self::isTargetPhpValue($fromEnv)) {
             throw new ConfigException('LOCKROT_TARGET_PHP must look like "8.4"; got "'.$fromEnv.'"');
         }
         [$target, $source] = self::pickWithSource([
@@ -249,26 +249,36 @@ final class LockrotConfig
             RunSettings::SOURCE_CONFIG => $extra['target-php'] ?? null,
             RunSettings::SOURCE_PLATFORM => $platformPhp === null ? null : self::asComposerReads($platformPhp),
         ], $runtimePhp, RunSettings::SOURCE_RUNTIME);
-        if (!self::looksLikePhpVersion($target)) {
+        if (!($source === RunSettings::SOURCE_OPTION ? self::isTargetPhpValue($target) : self::looksLikePhpVersion($target))) {
             throw new ConfigException('target-php must look like "8.4"; got "'.$target.'"');
         }
 
         return [PhpReleaseDates::minorOf($target), $source];
     }
 
-    /** Composer accepts `v8.4.1` in `config.platform.php`. A value that it refuses stays as written. */
-    private static function asComposerReads(string $platformPhp): string
+    /**
+     * Composer accepts `v8.4.1` in `config.platform.php`. A value that it refuses sets no target,
+     * and the move check reports it (ruling R8-37).
+     */
+    private static function asComposerReads(string $platformPhp): ?string
     {
         try {
             return (new VersionParser())->normalize($platformPhp);
         } catch (\UnexpectedValueException $e) {
-            return $platformPhp;
+            return null;
         }
     }
 
+    /** The running PHP can carry a suffix after the version, such as a distribution build's. */
     private static function looksLikePhpVersion(string $value): bool
     {
         return preg_match('{^\d+(\.\d+)?}', $value) === 1;
+    }
+
+    /** A value that the user types: a major, a minor or a patch, with nothing after it. */
+    private static function isTargetPhpValue(string $value): bool
+    {
+        return preg_match('{^\d+(\.\d+){0,2}$}D', $value) === 1;
     }
 
     /**

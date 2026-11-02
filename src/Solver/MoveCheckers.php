@@ -6,6 +6,7 @@ namespace Lockrot\Solver;
 
 use Composer\Config;
 use Composer\Package\RootPackageInterface;
+use Composer\Package\Version\VersionParser as ComposerVersionParser;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
 use Composer\Semver\Constraint\Constraint;
@@ -39,14 +40,9 @@ final class MoveCheckers
      */
     public static function forProject(RootPackageInterface $root, LockFile $lock, ProjectConfig $project, Config $config, array $repositories, string $targetPhp, bool $offline, Deadline $deadline, string $advisoryScope = AdvisoryCoverage::SCOPE_ALL): MoveChecker
     {
-        $overrides = [];
-        $configured = $config->get('platform');
-        // Composer's PlatformRepository refuses a value that is no string and not false, `php` (as written) of false and a name that is no platform package.
-        foreach (\is_array($configured) ? $configured : [] as $name => $version) {
-            if ((!\is_string($version) && $version !== false) || ($name === 'php' && $version === false) || !PlatformRepository::isPlatformPackage((string) $name)) {
-                return new UncheckedMoves(MoveCheck::PLATFORM_CONFIG_INVALID, self::configuredPhp($config));
-            }
-            $overrides[strtolower((string) $name)] = $version;
+        $overrides = self::platformOverrides($config->get('platform'));
+        if ($overrides === null) {
+            return new UncheckedMoves(MoveCheck::PLATFORM_CONFIG_INVALID, self::configuredPhp($config));
         }
         $platformNames = array_keys($overrides);
         $configured = self::configuredPhp($config);
@@ -99,6 +95,47 @@ final class MoveCheckers
     public static function platformPhp(string $targetMinor, ?string $platform): string
     {
         return $platform !== null && self::isStableIn($platform, $targetMinor) ? $platform : $targetMinor.'.'.self::NEWEST_PATCH;
+    }
+
+    /**
+     * `config.platform` as Composer's PlatformRepository reads it, by lower-case name, or null
+     * when it refuses the config. The constructor checks each entry, and the last entry of a name
+     * in any letter case wins. Then each name must be a platform package with a version that
+     * VersionParser normalises. A disabled php stops every update, so lockrot refuses it too.
+     *
+     * @param mixed $configured
+     *
+     * @return array<string, string|false>|null
+     */
+    private static function platformOverrides($configured): ?array
+    {
+        $entries = [];
+        foreach (\is_array($configured) ? $configured : [] as $name => $version) {
+            if ((!\is_string($version) && $version !== false) || ($name === 'php' && $version === false)) {
+                return null;
+            }
+            $entries[strtolower((string) $name)] = [(string) $name, $version];
+        }
+        $overrides = [];
+        foreach ($entries as $lower => [$name, $version]) {
+            if (!PlatformRepository::isPlatformPackage($name) || ($version === false ? $lower === 'php' : !self::normalises($version))) {
+                return null;
+            }
+            $overrides[$lower] = $version;
+        }
+
+        return $overrides;
+    }
+
+    private static function normalises(string $version): bool
+    {
+        try {
+            (new ComposerVersionParser())->normalize($version);
+
+            return true;
+        } catch (\UnexpectedValueException $e) {
+            return false;
+        }
     }
 
     /** Whether Composer reads $version as a stable release of $minor: `8` is 8.0.0. */

@@ -600,6 +600,5584 @@
       "reason": "The model reads no constraint of composer.json or of a dependent in the lock, so it names no holder."
     },
     {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "verdict",
+      "lockrot": "low",
+      "model": "high",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "lead",
+      "lockrot": "stale",
+      "model": "silent",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2019-11-20T18:27:48+00:00",
+          "dated_by": null,
+          "years": 6.9
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2021-08-11T00:08:37+00:00",
+          "level": "high",
+          "years": 5.2
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2019-11-20T18:27:48+00:00",
+          "dated_by": null,
+          "level": "high",
+          "version": "v1.4.3",
+          "years": 6.9
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2019-11-20T18:27:48+00:00",
+          "dated_by": null,
+          "years": 6.9
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2021-08-11T00:08:37+00:00",
+          "level": "high",
+          "years": 5.2
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2019-11-20T18:27:48+00:00",
+          "dated_by": null,
+          "level": "high",
+          "version": "v1.4.3",
+          "years": 6.9
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "gate.fails",
+      "lockrot": false,
+      "model": true,
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "gate.reaches_fail_on",
+      "lockrot": false,
+      "model": true,
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "gate.by",
+      "lockrot": [],
+      "model": [
+        {
+          "facts": [
+            {
+              "id": "silent",
+              "kind": "flag"
+            }
+          ],
+          "kind": "grade",
+          "value": "high"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "score.total",
+      "lockrot": 4,
+      "model": 16,
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "score.exact",
+      "lockrot": 4,
+      "model": 16,
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "score.band",
+      "lockrot": {
+        "floor": 1,
+        "next": "medium",
+        "to_next": 4
+      },
+      "model": {
+        "floor": 16,
+        "next": "critical",
+        "to_next": 16
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "score.parts",
+      "lockrot": {
+        "maintenance": {
+          "alone": {
+            "total": 4,
+            "verdict": "low"
+          },
+          "contribution": 4,
+          "status": "counted"
+        },
+        "security": {
+          "alone": {
+            "total": 0,
+            "verdict": null
+          },
+          "contribution": 0,
+          "of": 0,
+          "status": "unchecked",
+          "tied": []
+        }
+      },
+      "model": {
+        "maintenance": {
+          "alone": {
+            "total": 16,
+            "verdict": "high"
+          },
+          "contribution": 16,
+          "status": "counted"
+        },
+        "security": {
+          "alone": {
+            "total": 0,
+            "verdict": null
+          },
+          "contribution": 0,
+          "of": 0,
+          "status": "unchecked",
+          "tied": []
+        }
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "score.terms",
+      "lockrot": [
+        {
+          "contribution": 4,
+          "divisor": 1,
+          "flag": "stale",
+          "part": "maintenance",
+          "points": 8,
+          "role": "lead",
+          "weight": 8
+        }
+      ],
+      "model": [
+        {
+          "contribution": 16,
+          "divisor": 1,
+          "flag": "silent",
+          "part": "maintenance",
+          "points": 32,
+          "role": "lead",
+          "weight": 32
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "score.modifiers",
+      "lockrot": [
+        {
+          "after": 4,
+          "applies_to": "maintenance",
+          "before": 8,
+          "divide_by": 2,
+          "reason": "transitive"
+        }
+      ],
+      "model": [
+        {
+          "after": 16,
+          "applies_to": "maintenance",
+          "before": 32,
+          "divide_by": 2,
+          "reason": "transitive"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "next_step.kind",
+      "lockrot": "no-move",
+      "model": "find-alternative",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "next_step.leaves",
+      "lockrot": [
+        {
+          "id": "stale",
+          "kind": "flag"
+        }
+      ],
+      "model": [
+        {
+          "id": "silent",
+          "kind": "flag"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "next_step.composer_moves_because",
+      "lockrot": [],
+      "model": [
+        "transitive"
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "flags.stale.role",
+      "lockrot": "lead",
+      "model": {
+        "$absent": true
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "flags.stale.headline",
+      "lockrot": {
+        "source": "push",
+        "unit": "years",
+        "value": 5.2
+      },
+      "model": {
+        "$absent": true
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "flags.stale.degree",
+      "lockrot": {
+        "liveness_complete": false
+      },
+      "model": {
+        "$absent": true
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "flags.silent.role",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": "lead",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "flags.silent.headline",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": {
+        "source": "release",
+        "unit": "years",
+        "value": 6.9
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/console_getopt",
+      "path": "flags.silent.degree",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": {
+        "liveness_complete": true
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "composer/installers",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "composer/installers",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "composer/installers",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2024-06-24T20:46:46+00:00",
+          "dated_by": null,
+          "years": 2.3
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-07-01T21:02:33+00:00",
+          "level": null,
+          "years": 0.3
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2024-06-24T20:46:46+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v2.3.0",
+          "years": 2.3
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2024-06-24T20:46:46+00:00",
+          "dated_by": null,
+          "years": 2.3
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-07-01T21:02:33+00:00",
+          "level": null,
+          "years": 0.3
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2024-06-24T20:46:46+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v2.3.0",
+          "years": 2.3
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "asm89/stack-cors",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "asm89/stack-cors",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "asm89/stack-cors",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-01-28T13:08:04+00:00",
+          "dated_by": null,
+          "years": 0.7
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-01-28T13:08:35+00:00",
+          "level": null,
+          "years": 0.7
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-01-28T13:08:04+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v2.4.0",
+          "years": 0.7
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-01-28T13:08:04+00:00",
+          "dated_by": null,
+          "years": 0.7
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-01-28T13:08:35+00:00",
+          "level": null,
+          "years": 0.7
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-01-28T13:08:04+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v2.4.0",
+          "years": 0.7
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "composer/semver",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "composer/semver",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "composer/semver",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2025-08-20T19:15:30+00:00",
+          "dated_by": null,
+          "years": 1.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-05T13:12:46+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-10-05T13:12:12+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "3.5.1",
+          "years": 0
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2025-08-20T19:15:30+00:00",
+          "dated_by": null,
+          "years": 1.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-05T13:12:46+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-10-05T13:12:12+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "3.5.1",
+          "years": 0
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "doctrine/lexer",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "doctrine/lexer",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "doctrine/lexer",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2024-02-05T11:56:58+00:00",
+          "dated_by": null,
+          "years": 2.7
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-01T18:58:39+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-10-01T06:59:29+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "3.0.3",
+          "years": 0
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2024-02-05T11:56:58+00:00",
+          "dated_by": null,
+          "years": 2.7
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-01T18:58:39+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-10-01T06:59:29+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "3.0.3",
+          "years": 0
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "egulias/email-validator",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "egulias/email-validator",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "egulias/email-validator",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2025-03-06T22:45:56+00:00",
+          "dated_by": null,
+          "years": 1.6
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2025-03-20T21:39:01+00:00",
+          "level": null,
+          "years": 1.6
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2025-03-06T22:45:56+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "4.0.4",
+          "years": 1.6
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2025-03-06T22:45:56+00:00",
+          "dated_by": null,
+          "years": 1.6
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2025-03-20T21:39:01+00:00",
+          "level": null,
+          "years": 1.6
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2025-03-06T22:45:56+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "4.0.4",
+          "years": 1.6
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "guzzlehttp/guzzle",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "guzzlehttp/guzzle",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "guzzlehttp/guzzle",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-09-06T13:55:09+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-06T13:55:34+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-06T13:55:09+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "8.2.0",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-09-06T13:55:09+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-06T13:55:34+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-06T13:55:09+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "8.2.0",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "guzzlehttp/promises",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "guzzlehttp/promises",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "guzzlehttp/promises",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-24T10:00:26+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-08-24T10:00:45+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-08-24T10:00:26+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "3.0.2",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-24T10:00:26+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-08-24T10:00:45+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-08-24T10:00:26+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "3.0.2",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "guzzlehttp/psr7",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "guzzlehttp/psr7",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "guzzlehttp/psr7",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-24T11:02:13+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-08-24T11:03:20+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-08-24T11:02:13+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "3.1.0",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-24T11:02:13+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-08-24T11:03:20+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-08-24T11:02:13+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "3.1.0",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "justinrainbow/json-schema",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "justinrainbow/json-schema",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "justinrainbow/json-schema",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-09-04T12:54:20+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T14:31:54+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-30T07:42:28+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "6.13.1",
+          "years": 0
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-09-04T12:54:20+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T14:31:54+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-30T07:42:28+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "6.13.1",
+          "years": 0
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "marc-mabe/php-enum",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "marc-mabe/php-enum",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "marc-mabe/php-enum",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2025-09-14T11:18:39+00:00",
+          "dated_by": null,
+          "years": 1.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-02-09T21:42:51+00:00",
+          "level": null,
+          "years": 0.7
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2025-09-14T11:18:39+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v4.7.2",
+          "years": 1.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2025-09-14T11:18:39+00:00",
+          "dated_by": null,
+          "years": 1.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-02-09T21:42:51+00:00",
+          "level": null,
+          "years": 0.7
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2025-09-14T11:18:39+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v4.7.2",
+          "years": 1.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "masterminds/html5",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "masterminds/html5",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "masterminds/html5",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-18T06:18:41+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-08-18T06:20:28+00:00",
+          "level": null,
+          "years": 0.2
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-08-18T06:18:41+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "2.11.0",
+          "years": 0.2
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-18T06:18:41+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-08-18T06:20:28+00:00",
+          "level": null,
+          "years": 0.2
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-08-18T06:18:41+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "2.11.0",
+          "years": 0.2
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "mck89/peast",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "mck89/peast",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "mck89/peast",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-19T09:36:10+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-29T07:14:46+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-15T06:27:15+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.18.1",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-19T09:36:10+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-29T07:14:46+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-15T06:27:15+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.18.1",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/archive_tar",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/archive_tar",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/archive_tar",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-19T17:37:49+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-10T13:19:14+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-08-19T17:37:49+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "1.6.1",
+          "years": 0.2
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-19T17:37:49+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-10T13:19:14+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-08-19T17:37:49+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "1.6.1",
+          "years": 0.2
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear-core-minimal",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear-core-minimal",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear-core-minimal",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2025-12-14T20:37:07+00:00",
+          "dated_by": null,
+          "years": 0.8
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-01-25T18:45:12+00:00",
+          "level": null,
+          "years": 0.7
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2025-12-14T20:37:07+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.10.18",
+          "years": 0.8
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2025-12-14T20:37:07+00:00",
+          "dated_by": null,
+          "years": 0.8
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-01-25T18:45:12+00:00",
+          "level": null,
+          "years": 0.7
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2025-12-14T20:37:07+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.10.18",
+          "years": 0.8
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "low",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "lead",
+      "lockrot": null,
+      "model": "stale",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2021-03-21T15:43:46+00:00",
+          "dated_by": null,
+          "years": 5.6
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-01-31T21:47:48+00:00",
+          "level": null,
+          "years": 0.7
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2021-03-21T15:43:46+00:00",
+          "dated_by": null,
+          "level": "high",
+          "version": "v1.0.2",
+          "years": 5.6
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2021-03-21T15:43:46+00:00",
+          "dated_by": null,
+          "years": 5.6
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-01-31T21:47:48+00:00",
+          "level": null,
+          "years": 0.7
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2021-03-21T15:43:46+00:00",
+          "dated_by": null,
+          "level": "high",
+          "version": "v1.0.2",
+          "years": 5.6
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "score.total",
+      "lockrot": 0,
+      "model": 4,
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "score.exact",
+      "lockrot": 0,
+      "model": 4,
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "score.band",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": {
+        "floor": 1,
+        "next": "medium",
+        "to_next": 4
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "score.decided_by",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": "maintenance",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "score.rounded_down",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": false,
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "score.parts",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": {
+        "maintenance": {
+          "alone": {
+            "total": 4,
+            "verdict": "low"
+          },
+          "contribution": 4,
+          "status": "counted"
+        },
+        "security": {
+          "alone": {
+            "total": 0,
+            "verdict": null
+          },
+          "contribution": 0,
+          "of": 0,
+          "status": "unchecked",
+          "tied": []
+        }
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "score.terms",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": [
+        {
+          "contribution": 4,
+          "divisor": 1,
+          "flag": "stale",
+          "part": "maintenance",
+          "points": 8,
+          "role": "lead",
+          "weight": 8
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "score.modifiers",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": [
+        {
+          "after": 4,
+          "applies_to": "maintenance",
+          "before": 8,
+          "divide_by": 2,
+          "reason": "transitive"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "score.without",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.kind",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": "no-move",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.constraint",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": null,
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.version",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": null,
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.to_branch",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": null,
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.clears",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.leaves",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": [
+        {
+          "id": "stale",
+          "kind": "flag"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.adds",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.clears_all",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": false,
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.through",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": [
+        {
+          "installed_requires": null,
+          "installed_version": "dev-main",
+          "local": true,
+          "newest_is_installed": null,
+          "newest_requires": null,
+          "newest_requires_unmeasured": "not_from_composer_repository",
+          "newest_stable": null,
+          "package": "drupal/core"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.unverified",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.php_check",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": null,
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.commands",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.crosses_major",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": null,
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.composer_moves_because",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.if_applied",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": null,
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "next_step.held_by",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "flags.stale.role",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": "lead",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "flags.stale.headline",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": {
+        "source": "release",
+        "unit": "years",
+        "value": 5.6
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "pear/pear_exception",
+      "path": "flags.stale.degree",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": {
+        "liveness_complete": true
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "php-tuf/composer-stager",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "php-tuf/composer-stager",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "php-tuf/composer-stager",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-07-07T14:30:49+00:00",
+          "dated_by": null,
+          "years": 0.3
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-08-10T21:15:57+00:00",
+          "level": null,
+          "years": 0.2
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-07-07T14:30:49+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v2.1.1",
+          "years": 0.3
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-07-07T14:30:49+00:00",
+          "dated_by": null,
+          "years": 0.3
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-08-10T21:15:57+00:00",
+          "level": null,
+          "years": 0.2
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-07-07T14:30:49+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v2.1.1",
+          "years": 0.3
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "revolt/event-loop",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "revolt/event-loop",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "revolt/event-loop",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-05-16T17:55:38+00:00",
+          "dated_by": null,
+          "years": 0.4
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-04T09:10:38+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-05-16T17:55:38+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.0.9",
+          "years": 0.4
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-05-16T17:55:38+00:00",
+          "dated_by": null,
+          "years": 0.4
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-04T09:10:38+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-05-16T17:55:38+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.0.9",
+          "years": 0.4
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "sebastian/diff",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "sebastian/diff",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "sebastian/diff",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-25T15:35:54+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T04:24:52+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-08-25T15:35:54+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "7.0.1",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-25T15:35:54+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T04:24:52+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-08-25T15:38:55+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "9.0.1",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/console",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/console",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/console",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-25T14:18:42+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T05:37:08+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-18T16:00:27+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-25T14:18:42+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T05:37:08+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-18T16:00:27+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/dependency-injection",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/dependency-injection",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/dependency-injection",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-21T17:47:34+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T13:04:14+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-29T12:38:40+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-21T17:47:34+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T13:04:14+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-29T12:38:40+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/deprecation-contracts",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/deprecation-contracts",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/deprecation-contracts",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-06-05T06:23:12+00:00",
+          "dated_by": null,
+          "years": 0.4
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-16T14:21:11+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-06-05T06:23:12+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v3.7.1",
+          "years": 0.4
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-06-05T06:23:12+00:00",
+          "dated_by": null,
+          "years": 0.4
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-16T14:21:11+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-06-05T06:23:12+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v3.7.1",
+          "years": 0.4
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/error-handler",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/error-handler",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/error-handler",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-21T17:47:34+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-10T13:22:50+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-22T18:58:53+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-21T17:47:34+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-10T13:22:50+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-22T18:58:53+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/event-dispatcher",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/event-dispatcher",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/event-dispatcher",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-21T17:47:34+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-09T14:18:33+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-08-21T17:47:34+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.5",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-21T17:47:34+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-09T14:18:33+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-08-21T17:47:34+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.5",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/event-dispatcher-contracts",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/event-dispatcher-contracts",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/event-dispatcher-contracts",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-06-05T06:23:12+00:00",
+          "dated_by": null,
+          "years": 0.4
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-16T14:21:11+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-06-05T06:23:12+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v3.7.1",
+          "years": 0.4
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-06-05T06:23:12+00:00",
+          "dated_by": null,
+          "years": 0.4
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-16T14:21:11+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-06-05T06:23:12+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v3.7.1",
+          "years": 0.4
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/filesystem",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/filesystem",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/filesystem",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-23T10:06:25+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-06T20:07:49+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-08-23T10:06:25+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.6",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-23T10:06:25+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-06T20:07:49+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-08-23T10:06:25+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.6",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/finder",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/finder",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/finder",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-21T12:16:08+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-29T14:09:12+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-26T06:33:49+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-21T12:16:08+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-29T14:09:12+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-26T06:33:49+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/http-foundation",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/http-foundation",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/http-foundation",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-30T20:10:55+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-12T14:30:55+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-24T07:13:53+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-30T20:10:55+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-12T14:30:55+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-24T07:13:53+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/http-kernel",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/http-kernel",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/http-kernel",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-30T21:40:49+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T19:43:35+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-29T14:08:01+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-30T21:40:49+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T19:43:35+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-29T14:08:01+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/mailer",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/mailer",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/mailer",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-21T17:47:34+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-12T14:30:52+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-15T06:01:24+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.7",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-21T17:47:34+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-12T14:30:52+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-15T06:01:24+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.7",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/mime",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/mime",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/mime",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-22T09:06:25+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-12T14:30:54+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-04T11:02:17+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.7",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-22T09:06:25+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-12T14:30:54+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-04T11:02:17+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.7",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/process",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/process",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/process",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-21T17:47:34+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-08T17:01:44+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-02T12:40:29+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.7",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-21T17:47:34+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-08T17:01:44+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-02T12:40:29+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.7",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/psr-http-message-bridge",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/psr-http-message-bridge",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/psr-http-message-bridge",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-05-29T05:06:50+00:00",
+          "dated_by": null,
+          "years": 0.4
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-07T08:24:02+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-05-29T05:06:50+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.0",
+          "years": 0.4
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-05-29T05:06:50+00:00",
+          "dated_by": null,
+          "years": 0.4
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-07T08:24:02+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-05-29T05:06:50+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.0",
+          "years": 0.4
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/routing",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/routing",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/routing",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-17T13:18:34+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T11:59:35+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-28T19:13:15+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-17T13:18:34+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T11:59:35+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-28T19:13:15+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/runtime",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/runtime",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/runtime",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-05-29T05:06:50+00:00",
+          "dated_by": null,
+          "years": 0.4
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-06T20:07:49+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-06-05T06:22:43+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.0.14",
+          "years": 0.4
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-05-29T05:06:50+00:00",
+          "dated_by": null,
+          "years": 0.4
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-06T20:07:49+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-06-05T06:22:43+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.0.14",
+          "years": 0.4
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/serializer",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/serializer",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/serializer",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-30T08:48:47+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T12:38:52+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-28T09:40:25+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-30T08:48:47+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T12:38:52+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-28T09:40:25+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/service-contracts",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/service-contracts",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/service-contracts",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-07-27T15:39:01+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-16T14:21:13+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-07-27T15:39:01+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v3.7.3",
+          "years": 0.2
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-07-27T15:39:01+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-16T14:21:13+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-07-27T15:39:01+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v3.7.3",
+          "years": 0.2
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/string",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/string",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/string",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-07-28T07:35:25+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-03T15:19:13+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-11T14:51:16+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.7",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-07-28T07:35:25+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-03T15:19:13+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-11T14:51:16+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.7",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/translation-contracts",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/translation-contracts",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/translation-contracts",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-06-05T06:23:12+00:00",
+          "dated_by": null,
+          "years": 0.4
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-03T08:18:24+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-06-05T06:23:12+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v3.7.1",
+          "years": 0.4
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-06-05T06:23:12+00:00",
+          "dated_by": null,
+          "years": 0.4
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-03T08:18:24+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-06-05T06:23:12+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v3.7.1",
+          "years": 0.4
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/validator",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/validator",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/validator",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-30T01:03:44+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T16:18:52+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-29T12:38:40+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-30T01:03:44+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T16:18:52+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-29T12:38:40+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/var-dumper",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/var-dumper",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/var-dumper",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-30T20:10:55+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T06:12:55+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-03T16:02:27+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.7",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-30T20:10:55+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T06:12:55+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-03T16:02:27+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.7",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/var-exporter",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/var-exporter",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/var-exporter",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-29T06:30:03+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-12T08:04:14+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-08-29T06:30:03+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.6",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-29T06:30:03+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-12T08:04:14+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-08-29T06:30:03+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.6",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/yaml",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/yaml",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/yaml",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-30T01:03:44+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-12T14:11:47+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-26T06:33:49+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-30T01:03:44+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-12T14:11:47+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-26T06:33:49+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v8.1.8",
+          "years": 0
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "twig/html-extra",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "twig/html-extra",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "twig/html-extra",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-06-25T06:50:01+00:00",
+          "dated_by": null,
+          "years": 0.3
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-22T20:18:15+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-06T20:35:36+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v3.29.0",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-06-25T06:50:01+00:00",
+          "dated_by": null,
+          "years": 0.3
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-09-22T20:18:15+00:00",
+          "level": null,
+          "years": 0.1
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-06T20:35:36+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v3.29.0",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "twig/twig",
+      "path": "verdict",
+      "lockrot": "unknown",
+      "model": "ok",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "twig/twig",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "twig/twig",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-07-03T20:44:34+00:00",
+          "dated_by": null,
+          "years": 0.3
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T20:27:02+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-25T13:20:01+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v3.30.0",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-07-03T20:44:34+00:00",
+          "dated_by": null,
+          "years": 0.3
+        },
+        "installed_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T20:27:02+00:00",
+          "level": null,
+          "years": 0
+        },
+        "push_unmeasured": null,
+        "release": {
+          "at": "2026-09-25T13:20:01+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v3.30.0",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/container",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/container",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2021-11-05T16:47:00+00:00",
+          "dated_by": null,
+          "years": 4.9
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2021-11-05T16:47:00+00:00",
+          "dated_by": null,
+          "level": "warn",
+          "version": "2.0.2",
+          "years": 4.9
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2021-11-05T16:47:00+00:00",
+          "dated_by": null,
+          "years": 4.9
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": {
+          "at": "2021-11-05T16:50:12+00:00",
+          "dated_by": null,
+          "level": "warn",
+          "version": "1.1.2",
+          "years": 4.9
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/container",
+      "path": "score.accepted",
+      "lockrot": [],
+      "model": [
+        {
+          "flag": "stale",
+          "if_counted": {
+            "at_least": true,
+            "modifiers": [
+              {
+                "after": 4,
+                "applies_to": "maintenance",
+                "before": 8,
+                "divide_by": 2,
+                "reason": "transitive"
+              }
+            ],
+            "role": "lead",
+            "total": 4,
+            "verdict": "low"
+          },
+          "weight": 8
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/container",
+      "path": "flags.stale.role",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": "accepted",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/container",
+      "path": "flags.stale.headline",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": {
+        "source": "release",
+        "unit": "years",
+        "value": 4.9
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/container",
+      "path": "flags.stale.degree",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": {
+        "liveness_complete": false
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/event-dispatcher",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/event-dispatcher",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2019-01-08T18:20:26+00:00",
+          "dated_by": null,
+          "years": 7.8
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2019-01-08T18:20:26+00:00",
+          "dated_by": null,
+          "level": "high",
+          "version": "1.0.0",
+          "years": 7.8
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2019-01-08T18:20:26+00:00",
+          "dated_by": null,
+          "years": 7.8
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": {
+          "at": "2019-01-08T18:20:26+00:00",
+          "dated_by": null,
+          "level": "high",
+          "version": "1.0.0",
+          "years": 7.8
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/event-dispatcher",
+      "path": "score.accepted",
+      "lockrot": [
+        {
+          "flag": "old-promise",
+          "if_counted": {
+            "at_least": false,
+            "modifiers": [
+              {
+                "after": 8,
+                "applies_to": "maintenance",
+                "before": 16,
+                "divide_by": 2,
+                "reason": "transitive"
+              }
+            ],
+            "role": "lead",
+            "total": 8,
+            "verdict": "medium"
+          },
+          "weight": 16
+        }
+      ],
+      "model": [
+        {
+          "flag": "old-promise",
+          "if_counted": {
+            "at_least": false,
+            "modifiers": [
+              {
+                "after": 8,
+                "applies_to": "maintenance",
+                "before": 16,
+                "divide_by": 2,
+                "reason": "transitive"
+              }
+            ],
+            "role": "lead",
+            "total": 8,
+            "verdict": "medium"
+          },
+          "weight": 16
+        },
+        {
+          "flag": "stale",
+          "if_counted": {
+            "at_least": true,
+            "modifiers": [
+              {
+                "after": 4,
+                "applies_to": "maintenance",
+                "before": 8,
+                "divide_by": 2,
+                "reason": "transitive"
+              }
+            ],
+            "role": "lead",
+            "total": 4,
+            "verdict": "low"
+          },
+          "weight": 8
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/event-dispatcher",
+      "path": "flags.stale.role",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": "accepted",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/event-dispatcher",
+      "path": "flags.stale.headline",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": {
+        "source": "release",
+        "unit": "years",
+        "value": 7.8
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/event-dispatcher",
+      "path": "flags.stale.degree",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": {
+        "liveness_complete": false
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/http-client",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/http-client",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2023-09-23T14:17:50+00:00",
+          "dated_by": null,
+          "years": 3.1
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2023-09-23T14:17:50+00:00",
+          "dated_by": null,
+          "level": "warn",
+          "version": "1.0.3",
+          "years": 3.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2023-09-23T14:17:50+00:00",
+          "dated_by": null,
+          "years": 3.1
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": {
+          "at": "2023-09-23T14:17:50+00:00",
+          "dated_by": null,
+          "level": "warn",
+          "version": "1.0.3",
+          "years": 3.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/http-client",
+      "path": "score.accepted",
+      "lockrot": [],
+      "model": [
+        {
+          "flag": "stale",
+          "if_counted": {
+            "at_least": true,
+            "modifiers": [
+              {
+                "after": 4,
+                "applies_to": "maintenance",
+                "before": 8,
+                "divide_by": 2,
+                "reason": "transitive"
+              }
+            ],
+            "role": "lead",
+            "total": 4,
+            "verdict": "low"
+          },
+          "weight": 8
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/http-client",
+      "path": "flags.stale.role",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": "accepted",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/http-client",
+      "path": "flags.stale.headline",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": {
+        "source": "release",
+        "unit": "years",
+        "value": 3.1
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/http-client",
+      "path": "flags.stale.degree",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": {
+        "liveness_complete": false
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/http-factory",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/http-factory",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2024-04-15T12:06:14+00:00",
+          "dated_by": null,
+          "years": 2.5
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2024-04-15T12:06:14+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "1.1.0",
+          "years": 2.5
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2024-04-15T12:06:14+00:00",
+          "dated_by": null,
+          "years": 2.5
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": {
+          "at": "2024-04-15T12:06:14+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "1.1.0",
+          "years": 2.5
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/http-message",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/http-message",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2023-04-04T09:54:51+00:00",
+          "dated_by": null,
+          "years": 3.5
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2023-04-04T09:54:51+00:00",
+          "dated_by": null,
+          "level": "warn",
+          "version": "2.0",
+          "years": 3.5
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2023-04-04T09:54:51+00:00",
+          "dated_by": null,
+          "years": 3.5
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": {
+          "at": "2023-04-04T09:54:51+00:00",
+          "dated_by": null,
+          "level": "warn",
+          "version": "2.0",
+          "years": 3.5
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/http-message",
+      "path": "score.accepted",
+      "lockrot": [],
+      "model": [
+        {
+          "flag": "stale",
+          "if_counted": {
+            "at_least": true,
+            "modifiers": [
+              {
+                "after": 4,
+                "applies_to": "maintenance",
+                "before": 8,
+                "divide_by": 2,
+                "reason": "transitive"
+              }
+            ],
+            "role": "lead",
+            "total": 4,
+            "verdict": "low"
+          },
+          "weight": 8
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/http-message",
+      "path": "flags.stale.role",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": "accepted",
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/http-message",
+      "path": "flags.stale.headline",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": {
+        "source": "release",
+        "unit": "years",
+        "value": 3.5
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/http-message",
+      "path": "flags.stale.degree",
+      "lockrot": {
+        "$absent": true
+      },
+      "model": {
+        "liveness_complete": false
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/log",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "psr/log",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2024-09-11T13:17:53+00:00",
+          "dated_by": null,
+          "years": 2.1
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2024-09-11T13:17:53+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "3.0.2",
+          "years": 2.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2024-09-11T13:17:53+00:00",
+          "dated_by": null,
+          "years": 2.1
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": {
+          "at": "2024-09-11T13:17:53+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "3.0.2",
+          "years": 2.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-ctype",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-ctype",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-04-10T16:19:22+00:00",
+          "dated_by": null,
+          "years": 0.5
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": null,
+        "branch_release_unmeasured": "undated_releases",
+        "installed": null,
+        "installed_unmeasured": "shared_commit",
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": null,
+        "release_unmeasured": "undated_releases"
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-deepclone",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-deepclone",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-07T06:33:24+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-10-06T19:46:18+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.43.1",
+          "years": 0
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-07T06:33:24+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": {
+          "at": "2026-10-06T19:46:18+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.43.1",
+          "years": 0
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-iconv",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-iconv",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-04-10T16:19:22+00:00",
+          "dated_by": null,
+          "years": 0.5
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-29T06:25:14+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.43.0",
+          "years": 0
+        },
+        "branch_release_unmeasured": null,
+        "installed": null,
+        "installed_unmeasured": "shared_commit",
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": {
+          "at": "2026-09-29T06:25:14+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.43.0",
+          "years": 0
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-intl-grapheme",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-intl-grapheme",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-07-28T08:25:59+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-25T15:46:47+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.43.0",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-07-28T08:25:59+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": {
+          "at": "2026-09-25T15:46:47+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.43.0",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-intl-idn",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-intl-idn",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-24T10:51:20+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-23T14:40:04+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.43.0",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-24T10:51:20+00:00",
+          "dated_by": null,
+          "years": 0.1
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": {
+          "at": "2026-09-23T14:40:04+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.43.0",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-intl-normalizer",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-intl-normalizer",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-08-07T06:33:24+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-23T22:02:09+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.43.0",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-08-07T06:33:24+00:00",
+          "dated_by": null,
+          "years": 0.2
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": {
+          "at": "2026-09-23T22:02:09+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.43.0",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-mbstring",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-mbstring",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-05-27T06:59:30+00:00",
+          "dated_by": null,
+          "years": 0.4
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-24T15:19:04+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.43.0",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-05-27T06:59:30+00:00",
+          "dated_by": null,
+          "years": 0.4
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": {
+          "at": "2026-09-24T15:19:04+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.43.0",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-php86",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_metadata",
+          "reason": "unavailable"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
+      "app": "drupal_drupal.feed-failed",
+      "package": "symfony/polyfill-php86",
+      "path": "age",
+      "lockrot": {
+        "branch_release": null,
+        "branch_release_unmeasured": "unavailable",
+        "installed": {
+          "at": "2026-07-02T13:42:24+00:00",
+          "dated_by": null,
+          "years": 0.3
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": null,
+        "release_unmeasured": "unavailable"
+      },
+      "model": {
+        "branch_release": {
+          "at": "2026-09-25T15:46:47+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.43.0",
+          "years": 0.1
+        },
+        "branch_release_unmeasured": null,
+        "installed": {
+          "at": "2026-07-02T13:42:24+00:00",
+          "dated_by": null,
+          "years": 0.3
+        },
+        "installed_unmeasured": null,
+        "push": null,
+        "push_unmeasured": "allowlisted",
+        "release": {
+          "at": "2026-09-25T15:46:47+00:00",
+          "dated_by": null,
+          "level": null,
+          "version": "v1.43.0",
+          "years": 0.1
+        },
+        "release_unmeasured": null
+      },
+      "reason": "Finding 49: packages.drupal.org is canonical and does not answer in this run, so lockrot stops the metadata failover there, as Composer stops its update, and the name reads metadata unavailable. The 0.13 model asked packagist.org."
+    },
+    {
       "app": "firefly-iii_firefly-iii",
       "package": "league/commonmark",
       "path": "S9.fix.version[PKSA-m2dq-1fhr-29b1]",

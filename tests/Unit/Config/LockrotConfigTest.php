@@ -184,11 +184,81 @@ final class LockrotConfigTest extends TestCase
         self::assertSame(RunSettings::SOURCE_PLATFORM, LockrotConfig::fromSources([], [], [], '8.5.10', 'v8.4.1')->targetPhpSource());
     }
 
+    /**
+     * Ruling R8-37: Composer refuses such a `config.platform.php`, so the run continues at the
+     * running PHP and the move check reads `platform_config_invalid`.
+     *
+     * @dataProvider platformPhpsThatComposerRefuses
+     */
+    #[DataProvider('platformPhpsThatComposerRefuses')]
+    public function testAPlatformPhpThatComposerRefusesLeavesTheDefaultTargetToTheRunningPhp(string $platformPhp): void
+    {
+        $config = LockrotConfig::fromSources([], [], [], '8.5.10', $platformPhp);
+
+        self::assertSame(['8.5', RunSettings::SOURCE_RUNTIME], [$config->targetPhp(), $config->targetPhpSource()]);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function platformPhpsThatComposerRefuses(): iterable
+    {
+        yield 'a constraint' => ['^8.2'];
+        yield 'a word' => ['eight'];
+    }
+
     public function testAVPrefixedTargetPhpOptionIsStillRefused(): void
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('target-php must look like "8.4"; got "v8.4"');
         LockrotConfig::fromSources([], [], ['target-php' => 'v8.4'], '8.5.10', 'v8.4.1');
+    }
+
+    /** @dataProvider targetPhpsWithTrailingText */
+    #[DataProvider('targetPhpsWithTrailingText')]
+    public function testATargetPhpOptionWithTextAfterTheVersionIsRefused(string $value): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('target-php must look like "8.4"; got "'.$value.'"');
+        LockrotConfig::fromSources([], [], ['target-php' => $value], '8.5.10', null);
+    }
+
+    /** @dataProvider targetPhpsWithTrailingText */
+    #[DataProvider('targetPhpsWithTrailingText')]
+    public function testALockrotTargetPhpWithTextAfterTheVersionIsRefused(string $value): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('LOCKROT_TARGET_PHP must look like "8.4"; got "'.$value.'"');
+        LockrotConfig::fromSources([], ['LOCKROT_TARGET_PHP' => $value], [], '8.5.10', null);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function targetPhpsWithTrailingText(): iterable
+    {
+        yield 'letters' => ['8.4foo'];
+        yield 'a constraint' => ['8.4 || 8.5'];
+        yield 'an image tag' => ['8.4-fpm'];
+        yield 'a wildcard' => ['8.4.*'];
+        yield 'a distribution build' => ['8.1.2-1ubuntu2.14'];
+        yield 'a fourth part' => ['8.4.1.0'];
+        yield 'a trailing newline' => ["8.4\n"];
+    }
+
+    public function testATargetPhpOptionOrVariableReadsTheMinorOfAMajorMinorOrPatch(): void
+    {
+        self::assertSame(
+            ['8.0', '8.4', '8.4', '8.3'],
+            [
+                LockrotConfig::fromSources([], [], ['target-php' => '8'], '8.5.10', null)->targetPhp(),
+                LockrotConfig::fromSources([], [], ['target-php' => '8.4'], '8.5.10', null)->targetPhp(),
+                LockrotConfig::fromSources([], [], ['target-php' => '8.4.1'], '8.5.10', null)->targetPhp(),
+                LockrotConfig::fromSources([], ['LOCKROT_TARGET_PHP' => '8.3.12'], [], '8.5.10', null)->targetPhp(),
+            ]
+        );
+    }
+
+    /** PHP_VERSION of a distribution build carries the distribution's suffix. */
+    public function testTheRunningPhpOfADistributionBuildSetsTheDefaultTargetMinor(): void
+    {
+        self::assertSame('8.1', LockrotConfig::fromSources([], [], [], '8.1.2-1ubuntu2.14', null)->targetPhp());
     }
 
     public function testFailOnAcceptsAPriorityFromEverySource(): void

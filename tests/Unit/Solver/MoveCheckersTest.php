@@ -96,13 +96,13 @@ final class MoveCheckersTest extends TestCase
     }
 
     /**
-     * Ruling R8-37: Composer's PlatformRepository refuses each `config.platform` value that is no
-     * string and not false, a php of false and a name that is no platform package, so every
-     * `composer update` stops. No move resolves. The PHP window still reads the configured php.
+     * Ruling R8-37: Composer's PlatformRepository refuses each `config.platform` of the provider,
+     * or reads it as a disabled php, so every `composer update` stops. No move resolves. The PHP
+     * window still reads the configured php.
      *
      * @dataProvider platformsThatComposerRefuses
      *
-     * @param array<string, mixed> $platform
+     * @param array<array-key, mixed> $platform
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('platformsThatComposerRefuses')]
     public function testAConfigPlatformValueThatComposerRefusesChecksNoMove(array $platform, ?string $configuredPhp): void
@@ -120,13 +120,46 @@ final class MoveCheckersTest extends TestCase
         self::assertSame($configuredPhp, $checker->configuredPhp());
     }
 
-    /** @return iterable<string, array{array<string, mixed>, ?string}> the platform and its configured php */
+    /** @return iterable<string, array{array<array-key, mixed>, ?string}> the platform and its configured php */
     public static function platformsThatComposerRefuses(): iterable
     {
         yield 'php false' => [['php' => false], null];
         yield 'an extension true' => [['php' => '8.4.3', 'ext-intl' => true], '8.4.3'];
         yield 'a library as a number' => [['lib-lockrot-test' => 1], null];
         yield 'a name that is no platform package' => [['php' => '8.4.3', 'acme/lib' => '1.0.0'], '8.4.3'];
+        yield 'php as a constraint' => [['php' => '^8.2'], '^8.2'];
+        yield 'php that is no version' => [['php' => 'eight'], 'eight'];
+        yield 'php in capitals as false' => [['PHP' => false], null];
+        yield 'php in capitals as false after a php' => [['php' => '8.4.3', 'PHP' => false], null];
+        yield 'an extension as a constraint' => [['php' => '8.4.3', 'ext-intl' => '^1.0'], '8.4.3'];
+        yield 'a list, whose names are numbers' => [['8.4.3'], null];
+    }
+
+    /**
+     * Composer disables a platform package other than php that `config.platform` sets to false,
+     * and normalises the last value of each name in any letter case.
+     *
+     * @dataProvider platformsThatComposerAccepts
+     *
+     * @param array<string, string|false> $platform
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('platformsThatComposerAccepts')]
+    public function testAConfigPlatformValueThatComposerAcceptsKeepsTheMoveCheck(array $platform): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['platform' => $platform]]);
+
+        $checker = MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]]), ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
+
+        self::assertSame(MoveCheck::RESOLVES, $checker->baseline()->check()->result());
+    }
+
+    /** @return iterable<string, array{array<string, string|false>}> */
+    public static function platformsThatComposerAccepts(): iterable
+    {
+        yield 'a disabled extension, a library and a dev version' => [['php' => '8.4.3', 'ext-intl' => false, 'lib-icu' => '72.1', 'ext-json' => '8.4.x-dev']];
+        yield 'php false in capitals before a php' => [['PHP' => false, 'php' => '8.4.3']];
+        yield 'a constraint before a php in capitals' => [['php' => '^8.2', 'PHP' => '8.4.3']];
     }
 
     /** Composer lower-cases each `config.platform` name, so `PHP` is the project's php. */

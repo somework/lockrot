@@ -162,7 +162,7 @@ not make the site pass `--fail-on=unchecked`: packages from packages.drupal.org 
 `undated_releases`, a gap that `accept-unchecked` does not accept. A recorded run of the PHAR over
 public Drupal site locks showed both.
 
-## Which Composer repository answers {#two-passes}
+## <a name="two-passes"></a>Which Composer repository answers {#two-passes}
 
 - lockrot looks up only lock entries that carry a `notification-url`, which Composer records for a
   package from a Composer repository. A Satis build without
@@ -170,9 +170,18 @@ public Drupal site locks showed both.
   gives its packages none, so they read as not from a Composer repository
   (`from_composer_repository` false, [note](notes.md#not_from_composer_repository)).
 
-- lockrot asks Composer repositories in Composer's lookup order, and the first that lists a
-  package answers for it. A repository that fails or does not list the package passes it to the
-  next.
+- lockrot asks Composer repositories in Composer's lookup order, each for the packages that its
+  `only` and `exclude` admit. The first
+  [canonical](https://getcomposer.org/doc/articles/repository-priorities.md#canonical-repositories)
+  repository that lists a package answers for it. A repository that does not list the package
+  passes it to the next.
+
+- When a canonical repository fails on a package, lockrot asks no later repository for it, as
+  Composer does. The package's metadata is then [unavailable](notes.md#metadata_unavailable).
+
+- A repository with `canonical: false` answers only for a package that no later repository lists,
+  and its failure passes the package to the next. Composer merges the versions of such
+  repositories, but lockrot reads the metadata of one.
 
 - lockrot asks each repository for tagged releases first. It fetches a package's `~dev` branch
   file only when the package has no tagged release.

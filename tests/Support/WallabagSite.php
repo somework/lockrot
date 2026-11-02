@@ -38,25 +38,27 @@ final class WallabagSite
     public const DIR = __DIR__.'/../fixtures/sites/wallabag-2.6.14/';
     private const NOW = '2026-10-18T00:00:00+00:00';
 
-    public static function analyze(string $targetPhp): Report
+    /** @param array<string, mixed>|null $platform `config.platform` in place of the site's own */
+    public static function analyze(string $targetPhp, ?array $platform = null): Report
     {
         $server = FixtureRepositoryServer::fromLockFiles([self::DIR.'composer.lock'], self::DIR.'http/p2');
         $server->withRecordedAdvisoryApi(self::DIR, self::DIR.'http/advisories');
         $server->start();
         try {
-            return self::analyzeOn($server, $targetPhp);
+            return self::analyzeOn($server, $targetPhp, $platform);
         } finally {
             $server->stop();
         }
     }
 
-    private static function analyzeOn(FixtureRepositoryServer $server, string $targetPhp): Report
+    /** @param array<string, mixed>|null $platform */
+    private static function analyzeOn(FixtureRepositoryServer $server, string $targetPhp, ?array $platform): Report
     {
         $clock = Clock::fixed(self::NOW);
         $auth = ForgeAuth::withTokens(new Tokens(null, null));
         $json = JsonPath::decodeFile(self::DIR.'composer.json');
         $config = $server->config();
-        $config->merge(['config' => ['platform' => JsonPath::arrayAt($json, ['config', 'platform'])]]);
+        $config->merge(['config' => ['platform' => $platform ?? JsonPath::arrayAt($json, ['config', 'platform'])]]);
         $repositories = $server->repositories();
         $io = new NullIO();
         /** @var array<string, mixed> $json */

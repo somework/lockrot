@@ -71,7 +71,7 @@ What each value fails the run on, and which to start with, is in [In CI](ci.md).
 |---|---|---|
 | `--format=<format>` | Output format for stdout. Values as for the `format` key | `format` |
 | `--fail-on=<values>` | The values that make this run exit `1`, comma-separated. Values as for the `fail-on` key | `LOCKROT_FAIL_ON`, `fail-on` |
-| `--target-php=<version>` | PHP version the project runs on, such as `8.4` | `LOCKROT_TARGET_PHP`, `target-php` |
+| `--target-php=<version>` | PHP version the project runs on: a major, a minor or a patch, such as `8.4`. A value with text after the version is exit `2` | `LOCKROT_TARGET_PHP`, `target-php` |
 | `--dev` | Also check `packages-dev` | `include-dev` |
 | `--all` | List every checked package, not only graded ones (in `table`, under a final `not flagged` group) | — |
 | `--offline` | Never reach the network: repository metadata comes from Composer's cache, activity from lockrot's. lockrot reports a package that is missing from the cache as unavailable ([Working offline](internals.md#working-offline)) | — |
@@ -96,7 +96,7 @@ Exit codes are in [ci.md](ci.md#exit-codes).
 |---|---|
 | `LOCKROT_DISABLE` | `1` or `true`: `composer lockrot` and the PHAR print `lockrot disabled via LOCKROT_DISABLE` on stderr and exit `0` before they read anything — the command line, `composer.json` or the lock. lockrot also skips the install-time summary. `lockrot.phar self-update` ignores it |
 | `LOCKROT_FAIL_ON` | Overrides `fail-on` |
-| `LOCKROT_TARGET_PHP` | Overrides `target-php` |
+| `LOCKROT_TARGET_PHP` | Overrides `target-php`. Values as for `--target-php` |
 | `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN` | Token for github.com (S3, S4). `GITHUB_TOKEN` counts only when `GITHUB_SERVER_URL` and `GH_HOST` are each unset, empty or name github.com. When Composer holds credentials for github.com, lockrot sends Composer's instead ([credentials](internals.md#repository-hosts-and-credentials)) |
 | `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN` | Personal access token, sent to gitlab.com only. `GITLAB_TOKEN` counts only when `CI_SERVER_URL`, `GITLAB_HOST`, `GL_HOST` and `GITLAB_URI` are each unset, empty or name gitlab.com. Without credentials, GitLab hides the archived flag (S3). A self-hosted instance uses Composer's `gitlab-token` or `gitlab-oauth` ([credentials](internals.md#repository-hosts-and-credentials)) |
 | `COMPOSER` | The manifest, as for every Composer command: `COMPOSER=alt.json composer lockrot` reads `extra.lockrot` from `alt.json`, analyses `alt.lock` and looks for the baseline next to `alt.json` |

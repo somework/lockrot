@@ -7,6 +7,7 @@ namespace Lockrot\Data\Repository;
 use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
 use Composer\Repository\ComposerRepository;
+use Composer\Repository\FilterRepository;
 use Composer\Repository\RepositoryInterface;
 use Lockrot\Clock;
 use Lockrot\Deadline;
@@ -42,7 +43,7 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
     private bool $offline;
     private Deadline $deadline;
 
-    /** @param list<RepositoryInterface> $repositories only ComposerRepository instances are queried */
+    /** @param list<RepositoryInterface> $repositories a ComposerRepository is queried, also through the FilterRepository that wraps it */
     public function __construct(array $repositories, Clock $clock, bool $offline = false, ?Deadline $deadline = null)
     {
         $this->repositories = $repositories;
@@ -52,9 +53,11 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
     }
 
     /**
-     * The first repository, in configured order, that resolves a name wins. A name that a
-     * repository could not answer, absent or failed, stays in the queue for the next one. A failure
-     * reason is reported only when no repository resolved the name.
+     * The first canonical repository, in configured order, that resolves a name wins. A repository
+     * with `only` or `exclude` is asked only for the names that its filter admits. A name that a
+     * canonical repository fails on fails with that reason, and no later repository is asked for it.
+     * A repository with `canonical: false` answers a name only when no later repository resolves it,
+     * and its failure leaves the name to the later ones.
      *
      * @param array<string, ?string> $installedByName
      */
@@ -62,27 +65,44 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
     {
         $remaining = array_keys($installedByName);
         $metadata = [];
+        $notCanonical = [];
         $reasons = [];
+        $failed = [];
 
         foreach ($this->repositories as $repository) {
-            if ($remaining === [] || !$repository instanceof ComposerRepository) {
+            $filter = $repository instanceof FilterRepository ? $repository : null;
+            $inner = $filter === null ? $repository : $filter->getRepository();
+            if ($remaining === [] || !$inner instanceof ComposerRepository) {
                 continue;
             }
-            $batch = $this->loadFromRepository($repository, $remaining, $installedByName);
-            $url = $repository->getRepoConfig()['url'] ?? null;
-            // A repository is asked only for the names that the earlier ones left unresolved.
+            $canonical = $filter === null || self::isCanonical($filter);
+            $asked = $filter === null ? $remaining : self::kept($remaining, static fn (string $name): bool => self::admits($filter, $name));
+            $batch = $this->loadFromRepository($inner, $asked, $installedByName);
+            $url = $inner->getRepoConfig()['url'] ?? null;
             foreach ($batch->metadata() as $name => $meta) {
-                $metadata[$name] = $meta->withComposerRepositoryUrl(\is_string($url) ? $url : null);
+                $meta = $meta->withComposerRepositoryUrl(\is_string($url) ? $url : null);
+                if ($canonical) {
+                    $metadata[$name] = $meta;
+                } else {
+                    $notCanonical[$name] ??= $meta;
+                }
             }
             foreach ($batch->failed() as $name => $reason) {
-                $reasons[$name] = $reason;
+                if ($canonical) {
+                    $failed[$name] = $reason;
+                } else {
+                    $reasons[$name] = $reason;
+                }
             }
-            $remaining = $this->unresolved($remaining, $metadata);
+            $remaining = self::kept($remaining, static fn (string $name): bool => !isset($metadata[$name]) && !isset($failed[$name]));
         }
 
         $notFound = [];
-        $failed = [];
         foreach ($remaining as $name) {
+            if (isset($notCanonical[$name])) {
+                $metadata[$name] = $notCanonical[$name];
+                continue;
+            }
             if (isset($reasons[$name])) {
                 $failed[$name] = $reasons[$name];
                 continue;
@@ -98,21 +118,35 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
     }
 
     /**
-     * @param list<string>                   $names
-     * @param array<string, PackageMetadata> $metadata
+     * @param list<string> $names
+     * @param callable(string): bool $keep
      *
      * @return list<string>
      */
-    private function unresolved(array $names, array $metadata): array
+    private static function kept(array $names, callable $keep): array
     {
-        $still = [];
+        $kept = [];
         foreach ($names as $name) {
-            if (!isset($metadata[$name])) {
-                $still[] = $name;
+            if ($keep($name)) {
+                $kept[] = $name;
             }
         }
 
-        return $still;
+        return $kept;
+    }
+
+    /**
+     * RepositoryManager::createRepository() moves `only`, `exclude` and `canonical` out of the
+     * repository config into FilterRepository's private state, which has no getter.
+     */
+    private static function admits(FilterRepository $repository, string $name): bool
+    {
+        return \Closure::bind(fn (): bool => $this->isAllowed($name), $repository, FilterRepository::class)();
+    }
+
+    private static function isCanonical(FilterRepository $repository): bool
+    {
+        return \Closure::bind(fn (): bool => $this->canonical, $repository, FilterRepository::class)();
     }
 
     /**
