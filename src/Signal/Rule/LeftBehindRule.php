@@ -77,10 +77,10 @@ final class LeftBehindRule implements SignalRule
             // A lower tag with a date of its own is quoted exactly.
             $atLeast = $release['highest']['at'] === null && $release['version'] === $release['highest']['pretty'];
             $candidate = ['branch' => (string) $key, 'version' => $release['version'], 'at' => $release['at'], 'php' => $release['php'] ?? null, 'at_least' => $atLeast];
-            if ($newest === null || $release['at'] > $newest['at']) {
+            if (self::newer($candidate, $newest)) {
                 $newest = $candidate;
             }
-            if ($this->floor->blocking($candidate['php']) === null && ($reachable === null || $release['at'] > $reachable['at'])) {
+            if ($this->floor->blocking($candidate['php']) === null && self::newer($candidate, $reachable)) {
                 $reachable = $candidate;
             }
         }
@@ -204,5 +204,21 @@ final class LeftBehindRule implements SignalRule
         }
 
         return (new VersionSelector(new RepositorySet()))->findRecommendedRequireVersion(new Package($package, $normalized, $newestVersion));
+    }
+
+    /**
+     * Whether $candidate releases after $than: a later date, or on the same date a higher branch. The
+     * answer must not depend on the order in which a repository lists its versions.
+     *
+     * @param array{branch: string, at: \DateTimeImmutable}      $candidate
+     * @param array{branch: string, at: \DateTimeImmutable}|null $than
+     */
+    private static function newer(array $candidate, ?array $than): bool
+    {
+        if ($than === null || $candidate['at'] > $than['at']) {
+            return true;
+        }
+
+        return $candidate['at'] >= $than['at'] && ReleaseBranch::isAbove($candidate['branch'], $than['branch']);
     }
 }

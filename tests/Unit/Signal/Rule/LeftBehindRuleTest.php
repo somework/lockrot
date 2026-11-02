@@ -15,6 +15,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class LeftBehindRuleTest extends TestCase
@@ -142,12 +143,22 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta)));
     }
 
-    public function testTwoHigherBranchesReleasedTheSameDayKeepTheFirstListed(): void
+    /** @return iterable<string, array{list<array{string, string}>}> */
+    public static function provideTwoHigherBranchesReleasedTheSameDay(): iterable
     {
-        // Packagist lists the highest version first, so a tie names the highest branch.
-        $meta = F::metadata([['3.0.0', '2026-01-01'], ['2.5.0', '2026-01-01'], ['1.9.2', '2019-03-02']]);
+        yield 'highest listed first' => [[['3.0.0', '2026-01-01'], ['2.5.0', '2026-01-01'], ['1.9.2', '2019-03-02']]];
+        yield 'highest listed last' => [[['1.9.2', '2019-03-02'], ['2.5.0', '2026-01-01'], ['3.0.0', '2026-01-01']]];
+    }
 
-        $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta));
+    /**
+     * @param list<array{string, string}> $releases
+     *
+     * @dataProvider provideTwoHigherBranchesReleasedTheSameDay
+     */
+    #[DataProvider('provideTwoHigherBranchesReleasedTheSameDay')]
+    public function testTwoHigherBranchesReleasedTheSameDayNameTheHigherBranch(array $releases): void
+    {
+        $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), F::metadata($releases)));
 
         self::assertNotNull($signal);
         self::assertStringEndsWith('; 3.x released 3.0.0 (2026-01-01)', $signal->summary());

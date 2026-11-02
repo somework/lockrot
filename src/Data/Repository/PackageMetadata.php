@@ -172,7 +172,7 @@ final class PackageMetadata
         $byBranch = [];
         $tagsOnCommit = [];
         $highestCommitByBranch = [];
-        /** @var array<array-key, string> $newestDatedByBranch the normalized version that each branch's `version` names */
+        /** @var array<array-key, string> $newestDatedByBranch the normalized version of each branch's dated `version` */
         $newestDatedByBranch = [];
         $highestCommit = null;
         $replaces = [];

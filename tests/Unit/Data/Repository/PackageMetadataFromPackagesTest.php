@@ -180,6 +180,20 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame('1.0.1', PackageMetadata::fromPackages('a/b', [$higher, $lower], new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1']['version']);
     }
 
+    public function testThreeReleasesWithTheSameTimeNameTheHighestWhereverItIsListed(): void
+    {
+        $at = '2021-01-01T00:00:00+00:00';
+        $releases = [
+            $this->load(['name' => 'a/b', 'version' => '1.0.0', 'time' => $at]),
+            $this->load(['name' => 'a/b', 'version' => '1.0.2', 'time' => $at]),
+            $this->load(['name' => 'a/b', 'version' => '1.0.1', 'time' => $at]),
+        ];
+
+        $metadata = PackageMetadata::fromPackages('a/b', $releases, new \DateTimeImmutable(self::FIXED));
+
+        self::assertSame(['1.0.2', '1.0.2'], [$metadata->lastStableVersion(), $metadata->latestStableByBranch()['1']['version']]);
+    }
+
     public function testTheBranchsHighestTagTravelsNextToItsNewestRelease(): void
     {
         $higherButOlderDate = $this->load(['name' => 'a/b', 'version' => 'v1.5.0', 'time' => '2020-01-01T00:00:00+00:00']);
