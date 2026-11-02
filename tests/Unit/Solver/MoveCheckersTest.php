@@ -98,14 +98,14 @@ final class MoveCheckersTest extends TestCase
     /**
      * Ruling R8-37: Composer's PlatformRepository refuses each `config.platform` value that is no
      * string and not false, a php of false and a name that is no platform package, so every
-     * `composer update` stops. No move resolves.
+     * `composer update` stops. No move resolves. The PHP window still reads the configured php.
      *
      * @dataProvider platformsThatComposerRefuses
      *
      * @param array<string, mixed> $platform
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('platformsThatComposerRefuses')]
-    public function testAConfigPlatformValueThatComposerRefusesChecksNoMove(array $platform): void
+    public function testAConfigPlatformValueThatComposerRefusesChecksNoMove(array $platform, ?string $configuredPhp): void
     {
         $config = new Config(false);
         $config->merge(['config' => ['platform' => $platform]]);
@@ -117,15 +117,16 @@ final class MoveCheckersTest extends TestCase
         $unchecked = ['result' => MoveCheck::NOT_CHECKED, 'form' => null, 'reason' => MoveCheck::PLATFORM_CONFIG_INVALID, 'installs' => null];
         self::assertSame($unchecked, $checker->baseline()->check()->jsonSerialize(), 'baseline');
         self::assertSame($unchecked, $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize(), 'move');
+        self::assertSame($configuredPhp, $checker->configuredPhp());
     }
 
-    /** @return iterable<string, array{array<string, mixed>}> */
+    /** @return iterable<string, array{array<string, mixed>, ?string}> the platform and its configured php */
     public static function platformsThatComposerRefuses(): iterable
     {
-        yield 'php false' => [['php' => false]];
-        yield 'an extension true' => [['php' => '8.4.3', 'ext-intl' => true]];
-        yield 'a library as a number' => [['lib-lockrot-test' => 1]];
-        yield 'a name that is no platform package' => [['php' => '8.4.3', 'acme/lib' => '1.0.0']];
+        yield 'php false' => [['php' => false], null];
+        yield 'an extension true' => [['php' => '8.4.3', 'ext-intl' => true], '8.4.3'];
+        yield 'a library as a number' => [['lib-lockrot-test' => 1], null];
+        yield 'a name that is no platform package' => [['php' => '8.4.3', 'acme/lib' => '1.0.0'], '8.4.3'];
     }
 
     /** Composer lower-cases each `config.platform` name, so `PHP` is the project's php. */

@@ -922,7 +922,7 @@
             "band-floors": 1,
             "zero-verdicts": 0,
             "sort": null,
-            "gate-bounded-new": 0,
+            "gate-bounded-new": 1,
             "baseline-cover": 0
         }
     },

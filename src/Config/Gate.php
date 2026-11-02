@@ -114,7 +114,7 @@ final class Gate
             $trippedBy[] = self::TRIP_FAIL_ON;
         }
 
-        $gate = new self($trippedBy, $applied, $standings, $failOn, $applied ? self::notApplied($report->findings(), $failOn) : []);
+        $gate = new self($trippedBy, $applied, $standings, $failOn, $applied ? self::notApplied($report->findings(), $failOn, $byPackage) : []);
         $gate->byPackage = $byPackage;
         $gate->standingCounts = $standingCounts;
         $gate->failingPackages = $failingPackages;
@@ -137,10 +137,9 @@ final class Gate
         $counted = array_map(static fn (Term $term): string => $term->flag(), $score->maintenanceTerms());
         $gate = $baseline === null ? null : $baseline->gateScore($score);
         $missing = $finding->checksMissing();
-        // A baseline covers graded findings only, so an entry carried forward for a score-0 one exempts nothing (docs/baseline.md).
         $by = RecordMarks::of(
             $score,
-            $score->total() === 0 ? null : $gate,
+            $gate,
             $baseline === null ? $counted : $baseline->uncoveredFlags(),
             $baseline === null ? $finding->flags()->advisories() : $baseline->unknownAdvisories(),
             $missing,
@@ -179,14 +178,15 @@ final class Gate
 
     /**
      * The advisories a grade or `vulnerable` value could not read, one entry per reason (SPEC §6.2,
-     * "Fail-open, visibly"). With `unchecked` active, a finding whose advisories carry S10 fails
-     * closed on it, so only a skip or an accepted `no_feed` is a gap.
+     * "Fail-open, visibly"). A finding that fails `unchecked` on S10 of its advisories fails closed,
+     * so its gap is not listed. A baseline entry that exempts the finding leaves the gap listed.
      *
-     * @param list<Finding> $findings
+     * @param list<Finding>               $findings
+     * @param array<string, GateStanding> $byPackage
      *
      * @return list<GateNotApplied> by `packages` descending, then by reason
      */
-    private static function notApplied(array $findings, FailOn $failOn): array
+    private static function notApplied(array $findings, FailOn $failOn, array $byPackage): array
     {
         if (!$failOn->has(FailOn::KIND_GRADE) && !$failOn->has(FailOn::KIND_VULNERABLE)) {
             return [];
@@ -196,7 +196,8 @@ final class Gate
             if ($finding->securityStanding()->status() !== SecurityStanding::UNCHECKED) {
                 continue;
             }
-            if ($failOn->has(FailOn::KIND_UNCHECKED) && self::advisoriesInS10($finding)) {
+            $standing = $byPackage[$finding->package()] ?? null;
+            if ($standing !== null && $standing->failsValue(FailOn::UNCHECKED) && self::advisoriesInS10($finding)) {
                 continue;
             }
             $reason = $finding->details()->uncheckedReason() ?? '';

@@ -309,6 +309,14 @@ final class TargetFixTest extends TestCase
         self::assertSame(['composer', 'update', 'acme/capped'], $fix['command']);
     }
 
+    /** `lock_platform` is a JSON list: a lock-only link after a root ceiling keeps no gap in its keys. */
+    public function testALockOnlyLinkAfterARootCeilingIsTheFirstEntryOfTheLockPlatformList(): void
+    {
+        $fix = self::fix(['packages' => [], 'packages-dev' => [], 'platform' => ['php' => '<8.1', 'php-64bit' => '<8.2']], ['require' => ['php' => '<8.1']], null);
+
+        self::assertSame([['require', 'php-64bit', '<8.2']], array_map(static fn (array $req): array => [$req['link'], $req['target'], $req['constraint']], $fix['lock_platform']));
+    }
+
     /** On a lock-only run, every root link comes from the lock's platform, and it is the root ceiling. */
     public function testALockOnlyRunReadsTheLocksPlatformAsTheRootCeiling(): void
     {

@@ -50344,6 +50344,7 @@
                     "reason": "undated_releases",
                     "blocks": [
                         "S2",
+                        "S5",
                         "S8"
                     ]
                 }
@@ -50398,7 +50399,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2, S5 and S8 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -50414,6 +50415,7 @@
                                 "reason": "undated_releases",
                                 "blocks": [
                                     "S2",
+                                    "S5",
                                     "S8"
                                 ]
                             }
@@ -50422,6 +50424,7 @@
                             "S2",
                             "S3",
                             "S4",
+                            "S5",
                             "S8"
                         ]
                     }

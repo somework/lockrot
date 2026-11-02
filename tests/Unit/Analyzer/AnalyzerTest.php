@@ -157,24 +157,48 @@ final class AnalyzerTest extends TestCase
         };
     }
 
-    /** Case `move-check‡`, whose lock records a platform PHP outside the minor of its target 8.4. */
-    public function testAMoveWithCommandsFirstSetsThePlatformPhpThatTheLockRecords(): void
+    /** Case `move-check‡`, whose composer.json sets a platform PHP outside the minor of its target 8.4. */
+    public function testAMoveWithCommandsFirstSetsThePlatformPhpThatComposersConfigSets(): void
     {
         $case = CaseHydrator::case('move-check‡');
         $inputs = JsonPath::arrayAt($case, ['inputs']);
-        $inputs['php_lock'] = ['platform-overrides' => ['php' => '7.4.29']];
+        $inputs['config_platform_php'] = '7.4.29';
         $case['inputs'] = $inputs;
 
         $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
 
         self::assertNotSame([], JsonPath::arrayAt($document, ['findings', 0, 'next_step', 'commands']));
-        self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. ', JsonPath::stringAt($document, ['findings', 0, 'next_step', 'text']));
+        self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29. ', JsonPath::stringAt($document, ['findings', 0, 'next_step', 'text']));
+    }
+
+    /**
+     * Case `move-check‡` at target 8.0, where `config.platform.php` 8.0.1 sets the PHP that Composer
+     * solves at. v2.3.5 needs 8.0.2, so the update reads v2.3.2, the newest release that 8.0.1 runs.
+     */
+    public function testAConfiguredPatchInTheTargetMinorSetsThePhpThatTheMoveIsReadAt(): void
+    {
+        $case = CaseHydrator::case('move-check‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['config_platform_php'] = '8.0.1';
+        $inputs['root'] = ['require' => ['php' => '>=7.2'] + JsonPath::arrayAt($inputs, ['root', 'require'])] + JsonPath::arrayAt($inputs, ['root']);
+        $inputs['run'] = ['target_php' => '8.0', 'project_php' => '>=7.2'] + JsonPath::arrayAt($inputs, ['run']);
+        $inputs['releases'] = array_merge(JsonPath::arrayAt($inputs, ['releases']), [['version' => 'v2.3.5', 'time' => '2026-07-01T00:00:00+00:00', 'php' => '>=8.0.2']]);
+        $inputs['move_check'] = ['php' => '8.0.1', 'config_php' => '8.0.1'] + JsonPath::arrayAt($inputs, ['move_check']);
+        $case['inputs'] = $inputs;
+
+        $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+
+        $step = JsonPath::arrayAt($document, ['findings', 0, 'next_step']);
+        $phpCheck = JsonPath::arrayAt($step, ['php_check']);
+
+        self::assertSame(['v2.3.2', true, null], [$step['newest'] ?? null, $phpCheck['target_runs'] ?? null, $phpCheck['raise_to'] ?? null]);
+        self::assertSame('resolves', JsonPath::stringAt($step, ['check', 'result']));
     }
 
     /** @return iterable<string, array{list<string>, bool, string}> the lock's php of each package, whether Composer refuses the lock itself, and the step */
     public static function refusedBaselines(): iterable
     {
-        $step = 'First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29.';
+        $step = 'First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29.';
         $refused = $step.' Composer still refuses the lock itself: the moves_not_checked note names the first cause. ';
         yield 'a lock that Composer installs' => [[], false, $step.' '];
         yield 'a refused lock with the target inside the window' => [[], true, $refused];
@@ -195,7 +219,7 @@ final class AnalyzerTest extends TestCase
     {
         $case = CaseHydrator::case('move-check‡');
         $inputs = JsonPath::arrayAt($case, ['inputs']);
-        $inputs['php_lock'] = ['platform-overrides' => ['php' => '7.4.29']];
+        $inputs['config_platform_php'] = '7.4.29';
         $lock = JsonPath::arrayAt($inputs, ['lock']);
         $first = JsonPath::arrayAt($lock, [0]);
         foreach ($phps as $index => $php) {
@@ -780,6 +804,18 @@ final class AnalyzerTest extends TestCase
         self::assertNotNull($window);
         self::assertSame('7.1', $window->targetMinor());
         self::assertSame('7.1.99', $window->toArray()['target']['php']);
+    }
+
+    public function testARunWithoutAMoveCheckReadsTheTargetAtComposerJsonsPlatformPhp(): void
+    {
+        $project = ProjectConfig::fromArray(['config' => ['platform' => ['php' => '7.1.3']]]);
+
+        $report = $this->analyzer($this->loader(), $this->http([]), true, new Allowlist([]), false, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, null, null, '7.1')
+            ->analyze(LockFile::fromArray(['packages' => []]), $project, false);
+
+        $window = $report->phpWindow();
+        self::assertNotNull($window);
+        self::assertSame(['7.1.3', '7.1.3'], [$window->toArray()['target']['php'], $window->platformOverride()]);
     }
 
     public function testPackagesNotFromAComposerRepositoryAreCountedInOneNote(): void

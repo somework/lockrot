@@ -17,14 +17,14 @@
 <options=bold><fg=red>high (3)</fg=red></options=bold>
   matomo/searchengine-and-social-list dev-master  direct  ·  pinned · stale
       18 = pinned 16 + stale 2 [¼ of 8]
-      do: First set config.platform.php to your PHP 8.4 release: the lock records 8.1.0. require a tag — the newest is
-          3.14.0 (2023-01-20), older than your snapshot (2026-07-15); review, or replace; stale stays
+      do: First set config.platform.php to your PHP 8.4 release: Composer's config sets 8.1.0. require a tag — the
+          newest is 3.14.0 (2023-01-20), older than your snapshot (2026-07-15); review, or replace; stale stays
       pinned       pinned to branch snapshot dev-master
       stale        last release 2023-01-20 (3.6 years ago)
   matomo/referrer-spam-list dev-master  direct  ·  pinned
       16 = pinned 16
-      do: First set config.platform.php to your PHP 8.4 release: the lock records 8.1.0. require a tag — the newest is
-          4.0.5 (2026-04-15), older than your snapshot (2026-09-04); review, or replace
+      do: First set config.platform.php to your PHP 8.4 release: Composer's config sets 8.1.0. require a tag — the
+          newest is 4.0.5 (2026-04-15), older than your snapshot (2026-09-04); review, or replace
       pinned       pinned to branch snapshot dev-master
       age: newest release 4.0.5 2026-04-15 (0.4 years ago); last push 2026-09-04 (less than three weeks ago)
   pear/console_getopt v1.4.3  via matomo/decompress  ·  silent
@@ -54,7 +54,7 @@ libyears: 0.9 behind across 47 of 52 packages · 0.1 from direct requirements ·
 furthest behind maxmind-db/reader v1.13.1 at 0.8
 pulled in by: matomo/cache 1 · matomo/decompress 1
 advisories: 0 packages asked, 52 not asked
-php: the lock installs on PHP 8.1 to 8.5; Composer checks it at 8.1.0 from config.platform.php
+php: the lock installs on PHP 8.1 to 8.5; Composer solves at 8.1.0 from config.platform.php
 <fg=red>gate: fails · --fail-on=high · 5 findings fail it ·</fg=red>
 <fg=red>advisories not applied to 52 packages: not checked (no repository publishes advisories) · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for

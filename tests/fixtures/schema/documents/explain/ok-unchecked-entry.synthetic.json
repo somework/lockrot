@@ -167,20 +167,9 @@
   },
   "gate": {
    "reaches_fail_on": true,
-   "fails": true,
-   "exempt_by": null,
-   "by": [
-    {
-     "value": "unchecked",
-     "kind": "unchecked",
-     "facts": [
-      {
-       "kind": "signal",
-       "id": "S2"
-      }
-     ]
-    }
-   ],
+   "fails": false,
+   "exempt_by": "baseline",
+   "by": [],
    "basis": {
     "score": 0,
     "verdict": null,

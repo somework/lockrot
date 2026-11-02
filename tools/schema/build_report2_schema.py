@@ -233,7 +233,9 @@ defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether the mov
                     closed(['inline', 'with-dependencies', 'with-all-dependencies'])),
         'reason': nul(("Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the "
                        "`moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), "
-                       "`install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), `no_release_read` (no release of the row was read, so the move names no version), "
+                       "`install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), "
+                       "`platform_config_invalid` (Composer refuses a `config.platform` entry of its merged config: `php: false`, a value that is neither a string "
+                       "nor false, or a name that is no platform package), `no_release_read` (no release of the row was read, so the move names no version), "
                        "`pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: "
                        "the `move_check_failed` note). An open set (§8.2)."),
                       {'type': 'string', 'pattern': SNAKE, 'x-known-values': MOVE_CHECK_REASONS}),
@@ -246,18 +248,18 @@ defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether the mov
 HOLDER_MOVE = obj("The holder's own move, `{kind, to_branch, constraint, check}` of its `next_step`, so a sentence writes \"its own move, require ^4.4.51\" without reading another finding (§5.3, round 2).", {
     'kind': open_set(['replace', 'find-alternative', 'tag', 'require', 'update', 'raise-php', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix'],
                      "The holder's `next_step.kind` (an open set, as `next_step.kind`).", HYPHEN),
-    'to_branch': nul("The holder's `next_step.to_branch`.", ref('branchLabel')),
-    'constraint': nul("The holder's `next_step.constraint`.", {'type': 'string'}),
+    'to_branch': nul("The holder's `next_step.to_branch`; null when the holder's is null.", ref('branchLabel')),
+    'constraint': nul("The holder's `next_step.constraint`; null when the holder's is null.", {'type': 'string'}),
     'check': ref('moveCheck'),
 })
 defs['holder'] = nul(("The holder's own finding in this report, for display only (no score reads it; §5.3): `{verdict, lead, flag_ids[], replacement, next_step}`. "
                       "Null for the root, for a holder that is not a finding of this report, and for a hold whose `version` is not the holder's locked version."),
     obj("A holder's finding, restated.", {
         'verdict': ref('verdict'),
-        'lead': nul("The holder's `lead`.", ref('maintenanceFlag')),
+        'lead': nul("The holder's `lead`; null when no flag of the holder counts.", ref('maintenanceFlag')),
         'flag_ids': arr("The holder's counted flag ids, in flag order (every list of bare flag ids is `flag_ids`, §8.2 \"One name, one type\").", ref('flag'), uniqueItems=True),
         'direct': d("The holder's own `direct`: whether the run requires the holder directly.", {'type': 'boolean'}),
-        'replacement': nul("The holder's `replacement` (a Composer package name), so an abandoned holder reads \"held by abandoned symfony/x (replacement: …)\".", ref('packageName')),
+        'replacement': nul("The holder's `replacement` (a Composer package name), null when the holder's is null, so an abandoned holder reads \"held by abandoned symfony/x (replacement: …)\".", ref('packageName')),
         'next_step': nul("The holder's own move; null when the holder's finding has no move (score 0).", HOLDER_MOVE),
     }))
 defs['heldBy'] = obj(("One link that excludes the move or the fix (§5.3): the root's or a locked package's `require`, `require-dev`, `conflict` or `replace`, "
@@ -442,7 +444,7 @@ defs['replacement'] = nul("The replacement a `replace` move names (§5.6 `replac
     'named_by': open_set(['repository', 'lock'], "Who named it (S1's `marked_by`): an open set (§8.2, round 3)."),
     'finding': nul("The replacement's own finding when it is graded in this report, `{verdict, lead, flag_ids}` (filled as `holder` is); else null.", obj('A graded replacement.', {
         'verdict': ref('grade'),
-        'lead': nul("Its lead.", ref('maintenanceFlag')),
+        'lead': nul("Its lead; null when no maintenance flag counts.", ref('maintenanceFlag')),
         'flag_ids': arr('Its counted flag ids, in flag order.', ref('flag'), uniqueItems=True),
     })),
 }))
@@ -583,7 +585,7 @@ defs['branchFixes'] = obj(("How many counted advisories one branch fixes, and th
 defs['ignoredAdvisory'] = obj("An advisory Composer's audit ignore lists match (§5.1): not counted, never in S9 (round 4), listed here on every `security` shape.", {
     'id': ref('advisoryId'),
     'cve': nul('Its CVE, null when it has none.', {'type': 'string'}),
-    'title': nul('Its title, without a leading `<cve>: `.', {'type': 'string'}),
+    'title': nul('Its title, without a leading `<cve>: `; null when the repository serves only the partial advisory form (id and affected range).', {'type': 'string'}),
     'severity': ref('severity'),
     'by': open_set(['policy.advisories', 'audit.ignore', 'audit.ignore-severity'], ("The Composer setting that ignores it (SPEC §4.1): `policy.advisories`, or `audit.ignore` or "
                    "`audit.ignore-severity` when composer.json sets no `config.policy.advisories`. An open set: read an unknown key as another setting."), DOTTED),
@@ -831,7 +833,8 @@ defs['findingGate'] = obj("Where the finding stands against the gate values (§6
     'exempt_by': nul("What keeps a reaching finding from failing: `baseline` when the finding reaches a value and the baseline is why it fails none. "
                      "A grade value does not fail while the gate score stays below it. A flag value does not fail while the baseline entry covers each "
                      "counted flag that reaches it, and a `vulnerable` value while the entry knows each counted advisory that reaches it. An `unchecked` "
-                     "value does not fail while the gate score is 0. So a `known` finding is exempt from every value. Set only under a baseline entry (I15b). An open set.",
+                     "value does not fail while the gate score is 0. So a `known` finding is exempt from every value, `unchecked` included, also when its score is 0. "
+                     "Set only under a baseline entry (I15b). Null when nothing exempts the finding. An open set.",
                      {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['baseline']}),
     'by': arr("One entry per value of `run.gates[]` the finding fails (`by[].value` ∈ `run.gates[]`), naming the facts whose records are `error` (§6.2; `Output\\RecordMarks` is the single producer).",
               obj('One failing value.', {
@@ -861,11 +864,11 @@ def sig_data(desc, props):
 
 defs['s1'] = sig_data("S1 (§2.1): marked abandoned by its repository or by the lock.", {
     'marked_by': closed(['repository', 'lock'], 'Who marked it (revision 3). Closed (§8.2).'),
-    'replacement': nul('The replacement as the registry or the lock wrote it: free text, a package name or a URL (data; `next_step.replacement` classifies it). Text, never markup.', {'type': 'string', 'minLength': 1}),
+    'replacement': nul('The replacement as the registry or the lock wrote it: free text, a package name or a URL (data; `next_step.replacement` classifies it). Text, never markup. Null when the package is abandoned with no replacement named (`abandoned: true`).', {'type': 'string', 'minLength': 1}),
     'replacement_url': nul("packagist.org's page for the replacement when it is a package name packagist.org named; else null. Show a link only when it is a string.", {'type': 'string', 'pattern': '^https?:\\/\\/'}),
 })
 defs['s2'] = sig_data('S2 (§2.1): no release for years (report-1, unchanged).', {
-    'last_release': ref('dateTime'), 'last_version': nul('The version `last_release` dates.', {'type': 'string'}),
+    'last_release': ref('dateTime'), 'last_version': d('The version `last_release` dates. S2 fires only on a dated release, so it is never null.', {'type': 'string'}),
     'years': ref('years'), 'dated_by': ref('datedBy')})
 FORGE = d("The forge kind, as the repository reference lockrot asked names it (`RepoRef::forge()`; a self-hosted GitLab is `gitlab`): `github gitlab bitbucket` known; "
           "Forgejo/Gitea and GitHub Enterprise are on the roadmap. An open set (§8.2). Never null: S3 and S4 exist only when lockrot asked a forge.",
@@ -900,7 +903,7 @@ defs['s7'] = sig_data(("S7: a direct requirement pulling in graded transitive pa
         'package': ref('packageName'),
         'chain': arr('From this requirement down to the package.', ref('packageName')),
         'verdict': d("The package's grade (report-1's cause word moved to `lead`; §8.4).", ref('grade')),
-        'lead': nul('Its lead.', ref('maintenanceFlag')),
+        'lead': nul('Its lead; null when no maintenance flag counts.', ref('maintenanceFlag')),
         'flag_ids': arr('Its counted flag ids, in flag order (critic round: never `flags`).', ref('flag'), minItems=1, uniqueItems=True),
     }), minItems=1),
 })
@@ -951,7 +954,8 @@ defs['s9row'] = obj("One counted advisory on the installed version (§7.6 S9 `da
     'id': ref('advisoryId'),
     'cve': nul('Its CVE; null when it has none.', {'type': 'string'}),
     'title': nul(('Its title without a leading `<cve>: ` (round 2), so `{cve} {title}` never prints the CVE twice; trimmed, runs of whitespace collapsed (attack round 1). '
-                  'Text, never markup: a page that styles backticks escapes them here (102 corpus titles hold backticks).'), {'type': 'string'}),
+                  'Text, never markup: a page that styles backticks escapes them here (102 corpus titles hold backticks). Null when the repository serves only the '
+                  'partial advisory form (id and affected range).'), {'type': 'string'}),
     'link': nul('Its advisory page; null when the repository serves none.', {'type': 'string'}),
     'reported_at': nul('When it was reported; null when the repository does not say.', ref('dateTime')),
     'severity': d('Its severity bucket (§5.2).', ref('severity')),
@@ -1049,11 +1053,14 @@ UNMEASURED_BY_KEY = {
                             "Why `age.installed` is null: a dev pin (`branch_snapshot`), a tag dated only by a commit that other tags share (`shared_commit`), "
                             "or a lock entry with no date (`undated`)."),
     'releaseUnmeasured': (['not_from_composer_repository', 'unavailable', 'not_found', 'no_stable_release', 'undated_releases'],
-                          "Why `age.release` is null: the metadata was not read (the `metadata.status` value), no stable release, or no dated stable release."),
+                          ("Why `age.release` is null: the metadata was not read (the `metadata.status` value), no stable release (`no_stable_release`), or "
+                           "the highest stable tag has no trusted date (`undated_releases`): it has no date, or its date is a commit that the split's "
+                           "tags share, also when lower releases are dated.")),
     'branchReleaseUnmeasured': (['not_from_composer_repository', 'unavailable', 'not_found', 'branch_snapshot', 'no_branch_row', 'undated_releases', 'above_listed_releases'],
                                 "Why `age.branch_release` is null. The metadata was not read (the `metadata.status` value, which comes first). "
                                 "Or the installed line has no dated release: a snapshot names no line, the branch has no release, or its releases have no date. "
-                                "Or the installed version is above every listed release."),
+                                "Or a stable installed version is above every listed stable release (`above_listed_releases`). An installed pre-release above "
+                                "the newest stable release of its branch is read against that release."),
     'pushUnmeasured': (ACT_REASONS + ['undated'], "Why `age.push` is null: `activity.reason` when the activity was not read, or `undated` when the answer carried no date."),
     'libyearsUnmeasured': (['not_from_composer_repository', 'unavailable', 'not_found', 'branch_snapshot', 'shared_commit', 'undated', 'no_stable_release', 'undated_releases'],
                            "Why `libyears` is null. The metadata was not read (the `metadata.status` value). Or the installed end has no date that lockrot trusts "
@@ -1111,7 +1118,7 @@ defs['abandonedIgnored'] = nul(("Composer's abandoned ignore list (the audit ope
     }))
 defs['composerJsonSection'] = closed(['require', 'require-dev'], 'A composer.json section whose keys name packages. Closed.')
 defs['depth'] = nul(("The fewest hops from a composer.json requirement that the run walked to the package: the length of `chain` minus one (W12). "
-                     "No score, gate, sort or baseline reads it."), dict(INT0))
+                     "No score, gate, sort or baseline reads it. Null exactly when `depth_unmeasured` is set: the run walked no path to the package."), dict(INT0))
 REGISTRY = {'type': 'string', 'pattern': '^[a-z0-9][a-z0-9.-]*$', 'x-known-values': ['packagist.org', 'repo.packagist.com', 'wp-packages.org', 'packages.drupal.org']}
 defs['advisoryFeed'] = obj("What one advisory-capable Composer repository did for the name of this package (C75), in `run.advisory_lookup.repositories` order.", {
     'composer_repository': d(("The name that Composer gives the repository, credentials stripped. It joins `run.advisory_lookup.repositories[]` and the notes."),
@@ -1312,8 +1319,8 @@ defs['scoreModel'] = obj(("The score model, self-described (§3.7): ordered flag
         'band': nul('The band its points reach alone (the pill tone); null for `vulnerable`.', ref('grade')),
         'can_corroborate': d('Whether it can follow another counted maintenance flag.', {'type': 'boolean'}),
         'corroborating_points': nul('Its quarter; null for `abandoned`, `silent` and `vulnerable`.', INT1),
-        'max_maintenance': nul('The most corroboration can add under it as lead.', INT1),
-        'max_maintenance_flags': nul('The flag set that reaches `max_maintenance` (round 4).', arr('Flags.', ref('flag'), minItems=1)),
+        'max_maintenance': nul('The most corroboration can add under it as lead; null for the security flag `vulnerable`.', INT1),
+        'max_maintenance_flags': nul('The flag set that reaches `max_maintenance` (round 4); null exactly when `max_maintenance` is null.', arr('Flags.', ref('flag'), minItems=1)),
         'raised_by': arr('The signals that raise it.', ref('signalId'), minItems=1),
         'thresholds': arr('The `run.thresholds` keys it reads.', open_set(['release-warn-years', 'release-high-years', 'push-warn-years', 'push-high-years'], 'A threshold key.', HYPHEN)),
         'basis': obj('How its points are formed (round 4).', {
@@ -1388,14 +1395,16 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
     'target_php': d('The target PHP minor (`8.4`) from the first link of the target chain that sets it, as `PhpReleaseDates::minorOf` writes it (`8` reads `8.0`, `8.4.7` reads `8.4`), the form baseline-2 stores; '
                     'always a string with `target_php_source` beside it (§8.2).', {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}),
     'target_php_source': closed(['option', 'env', 'config', 'platform', 'runtime'], "Which link of the chain set it (`config` = `extra.lockrot.target-php`, `platform` = `config.platform.php`). Closed (§8.2)."),
-    'project_php': nul("The project's `require.php` as written (report-1); never parse it.", {'type': 'string', 'minLength': 1}),
+    'project_php': nul("The project's `require.php` as written (report-1); never parse it. Null when composer.json has no `require.php`, "
+                        "an empty one, or no composer.json was read.", {'type': 'string', 'minLength': 1}),
     'project_php_lowest': nul("The lowest stable MAJOR.MINOR.PATCH that `require.php` admits: each range of the constraint is read at its start and at the next patch, "
                               "and the first point that the constraint matches counts (`^7.4.0-RC1` gives `7.4.0`; `7.2.0` for `^7.2 || ^8.0.0`; an exclusive stable bound gives the next patch: `>7.4` gives `7.4.1`, "
                               "and the post-release bound `>=7.4.0-p1` gives `7.4.1`; an exclusive pre-release bound gives its release: `>7.4.0-RC1` gives `7.4.0`; a `!=` hole moves it: `>=8.1 !=8.1.0` gives `8.1.1`; "
                               "a range with no stable version is passed: `==7.4.0-RC1 || ^8.1` gives `8.1.0`). Null exactly when `PhpFloor` has no lowest: no `require.php`, `*`, an alternative with no lower bound (`<8`), "
                               "a constraint that admits no stable version (`>=8.1 <8.1.0`, `>=8.2 <8.1`), or one it cannot parse (§5.3). Print it with a trailing `.0` patch dropped.",
                               {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+\\.[0-9]+$'}),
-    'lock_file': nul('The name of the lock (report-1), never its path.', {'type': 'string'}),
+    'lock_file': nul('The name of the lock (report-1), never its path. Null only in a report built without a run, such as a contract fixture: '
+                      '`composer lockrot` always writes the name.', {'type': 'string'}),
     'fail_on': d("The parsed values in kind order (grade, flag, vulnerable, unchecked; a list holds one value per kind), joined with `,`, no spaces, lower case (`high`, "
                  "`left-behind,vulnerable-high`, `none`): one gate writes one string whatever order it was typed in (§6.1). report-1's string type.",
                  {'type': 'string', 'pattern': '^[a-z][a-z0-9-]*(,[a-z][a-z0-9-]*)*$'}),
@@ -1405,7 +1414,8 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
     'include_dev': d("Whether packages-dev were analysed (`--dev`): the graph then walks `require-dev` too, so a reach sentence names the requirements it walked. Equal to the report's root `include_dev`.",
                      {'type': 'boolean'}),
     'mode': copy.deepcopy(R1RUN['mode']),
-    'thresholds': d("The ages, in years, that raise `silent`, `left-behind` and `stale`: each flag of `score_model.flags` names the keys that it reads in `thresholds`.", copy.deepcopy(R1RUN['thresholds'])),
+    'thresholds': d("The ages, in years, that raise `silent`, `left-behind` and `stale`: each flag of `score_model.flags` names the keys that it reads in `thresholds`.",
+                    copy.deepcopy(next(x for x in R1RUN['thresholds']['oneOf'] if x.get('type') == 'object'))),
     'flag_ids': arr('The eight flag ids in flag order (the vocabulary used, not a setting).', ref('flag'), minItems=1, uniqueItems=True),
     'verdicts': arr('The seven verdicts, highest first.', ref('verdict'), minItems=1, uniqueItems=True),
     'graded_verdicts': arr('The grades, highest first (replaces `flagged_verdicts`).', ref('grade'), minItems=1, uniqueItems=True),
@@ -1414,7 +1424,7 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
     'text_grammar': d('The version of the sentence grammars: MoveText, GateText, FlagSentence, SignalSentence, NoteSentence, the suffix and the command renderings (§7.11, round 4). ScoreText is versioned apart, by `score_model.score_text_grammar`.', INT1),
     'score_model': ref('scoreModel'),
     'advisory_lookup': ref('advisoryLookup'),
-    'move_check': nul("How Composer's solver checked the run's moves (§5.6). `composer lockrot` always writes it. A run that checks no move says why in `baseline` and `reason`.", obj('The move check of the run.', {
+    'move_check': nul("How Composer's solver checked the run's moves (§5.6). `composer lockrot` always writes it. A run that checks no move says why in `baseline` and `reason`. Null means a report built without the move check, such as the contract fixtures.", obj('The move check of the run.', {
         'composer': nul('The version of the Composer that solved; null when nothing solved.', {'type': 'string', 'minLength': 1}),
         'blocks_advisories': d('Whether the solve removed the versions that an advisory affects, as Composer does in an update.', {'type': 'boolean'}),
         'blocking_disabled_by': arr("The switches that turn off the advisory blocking of the running Composer, in this order: " + ', '.join('`%s`' % n for n in BLOCKING_SWITCHES) + ". "
@@ -1436,12 +1446,16 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
                          {'properties': {'baseline': {'enum': ['not_checked']}, 'reason': {'type': 'string'}}}]}])),
     'php_window': nul('On which PHP minors the lock installs at each minor\'s newest patch, with require-dev and without (§5.9); null when a package or the root provides or replaces `php` or `php-64bit`, or a php link does not parse.',
                       obj('The PHP window of the lock.', {
-        'platform_override': nul("The lock's `platform-overrides.php`: the PHP at which `composer install` checks the lock.", {'type': 'string', 'minLength': 1}),
+        'platform_override': nul(("`config.platform.php` from Composer's merged config (composer.json, then the global `config.json`): the PHP at which "
+                                  "`composer update` solves, which the move check and `target_fix` read. Null when no config sets it. The lock's "
+                                  "`platform-overrides` records the value of the last update, and `composer install` checks the lock at that value."),
+                                 {'type': 'string', 'minLength': 1}),
         'host_requires': arr('The host features that a requirement names (`php-debug`, `php-ipv6`, `php-zts`), sorted.', closed(['php-debug', 'php-ipv6', 'php-zts']), uniqueItems=True),
         'with_dev': nul('Packages, packages-dev and the root with require-dev; null when the lock has no `packages-dev` key.', ref('phpWindowSet')),
         'without_dev': ref('phpWindowSet'),
         'target': obj('The target PHP against the window.', {
-            'php': d("The php that the move check solves at: `config.platform.php` when it lies in the target minor, else the minor at patch 99.", {'type': 'string', 'pattern': '^[0-9]+(\\.[0-9]+)*$'}),
+            'php': d(("The php that the move check solves at: `config.platform.php` when it is a stable release in the target minor, in its "
+                      "normalized `X.Y.Z` form (`v8.4.1` and `8.4.1-p1` give `8.4.1`), else the minor at patch 99."), {'type': 'string', 'pattern': '^[0-9]+(\\.[0-9]+)*$'}),
             'inside': d('Whether the set with require-dev (`without_dev` when `with_dev` is null) admits that point.', {'type': 'boolean'}),
         }),
         'target_fix': nul(("What admits the target (§5.9): the package links that exclude it and Composer's answer to their update at the target's "
@@ -1463,8 +1477,8 @@ RUN_RELATION = {'description': '`fail_on` is `none` exactly when `gates` is empt
                           {'properties': {'fail_on': {'not': {'enum': ['none']}}, 'gates': {'minItems': 1}}}]}
 TARGET_FIX_UNCHECKED = {'properties': {'php_window': {'properties': {'target_fix': {'properties': {'check': {'enum': ['not_checked']}}, 'required': ['check']}}, 'required': ['target_fix']}},
                         'required': ['php_window']}
-TARGET_FIX_RELATION = {'description': ("`run.php_window.target_fix.reason` is null on a `not_checked` fix exactly when `move_check` is null: a run that checks no move "
-                                       "names no reason."),
+TARGET_FIX_RELATION = {'description': ("`run.php_window.target_fix.reason` is null on a `not_checked` fix exactly when `move_check` is null: a report built without the move check "
+                                       "names no reason. A run that checks no move writes `move_check` and names its reason."),
                        'anyOf': [{'not': TARGET_FIX_UNCHECKED},
                                  {'properties': {'move_check': {'type': 'null'}, 'php_window': {'properties': {'target_fix': {'properties': {'reason': {'type': 'null'}}}}}}},
                                  {'properties': {'move_check': {'type': 'object'}, 'php_window': {'properties': {'target_fix': {'properties': {'reason': {'type': 'string'}}}}}}}]}
@@ -1509,7 +1523,8 @@ defs['noteAdvisoriesNotChecked']['description'] = ("`advisories_not_checked` (0.
 defs['noteAdvisoriesDisabledByPolicy'] = obj(("`advisories_disabled_by_policy` (§5.1, §6.2): Composer's policy stops Composer blocking installs and updates on "
                                                "advisories. It only informs: lockrot still asks and counts every advisory."), {
     'policy_key': open_set(['policy', 'policy.advisories', 'COMPOSER_POLICY'],
-                           'The full Composer config key, or the environment variable `COMPOSER_POLICY`. Open.', POLICY_KEY),
+                           ('The full Composer config key, or the environment variable `COMPOSER_POLICY`. Open. When `COMPOSER_POLICY` is set, '
+                            'Composer reads it in place of `config.policy`, so the key is `COMPOSER_POLICY`, as in `run.move_check.blocking_disabled_by`.'), POLICY_KEY),
     'value': d('Its value as configured (`false`, `"ignore"`, `"0"`).', {'type': ['boolean', 'string']}),
 })
 defs['noteAbandonedMarkingsIgnored'] = obj(("`abandoned_markings_ignored`: Composer's abandoned ignore list removed the abandoned marking (S1) of these packages. "
@@ -1695,9 +1710,11 @@ defs['rootGate'] = obj("The run's gate (report-1's, §6.2) plus the finding coun
     'failing_by': arr(("One entry per `run.gates` value, in its order: how many findings fail that value (their `gate.by[]` names it). Zero counts are written. "
                        "`[]` when `run.gates` is `[]`."), ref('gateValueFailing')),
     'not_applied': arr(("What the gate could not judge, so it failed open: advisories that a grade or vulnerable value could not read because nothing checked them. "
-                        "Written in a check run with a grade or vulnerable value active. With `unchecked` also active, it counts only the packages whose advisories carry no S10 "
-                        "(a skip reason: `not_from_composer_repository`, `unparseable_version`, or a `no_feed` that the project accepted), because the "
-                        "others carry S10 and fail closed. One entry per reason, by `packages` descending, then by reason. The `packages` of the entries add up to the "
+                        "Written in a check run with a grade or vulnerable value active. With `unchecked` also active, a finding's gap is left out only when two conditions hold. "
+                        "The finding fails the `unchecked` value, and its S10 names the advisories. "
+                        "Every other unchecked finding is counted, so the gate fails open visibly (§6.2). "
+                        "Examples are a skip reason (`not_from_composer_repository`, `unparseable_version`) and an accepted `no_feed`, which carry no S10. "
+                        "A baseline exemption from `unchecked` (ruling R8-41) and a failure of `unchecked` on release dates alone also keep the gap. One entry per reason, by `packages` descending, then by reason. The `packages` of the entries add up to the "
                         "findings covered. `[]` otherwise, and when nothing is missing."), ref('gateNotApplied')),
     'text': dict(rendered('The `gate:` line of the text formats, `RunGateText` (text grammar 1).', ['gate', 'run.fail_on', 'run.fail_on_source', 'run.gates', 'run.mode',
                                                                                                   'run.target_php', 'run.target_php_source']), minLength=1),
@@ -1744,7 +1761,7 @@ LIBY['properties'] = {k: LIBY['properties'][k] for k in ('total', 'direct_requir
         'shared_commit': d('A commit that other tags share dates the installed tag, and no parent tag dates it (`age.installed_unmeasured` `shared_commit`).', INT0),
         'undated': d('The installed release has no date at all (`age.installed_unmeasured` `undated`).', INT0),
         'no_stable_release': d('No stable release to measure to (`age.release_unmeasured` `no_stable_release`).', INT0),
-        'undated_releases': d('No dated release to measure to (`age.release_unmeasured` `undated_releases`).', INT0),
+        'undated_releases': d('The newest end has no trusted date (`age.release_unmeasured` `undated_releases`: the highest stable tag has none).', INT0),
     }, additionalProperties=INT0),
     'furthest_behind': LIBY['properties']['furthest_behind'], 'packages': LIBY['properties']['packages']}
 _fb = LIBY['properties']['furthest_behind']['oneOf'][0]
@@ -1791,7 +1808,7 @@ ROOT = {
                           description=R1['properties']['exposure_rule']['description'].replace(' Absent from documents written before 0.13.0.', '')),
     'unattributed': arr("Graded transitive packages reached from more than `exposure_rule.max_fan_in` direct requirements, vulnerable-only ones included; report-2 adds `lead` "
                          "and `flag_ids` (the counted flags), and `verdict` is the grade. With S7 they name every graded package a direct requirement reaches.",
-                        obj('An unattributed package.', {'package': ref('packageName'), 'verdict': ref('grade'), 'lead': nul('Its lead (jq: read `.lead`, §8.4).', ref('maintenanceFlag')),
+                        obj('An unattributed package.', {'package': ref('packageName'), 'verdict': ref('grade'), 'lead': nul('Its lead (jq: read `.lead`, §8.4); null when no maintenance flag counts.', ref('maintenanceFlag')),
                                                          'flag_ids': arr('Its counted flag ids.', ref('flag'), minItems=1, uniqueItems=True),
                                                          'fan_in': d('How many direct requirements reach it.', INT1)})),
     'rot_depth': ref('rotDepth'),

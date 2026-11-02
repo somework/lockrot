@@ -13,10 +13,13 @@ namespace Lockrot\Solver;
 final class UncheckedMoves implements MoveChecker
 {
     private string $reason;
+    private ?string $configuredPhp;
 
-    public function __construct(string $reason)
+    /** @param ?string $configuredPhp `config.platform.php` of Composer's merged config, as {@see MoveCheckers::configuredPhp()} reads it */
+    public function __construct(string $reason, ?string $configuredPhp = null)
     {
         $this->reason = $reason;
+        $this->configuredPhp = $configuredPhp;
     }
 
     public function baseline(): CheckOutcome
@@ -51,7 +54,7 @@ final class UncheckedMoves implements MoveChecker
 
     public function configuredPhp(): ?string
     {
-        return null;
+        return $this->configuredPhp;
     }
 
     public function composerVersion(): ?string

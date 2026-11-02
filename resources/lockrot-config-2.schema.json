@@ -292,7 +292,7 @@
             "minLength": 1
         },
         "push-high-years": {
-            "description": "Years without a push or commit at which S4 reaches `high` (default 5).",
+            "description": "Years without a push or commit at which S4 reaches `high` (default 5). A value below `push-warn-years` is refused: the run exits 2.",
             "type": "integer",
             "minimum": 1
         },
@@ -302,7 +302,7 @@
             "minimum": 1
         },
         "release-high-years": {
-            "description": "Years without a stable release at which S2 and S8 reach `high` (default 5).",
+            "description": "Years without a stable release at which S2 and S8 reach `high` (default 5). A value below `release-warn-years` is refused: the run exits 2.",
             "type": "integer",
             "minimum": 1
         },

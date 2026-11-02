@@ -124,6 +124,29 @@ class ACaseWithoutBranchRowsHydratesFromItsRunReleases(unittest.TestCase):
 
         self.assertEqual({'laminas/laminas-code': '~4.7.0'}, inputs['root']['require'])
 
+    def test_a_lock_entry_without_a_time_takes_the_time_of_its_merged_release(self):
+        given = self.RELEASES + [{'version': '4.7.1', 'time': '2015-06-25T11:21:15+00:00', 'php': '^7.4 || ~8.0.0', 'shared_commit': True}]
+
+        inputs = project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN, 'run_inputs': {'_releases': given}})
+
+        self.assertEqual('2015-06-25T11:21:15+00:00', inputs['lock'][0]['time'])
+
+    def test_a_lock_entry_that_the_model_reads_as_undated_stays_without_a_time(self):
+        finding = dict(self.FINDING, age={'installed_unmeasured': 'undated'})
+        given = [{'version': '4.7.1', 'time': '2015-06-25T11:21:15+00:00', 'php': '^7.4 || ~8.0.0'}]
+
+        inputs = project_fixtures.inputs_of({'finding': finding, 'run': self.RUN, 'run_inputs': {'_releases': given}})
+
+        self.assertIsNone(inputs['lock'][0]['time'])
+
+    def test_a_lock_entry_with_a_time_keeps_it_over_its_merged_release(self):
+        finding = dict(self.FINDING, age={'installed': {'at': '2021-08-30T10:00:00+00:00'}})
+        given = [{'version': '4.7.1', 'time': '2015-06-25T11:21:15+00:00', 'php': '^7.4 || ~8.0.0'}]
+
+        inputs = project_fixtures.inputs_of({'finding': finding, 'run': self.RUN, 'run_inputs': {'_releases': given}})
+
+        self.assertEqual('2021-08-30T10:00:00+00:00', inputs['lock'][0]['time'])
+
     def test_a_case_without_branch_rows_and_without_run_releases_gets_none(self):
         self.assertIsNone(project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN}))
 
@@ -145,6 +168,32 @@ class APackageThatIsNotFoundHasNoReleases(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class AParentThatDatesABranchRowHoldsItsTags(unittest.TestCase):
+    ROW = {'branch': '2.x', 'installed': True, 'highest': 'v2.8.52', 'highest_released': '2019-11-13T08:36:42+00:00', 'highest_commit_date': None,
+           'newest_dated': 'v2.6.13', 'newest_dated_released': '2021-08-30T10:00:00+00:00', 'dated_by': 'symfony/symfony', 'php': '>=5.3.9',
+           'highest_php': '>=5.3.9', 'fixes': None}
+    DATED = {'at': '2021-08-30T10:00:00+00:00', 'dated_by': 'symfony/symfony'}
+    FINDING = {'package': 'symfony/monolog-bridge', 'version': 'v2.6.13', 'dev': False, 'origin': {'kind': 'packagist'}, 'installed_php': {'requires': '>=5.3.3'},
+               'signals': [], 'security': {'records': 0, 'ignored': []}, 'activity': {}, 'metadata': {'status': 'read'},
+               'age': {'installed': DATED, 'branch_release': dict(DATED, version='v2.6.13')}}
+
+    def test_the_parent_holds_the_highest_and_the_newest_dated_tag_of_the_row_once_each(self):
+        facts = project_fixtures.package_facts(self.FINDING, [self.ROW])
+
+        self.assertEqual({'name': 'symfony/symfony', 'releases': [{'version': 'v2.6.13', 'time': '2021-08-30T10:00:00+00:00'},
+                                                                  {'version': 'v2.8.52', 'time': '2019-11-13T08:36:42+00:00'}]}, facts['parent'])
+
+    def test_the_highest_tag_of_a_row_that_the_parent_dates_shares_its_commit(self):
+        releases = {r['version']: r for r in project_fixtures.package_facts(self.FINDING, [self.ROW])['releases']}
+
+        self.assertTrue(releases['v2.8.52'].get('shared_commit'))
+
+    def test_a_row_without_a_parent_gives_no_parent(self):
+        finding = dict(self.FINDING, age={'installed': {'at': '2021-08-30T10:00:00+00:00'}})
+
+        self.assertNotIn('parent', project_fixtures.package_facts(finding, [dict(self.ROW, dated_by=None)]))
 
 
 class ACaseWhoseDesignedRowsMissItsNewestReleaseIsNotHydrated(unittest.TestCase):

@@ -9,11 +9,13 @@ use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Forge\LocatedRepository;
+use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\ConfiguredRepositories;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Signal\ConstraintOpenness;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
@@ -22,6 +24,7 @@ use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\CappedRule;
 use Lockrot\Signal\Rule\LeftBehindRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
+use Lockrot\Signal\Rule\OldPromiseRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\JsonPath;
@@ -460,5 +463,44 @@ final class NotCheckedRuleTest extends TestCase
         yield 'not found' => [new PackageFacts(F::package(), null, null, [$advisory]), PackageFacts::METADATA_NOT_FOUND];
         yield 'not from a Composer repository' => [new PackageFacts(F::package(['fromComposerRepository' => false]), null, null, [$advisory], null, null, null, true), PackageFacts::METADATA_NOT_FROM_COMPOSER_REPOSITORY];
         yield 'unavailable with no counted advisory' => [new PackageFacts(F::package(), null, null, [], null, null, null, true), PackageFacts::METADATA_UNAVAILABLE];
+    }
+
+    /**
+     * A split's installed tag shares its commit with other tags, and no parent dates it: the lock
+     * date is a commit's, so S5 cannot tell whether the release predates PHP 8.0's GA.
+     */
+    public function testAnUntrustedInstalledDateBlocksS5(): void
+    {
+        $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
+        $metadata = new PackageMetadata('vendor/pkg', false, null, true, new \DateTimeImmutable('2021-08-30T00:00:00+00:00'), 'v4.4.31', 3, null, 'library', new \DateTimeImmutable(self::NOW), [], [], null, [], null, ['4.4.30.0' => true]);
+        $facts = new PackageFacts(F::package(['version' => 'v4.4.30', 'time' => '2020-10-01T00:00:00+00:00', 'php' => '>=7.1.3']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []);
+
+        $signal = $rule->evaluate($facts);
+
+        self::assertNotNull($signal);
+        self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S5]]], JsonPath::decoded($signal->data())['unchecked']);
+        self::assertSame('the age of the package was not read (its newest releases are dated by a commit their tags share), so S5 could not measure it', $signal->summary());
+    }
+
+    public function testATrustedInstalledDateBlocksNothing(): void
+    {
+        $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
+        $facts = new PackageFacts(F::package(['version' => 'v4.4.30', 'time' => '2020-10-01T00:00:00+00:00', 'php' => '>=7.1.3']), self::dated(), F::activity(false, '2026-09-01T00:00:00+00:00'), []);
+
+        self::assertNull($rule->evaluate($facts));
+    }
+
+    /** S2, S5 and S8 all lose their input, and one sentence names the three (the S10 words of the model's S5-untrusted‡). */
+    public function testS5IsNamedWithTheAgeSignals(): void
+    {
+        $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
+        $metadata = self::newestUndated(F::metadata([['v2.0.0', null], ['v1.2.0', null]]));
+        $facts = new PackageFacts(F::package(['version' => 'v1.2.0', 'php' => '>=7.1.3']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []);
+
+        $signal = $rule->evaluate($facts);
+
+        self::assertNotNull($signal);
+        self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2, Signal::S5, Signal::S8]]], JsonPath::decoded($signal->data())['unchecked']);
+        self::assertSame('the age of the package was not read (its newest releases are dated by a commit their tags share), so S2, S5 and S8 could not measure it', $signal->summary());
     }
 }

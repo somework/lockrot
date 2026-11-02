@@ -81,6 +81,17 @@ final class ScoreModelTest extends TestCase
         }
     }
 
+    /** report-2 `scoreModel.flags[]`: both maxima are null for the security flag `vulnerable`, and set together for every other flag. */
+    public function testOnlyTheSecurityFlagHasNoMaintenanceMaximum(): void
+    {
+        $nulls = [];
+        foreach (self::rows(ScoreModel::toArray(), 'flags') as $flag) {
+            $nulls[JsonPath::stringAt($flag, ['id'])] = [$flag['max_maintenance'] === null, $flag['max_maintenance_flags'] === null];
+        }
+
+        self::assertSame(['vulnerable' => [true, true]], array_filter($nulls, static fn (array $pair): bool => $pair !== [false, false]));
+    }
+
     public function testNoMaximalMaintenanceSetHoldsAnExclusiveGroup(): void
     {
         $model = ScoreModel::toArray();

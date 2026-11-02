@@ -11,8 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Breaking:** **Baseline:** a finding is worsened by a flag above the recorded one, a new
   advisory, or a known one re-rated or no longer fixable. The gate reads `min(score, 2 × what the
-  new facts add)`. Action: run once, review, then `--generate-baseline`.
-  ([Baseline](docs/baseline.md))
+  new facts add)`. A `known` finding fails no `--fail-on` value, `unchecked` included. Action: run
+  once, review, then `--generate-baseline`. ([Baseline](docs/baseline.md))
 - **Breaking:** **All formats:** a finding lists every flag that fired (`abandoned`, `silent`,
   `pinned`, `left-behind`, `old-promise`, `stale`, and the new `capped` and `vulnerable`). Accepted flags stay
   listed, muted. Action: read a finding's `flags` where you read the verdict, or `lead` for 0.13's
@@ -65,7 +65,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** `direct`, `chain` and `direct_dependents` follow `replace` and `provide`. A
   package that replaces a required name is reached through it (`friendsofphp/proxy-manager-lts`
   for `ocramius/proxy-manager`), so its maintenance is no longer halved as `unreached`, and its
-  grade can rise one band. ([The score](docs/verdicts.md#score))
+  grade can rise one band. With `--dev`, a package that `provide`s a `require` name stays direct.
+  ([The score](docs/verdicts.md#score))
 - **All formats:** S8 reads the project's lowest PHP as a full version: an inclusive bound gives
   `X.Y.Z` (`>=8.2` now admits a branch that needs `8.2.0`), an exclusive or post-release bound the
   next patch (`>7.1` no longer admits a branch that needs exactly `7.1.0`, `>=7.4.0-p1` gives
@@ -74,6 +75,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** a repository that answers 404 no longer carries S10 `rate_limit` when the same
   host also rate-limits: the 404 is an answer.
   ([Not found](docs/notes.md#repository_activity_not_found))
+- **All formats:** S8 (`left-behind`) reads an installed pre-release above its branch's newest
+  stable release against that release, so such a pre-release can carry S8.
+  ([Within reach](docs/verdicts.md#within-reach))
+- **All formats:** S5 (`old-promise`) reads the installed release's trusted date. A date that a
+  split's tags share no longer fires it: S10 then names S5 with `undated_releases`.
+  ([What was not checked](docs/verdicts.md#what-was-not-checked))
 
 ### Security
 
@@ -103,7 +110,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   hostile lock cannot inject into a pasted command. This affects a reader who copies these commands. Action: if a step is missing,
   check that lock entry before you write the command by hand. ([The move](docs/schema.md#the-move))
 - **CLI:** a repository host's redirect to another origin no longer receives lockrot's
-  `Authorization` or `PRIVATE-TOKEN` header. lockrot asks the redirect target again without it. ([Which credentials](docs/internals.md#which-credentials))
+  `Authorization` or `PRIVATE-TOKEN` header. lockrot asks the redirect target again without it. A
+  redirect to a URL that is not http or https, or that has no host, is a failed request, so a
+  `file://` redirect reads no local file. ([Which credentials](docs/internals.md#which-credentials))
 - **table, github, markdown:** a control character from the lock or a repository prints as an
   escape (`\x1B`), also in `--explain`, in the error lines on stderr, as in the install-time
   summary. So does a character that prints as nothing, such as a zero-width space (`\u{200B}`). A
@@ -117,6 +126,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   address, an issue reference (`#1`, `GH-1`) or a commit hash, in a pull request comment or a job
   summary. It cannot render as math or as an emoji, or
   stand in for a package name on a footer line. ([`--format=markdown`](docs/ci.md#-formatmarkdown))
+- **markdown, gitlab, sarif:** a line break from the lock prints as `\n` in markdown. A control or
+  bidi character from the lock prints as an escape in the gitlab `description`, and in the sarif
+  message and advisory rule text.
 - **sarif:** text from a Composer repository, such as an advisory title or id, cannot embed a link
   (`[text](uri)`) in a message or a rule description. ([`--format=sarif`](docs/ci.md#-formatsarif))
 - **All formats:** a repository URL with a `.` or `..` path segment names no repository, so a lock
@@ -150,16 +162,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `security.status` can read `clear`.
   ([Which advisories count](docs/verdicts.md#which-advisories-count))
 - **All formats:** the move check reads `update-with-minimal-changes` and
-  `COMPOSER_MINIMAL_CHANGES`, as Composer does. It leaves `php-ext` and `php-ext-zend` packages
-  out, and loads no vcs, git or artifact repository. A move whose solve needs another release of a
-  package that the lock records from a vcs repository reads `not_checked` with `unloaded_name`.
+  `COMPOSER_MINIMAL_CHANGES`, as Composer does. It skips `php-ext` and `php-ext-zend` packages, and
+  loads no vcs, git or artifact repository. A move that needs another release of a name that
+  such a repository serves reads `not_checked` with `unloaded_name`, unless its `only`, `exclude`
+  or `canonical: false` leaves the name out. ([The move check](docs/verdicts.md#the-move-check))
+- **All formats:** a `config.platform` value that Composer refuses (`php: false`, a value that is no
+  string and not false, a name that is no platform package) makes the move check and `target_fix`
+  `not_checked` with `platform_config_invalid`. Composer stops every `composer update` on it.
   ([The move check](docs/verdicts.md#the-move-check))
 - **json:** `security.update_now_command` holds no PHP raise step. Only the `update now:` line says
   to raise `require.php` first. ([Security](docs/schema.md#advisories-with-no-fix-expected))
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
-  installs, with require-dev and without, and the links that set each edge. The minors and edges
-  assume no override, and `platform_override` names the lock's `platform-overrides.php`. The text
-  formats print it as a `php:` line. ([The PHP window](docs/verdicts.md#the-php-window))
+  installs, with require-dev and without, and the links that set each edge. `platform_override`
+  names `config.platform.php` from Composer's merged config, and `target.php` the `X.Y.Z` release
+  that the move check solves at. The text formats print a `php:` line.
+  ([The PHP window](docs/verdicts.md#the-php-window))
 - **json, table, markdown, github:** `run.php_window.target_fix` names the packages that exclude
   the target PHP, and the answer of Composer's solver to their update at the target: the command,
   the holds of a refusal, or the root links that no update can change. The `php:` line prints it,
@@ -181,10 +198,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   words below it. Without it an entry accepts them all.
   ([The allowlist](docs/configuration.md#the-allowlist))
 - **All formats:** a `gate:` line says whether the run fails, which `--fail-on` value and source
-  decided it, and how many findings fail each value. json writes the `gate` keys `text`,
-  `failing_by`, `standing`, `failing_packages` and `not_applied`. A failing run that writes json,
-  sarif, gitlab or html to stdout also prints `lockrot: gate: …` on stderr. Read stdout alone,
-  without `2>&1`.
+  decided it, and how many findings fail each value. json writes it as `gate.text`, with
+  `failing_by`, `standing`, `failing_packages` and `not_applied`, each advisory gap that no
+  `unchecked` failure closes. A failing run with a report on stdout repeats the line on stderr.
   ([Reading the gate line](docs/ci.md#reading-the-gate-line))
 - **Config, json:** `extra.lockrot.accept-unchecked` accepts a check that lockrot did not run (a
   host it cannot ask, no advisory feed, a package from vcs or an unknown origin) by host,
@@ -197,9 +213,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Each branch row's `fixes.if_applied` scores a move to that branch. For a package that comes in
   through a dependency, `through[]` says whether that dependency's newest release requires it.
   `--fail-on` and the exit code do not read `next_step`. ([The move](docs/verdicts.md#move))
-- **All formats:** when the lock records a `config.platform.php` that is not a stable release in
-  the minor of the target PHP, each move line with commands and the `update now:` line first say to
-  set it to a target PHP release. When Composer also refuses the lock itself, that sentence says
+- **All formats:** when Composer's config sets a `config.platform.php` that is not a stable release
+  in the minor of the target PHP, each move line with commands and the `update now:` line first say
+  to set it to a target PHP release. When Composer also refuses the lock itself, that sentence says
   that the run note `moves_not_checked` names the first cause.
   ([The move](docs/verdicts.md#move))
 - **json:** the `--explain` document writes `run.php_window` with `platform_override` and `target`
@@ -218,14 +234,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** the run notes `abandoned_markings_ignored`, `abandoned_not_audited_by_composer`
   and `abandoned_ignore_unreadable` say what Composer's abandoned ignore list and its audit setting
   did. ([Run notes](docs/notes.md#abandoned_markings_ignored))
-- **All formats:** the run note `advisories_disabled_by_policy` names the Composer setting
-  (`config.policy: false`, `policy.advisories: false` or `COMPOSER_POLICY=0`) that turns off
-  Composer's advisory blocking in an update (`composer update`, `require` or `remove`). lockrot
-  still asks, and every advisory still counts.
-  ([Run notes](docs/notes.md#advisories_disabled_by_policy))
+- **All formats:** the run note `advisories_disabled_by_policy` names the setting that turns off
+  Composer's advisory blocking in `composer update`, `require` or `remove`: `config.policy: false`,
+  `policy.advisories: false` or `COMPOSER_POLICY=0`, which wins over `config.policy`. lockrot still
+  asks, and every advisory still counts. ([Run notes](docs/notes.md#advisories_disabled_by_policy))
 - **markdown:** `--markdown-max-bytes` keeps a report written through `--output` within a byte
   budget. The report ends at a whole row, and a last row counts the rows it left out.
   ([In CI](docs/ci.md))
+- **github, gitlab, sarif:** when advisories were not checked, one run-level record
+  (`lockrot/advisories-unchecked`) names each advisory repository that failed or that lockrot did
+  not ask, with the reason. sarif adds a `note` notification per repository that lockrot did not
+  ask. ([Marks](docs/ci.md#how-each-format-marks-a-finding))
 - **sarif:** `invocations[0]` carries `exitCode` and `exitCodeDescription`.
   ([SARIF exit code](docs/ci.md#sarif-exit-code))
 - **json:** each `--explain` branch row and each branch row of the html page's details block write
@@ -278,6 +297,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   0.13 ignored and config-2 refuses (`"flags": "stale"`, `"advisory-lookup": 1`) now exits 2. One
   run names each refusal of `fail-on` and `ignore[].flags`, and each schema error. Action: give
   the key a valid value, or drop it.
+  ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
+- **Breaking:** **Config:** a `release-high-years` below `release-warn-years`, or a
+  `push-high-years` below `push-warn-years`, exits 2. 0.13 read such thresholds. Action: set each
+  high threshold at or above its warn threshold.
   ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 - **Breaking:** **CLI:** a repeated `--fail-on`, `--baseline` or `--target-php`, or `--explain`
   with `--generate-baseline`, exits 2 before Composer starts. 0.13 took the last value, and ran
@@ -375,7 +398,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the php of the branch's newest dated release, such as an LTS backport, beside the highest tag.
   ([Explaining one package](docs/configuration.md#explaining-one-package))
 - **Config:** a `LOCKROT_TODAY` value without an offset is UTC. It took the default timezone of the
-  PHP process. ([Testing hooks](docs/configuration.md#testing-hooks))
+  PHP process. A value with an offset dates the report, the footer and a written baseline on its
+  UTC day. ([Testing hooks](docs/configuration.md#testing-hooks))
 - **All formats:** a lock URL with a long run of slashes does not stall the run.
 - **CLI:** a cached 404 from a run without a token does not hide a private repository from a later
   run with a token. The activity cache keeps an answer per credential state, so the first run after
@@ -387,6 +411,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   repeated `packages` key.
 - **CLI:** the `--explain` branch table keeps its columns in place when a tag holds a control or
   zero-width character. ([Explaining one package](docs/configuration.md#explaining-one-package))
+- **Config:** the default target PHP reads `config.platform.php` from Composer's merged config, the
+  global `config.json` included, and reads a `v`-prefixed value as Composer does.
+  ([Configuration](docs/configuration.md))
+- **All formats:** a GitHub secondary rate limit that answers 403 without rate-limit headers gives
+  the reason `rate_limit` and the note `repository_activity_rate_limited`.
+- **Install-time:** without ext-curl, the install-time check stops repository activity requests at
+  the budget, and the move check starts no metadata request after it.
+- **Baseline:** on PHP 8.1 and later, a baseline write calls fsync before the rename.
+- **html:** the page's `details` is a JSON object also when no package is explained.
+- **All formats:** summaries print years with a point under a locale with a decimal comma.
 
 ## [0.13.0] - 2026-10-01
 

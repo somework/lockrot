@@ -12,6 +12,7 @@ use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
+use Lockrot\Verdict\ListWords;
 
 /**
  * S10: a check that this package's verdict rests on did not run, and what it could not decide
@@ -72,12 +73,14 @@ final class NotCheckedRule implements SignalRule
 
     private LeftBehindRule $leftBehind;
     private ?CappedRule $capped;
+    private ?OldPromiseRule $oldPromise;
 
     /** @param ?CappedRule $capped S11 fires without release metadata, so an unread one blocks only its `admits_newest` */
-    public function __construct(LeftBehindRule $leftBehind, ?CappedRule $capped = null)
+    public function __construct(LeftBehindRule $leftBehind, ?CappedRule $capped = null, ?OldPromiseRule $oldPromise = null)
     {
         $this->leftBehind = $leftBehind;
         $this->capped = $capped;
+        $this->oldPromise = $oldPromise;
     }
 
     public function evaluate(PackageFacts $facts): ?Signal
@@ -98,6 +101,9 @@ final class NotCheckedRule implements SignalRule
         $ageBlocks = [];
         if ($metadata !== null && $metadata->hasStableRelease() && $metadata->lastStableReleaseAt() === null) {
             $ageBlocks[] = Signal::S2;
+        }
+        if ($this->oldPromise !== null && $this->oldPromise->missesATrustedDate($facts)) {
+            $ageBlocks[] = Signal::S5;
         }
         if ($this->leftBehind->missesAnUndatedRelease($facts)) {
             $ageBlocks[] = Signal::S8;
@@ -221,7 +227,7 @@ final class NotCheckedRule implements SignalRule
             return 'security advisories not checked ('.(self::ADVISORY_CAUSES[$entry->reason()] ?? $entry->reason()).'), so S9 could not be read';
         }
         if ($entry->check() === 'release_dates') {
-            return 'the age of the package was not read (its newest releases are dated by a commit their tags share), so '.implode(' and ', $entry->blocks()).' could not measure it';
+            return 'the age of the package was not read (its newest releases are dated by a commit their tags share), so '.ListWords::of($entry->blocks()).' could not measure it';
         }
 
         throw new \LogicException('S10 has no words for the check '.$entry->check().'.');

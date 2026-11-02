@@ -1197,7 +1197,7 @@
    "reason": null
   },
   "php_window": {
-   "platform_override": null,
+   "platform_override": "8.4.7",
    "target": {
     "php": "8.4.7",
     "inside": false

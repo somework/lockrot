@@ -58,7 +58,7 @@ final class SarifFormatter implements FormatterInterface
             $results[] = [
                 'ruleId' => 'lockrot/'.self::ADVISORIES_UNCHECKED,
                 'level' => $gap,
-                'message' => SarifRecords::message('advisories not checked: the gate could not read the advisories of every package'),
+                'message' => SarifRecords::message(RunFooter::advisoriesNotChecked($report)),
                 'locations' => [['physicalLocation' => ['artifactLocation' => $this->artifactLocation()]]],
                 'partialFingerprints' => ['lockrot/run' => self::ADVISORIES_UNCHECKED],
             ];
@@ -133,8 +133,9 @@ final class SarifFormatter implements FormatterInterface
         ];
         $notifications = [];
         foreach ($report->advisoryLookup()->repositories() as $repository) {
-            if ($repository->outcome() === AdvisoryRepository::FAILED) {
-                $notifications[] = ['level' => FormatContext::LEVEL_WARNING, 'message' => SarifRecords::message(RunFooter::repository($repository))];
+            $level = [AdvisoryRepository::FAILED => FormatContext::LEVEL_WARNING, AdvisoryRepository::NOT_ASKED => FormatContext::LEVEL_NOTE][$repository->outcome()] ?? null;
+            if ($level !== null) {
+                $notifications[] = ['level' => $level, 'message' => SarifRecords::message(RunFooter::repository($repository))];
             }
         }
         $notes = $report->notes();

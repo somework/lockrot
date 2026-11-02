@@ -1350,7 +1350,7 @@
     "constraint": null,
     "latest": null,
     "php_check": {
-     "requires": ">=8.1",
+     "requires": ">=8.1 <8.5",
      "project_allows": true,
      "target_runs": true,
      "raise_to": null,
@@ -1544,7 +1544,7 @@
     "gets": {
      "version": "v6.4.40",
      "php_check": {
-      "requires": ">=8.1",
+      "requires": ">=8.1 <8.5",
       "project_allows": true,
       "target_runs": true,
       "raise_to": null,

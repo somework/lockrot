@@ -292,7 +292,9 @@ Each branch row in the JSON carries:
 S5 fires when all of these hold:
 
 1. The installed release was published before the GA of the target PHP's major: 8.0 for any 8.x
-   target, not the target minor.
+   target, not the target minor. The release date is the [trusted date](#dates-from-the-monorepo)
+   of the installed version, and a branch snapshot's date is its commit's. Without a trusted date,
+   S5 does not fire, and S10 names S5 when the lock's date is before that GA or absent.
 
 2. Its `require.php` has no upper bound.
 
@@ -406,7 +408,8 @@ list names. lockrot cannot date a split that no package replaces as `self.versio
 request on it.
 
 - The parent dates the installed version too. Where it lists the same version, its date replaces
-  the lock's shared-commit `time` for [libyears](#libyears) and `age.installed`. `--explain` prints
+  the lock's shared-commit `time` for [libyears](#libyears), `age.installed` and
+  [S5](#old-promise). `--explain` prints
   it as `installed release` (`installed_release_dated_by` in JSON). Where it does not, the
   package is unmeasured.
 
@@ -662,10 +665,12 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 
 - **A new major.** A move to a higher branch says that a new major brings its own requirements.
 
-- **A PHP that the lock records.** When `run.php_window.platform_override` is not a stable release
-  in the minor of the target PHP, Composer solves the commands of a move at that PHP, not at the target. The
-  line of each move with commands then starts with "First set config.platform.php to your PHP
-  <target> release: the lock records <version>." So does the `update now:` line. The commands
+- **A PHP that Composer's config sets.** When `run.php_window.platform_override` is set and is
+  not a stable release in the minor of the target PHP, Composer solves the commands of a move at
+  that PHP, not at the target. `platform_override` is `config.platform.php` from Composer's merged
+  config, the global `config.json` included. The line of each move with commands then starts with
+  "First set config.platform.php to your PHP <target> release: Composer's config sets <version>."
+  So does the `update now:` line. The commands
   stay the same. When `run.move_check.baseline` is `refused`, the sentence goes on with "Composer
   still refuses the lock itself: the moves_not_checked note names the first cause." The run note
   [`moves_not_checked`](notes.md#moves_not_checked) names the cause of Composer's first problem.
@@ -786,7 +791,8 @@ Limits of the check:
   versions of the Composer that runs lockrot.
 - It solves at `config.platform.php` when that version is a stable release in the target PHP's minor, else at the
   newest patch of the target minor (`8.4.99`). Composer reads `8.4` as `8.4.0`. It keeps every
-  other `config.platform` override.
+  other `config.platform` override. The `target_runs` of `installed_php` and of a move's
+  `php_check`, and the `newest` of a move, test the target at the same PHP.
 - It offers the tagged releases of a package. It offers the dev versions too when the package has
   no tagged release. Composer also offers them when composer.json's
   [`minimum-stability`](https://getcomposer.org/doc/04-schema.md#minimum-stability) or a
@@ -900,9 +906,12 @@ the packages and the root without `require-dev`. `with_dev` is null when the loc
 
 Composer does not show the window, and these facts hide it:
 
-- `composer install` checks the lock against the lock's own `platform-overrides`. A change of
-  `config.platform.php` in composer.json does not change that check. `platform_override` holds the
-  lock's `platform-overrides.php`. Composer checks the lock at that PHP on every machine.
+- `composer install` checks the lock against the lock's own `platform-overrides`, which records
+  the `config.platform.php` of the last update. A change of `config.platform.php` in composer.json
+  does not change that check until the next update.
+- `platform_override` holds `config.platform.php` from Composer's merged config: composer.json, then
+  the global `config.json`. `composer update` solves at that PHP. The move check solves at it only
+  when it is a stable release in the minor of the target PHP, else at `target.php`.
 - The platform check that the Composer autoloader runs checks only the lower bound of `php` and
   `php-64bit`. It checks only the packages without require-dev.
 
@@ -923,8 +932,8 @@ How lockrot reads the window:
 - A known minor is a PHP minor whose GA date is on or before the run's date. A known minor is in
   `minors` when every requirement admits its newest patch (`8.4.99`) and no conflict matches it.
 - lockrot reads the target's minor at the PHP that [the move check](#the-move-check) solves at
-  instead, and `target.php` holds that PHP. The move check reads `config.platform.php` from
-  Composer's config, the global `config.json` included. A cap inside a minor, such as `<8.4.5`, leaves that minor out.
+  instead, and `target.php` holds that PHP. lockrot reads `config.platform.php` from Composer's
+  config, the global `config.json` included, also in a run that checks no move. A cap inside a minor, such as `<8.4.5`, leaves that minor out.
 - When the set does not admit that PHP, the target's minor stays in the window if the set admits
   a later patch of that minor. So with `config.platform.php` 8.4.0, a patch floor such as
   `>=8.4.2` keeps 8.4 in the window, and `lower_edge.php` reads 8.4.2. A cap below that PHP leaves
@@ -1207,7 +1216,7 @@ formats print only under `--all`, keeps its verdict and adds the same `checks mi
 | `repository_activity` | `host_not_supported` | The repository is on a host that lockrot cannot ask ([host note](notes.md#repository_activity_host_not_supported)) | S3, S4 |
 | `repository_activity` | `not_from_composer_repository` | The package comes from vcs, or from an origin that lockrot cannot tell: lockrot asks no host for it | S3, S4 |
 | `release_metadata` | `not_from_composer_repository` | The same origins: no Composer repository serves its releases | S2, S8 |
-| `release_dates` | `undated_releases` | A release that S2 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it | S2 when the highest tag is undated. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
+| `release_dates` | `undated_releases` | A release that S2, S5 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it | S2 when the highest tag is undated. S5 when the installed release is undated, its lock date is before the GA of the target's major or absent, and the other two [S5 conditions](#old-promise) hold. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
 | `advisories` | `offline`, `install_time_budget`, `lookup_failed`, `no_feed` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
 | `releases` | `releases_unknown` | A counted advisory's fix is unknown because the package's release data did not come | S9 |
 

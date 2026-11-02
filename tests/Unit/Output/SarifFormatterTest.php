@@ -690,7 +690,7 @@ final class SarifFormatterTest extends TestCase
         self::assertSame(0, JsonPath::intAt($generate, ['invocations', 0, 'exitCode']));
     }
 
-    public function testTheRunLevelRuleIsDescribedAndAFailedRepositoryIsANotification(): void
+    public function testTheRunLevelRuleIsDescribedAndEachRepositoryThatFailedOrWasNotAskedIsANotification(): void
     {
         $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, [
             AdvisoryRepository::of('composer repo (https://repo.packagist.org)', AdvisoryRepository::FAILED, AdvisoryCoverage::TRANSPORT, 'timeout'),
@@ -700,7 +700,14 @@ final class SarifFormatterTest extends TestCase
         $run = $this->singleRun($this->formatter('unchecked', null)->format($report));
 
         self::assertContains('lockrot/advisories-unchecked', array_column(JsonPath::arrayAt($run, ['tool', 'driver', 'rules']), 'id'));
-        self::assertSame([['level' => 'warning', 'message' => ['text' => 'packagist.org lookup failed (network error: timeout)']]], JsonPath::arrayAt($run, ['invocations', 0, 'toolExecutionNotifications']));
+        self::assertSame([
+            ['level' => 'warning', 'message' => ['text' => 'packagist.org lookup failed (network error: timeout)']],
+            ['level' => 'note', 'message' => ['text' => 'composer repo (https://repo.example.test) not asked (offline)']],
+        ], JsonPath::arrayAt($run, ['invocations', 0, 'toolExecutionNotifications']));
+        self::assertSame(
+            'advisories not checked: packagist.org lookup failed (network error: timeout); composer repo (https://repo.example.test) not asked (offline)',
+            JsonPath::stringAt($this->runLevel($this->formatter('unchecked', null)->format($report)), ['message', 'text'])
+        );
     }
 
     /**

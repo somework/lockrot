@@ -3694,9 +3694,9 @@
       "php_rows": [
         "PHP window, with require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
         "PHP window, without require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
-        "Composer checks the lock at: 7.4.29 (config.platform.php)"
+        "Composer's config.platform.php: 7.4.29"
       ],
-      "platform_step": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29.",
+      "platform_step": "First set config.platform.php to your PHP 8.4 release: Composer's config sets 7.4.29.",
       "sheet_moves": {},
       "sheet_provenance": {},
       "sheet_holders": {},
@@ -6401,7 +6401,7 @@
       "state_lines": [],
       "state_links": [],
       "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
-      "lead_scope": "1 in production",
+      "lead_scope": "1 in production · 1 unreached",
       "grade_chips": [
         "high 1"
       ],
@@ -7310,7 +7310,8 @@
       "php_line": "php: the lock installs on PHP 8.2 to 8.5, but not on your target, 8.4.5; Composer's solver at PHP 8.4 resolves: composer update acme/conflict-hole",
       "php_rows": [
         "PHP window, with require-dev: 8.2 to 8.5 · lowest 8.2.0, set by require.php ^8.2 and laravel/framework ^8.2",
-        "PHP window, without require-dev: 8.2 to 8.5 · lowest 8.2.0, set by require.php ^8.2 and laravel/framework ^8.2"
+        "PHP window, without require-dev: 8.2 to 8.5 · lowest 8.2.0, set by require.php ^8.2 and laravel/framework ^8.2",
+        "Composer's config.platform.php: 8.4.5"
       ],
       "platform_step": null,
       "sheet_moves": {},
@@ -8227,7 +8228,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [
-        "PHP: this lock installs on PHP 8.2 to 8.4 · Composer checks it at 8.4.1, the PHP that the lock records from config.platform.php, not the PHP of the machine. The PHP window"
+        "PHP: this lock installs on PHP 8.2 to 8.4 · Composer solves at 8.4.1, the PHP that config.platform.php sets in Composer's config, not the PHP of the machine. The PHP window"
       ],
       "state_links": [
         {
@@ -8649,11 +8650,11 @@
         }
       ],
       "run_notes": [],
-      "php_line": "php: the lock installs on PHP 8.2 to 8.4; Composer checks it at 8.4.1 from config.platform.php; acme/clock excludes 8.5",
+      "php_line": "php: the lock installs on PHP 8.2 to 8.4; Composer solves at 8.4.1 from config.platform.php; acme/clock excludes 8.5",
       "php_rows": [
         "PHP window, with require-dev: 8.2 to 8.4 · lowest 8.2.0, set by require.php >=8.2 and acme/clock ~8.2.0 || ~8.3.0 || ~8.4.0 · 8.5 excluded by acme/clock ~8.2.0 || ~8.3.0 || ~8.4.0",
         "PHP window, without require-dev: 8.2 to 8.4 · lowest 8.2.0, set by require.php >=8.2 and acme/clock ~8.2.0 || ~8.3.0 || ~8.4.0 · 8.5 excluded by acme/clock ~8.2.0 || ~8.3.0 || ~8.4.0",
-        "Composer checks the lock at: 8.4.1 (config.platform.php)"
+        "Composer's config.platform.php: 8.4.1"
       ],
       "platform_step": null,
       "sheet_moves": {},
@@ -9117,7 +9118,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 83,
       "state_lines": [
-        "PHP: this lock installs on PHP 7.4 · Composer checks it at 7.4.29, the PHP that the lock records from config.platform.php, not the PHP of the machine · 2 packages stop below the newest PHP, 8.5. The PHP window"
+        "PHP: this lock installs on PHP 7.4 · Composer solves at 7.4.29, the PHP that config.platform.php sets in Composer's config, not the PHP of the machine · 2 packages stop below the newest PHP, 8.5. The PHP window"
       ],
       "state_links": [
         {
@@ -11018,11 +11019,11 @@
         }
       ],
       "run_notes": [],
-      "php_line": "php: the lock installs on PHP 7.4; Composer checks it at 7.4.29 from config.platform.php; php-http/guzzle5-adapter excludes 8.0",
+      "php_line": "php: the lock installs on PHP 7.4; Composer solves at 7.4.29 from config.platform.php; php-http/guzzle5-adapter excludes 8.0",
       "php_rows": [
         "PHP window, with require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
         "PHP window, without require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
-        "Composer checks the lock at: 7.4.29 (config.platform.php)"
+        "Composer's config.platform.php: 7.4.29"
       ],
       "platform_step": null,
       "sheet_moves": {},
@@ -12026,7 +12027,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 6,
       "state_lines": [
-        "PHP: this lock installs on PHP 8.2 to 8.3 · Composer checks it at 8.2.0, the PHP that the lock records from config.platform.php, not the PHP of the machine · 1 package stops below the newest PHP, 8.5. The PHP window"
+        "PHP: this lock installs on PHP 8.2 to 8.3 · Composer solves at 8.2.0, the PHP that config.platform.php sets in Composer's config, not the PHP of the machine · 1 package stops below the newest PHP, 8.5. The PHP window"
       ],
       "state_links": [
         {
@@ -12661,11 +12662,11 @@
       "run_notes": [
         "1 package is not from a Composer repository: their release metadata and repository activity were not read · advisories asked"
       ],
-      "php_line": "php: the lock installs on PHP 8.2 to 8.3; Composer checks it at 8.2.0 from config.platform.php; ezyang/htmlpurifier excludes 8.4",
+      "php_line": "php: the lock installs on PHP 8.2 to 8.3; Composer solves at 8.2.0 from config.platform.php; ezyang/htmlpurifier excludes 8.4",
       "php_rows": [
         "PHP window, with require-dev: 8.2 to 8.3 · lowest 8.2.0, set by api-platform/core >=8.2, codeception/codeception ^8.2, codeception/lib-asserts ^8.2 || ^8.3 || ^8.4 || ^8.5 and 81 more · 8.4 excluded by ezyang/htmlpurifier ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
         "PHP window, without require-dev: 8.2 to 8.3 · lowest 8.2.0, set by api-platform/core >=8.2, maennchen/zipstream-php php-64bit ^8.2, mautic/core-lib ~8.2 and 50 more · 8.4 excluded by ezyang/htmlpurifier ~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
-        "Composer checks the lock at: 8.2.0 (config.platform.php)"
+        "Composer's config.platform.php: 8.2.0"
       ],
       "platform_step": null,
       "sheet_moves": {
@@ -13045,7 +13046,7 @@
       "gate_link": "#view=findings&gate=fails",
       "gate_link_rows": 83,
       "state_lines": [
-        "PHP: this lock installs on PHP 7.4 · Composer checks it at 7.4.29, the PHP that the lock records from config.platform.php, not the PHP of the machine · 2 packages stop below the newest PHP, 8.5. The PHP window"
+        "PHP: this lock installs on PHP 7.4 · Composer solves at 7.4.29, the PHP that config.platform.php sets in Composer's config, not the PHP of the machine · 2 packages stop below the newest PHP, 8.5. The PHP window"
       ],
       "state_links": [
         {
@@ -14933,11 +14934,11 @@
         }
       ],
       "run_notes": [],
-      "php_line": "php: the lock installs on PHP 7.4; Composer checks it at 7.4.29 from config.platform.php; php-http/guzzle5-adapter excludes 8.0",
+      "php_line": "php: the lock installs on PHP 7.4; Composer solves at 7.4.29 from config.platform.php; php-http/guzzle5-adapter excludes 8.0",
       "php_rows": [
         "PHP window, with require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
         "PHP window, without require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
-        "Composer checks the lock at: 7.4.29 (config.platform.php)"
+        "Composer's config.platform.php: 7.4.29"
       ],
       "platform_step": null,
       "sheet_moves": {},
@@ -15264,9 +15265,11 @@
       "php_line": "php: the lock installs on PHP 8.3 to 8.4, so your target, 8.5, is excluded; set config.platform.php to your PHP 8.5 release, then Composer's solver resolves: composer update moneyphp/money nette/schema brianium/paratest --with-all-dependencies",
       "php_rows": [
         "PHP window, with require-dev: 8.3 to 8.4 · lowest 8.3.0, set by require.php ^8.3 · 8.5 excluded by brianium/paratest ~8.2.0 || ~8.3.0 || ~8.4.0, moneyphp/money ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and nette/schema 8.1 - 8.4",
-        "PHP window, without require-dev: 8.3 to 8.4 · lowest 8.3.0, set by require.php ^8.3 · 8.5 excluded by moneyphp/money ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and nette/schema 8.1 - 8.4"
+        "PHP window, without require-dev: 8.3 to 8.4 · lowest 8.3.0, set by require.php ^8.3 · 8.5 excluded by moneyphp/money ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and nette/schema 8.1 - 8.4",
+        "Composer's config.platform.php: 8.4.12",
+        "composer update solves at 8.4.12, and the move check solves at the target PHP 8.5.99."
       ],
-      "platform_step": null,
+      "platform_step": "First set config.platform.php to your PHP 8.5 release: Composer's config sets 8.4.12. Composer still refuses the lock itself: the PHP line in the Overview names the packages.",
       "sheet_moves": {},
       "sheet_provenance": {},
       "sheet_holders": {},
@@ -19925,16 +19928,16 @@
       "php_rows": [
         "PHP window, with require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
         "PHP window, without require-dev: 7.4 · lowest 7.4.2, set by php-amqplib/php-amqplib conflict php 7.4.0 - 7.4.1 · 8.0 excluded by php-http/guzzle5-adapter ^7.0",
-        "Composer checks the lock at: 7.4.29 (config.platform.php)",
-        "composer install reads 7.4.29, and the move check solves at the target PHP 8.4.99."
+        "Composer's config.platform.php: 7.4.29",
+        "composer update solves at 7.4.29, and the move check solves at the target PHP 8.4.99."
       ],
-      "platform_step": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line in the Overview names the packages.",
+      "platform_step": "First set config.platform.php to your PHP 8.4 release: Composer's config sets 7.4.29. Composer still refuses the lock itself: the PHP line in the Overview names the packages.",
       "sheet_moves": {
         "twig/twig": [
           {
             "heading": "The move",
             "action": "Raise require.php to >=8.1, then require ^3.27.0",
-            "platform_step": "First set config.platform.php to your PHP 8.4 release: the lock records 7.4.29. Composer still refuses the lock itself: the PHP line in the Overview names the packages.",
+            "platform_step": "First set config.platform.php to your PHP 8.4 release: Composer's config sets 7.4.29. Composer still refuses the lock itself: the PHP line in the Overview names the packages.",
             "command_note": null,
             "moves_with": null,
             "commands": [

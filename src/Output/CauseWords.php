@@ -37,7 +37,7 @@ final class CauseWords
         'undated' => 'no date',
         'no_stable_release' => 'no stable release',
         'no_branch_row' => 'no release on its branch',
-        'above_listed_releases' => 'installed above every listed release',
+        'above_listed_releases' => 'installed above every listed stable release',
         'unreached' => 'lockrot found no path to it from composer.json',
         'no_composer_json' => 'the run read no composer.json',
         'installed_unlisted' => 'its installed release is not among the releases read',

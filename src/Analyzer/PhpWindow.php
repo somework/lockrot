@@ -49,7 +49,7 @@ final class PhpWindow implements \JsonSerializable
     private array $lockPlatform;
     /** @var list<string> */
     private array $skippedNames;
-    private ?string $projectPlatformPhp;
+    private ?string $configuredPhp;
 
     /**
      * @param Data         $data
@@ -58,7 +58,7 @@ final class PhpWindow implements \JsonSerializable
      * @param list<Req>    $lockPlatform  those of them that only the lock's platform holds
      * @param list<string> $skippedNames  {@see LockFile::skippedNames()}
      */
-    private function __construct(array $data, string $targetMinor, array $knownMinors, array $targetFailing, array $lockPlatform, array $skippedNames, ?string $projectPlatformPhp)
+    private function __construct(array $data, string $targetMinor, array $knownMinors, array $targetFailing, array $lockPlatform, array $skippedNames, ?string $configuredPhp)
     {
         $this->lockPlatform = $lockPlatform;
         $this->data = $data;
@@ -66,7 +66,7 @@ final class PhpWindow implements \JsonSerializable
         $this->knownMinors = $knownMinors;
         $this->targetFailing = $targetFailing;
         $this->skippedNames = $skippedNames;
-        $this->projectPlatformPhp = $projectPlatformPhp;
+        $this->configuredPhp = $configuredPhp;
     }
 
     /**
@@ -76,9 +76,12 @@ final class PhpWindow implements \JsonSerializable
      * @param string       $targetMinor the run's target PHP minor
      * @param list<string> $knownMinors {@see \Lockrot\Data\Php\PhpReleaseDates::minors()}
      * @param ?string      $solvePhp    the php that the move check solves at, from Composer's merged
-     *                                  config; null reads composer.json's `config.platform.php`
+     *                                  config; null reads $configuredPhp as the check does
+     * @param ?string      $configuredPhp `config.platform.php` of Composer's merged config, which
+     *                                    `platform_override` holds; null reads composer.json's
+     *                                    `config.platform.php`
      */
-    public static function of(LockFile $lock, ProjectConfig $project, string $targetMinor, array $knownMinors, ?string $solvePhp = null): ?self
+    public static function of(LockFile $lock, ProjectConfig $project, string $targetMinor, array $knownMinors, ?string $solvePhp = null, ?string $configuredPhp = null): ?self
     {
         $rootProvides = $project->platformConstraints(ProjectConfig::PROVIDE) + $project->platformConstraints(ProjectConfig::REPLACE);
         if (array_intersect(array_keys($rootProvides), self::VERSIONED) !== []) {
@@ -116,7 +119,8 @@ final class PhpWindow implements \JsonSerializable
         $hosts = array_unique($hosts);
         sort($hosts);
 
-        $targetPoint = $solvePhp ?? MoveCheckers::platformPhp($targetMinor, $project->platformPhp());
+        $configuredPhp ??= $project->platformPhp();
+        $targetPoint = $solvePhp ?? MoveCheckers::platformPhp($targetMinor, $configuredPhp);
         $windows = [];
         foreach ($sets as $set => $links) {
             $windows[$set] = $links === null ? null : self::setWindow($links, $knownMinors, $targetMinor, $targetPoint);
@@ -125,13 +129,13 @@ final class PhpWindow implements \JsonSerializable
         $lockOnly = self::lockOnlyLinks($lock, $project, $sets['with_dev'] !== null);
 
         return new self([
-            'platform_override' => $lock->platformOverridePhp(),
+            'platform_override' => $configuredPhp,
             'host_requires' => $hosts,
             'with_dev' => $windows['with_dev'],
             'without_dev' => $windows['without_dev'],
             'target' => ['php' => self::releaseOf($targetPoint), 'inside' => $targetFailing === []],
             'target_fix' => null,
-        ], $targetMinor, $knownMinors, $targetFailing, array_values(array_filter($targetFailing, static fn (array $req): bool => \in_array($req, $lockOnly, true))), $lock->skippedNames(), $project->platformPhp());
+        ], $targetMinor, $knownMinors, $targetFailing, array_values(array_filter($targetFailing, static fn (array $req): bool => \in_array($req, $lockOnly, true))), $lock->skippedNames(), $configuredPhp);
     }
 
     /**
@@ -145,7 +149,7 @@ final class PhpWindow implements \JsonSerializable
         if ($this->data['target']['inside'] || $this->targetBelowLowest()) {
             return $this;
         }
-        $configured = ($checker === null ? null : $checker->configuredPhp()) ?? $this->projectPlatformPhp;
+        $configured = ($checker === null ? null : $checker->configuredPhp()) ?? $this->configuredPhp;
         $platformStep = $configured !== null && MoveCheckers::platformPhp($this->targetMinor, $configured) !== $configured;
         $copy = clone $this;
         $copy->data['target_fix'] = TargetFix::of($this->targetFailing, $this->lockPlatform, $this->skippedNames, $platformStep, $checker);

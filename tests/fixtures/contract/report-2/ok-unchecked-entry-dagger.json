@@ -1080,15 +1080,13 @@
         "stale": []
     },
     "gate": {
-        "fails": true,
-        "tripped_by": [
-            "fail_on"
-        ],
+        "fails": false,
+        "tripped_by": [],
         "fail_on_applied": true,
         "reaching": 1,
-        "failing": 1,
+        "failing": 0,
         "exempt": {
-            "baseline": 0
+            "baseline": 1
         },
         "standing": {
             "known": 1,
@@ -1096,9 +1094,7 @@
             "worsened": 0,
             "none": 0
         },
-        "failing_packages": [
-            "scheb/2fa-google-authenticator"
-        ],
+        "failing_packages": [],
         "failing_by": [
             {
                 "value": "high",
@@ -1106,11 +1102,11 @@
             },
             {
                 "value": "unchecked",
-                "failing": 1
+                "failing": 0
             }
         ],
         "not_applied": [],
-        "text": "gate: fails \u00b7 --fail-on=high,unchecked \u00b7 1 finding fails it (unchecked 1) \u00b7 target php 8.4 (--target-php)"
+        "text": "gate: passes \u00b7 --fail-on=high,unchecked \u00b7 no finding fails it; 1 reaches it and is known to the baseline \u00b7 target php 8.4 (--target-php)"
     },
     "security": {
         "check": "complete",
@@ -1308,20 +1304,9 @@
             },
             "gate": {
                 "reaches_fail_on": true,
-                "fails": true,
-                "exempt_by": null,
-                "by": [
-                    {
-                        "value": "unchecked",
-                        "kind": "unchecked",
-                        "facts": [
-                            {
-                                "kind": "signal",
-                                "id": "S2"
-                            }
-                        ]
-                    }
-                ],
+                "fails": false,
+                "exempt_by": "baseline",
+                "by": [],
                 "basis": {
                     "score": 0,
                     "verdict": null,

@@ -22,7 +22,7 @@
         "categories": [
             "Bug Risk"
         ],
-        "severity": "major",
+        "severity": "info",
         "fingerprint": "280c288cc445a0660a832dcc32d402befff57b1e5dbabc0cf554eb071eed7b92",
         "location": {
             "path": "composer.lock",

@@ -1186,8 +1186,7 @@
    "composer": "2.10.3",
    "blocks_advisories": false,
    "blocking_disabled_by": [
-    "COMPOSER_POLICY",
-    "config.policy"
+    "COMPOSER_POLICY"
    ],
    "ignored_platform": [
     "ext-*",

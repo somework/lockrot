@@ -249,6 +249,23 @@ final class MoveContext
         return $at !== null && $at > $this->now->modify('-'.$this->warnYears.' years');
     }
 
+    /**
+     * The php of the release that Composer installs at the target for a move from $lower to
+     * $newest (ruling R8-1): $newest when the target runs it, else the `newest` that FixFinder
+     * reads at $lower. The branch top when the target runs no such release.
+     */
+    public function phpAtTarget(BranchRow $row, ?Candidate $lower, ?string $newest): ?string
+    {
+        $release = $newest === null ? null : $this->release($newest);
+        if ($release !== null && $this->floor->admitsTarget($release->php()) !== false) {
+            return $release->php();
+        }
+        $runs = $lower === null ? null : $this->finder->newestOf($this->subject->package(), $this->releases ?? [], $lower);
+        $runs = $runs === null ? null : $this->release($runs);
+
+        return $runs === null ? $row->highestPhp() : $runs->php();
+    }
+
     /** A release above the installed one, by its version as the repository writes it. */
     public function release(string $pretty): ?StableRelease
     {

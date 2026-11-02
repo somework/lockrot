@@ -827,7 +827,7 @@
    "reason": null
   },
   "php_window": {
-   "platform_override": null,
+   "platform_override": "8.4.12",
    "host_requires": [],
    "with_dev": {
     "minors": [
@@ -1424,7 +1424,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "composer update 'moneyphp/money:^4.9.0' (gets v4.9.0) — clears capped; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+    "text": "First set config.platform.php to your PHP 8.5 release: Composer's config sets 8.4.12. Composer still refuses the lock itself: the moves_not_checked note names the first cause. composer update 'moneyphp/money:^4.9.0' (gets v4.9.0) — clears capped; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
    },
    "security": {
     "status": "clear",
@@ -1717,7 +1717,7 @@
      }
     ],
     "also": [],
-    "text": "composer update 'erusev/parsedown:^1.8.0' (gets 1.8.0) — clears old-promise; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+    "text": "First set config.platform.php to your PHP 8.5 release: Composer's config sets 8.4.12. Composer still refuses the lock itself: the moves_not_checked note names the first cause. composer update 'erusev/parsedown:^1.8.0' (gets 1.8.0) — clears old-promise; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
    },
    "security": {
     "status": "clear",
@@ -2350,7 +2350,7 @@
      }
     ],
     "also": [],
-    "text": "composer update 'nette/schema:^1.3.6' (gets v1.3.6) — clears capped; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+    "text": "First set config.platform.php to your PHP 8.5 release: Composer's config sets 8.4.12. Composer still refuses the lock itself: the moves_not_checked note names the first cause. composer update 'nette/schema:^1.3.6' (gets v1.3.6) — clears capped; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
    },
    "security": {
     "status": "clear",

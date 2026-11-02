@@ -291,7 +291,8 @@ mark.
 - **The run-level record.** When advisories were not checked, `github`, `sarif` and `gitlab` add
   one record for the run: `lockrot/advisories-unchecked`. It is `error` (`major`) only when
   `unchecked` is a failing value and a finding fails it on an advisory gap. Otherwise it is
-  `warning` (`minor`).
+  `warning` (`minor`). Its message names each advisory repository that failed or that lockrot did
+  not ask, with the reason.
 - **Text from the lock or a repository** in a `sarif` or `gitlab` message prints a control
   character, a bidi control or another character that prints as nothing as an escape, such as
   `\x1B`.
@@ -433,7 +434,7 @@ steps:
 | `suppressions` | On a result whose fact the baseline covers |
 | `properties` | `package`, `version`, `verdict` (the grade), `priority`, `lead`, `score_total`, `score_text`, `score_model_id`, `flag_ids`, `direct`, `dev`, `data_date`, `baseline_status` (`known`, `new`, `worsened` or null), `error_by` (the failing values), `chain`, `depth`, `direct_dependents`, `signal_ids` and `age`. An advisory result adds the advisory's `fix` |
 | `runs[0].properties` | `lockrot_schema`, `text_grammar`, `score_text_grammar`, `score_model_id`, `fix_model` and `advisory_lookup` |
-| `invocations[].toolExecutionNotifications` | The report's notes, and a warning per advisory repository that failed |
+| `invocations[].toolExecutionNotifications` | The report's notes, a warning per advisory repository that failed, and a note per advisory repository that lockrot did not ask |
 
 - Guard a script on `runs[0].properties.lockrot_schema == 2`, then read `properties.lead` for the
   first maintenance flag.
