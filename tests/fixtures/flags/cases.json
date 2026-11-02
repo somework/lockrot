@@ -79681,6 +79681,7 @@
    },
    "synthetic_inputs": [
     "metadata.installed_release 2021-08-30 dated by symfony/symfony (‡)",
+    "metadata.branches 2.x: newest_dated v2.6.13 2021-08-30, dated by symfony/symfony, the newest dated release of the branch by date (‡)",
     "next_step.held_by[], also[].held_by[] and the S9 rows' fix.held_by: the lock links of the corpus commit (LINKS)"
    ],
    "finding": {
@@ -79707,10 +79708,10 @@
       "degree": null,
       "headline": {
        "unit": "years",
-       "value": 6.9,
+       "value": 5.1,
        "source": "branch"
       },
-      "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+      "summary": "branch 2.x last released 2021-08-30 (5.1 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
      },
      {
       "id": "vulnerable",
@@ -80000,12 +80001,12 @@
      {
       "id": "S8",
       "level": "high",
-      "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+      "summary": "branch 2.x last released 2021-08-30 (5.1 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
       "data": {
        "branch": "2.x",
-       "branch_last_release": "2019-11-13T08:36:42+00:00",
-       "branch_last_version": "v2.8.52",
-       "years": 6.9,
+       "branch_last_release": "2021-08-30T10:00:00+00:00",
+       "branch_last_version": "v2.6.13",
+       "years": 5.1,
        "newest_branch": "6.x",
        "newest_version": "v6.4.45",
        "newest_release": "2026-08-30T01:18:12+00:00",
@@ -80075,7 +80076,7 @@
       }
      }
     ],
-    "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); vulnerable: 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+    "evidence": "left-behind: branch 2.x last released 2021-08-30 (5.1 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); vulnerable: 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
     "allowlist_reason": null,
     "data_date": "2026-10-01T17:39:31+00:00",
     "libyears": 10.62,
@@ -80095,9 +80096,9 @@
      },
      "release_unmeasured": null,
      "branch_release": {
-      "version": "v2.8.52",
-      "at": "2019-11-13T08:36:42+00:00",
-      "years": 6.9,
+      "version": "v2.6.13",
+      "at": "2021-08-30T10:00:00+00:00",
+      "years": 5.1,
       "level": "high",
       "dated_by": "symfony/symfony"
      },
@@ -80407,8 +80408,8 @@
        "highest": "v2.8.52",
        "highest_released": "2019-11-13T08:36:42+00:00",
        "highest_commit_date": null,
-       "newest_dated": "v2.8.52",
-       "newest_dated_released": "2019-11-13T08:36:42+00:00",
+       "newest_dated": "v2.6.13",
+       "newest_dated_released": "2021-08-30T10:00:00+00:00",
        "dated_by": "symfony/symfony",
        "php": ">=5.3.9",
        "highest_php": ">=5.3.9",
@@ -80443,7 +80444,7 @@
     "readings": [
      {
       "flag": "left-behind",
-      "text": "Its branch, 2.x, had its last release 6.9 years ago, behind 5.x. See Release branches."
+      "text": "Its branch, 2.x, had its last release 5.1 years ago, behind 5.x. See Release branches."
      },
      {
       "flag": "vulnerable",
@@ -80612,7 +80613,7 @@
      ]
     },
     "branches_lead": [
-     "Your branch, 2.x, had its last release, v2.8.52, 6.9 years ago.",
+     "Your branch, 2.x, had its last release, v2.6.13, 5.1 years ago.",
      "The move's branch, 5.x, released v5.4.52 0.4 years ago."
     ],
     "branch_rows": [
@@ -80685,22 +80686,18 @@
       "marks": [
        "yours"
       ],
-      "latest": "v2.8.52",
-      "age": "6.9y",
+      "latest": "v2.6.13",
+      "age": "5.1y",
       "php": ">=5.3.9",
       "php_words": null,
-      "bar": "v2.8.52, released 6.9 years ago, dated by symfony/symfony",
+      "bar": "v2.6.13, released 5.1 years ago, dated by symfony/symfony",
       "folded_in": null
      }
     ],
     "age_rows": [
      {
       "label": "installed",
-      "value": "v2.6.13 · 2021-08-30 · 5.1 years ago, dated by symfony/symfony"
-     },
-     {
-      "label": "2.x last",
-      "value": "v2.8.52 · 2019-11-13 · 6.9 years ago, dated by symfony/symfony"
+      "value": "v2.6.13 · 2021-08-30 · 5.1 years ago, dated by symfony/symfony · the newest on 2.x"
      },
      {
       "label": "most recent",
@@ -80749,7 +80746,7 @@
      "composer why-not symfony/monolog-bridge v5.4.52 --locked"
     ],
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: installed v2.6.13 released 2021-08-30 (5.1 years ago, dated by symfony/symfony); 2.x last released v2.8.52 2019-11-13 (6.9 years ago, dated by symfony/symfony); newest release v6.4.45 2026-08-30 (0.1 years ago); last push 2026-09-23 (less than three weeks ago)"
+    "age_line": "age: installed v2.6.13 released 2021-08-30 (5.1 years ago, dated by symfony/symfony), the newest on 2.x; newest release v6.4.45 2026-08-30 (0.1 years ago); last push 2026-09-23 (less than three weeks ago)"
    },
    "inputs": {
     "root": {
@@ -80773,14 +80770,13 @@
      {
       "version": "v2.6.13",
       "time": "2021-08-30T10:00:00+00:00",
-      "php": ">=5.3.3",
+      "php": ">=5.3.9",
       "shared_commit": true
      },
      {
       "version": "v2.8.52",
       "time": "2019-11-13T08:36:42+00:00",
-      "php": ">=5.3.9",
-      "shared_commit": true
+      "php": ">=5.3.9"
      },
      {
       "version": "v3.4.47",
@@ -80859,8 +80855,8 @@
        "time": "2021-08-30T10:00:00+00:00"
       },
       {
-       "version": "v2.8.52",
-       "time": "2019-11-13T08:36:42+00:00"
+       "version": "v2.6.13",
+       "time": "2021-08-30T10:00:00+00:00"
       }
      ]
     },
@@ -82868,7 +82864,7 @@
      {
       "name": "symfony/monolog-bridge",
       "version": "v2.6.13",
-      "time": null,
+      "time": "2015-06-25T11:21:15+00:00",
       "php": ">=5.3.3",
       "dev": false,
       "origin": "packagist"
@@ -82877,7 +82873,7 @@
     "releases": [
      {
       "version": "v2.6.13",
-      "time": null,
+      "time": "2015-06-25T11:21:15+00:00",
       "php": ">=5.3.3",
       "shared_commit": true
      },

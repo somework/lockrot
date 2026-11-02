@@ -177,26 +177,24 @@
      "clears_hold"
     ]
    },
-   "check": null,
+   "check": {
+    "result": "resolves",
+    "form": "inline",
+    "reason": null,
+    "installs": null
+   },
    "moves_with": [],
    "composer_moves_because": [],
    "commands": [
     [
      "composer",
      "update",
-     "composer/composer"
-    ],
-    [
-     "composer",
-     "why-not",
-     "composer/composer",
-     "2.10.3",
-     "--locked"
+     "composer/composer:^2.10.3"
     ]
    ],
    "through": [],
    "also": [],
-   "text": "composer update composer/composer (gets 2.10.3) — clears 7 advisories"
+   "text": "composer update 'composer/composer:^2.10.3' (gets 2.10.3) — clears 7 advisories; Composer's solver checked it against the lock"
   },
   "security": {
    "status": "vulnerable",
@@ -240,7 +238,12 @@
       "clears_hold"
      ]
     },
-    "check": null
+    "check": {
+     "result": "resolves",
+     "form": "inline",
+     "reason": null,
+     "installs": null
+    }
    },
    "move_in": "next_step",
    "gets": {
