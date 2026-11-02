@@ -1,0 +1,10 @@
+{
+    "sha256": {
+        "resources/lockrot-baseline-2.schema.json": "b534ef575d0dbf8d4842ec1918c71f2aa066d1a74103fe17f8375d7e19e3677f",
+        "resources/lockrot-config-2.schema.json": "667609af1f7b8b2cedb45c9d2d39cf57be288a101379b70a151e4ffb98f04d06",
+        "resources/lockrot-explain-2.schema.json": "2fdb0d46eb7222f49a88285b4a24634bb14cec931599719490b7f0631836d200",
+        "resources/lockrot-report-2.schema.json": "0b90d31b498f9be413bc0cc828fe4144b213e68ca58a143557bceb8119a05db7",
+        "types/lockrot-report-2.d.ts": "83ad8a3e37719ed7d8f506f03a51525f2f74a5034a54cc9902cfb89c4b8e6919",
+        "types/lockrot-report-2.known.d.ts": "9448d8ec3fda22e902336879489e4c5ed448d27417d032bc35c4e6041ee6f5d8"
+    }
+}
