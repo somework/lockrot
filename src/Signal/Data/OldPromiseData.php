@@ -66,6 +66,20 @@ final class OldPromiseData implements SignalData
         return $this->released;
     }
 
+    /** S5's sentence. A constraint with no lower major is quoted alone, so no empty major prints. */
+    public function summary(): string
+    {
+        return \sprintf(
+            'released %s %s, before PHP %s existed (%s GA %s); admits %s untested',
+            substr($this->released, 0, 10),
+            $this->writtenForPhp === null ? 'with php "'.$this->phpConstraint.'"' : 'for PHP '.$this->writtenForPhp.' (php "'.$this->phpConstraint.'")',
+            explode('.', $this->targetMajor)[0],
+            $this->targetMajor,
+            $this->gaDate,
+            $this->targetPhp
+        );
+    }
+
     /** @return array{target_php: string, target_major: string, ga_date: string, php_constraint: string, written_for_php: ?int, released: string} */
     public function jsonSerialize(): array
     {

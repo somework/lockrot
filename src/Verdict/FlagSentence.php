@@ -139,9 +139,7 @@ final class FlagSentence
             return 'last '.$d->event().' '.self::ago($d->lastPush(), $d->years(), null);
         }
         if ($d instanceof OldPromiseData) {
-            $major = explode('.', $d->targetMajor())[0];
-
-            return \sprintf('released %s for PHP %s (php "%s"), before PHP %s existed (%s GA %s); admits %s untested', substr($d->released(), 0, 10), (string) $d->writtenForPhp(), $d->phpConstraint(), $major, $d->targetMajor(), $d->gaDate(), $d->targetPhp());
+            return $d->summary();
         }
         if ($d instanceof CappedData) {
             return \sprintf('requires php %s: it stops at %s, so %s, is excluded', $d->requires(), $d->stopsAt(), $d->newestWords());

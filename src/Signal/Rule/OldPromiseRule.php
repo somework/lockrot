@@ -50,26 +50,17 @@ final class OldPromiseRule implements SignalRule
         if (!$this->openness->isOpenEndedFor($constraint, $this->targetPhp)) {
             return null;
         }
-        $major = explode('.', $this->targetMajor)[0];
         $writtenFor = $this->openness->lowerMajor($constraint);
-        $summary = \sprintf(
-            'released %s %s, before PHP %s existed (%s GA %s); admits %s untested',
-            $released->format('Y-m-d'),
-            $writtenFor === null || $writtenFor === 0 ? 'with php "'.$constraint.'"' : 'for PHP '.$writtenFor.' (php "'.$constraint.'")',
-            $major,
-            $this->targetMajor,
-            $ga->format('Y-m-d'),
-            $this->targetPhp
-        );
-
-        return new Signal(Signal::LEVEL_WARN, $summary, new OldPromiseData(
+        $data = new OldPromiseData(
             $this->targetPhp,
             $this->targetMajor,
             $ga->format('Y-m-d'),
             $constraint,
             $writtenFor === null || $writtenFor === 0 ? null : $writtenFor,
             $released->format(\DATE_ATOM)
-        ));
+        );
+
+        return new Signal(Signal::LEVEL_WARN, $data->summary(), $data);
     }
 
     /**
