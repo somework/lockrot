@@ -94,6 +94,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   sending the runner's token, when a setup step writes it into `github-oauth`. Action: if you put a github.com or gitlab.com token in
   `GITHUB_TOKEN` or `GITLAB_TOKEN` on such a runner, move it to `LOCKROT_GITHUB_TOKEN` or
   `LOCKROT_GITLAB_TOKEN`. ([Which credentials](docs/internals.md#which-credentials))
+- **Breaking:** **Baseline:** `--generate-baseline` refuses a baseline path named `composer.json`
+  or `composer.lock`, a file that `COMPOSER` names, or a name with a colon or a trailing dot or
+  space, with exit 2 on every OS. So it never writes over the project's Composer files. Action: if
+  your baseline has such a name, rename the file and set `baseline` or `--baseline` to the new name.
+  ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 - **All formats:** advisories are looked up by name for every package the run checks (packages-dev
   with `--dev`), so the names of packages from vcs, a path, an archive or an origin lockrot cannot
   tell now reach each Composer repository that publishes advisories. Action: set
@@ -133,10 +138,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`[text](uri)`) in a message or a rule description. ([`--format=sarif`](docs/ci.md#-formatsarif))
 - **All formats:** a repository URL with a `.` or `..` path segment names no repository, so a lock
   cannot send the token to another API path of the repository host.
-- **Baseline:** `--generate-baseline` refuses a baseline path named `composer.json` or
-  `composer.lock`, a file that `COMPOSER` names, or a name with a colon or a trailing dot or space,
-  with exit 2 on every OS. So it never writes over the project's Composer files.
-  ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 
 ### Added
 

@@ -45,15 +45,18 @@ then environment variable, then `extra.lockrot`, then the default.
 The `fail-on` key, `--fail-on` and `LOCKROT_FAIL_ON` each take a comma-separated list, with at most
 one value of each kind. The key also takes a JSON array. lockrot trims and lower-cases each value.
 
-| Kind | Values | A finding reaches it when |
+| Kind | Values | A finding reaches it, before the baseline, when |
 |---|---|---|
-| `grade` | `critical`, `high`, `medium`, `low` | Its gate score is in that [grade](verdicts.md#the-nine-verdicts) or a higher one |
+| `grade` | `critical`, `high`, `medium`, `low` | Its score is in that [grade](verdicts.md#the-nine-verdicts) or a higher one |
 | `flag` | `abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale`, `capped` | It carries a counted maintenance [flag](verdicts.md#flags) at or above the value in flag order |
 | `vulnerable` | `vulnerable`, `vulnerable-medium`, `vulnerable-high`, `vulnerable-critical` | A counted advisory has that [severity](verdicts.md#severity) or a higher one. `vulnerable` takes any severity |
 | `unchecked` | `unchecked` | It carries [S10](verdicts.md#what-was-not-checked) |
 | No value | `none`, the default | Never. `none` stands alone |
 
 - The highest source that sets the list replaces the others whole. They never merge.
+- The [baseline](baseline.md) applies after the reach. A finding that reaches a value fails it,
+  unless its baseline entry exempts it. A finding's `gate.reaches_fail_on` holds the reach,
+  and its `gate.exempt_by` holds the exemption ([The gate](schema.md#the-gate)).
 - `vulnerable-low` is an error: use `vulnerable`, which every counted advisory reaches.
 - The report writes the list as `run.fail_on`, in kind order (`"left-behind,vulnerable-high"`),
   and each value with its kind in `run.gates[]`.
