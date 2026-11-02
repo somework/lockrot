@@ -86,6 +86,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** S5 (`old-promise`) reads the installed release's trusted date. A date that a
   split's tags share no longer fires it: S10 then names S5 with `undated_releases`.
   ([What was not checked](docs/verdicts.md#what-was-not-checked))
+- **All formats:** S8, S11's `excludes_target` and the `--explain` branch rows test the target PHP
+  at `config.platform.php` when it is a stable release in the target minor, as
+  `installed_php.target_runs` does. Else they test the minor's newest patch.
+  ([Within reach](docs/verdicts.md#within-reach))
+- **All formats:** lockrot knows the PHP 8.6 GA date (2026-11-19). From that day, the PHP window
+  and `capped` count PHP 8.6 as the newest minor. ([Capped](docs/verdicts.md#capped))
 
 ### Security
 
@@ -136,13 +142,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   address, an issue reference (`#1`, `GH-1`) or a commit hash, in a pull request comment or a job
   summary. It cannot render as math or as an emoji, or
   stand in for a package name on a footer line. ([`--format=markdown`](docs/ci.md#-formatmarkdown))
-- **markdown, gitlab, sarif:** a line break from the lock prints as `\n` in markdown. A control or
-  bidi character from the lock prints as an escape in the gitlab `description`, and in the sarif
-  message and advisory rule text.
+- **markdown, github, gitlab, sarif:** a line break from the lock prints as `\n` in markdown and in
+  a github annotation, so it cannot start a new line. A control or bidi character from the lock
+  prints as an escape in the gitlab `description`, and in the sarif message and advisory rule text.
 - **sarif:** text from a Composer repository, such as an advisory title or id, cannot embed a link
   (`[text](uri)`) in a message or a rule description. ([`--format=sarif`](docs/ci.md#-formatsarif))
 - **All formats:** a repository URL with a `.` or `..` path segment names no repository, so a lock
   cannot send the token to another API path of the repository host.
+- **All formats:** a repository URL without a scheme that holds credentials (`user:token@host/path`)
+  gives `host` as the repository host. The token no longer reaches the report as the host name.
 
 ### Added
 
@@ -259,6 +267,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([The PHP test](docs/verdicts.md#the-php-test-in-explain))
 - **json:** each S9 row's `fix` writes `admits_target_php` and `admits_project_php`, the floor
   answers of a branch row asked of `fix.php`. ([Fix](docs/verdicts.md#fix))
+- **All formats:** S8 quotes a branch's highest tag that only a commit shared with other tags dates
+  as "on or after" that date. json marks the bound with `newest_release_at_least` and
+  `reachable_release_at_least`.
+  ([Dates from the monorepo](docs/verdicts.md#dates-from-the-monorepo))
 
 ### Changed
 
@@ -358,6 +370,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** the run note `advisories_not_checked` says that no finding is graded for an
   advisory, and that each next step's score after the move assumes none on its versions.
   ([Run notes](docs/notes.md#advisories_not_checked))
+- **All formats:** an S10 `release_dates` entry names the cause for each signal that it blocks.
+  A cause is a lock entry with no date, an installed tag on a shared commit, a tag with no date, or
+  tags dated by a shared commit. ([What was not checked](docs/verdicts.md#what-was-not-checked))
+- **json:** a `release_dates` gap that S1 or a whole-package allowlist entry drops from S10 shows in
+  `checks_skipped[]` with the reason `undated_releases`, as the other dropped gaps do.
+  ([What was not checked](docs/verdicts.md#what-was-not-checked))
 
 ### Deprecated
 
@@ -394,8 +412,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** on Composer 2.11, lockrot still counts the advisories of a `dev-*` version and
   refuses a partial advisory record, as on 2.10. `composer audit` 2.11 skips the first and reports
   the second. ([Which advisories count](docs/verdicts.md#which-advisories-count))
-- **sarif:** a message writes each literal `{` as `{{` and each `}` as `}}`, as SARIF 2.1.0
-  requires, so a viewer that fills placeholders shows an advisory title such as `{% use %}` as written.
+- **sarif:** a message and an advisory's rule text write each literal `{` as `{{` and each `}` as
+  `}}`, as SARIF 2.1.0 requires. A viewer that fills placeholders then shows an advisory title such
+  as `{% use %}`, or an advisory id with braces, as written.
 - **sarif:** `originalUriBaseIds.%SRCROOT%.uri` is `file:///` for a project in `/` and
   `file://server/share/proj/` for one on a UNC share. It read `file:////` and `file:///server/…`.
 - **All formats:** the anonymous cap note counts one package in the singular ("1 candidate package").
@@ -404,17 +423,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CLI:** `--explain` prints "archived flag not read" for a repository whose host did not send the
   flag, such as gitlab.com without a token. It printed "not archived".
   ([Explaining one package](docs/configuration.md#explaining-one-package))
+- **All formats:** a GitHub answer without a boolean `archived` skips the archived check
+  (`repository_archived` with `fetch_failed`). It read as not archived.
+- **CLI:** when the metadata lists releases but none on a release branch, `--explain` says how many
+  releases it lists. ([Explaining one package](docs/configuration.md#explaining-one-package))
 - **CLI:** the `--explain` branch table prints the php of each branch's highest tag. It printed
   the php of the branch's newest dated release, such as an LTS backport, beside the highest tag.
   ([Explaining one package](docs/configuration.md#explaining-one-package))
 - **Config:** a `LOCKROT_TODAY` value without an offset is UTC. It took the default timezone of the
   PHP process. A value with an offset dates the report, the footer and a written baseline on its
-  UTC day. ([Testing hooks](docs/configuration.md#testing-hooks))
+  UTC day. A value that is no ISO 8601 calendar date, such as `2026-02-30`, is a configuration
+  error that names the value. ([Testing hooks](docs/configuration.md#testing-hooks))
 - **All formats:** a lock URL with a long run of slashes does not stall the run.
 - **CLI:** a cached 404 from a run without a token does not hide a private repository from a later
   run with a token. The activity cache keeps an answer per credential state, so the first run after
   the upgrade fetches again each answer that it fetched without a token.
   ([Caching](docs/internals.md#caching))
+- **CLI:** the activity cache stores only a JSON answer or a 404, so a proxy page or a redirect
+  does not replace a cached answer. A failed refetch of an expired 404 leaves the repository
+  unchecked (S10 `fetch_failed`). A 404 from the cache carries its fetch time in
+  `activity.cached_at`, and `--explain` prints it. ([Caching](docs/internals.md#caching))
 - **CLI, Install-time:** a failed read or write of lockrot's cache in Composer's cache directory is a
   cache miss, not exit 2. ([Caching](docs/internals.md#caching))
 - **github, gitlab, sarif:** the line annotations are right for a lock with a very long string or a
@@ -431,6 +459,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Baseline:** on PHP 8.1 and later, a baseline write calls fsync before the rename.
 - **html:** the page's `details` is a JSON object also when no package is explained.
 - **All formats:** summaries print years with a point under a locale with a decimal comma.
+- **Install-time:** lockrot starts no more repository activity requests at once than Composer's
+  parallel limit, and each request gets the time that the budget has left when it starts.
+  ([Time budget](docs/install-time.md#time-budget))
+- **CLI:** an unparsable `composer.lock` beside a `composer.json`, and a `PRE_COMMAND_RUN` listener
+  that throws, exit 2. ([Exit codes](docs/ci.md#exit-codes))
+- **CLI:** `vendor/somework/lockrot/bin/lockrot` in a project without composer/composer names the
+  ways to run lockrot: `composer lockrot`, the PHAR, or composer/composer as a dependency.
+- **Baseline:** a baseline entry with a hand-emptied `flags` or `advisories` map is refused with the
+  rule that the map holds at least one item. ([Baseline](docs/baseline.md))
+- **CLI:** a run on a lock with many direct requirements builds no dependency chain per root for
+  each finding. Those chains took most of the time of a large `--offline` run.
 
 ## [0.13.0] - 2026-10-01
 
