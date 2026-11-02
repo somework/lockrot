@@ -32,9 +32,11 @@ final class ActivityLookup implements \JsonSerializable
     private LocatedRepository $where;
     private ?RepositoryActivity $activity;
     private ?string $archivedUnread;
+    private ?\DateTimeImmutable $notFoundCachedAt;
 
-    private function __construct(string $status, ?string $reason, LocatedRepository $where, ?RepositoryActivity $activity, ?string $archivedUnread)
+    private function __construct(string $status, ?string $reason, LocatedRepository $where, ?RepositoryActivity $activity, ?string $archivedUnread, ?\DateTimeImmutable $notFoundCachedAt = null)
     {
+        $this->notFoundCachedAt = $notFoundCachedAt;
         $this->status = $status;
         $this->reason = $reason;
         $this->where = $where;
@@ -49,9 +51,10 @@ final class ActivityLookup implements \JsonSerializable
         return new self(self::READ, null, LocatedRepository::located($activity->ref()), $activity, $unread);
     }
 
-    public static function notFound(RepoRef $ref): self
+    /** @param ?\DateTimeImmutable $cachedAt the fetch time of the 404 when it came from lockrot's cache */
+    public static function notFound(RepoRef $ref, ?\DateTimeImmutable $cachedAt = null): self
     {
-        return new self(self::NOT_FOUND, self::REPOSITORY_NOT_FOUND, LocatedRepository::located($ref), null, null);
+        return new self(self::NOT_FOUND, self::REPOSITORY_NOT_FOUND, LocatedRepository::located($ref), null, null, $cachedAt);
     }
 
     public static function notRead(string $reason, LocatedRepository $where): self
@@ -86,6 +89,12 @@ final class ActivityLookup implements \JsonSerializable
         return $this->activity === null ? null : $this->activity->ref()->event();
     }
 
+    /** The fetch time of the oldest answer from lockrot's cache behind a read or a 404, null when every one was fetched in this run. */
+    public function cachedAt(): ?\DateTimeImmutable
+    {
+        return $this->activity === null ? $this->notFoundCachedAt : $this->activity->cachedAt();
+    }
+
     /** Set exactly when a read answer did not carry the archived flag. */
     public function archivedUnread(): ?string
     {
@@ -109,7 +118,7 @@ final class ActivityLookup implements \JsonSerializable
             'event' => $this->event(),
             'archived' => $activity === null ? null : $activity->archived(),
             'fetched_at' => $activity === null ? null : $activity->fetchedAt()->format(\DATE_ATOM),
-            'cached_at' => $activity === null || $activity->cachedAt() === null ? null : $activity->cachedAt()->format(\DATE_ATOM),
+            'cached_at' => $this->cachedAt() === null ? null : $this->cachedAt()->format(\DATE_ATOM),
         ];
     }
 }

@@ -135,7 +135,9 @@ final class ExplainFormatter
         }
         $name = $ref === null ? $where->host() : $ref->forgeLabel().' '.$ref->host().'/'.$ref->path();
         if ($lookup->status() === ActivityLookup::NOT_FOUND) {
-            return $name.': the host answered 404 (private, renamed or removed)';
+            $cached = $lookup->cachedAt();
+
+            return $name.': the host answered 404 (private, renamed or removed)'.($cached === null ? '' : ' (cached '.$cached->format('Y-m-d').')');
         }
         $event = $lookup->event() ?? 'push';
         $push = $finding->details()->age()->push();
