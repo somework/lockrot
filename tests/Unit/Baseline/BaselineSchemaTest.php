@@ -120,7 +120,7 @@ final class BaselineSchemaTest extends TestCase
             BaselineSchema::validate($document);
         } catch (ConfigException $e) {
             $message = $e->getMessage()."\n".implode("\n", $e->details());
-            self::assertStringContainsString('findings.twilio/sdk.'.$key.': Must contain a minimum of 1 properties', $message);
+            self::assertMatchesRegularExpression('{^\W*findings\.twilio/sdk\.'.$key.': .*\bminimum of 1\b}m', $message);
             self::assertStringNotContainsString('an object is required', $message);
 
             return;

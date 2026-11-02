@@ -94,8 +94,10 @@ cap ([run notes](notes.md)) prints nothing on its own. The unknown-key line stil
 Once `install-time-budget` seconds have passed, the install-time check starts no new metadata,
 advisory or repository-activity request. A repository-activity request gets the time left as its
 timeout when it starts. lockrot starts no more of them at once than Composer's parallel limit
-(`COMPOSER_MAX_PARALLEL_HTTP`), so no request waits in Composer's queue with an older timeout. A
-retry or a redirect on the same host keeps the timeout of its request. Composer sets the timeout of a metadata or advisory request, and lockrot cannot shorten it.
+(`COMPOSER_MAX_PARALLEL_HTTP`), so no request waits in Composer's queue for a free slot. Composer
+2.11 holds a host after a 429 with `Retry-After`, and a request to that host waits with its
+timeout. A retry or a redirect on the same host keeps the timeout of its request. Composer sets
+the timeout of a metadata or advisory request, and lockrot cannot shorten it.
 So a metadata or advisory request that is already running can hold the install for Composer's
 timeout, and Composer can retry a failed transfer. With curl, the timeout of one metadata request is
 `default_socket_timeout` or 300 seconds, whichever is larger

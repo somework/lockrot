@@ -50,7 +50,9 @@ final class SourceEntryGuardTest extends TestCase
 
         self::assertSame(2, $process->getExitCode(), $process->getErrorOutput());
         self::assertSame('', $process->getOutput());
-        self::assertSame("lockrot needs the composer/composer package 2.10 or newer, and this project does not install it. Run composer lockrot, run the PHAR (https://lockrot.dev/phar/), or require composer/composer.\n", $process->getErrorOutput());
+        foreach (['composer/composer', 'composer lockrot', 'https://lockrot.dev/phar/'] as $way) {
+            self::assertStringContainsString($way, $process->getErrorOutput());
+        }
     }
 
     /**

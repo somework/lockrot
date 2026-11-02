@@ -70,7 +70,7 @@ final class CachingHttpClient implements HttpClientInterface
             foreach ($this->inner->fetchAll($toFetch, $headers) as $url => $result) {
                 if (!self::isAnswer($result)) {
                     $older = $stale[$url] ?? null;
-                    // An expired 404 is no answer to fall back on: the repository can exist by now.
+                    // An expired 404 is no answer to fall back on: the repository can exist at the refetch.
                     $results[$url] = $older !== null && !$older->isNotFound() ? $older->asCached() : $result;
                     continue;
                 }

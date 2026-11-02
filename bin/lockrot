@@ -37,7 +37,7 @@ foreach ([
 
 if (!class_exists(\Composer\Console\Application::class)) {
     fwrite(\STDERR, $lockrotInProject
-        ? "lockrot needs the composer/composer package 2.10 or newer, and this project does not install it. Run composer lockrot, run the PHAR (https://lockrot.dev/phar/), or require composer/composer.\n"
+        ? "lockrot needs the composer/composer package 2.10 or newer, and the vendor directory of lockrot does not hold it. Run composer lockrot, run the PHAR (https://lockrot.dev/phar/), or require composer/composer.\n"
         : "composer/composer is not installed; run composer install in build/phar\n");
     exit(2);
 }

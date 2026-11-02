@@ -208,8 +208,8 @@ public Drupal site locks showed both.
 - lockrot caches a JSON answer and a 404. It caches no other response: a transport error, a 5xx,
   a 4xx other than 404 (401 and 429 included), a 3xx, or a 2xx that is not JSON, such as a proxy
   login page. When an older answer for the URL is cached, lockrot uses it, and the footer shows its
-  age. lockrot does not use an older 404, because the repository can exist by now. The repository
-  is then unchecked (S10).
+  age. When the refetch of an expired 404 fails, lockrot does not use that 404, because the
+  repository can exist at the time of the refetch. The repository is then unchecked (S10).
 
 - lockrot keeps the answer to a request with its own credential header apart from the answer to a
   request without one. So a run with a token asks again for a repository that answered 404 to a
