@@ -17037,6 +17037,468 @@
         }
       ],
       "reason": "lockrot reads the dev-master releases of the wallabag/rulerz packages from their ~dev answers, so it reads the require names of the installed release. The model reads only the tagged releases, so the installed release is installed_unlisted for it."
+    },
+    {
+      "app": "BookStackApp_BookStack",
+      "package": "symfony/polyfill-ctype",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "The S10 filter drops the release_dates entry of a package that S1 or the builtin allowlist covers whole. lockrot keeps the dropped entry as the skip {release_dates, undated_releases} with its blocks. The model writes that skip too, but its corpus documents predate the rule."
+    },
+    {
+      "app": "PrestaShop_PrestaShop",
+      "package": "symfony/polyfill-php73",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "The S10 filter drops the release_dates entry of a package that S1 or the builtin allowlist covers whole. lockrot keeps the dropped entry as the skip {release_dates, undated_releases} with its blocks. The model writes that skip too, but its corpus documents predate the rule."
+    },
+    {
+      "app": "PrestaShop_PrestaShop",
+      "package": "symfony/polyfill-ctype",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "The S10 filter drops the release_dates entry of a package that S1 or the builtin allowlist covers whole. lockrot keeps the dropped entry as the skip {release_dates, undated_releases} with its blocks. The model writes that skip too, but its corpus documents predate the rule."
+    },
+    {
+      "app": "drupal_drupal",
+      "package": "symfony/polyfill-ctype",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "The S10 filter drops the release_dates entry of a package that S1 or the builtin allowlist covers whole. lockrot keeps the dropped entry as the skip {release_dates, undated_releases} with its blocks. The model writes that skip too, but its corpus documents predate the rule."
+    },
+    {
+      "app": "firefly-iii_firefly-iii",
+      "package": "symfony/polyfill-ctype",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "The S10 filter drops the release_dates entry of a package that S1 or the builtin allowlist covers whole. lockrot keeps the dropped entry as the skip {release_dates, undated_releases} with its blocks. The model writes that skip too, but its corpus documents predate the rule."
+    },
+    {
+      "app": "grokability_snipe-it",
+      "package": "symfony/polyfill-ctype",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "The S10 filter drops the release_dates entry of a package that S1 or the builtin allowlist covers whole. lockrot keeps the dropped entry as the skip {release_dates, undated_releases} with its blocks. The model writes that skip too, but its corpus documents predate the rule."
+    },
+    {
+      "app": "koel_koel",
+      "package": "symfony/polyfill-ctype",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "The S10 filter drops the release_dates entry of a package that S1 or the builtin allowlist covers whole. lockrot keeps the dropped entry as the skip {release_dates, undated_releases} with its blocks. The model writes that skip too, but its corpus documents predate the rule."
+    },
+    {
+      "app": "magento_magento2",
+      "package": "symfony/polyfill-ctype",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "The S10 filter drops the release_dates entry of a package that S1 or the builtin allowlist covers whole. lockrot keeps the dropped entry as the skip {release_dates, undated_releases} with its blocks. The model writes that skip too, but its corpus documents predate the rule."
+    },
+    {
+      "app": "magento_magento2",
+      "package": "symfony/polyfill-php73",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "The S10 filter drops the release_dates entry of a package that S1 or the builtin allowlist covers whole. lockrot keeps the dropped entry as the skip {release_dates, undated_releases} with its blocks. The model writes that skip too, but its corpus documents predate the rule."
+    },
+    {
+      "app": "matomo-org_matomo",
+      "package": "symfony/polyfill-ctype",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "The S10 filter drops the release_dates entry of a package that S1 or the builtin allowlist covers whole. lockrot keeps the dropped entry as the skip {release_dates, undated_releases} with its blocks. The model writes that skip too, but its corpus documents predate the rule."
+    },
+    {
+      "app": "mautic_mautic",
+      "package": "symfony/polyfill-ctype",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "The S10 filter drops the release_dates entry of a package that S1 or the builtin allowlist covers whole. lockrot keeps the dropped entry as the skip {release_dates, undated_releases} with its blocks. The model writes that skip too, but its corpus documents predate the rule."
+    },
+    {
+      "app": "mautic_mautic",
+      "package": "symfony/polyfill-php73",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "The S10 filter drops the release_dates entry of a package that S1 or the builtin allowlist covers whole. lockrot keeps the dropped entry as the skip {release_dates, undated_releases} with its blocks. The model writes that skip too, but its corpus documents predate the rule."
+    },
+    {
+      "app": "monicahq_monica",
+      "package": "symfony/polyfill-ctype",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "The S10 filter drops the release_dates entry of a package that S1 or the builtin allowlist covers whole. lockrot keeps the dropped entry as the skip {release_dates, undated_releases} with its blocks. The model writes that skip too, but its corpus documents predate the rule."
+    },
+    {
+      "app": "wallabag_wallabag",
+      "package": "symfony/polyfill-ctype",
+      "path": "checks_skipped",
+      "lockrot": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        },
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S3",
+            "S4"
+          ],
+          "check": "repository_activity",
+          "reason": "allowlisted"
+        }
+      ],
+      "reason": "The S10 filter drops the release_dates entry of a package that S1 or the builtin allowlist covers whole. lockrot keeps the dropped entry as the skip {release_dates, undated_releases} with its blocks. The model writes that skip too, but its corpus documents predate the rule."
     }
   ]
 }
