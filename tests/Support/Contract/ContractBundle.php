@@ -23,7 +23,8 @@ use Lockrot\Version;
 
 /**
  * The rendering contract bundle of SPEC-0.14.md §7.11, as lockrot writes it. It holds every case of
- * tests/fixtures/flags/cases.json, the composite, the words tables and the tables of the PHP grammars.
+ * tests/fixtures/flags/cases.json, the composite, the words tables, the tables of the PHP grammars
+ * and the sha256 of the published schemas and types (`contract-files.json`).
  * tools/report/record writes it to tests/fixtures/contract/. Every file carries the tool version
  * through {@see VersionMask}.
  */
@@ -35,6 +36,9 @@ final class ContractBundle
     /** The directory of DIRECTORY that holds the {@see EnginePage} cases, which tools/report/record --engine-pages writes. */
     public const ENGINE_PAGES = 'page/';
     private const FIXTURES = __DIR__.'/../../fixtures/';
+    private const ROOT = __DIR__.'/../../../';
+    /** The published -2 schemas and types, by glob below ROOT. A release ships them beside the vendored renderer page. */
+    private const CONTRACT_FILES = ['resources/lockrot-*-2.schema.json', 'types/lockrot-report-2*.d.ts'];
 
     /** The text formats, by the suffix of the file each one is written to below `text/`. */
     private const TEXT = ['table' => '.table.txt', 'markdown' => '.md', 'github' => '.github.txt'];
@@ -295,6 +299,21 @@ final class ContractBundle
         foreach (PageWords::TABLES as $file => $table) {
             $this->put('en/'.$file, $table);
         }
+        $this->put('contract-files.json', ['sha256' => self::contractFiles()]);
+    }
+
+    /** @return array<string, string> the sha256 of each contract file, by its path below ROOT */
+    private static function contractFiles(): array
+    {
+        $files = [];
+        foreach (self::CONTRACT_FILES as $pattern) {
+            foreach (glob(self::ROOT.$pattern) ?: [] as $path) {
+                $files[substr($path, \strlen(self::ROOT))] = (string) hash_file('sha256', $path);
+            }
+        }
+        ksort($files);
+
+        return $files;
     }
 
     /**
