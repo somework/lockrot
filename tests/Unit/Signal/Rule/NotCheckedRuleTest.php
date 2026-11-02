@@ -524,4 +524,108 @@ final class NotCheckedRuleTest extends TestCase
         self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2, Signal::S5, Signal::S8]]], JsonPath::decoded($signal->data())['unchecked']);
         self::assertSame('the age of the package was not read (its newest releases are dated by a commit their tags share), so S2, S5 and S8 could not measure it', $signal->summary());
     }
+
+    /** A highest tag with no `time` is a tag without a date, not a shared commit. */
+    public function testAHighestTagWithNoTimeIsTheCauseOfAnS2Gap(): void
+    {
+        $metadata = self::newestUndated(F::metadata([['v2.0.0', null], ['v1.2.0', '2026-01-01T00:00:00+00:00']]));
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertSame([NotCheckedRule::CAUSE_TAG_UNDATED => [Signal::S2]], self::releaseDatesCauses($signal));
+    }
+
+    /** PackageMetadata::fromPackages() lists the highest tag among the shared-commit ones: its date is a commit's. */
+    public function testAHighestTagOnASharedCommitIsTheCauseOfAnS2Gap(): void
+    {
+        $metadata = self::sharedCommit(F::metadata([['v2.0.0', null], ['v1.2.0', '2026-01-01T00:00:00+00:00']]), ['2.0.0.0']);
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertSame([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S2]], self::releaseDatesCauses($signal));
+    }
+
+    public function testAnInstalledTagOnASharedCommitIsTheCauseOfAnS5Gap(): void
+    {
+        $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
+        $metadata = new PackageMetadata('vendor/pkg', false, null, true, new \DateTimeImmutable('2021-08-30T00:00:00+00:00'), 'v4.4.31', 3, null, 'library', new \DateTimeImmutable(self::NOW), [], [], null, [], null, ['4.4.30.0' => true]);
+        $facts = new PackageFacts(F::package(['version' => 'v4.4.30', 'time' => '2020-10-01T00:00:00+00:00', 'php' => '>=7.1.3']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []);
+
+        self::assertSame([NotCheckedRule::CAUSE_INSTALLED_SHARED_COMMIT => [Signal::S5]], self::releaseDatesCauses($rule->evaluate($facts)));
+    }
+
+    public function testALockEntryWithNoTimeIsTheCauseOfAnS5Gap(): void
+    {
+        $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
+        $facts = new PackageFacts(F::package(['version' => 'v4.4.30', 'php' => '>=7.1.3']), self::dated(), F::activity(false, '2026-09-01T00:00:00+00:00'), []);
+
+        self::assertSame([NotCheckedRule::CAUSE_LOCK_UNDATED => [Signal::S5]], self::releaseDatesCauses($rule->evaluate($facts)));
+    }
+
+    public function testAnInstalledBranchWhoseHighestTagHasNoTimeIsTheCauseOfAnS8Gap(): void
+    {
+        $metadata = F::metadata([['v2.0.0', '2026-01-01T00:00:00+00:00'], ['v1.2.0', null]]);
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertSame([NotCheckedRule::CAUSE_TAG_UNDATED => [Signal::S8]], self::releaseDatesCauses($signal));
+    }
+
+    public function testAHigherBranchWhoseHighestTagIsOnASharedCommitIsTheCauseOfAnS8Gap(): void
+    {
+        $metadata = self::sharedCommit(F::metadata([['v2.1.0', null], ['v2.0.0', '2018-01-01T00:00:00+00:00'], ['v1.2.0', '2019-01-01T00:00:00+00:00']]), ['2.1.0.0'], new \DateTimeImmutable('2019-01-01T00:00:00+00:00'));
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertSame([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S8]], self::releaseDatesCauses($signal));
+    }
+
+    /** One entry, one cause per kind of missing date, in the order of the signals that each blocks. */
+    public function testEachBlockedSignalKeepsItsOwnCause(): void
+    {
+        $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
+        $metadata = self::sharedCommit(F::metadata([['v2.0.0', null], ['v1.2.0', null]]), ['2.0.0.0']);
+        $facts = new PackageFacts(F::package(['version' => 'v1.2.0', 'php' => '>=7.1.3']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []);
+
+        $signal = $rule->evaluate($facts);
+
+        self::assertNotNull($signal);
+        self::assertSame([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S2], NotCheckedRule::CAUSE_LOCK_UNDATED => [Signal::S5], NotCheckedRule::CAUSE_TAG_UNDATED => [Signal::S8]], self::releaseDatesCauses($signal));
+        self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2, Signal::S5, Signal::S8]]], JsonPath::decoded($signal->data())['unchecked'], 'the cause stays out of the JSON');
+    }
+
+    public function testNarrowingS10KeepsTheCausesOfTheEntriesItKeeps(): void
+    {
+        $metadata = self::sharedCommit(F::metadata([['v2.0.0', null], ['v1.2.0', '2026-01-01T00:00:00+00:00']]), ['2.0.0.0']);
+        $s10 = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), $metadata, null, [], NotCheckedRule::OFFLINE));
+        self::assertNotNull($s10);
+        $data = $s10->data();
+        self::assertInstanceOf(NotCheckedData::class, $data);
+
+        $kept = NotCheckedRule::keeping([$s10], [$data->checks()[1]], null, null);
+
+        self::assertSame([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S2]], self::releaseDatesCauses($kept[0]));
+    }
+
+    /**
+     * @param list<string> $sharedCommit normalized versions on a commit that three or more stable tags share
+     */
+    private static function sharedCommit(PackageMetadata $metadata, array $sharedCommit, ?\DateTimeImmutable $lastStableReleaseAt = null): PackageMetadata
+    {
+        return new PackageMetadata('vendor/pkg', false, null, true, $lastStableReleaseAt, null, 12, null, 'library', new \DateTimeImmutable(self::NOW), $metadata->latestStableByBranch(), [], null, [], null, array_fill_keys($sharedCommit, true));
+    }
+
+    /** @return array<string, list<string>> */
+    private static function releaseDatesCauses(?Signal $signal): array
+    {
+        self::assertNotNull($signal);
+        $data = $signal->data();
+        self::assertInstanceOf(NotCheckedData::class, $data);
+        foreach ($data->checks() as $check) {
+            if ($check->check() === 'release_dates') {
+                return $check->causes();
+            }
+        }
+        self::fail('S10 has no release_dates entry');
+    }
 }

@@ -6,6 +6,8 @@ namespace Lockrot\Signal\Rule;
 
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Forge\ActivityLookup;
+use Lockrot\Data\Repository\InstalledRelease;
+use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\NotCheckedData;
@@ -68,6 +70,15 @@ final class NotCheckedRule implements SignalRule
     /** An unknown origin can be a Composer repository that leaves no notification-url, so it gets words of its own. */
     private const ORIGIN_CAUSE = [PackageOrigin::UNKNOWN => 'lockrot cannot tell which repository serves it'];
 
+    /** The causes of a `release_dates` entry ({@see Check::causes()}): the installed tag's lock date is a commit that other tags share. */
+    public const CAUSE_INSTALLED_SHARED_COMMIT = 'installed_shared_commit';
+    /** The lock entry of the installed release has no `time`. */
+    public const CAUSE_LOCK_UNDATED = 'lock_undated';
+    /** A highest tag that the signal reads has no `time`. */
+    public const CAUSE_TAG_UNDATED = 'tag_undated';
+    /** A highest tag that the signal reads is on a commit that other tags share. */
+    public const CAUSE_SHARED_COMMIT = 'shared_commit';
+
     /** The S10 checks about the package's upkeep, which a raised S1 makes moot. */
     private const MAINTENANCE_CHECKS = ['repository_activity', 'release_dates', 'release_metadata'];
 
@@ -96,20 +107,9 @@ final class NotCheckedRule implements SignalRule
         }
 
         $metadata = $facts->metadata();
-        // PackageMetadata::fromPackages() leaves a tag undated where a shared commit dates it.
-        // `blocks` names only the signals whose input that leaves unmeasured.
-        $ageBlocks = [];
-        if ($metadata !== null && $metadata->hasStableRelease() && $metadata->lastStableReleaseAt() === null) {
-            $ageBlocks[] = Signal::S2;
-        }
-        if ($this->oldPromise !== null && $this->oldPromise->missesATrustedDate($facts)) {
-            $ageBlocks[] = Signal::S5;
-        }
-        if ($this->leftBehind->missesAnUndatedRelease($facts)) {
-            $ageBlocks[] = Signal::S8;
-        }
-        if ($ageBlocks !== []) {
-            $unchecked[] = new Check('release_dates', 'undated_releases', $ageBlocks);
+        $dates = $metadata === null ? null : $this->releaseDates($facts, $metadata);
+        if ($dates !== null) {
+            $unchecked[] = $dates;
         }
 
         $coverage = $facts->advisoryCoverage();
@@ -121,6 +121,55 @@ final class NotCheckedRule implements SignalRule
         $host = $reason === self::HOST_NOT_SUPPORTED ? $facts->activityLookup()->where()->host() : null;
 
         return self::signalOf($unchecked, array_map(static fn (Check $entry): string => self::summaryOf($entry, $host, $origin), $unchecked));
+    }
+
+    /**
+     * The `release_dates` entry, null when every age signal has its date. PackageMetadata::fromPackages()
+     * leaves a tag undated where a shared commit dates it. `blocks` names only the signals whose
+     * input that leaves unmeasured.
+     */
+    private function releaseDates(PackageFacts $facts, PackageMetadata $metadata): ?Check
+    {
+        $blocked = [];
+        if ($metadata->hasStableRelease() && $metadata->lastStableReleaseAt() === null) {
+            $blocked[] = [self::tagCause($metadata, self::highestTag($metadata)), Signal::S2];
+        }
+        if ($this->oldPromise !== null && $this->oldPromise->missesATrustedDate($facts)) {
+            $shared = InstalledRelease::of($facts->package(), $metadata)->kind() === InstalledRelease::SHARED_COMMIT;
+            $blocked[] = [$shared ? self::CAUSE_INSTALLED_SHARED_COMMIT : self::CAUSE_LOCK_UNDATED, Signal::S5];
+        }
+        foreach ($this->leftBehind->undatedReleases($facts) as $tag) {
+            $blocked[] = [self::tagCause($metadata, $tag), Signal::S8];
+        }
+        if ($blocked === []) {
+            return null;
+        }
+        $causes = [];
+        foreach ($blocked as [$cause, $signal]) {
+            $causes[$cause] = array_values(array_unique(array_merge($causes[$cause] ?? [], [$signal])));
+        }
+        $blocks = array_values(array_unique(array_column($blocked, 1)));
+
+        return new Check('release_dates', 'undated_releases', $blocks, $causes);
+    }
+
+    /** The highest tag over the branches, normalized, null when no branch has one. */
+    private static function highestTag(PackageMetadata $metadata): ?string
+    {
+        $highest = null;
+        foreach ($metadata->latestStableByBranch() as $release) {
+            $tag = $release['highest']['normalized'];
+            if ($highest === null || version_compare($tag, $highest, '>')) {
+                $highest = $tag;
+            }
+        }
+
+        return $highest;
+    }
+
+    private static function tagCause(PackageMetadata $metadata, ?string $tag): string
+    {
+        return $tag !== null && $metadata->sharesItsCommit($tag) ? self::CAUSE_SHARED_COMMIT : self::CAUSE_TAG_UNDATED;
     }
 
     /**
