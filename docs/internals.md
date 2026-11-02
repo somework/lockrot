@@ -16,7 +16,7 @@ For a missing or wrong date, start at
 
 | Source | What lockrot asks | Credentials | Without credentials | Cache |
 |---|---|---|---|---|
-| Composer repositories: Packagist, Private Packagist, Satis, mirrors | Metadata: abandoned flag, versions, release dates (S1, S2, S6, S8). The releases S9 looks in for a fix. Advisories on the installed version (S9) | Composer's own, from `auth.json` or `COMPOSER_AUTH` | What the repository serves anonymously | Composer's |
+| Composer repositories: Packagist, Private Packagist, Satis, mirrors | Metadata: abandoned flag, versions, release dates (S1, S2, S5, S6, S8). The releases S9 looks in for a fix. Advisories on the installed version (S9) | Composer's own, from `auth.json` or `COMPOSER_AUTH` | What the repository serves anonymously | Composer's |
 | GitHub, `api.github.com` | Archived flag (S3), last push to any branch (S4) | `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN` when github.com issued it, else Composer's `github-oauth`. Any other Composer credential for github.com counts too | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
 | GitLab: gitlab.com and every host in Composer's `gitlab-domains` | Newest commit on any branch (S4). Archived flag (S3) with credentials only | `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN` when gitlab.com issued it, for gitlab.com only. Any Composer credential for the host, such as `gitlab-token` | Every package, but the archived flag is hidden, so S3 cannot fire | lockrot's, 24 h |
 | Bitbucket Cloud, `api.bitbucket.org` | Newest commit on any branch (S4). Bitbucket has no archived state | Composer's `http-basic` (an Atlassian API token), `bearer` or `bitbucket-oauth` | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
@@ -134,7 +134,7 @@ Credentials for a repository host feed two signals only: S3 (archived) and S4 (l
 
 - S3 raises `abandoned`, and S4 counts toward `silent` and `stale`.
 
-S1, S2, S8 and S9 read the Composer repositories with Composer's own credentials, and S5 and S6
+S1, S2, S5, S8 and S9 read the Composer repositories with Composer's own credentials. S5 and S6
 read the lock. A host token changes none of them.
 
 ## Self-hosted GitLab {#self-hosted-gitlab}
@@ -242,7 +242,7 @@ run.
 |---|---|---|
 | No S2, S5 or S8, and S10 names `release_dates` | A release that the signal reads has no trusted date. The tag or the lock entry has no date, or the Composer repository dates the tag only by a commit that other tags share (a subtree split), and no monorepo parent dates it | [Left behind](verdicts.md#left-behind), [Dates from the monorepo](verdicts.md#dates-from-the-monorepo) |
 | A release date older than the release | The Composer repository dates a tag by its commit, so a tag cut on an old commit carries that commit's date | [Left behind](verdicts.md#left-behind) |
-| S5's release date is wrong | S5 reads the installed release's trusted date: the monorepo parent's date of the same version, else the lock entry's `time`. A `time` that is a commit other tags share is no release date, so S5 does not fire, and S10 names S5 | Check the lock entry's `time`, and see [Dates from the monorepo](verdicts.md#dates-from-the-monorepo) |
+| S5's release date is wrong | S5 reads the installed release's trusted date: the monorepo parent's date of the same version, else the lock entry's `time`. A `time` that is a commit other tags share is no release date, so S5 does not fire. S10 names S5 when S5 could otherwise fire | Check the lock entry's `time`, and see [Dates from the monorepo](verdicts.md#dates-from-the-monorepo) |
 | S10 names `repository_activity` with `no_token` or `anonymous_budget` | An anonymous run on GitHub or Bitbucket | Set `GITHUB_TOKEN`, or add bitbucket.org credentials to `auth.json` |
 | S10 names `repository_activity` with `install_time_budget` or `offline` | The install-time budget ran out, or `--offline` found no cached answer | [install-time.md](install-time.md), [Working offline](#working-offline) |
 | S10 with `rate_limit` or `fetch_failed`, or the [Rate limited](notes.md#repository_activity_rate_limited) or [Unreachable](notes.md#repository_activity_unreachable) note | The repository host refused or did not answer | Rerun. For a rate limit, add credentials for the repository host |

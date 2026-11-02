@@ -535,7 +535,7 @@ final class NotCheckedRuleTest extends TestCase
         self::assertSame([NotCheckedRule::CAUSE_TAG_UNDATED => [Signal::S2]], self::releaseDatesCauses($signal));
     }
 
-    /** PackageMetadata::fromPackages() lists the highest tag among the shared-commit ones: its date is a commit's. */
+    /** The version that S2 reads is on a shared commit: its date is a commit's. */
     public function testAHighestTagOnASharedCommitIsTheCauseOfAnS2Gap(): void
     {
         $metadata = self::sharedCommit(F::metadata([['v2.0.0', null], ['v1.2.0', '2026-01-01T00:00:00+00:00']]), ['2.0.0.0']);
@@ -549,6 +549,16 @@ final class NotCheckedRuleTest extends TestCase
     {
         $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
         $metadata = new PackageMetadata('vendor/pkg', false, null, true, new \DateTimeImmutable('2021-08-30T00:00:00+00:00'), 'v4.4.31', 3, null, 'library', new \DateTimeImmutable(self::NOW), [], [], null, [], null, ['4.4.30.0' => true]);
+        $facts = new PackageFacts(F::package(['version' => 'v4.4.30', 'time' => '2020-10-01T00:00:00+00:00', 'php' => '>=7.1.3']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []);
+
+        self::assertSame([NotCheckedRule::CAUSE_INSTALLED_SHARED_COMMIT => [Signal::S5]], self::releaseDatesCauses($rule->evaluate($facts)));
+    }
+
+    /** A parent dated the newest release, so the package is a split, and its installed tag's lock date is a shared commit's. */
+    public function testAnInstalledTagOfASplitThatAParentDatesIsTheCauseOfAnS5Gap(): void
+    {
+        $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
+        $metadata = new PackageMetadata('vendor/pkg', false, null, true, new \DateTimeImmutable('2021-08-30T00:00:00+00:00'), 'v4.4.31', 3, null, 'library', new \DateTimeImmutable(self::NOW), [], [], 'acme/parent');
         $facts = new PackageFacts(F::package(['version' => 'v4.4.30', 'time' => '2020-10-01T00:00:00+00:00', 'php' => '>=7.1.3']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []);
 
         self::assertSame([NotCheckedRule::CAUSE_INSTALLED_SHARED_COMMIT => [Signal::S5]], self::releaseDatesCauses($rule->evaluate($facts)));
@@ -611,8 +621,18 @@ final class NotCheckedRuleTest extends TestCase
         $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
 
         self::assertNotNull($signal);
-        self::assertEqualsCanonicalizing([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S8], NotCheckedRule::CAUSE_TAG_UNDATED => [Signal::S8]], self::releaseDatesCauses($signal));
+        self::assertSame([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S8], NotCheckedRule::CAUSE_TAG_UNDATED => [Signal::S8]], self::releaseDatesCauses($signal), 'the highest branch first, whatever order the repository lists');
         self::assertSame([Signal::S8], JsonPath::arrayAt(JsonPath::decoded($signal->data()), ['unchecked', 0, 'blocks']));
+    }
+
+    public function testTheCausesOfS8FollowTheBranchesHighestFirst(): void
+    {
+        $byBranch = F::metadata([['v3.1.0', null], ['v3.0.0', '2018-01-01T00:00:00+00:00'], ['v2.1.0', null], ['v2.0.0', '2018-01-01T00:00:00+00:00'], ['v1.2.0', '2019-01-01T00:00:00+00:00']])->latestStableByBranch();
+        $listedLowFirst = new PackageMetadata('vendor/pkg', false, null, true, new \DateTimeImmutable('2019-01-01T00:00:00+00:00'), null, 12, null, 'library', new \DateTimeImmutable(self::NOW), array_reverse($byBranch, true), [], null, [], null, ['3.1.0.0' => true]);
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), $listedLowFirst, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertSame([NotCheckedRule::CAUSE_SHARED_COMMIT, NotCheckedRule::CAUSE_TAG_UNDATED], array_keys(self::releaseDatesCauses($signal)));
     }
 
     public function testTwoHigherBranchesWithOneCauseNameItOnce(): void
@@ -638,11 +658,12 @@ final class NotCheckedRuleTest extends TestCase
     }
 
     /**
-     * @param list<string> $sharedCommit normalized versions on a commit that three or more stable tags share
+     * @param list<string> $sharedCommit normalized versions on a commit that three or more stable tags share.
+     *                                   With no last release date, the version that S2 reads is one of them.
      */
     private static function sharedCommit(PackageMetadata $metadata, array $sharedCommit, ?\DateTimeImmutable $lastStableReleaseAt = null): PackageMetadata
     {
-        return new PackageMetadata('vendor/pkg', false, null, true, $lastStableReleaseAt, null, 12, null, 'library', new \DateTimeImmutable(self::NOW), $metadata->latestStableByBranch(), [], null, [], null, array_fill_keys($sharedCommit, true));
+        return new PackageMetadata('vendor/pkg', false, null, true, $lastStableReleaseAt, null, 12, null, 'library', new \DateTimeImmutable(self::NOW), $metadata->latestStableByBranch(), [], null, [], null, array_fill_keys($sharedCommit, true), null, $lastStableReleaseAt === null);
     }
 
     /** @return array<string, list<string>> */

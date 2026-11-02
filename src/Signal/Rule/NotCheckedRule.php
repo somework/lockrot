@@ -124,15 +124,14 @@ final class NotCheckedRule implements SignalRule
     }
 
     /**
-     * The `release_dates` entry, null when every age signal has its date. PackageMetadata::fromPackages()
-     * leaves a tag undated where a shared commit dates it. `blocks` names only the signals whose
-     * input that leaves unmeasured.
+     * The `release_dates` entry, null when every age signal has its date. `blocks` names only the
+     * signals that lost their input, and the causes say why each one did.
      */
     private function releaseDates(PackageFacts $facts, PackageMetadata $metadata): ?Check
     {
         $blocked = [];
         if ($metadata->hasStableRelease() && $metadata->lastStableReleaseAt() === null) {
-            $blocked[] = [self::tagCause($metadata, self::highestTag($metadata)), Signal::S2];
+            $blocked[] = [$metadata->lastStableSharesItsCommit() ? self::CAUSE_SHARED_COMMIT : self::CAUSE_TAG_UNDATED, Signal::S2];
         }
         if ($this->oldPromise !== null && $this->oldPromise->missesATrustedDate($facts)) {
             $shared = InstalledRelease::of($facts->package(), $metadata)->kind() === InstalledRelease::SHARED_COMMIT;
@@ -156,23 +155,9 @@ final class NotCheckedRule implements SignalRule
         return new Check('release_dates', 'undated_releases', $blocks, $causes);
     }
 
-    /** The highest tag over the branches, normalized, null when no branch has one. */
-    private static function highestTag(PackageMetadata $metadata): ?string
+    private static function tagCause(PackageMetadata $metadata, string $tag): string
     {
-        $highest = null;
-        foreach ($metadata->latestStableByBranch() as $release) {
-            $tag = $release['highest']['normalized'];
-            if ($highest === null || version_compare($tag, $highest, '>')) {
-                $highest = $tag;
-            }
-        }
-
-        return $highest;
-    }
-
-    private static function tagCause(PackageMetadata $metadata, ?string $tag): string
-    {
-        return $tag !== null && $metadata->sharesItsCommit($tag) ? self::CAUSE_SHARED_COMMIT : self::CAUSE_TAG_UNDATED;
+        return $metadata->sharesItsCommit($tag) ? self::CAUSE_SHARED_COMMIT : self::CAUSE_TAG_UNDATED;
     }
 
     /**

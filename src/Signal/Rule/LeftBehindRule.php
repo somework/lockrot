@@ -144,7 +144,7 @@ final class LeftBehindRule implements SignalRule
      * Or it is a higher branch's tag, while the installed branch is quiet enough for a level and
      * S8 did not fire. A branch snapshot is on no release branch, so S8 misses nothing there.
      *
-     * @return list<string>
+     * @return list<string> highest first
      */
     public function undatedReleases(PackageFacts $facts): array
     {
@@ -169,6 +169,8 @@ final class LeftBehindRule implements SignalRule
                 $undated[] = $release['highest']['normalized'];
             }
         }
+        // Highest first, whatever order the repository lists the branches in.
+        usort($undated, static fn (string $a, string $b): int => version_compare($b, $a));
 
         return $undated;
     }

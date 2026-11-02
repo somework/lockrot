@@ -237,6 +237,25 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertTrue($sharedHighest->hasStableRelease());
         self::assertNull($sharedHighest->lastStableReleaseAt(), 'the package\'s age is its highest tag\'s, and that one is dated by no release');
         self::assertNull($sharedHighest->lastStableVersion());
+        self::assertTrue($sharedHighest->lastStableSharesItsCommit(), 'S10 names the shared commit as the cause');
+        self::assertFalse(PackageMetadata::fromPackages('a/b', [$top, $middle, $lower, $unique], new \DateTimeImmutable(self::FIXED))->lastStableSharesItsCommit());
+    }
+
+    /** The age is the highest non-dev version's, so a pre-release with no date above shared stable tags is the cause, not their commit. */
+    public function testAnUndatedPreReleaseAboveSharedTagsDoesNotShareItsCommit(): void
+    {
+        $split = static fn (string $version, string $commit, ?string $time): array => array_filter(['name' => 'a/b', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]]);
+        $versions = [
+            $this->load($split('v3.0.0-beta1', 'beta', null)),
+            $this->load($split('v2.0.0', 'split', '2023-06-05T12:46:42+00:00')),
+            $this->load($split('v1.9.4', 'split', '2023-06-05T12:46:42+00:00')),
+            $this->load($split('v1.9.3', 'split', '2023-06-05T12:46:42+00:00')),
+        ];
+
+        $metadata = PackageMetadata::fromPackages('a/b', $versions, new \DateTimeImmutable(self::FIXED));
+
+        self::assertNull($metadata->lastStableReleaseAt());
+        self::assertFalse($metadata->lastStableSharesItsCommit());
     }
 
     /** Setting a shared-commit tag aside as undated changes its date, not what the branch requires. */
