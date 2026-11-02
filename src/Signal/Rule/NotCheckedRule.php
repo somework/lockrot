@@ -138,17 +138,20 @@ final class NotCheckedRule implements SignalRule
             $shared = InstalledRelease::of($facts->package(), $metadata)->kind() === InstalledRelease::SHARED_COMMIT;
             $blocked[] = [$shared ? self::CAUSE_INSTALLED_SHARED_COMMIT : self::CAUSE_LOCK_UNDATED, Signal::S5];
         }
-        foreach ($this->leftBehind->undatedReleases($facts) as $tag) {
-            $blocked[] = [self::tagCause($metadata, $tag), Signal::S8];
+        foreach (array_unique(array_map(static fn (string $tag): string => self::tagCause($metadata, $tag), $this->leftBehind->undatedReleases($facts))) as $cause) {
+            $blocked[] = [$cause, Signal::S8];
         }
         if ($blocked === []) {
             return null;
         }
         $causes = [];
+        $blocks = [];
         foreach ($blocked as [$cause, $signal]) {
-            $causes[$cause] = array_values(array_unique(array_merge($causes[$cause] ?? [], [$signal])));
+            $causes[$cause] = [...$causes[$cause] ?? [], $signal];
+            if (!\in_array($signal, $blocks, true)) {
+                $blocks[] = $signal;
+            }
         }
-        $blocks = array_values(array_unique(array_column($blocked, 1)));
 
         return new Check('release_dates', 'undated_releases', $blocks, $causes);
     }

@@ -594,6 +594,36 @@ final class NotCheckedRuleTest extends TestCase
         self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2, Signal::S5, Signal::S8]]], JsonPath::decoded($signal->data())['unchecked'], 'the cause stays out of the JSON');
     }
 
+    public function testOneCauseNamesEverySignalThatItBlocks(): void
+    {
+        $metadata = self::newestUndated(F::metadata([['v2.0.0', null], ['v1.2.0', null]]));
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertSame([NotCheckedRule::CAUSE_TAG_UNDATED => [Signal::S2, Signal::S8]], self::releaseDatesCauses($signal));
+    }
+
+    /** The installed branch is quiet, and two higher branches lack a trusted date, each for its own cause: S8 names both, once in `blocks`. */
+    public function testEveryUndatedHigherBranchGivesS8ItsCause(): void
+    {
+        $metadata = self::sharedCommit(F::metadata([['v3.1.0', null], ['v3.0.0', '2018-01-01T00:00:00+00:00'], ['v2.1.0', null], ['v2.0.0', '2018-01-01T00:00:00+00:00'], ['v1.2.0', '2019-01-01T00:00:00+00:00']]), ['3.1.0.0'], new \DateTimeImmutable('2019-01-01T00:00:00+00:00'));
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertNotNull($signal);
+        self::assertEqualsCanonicalizing([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S8], NotCheckedRule::CAUSE_TAG_UNDATED => [Signal::S8]], self::releaseDatesCauses($signal));
+        self::assertSame([Signal::S8], JsonPath::arrayAt(JsonPath::decoded($signal->data()), ['unchecked', 0, 'blocks']));
+    }
+
+    public function testTwoHigherBranchesWithOneCauseNameItOnce(): void
+    {
+        $metadata = F::metadata([['v3.1.0', null], ['v3.0.0', '2018-01-01T00:00:00+00:00'], ['v2.1.0', null], ['v2.0.0', '2018-01-01T00:00:00+00:00'], ['v1.2.0', '2019-01-01T00:00:00+00:00']]);
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertSame([NotCheckedRule::CAUSE_TAG_UNDATED => [Signal::S8]], self::releaseDatesCauses($signal));
+    }
+
     public function testNarrowingS10KeepsTheCausesOfTheEntriesItKeeps(): void
     {
         $metadata = self::sharedCommit(F::metadata([['v2.0.0', null], ['v1.2.0', '2026-01-01T00:00:00+00:00']]), ['2.0.0.0']);
