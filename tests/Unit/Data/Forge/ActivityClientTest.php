@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Data\Forge;
 
 use Lockrot\Data\Forge\ActivityClient;
+use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Forge\ForgeAuth;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\HttpClientInterface;
 use Lockrot\Data\Http\HttpResult;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class ActivityClientTest extends TestCase
@@ -197,10 +199,41 @@ final class ActivityClientTest extends TestCase
         $client = new ActivityClient($this->http([self::GH_URL => [200, '{"archived":true,"pushed_at":"2020-01-01T00:00:00Z"}']], new \ArrayObject()), ForgeAuth::anonymous());
         self::assertTrue($client->fetch([self::github()])->activity()['github.com/Grandt/PHPZip']->isArchived());
 
-        // A document that does not carry the flag at all is not an archived repository: only an
-        // explicit `true` is, so a shape lockrot did not expect never invents the strongest signal.
-        $client = new ActivityClient($this->http([self::GH_URL => [200, '{"pushed_at":"2020-01-01T00:00:00Z"}']], new \ArrayObject()), ForgeAuth::anonymous());
-        self::assertFalse($client->fetch([self::github()])->activity()['github.com/Grandt/PHPZip']->isArchived());
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function githubBodiesWithoutTheFlag(): iterable
+    {
+        yield 'no archived key' => ['{"pushed_at":"2020-01-01T00:00:00Z"}'];
+        yield 'a proxy message' => ['{"message":"blocked by policy"}'];
+        yield 'archived not a boolean' => ['{"archived":"yes","pushed_at":"2020-01-01T00:00:00Z"}'];
+    }
+
+    /**
+     * A 200 body that lockrot did not expect reads the flag as unknown: neither the strongest
+     * signal nor a "not archived" that nothing read.
+     *
+     * @dataProvider githubBodiesWithoutTheFlag
+     */
+    #[DataProvider('githubBodiesWithoutTheFlag')]
+    public function testAGithubBodyWithoutABooleanArchivedReadsTheFlagAsUnknown(string $body): void
+    {
+        $client = new ActivityClient($this->http([self::GH_URL => [200, $body]], new \ArrayObject()), ForgeAuth::anonymous());
+
+        $activity = $client->fetch([self::github()])->activity()['github.com/Grandt/PHPZip'];
+
+        self::assertNull($activity->archived());
+        self::assertSame(ActivityLookup::FETCH_FAILED, ActivityLookup::read($activity)->archivedUnread());
+    }
+
+    public function testAGithubBodyWithArchivedFalseReadsNotArchived(): void
+    {
+        $client = new ActivityClient($this->http([self::GH_URL => [200, '{"archived":false,"pushed_at":"2020-01-01T00:00:00Z"}']], new \ArrayObject()), ForgeAuth::anonymous());
+
+        $activity = $client->fetch([self::github()])->activity()['github.com/Grandt/PHPZip'];
+
+        self::assertFalse($activity->archived());
+        self::assertNull(ActivityLookup::read($activity)->archivedUnread());
     }
 
     /** Anonymously only the commits call is made: the project document does not carry `archived` anyway. */
