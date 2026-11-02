@@ -371,6 +371,11 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame(['doctrine/cache'], $answered->load(['doctrine/cache' => '2.2.0'])->asked());
     }
 
+    public function testALookupOfNoNamesReadsNoneAndNeverFails(): void
+    {
+        self::assertSame([], (new RepositoryAdvisoryLoader($this->server()->repositories(), true))->records([], true));
+    }
+
     /** Ruling Q7 of PR #151: a repository that answers a full request with a partial record, as Composer 2.11 does, fails its answer. */
     public function testAPartialRecordInTheAnswerToAFullRequestFailsTheAnswerOfThatRepository(): void
     {
@@ -380,6 +385,35 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame([RunNote::ADVISORIES_UNAVAILABLE], array_map(static fn (RunNote $note): string => $note->code(), $batch->notes()));
         self::assertSame(['composer_repository' => 'partial repo', 'message' => 'Advisory for acme/lib could not be loaded as a full advisory from partial repo'], $batch->notes()[0]->data());
         self::assertSame([false], self::networkFailures($batch));
+    }
+
+    /** Composer's Auditor reads only the names that it asked, so an answer for another name counts against no package. */
+    public function testAnAdvisoryOfANameThatTheLoaderDidNotAskIsNotCounted(): void
+    {
+        $repository = new class () extends ArrayRepository implements AdvisoryProviderInterface {
+            public function getRepoName(): string
+            {
+                return 'chatty repo';
+            }
+
+            public function hasSecurityAdvisories(): bool
+            {
+                return true;
+            }
+
+            public function getSecurityAdvisories(array $packageConstraintMap, bool $allowPartialAdvisories = false): array
+            {
+                $data = ['advisoryId' => 'PKSA-other', 'packageName' => 'other/lib', 'remoteId' => 'PKSA-other', 'title' => 'Other', 'link' => 'https://example.test/PKSA-other', 'affectedVersions' => '>=0', 'sources' => [], 'reportedAt' => '2024-03-01 12:00:00', 'severity' => 'high'];
+
+                return ['namesFound' => array_merge(array_keys($packageConstraintMap), ['other/lib']), 'advisories' => ['other/lib' => [PartialSecurityAdvisory::create('other/lib', $data, new VersionParser())]]];
+            }
+        };
+
+        $batch = (new RepositoryAdvisoryLoader([$repository]))->load(['acme/lib' => '1.0.0']);
+
+        self::assertSame([], $batch->byName());
+        self::assertSame([], $batch->for('other/lib'));
+        self::assertSame([], self::texts($batch));
     }
 
     public function testAPartialRecordInTheAnswerToAPartialRequestIsKept(): void

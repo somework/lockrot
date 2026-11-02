@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Integration;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\Contract\CaseRecording;
 use Lockrot\Tests\Support\Contract\Fields;
+use Lockrot\Tests\Support\Contract\ModelBounds;
 use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -482,6 +483,18 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         self::assertSame(Fields::only($model, $kept), Fields::only($lockrot, $kept), $id.' '.$line.': the recording differs from the model in the fields that the line reads');
         $commands = array_values(array_intersect($listed, ['next_step.commands', 'next_step.also[].commands']));
         self::assertSame(Fields::only($model, $commands), Fields::only(self::withoutWhyNot($lockrot), $commands), $id.' '.$line.': a listed commands differs in more than the trailing why-not step');
+        foreach (self::DIFFERENCES[$id][$line] ?? [] as [$paths, $reason]) {
+            if ($reason === self::MOVE_VERSION) {
+                $moves = \in_array('next_step.version', $paths, true) ? [$lockrot['next_step']] : JsonPath::arrayAt($lockrot, ['next_step', 'also']);
+                self::assertNotSame([], $moves, $id.' '.$line);
+                foreach ($moves as $move) {
+                    ModelBounds::assertTheLowestAdmittedRelease(JsonPath::decoded($move), JsonPath::arrayAt($case, ['inputs', 'releases']), $id.' '.$line);
+                }
+            }
+            if ($reason === self::IF_APPLIED) {
+                ModelBounds::assertWithinTheModelsBound(JsonPath::arrayAt($model, ['details', 'metadata', 'branches']), JsonPath::arrayAt($lockrot, ['details', 'metadata', 'branches']), $id.' '.$line);
+            }
+        }
     }
 
     /**

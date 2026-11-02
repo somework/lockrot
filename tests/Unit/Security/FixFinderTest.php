@@ -269,6 +269,29 @@ final class FixFinderTest extends TestCase
         self::assertNull($fix->php(), 'the release declares no php');
     }
 
+    public function testAPackageWithNoCountedAdvisoryGetsNoFixAndNoMove(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['1.1.0', null], ['2.0.0', null]],
+            [],
+            new PhpFloor('8.4', '>=8.1')
+        );
+
+        self::assertSame([], $fixes->fixes());
+        self::assertSame([], $fixes->branches());
+        self::assertNull($fixes->gets());
+        self::assertNull($fixes->move());
+        self::assertNull($fixes->partial());
+    }
+
+    public function testADevReleaseIsNoCandidateOnAnyBranch(): void
+    {
+        $finder = $this->finder(new PhpFloor('8.4', '>=8.1'), [['name' => 'a/b', 'version' => '1.0.0']]);
+
+        self::assertNull($finder->candidate('a/b', new StableRelease('dev-main', 'dev-main', null, null, false)));
+    }
+
     public function testAConflictHoldsTheRelease(): void
     {
         $fix = $this->conflicting()->forAdvisory('A');

@@ -79,6 +79,10 @@ final class ComposerHttpClientRedirectTest extends TestCase
             header('Location: file://localhost'.__DIR__.'/requests.log', true, 302);
             exit;
         }
+        if ($path === '/protocol-relative') {
+            header('Location: //localhost:'.$port.'/headers', true, 302);
+            exit;
+        }
         if ($path === '/same-host') {
             header('Location: /headers', true, 302);
             exit;
@@ -152,6 +156,17 @@ final class ComposerHttpClientRedirectTest extends TestCase
         );
     }
 
+    public function testAProtocolRelativeRedirectToAnotherHostArrivesWithoutLockrotsCredentials(): void
+    {
+        if (!HttpDownloader::isCurlEnabled()) {
+            self::markTestSkipped('Composer takes prevent_url_access_callable through curl only');
+        }
+        self::assertSame(
+            ['authorization' => null, 'private_token' => null, 'user_agent' => 'lockrot', 'path' => '/headers'],
+            $this->headersSeenAfter('/protocol-relative')
+        );
+    }
+
     public function testARedirectOnTheSameHostKeepsLockrotsCredentials(): void
     {
         self::assertSame(
@@ -185,6 +200,37 @@ final class ComposerHttpClientRedirectTest extends TestCase
         $result = $client->fetchAll([$url], self::HEADERS)[$url];
 
         self::assertSame([0, null], [$result->status(), $result->body()]);
+    }
+
+    /** Without curl, lockrot follows a same-host hop itself, so the budget can end between two hops. */
+    public function testASameHostHopAfterTheBudgetRanOutIsNotSentWithoutCurl(): void
+    {
+        $log = $this->dir.'/root/requests.log';
+        $before = \count(file($log) ?: []);
+        $now = static function () use ($log, $before): float {
+            clearstatcache();
+
+            return \count(file($log) ?: []) > $before ? 10.0 : 0.0;
+        };
+        $io = new NullIO();
+        $config = HermeticComposerConfig::create($this->dir.'/home', $io);
+        $config->merge(['config' => ['secure-http' => false]]);
+        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, Clock::fixed('2026-09-14T00:00:00+00:00'), Deadline::inSeconds(5.0, $now), false);
+        $url = $this->server->url().'/same-host';
+
+        $result = $client->fetchAll([$url], self::HEADERS)[$url];
+
+        self::assertSame([0, null], [$result->status(), $result->body()]);
+        self::assertSame($before + 1, \count(file($log) ?: []), 'only the first hop reaches the server');
+    }
+
+    /** A Location that starts with `//` names a host and keeps the request's scheme. */
+    public function testAProtocolRelativeRedirectToAnotherHostArrivesWithoutLockrotsCredentialsWithoutCurl(): void
+    {
+        self::assertSame(
+            ['authorization' => null, 'private_token' => null, 'user_agent' => 'lockrot', 'path' => '/headers'],
+            $this->headersSeenAfter('/protocol-relative', false)
+        );
     }
 
     public function testARedirectOnTheSameHostKeepsLockrotsCredentialsWithoutCurl(): void

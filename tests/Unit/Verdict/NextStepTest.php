@@ -42,6 +42,17 @@ final class NextStepTest extends TestCase
         self::assertSame(['2.0.0', Move::REQUIRE, '^2.0.0'], [$lower->release()->pretty(), $merged->kind(), $merged->constraint()]);
     }
 
+    public function testAMergeKeepsTheLeadWhenTheOtherMovesConstraintDoesNotParse(): void
+    {
+        $row = self::row();
+        $lead = new Candidate(new StableRelease('1.5.0.0', '1.5.0', null, null, false), '1.x', Fix::UPGRADE, []);
+        $higher = new Candidate(new StableRelease('2.0.0.0', '2.0.0', null, null, false), '2.x', Fix::UPGRADE, []);
+        $main = MoveDraft::of(Move::REQUIRE, FlagSet::VULNERABLE)->to($row, $lead, '^1.5.0')->withFixKind(Fix::UPGRADE);
+        $other = MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $higher, 'not a constraint');
+
+        self::assertSame($main, NextStep::merge($main, $other));
+    }
+
     /** @return iterable<string, array{string}> SPEC §5.6, choice of move, rule 4: the cases of a merge that Composer's solver refuses */
     public static function splitCases(): iterable
     {

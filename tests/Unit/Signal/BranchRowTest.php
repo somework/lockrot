@@ -10,6 +10,7 @@ use Composer\Semver\VersionParser;
 use Lockrot\Clock;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Data\Repository\StableRelease;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
@@ -97,6 +98,23 @@ final class BranchRowTest extends TestCase
         $two = $rows[1]->fixes();
         self::assertNotNull($two);
         self::assertSame(0, $two->fixed());
+    }
+
+    public function testAReleaseOfNoBranchGivesNoRow(): void
+    {
+        $dev = new StableRelease('dev-main', 'dev-main', null, null, false);
+
+        self::assertNull(BranchRow::ofRelease($dev, false, new PhpFloor('8.4')));
+    }
+
+    public function testAStableReleaseGivesTheRowOfItsBranch(): void
+    {
+        $stable = new StableRelease('2.1.0.0', 'v2.1.0', null, '>=8.2', false);
+
+        $row = BranchRow::ofRelease($stable, false, new PhpFloor('8.4'));
+
+        self::assertNotNull($row);
+        self::assertSame(['2.x', 'v2.1.0'], [$row->branch(), $row->highest()]);
     }
 
     public function testNoMetadataGivesNoRows(): void

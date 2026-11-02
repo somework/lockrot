@@ -2931,6 +2931,21 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(0, $lenient);
     }
 
+    public function testAGenerateRunWithAStrictNetworkFailurePrintsTheGateLineOnStderr(): void
+    {
+        $this->fixtureCopy(self::WALLABAG_LOCK);
+        $failing = new class () implements MetadataLoaderInterface {
+            public function load(array $installedByName): MetadataBatch
+            {
+                return new MetadataBatch([], [], array_fill_keys(array_keys($installedByName), 'connection refused'));
+            }
+        };
+
+        [, , $stderr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--strict-network' => true, '--fail-on' => 'none', '--target-php' => '8.4'], $failing);
+
+        self::assertMatchesRegularExpression('/^lockrot: gate: .*--strict-network: a lookup failed/m', $stderr);
+    }
+
     public function testExplainWithOutputIsExit2AndWritesNothing(): void
     {
         $dir = $this->fixtureCopy(self::WALLABAG_LOCK);

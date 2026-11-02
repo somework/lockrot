@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The mutation gate: undocumented escaped or uncovered mutants fail, documented ones are listed.
 
-    python3 tools/mutation/pr_gate.py [--shard '<paths>' | --paths '<paths>'] [--report-only] build/infection.json [more.json ...] tests/infection-equivalents.md
+    python3 tools/mutation/pr_gate.py [--shard '<paths>' | --paths '<paths>'] [--changed <base>] [--report-only] build/infection.json [more.json ...] tests/infection-equivalents.md
 
 On a pull request each mutation shard mutates only the lines the request changes (ci.yml), and a
 minimum MSI over a handful of mutants is noise. A full run (--shard, the shard's filter) mutates the
@@ -9,7 +9,9 @@ whole shard. Either way the gate reads Infection's JSON log (`logs.json` in infe
 fails on an escaped or uncovered mutant that no entry of tests/infection-equivalents.md accounts
 for, on any ignored mutant, and on a skipped one. Every such mutant goes to the step summary.
 --paths, the shard filter of the diff mode, keeps only the mutants and the entries of those files
-and directories.
+and directories. --changed <base> keeps only the mutants that a pull request against base mutates:
+the full-check release rehearsal reads a full run as the release pull request into main will. The
+log names no line of a skipped mutant, so --changed keeps the whole skipped count.
 
 An escape is keyed on its file, its mutator and the line Infection mutated, whitespace-normalised,
 so that a line added or removed above it leaves the key alone. When that text occurs more than once
@@ -27,6 +29,7 @@ Standard library only.
 import json
 import os
 import re
+import subprocess
 import sys
 from typing import Dict, List, NamedTuple, Optional, Tuple
 
@@ -42,6 +45,8 @@ ENTRY = re.compile(
 )
 METHOD_SPAN = re.compile(r'^(\w+)\(\)$')
 FUNCTION = re.compile(r'\bfunction\s+(\w+)\s*\(')
+HUNK = re.compile(r'^@@ -\S+ \+(\d+)(?:,(\d+))? @@')
+OPENS, CLOSES = '([{', ')]}'
 Key = Tuple[str, str, str]
 
 
@@ -112,6 +117,7 @@ class Source:
     def __init__(self, root: str):
         self.root = root
         self.cache: Dict[str, List[str]] = {}
+        self.code_cache: Dict[str, List[str]] = {}
 
     def lines(self, path: str) -> List[str]:
         if path not in self.cache:
@@ -121,6 +127,11 @@ class Source:
             except OSError:
                 self.cache[path] = []
         return self.cache[path]
+
+    def code(self, path: str) -> List[str]:
+        if path not in self.code_cache:
+            self.code_cache[path] = code_lines(self.lines(path))
+        return self.code_cache[path]
 
     def text(self, path: str, line: int) -> str:
         lines = self.lines(path)
@@ -149,6 +160,111 @@ class Source:
         else:
             method = next((m for m in (self.method(path, n) for n in occurrences) if m in methods), '')
         return [(path, mutator, 'method:' + method + ' text:' + text)] if method else []
+
+
+def git(root: str, *args: str) -> str:
+    try:
+        return subprocess.run(['git', '-C', root, '--no-pager'] + list(args), check=True, capture_output=True, text=True).stdout
+    except (OSError, subprocess.CalledProcessError) as error:
+        raise LogError('git {} failed: {}'.format(' '.join(args), getattr(error, 'stderr', '') or error))
+
+
+Ranges = Dict[str, Optional[List[Tuple[int, int]]]]
+
+
+def changed_since(base: str, root: str) -> Ranges:
+    """The lines of src that ci.yml mutates on a pull request against base, per path. None is a whole
+    file: a renamed one, or one at the root of src. A hunk that only removes lines changes none, as in
+    Infection's --git-diff-lines."""
+    found: Ranges = {}
+    path = ''
+    for line in git(root, 'diff', '--no-ext-diff', '--no-color', '--unified=0', '--diff-filter=AM', base, '--', 'src').splitlines():
+        if line.startswith('+++ '):
+            path = line[6:] if line.startswith('+++ b/') else ''
+            found.setdefault(path, [])
+        hunk = HUNK.match(line)
+        if hunk and path and int(hunk.group(2) or 1) > 0:
+            start = int(hunk.group(1))
+            found[path].append((start, start + int(hunk.group(2) or 1) - 1))
+    renamed = git(root, 'diff', '--name-only', '--diff-filter=R', base, '--', 'src').split()
+    return {**found, **{p: None for p in list(found) + renamed if p in renamed or os.path.dirname(p) == 'src'}}
+
+
+CASE = re.compile(r'(case\b|default\s*:)')
+HEREDOC = re.compile(r'<<<[ \t]*([\'"]?)([A-Za-z_]\w*)\1')
+
+
+def code_lines(lines: List[str]) -> List[str]:
+    """Each line's code, without string literals, comments, docblocks and heredoc bodies. A line
+    keeps its place, so line n of the result is line n of the source."""
+    text = '\n'.join(lines)
+    out: List[str] = []
+    state, n, heredoc = '', 0, ''
+    while n < len(text):
+        char = text[n]
+        if char == '\n':
+            out.append(char)
+            if state == '//':
+                state = ''
+            elif state == '<<<':
+                line_end = text.find('\n', n + 1)
+                if re.match(r'[ \t]*' + heredoc + r'\b', text[n + 1:len(text) if line_end < 0 else line_end]):
+                    state = ''
+                    n = text.index(heredoc, n + 1) + len(heredoc) - 1
+        elif state in ("'", '"'):
+            if char == '\\':
+                n += 1
+                out.append('\n' if text[n:n + 1] == '\n' else '')
+            elif char == state:
+                state = ''
+        elif state == '/*':
+            if text.startswith('*/', n):
+                state, n = '', n + 1
+        elif state in ('//', '<<<'):
+            pass
+        elif char in '\'"':
+            state = char
+        elif text.startswith('/*', n):
+            state, n = '/*', n + 1
+        elif text.startswith('//', n) or (char == '#' and not text.startswith('#[', n)):
+            state = '//'
+        elif text.startswith('<<<', n) and HEREDOC.match(text, n):
+            state, heredoc = '<<<', HEREDOC.match(text, n).group(2)
+            n = HEREDOC.match(text, n).end() - 1
+        else:
+            out.append(char)
+        n += 1
+    return ''.join(out).split('\n')
+
+
+def node_end(code: List[str], start: int) -> int:
+    """A line at or after the last line of each node that opens at line start, read from the brackets
+    of code_lines(). The span ends on a `;` or a closing `}` that brings the depth back to where it
+    started, or on a bracket that closes one opened before start. The `}` that opens a start line of
+    `} else {` or `} catch (…) {` closes the block before the node. A `case` spans to the next `case`
+    or `default`. A span never ends early, so the rehearsal can keep a mutant that the pull request
+    gate does not mutate, never the reverse."""
+    depth = 0
+    first = re.sub(r'^[\s)\]}]+', '', code[start - 1]).strip() if start <= len(code) else ''
+    case = CASE.match(first) is not None
+    for number in range(start, len(code) + 1):
+        line = first if number == start else code[number - 1].strip()
+        if case and number > start and depth == 0 and CASE.match(line):
+            return number - 1
+        depth += sum(line.count(c) for c in OPENS) - sum(line.count(c) for c in CLOSES)
+        if depth < 0 or (not case and depth == 0 and line.endswith((';', '}'))):
+            return number
+    return len(code)
+
+
+def touched(found: Mutant, ranges: Ranges, source: Source) -> bool:
+    if found.path not in ranges:
+        return False
+    spans = ranges[found.path]
+    if spans is None:
+        return True
+    end = node_end(source.code(found.path), found.line)
+    return any(first <= end and found.line <= last for first, last in spans)
 
 
 class Claim:
@@ -277,6 +393,7 @@ def summary(log: Log, claims: List[Claim], source: Source, shard_mode: bool) -> 
 def main(argv: List[str], root: str = '.') -> Tuple[int, str]:
     """The options, the JSON logs of every Infection pass of one shard, then the documented-equivalents file."""
     shard: Optional[List[str]] = None
+    base: Optional[str] = None
     shard_mode = report_only = False
     args = list(argv)
     while args and args[0].startswith('--'):
@@ -285,10 +402,12 @@ def main(argv: List[str], root: str = '.') -> Tuple[int, str]:
             report_only = True
         elif option in ('--shard', '--paths') and args:
             shard, shard_mode = args.pop(0).split(), option == '--shard'
+        elif option == '--changed' and args:
+            base = args.pop(0)
         else:
             return 2, 'unknown option {}\n'.format(option)
     if len(args) < 2:
-        return 2, 'usage: pr_gate.py [--shard <paths> | --paths <paths>] [--report-only] <infection.json>... <infection-equivalents.md>\n'
+        return 2, 'usage: pr_gate.py [--shard <paths> | --paths <paths>] [--changed <base>] [--report-only] <infection.json>... <infection-equivalents.md>\n'
     logs: List[Log] = []
     try:
         for path in args[:-1]:
@@ -305,8 +424,16 @@ def main(argv: List[str], root: str = '.') -> Tuple[int, str]:
     if elsewhere:
         return 2, 'The mutation log names files that this checkout does not hold: {}\n'.format(', '.join(elsewhere))
     source = Source(root)
-    merged = Log([m for log in logs for m in log.mutants if in_shard(m.path, shard)],
-                 [m for log in logs for m in log.ignored if in_shard(m.path, shard)], sum(log.skipped for log in logs))
+    try:
+        ranges = changed_since(base, root) if base is not None else None
+    except LogError as error:
+        return 2, 'The changed lines cannot be read: {}\n'.format(error)
+
+    def kept(found: Mutant) -> bool:
+        return in_shard(found.path, shard) and (ranges is None or touched(found, ranges, source))
+
+    merged = Log([m for log in logs for m in log.mutants if kept(m)],
+                 [m for log in logs for m in log.ignored if kept(m)], sum(log.skipped for log in logs))
     code, text = summary(merged, allowances(markdown, source, shard), source, shard_mode)
     return (0 if report_only else code), text
 

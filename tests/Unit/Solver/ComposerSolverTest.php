@@ -283,6 +283,16 @@ final class ComposerSolverTest extends TestCase
         self::assertNotContains('>=7.4', array_column($holds, 'constraint'), 'the target php meets the root requirement');
     }
 
+    public function testARefusedPlatformRequirementNamesNoRootRequirementOfThePlatformPackageThatItExcludes(): void
+    {
+        $solver = self::solver(['require' => ['php' => '<8.0', 'acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['php' => '>=9.0']]]]);
+
+        $holds = self::rows($solver->solve(SolveRequest::update(['acme/lib' => '^1.1']))->holds());
+
+        self::assertContains(['source' => 'package', 'package' => 'acme/lib', 'version' => '1.1.0', 'link' => 'platform', 'target' => 'php', 'constraint' => '>=9.0'], $holds);
+        self::assertNotContains('root-require', array_column($holds, 'link'), json_encode($holds) ?: '');
+    }
+
     /** @return iterable<string, array{array<string, mixed>}> */
     public static function rootSections(): iterable
     {

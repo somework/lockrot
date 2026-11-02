@@ -425,6 +425,27 @@ final class NotCheckedRuleTest extends TestCase
         self::assertSame([$s2, $s8], NotCheckedRule::keeping([$s2, $s10, $s8], [], null, null), 'S10 goes with no entry left');
     }
 
+    public function testKeepingRefusesAnEntryOfACheckThatS10HasNoWordsFor(): void
+    {
+        $releases = new Check('releases', 'releases_unknown', [Signal::S9]);
+        $s10 = new Signal(Signal::LEVEL_INFO, 'not checked', new NotCheckedData([$releases]));
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('S10 has no words for the check releases.');
+
+        NotCheckedRule::keeping([$s10], [$releases], null, null);
+    }
+
+    public function testDroppingTheMaintenanceGapsRefusesAnEntryOfACheckThatS10HasNoWordsFor(): void
+    {
+        $s10 = new Signal(Signal::LEVEL_INFO, 'not checked', new NotCheckedData([new Check('releases', 'releases_unknown', [Signal::S9])]));
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('S10 has no words for the check releases.');
+
+        NotCheckedRule::withoutMaintenanceGaps([$s10]);
+    }
+
     /**
      * Release data that a Composer repository listing the package did not serve
      * leaves every fix unknown, so S9 is incomplete. Computed here, written by report-2 only:

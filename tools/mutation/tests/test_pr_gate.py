@@ -2,6 +2,7 @@
 
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -278,6 +279,131 @@ class ShardMode(Gate):
 
     def test_an_unknown_option_is_an_error(self):
         self.assertEqual(2, self.run_gate([log()], '', ('--full',))[0])
+
+
+class ChangedSince(Gate):
+    """--changed <base> keeps what a pull request against base mutates, as Infection's --git-diff-lines does."""
+
+    def setUp(self):
+        super().setUp()
+        self.git('init', '-q')
+        self.git('add', '-A')
+        self.git('commit', '-qm', 'base')
+
+    def git(self, *args):
+        subprocess.run(['git', '-C', self.root, '-c', 'user.name=t', '-c', 'user.email=t@t'] + list(args), check=True, capture_output=True)
+
+    def write(self, path, text):
+        os.makedirs(os.path.dirname(os.path.join(self.root, path)), exist_ok=True)
+        with open(os.path.join(self.root, path), 'w', encoding='utf-8') as handle:
+            handle.write(text)
+
+    def test_an_escape_on_an_unchanged_line_passes(self):
+        self.write('src/Signal/Openness.php', SOURCE.replace('return 1;\n    }\n\n    public function patch', 'return 2;\n    }\n\n    public function patch'))
+
+        self.assertEqual(0, self.run_gate([log((7, 'Plus', PLUS))], '', ('--changed', 'HEAD'))[0])
+
+    def test_an_escape_on_a_changed_line_fails(self):
+        self.write('src/Signal/Openness.php', SOURCE.replace('+ 0;', '+ 1;'))
+
+        code, summary = self.run_gate([log((7, 'Plus', '        return (int) $parts[0] + 1;'))], '', ('--changed', 'HEAD'))
+
+        self.assertEqual(1, code, summary)
+        self.assertIn('`src/Signal/Openness.php` Plus (line 7)', summary)
+
+    def test_a_mutant_whose_node_spans_a_changed_line_fails(self):
+        self.write('src/Signal/Openness.php', SOURCE.replace("explode('.', $v)", "explode(\n            '.',\n            $v\n        )"))
+        self.git('commit', '-qam', 'split')
+        self.write('src/Signal/Openness.php', SOURCE.replace("explode('.', $v)", "explode(\n            '.',\n            $v . ''\n        )"))
+
+        code, summary = self.run_gate([log((6, 'UnwrapExplode', "        $parts = explode("))], '', ('--changed', 'HEAD'))
+
+        self.assertEqual(1, code, summary)
+
+    def test_a_method_mutant_spans_its_body(self):
+        self.write('src/Signal/Openness.php', SOURCE.replace('+ 0;', '+ 1;'))
+
+        code, summary = self.run_gate([log((4, 'PublicVisibility', '    public function major(string $v): int'))], '', ('--changed', 'HEAD'))
+
+        self.assertEqual(1, code, summary)
+
+    def test_a_mutant_after_its_statement_ends_is_not_spanned(self):
+        self.write('src/Signal/Openness.php', SOURCE.replace('+ 0;', '+ 1;'))
+
+        self.assertEqual(0, self.run_gate([log((6, 'UnwrapExplode', "        $parts = explode('.', $v);"))], '', ('--changed', 'HEAD'))[0])
+
+    def test_a_bracket_in_a_string_or_a_comment_does_not_widen_the_span(self):
+        self.write('src/Signal/Openness.php', SOURCE.replace("explode('.', $v);", "explode('(', $v); // (").replace('+ 0;', '+ 1;'))
+        self.git('add', '-A')
+        self.git('commit', '-qm', 'brackets')
+        self.write('src/Signal/Openness.php', SOURCE.replace("explode('.', $v);", "explode('(', $v); // (").replace('+ 0;', '+ 2;'))
+
+        self.assertEqual(0, self.run_gate([log((6, 'UnwrapExplode', "        $parts = explode('(', $v); // ("))], '', ('--changed', 'HEAD'))[0])
+
+    def test_a_condition_over_several_lines_spans_to_its_last_line(self):
+        method = ("    public function both(array $a, array $b): bool\n    {\n        return $a !== []\n"
+                  "            && $b === []\n            && $a !== $b;\n    }\n")
+        self.write('src/Signal/Openness.php', SOURCE[:-2] + '\n' + method + '}\n')
+        self.git('add', '-A')
+        self.git('commit', '-qm', 'both')
+        self.write('src/Signal/Openness.php', SOURCE[:-2] + '\n' + method.replace('$a !== $b;', '$a != $b;') + '}\n')
+
+        code, summary = self.run_gate([log((23, 'LogicalAnd', '        return $a !== []'))], '', ('--changed', 'HEAD'))
+
+        self.assertEqual(1, code, summary)
+
+    def test_brackets_in_a_docblock_a_block_comment_or_a_heredoc_do_not_end_the_span_early(self):
+        method = ("    /** A ``//`` path, then ) and ]. */\n    public function text(): string\n    {\n"
+                  "        /* ( */\n        $x = <<<TXT\n            ) ] }\n            TXT;\n        # (\n        return $x;\n    }\n")
+        self.write('src/Signal/Openness.php', SOURCE[:-2] + '\n' + method + '}\n')
+        self.git('add', '-A')
+        self.git('commit', '-qm', 'text')
+        self.write('src/Signal/Openness.php', SOURCE[:-2] + '\n' + method.replace('return $x;', 'return $x . "";') + '}\n')
+
+        code, summary = self.run_gate([log((22, 'PublicVisibility', '    public function text(): string'))], '', ('--changed', 'HEAD'))
+
+        self.assertEqual(1, code, summary)
+
+    def test_a_span_that_never_closes_runs_to_the_end_of_the_file(self):
+        self.assertEqual(4, pr_gate.node_end(['<?php', 'return foo(', '    1,', '    2'], 2))
+
+    def test_a_catch_an_else_and_a_case_span_their_whole_block(self):
+        lines = ['<?php', 'if ($a) {', '    a();', '} elseif ($b) {', '    b();', '    c();', '} else {', '    d();', '}',
+                 'switch ($c) {', '    case 1:', '        e();', '        f();', '    default:', '        g();', '}']
+        code = pr_gate.code_lines(lines)
+
+        self.assertEqual([9, 9, 13, 16], [pr_gate.node_end(code, 4), pr_gate.node_end(code, 7), pr_gate.node_end(code, 11), pr_gate.node_end(code, 14)])
+
+    def test_a_try_spans_its_catch_block(self):
+        lines = ['<?php', 'try {', '    a();', '} catch (E $e) {', '    b();', '}', 'c();']
+
+        self.assertEqual(6, pr_gate.node_end(pr_gate.code_lines(lines), 2))
+
+    def test_a_removed_line_alone_changes_nothing(self):
+        self.write('src/Signal/Openness.php', SOURCE.replace("        $parts = explode('.', $v);\n", ''))
+
+        self.assertEqual(0, self.run_gate([log((6, 'Plus', '        return (int) $parts[0] + 0;'))], '', ('--changed', 'HEAD'))[0])
+
+    def test_a_renamed_file_counts_whole(self):
+        self.git('mv', 'src/Signal/Openness.php', 'src/Signal/Open.php')
+        escape = json.dumps(json.loads(log((7, 'Plus', PLUS)))).replace('Openness.php', 'Open.php')
+
+        self.assertEqual(1, self.run_gate([escape], '', ('--changed', 'HEAD'))[0])
+
+    def test_a_changed_file_at_the_root_of_src_counts_whole(self):
+        self.write('src/Version.php', SOURCE)
+        self.git('add', '-A')
+        self.git('commit', '-qm', 'root')
+        self.write('src/Version.php', SOURCE.replace('return 1;\n    }\n\n    public function patch', 'return 2;\n    }\n\n    public function patch'))
+        escape = json.dumps(json.loads(log((7, 'Plus', PLUS)))).replace('Signal/Openness.php', 'Version.php')
+
+        self.assertEqual(1, self.run_gate([escape], '', ('--changed', 'HEAD'))[0])
+
+    def test_an_unknown_base_is_an_error(self):
+        self.assertEqual(2, self.run_gate([log()], '', ('--changed', 'no-such-ref'))[0])
+
+    def test_the_option_needs_a_base(self):
+        self.assertEqual(2, self.run_gate([log()], '', ('--changed',))[0])
 
 
 class StaleEntries(Gate):
