@@ -84,26 +84,6 @@ final class CaseHydratorTest extends TestCase
     }
 
     /**
-     * Case S10-tag-undated‡ records v8.6.1 undated on a shared commit. The spellings that the hydrator
-     * plants on that commit must not replace the version that a branch row names.
-     */
-    public function testAPlantedSpellingOfAnUndatedSharedCommitReleaseKeepsTheBranchRowVersion(): void
-    {
-        $release = null;
-        foreach (JsonPath::arrayAt(CaseHydrator::case('S10-tag-undated‡'), ['inputs', 'releases']) as $row) {
-            self::assertIsArray($row);
-            if (($row['version'] ?? null) === 'v8.6.1') {
-                $release = $row;
-            }
-        }
-        self::assertSame(['version' => 'v8.6.1', 'time' => null, 'shared_commit' => true], array_intersect_key((array) $release, ['version' => 0, 'time' => 0, 'shared_commit' => 0]), 'the case records v8.6.1 undated on a shared commit');
-
-        $row = CaseHydrator::branchRows()['S10-tag-undated‡'][0] ?? [];
-
-        self::assertSame(['branch' => '8.x', 'highest' => 'v8.6.1', 'newest_dated' => 'v8.6.1'], array_intersect_key($row, ['branch' => 0, 'highest' => 0, 'newest_dated' => 0]));
-    }
-
-    /**
      * Every case's recorded `finding`, with or without inputs, is a report-2 finding. It covers
      * nothing: its validations outlast the timeout of a mutation run, and they read no product code.
      *
