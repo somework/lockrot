@@ -46,7 +46,7 @@ final class Clock
         }
         $malformed = new ConfigException('LOCKROT_TODAY must be an ISO 8601 date or date-time, such as "2026-09-14"; got "'.$today.'"');
         // PHP also reads "tomorrow" and rolls 2026-02-30 over into March.
-        if (preg_match('{^(\d{4})-(\d{2})-(\d{2})(?:T|$)}', $today, $m) !== 1 || !checkdate((int) $m[2], (int) $m[3], (int) $m[1])) {
+        if (preg_match('{^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})(?:T|$)}', $today, $m) !== 1 || !checkdate((int) $m['month'], (int) $m['day'], (int) $m['year'])) {
             throw $malformed;
         }
         try {

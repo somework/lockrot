@@ -135,6 +135,7 @@ final class ClockTest extends TestCase
         yield 'a relative date that PHP reads' => ['tomorrow'];
         yield 'a day-first date' => ['14.09.2026'];
         yield 'a day that the month does not have' => ['2026-02-30'];
+        yield 'a leap day in a common year' => ['2027-02-29'];
     }
 
     /**
@@ -156,6 +157,7 @@ final class ClockTest extends TestCase
     public static function lockrotTodays(): iterable
     {
         yield 'a date' => ['2026-09-14', '2026-09-14T00:00:00+00:00'];
+        yield 'a leap day' => ['2028-02-29', '2028-02-29T00:00:00+00:00'];
         yield 'a date-time without an offset' => ['2026-09-14T10:30:00', '2026-09-14T10:30:00+00:00'];
         yield 'an explicit offset sets the instant' => ['2026-09-14T00:00:00+03:00', '2026-09-13T21:00:00+00:00'];
         yield 'an offset that ends the year a day early' => ['2026-12-31T23:30:00-05:00', '2027-01-01T04:30:00+00:00'];
