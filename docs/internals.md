@@ -161,7 +161,7 @@ not make the site pass `--fail-on=unchecked`: packages from packages.drupal.org 
 `undated_releases`, a gap that `accept-unchecked` does not accept. A recorded run of the PHAR over
 public Drupal site locks showed both.
 
-## Which Composer repository answers {#two-passes}
+## <a name="two-passes"></a>Which Composer repository answers {#two-passes}
 
 - lockrot looks up only lock entries that carry a `notification-url`, which Composer records for a
   package from a Composer repository. A Satis build without
