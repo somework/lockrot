@@ -275,7 +275,7 @@ shapes leave out the parts that do not apply. A score of 0 carries only `model`,
 | `checks_missing`, `checks_skipped`, `unchecked_accepted` | array | The checks that did not run, as S10 or as skips, and the ones that `accept-unchecked` accepted ([What was not checked](verdicts.md#what-was-not-checked)) |
 | `maintenance_judged` | boolean | True exactly when lockrot read the package's release metadata |
 | `metadata` | object | `status` (`read`, `not_from_composer_repository`, `unavailable`, `not_found`) and why it was not read |
-| `activity` | object | What the repository activity lookup did: `status`, `reason`, `forge`, `host`, `repo`, `event`, `archived`, `fetched_at` and `cached_at` |
+| `activity` | object | What the repository activity lookup did: `status`, `reason`, `forge`, `host`, `repo`, `event`, `archived`, `fetched_at` and `cached_at`. `cached_at` holds the fetch time of the oldest cached answer, on `read` and on `not_found` |
 | `age` | object | Four readings on the run clock (`installed`, `release`, `branch_release`, `push`), each with `years`, and a `<reading>_unmeasured` reason beside each null one |
 | `allowlist` | object or null | Who accepted the package's flags (`by`: `builtin`, `project`, `type`), the `pattern`, `reason`, `reason_id`, `reason_by`, `expires`, `flag_ids` (null: every maintenance flag) and `version` (the version that the entry is limited to, null when it names none) |
 | `allowlist_reason` | string or null | The reason of an entry that accepts the whole package |
@@ -489,7 +489,7 @@ validates with any object as its `data`.
 |---|---|---|
 | S4 | `event` | What the date is: `push` or `commit`. An open set |
 | S6 | `reason`, `has_stable_release`, `last_stable_release`, `last_stable_version`, `last_stable_dated_by`, `snapshot_time`, `tag_relation` | See [What S6 carries](verdicts.md#what-s6-carries) |
-| S8 | `suggested_constraint`, `reachable_branch`, `reachable_version`, `reachable_release` | The newest higher branch that releases and is within reach ([Within reach](verdicts.md#within-reach)) |
+| S8 | `suggested_constraint`, `reachable_branch`, `reachable_version`, `reachable_release`, `newest_release_at_least`, `reachable_release_at_least` | The newest higher branch that releases and is within reach ([Within reach](verdicts.md#within-reach)). `newest_release_at_least` and `reachable_release_at_least` are true when the branch's highest tag has no trusted date: the release date is then the date of a commit that its tags share, a lower bound. `reachable_release_at_least` is null exactly when `reachable_branch` is null |
 | S9 | `advisories`, `releases_read`, `complete` | One row per counted advisory, the deciding one first: `id`, `cve`, `title`, `link`, `reported_at`, `severity`, `severity_published`, `affected_versions`, `counted`, `points`, `deciding`, `fix` and `baseline` |
 | S10 | `unchecked`, `blocks` | See [What was not checked](verdicts.md#what-was-not-checked) |
 | S11 | `newest_php`, `newest_php_source`, `requires`, `stops_at`, `excludes_target`, `admits_newest` | See [Capped](verdicts.md#capped) |

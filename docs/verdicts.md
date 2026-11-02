@@ -304,6 +304,9 @@ A constraint that names the target's major (`^7.2 || ^8.0`) has an upper bound a
 `>=7.2` released after PHP 8.0's GA is not S5 either. `composer check-platform-reqs` asks a
 different question: whether the platform satisfies each constraint, which `>=7.2` does on PHP 8.4.
 
+A constraint with no lower bound names no PHP major. The text then quotes the constraint
+(`released 2016-01-14 with php "*"`), and the flag's `headline.value` is null.
+
 A release whose own `require.php` excludes the target cannot install there at all: Composer refuses
 it. That is not an old promise. `finding.installed_php` states the fact, and the text says that
 the target does not run the version you have.
@@ -346,8 +349,8 @@ S11's `data`:
 | `newest_php` | R |
 | `newest_php_source` | `known` when R is the newest known minor, `require_php` when composer.json's `require.php` limits it, `platform_php` when the lock's `platform.php` limits it |
 | `requires`, `stops_at` | The installed `require.php`, and the newest known minor that it admits |
-| `excludes_target` | True when `requires` excludes the target PHP at the point that S8 tests ([Within reach](#within-reach)): exactly `installed_php.target_runs` false |
-| `admits_newest` | The newest release of the lowest branch whose newest release admits R or states no php, with its `branch` and `blocking` (`project`, `target` or null). Null when no release admits R, or when the release metadata was not read |
+| `excludes_target` | True when `requires` excludes the PHP at which the move check solves ([Within reach](#within-reach)): exactly `installed_php.target_runs` false |
+| `admits_newest` | The newest release of the lowest branch whose newest release admits R or states no php, with its `branch` and `blocking`. `blocking` is `project` when the release's `require.php` excludes the project's lowest PHP. It is `target` when that `require.php` excludes the PHP at which the move check solves, else null. `admits_newest` is null when no release admits R, or when the release metadata was not read |
 
 - **Which releases count.** `admits_newest` reads the stable releases above the installed one. Above
   an `X.Y.x-dev` snapshot or a snapshot with a branch alias, the releases count from `X.Y.0`. Above
