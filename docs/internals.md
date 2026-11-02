@@ -200,14 +200,16 @@ public Drupal site locks showed both.
 | Repository metadata | Composer's cache | Revalidated each run (`If-Modified-Since`) | Every run |
 | Advisories from an advisory API, such as Packagist's | Not cached | None | Every run |
 | Advisories a repository carries in its package files | Composer's cache, inside the metadata | Revalidated with the metadata | Every run |
-| Repository activity | `lockrot/` under Composer's `cache-dir` | 24 hours, fixed | When the answer is 24 hours old. A failed refetch keeps the older answer. `--offline` never refetches |
+| Repository activity | `lockrot/` under Composer's `cache-dir` | 24 hours, fixed | When the answer is 24 hours old. A failed refetch keeps an older answer other than a 404. `--offline` never refetches |
 
 - Each cached answer holds the response's status, body and fetch time. lockrot stores no request
   header, so it stores no token.
 
-- lockrot does not cache a failed request: a transport error, a 5xx, or a 4xx other than 404, 401
-  and 429 included. When an older answer for the URL is cached, lockrot uses it, and the footer
-  shows its age. A 404 is an answer, and lockrot caches it.
+- lockrot caches a JSON answer and a 404. It caches no other response: a transport error, a 5xx,
+  a 4xx other than 404 (401 and 429 included), a 3xx, or a 2xx that is not JSON, such as a proxy
+  login page. When an older answer for the URL is cached, lockrot uses it, and the footer shows its
+  age. lockrot does not use an older 404, because the repository can exist by now. The repository
+  is then unchecked (S10).
 
 - lockrot keeps the answer to a request with its own credential header apart from the answer to a
   request without one. So a run with a token asks again for a repository that answered 404 to a

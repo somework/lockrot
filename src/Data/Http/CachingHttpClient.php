@@ -68,8 +68,10 @@ final class CachingHttpClient implements HttpClientInterface
         }
         if ($toFetch !== []) {
             foreach ($this->inner->fetchAll($toFetch, $headers) as $url => $result) {
-                if ($result->isFailure()) {
-                    $results[$url] = isset($stale[$url]) ? $stale[$url]->asCached() : $result;
+                if (!self::isAnswer($result)) {
+                    $older = $stale[$url] ?? null;
+                    // An expired 404 is no answer to fall back on: the repository can exist by now.
+                    $results[$url] = $older !== null && !$older->isNotFound() ? $older->asCached() : $result;
                     continue;
                 }
                 $this->cache->set($url.$suffix, $result);
@@ -78,6 +80,12 @@ final class CachingHttpClient implements HttpClientInterface
         }
 
         return $results;
+    }
+
+    /** Every host API that lockrot asks answers JSON, so another 2xx or a 3xx is a proxy page or a broken answer. */
+    private static function isAnswer(HttpResult $result): bool
+    {
+        return $result->isNotFound() || ($result->isOk() && $result->json() !== null);
     }
 
     public static function isCredentialHeader(string $header): bool
