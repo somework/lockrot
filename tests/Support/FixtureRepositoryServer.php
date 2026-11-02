@@ -209,9 +209,10 @@ final class FixtureRepositoryServer
      * the URL to use in its place: its packages.json, the p2 answer of each served name that its
      * `available-packages` or `available-package-patterns` admit, and its advisory API, which gives
      * the recorded answer to any POST. Each answer is the envelope that `bin/record-fixtures --into`
-     * wrote in $recordingDir for the original URL. Call before {@see start()}.
+     * wrote in $recordingDir for the original URL. With $advisoriesFail, packages.json names an
+     * advisory API on a closed port. Call before {@see start()}.
      */
-    public function withMirror(string $url, string $recordingDir): string
+    public function withMirror(string $url, string $recordingDir, bool $advisoriesFail = false): string
     {
         $prefix = '/mirror/'.\count(glob($this->docroot.'/mirror/*', \GLOB_ONLYDIR) ?: []);
         $port = parse_url($url, \PHP_URL_PORT);
@@ -248,7 +249,9 @@ final class FixtureRepositoryServer
         }
         $api = \is_string($security['api-url'] ?? null) ? $resolve($security['api-url']) : null;
         $advisories = $api === null ? null : $answer($api);
-        if ($api !== null && $advisories !== null) {
+        if ($api !== null && $advisoriesFail) {
+            $served['security-advisories'] = ['api-url' => 'http://127.0.0.1:'.PhpBuiltinServer::closedPort().$local($api)];
+        } elseif ($api !== null && $advisories !== null) {
             $served['security-advisories'] = ['api-url' => $local($api)];
             self::writeFile($this->docroot.$local($api).'.post', $advisories);
         }

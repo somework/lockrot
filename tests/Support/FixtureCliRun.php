@@ -51,15 +51,16 @@ final class FixtureCliRun
      * @param bool         $parents        also serve the monorepo parents that `bin/record-fixtures` records
      * @param array<string, string> $mirrors the recording directory of each further `composer` repository, by its URL
      * @param list<string>          $names   more names to serve, which no lock lists
+     * @param bool                  $mirrorAdvisoriesFail each mirror's advisory API is unreachable, and its metadata is served
      */
-    public static function start(array $lockFiles, array $p2Dirs, array $githubDirs, string $advisoryAnswer, bool $parents, array $mirrors = [], array $names = []): self
+    public static function start(array $lockFiles, array $p2Dirs, array $githubDirs, string $advisoryAnswer, bool $parents, array $mirrors = [], array $names = [], bool $mirrorAdvisoriesFail = false): self
     {
         $more = array_map(static fn (string $dir): array => ['https://repo.packagist.org/p2/', $dir], \array_slice($p2Dirs, 1));
         $server = FixtureRepositoryServer::fromLockFiles($lockFiles, $p2Dirs[0], array_merge($parents ? MonorepoParents::load()->candidates() : [], $names), $more);
         $server->withRecordedAdvisoryApi(basename($advisoryAnswer, '.json'), \dirname($advisoryAnswer));
         $local = [];
         foreach ($mirrors as $url => $dir) {
-            $local[$url] = $server->withMirror($url, $dir);
+            $local[$url] = $server->withMirror($url, $dir, $mirrorAdvisoriesFail);
         }
         $server->start();
 
@@ -71,8 +72,9 @@ final class FixtureCliRun
      * With $mirrors, each `composer` repository of the project's composer.json that `repos/` holds
      * a recording of is served too. Without, the run cannot reach it. A run on the corpus cache also
      * gets the answers of {@see CORPUS_SOLVER_P2} for each request that the cache does not answer.
+     * With $mirrorAdvisoriesFail, only the advisory API of each served mirror is unreachable.
      */
-    public static function forRecording(string $projectDir, string $httpDir, bool $mirrors = true): self
+    public static function forRecording(string $projectDir, string $httpDir, bool $mirrors = true, bool $mirrorAdvisoriesFail = false): self
     {
         $manifest = JsonPath::decodeFile($projectDir.'/composer.json');
         $recorded = [];
@@ -86,7 +88,7 @@ final class FixtureCliRun
         $solver = realpath($httpDir) === realpath(self::CORPUS_CACHE);
         $names = $solver ? array_values(array_filter(JsonPath::decodeFile(self::CORPUS_SOLVER_P2.'/names.json'), 'is_string')) : [];
 
-        return self::start([$projectDir.'/composer.lock'], array_merge([$httpDir.'/p2'], $solver ? [self::CORPUS_SOLVER_P2] : []), [$httpDir.'/github'], $httpDir.'/advisories/'.basename($projectDir).'.json', true, $recorded, $names);
+        return self::start([$projectDir.'/composer.lock'], array_merge([$httpDir.'/p2'], $solver ? [self::CORPUS_SOLVER_P2] : []), [$httpDir.'/github'], $httpDir.'/advisories/'.basename($projectDir).'.json', true, $recorded, $names, $mirrorAdvisoriesFail);
     }
 
     public function stop(): void

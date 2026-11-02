@@ -87,8 +87,12 @@ move, so `run.move_check` is null. The differential compares each finding of rep
 model's document for the same lock. `Lockrot\Tests\Support\CorpusDifferential::FIELDS` names the
 compared fields. They include each finding's gate decision at `--fail-on=high`, the value that both
 sides run with. drupal runs twice:
-once with its packages.drupal.org answers, and once with that advisory lookup failed. Both sides read
-only the answers in `tests/fixtures/corpus/cache/`, at one clock.
+once with its packages.drupal.org answers, and once with packages.drupal.org unreachable. In the
+second run, the advisory lookup fails. packages.drupal.org is canonical, so lockrot also reads no
+metadata of the names that it could serve, as Composer stops its update. The 0.13 model asked
+packagist.org, and model-divergences.json lists those cells. Both sides read only the answers in
+`tests/fixtures/corpus/cache/`, at one clock. `tests/Integration/AdvisoryFeedFailedTest` runs
+drupal with only the advisory API of packages.drupal.org unreachable.
 
 Each reviewed difference is an entry of `tests/fixtures/corpus/model-divergences.json`, with its
 reason. An entry names one cell: the run, the package, the path and both values. An entry with
