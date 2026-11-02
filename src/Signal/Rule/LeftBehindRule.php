@@ -65,19 +65,22 @@ final class LeftBehindRule implements SignalRule
         }
         $ownAt = $reading->measuredAt();
 
-        /** @var array{branch: string, version: string, at: \DateTimeImmutable, php: ?string}|null $newest */
+        /** @var array{branch: string, version: string, at: \DateTimeImmutable, php: ?string, at_least: bool}|null $newest */
         $newest = null;
-        /** @var array{branch: string, version: string, at: \DateTimeImmutable, php: ?string}|null $reachable */
+        /** @var array{branch: string, version: string, at: \DateTimeImmutable, php: ?string, at_least: bool}|null $reachable */
         $reachable = null;
         foreach ($byBranch as $key => $release) {
             if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $ownAt) {
                 continue;
             }
-            $candidate = ['branch' => (string) $key, 'version' => $release['version'], 'at' => $release['at'], 'php' => $release['php'] ?? null];
-            if ($newest === null || $release['at'] > $newest['at']) {
+            // The highest tag itself, dated only by a commit its tags share, is released on or after `at`.
+            // A lower tag with a date of its own is quoted exactly.
+            $atLeast = $release['highest']['at'] === null && $release['version'] === $release['highest']['pretty'];
+            $candidate = ['branch' => (string) $key, 'version' => $release['version'], 'at' => $release['at'], 'php' => $release['php'] ?? null, 'at_least' => $atLeast];
+            if (self::newer($candidate, $newest)) {
                 $newest = $candidate;
             }
-            if ($this->floor->blocking($candidate['php']) === null && ($reachable === null || $release['at'] > $reachable['at'])) {
+            if ($this->floor->blocking($candidate['php']) === null && self::newer($candidate, $reachable)) {
                 $reachable = $candidate;
             }
         }
@@ -96,20 +99,18 @@ final class LeftBehindRule implements SignalRule
         // date from a monorepo parent says so ({@see PackageMetadata::datedBy()}).
         $datedBy = $reading->datedBy();
         $summary = \sprintf(
-            'branch %s last released %s (%.1F years ago%s); %s released %s (%s)',
+            'branch %s last released %s (%.1F years ago%s); %s',
             ReleaseBranch::label($branch),
             $ownAt->format('Y-m-d'),
             $reading->years(),
             $datedBy === null ? '' : ', dated by '.$datedBy,
-            ReleaseBranch::label($newest['branch']),
-            $newest['version'],
-            $newest['at']->format('Y-m-d')
+            self::released($newest)
         );
         if ($blocking !== null) {
             $summary .= ', needs php '.$newest['php'].PhpFloor::missWords($this->floor->misses($blocking, $newest['php']), $this->floor->describe($blocking));
             $summary .= $reachable === null
                 ? '; no releasing branch within reach'
-                : \sprintf('; %s released %s (%s)', ReleaseBranch::label($reachable['branch']), $reachable['version'], $reachable['at']->format('Y-m-d'));
+                : '; '.self::released($reachable);
         }
 
         return new Signal($level, $summary, new LeftBehindData(
@@ -133,8 +134,10 @@ final class LeftBehindRule implements SignalRule
                 $this->clock->tenthsSince($reachable['at']) / 10,
                 $reachable['php'],
                 ['project' => $this->floor->admitsProject($reachable['php']), 'target' => $this->floor->admitsTarget($reachable['php'])],
-                $this->suggestedConstraint($facts->package()->name(), $reachable['version'])
-            )
+                $this->suggestedConstraint($facts->package()->name(), $reachable['version']),
+                $reachable['at_least']
+            ),
+            $newest['at_least']
         ));
     }
 
@@ -175,6 +178,12 @@ final class LeftBehindRule implements SignalRule
         return $undated;
     }
 
+    /** @param array{branch: string, version: string, at: \DateTimeImmutable, php: ?string, at_least: bool} $release */
+    private static function released(array $release): string
+    {
+        return LeftBehindData::releasedWords(ReleaseBranch::label($release['branch']), $release['version'], $release['at']->format('Y-m-d'), $release['at_least']);
+    }
+
     /** Released within `release-warn-years` of today: the branch is still where fixes land. */
     private function isAlive(\DateTimeImmutable $at): bool
     {
@@ -195,5 +204,21 @@ final class LeftBehindRule implements SignalRule
         }
 
         return (new VersionSelector(new RepositorySet()))->findRecommendedRequireVersion(new Package($package, $normalized, $newestVersion));
+    }
+
+    /**
+     * Whether $candidate releases after $than: a later date, or on the same date a higher branch. The
+     * answer must not depend on the order in which a repository lists its versions.
+     *
+     * @param array{branch: string, at: \DateTimeImmutable}      $candidate
+     * @param array{branch: string, at: \DateTimeImmutable}|null $than
+     */
+    private static function newer(array $candidate, ?array $than): bool
+    {
+        if ($than === null || $candidate['at'] > $than['at']) {
+            return true;
+        }
+
+        return $candidate['at'] >= $than['at'] && ReleaseBranch::isAbove($candidate['branch'], $than['branch']);
     }
 }

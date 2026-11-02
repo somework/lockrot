@@ -525,10 +525,13 @@ final class AnalyzerTest extends TestCase
     public function testS10IsLeftOffAnAllowlistedPackageAndAnAbandonedOne(): void
     {
         $undated = static fn (string $name, bool $abandoned): PackageMetadata => new PackageMetadata($name, $abandoned, null, true, null, '1.0.0', 1, null, 'library', new \DateTimeImmutable(F::NOW));
-        $metadata = ['vendor/allowlisted' => $undated('vendor/allowlisted', false), 'vendor/abandoned' => $undated('vendor/abandoned', true), 'vendor/plain' => $undated('vendor/plain', false)];
-        $allowlist = new Allowlist([new AllowlistEntry('vendor/allowlisted', null, 'complete', null, 'builtin')]);
+        $metadata = ['vendor/allowlisted' => $undated('vendor/allowlisted', false), 'vendor/abandoned' => $undated('vendor/abandoned', true), 'vendor/ignored' => $undated('vendor/ignored', true), 'vendor/plain' => $undated('vendor/plain', false)];
+        $allowlist = new Allowlist([
+            new AllowlistEntry('vendor/allowlisted', null, 'complete', null, 'builtin'),
+            new AllowlistEntry('vendor/ignored', null, 'replaced next sprint', null, AllowlistEntry::BY_PROJECT, ['abandoned']),
+        ]);
 
-        $byName = self::byName($this->analyzeLock([self::locked('vendor/allowlisted'), self::locked('vendor/abandoned'), self::locked('vendor/plain')], $this->loader($metadata), $this->http([]), true, $allowlist));
+        $byName = self::byName($this->analyzeLock([self::locked('vendor/allowlisted'), self::locked('vendor/abandoned'), self::locked('vendor/ignored'), self::locked('vendor/plain')], $this->loader($metadata), $this->http([]), true, $allowlist));
         $ids = static fn (string $name): array => array_map(static fn ($s) => $s->id(), $byName[$name]->signals());
 
         self::assertSame(['S10'], $ids('vendor/plain'), 'the control: undated releases raise S10');
@@ -536,6 +539,26 @@ final class AnalyzerTest extends TestCase
         self::assertSame([], $ids('vendor/allowlisted'));
         self::assertSame(Verdict::ABANDONED, $byName['vendor/abandoned']->lead());
         self::assertSame(['S1'], $ids('vendor/abandoned'));
+    }
+
+    /** The release_dates gap that the S10 filter drops stays visible as a skip, so no reader counts S2 as quiet. */
+    public function testADroppedReleaseDatesGapIsASkip(): void
+    {
+        $undated = static fn (string $name, bool $abandoned): PackageMetadata => new PackageMetadata($name, $abandoned, null, true, null, '1.0.0', 1, null, 'library', new \DateTimeImmutable(F::NOW));
+        $metadata = ['vendor/allowlisted' => $undated('vendor/allowlisted', false), 'vendor/abandoned' => $undated('vendor/abandoned', true), 'vendor/ignored' => $undated('vendor/ignored', true), 'vendor/plain' => $undated('vendor/plain', false)];
+        $allowlist = new Allowlist([
+            new AllowlistEntry('vendor/allowlisted', null, 'complete', null, 'builtin'),
+            new AllowlistEntry('vendor/ignored', null, 'replaced next sprint', null, AllowlistEntry::BY_PROJECT, ['abandoned']),
+        ]);
+
+        $byName = self::byName($this->analyzeLock([self::locked('vendor/allowlisted'), self::locked('vendor/abandoned'), self::locked('vendor/ignored'), self::locked('vendor/plain')], $this->loader($metadata), $this->http([]), true, $allowlist));
+        $dateSkips = static fn (string $name): array => array_values(array_filter(JsonPath::decoded($byName[$name]->details()->skipped()), static fn ($skip): bool => \is_array($skip) && $skip['check'] === 'release_dates'));
+
+        $skip = ['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => ['S2']];
+        self::assertSame([$skip], $dateSkips('vendor/allowlisted'));
+        self::assertSame([$skip], $dateSkips('vendor/abandoned'));
+        self::assertSame([$skip], $dateSkips('vendor/ignored'), 'the filter reads the raised S1, also when an entry ignores abandoned');
+        self::assertSame([], $dateSkips('vendor/plain'), 'S10 holds the gap of a package that the filter keeps');
     }
 
     public function testRepositoryMetadataFailureIsUnknownWithNoteAndNetworkFlag(): void
@@ -1155,6 +1178,38 @@ final class AnalyzerTest extends TestCase
         ]), true);
         self::assertNull($fresh->activityCacheOldestAt());
         self::assertSame('package repositories, repository hosts', $fresh->dataSourcesClause());
+    }
+
+    /** A 404 from lockrot's cache is an answer with an age: its finding and the root both carry it (A9). */
+    public function testACachedNotFoundCarriesItsAgeOnTheFindingAndTheRoot(): void
+    {
+        $packages = [self::locked('vendor/a'), self::locked('vendor/b')];
+        $metadata = [
+            'vendor/a' => $this->metadataNamed('vendor/a', 'https://github.com/vendor/a.git'),
+            'vendor/b' => $this->metadataNamed('vendor/b', 'https://github.com/vendor/b.git'),
+        ];
+        $report = $this->analyzeLock($packages, $this->loader($metadata), $this->httpAnswering([
+            'https://api.github.com/repos/vendor/a' => (new HttpResult('https://api.github.com/repos/vendor/a', 404, '', new \DateTimeImmutable('2026-09-13T02:00:00+00:00')))->asCached(),
+            'https://api.github.com/repos/vendor/b' => (new HttpResult('https://api.github.com/repos/vendor/b', 200, '{"archived":false,"pushed_at":"2015-01-01T00:00:00Z"}', new \DateTimeImmutable('2026-09-13T05:00:00+00:00')))->asCached(),
+        ]), true);
+
+        $json = json_decode((string) json_encode($report->toArray()), true);
+        self::assertIsArray($json);
+        $byPackage = array_column(JsonPath::arrayAt($json, ['findings']), 'activity', 'package');
+        self::assertSame(['not_found', '2026-09-13T02:00:00+00:00'], [JsonPath::stringAt($byPackage, ['vendor/a', 'status']), JsonPath::stringAt($byPackage, ['vendor/a', 'cached_at'])]);
+        self::assertSame('2026-09-13T02:00:00+00:00', self::atomOf($report->activityCacheOldestAt()));
+    }
+
+    public function testALiveNotFoundCarriesNoCacheAge(): void
+    {
+        $report = $this->analyzeLock([self::locked('vendor/a')], $this->loader(['vendor/a' => $this->metadataNamed('vendor/a', 'https://github.com/vendor/a.git')]), $this->httpAnswering([
+            'https://api.github.com/repos/vendor/a' => new HttpResult('https://api.github.com/repos/vendor/a', 404, '', new \DateTimeImmutable('2026-09-14T00:00:00+00:00')),
+        ]), true);
+
+        $json = json_decode((string) json_encode($report->toArray()), true);
+        self::assertIsArray($json);
+        self::assertSame(['status' => 'not_found', 'cached_at' => null], array_intersect_key(JsonPath::arrayAt($json, ['findings', 0, 'activity']), ['status' => 1, 'cached_at' => 1]));
+        self::assertNull($report->activityCacheOldestAt());
     }
 
     public function testACachedActivityAnswerReachesTheTableFooterThroughTheRealCache(): void

@@ -15,15 +15,19 @@ final class ActivityBatch
     private array $failed;
     /** @var array<string, bool> */
     private array $rateLimited;
+    /** @var array<string, \DateTimeImmutable> */
+    private array $notFoundCachedAt;
 
     /**
      * @param array<string, RepositoryActivity>    $activity    keyed by {@see RepoRef::key()}
      * @param array<string, list<string>>          $notFound    {@see RepoRef::forge()} => keys of repositories that it does not know or hides
      * @param array<string, array<string, string>> $failed      {@see RepoRef::forge()} => (key => reason)
      * @param array<string, bool>                  $rateLimited {@see RepoRef::host()} of each host that answered "too many requests"
+     * @param array<string, \DateTimeImmutable>    $notFoundCachedAt key => the fetch time of a 404 from lockrot's cache
      */
-    public function __construct(array $activity, array $notFound, array $failed, array $rateLimited)
+    public function __construct(array $activity, array $notFound, array $failed, array $rateLimited, array $notFoundCachedAt = [])
     {
+        $this->notFoundCachedAt = $notFoundCachedAt;
         $this->activity = $activity;
         $this->notFound = $notFound;
         $this->failed = $failed;
@@ -63,6 +67,12 @@ final class ActivityBatch
     public function failedOn(string $forge): array
     {
         return $this->failed[$forge] ?? [];
+    }
+
+    /** The fetch time of the 404 from lockrot's cache that decided $key, null for a live 404 or none. */
+    public function notFoundCachedAt(string $key): ?\DateTimeImmutable
+    {
+        return $this->notFoundCachedAt[$key] ?? null;
     }
 
     public function rateLimited(string $host): bool

@@ -15,6 +15,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class LeftBehindRuleTest extends TestCase
@@ -51,7 +52,7 @@ final class LeftBehindRuleTest extends TestCase
             'reachable_release' => '2026-06-01T00:00:00+00:00',
             'suggested_constraint' => '^3.4',
             'dated_by' => null,
-        ], array_diff_key(JsonPath::decoded($signal->data()), array_flip(['reachable_php', 'reachable_admits', 'newest_years', 'reachable_years'])));
+        ], array_diff_key(JsonPath::decoded($signal->data()), array_flip(['reachable_php', 'reachable_admits', 'newest_years', 'reachable_years', 'newest_release_at_least', 'reachable_release_at_least'])));
     }
 
     public function testWarnBetweenThreeAndFiveYears(): void
@@ -142,12 +143,22 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta)));
     }
 
-    public function testTwoHigherBranchesReleasedTheSameDayKeepTheFirstListed(): void
+    /** @return iterable<string, array{list<array{string, string}>}> */
+    public static function provideTwoHigherBranchesReleasedTheSameDay(): iterable
     {
-        // Packagist lists the highest version first, so a tie names the highest branch.
-        $meta = F::metadata([['3.0.0', '2026-01-01'], ['2.5.0', '2026-01-01'], ['1.9.2', '2019-03-02']]);
+        yield 'highest listed first' => [[['3.0.0', '2026-01-01'], ['2.5.0', '2026-01-01'], ['1.9.2', '2019-03-02']]];
+        yield 'highest listed last' => [[['1.9.2', '2019-03-02'], ['2.5.0', '2026-01-01'], ['3.0.0', '2026-01-01']]];
+    }
 
-        $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), $meta));
+    /**
+     * @param list<array{string, string}> $releases
+     *
+     * @dataProvider provideTwoHigherBranchesReleasedTheSameDay
+     */
+    #[DataProvider('provideTwoHigherBranchesReleasedTheSameDay')]
+    public function testTwoHigherBranchesReleasedTheSameDayNameTheHigherBranch(array $releases): void
+    {
+        $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), F::metadata($releases)));
 
         self::assertNotNull($signal);
         self::assertStringEndsWith('; 3.x released 3.0.0 (2026-01-01)', $signal->summary());
@@ -286,7 +297,7 @@ final class LeftBehindRuleTest extends TestCase
         $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.5.0']), $meta));
 
         self::assertNotNull($signal);
-        self::assertSame('branch 1.x last released 2019-06-01 (7.3 years ago); 2.x released 2.3.0 (2025-06-01)', $signal->summary());
+        self::assertSame('branch 1.x last released 2019-06-01 (7.3 years ago); 2.x released 2.3.0 (on or after 2025-06-01, the date of a commit its tags share)', $signal->summary());
         self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '2.2.0']), $meta)), 'the shared-commit branch itself is not measured');
     }
 
@@ -521,5 +532,92 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNotNull($signal);
         self::assertSame(Signal::S8, $signal->id());
         self::assertSame('1.9.2', JsonPath::decoded($signal->data())['branch_last_version'] ?? null);
+    }
+
+    /** A higher branch whose highest tag has no trusted date: its date is a commit's, so the release is on or after it. */
+    public function testAHigherBranchDatedByASharedCommitIsQuotedAsALowerBound(): void
+    {
+        $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), self::branches([
+            '4' => self::row('v4.9.0', '2025-03-08', null, null),
+            '1' => self::row('1.9.2', '2019-03-02', '2019-03-02', null),
+        ])));
+
+        self::assertNotNull($signal);
+        self::assertSame('branch 1.x last released 2019-03-02 (7.5 years ago); 4.x released v4.9.0 (on or after 2025-03-08, the date of a commit its tags share)', $signal->summary());
+        $data = JsonPath::decoded($signal->data());
+        self::assertTrue($data['newest_release_at_least']);
+        self::assertTrue($data['reachable_release_at_least']);
+    }
+
+    /** The quoted release is a lower tag with a date of its own: that date is exact, whatever the undated highest tag. */
+    public function testALowerDatedTagOfABranchWithAnUndatedHighestTagIsQuotedExactly(): void
+    {
+        $date = new \DateTimeImmutable('2026-01-10T00:00:00+00:00');
+        $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), self::branches([
+            '2' => ['version' => '2.0.0', 'at' => $date, 'highest' => ['normalized' => '2.1.0.0', 'pretty' => '2.1.0', 'at' => null, 'php' => null], 'php' => null],
+            '1' => self::row('1.9.2', '2019-03-02', '2019-03-02', null),
+        ])));
+
+        self::assertNotNull($signal);
+        self::assertStringEndsWith('; 2.x released 2.0.0 (2026-01-10)', $signal->summary());
+        self::assertFalse(JsonPath::decoded($signal->data())['newest_release_at_least']);
+    }
+
+    public function testAHigherBranchWithATrustedDateIsQuotedExactly(): void
+    {
+        $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), F::metadata([['2.0.0', '2026-01-10'], ['1.9.2', '2019-03-02']])));
+
+        self::assertNotNull($signal);
+        $data = JsonPath::decoded($signal->data());
+        self::assertFalse($data['newest_release_at_least']);
+        self::assertFalse($data['reachable_release_at_least']);
+    }
+
+    public function testTheBranchWithinReachCarriesItsOwnLowerBound(): void
+    {
+        $signal = $this->rule(new PhpFloor('7.4', null))->evaluate(F::facts(F::package(['version' => '1.9.2']), self::branches([
+            '4' => self::row('4.1.0', '2026-03-01', '2026-03-01', '>=8.2'),
+            '3' => self::row('v3.1.0', '2025-01-01', null, '>=7.2'),
+            '1' => self::row('1.9.2', '2019-03-02', '2019-03-02', null),
+        ])));
+
+        self::assertNotNull($signal);
+        self::assertStringEndsWith('; 3.x released v3.1.0 (on or after 2025-01-01, the date of a commit its tags share)', $signal->summary());
+        $data = JsonPath::decoded($signal->data());
+        self::assertFalse($data['newest_release_at_least']);
+        self::assertTrue($data['reachable_release_at_least']);
+    }
+
+    public function testNoBranchWithinReachHasNoLowerBound(): void
+    {
+        $signal = $this->rule(new PhpFloor('7.4', null))->evaluate(F::facts(F::package(['version' => '1.9.2']), self::branches([
+            '4' => self::row('4.1.0', '2026-03-01', null, '>=8.2'),
+            '1' => self::row('1.9.2', '2019-03-02', '2019-03-02', null),
+        ])));
+
+        self::assertNotNull($signal);
+        $data = JsonPath::decoded($signal->data());
+        self::assertTrue($data['newest_release_at_least']);
+        self::assertNull($data['reachable_release_at_least']);
+    }
+
+    /**
+     * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, php: ?string}> $byBranch
+     */
+    private static function branches(array $byBranch): PackageMetadata
+    {
+        return new PackageMetadata('vendor/pkg', false, null, true, null, null, 3, null, 'library', new \DateTimeImmutable(F::NOW), $byBranch);
+    }
+
+    /**
+     * A branch row: the newest dated release, and the highest tag with no trusted date when $highestAt is null.
+     *
+     * @return array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, php: ?string}
+     */
+    private static function row(string $version, string $at, ?string $highestAt, ?string $php): array
+    {
+        $date = new \DateTimeImmutable($at.'T00:00:00+00:00');
+
+        return ['version' => $version, 'at' => $date, 'highest' => ['normalized' => ltrim($version, 'v').'.0', 'pretty' => $version, 'at' => $highestAt === null ? null : new \DateTimeImmutable($highestAt.'T00:00:00+00:00'), 'php' => $php], 'php' => $php];
     }
 }

@@ -304,6 +304,9 @@ A constraint that names the target's major (`^7.2 || ^8.0`) has an upper bound a
 `>=7.2` released after PHP 8.0's GA is not S5 either. `composer check-platform-reqs` asks a
 different question: whether the platform satisfies each constraint, which `>=7.2` does on PHP 8.4.
 
+A constraint with no lower bound names no PHP major. The text then quotes the constraint
+(`released 2016-01-14 with php "*"`), and the flag's `headline.value` is null.
+
 A release whose own `require.php` excludes the target cannot install there at all: Composer refuses
 it. That is not an old promise. `finding.installed_php` states the fact, and the text says that
 the target does not run the version you have.
@@ -346,8 +349,8 @@ S11's `data`:
 | `newest_php` | R |
 | `newest_php_source` | `known` when R is the newest known minor, `require_php` when composer.json's `require.php` limits it, `platform_php` when the lock's `platform.php` limits it |
 | `requires`, `stops_at` | The installed `require.php`, and the newest known minor that it admits |
-| `excludes_target` | True when `requires` excludes the target PHP at the point that S8 tests ([Within reach](#within-reach)): exactly `installed_php.target_runs` false |
-| `admits_newest` | The newest release of the lowest branch whose newest release admits R or states no php, with its `branch` and `blocking` (`project`, `target` or null). Null when no release admits R, or when the release metadata was not read |
+| `excludes_target` | True when `requires` excludes the PHP at which the move check solves ([Within reach](#within-reach)): exactly `installed_php.target_runs` false |
+| `admits_newest` | The newest release of the lowest branch whose newest release admits R or states no php, with its `branch` and `blocking`. `blocking` is `project` when the release's `require.php` excludes the project's lowest PHP. It is `target` when that `require.php` excludes the PHP at which the move check solves, else null. `admits_newest` is null when no release admits R, or when the release metadata was not read |
 
 - **Which releases count.** `admits_newest` reads the stable releases above the installed one. Above
   an `X.Y.x-dev` snapshot or a snapshot with a branch alias, the releases count from `X.Y.0`. Above
@@ -417,6 +420,11 @@ request on it.
   branch in an install-time run that has spent its [budget](install-time.md#time-budget).
 
 - S2 and S8 carry the parent as `dated_by`, and `--explain` marks the branch rows it supplied.
+
+- S8 can quote a branch's highest tag that only a commit shared with other tags dates. A release is
+  never older than its commit, so that date is a lower bound. The summary then says "on or after"
+  the date. `newest_release_at_least` or `reachable_release_at_least` is true. `newest_years` or
+  `reachable_years` is an upper bound.
 
 ## Security advisories
 
@@ -1228,7 +1236,7 @@ formats print only under `--all`, keeps its verdict and adds the same `checks mi
 | `repository_activity` | `host_not_supported` | The repository is on a host that lockrot cannot ask ([host note](notes.md#repository_activity_host_not_supported)) | S3, S4 |
 | `repository_activity` | `not_from_composer_repository` | The package comes from vcs, or from an origin that lockrot cannot tell: lockrot asks no host for it | S3, S4 |
 | `release_metadata` | `not_from_composer_repository` | The same origins: no Composer repository serves its releases | S2, S8. S11 too when S11 fires: a [capped](#capped) package then has `admits_newest` unread |
-| `release_dates` | `undated_releases` | A release that S2, S5 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it | S2 when the highest tag is undated. S5 when the installed release is undated, its lock date is before the GA of the target's major or absent, and the other two [S5 conditions](#old-promise) hold. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
+| `release_dates` | `undated_releases` | A release that S2, S5 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it. The summary gives one clause per cause. A cause is an undated lock entry, an installed tag on a shared commit, an undated tag, or tags dated by a shared commit | S2 when the highest tag is undated. S5 when the installed release is undated, its lock date is before the GA of the target's major or absent, and the other two [S5 conditions](#old-promise) hold. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
 | `advisories` | `offline`, `install_time_budget`, `lookup_failed`, `no_feed` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
 | `releases` | `releases_unknown` | A counted advisory's fix is unknown because the package's release data did not come | S9 |
 
@@ -1256,6 +1264,7 @@ The skips of `checks_skipped[]`:
 | `repository_archived` | `no_token`, `fetch_failed` | The host answered, without the archived flag: anonymous GitLab (`no_token`), a failed GitLab project request, or a GitHub answer without the flag (`fetch_failed`). S3 cannot fire |
 | `release_metadata` | `unavailable`, `not_found` | The metadata did not come. The package reads `unknown` when nothing else counts, and [`--strict-network`](ci.md#exit-codes) fails on the fetch |
 | `release_branch` | `branch_snapshot` | A branch snapshot has no release branch for S8 |
+| `release_dates` | `undated_releases` | The [S1 and allowlist filter](#what-was-not-checked) dropped the S10 `release_dates` entry. The skip keeps that entry's `blocks` |
 | `advisories` | `not_from_composer_repository` | `advisory-lookup: composer-repositories`, and the package is not from a Composer repository |
 | `advisories` | `unparseable_version` | Composer cannot parse the installed version |
 | any | `accepted_by_config` | An [`accept-unchecked`](configuration.md#accept-unchecked) entry accepted the S10 entry. `unchecked_accepted[]` holds it |
@@ -1264,8 +1273,8 @@ The skips of `checks_skipped[]`:
 - A package whose S1 fired, or that an allowlist entry accepts whole, drops its maintenance gaps
   (`repository_activity`, `release_dates`, `release_metadata`) from S10. This filter does not ask
   whether a gap could change the score. A raised S1 drops them also when an `ignore` entry accepts
-  `abandoned`, and a dropped gap can block S5 or S8. The `repository_activity` and
-  `release_metadata` gaps then show as skips. Its `advisories` and `releases` gaps stay S10.
+  `abandoned`, and a dropped gap can block S5 or S8. Each dropped gap then shows as a skip. Its
+  `advisories` and `releases` gaps stay S10.
 
 - Credentials for every host remove `no_token` and `anonymous_budget`. `rate_limit`, `fetch_failed`,
   `offline` and `install_time_budget` can still occur, and `release_dates` asks no host, so a fully

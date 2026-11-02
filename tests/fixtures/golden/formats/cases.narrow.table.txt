@@ -164,8 +164,9 @@ critical (11)
           registry; itself high: vulnerable)
       abandoned    marked abandoned by its registry,
                    replacement: web-token/jwt-library
-      age: installed 3.4.3, release date not known (no
-           date); last push 2025-05-07 (1.4 years ago)
+      age: installed 3.4.3, release date not known
+           (dated only by a commit its tags share); last
+           push 2025-05-07 (1.4 years ago)
       pulls in 3 flagged packages: web-token/jwt-library
       (vulnerable), paragonie/sodium_compat (vulnerable),
       brick/math (left-behind)
@@ -409,8 +410,9 @@ high (21)
           brings its own requirements, which lockrot does
           not solve
       left-behind  branch 3.x last released 2023-04-15 (3.5
-                   years ago); 4.x released v4.9.0
-                   (2025-03-08), needs php ^8.1 above the
+                   years ago); 4.x released v4.9.0 (on or
+                   after 2025-03-08, the date of a commit
+                   its tags share), needs php ^8.1 above the
                    project's php >=7.4; no releasing branch
                    within reach
       pulls in 1 flagged package: pagerfanta/core
@@ -714,8 +716,9 @@ low (7)
                    labels whose Punycode payload decodes to
                    ASCII-only: insecure equivalence
       age: installed v1.37.0, release date not known
-           (no date); 1.x last released v1.43.0 2026-09-23
-           (less than three weeks ago), its newest release
+           (dated only by a commit its tags share); 1.x last
+           released v1.43.0 2026-09-23 (less than three
+           weeks ago), its newest release
       maintenance accepted (lockrot's list)  polyfills for PHP
                               extensions; released
                               with Symfony and

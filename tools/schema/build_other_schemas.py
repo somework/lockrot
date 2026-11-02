@@ -274,7 +274,9 @@ def explain_metadata():
         '`misses_project_php` asked of `highest_php`: which side of the project\'s floor the highest tag\'s php is on. Null exactly where '
         '`highest_admits_project_php` is not false. Values grow in minor releases; treat one you do not know as other.'))
     row['properties']['released_years'] = nullable(ref('years'), 'The age of the branch\'s newest release on the run clock: `highest_released`, or, when '
-                                                                 'that is null, S8\'s `newest_release` for the same branch; null when neither dates it.')
+                                                                 'that is null, S8\'s `newest_release` for the same branch; null when neither dates it. When `highest_released` is null, the '
+                                                                 'date is a lower bound of the highest tag\'s release (a commit its tags share, or a lower tag\'s own date), '
+                                                                 'so the value is an upper bound on the age: the html bar reads "at most".')
     row['properties']['fixes'] = nullable(ref('branchFixes'), 'What the branch fixes of the counted advisories; null when the package has no counted advisory.')
     row['required'] = list(row['properties'])
     rows['properties']['installed_branch'] = nullable({'type': 'string', 'minLength': 1}, 'The installed row\'s label (`finding.branch`); null for a snapshot.')

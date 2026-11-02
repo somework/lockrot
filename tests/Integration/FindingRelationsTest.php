@@ -52,7 +52,7 @@ final class FindingRelationsTest extends TestCase
     public function testEveryFixtureDocumentHoldsEveryRelation(): void
     {
         $paths = self::documents();
-        self::assertCount(384, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
+        self::assertCount(389, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
         $broken = [];
         foreach (array_merge($paths, [self::COMPOSITE]) as $path) {
             $document = self::read($path);
@@ -123,6 +123,7 @@ final class FindingRelationsTest extends TestCase
         yield 'A1 a read activity without its event' => [['findings', 5, 'activity', 'event'], $to(null), 'C73 A1'];
         yield 'A2 not_found without its reason' => [['findings', 5, 'activity', 'status'], $to('not_found'), 'C73 A2'];
         yield 'A3 an activity not read with an event' => [['findings', 5, 'activity', 'status'], $to('skipped'), 'C73 A3'];
+        yield 'A3 an activity not read with a cache time' => [['findings', 5, 'activity'], static fn ($activity): array => array_merge(\is_array($activity) ? $activity : [], ['status' => 'not_read', 'reason' => 'offline', 'event' => null, 'archived' => null, 'fetched_at' => null, 'cached_at' => '2026-10-01T00:00:00+00:00']), 'C73 A3'];
         yield 'A4 a repo without a forge' => [['findings', 5, 'activity', 'forge'], $to(null), 'C73 A4'];
         yield 'A5 a missing activity check beside a read activity' => [['findings', 5, 'checks_missing'], $append(['check' => 'repository_activity', 'reason' => 'offline', 'blocks' => ['S3', 'S4']]), 'C73 A5'];
         yield 'A6 a read activity without its archived bit' => [['findings', 5, 'activity', 'archived'], $to(null), 'C73 A6'];

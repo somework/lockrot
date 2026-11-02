@@ -1086,8 +1086,8 @@
             "unavailable": 0,
             "not_found": 0,
             "branch_snapshot": 0,
-            "shared_commit": 0,
-            "undated": 1,
+            "shared_commit": 1,
+            "undated": 0,
             "no_stable_release": 0,
             "undated_releases": 0
         },
@@ -1184,7 +1184,7 @@
                         "reasons": [
                             "marked"
                         ],
-                        "liveness_complete": true
+                        "liveness_complete": false
                     },
                     "headline": {
                         "unit": "reason",
@@ -1307,7 +1307,15 @@
                 "ignored_count": 0
             },
             "checks_missing": [],
-            "checks_skipped": [],
+            "checks_skipped": [
+                {
+                    "check": "release_dates",
+                    "reason": "undated_releases",
+                    "blocks": [
+                        "S2"
+                    ]
+                }
+            ],
             "unchecked_accepted": [],
             "maintenance_judged": true,
             "metadata": {
@@ -1338,7 +1346,7 @@
             "replacement": "web-token/jwt-library",
             "replacement_url": "https://packagist.org/packages/web-token/jwt-library",
             "note": null,
-            "libyears_unmeasured": "undated",
+            "libyears_unmeasured": "shared_commit",
             "libyears_at_least": false,
             "direct": true,
             "dev": false,
@@ -1419,7 +1427,7 @@
             "libyears": null,
             "age": {
                 "installed": null,
-                "installed_unmeasured": "undated",
+                "installed_unmeasured": "shared_commit",
                 "release": null,
                 "release_unmeasured": "undated_releases",
                 "branch_release": null,

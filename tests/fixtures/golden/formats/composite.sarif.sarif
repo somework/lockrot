@@ -3775,7 +3775,7 @@
                         ],
                         "age": {
                             "installed": null,
-                            "installed_unmeasured": "undated",
+                            "installed_unmeasured": "shared_commit",
                             "release": {
                                 "version": "v1.43.0",
                                 "at": "2026-09-23T14:40:04+00:00",

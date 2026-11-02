@@ -319,10 +319,10 @@ def project_explain(doc, proj):
     return out
 
 
-def package_facts(f, rows):
+def package_facts(f, rows, lock_time=None):
     """The facts of one package that the hydrator turns into its lock entry, its releases, its advisories and its
     repository's answer, from its finding and its branch rows. `releases` is absent for a package that lockrot reads no
-    release of."""
+    release of. `lock_time` is the model's ‡ lock entry time, read only when no case document dates the installed tag."""
     s9 = next((s for s in f['signals'] if s['id'] == 'S9'), None)
     advisories = (s9 or {}).get('data', {}).get('advisories', [])
     releases = {}
@@ -395,9 +395,9 @@ def package_facts(f, rows):
     s5 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S5'), None) or {}
     if age.get('installed_unmeasured') == 'shared_commit' and f['version'] in releases:
         # The installed tag shares its commit, and no parent dates it: lockrot sets the lock's date aside as a commit date.
-        # The model holds that commit's date only for a branch's highest tag, so a lower tag stays undated.
+        # The model holds that commit's date only for a branch's highest tag. A lower tag takes the ‡ lock time, or stays undated.
         row = next((r for r in rows if r['installed'] and r['highest'] == f['version']), {})
-        own = releases[f['version']]['time'] or s5.get('released') or row.get('highest_commit_date')
+        own = releases[f['version']]['time'] or s5.get('released') or row.get('highest_commit_date') or lock_time
         releases[f['version']].update(shared_commit=True, time=own)
         installed_at = installed_at or own
     if parent and f['version'] in [r['version'] for r in parent['releases']] and s5.get('released'):
@@ -418,8 +418,11 @@ def package_facts(f, rows):
         'abandoned': marking,
         # The lock's `source` names the repository, and the hydrator answers as the forge answered the model: `status` and
         # `reason` say how. A package that lockrot never asks still names its repository there.
-        'activity': {'forge': act['forge'], 'host': act['host'], 'repo': act['repo'], 'status': act['status'], 'reason': act['reason'],
-                     'pushed_at': push.get('at'), 'archived': act['archived']} if act.get('host') else None,
+        # A 404 keeps its cache time, so the hydrator serves it from the cache. A read answer stays fresh: its cache time is the
+        # model's own fetch, which no case is about.
+        'activity': dict({'forge': act['forge'], 'host': act['host'], 'repo': act['repo'], 'status': act['status'], 'reason': act['reason'],
+                          'pushed_at': push.get('at'), 'archived': act['archived']},
+                         **({'cached_at': act['cached_at']} if act['status'] == 'not_found' and act.get('cached_at') else {})) if act.get('host') else None,
     }
     if parent:
         facts['parent'] = parent
@@ -451,7 +454,8 @@ def inputs_of(case):
     given = bool((case.get('run_inputs') or {}).get('_releases'))
     if (not rows and not unread and not given) or f['metadata']['status'] not in ('read', 'not_from_composer_repository') or unhydrated(case):
         return None
-    facts = package_facts(f, rows)
+    lock_times = (case.get('run_inputs') or {}).get('_lock_time') or {}
+    facts = package_facts(f, rows, lock_times.get(f['package']))
     advisories = (next((s for s in f['signals'] if s['id'] == 'S9'), None) or {}).get('data', {}).get('advisories', [])
     root_require = {f['package']: '*'} if f['direct'] and 'require' in f['named_in'] else {}
     # A name that only require-dev holds counts for the walk only with --dev.
@@ -521,7 +525,7 @@ def inputs_of(case):
     below = {p['package']: p['chain'] for p in s7.get('packages', [])}
     related = case.get('related') or {}
     if related:
-        inputs['packages'] = {name: dict(package_facts(r['finding'], rows_of(r.get('details'))), chain=r['finding']['chain'], below=below.get(name))
+        inputs['packages'] = {name: dict(package_facts(r['finding'], rows_of(r.get('details')), lock_times.get(name)), chain=r['finding']['chain'], below=below.get(name))
                               for name, r in sorted(related.items())}
     # Composer's abandoned ignore list of the project, as `policy.abandoned.ignore` or `audit.ignore-abandoned` holds it.
     ignored = f.get('abandoned_ignored')

@@ -2917,7 +2917,9 @@
                                 "target": true
                             },
                             "newest_years": 0.4,
-                            "reachable_years": 0.4
+                            "reachable_years": 0.4,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     },
                     {
@@ -6982,7 +6984,9 @@
                                 "target": true
                             },
                             "newest_years": 0.7,
-                            "reachable_years": 0.7
+                            "reachable_years": 0.7,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -7371,7 +7375,9 @@
                                 "target": true
                             },
                             "newest_years": 1,
-                            "reachable_years": 1
+                            "reachable_years": 1,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -7750,7 +7756,9 @@
                                 "target": true
                             },
                             "newest_years": 0.7,
-                            "reachable_years": 0.7
+                            "reachable_years": 0.7,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     },
                     {
@@ -8384,7 +8392,9 @@
                                 "target": true
                             },
                             "newest_years": 0.3,
-                            "reachable_years": 0.3
+                            "reachable_years": 0.3,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -8755,7 +8765,9 @@
                                 "target": true
                             },
                             "newest_years": 0.3,
-                            "reachable_years": 0.3
+                            "reachable_years": 0.3,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -9169,7 +9181,9 @@
                                 "target": true
                             },
                             "newest_years": 0.7,
-                            "reachable_years": 0.7
+                            "reachable_years": 0.7,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     },
                     {
@@ -9592,7 +9606,9 @@
                                 "target": true
                             },
                             "newest_years": 0.7,
-                            "reachable_years": 0.7
+                            "reachable_years": 0.7,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     },
                     {
@@ -10251,7 +10267,9 @@
                                 "target": true
                             },
                             "newest_years": 0.3,
-                            "reachable_years": 0.3
+                            "reachable_years": 0.3,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -19361,7 +19379,9 @@
                                 "target": true
                             },
                             "newest_years": 0.5,
-                            "reachable_years": 0.5
+                            "reachable_years": 0.5,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -19718,7 +19738,9 @@
                                 "target": true
                             },
                             "newest_years": 0.4,
-                            "reachable_years": 0.6
+                            "reachable_years": 0.6,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -20115,7 +20137,9 @@
                                 "target": true
                             },
                             "newest_years": 0.7,
-                            "reachable_years": 0.7
+                            "reachable_years": 0.7,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -20842,7 +20866,9 @@
                                 "target": true
                             },
                             "newest_years": 0.7,
-                            "reachable_years": 2.3
+                            "reachable_years": 2.3,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -21300,7 +21326,9 @@
                                 "target": true
                             },
                             "newest_years": 0,
-                            "reachable_years": 2.3
+                            "reachable_years": 2.3,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -21742,7 +21770,9 @@
                                 "target": true
                             },
                             "newest_years": 0.7,
-                            "reachable_years": 2.3
+                            "reachable_years": 2.3,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -22184,7 +22214,9 @@
                                 "target": true
                             },
                             "newest_years": 1.6,
-                            "reachable_years": 1.6
+                            "reachable_years": 1.6,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -22645,7 +22677,9 @@
                                 "target": true
                             },
                             "newest_years": 2.3,
-                            "reachable_years": 2.3
+                            "reachable_years": 2.3,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -23114,7 +23148,9 @@
                                 "target": true
                             },
                             "newest_years": 0.2,
-                            "reachable_years": 2.3
+                            "reachable_years": 2.3,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -23604,7 +23640,9 @@
                                 "target": true
                             },
                             "newest_years": 0.2,
-                            "reachable_years": 2.3
+                            "reachable_years": 2.3,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -24071,7 +24109,9 @@
                                 "target": true
                             },
                             "newest_years": 0,
-                            "reachable_years": 2
+                            "reachable_years": 2,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -25659,7 +25699,9 @@
                                 "target": true
                             },
                             "newest_years": 0.1,
-                            "reachable_years": 0.7
+                            "reachable_years": 0.7,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -26028,7 +26070,9 @@
                                 "target": true
                             },
                             "newest_years": 0,
-                            "reachable_years": 1.4
+                            "reachable_years": 1.4,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -26390,7 +26434,9 @@
                                 "target": true
                             },
                             "newest_years": 0.2,
-                            "reachable_years": 1.2
+                            "reachable_years": 1.2,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -35864,7 +35910,9 @@
                                 "target": true
                             },
                             "newest_years": 2.1,
-                            "reachable_years": 2.1
+                            "reachable_years": 2.1,
+                            "newest_release_at_least": false,
+                            "reachable_release_at_least": false
                         }
                     }
                 ],
@@ -54281,6 +54329,13 @@
                         "blocks": [
                             "S3",
                             "S4"
+                        ]
+                    },
+                    {
+                        "check": "release_dates",
+                        "reason": "undated_releases",
+                        "blocks": [
+                            "S2"
                         ]
                     }
                 ],

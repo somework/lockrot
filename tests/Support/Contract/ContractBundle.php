@@ -23,7 +23,8 @@ use Lockrot\Version;
 
 /**
  * The rendering contract bundle of SPEC-0.14.md §7.11, as lockrot writes it. It holds every case of
- * tests/fixtures/flags/cases.json, the composite, the words tables and the tables of the PHP grammars.
+ * tests/fixtures/flags/cases.json, the composite, the words tables, the tables of the PHP grammars
+ * and the sha256 of the published schemas and types (`contract-files.json`).
  * tools/report/record writes it to tests/fixtures/contract/. Every file carries the tool version
  * through {@see VersionMask}.
  */
@@ -35,6 +36,9 @@ final class ContractBundle
     /** The directory of DIRECTORY that holds the {@see EnginePage} cases, which tools/report/record --engine-pages writes. */
     public const ENGINE_PAGES = 'page/';
     private const FIXTURES = __DIR__.'/../../fixtures/';
+    private const ROOT = __DIR__.'/../../../';
+    /** The published -2 schemas and types, by glob below ROOT. A release ships them beside the vendored renderer page. */
+    private const CONTRACT_FILES = ['resources/lockrot-*-2.schema.json', 'types/lockrot-report-2*.d.ts'];
 
     /** The text formats, by the suffix of the file each one is written to below `text/`. */
     private const TEXT = ['table' => '.table.txt', 'markdown' => '.md', 'github' => '.github.txt'];
@@ -58,7 +62,7 @@ final class ContractBundle
      * that differs from the model's leaves its golden uncompared, so a lost input fails here. Keep
      * each floor at the count in provenance.json `model_goldens.compared` after a re-record.
      */
-    public const COMPARED_FLOOR = ['age_line' => 175, 'baseline_suffix' => 179, 'commands_cmd' => 161, 'commands_posix' => 161, 'gate_line' => 180, 'next_step_text' => 134, 'run_gate_line' => 181, 'score_text' => 180];
+    public const COMPARED_FLOOR = ['age_line' => 186, 'baseline_suffix' => 184, 'commands_cmd' => 166, 'commands_posix' => 166, 'gate_line' => 185, 'next_step_text' => 139, 'run_gate_line' => 186, 'score_text' => 185];
     /** The inputs of a command list: the move's argv. */
     private const COMMANDS = ['next_step.commands'];
     /** Up to this many score lines per grammar path of the sweep, as the model's score-lines.json keeps. */
@@ -295,6 +299,21 @@ final class ContractBundle
         foreach (PageWords::TABLES as $file => $table) {
             $this->put('en/'.$file, $table);
         }
+        $this->put('contract-files.json', ['sha256' => self::contractFiles()]);
+    }
+
+    /** @return array<string, string> the sha256 of each contract file, by its path below ROOT */
+    private static function contractFiles(): array
+    {
+        $files = [];
+        foreach (self::CONTRACT_FILES as $pattern) {
+            foreach (glob(self::ROOT.$pattern) ?: [] as $path) {
+                $files[substr($path, \strlen(self::ROOT))] = (string) hash_file('sha256', $path);
+            }
+        }
+        ksort($files);
+
+        return $files;
     }
 
     /**

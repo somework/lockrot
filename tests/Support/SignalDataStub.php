@@ -79,7 +79,7 @@ final class SignalDataStub
             case Signal::S8:
                 $admits = \is_array($d['reachable_admits'] ?? null) ? $d['reachable_admits'] : [];
                 $reachable = self::opt($d, 'reachable_branch');
-                $orphans = array_intersect(array_keys(array_filter($d, static fn ($v): bool => $v !== null)), ['reachable_version', 'reachable_release', 'reachable_years', 'reachable_php', 'reachable_admits', 'suggested_constraint']);
+                $orphans = array_intersect(array_keys(array_filter($d, static fn ($v): bool => $v !== null)), ['reachable_version', 'reachable_release', 'reachable_years', 'reachable_php', 'reachable_admits', 'suggested_constraint', 'reachable_release_at_least']);
                 Assert::assertTrue($reachable !== null || $orphans === [], 'A fact of the branch within reach needs reachable_branch: '.implode(', ', $orphans));
 
                 return new LeftBehindData(
@@ -103,8 +103,10 @@ final class SignalDataStub
                         self::float($d, 'reachable_years') ?? 0.0,
                         self::opt($d, 'reachable_php'),
                         ['project' => self::optBool($admits, 'project'), 'target' => self::optBool($admits, 'target')],
-                        self::opt($d, 'suggested_constraint')
-                    )
+                        self::opt($d, 'suggested_constraint'),
+                        ($d['reachable_release_at_least'] ?? false) === true
+                    ),
+                    ($d['newest_release_at_least'] ?? false) === true
                 );
             case Signal::S11:
                 $admits = $d['admits_newest'] ?? null;

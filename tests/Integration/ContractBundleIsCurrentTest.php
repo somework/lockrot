@@ -69,6 +69,29 @@ final class ContractBundleIsCurrentTest extends TestCase
         }
     }
 
+    /**
+     * A release ships the published -2 schemas and types beside the vendored renderer page. A change
+     * to one moves bundle_sha256, so RendererManifestTest fails until a renderer pins the change.
+     */
+    public function testTheBundlePinsThePublishedSchemasAndTypes(): void
+    {
+        $root = \dirname(__DIR__, 2).'/';
+        $paths = [
+            'resources/lockrot-baseline-2.schema.json',
+            'resources/lockrot-config-2.schema.json',
+            'resources/lockrot-explain-2.schema.json',
+            'resources/lockrot-report-2.schema.json',
+            'types/lockrot-report-2.d.ts',
+            'types/lockrot-report-2.known.d.ts',
+        ];
+        $expected = [];
+        foreach ($paths as $path) {
+            $expected[$path] = hash_file('sha256', $root.$path);
+        }
+
+        self::assertSame(['sha256' => $expected], JsonPath::decodeFile(ContractBundle::DIRECTORY.'/contract-files.json'), 're-record with tools/report/record');
+    }
+
     public function testTheBundleHashIsTheHashOfTheCommittedFiles(): void
     {
         self::assertSame(trim((string) file_get_contents(ContractBundle::DIRECTORY.'/bundle_sha256')), ContractBundle::sha256(ContractBundle::bundleFiles()));

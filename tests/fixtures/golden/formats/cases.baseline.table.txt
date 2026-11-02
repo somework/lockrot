@@ -97,7 +97,8 @@ critical (11)
       32 = abandoned 32 (baseline: new package)
       do: replace with web-token/jwt-library (named by its registry; itself high: vulnerable)
       abandoned    marked abandoned by its registry, replacement: web-token/jwt-library
-      age: installed 3.4.3, release date not known (no date); last push 2025-05-07 (1.4 years ago)
+      age: installed 3.4.3, release date not known (dated only by a commit its tags share); last push 2025-05-07
+           (1.4 years ago)
       pulls in 3 flagged packages: web-token/jwt-library (vulnerable), paragonie/sodium_compat (vulnerable), brick/math
       (left-behind)
 
@@ -237,8 +238,9 @@ high (21)
       do: raise require.php to >=8.1, then require pagerfanta/twig ^4.9 — clears left-behind; 4.x needs php ^8.1,
           require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements,
           which lockrot does not solve
-      left-behind  branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-08), needs php ^8.1
-                   above the project's php >=7.4; no releasing branch within reach
+      left-behind  branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (on or after 2025-03-08, the
+                   date of a commit its tags share), needs php ^8.1 above the project's php >=7.4; no releasing branch
+                   within reach
       pulls in 1 flagged package: pagerfanta/core (left-behind)
       checks missing: S2 (undated releases)
   roots/wp-config 1.0.0  direct  ·  old-promise
@@ -421,8 +423,8 @@ low (7)
           (gets v1.43.0) — clears the advisory
       vulnerable   1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts
                    xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence
-      age: installed v1.37.0, release date not known (no date); 1.x last released v1.43.0 2026-09-23 (less than
-           three weeks ago), its newest release
+      age: installed v1.37.0, release date not known (dated only by a commit its tags share); 1.x last released
+           v1.43.0 2026-09-23 (less than three weeks ago), its newest release
       maintenance accepted (lockrot's list)  polyfills for PHP extensions; released with Symfony and complete for the
                               API of the extension they replace
   ocramius/proxy-manager 2.2.4  via symfony/proxy-manager-bridge  ·  stale · capped

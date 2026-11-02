@@ -37,6 +37,7 @@ use Lockrot\Data\Forge\GitLabApi;
 use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\Tokens;
+use Lockrot\Data\Http\HttpResult;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
@@ -809,7 +810,7 @@ final class CaseHydrator
      *
      * @param list<array<mixed, mixed>|null> $activities
      *
-     * @return array<string, \Lockrot\Data\Http\HttpResult>
+     * @return array<string, HttpResult>
      */
     private static function activityAnswers(array $activities, RepoLocator $locator, ForgeAuth $auth): array
     {
@@ -824,7 +825,7 @@ final class CaseHydrator
     /**
      * @param array<mixed, mixed> $activity
      *
-     * @return array<string, \Lockrot\Data\Http\HttpResult>
+     * @return array<string, HttpResult>
      */
     private static function answersOf(array $activity, RepoLocator $locator, ForgeAuth $auth): array
     {
@@ -842,7 +843,10 @@ final class CaseHydrator
         $answers = [];
         foreach ($api->requests($repo, $auth->isAuthenticated($repo)) as $role => $url) {
             if ($activity['status'] === 'not_found') {
-                $answers[$url] = FakeHttpClient::status($url, 404);
+                $cachedAt = $activity['cached_at'] ?? null;
+                $answers[$url] = \is_string($cachedAt)
+                    ? (new HttpResult($url, 404, null, new \DateTimeImmutable($cachedAt)))->asCached()
+                    : FakeHttpClient::status($url, 404);
             } elseif (($activity['reason'] ?? null) === NotCheckedRule::RATE_LIMIT) {
                 $answers[$url] = FakeHttpClient::status($url, 429);
             } elseif ($activity['status'] === 'read') {

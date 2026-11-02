@@ -1439,7 +1439,9 @@
        "target": true
       },
       "newest_years": 0.1,
-      "reachable_years": 2
+      "reachable_years": 2,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": false
      }
     }
    ],

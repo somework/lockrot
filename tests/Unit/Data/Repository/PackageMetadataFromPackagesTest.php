@@ -78,15 +78,15 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertNull(PackageMetadata::fromPackages('a/b', [$alive], $at)->abandonedBy(), 'not abandoned, nobody marked it');
     }
 
-    /** Two releases stamped with the same time: the first one seen stands, so the answer is stable. */
-    public function testTwoReleasesWithTheSameTimeKeepTheFirstOneSeen(): void
+    /** Two releases stamped with the same time: the higher version stands, in any order the repository lists them. */
+    public function testTwoReleasesWithTheSameTimeNameTheHigherVersion(): void
     {
         $at = '2020-01-01T00:00:00+00:00';
-        $first = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'time' => $at]);
-        $second = $this->load(['name' => 'a/b', 'version' => '1.0.1', 'time' => $at]);
+        $lower = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'time' => $at]);
+        $higher = $this->load(['name' => 'a/b', 'version' => '1.0.1', 'time' => $at]);
 
-        self::assertSame('1.0.0', PackageMetadata::fromPackages('a/b', [$first, $second], new \DateTimeImmutable(self::FIXED))->lastStableVersion());
-        self::assertSame('1.0.1', PackageMetadata::fromPackages('a/b', [$second, $first], new \DateTimeImmutable(self::FIXED))->lastStableVersion());
+        self::assertSame('1.0.1', PackageMetadata::fromPackages('a/b', [$lower, $higher], new \DateTimeImmutable(self::FIXED))->lastStableVersion());
+        self::assertSame('1.0.1', PackageMetadata::fromPackages('a/b', [$higher, $lower], new \DateTimeImmutable(self::FIXED))->lastStableVersion());
     }
 
     public function testTheHighestReleasePerBranchAndItsDateAreKept(): void
@@ -171,13 +171,27 @@ final class PackageMetadataFromPackagesTest extends TestCase
         }
     }
 
-    public function testTwoReleasesOnABranchWithTheSameTimeKeepTheFirstOneSeen(): void
+    public function testTwoReleasesOnABranchWithTheSameTimeNameTheHigherVersion(): void
     {
-        $first = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'time' => '2021-01-01T00:00:00+00:00']);
-        $second = $this->load(['name' => 'a/b', 'version' => '1.0.1', 'time' => '2021-01-01T00:00:00+00:00']);
+        $lower = $this->load(['name' => 'a/b', 'version' => '1.0.0', 'time' => '2021-01-01T00:00:00+00:00']);
+        $higher = $this->load(['name' => 'a/b', 'version' => '1.0.1', 'time' => '2021-01-01T00:00:00+00:00']);
 
-        self::assertSame('1.0.0', PackageMetadata::fromPackages('a/b', [$first, $second], new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1']['version']);
-        self::assertSame('1.0.1', PackageMetadata::fromPackages('a/b', [$second, $first], new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1']['version']);
+        self::assertSame('1.0.1', PackageMetadata::fromPackages('a/b', [$lower, $higher], new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1']['version']);
+        self::assertSame('1.0.1', PackageMetadata::fromPackages('a/b', [$higher, $lower], new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['1']['version']);
+    }
+
+    public function testThreeReleasesWithTheSameTimeNameTheHighestWhereverItIsListed(): void
+    {
+        $at = '2021-01-01T00:00:00+00:00';
+        $releases = [
+            $this->load(['name' => 'a/b', 'version' => '1.0.0', 'time' => $at]),
+            $this->load(['name' => 'a/b', 'version' => '1.0.2', 'time' => $at]),
+            $this->load(['name' => 'a/b', 'version' => '1.0.1', 'time' => $at]),
+        ];
+
+        $metadata = PackageMetadata::fromPackages('a/b', $releases, new \DateTimeImmutable(self::FIXED));
+
+        self::assertSame(['1.0.2', '1.0.2'], [$metadata->lastStableVersion(), $metadata->latestStableByBranch()['1']['version']]);
     }
 
     public function testTheBranchsHighestTagTravelsNextToItsNewestRelease(): void

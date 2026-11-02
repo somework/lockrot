@@ -20,13 +20,15 @@ final class ReachableBranch
     /** @var array{project: ?bool, target: ?bool} */
     private array $admits;
     private ?string $suggestedConstraint;
+    private bool $atLeast;
 
     /**
      * @param string                               $release an ISO 8601 date and time
      * @param float                                $years   the age of the release in years on the run clock
      * @param array{project: ?bool, target: ?bool} $admits  whether each floor admits the branch's php, null for a floor lockrot could not compare
+     * @param bool                                 $atLeast $version is the branch's highest tag, dated only by a commit its tags share: $release is a lower bound, $years an upper one
      */
-    public function __construct(string $branch, string $version, string $release, float $years, ?string $php, array $admits, ?string $suggestedConstraint)
+    public function __construct(string $branch, string $version, string $release, float $years, ?string $php, array $admits, ?string $suggestedConstraint, bool $atLeast = false)
     {
         $this->branch = $branch;
         $this->version = $version;
@@ -35,6 +37,7 @@ final class ReachableBranch
         $this->php = $php;
         $this->admits = $admits;
         $this->suggestedConstraint = $suggestedConstraint;
+        $this->atLeast = $atLeast;
     }
 
     public function branch(): string
@@ -71,5 +74,10 @@ final class ReachableBranch
     public function suggestedConstraint(): ?string
     {
         return $this->suggestedConstraint;
+    }
+
+    public function isAtLeast(): bool
+    {
+        return $this->atLeast;
     }
 }

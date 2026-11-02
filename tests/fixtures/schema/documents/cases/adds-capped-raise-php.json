@@ -1381,7 +1381,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 0.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],

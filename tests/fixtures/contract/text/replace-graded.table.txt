@@ -3,7 +3,8 @@
       32 = abandoned 32
       do: replace with web-token/jwt-library (named by its registry; itself high: vulnerable)
       abandoned    marked abandoned by its registry, replacement: web-token/jwt-library
-      age: installed 3.4.3, release date not known (no date); last push 2025-05-07 (1.4 years ago)
+      age: installed 3.4.3, release date not known (dated only by a commit its tags share); last push 2025-05-07
+           (1.4 years ago)
       pulls in 3 flagged packages: web-token/jwt-library (vulnerable), paragonie/sodium_compat (vulnerable), brick/math
       (left-behind)
 

@@ -281,7 +281,7 @@ final class Analyzer
             $graded[$finding->package()] = GradedPackage::of($finding);
         }
         $findings = array_map(static fn (Finding $finding): Finding => $finding->withHolders($graded), $findings);
-        $report = (new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($activity), $includeDev, $advisories->coverage()))
+        $report = (new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($lookups), $includeDev, $advisories->coverage()))
             ->withPhpWindow($window === null ? null : $window->withTargetFix($checks === null ? null : $checks->checker()))
             ->withSolvePhp($solvePhp);
         if ($checks !== null) {
@@ -296,17 +296,17 @@ final class Analyzer
     }
 
     /**
-     * Fetch time of the oldest activity answer from lockrot's cache, null when every answer was
-     * fetched in this run.
+     * Fetch time of the oldest activity answer from lockrot's cache, a 404 included, null when
+     * every answer was fetched in this run.
      *
-     * @param array<string, RepositoryActivity> $activity
+     * @param array<string, ActivityLookup> $lookups
      */
-    private static function oldestCachedActivity(array $activity): ?\DateTimeImmutable
+    private static function oldestCachedActivity(array $lookups): ?\DateTimeImmutable
     {
         $cachedAt = [];
-        foreach ($activity as $record) {
-            if ($record->cachedAt() !== null) {
-                $cachedAt[] = $record->cachedAt();
+        foreach ($lookups as $lookup) {
+            if ($lookup->cachedAt() !== null) {
+                $cachedAt[] = $lookup->cachedAt();
             }
         }
 
@@ -442,7 +442,7 @@ final class Analyzer
             if ($read !== null) {
                 $lookups[$name] = ActivityLookup::read($read);
             } elseif (\in_array($repo->key(), $batch->notFoundOn($repo->forge()), true)) {
-                $lookups[$name] = ActivityLookup::notFound($repo);
+                $lookups[$name] = ActivityLookup::notFound($repo, $batch->notFoundCachedAt($repo->key()));
             } else {
                 $lookups[$name] = ActivityLookup::notRead($this->networkCause((string) $name, $repo, $batch, $plan), LocatedRepository::located($repo));
             }
@@ -579,7 +579,9 @@ final class Analyzer
         // A maintenance gap cannot change a verdict that an entry accepts whole, or one that a
         // raised S1 already makes `abandoned`. It reads the raised S1, never the metadata's
         // abandoned bit: a marking that Composer's list ignores leaves S3 to decide.
+        $droppedDates = null;
         if (($entry !== null && $entry->acceptsAll()) || $this->hasSignal($signals, Signal::S1)) {
+            $droppedDates = NotCheckedRule::releaseDatesSkip($signals);
             $signals = NotCheckedRule::withoutMaintenanceGaps($signals);
         }
         [$signals, $accepted] = $this->acceptUnchecked($signals, $facts);
@@ -612,7 +614,7 @@ final class Analyzer
         return $finding
             ->withComposerJson($composerJsonRead, $graph->namedIn($package->name()))
             ->withFlags($flags, $facts->metadataStatus() === PackageFacts::METADATA_READ)
-            ->withDetails(FindingDetails::of($facts, $entry, $floor, $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts), $accepted));
+            ->withDetails(FindingDetails::of($facts, $entry, $floor, $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts), $accepted, $droppedDates));
     }
 
     /**

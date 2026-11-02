@@ -31,7 +31,7 @@ use Lockrot\Verdict\ScoreModel;
 
 const FIXTURES = __DIR__.'/../../tests/fixtures/';
 /** The directories and files of tests/fixtures/contract/ that a recording replaces whole. */
-const RECORDED = ['report-2', 'model-only', 'explain-2', 'baseline-2', 'sarif', 'gitlab', 'text', 'goldens', 'score-lines.json', 'en/years-phrases.json', 'en/commands.json', 'en/reason-words.json', 'en/gate-words.json', 'en/sort-words.json', 'en/halving-words.json', 'en/activity-words.json', 'en/age-words.json'];
+const RECORDED = ['report-2', 'model-only', 'explain-2', 'baseline-2', 'sarif', 'gitlab', 'text', 'goldens', 'score-lines.json', 'en/years-phrases.json', 'en/commands.json', 'en/reason-words.json', 'en/gate-words.json', 'en/sort-words.json', 'en/halving-words.json', 'en/activity-words.json', 'en/age-words.json', 'contract-files.json'];
 const INPUTS = ['flags/cases.json', 'flags/composite.json', 'flags/provenance.json'];
 
 ini_set('memory_limit', '2G');

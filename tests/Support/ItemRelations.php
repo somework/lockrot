@@ -64,8 +64,8 @@ final class ItemRelations
         if (($status === 'not_found') !== ($reason === 'repository_not_found') || ($status === 'not_found' && (($a['forge'] ?? null) === null || ($a['host'] ?? null) === null || ($a['repo'] ?? null) === null))) {
             $out[] = 'C73 A2: not_found exactly for repository_not_found, with forge, host and repo';
         }
-        if ($status !== 'read' && (($a['event'] ?? null) !== null || ($a['archived'] ?? null) !== null || ($a['fetched_at'] ?? null) !== null || ($a['cached_at'] ?? null) !== null)) {
-            $out[] = 'C73 A3: an activity not read has no event, archived, fetched_at or cached_at';
+        if ($status !== 'read' && (($a['event'] ?? null) !== null || ($a['archived'] ?? null) !== null || ($a['fetched_at'] ?? null) !== null || ($status !== 'not_found' && ($a['cached_at'] ?? null) !== null))) {
+            $out[] = 'C73 A3: an activity not read has no event, archived or fetched_at, and cached_at only on not_found';
         }
         if ((($a['forge'] ?? null) === null) !== (($a['repo'] ?? null) === null) || (($a['forge'] ?? null) !== null && ($a['host'] ?? null) === null)
             || ($reason === 'host_not_supported' && (($a['host'] ?? null) === null || ($a['forge'] ?? null) !== null))) {

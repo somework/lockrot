@@ -3658,7 +3658,9 @@
        "target": true
       },
       "newest_years": 0.1,
-      "reachable_years": 0.1
+      "reachable_years": 0.1,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": false
      }
     },
     {
@@ -4404,7 +4406,9 @@
        "target": null
       },
       "newest_years": 2.2,
-      "reachable_years": 2.2
+      "reachable_years": 2.2,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": false
      }
     }
    ],
@@ -4685,7 +4689,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 0.9,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -4970,7 +4976,9 @@
        "target": true
       },
       "newest_years": 1.1,
-      "reachable_years": 1.1
+      "reachable_years": 1.1,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": false
      }
     }
    ],
@@ -5548,7 +5556,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -5829,7 +5839,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -6110,7 +6122,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -6415,7 +6429,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -6696,7 +6712,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -6977,7 +6995,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -7258,7 +7278,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -7544,7 +7566,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -7826,7 +7850,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 0.1,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -8109,7 +8135,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -8414,7 +8442,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -8719,7 +8749,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 0.5,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -9005,7 +9037,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 0.1,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -9286,7 +9320,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -9569,7 +9605,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -9859,7 +9897,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -10143,7 +10183,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -10430,7 +10472,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.2,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -10711,7 +10755,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -11258,7 +11304,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 1.8,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -11638,7 +11686,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 0.1,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -12628,7 +12678,7 @@
       "reasons": [
        "marked"
       ],
-      "liveness_complete": true
+      "liveness_complete": false
      },
      "headline": {
       "unit": "reason",
@@ -12769,7 +12819,16 @@
     "ignored_count": 0
    },
    "checks_missing": [],
-   "checks_skipped": [],
+   "checks_skipped": [
+    {
+     "check": "release_dates",
+     "reason": "undated_releases",
+     "blocks": [
+      "S2",
+      "S8"
+     ]
+    }
+   ],
    "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
@@ -12881,7 +12940,7 @@
       "reasons": [
        "marked"
       ],
-      "liveness_complete": true
+      "liveness_complete": false
      },
      "headline": {
       "unit": "reason",
@@ -13022,7 +13081,16 @@
     "ignored_count": 0
    },
    "checks_missing": [],
-   "checks_skipped": [],
+   "checks_skipped": [
+    {
+     "check": "release_dates",
+     "reason": "undated_releases",
+     "blocks": [
+      "S2",
+      "S8"
+     ]
+    }
+   ],
    "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
@@ -13133,7 +13201,7 @@
       "reasons": [
        "marked"
       ],
-      "liveness_complete": true
+      "liveness_complete": false
      },
      "headline": {
       "unit": "reason",
@@ -13274,7 +13342,16 @@
     "ignored_count": 0
    },
    "checks_missing": [],
-   "checks_skipped": [],
+   "checks_skipped": [
+    {
+     "check": "release_dates",
+     "reason": "undated_releases",
+     "blocks": [
+      "S2",
+      "S8"
+     ]
+    }
+   ],
    "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
@@ -13384,7 +13461,7 @@
       "reasons": [
        "marked"
       ],
-      "liveness_complete": true
+      "liveness_complete": false
      },
      "headline": {
       "unit": "reason",
@@ -13525,7 +13602,16 @@
     "ignored_count": 0
    },
    "checks_missing": [],
-   "checks_skipped": [],
+   "checks_skipped": [
+    {
+     "check": "release_dates",
+     "reason": "undated_releases",
+     "blocks": [
+      "S2",
+      "S8"
+     ]
+    }
+   ],
    "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
@@ -13635,7 +13721,7 @@
       "reasons": [
        "marked"
       ],
-      "liveness_complete": true
+      "liveness_complete": false
      },
      "headline": {
       "unit": "reason",
@@ -13776,7 +13862,16 @@
     "ignored_count": 0
    },
    "checks_missing": [],
-   "checks_skipped": [],
+   "checks_skipped": [
+    {
+     "check": "release_dates",
+     "reason": "undated_releases",
+     "blocks": [
+      "S2",
+      "S8"
+     ]
+    }
+   ],
    "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
@@ -13886,7 +13981,7 @@
       "reasons": [
        "marked"
       ],
-      "liveness_complete": true
+      "liveness_complete": false
      },
      "headline": {
       "unit": "reason",
@@ -14027,7 +14122,16 @@
     "ignored_count": 0
    },
    "checks_missing": [],
-   "checks_skipped": [],
+   "checks_skipped": [
+    {
+     "check": "release_dates",
+     "reason": "undated_releases",
+     "blocks": [
+      "S2",
+      "S8"
+     ]
+    }
+   ],
    "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
@@ -14137,7 +14241,7 @@
       "reasons": [
        "marked"
       ],
-      "liveness_complete": true
+      "liveness_complete": false
      },
      "headline": {
       "unit": "reason",
@@ -14278,7 +14382,16 @@
     "ignored_count": 0
    },
    "checks_missing": [],
-   "checks_skipped": [],
+   "checks_skipped": [
+    {
+     "check": "release_dates",
+     "reason": "undated_releases",
+     "blocks": [
+      "S2",
+      "S8"
+     ]
+    }
+   ],
    "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
@@ -14388,7 +14501,7 @@
       "reasons": [
        "marked"
       ],
-      "liveness_complete": true
+      "liveness_complete": false
      },
      "headline": {
       "unit": "reason",
@@ -14529,7 +14642,16 @@
     "ignored_count": 0
    },
    "checks_missing": [],
-   "checks_skipped": [],
+   "checks_skipped": [
+    {
+     "check": "release_dates",
+     "reason": "undated_releases",
+     "blocks": [
+      "S2",
+      "S8"
+     ]
+    }
+   ],
    "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
@@ -15698,7 +15820,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 0,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -16849,7 +16973,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 0.1,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -17147,7 +17273,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 0.5,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -17445,7 +17573,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 0,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -17743,7 +17873,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 0,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],
@@ -20235,7 +20367,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 2.1,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     }
    ],

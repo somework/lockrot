@@ -24181,6 +24181,76 @@
       "sheet_provenance": {},
       "sheet_holders": {},
       "sheet_ladder": {}
+    },
+    "empty-lock.offline‡": {
+      "document": "page/empty-lock.offline-dagger.json",
+      "title": "lockrot: composer.lock holds no package",
+      "description": "lockrot found no package in composer.lock.",
+      "copy_summary": [
+        "lockrot report for moodle/moodle · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run passes · --fail-on=high",
+        "No packages in this lock.",
+        "No security advisory."
+      ],
+      "grade_line": null,
+      "figure_line": null,
+      "load_line": null,
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": null,
+      "gate_link_rows": null,
+      "state_lines": [
+        "Offline run. What this run could not see",
+        "PHP: this lock installs on PHP 7.3 to 8.0 · your target, 8.4, is excluded, and only a change to require.php can admit it. The PHP window"
+      ],
+      "state_links": [
+        {
+          "link": "What this run could not see",
+          "href": "#view=run",
+          "count": null
+        },
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
+      ],
+      "waffle_caption": null,
+      "lead_scope": null,
+      "grade_chips": [],
+      "waffle": [],
+      "ready": null,
+      "security": null,
+      "weighs_most": null,
+      "flags_notes": [],
+      "exposure": null,
+      "depth": {
+        "rows": [],
+        "sentence": null
+      },
+      "libyears": null,
+      "radius_lead": [],
+      "advisories_lead": null,
+      "findings_groups": [],
+      "findings_rows": [],
+      "ready_count": 0,
+      "gate_partition": null,
+      "data_caption": "No row has repository data",
+      "data_column": false,
+      "signals_key": [],
+      "advisory_groups": [],
+      "run_notes": [
+        "offline: repository metadata served from Composer's cache"
+      ],
+      "php_line": "php: the lock installs on PHP 7.3 to 8.0; your target, 8.4, is excluded: require.php allows only >=7.3.0 <8.1",
+      "php_rows": [
+        "PHP window, with require-dev: 7.3 to 8.0 · lowest 7.3.0, set by require.php >=7.3.0 <8.1 · 8.1 excluded by require.php >=7.3.0 <8.1",
+        "PHP window, without require-dev: 7.3 to 8.0 · lowest 7.3.0, set by require.php >=7.3.0 <8.1 · 8.1 excluded by require.php >=7.3.0 <8.1"
+      ],
+      "platform_step": null,
+      "sheet_moves": {},
+      "sheet_provenance": {},
+      "sheet_holders": {},
+      "sheet_ladder": {}
     }
   }
 }

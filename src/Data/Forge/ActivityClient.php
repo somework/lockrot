@@ -44,6 +44,7 @@ final class ActivityClient
         $notFound = [];
         $failed = [];
         $rateLimited = [];
+        $notFoundCachedAt = [];
         foreach (self::byHost($repos) as $group) {
             $api = $this->apis[$group[0]->forge()];
             $authenticated = $this->auth->isAuthenticated($group[0]);
@@ -71,6 +72,9 @@ final class ActivityClient
                     if ($fetchedAt === null) {
                         if ($result->isNotFound()) {
                             $notFound[$forge][] = $repo->key();
+                            if ($result->fromCache()) {
+                                $notFoundCachedAt[$repo->key()] = $result->fetchedAt();
+                            }
                             continue 2;
                         }
                         if (!$result->isOk()) {
@@ -92,7 +96,7 @@ final class ActivityClient
             }
         }
 
-        return new ActivityBatch($activity, $notFound, $failed, $rateLimited);
+        return new ActivityBatch($activity, $notFound, $failed, $rateLimited, $notFoundCachedAt);
     }
 
     /** Unreachable: every api lists at least one request. Typed for PHPStan. */

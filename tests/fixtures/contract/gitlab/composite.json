@@ -139,7 +139,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 133
+                "begin": 134
             }
         }
     },
@@ -155,7 +155,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 133
+                "begin": 134
             }
         }
     },
@@ -235,7 +235,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 148
+                "begin": 149
             }
         }
     }
