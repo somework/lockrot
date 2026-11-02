@@ -821,6 +821,10 @@ Limits of the check:
   and `COMPOSER_MINIMAL_CHANGES`, as Composer does. It does not read
   `COMPOSER_PREFER_STABLE`, `COMPOSER_PREFER_LOWEST`, `COMPOSER_WITH_DEPENDENCIES` or
   `COMPOSER_WITH_ALL_DEPENDENCIES`.
+- It does not read `COMPOSER_IGNORE_PLATFORM_REQ` or `COMPOSER_IGNORE_PLATFORM_REQS`. The check
+  asks whether a release installs at the target PHP, and these variables only turn off Composer's
+  test of that. With one of them set, a printed command can install a release that the check
+  refuses or holds back.
 - With `--offline`, a package that composer.json admits at `dev` needs its `~dev` file in
   Composer's cache. Without that file, the move is not checked (`check.reason` `offline`). From
   these repositories, such a package with tags and no dev version also reads `not_checked` with
