@@ -206,15 +206,15 @@ final class GateTest extends TestCase
         self::assertSame([], Gate::decide($report, FailOn::parse('high'), false, Gate::MODE_GENERATE_BASELINE)->notAppliedEntries());
     }
 
-    /** A skipped lookup is no S10 entry, so S10 for release dates fails `unchecked` and the advisory gap stays listed. */
+    /** A lookup skipped for an unparseable version writes no S10 entry for the advisories. */
     public function testAFindingThatFailsUncheckedOnReleaseDatesAloneKeepsItsAdvisoryGap(): void
     {
-        $skipped = FindingBuilder::advisoriesUnchecked('a/skipped', 'not_from_composer_repository', false);
+        $skipped = FindingBuilder::advisoriesUnchecked('a/skipped', 'unparseable_version', false);
         $undated = $skipped->withSignals([self::s10('release_dates', 'undated_releases', ['S2'])]);
         $gate = self::gate(self::report($undated), 'high,unchecked');
 
         self::assertTrue($gate->packageFails('a/skipped'));
-        self::assertSame([['check' => 'advisories', 'packages' => 1, 'reason' => 'not_from_composer_repository']], JsonPath::decoded($gate->notAppliedEntries()));
+        self::assertSame([['check' => 'advisories', 'packages' => 1, 'reason' => 'unparseable_version']], JsonPath::decoded($gate->notAppliedEntries()));
     }
 
     public function testTheGateOfAReportWithoutRunSettingsChecksAndIgnoresNetworkFailures(): void
