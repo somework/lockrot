@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Lockrot\Signal\Data;
 
 /**
- * S8's highest releasing branch whose php the floors admit (docs/verdicts.md#left-behind).
+ * S8's newest releasing branch within reach: of the branches above the installed one whose php
+ * the floors admit, the one with the newest release date (docs/verdicts.md#left-behind).
  *
  * @internal
  */

@@ -432,6 +432,27 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString("\nrepository metadata\n  none — metadata unavailable (HTTP 503)\n", $explain($noted));
     }
 
+    /** Read metadata with pre-releases only has no release branch: the JSON carries it, so the text does not call it unavailable. */
+    public function testReadMetadataWithNoReleaseBranchSaysWhatWasListed(): void
+    {
+        $metadata = new PackageMetadata('vendor/pkg', false, null, true, new \DateTimeImmutable('2026-01-01T00:00:00+00:00'), '1.0.0-beta1', 3, null, 'library', new \DateTimeImmutable(F::NOW));
+        $finding = (new FindingBuilder())->withVersion('1.0.0-beta1')->build();
+
+        $text = self::plain(new Explanation($finding, F::facts(F::package(['version' => '1.0.0-beta1']), $metadata), new Thresholds(), '8.4', self::report()));
+
+        self::assertStringContainsString("\nrepository metadata\n  none — 3 releases listed, none on a release branch\n", $text);
+    }
+
+    public function testOneListedReleaseIsCountedInTheSingular(): void
+    {
+        $metadata = new PackageMetadata('vendor/pkg', false, null, true, new \DateTimeImmutable('2026-01-01T00:00:00+00:00'), '1.0.0-beta1', 1, null, 'library', new \DateTimeImmutable(F::NOW));
+        $finding = (new FindingBuilder())->withVersion('1.0.0-beta1')->build();
+
+        $text = self::plain(new Explanation($finding, F::facts(F::package(['version' => '1.0.0-beta1']), $metadata), new Thresholds(), '8.4', self::report()));
+
+        self::assertStringContainsString("\n  none — 1 release listed, none on a release branch\n", $text);
+    }
+
     public function testATagThatSharesItsCommitIsDatedByTheCommit(): void
     {
         $at = new \DateTimeImmutable('2024-03-01T00:00:00+00:00');

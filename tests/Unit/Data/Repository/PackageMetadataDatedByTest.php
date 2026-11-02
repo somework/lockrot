@@ -445,4 +445,14 @@ final class PackageMetadataDatedByTest extends TestCase
         self::assertArrayNotHasKey('dated_by', $dated->latestStableByBranch()['13'], 'a dated branch is left alone');
         self::assertSame('laravel/framework', $dated->latestStableByBranch()['8']['dated_by'] ?? null);
     }
+
+    /** A parent that dates only releases keeps the package's own reading of why its age is unknown. */
+    public function testDatingByAParentKeepsWhetherTheLastStableVersionSharesItsCommit(): void
+    {
+        $now = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
+        $child = new PackageMetadata('a/child', false, null, true, null, null, 3, null, 'library', $now, [], [], null, [], null, [], null, true);
+        $parent = new PackageMetadata('a/parent', false, null, true, $now, '9.9.9', 1, null, 'library', $now, [], ['a/child'], null, ['9.9.9.0' => $now]);
+
+        self::assertTrue($child->datedBy($parent)->lastStableSharesItsCommit());
+    }
 }

@@ -83,6 +83,8 @@ final class PackageMetadata
      * @var array<string, true>
      */
     private array $sharedCommitVersions;
+    /** The highest non-dev version, whose date S2 reads, is on a commit that SHARED_COMMIT_TAGS or more stable tags share. */
+    private bool $lastStableSharesItsCommit;
     /**
      * The stable releases above the installed version, ascending: every stable release for a
      * branch snapshot. Null when the load named no installed version (a monorepo parent) or it
@@ -121,7 +123,8 @@ final class PackageMetadata
         array $releaseDates = [],
         ?string $releaseDatesBy = null,
         array $sharedCommitVersions = [],
-        ?string $abandonedBy = null
+        ?string $abandonedBy = null,
+        bool $lastStableSharesItsCommit = false
     ) {
         $this->name = $name;
         $this->abandoned = $abandoned;
@@ -140,6 +143,7 @@ final class PackageMetadata
         $this->releaseDatesBy = $releaseDatesBy;
         $this->sharedCommitVersions = $sharedCommitVersions;
         $this->abandonedBy = $abandonedBy;
+        $this->lastStableSharesItsCommit = $lastStableSharesItsCommit;
     }
 
     /**
@@ -269,7 +273,8 @@ final class PackageMetadata
         }
         // The package's age is its highest tag's age. When that tag has no trusted date, an older
         // dated tag is not the last release, and S2 has nothing to measure.
-        if ($highestStable !== null && ($highestStable->getReleaseDate() === null || ($highestCommit !== null && isset($tagsOnCommit[$highestCommit]) && $tagsOnCommit[$highestCommit] >= self::SHARED_COMMIT_TAGS))) {
+        $highestShared = $highestCommit !== null && isset($tagsOnCommit[$highestCommit]) && $tagsOnCommit[$highestCommit] >= self::SHARED_COMMIT_TAGS;
+        if ($highestStable !== null && ($highestStable->getReleaseDate() === null || $highestShared)) {
             $lastStableReleaseAt = null;
             $lastStableVersion = null;
         }
@@ -314,7 +319,8 @@ final class PackageMetadata
             $releaseDates,
             null,
             $sharedCommitVersions,
-            $abandonedBy
+            $abandonedBy,
+            $highestShared
         );
         if ($installedVersion !== null) {
             $metadata->keepReleases($versions, $stable, $sharedCommitVersions, $dataDate, $installedVersion);
@@ -487,7 +493,8 @@ final class PackageMetadata
             $parent->releaseDates,
             $parent->name,
             $this->sharedCommitVersions,
-            $this->abandonedBy
+            $this->abandonedBy,
+            $this->lastStableSharesItsCommit
         );
         $dated->installedRequires = $this->installedRequires;
         $dated->newestRequires = $this->newestRequires;
@@ -629,6 +636,12 @@ final class PackageMetadata
     public function lastStableVersion(): ?string
     {
         return $this->lastStableVersion;
+    }
+
+    /** Whether a commit that other stable tags share dates the version that `lastStableReleaseAt()` reads. */
+    public function lastStableSharesItsCommit(): bool
+    {
+        return $this->lastStableSharesItsCommit;
     }
 
     /** The monorepo parent that dated `lastStableReleaseAt()` ({@see datedBy()}). Null when the date is the package's own. */

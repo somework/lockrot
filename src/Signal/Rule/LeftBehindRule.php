@@ -139,34 +139,40 @@ final class LeftBehindRule implements SignalRule
     }
 
     /**
-     * Whether an undated release leaves S8 undecided. It is the installed branch's own release,
-     * with a higher branch to compare with. Or it is a higher branch's release, while the installed
-     * branch is quiet enough for a level and S8 did not fire. A branch snapshot is on no release
-     * branch, so S8 misses nothing there.
+     * The highest tags without a trusted date that leave S8 undecided, normalized, empty when S8
+     * misses nothing. It is the installed branch's own tag, with a higher branch to compare with.
+     * Or it is a higher branch's tag, while the installed branch is quiet enough for a level and
+     * S8 did not fire. A branch snapshot is on no release branch, so S8 misses nothing there.
+     *
+     * @return list<string> highest first
      */
-    public function missesAnUndatedRelease(PackageFacts $facts): bool
+    public function undatedReleases(PackageFacts $facts): array
     {
         $branch = ReleaseBranch::of($facts->package()->version());
         $metadata = $facts->metadata();
         if ($branch === null || $metadata === null) {
-            return false;
+            return [];
         }
-        $higher = array_filter($metadata->latestStableByBranch(), static fn ($key): bool => ReleaseBranch::isAbove((string) $key, $branch), \ARRAY_FILTER_USE_KEY);
+        $byBranch = $metadata->latestStableByBranch();
+        $higher = array_filter($byBranch, static fn ($key): bool => ReleaseBranch::isAbove((string) $key, $branch), \ARRAY_FILTER_USE_KEY);
         $reading = $this->age->branchRelease($facts);
         if ($reading->unmeasured() === AgeMeasure::UNDATED_RELEASES) {
-            return $higher !== [];
+            return $higher === [] ? [] : [$byBranch[$branch]['highest']['normalized']];
         }
         if ($reading->level() === null || $this->evaluate($facts) !== null) {
-            return false;
+            return [];
         }
+        $undated = [];
         // A branch with no dated release has an undated highest tag too.
         foreach ($higher as $release) {
             if ($release['highest']['at'] === null) {
-                return true;
+                $undated[] = $release['highest']['normalized'];
             }
         }
+        // Highest first, whatever order the repository lists the branches in.
+        usort($undated, static fn (string $a, string $b): int => version_compare($b, $a));
 
-        return false;
+        return $undated;
     }
 
     /** Released within `release-warn-years` of today: the branch is still where fixes land. */

@@ -382,7 +382,10 @@ final class ExplainFormatter
         $finding = $explanation->finding();
         $rows = $explanation->branches();
         if ($rows === []) {
-            return ['repository metadata', self::INDENT.self::escape('none — '.($finding->note() ?? 'not available'))];
+            $listed = $explanation->releasesListed();
+            $why = $listed === null ? $finding->note() ?? 'not available' : $listed.($listed === 1 ? ' release' : ' releases').' listed, none on a release branch';
+
+            return ['repository metadata', self::INDENT.self::escape('none — '.$why)];
         }
         $fixes = [];
         $packageFixes = $finding->details()->fixes();
