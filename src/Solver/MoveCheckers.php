@@ -6,6 +6,7 @@ namespace Lockrot\Solver;
 
 use Composer\Config;
 use Composer\Package\RootPackageInterface;
+use Composer\Package\Version\VersionParser as ComposerVersionParser;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
 use Composer\Semver\Constraint\Constraint;
@@ -41,9 +42,8 @@ final class MoveCheckers
     {
         $overrides = [];
         $configured = $config->get('platform');
-        // Composer's PlatformRepository refuses a value that is no string and not false, `php` (as written) of false and a name that is no platform package.
         foreach (\is_array($configured) ? $configured : [] as $name => $version) {
-            if ((!\is_string($version) && $version !== false) || ($name === 'php' && $version === false) || !PlatformRepository::isPlatformPackage((string) $name)) {
+            if (!self::composerAccepts((string) $name, $version)) {
                 return new UncheckedMoves(MoveCheck::PLATFORM_CONFIG_INVALID, self::configuredPhp($config));
             }
             $overrides[strtolower((string) $name)] = $version;
@@ -99,6 +99,35 @@ final class MoveCheckers
     public static function platformPhp(string $targetMinor, ?string $platform): string
     {
         return $platform !== null && self::isStableIn($platform, $targetMinor) ? $platform : $targetMinor.'.'.self::NEWEST_PATCH;
+    }
+
+    /**
+     * Whether Composer's PlatformRepository takes this `config.platform` entry: a platform package
+     * name, and a version that Composer's VersionParser normalises. False disables the package,
+     * but a disabled php (any case of the name) stops every update, so lockrot refuses it too.
+     *
+     * @param mixed $version
+     *
+     * @phpstan-assert-if-true string|false $version
+     */
+    private static function composerAccepts(string $name, $version): bool
+    {
+        if (!PlatformRepository::isPlatformPackage($name)) {
+            return false;
+        }
+        if ($version === false) {
+            return strtolower($name) !== 'php';
+        }
+        if (!\is_string($version)) {
+            return false;
+        }
+        try {
+            (new ComposerVersionParser())->normalize($version);
+
+            return true;
+        } catch (\UnexpectedValueException $e) {
+            return false;
+        }
     }
 
     /** Whether Composer reads $version as a stable release of $minor: `8` is 8.0.0. */

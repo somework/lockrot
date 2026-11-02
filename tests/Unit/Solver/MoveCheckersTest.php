@@ -127,6 +127,22 @@ final class MoveCheckersTest extends TestCase
         yield 'an extension true' => [['php' => '8.4.3', 'ext-intl' => true], '8.4.3'];
         yield 'a library as a number' => [['lib-lockrot-test' => 1], null];
         yield 'a name that is no platform package' => [['php' => '8.4.3', 'acme/lib' => '1.0.0'], '8.4.3'];
+        yield 'php as a constraint' => [['php' => '^8.2'], '^8.2'];
+        yield 'php that is no version' => [['php' => 'eight'], 'eight'];
+        yield 'php in capitals as false' => [['PHP' => false], null];
+        yield 'php in capitals as false after a php' => [['php' => '8.4.3', 'PHP' => false], null];
+        yield 'an extension as a constraint' => [['php' => '8.4.3', 'ext-intl' => '^1.0'], '8.4.3'];
+    }
+
+    /** Composer disables a platform package other than php that `config.platform` sets to false, and normalises every string. */
+    public function testAConfigPlatformValueThatComposerAcceptsKeepsTheMoveCheck(): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['platform' => ['php' => '8.4.3', 'ext-intl' => false, 'lib-icu' => '72.1', 'ext-json' => '8.4.x-dev']]]);
+
+        $checker = MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]]), ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
+
+        self::assertSame(MoveCheck::RESOLVES, $checker->baseline()->check()->result());
     }
 
     /** Composer lower-cases each `config.platform` name, so `PHP` is the project's php. */

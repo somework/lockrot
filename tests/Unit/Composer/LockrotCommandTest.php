@@ -1418,24 +1418,44 @@ final class LockrotCommandTest extends TestCase
         yield 'a composer.json that Composer cannot load' => [['name' => 'lockrot/invalid-manifest-test', 'require' => ['acme/<<fg=red>>' => '1.0.0']], MoveCheck::COMPOSER_JSON_INVALID];
     }
 
-    /** Ruling R8-37: a config.platform value that Composer refuses checks no move, and the exit code stays that of the findings. */
-    public function testAConfigPlatformValueThatComposerRefusesLeavesEveryMoveUncheckedForThatReason(): void
+    /**
+     * Ruling R8-37: a config.platform value that Composer refuses checks no move, prints no
+     * command, and the exit code stays that of the findings.
+     *
+     * @dataProvider platformsThatComposerRefuses
+     *
+     * @param array<string, mixed> $platform
+     */
+    #[DataProvider('platformsThatComposerRefuses')]
+    public function testAConfigPlatformValueThatComposerRefusesLeavesEveryMoveUncheckedForThatReason(array $platform): void
     {
         $project = $this->tempDir('lockrot-invalid-platform-');
-        file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/invalid-platform-test', 'require' => ['acme/kept' => '1.0.0'], 'config' => ['platform' => ['ext-intl' => true]]]));
+        file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/invalid-platform-test', 'require' => ['acme/kept' => '1.0.0'], 'config' => ['platform' => $platform]]));
         file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));
         chdir($project);
         $loader = $this->emptyLoader();
-        $command = $this->buildCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?\Closure $checks = null): Analyzer => self::withChecks(self::testAnalyzer($loader, $lockrot, $clock), $checks));
+        $command = fn (): LockrotCommand => $this->buildCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?\Closure $checks = null): Analyzer => self::withChecks(self::testAnalyzer($loader, $lockrot, $clock), $checks));
 
         $this->withComposerEnv($this->tempDir('lockrot-invalid-platform-cache-'), $this->tempDir('lockrot-invalid-platform-home-'), function () use ($command): void {
-            [$code, $stdout, $stderr] = $this->runCommandWithSplitStreams($command, ['--format' => 'json', '--target-php' => '8.4']);
+            [$code, $stdout, $stderr] = $this->runCommandWithSplitStreams($command(), ['--format' => 'json', '--target-php' => '8.4']);
+            [$textCode, $text] = $this->runCommandWithSplitStreams($command(), ['--target-php' => '8.4']);
 
-            self::assertSame(0, $code, $stderr);
+            self::assertSame([0, 0], [$code, $textCode], $stderr);
             $json = json_decode($stdout, true);
             self::assertIsArray($json);
             self::assertSame(['not_checked', MoveCheck::PLATFORM_CONFIG_INVALID], [JsonPath::stringAt($json, ['run', 'move_check', 'baseline']), JsonPath::stringAt($json, ['run', 'move_check', 'reason'])]);
+            self::assertStringContainsString('moves: not checked (', $text);
+            self::assertDoesNotMatchRegularExpression('{composer (update|require)}', $stdout.$text);
         });
+    }
+
+    /** @return iterable<string, array{array<string, mixed>}> */
+    public static function platformsThatComposerRefuses(): iterable
+    {
+        yield 'an extension true' => [['ext-intl' => true]];
+        yield 'php as a constraint' => [['php' => '^8.2']];
+        yield 'php in capitals as false' => [['PHP' => false]];
+        yield 'an extension as a constraint' => [['php' => '8.4.3', 'ext-intl' => '^1.0']];
     }
 
     /**
