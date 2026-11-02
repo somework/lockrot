@@ -307,6 +307,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with `--generate-baseline`, exits 2 before Composer starts. 0.13 took the last value, and ran
   the explanation with no baseline written. Action: give each option once, and run `--explain` in
   its own step. ([Exit codes](docs/ci.md#exit-codes))
+- **Breaking:** **CLI, Config:** `--target-php` and `LOCKROT_TARGET_PHP` take a major, a minor or
+  a patch with nothing after it, such as `8.4`. Any other value, such as `8.4-fpm` or `8.4 || 8.5`,
+  exits 2. 0.13 read the version at its start. Action: pass the version alone.
+  ([CLI options](docs/configuration.md#cli-options))
 - **Breaking:** **CLI:** a lock whose `packages`, `packages-dev`, `platform`, `platform-dev`,
   `platform-overrides` or `aliases` section Composer or lockrot cannot read, or that lists two
   names equal without case, exits 2. 0.13 read on past these sections. Action: run
