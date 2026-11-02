@@ -10,6 +10,7 @@ use Composer\IO\IOInterface;
 use Composer\Util\Http\Response;
 use Composer\Util\HttpDownloader;
 use Composer\Util\Loop;
+use Composer\Util\Platform;
 use Composer\Util\RemoteFilesystem;
 use Composer\Util\Url;
 use Lockrot\Clock;
@@ -38,15 +39,22 @@ final class ComposerHttpClient implements HttpClientInterface
     private Clock $clock;
     private Deadline $deadline;
     private bool $refusesRedirects;
+    private int $maxParallel;
+    /** @var list<\Closure(\Closure(): void): void> the requests of {@see run()} that wait for a free slot */
+    private array $starts = [];
+    private int $running = 0;
+    private bool $pumping = false;
 
     /**
      * @param IOInterface $io       the IO that the downloader was built with, see {@see withoutRedundantAuthorization()}
      * @param Config      $config   the Config that the downloader was built with: Composer resolves the origin of a request against its `gitlab-domains`
      * @param ?Deadline   $deadline install-time budget, where null or a never-expiring deadline keeps {@see DEFAULT_TIMEOUT}
      * @param ?bool       $refusesRedirects whether the downloader takes `prevent_url_access_callable`, null for whether curl runs it: RemoteFilesystem throws on the option
+     * @param ?int        $maxParallel      the most requests that lockrot adds before one ends, null for the limit of Composer's downloader
      */
-    public function __construct(HttpDownloader $downloader, IOInterface $io, Config $config, Clock $clock, ?Deadline $deadline = null, ?bool $refusesRedirects = null)
+    public function __construct(HttpDownloader $downloader, IOInterface $io, Config $config, Clock $clock, ?Deadline $deadline = null, ?bool $refusesRedirects = null, ?int $maxParallel = null)
     {
+        $this->maxParallel = $maxParallel ?? self::composerMaxParallel();
         $this->refusesRedirects = $refusesRedirects ?? HttpDownloader::isCurlEnabled();
         $this->downloader = (new Loop($downloader))->getHttpDownloader();
         $this->io = $io;
@@ -56,9 +64,8 @@ final class ComposerHttpClient implements HttpClientInterface
     }
 
     /**
-     * The timeout of each request in the next fetchAll(): the default, or the time left of the
-     * budget, at least one second. It is read at request time, because the repository-metadata pass
-     * runs after construction, and with a frozen value the activity requests outlast the budget.
+     * The timeout of a request that starts: the default, or the time left of the budget, at least
+     * one second. A retry and a same-origin redirect hop keep the timeout of their request.
      */
     public function timeoutSeconds(): int
     {
@@ -160,58 +167,69 @@ final class ComposerHttpClient implements HttpClientInterface
 
             return true;
         };
+        $starts = [];
         foreach (array_unique($urls) as $url) {
-            // Without curl, add() blocks until the request ends, so each request starts inside the budget.
-            if ($this->deadline->isPast()) {
-                $stopped[$url] = $url;
+            $starts[] = function (\Closure $done) use ($url, $headers, &$results, &$redirects, &$stopped, $budgetEnded): void {
+                // Without curl, add() blocks until the request ends, so each request starts inside the budget.
+                if ($this->deadline->isPast()) {
+                    $stopped[$url] = $url;
+                    $done();
 
-                continue;
-            }
-            $sent = self::withoutRedundantAuthorization($this->io, $this->config, $url, $headers);
-            $options = self::options($this->timeoutSeconds(), $sent);
-            if (!$this->refusesRedirects && self::carriesCredentials($sent)) {
-                $this->fetchHolding($url, $options, $results, $redirects);
-                continue;
-            }
-            if ($this->refusesRedirects) {
-                $options['prevent_url_access_callable'] = static function (string $target) use ($url, &$redirects, $budgetEnded): bool {
-                    if ($budgetEnded($url)) {
+                    return;
+                }
+                $sent = self::withoutRedundantAuthorization($this->io, $this->config, $url, $headers);
+                $options = self::options($this->timeoutSeconds(), $sent);
+                if (!$this->refusesRedirects && self::carriesCredentials($sent)) {
+                    $this->fetchHolding($url, $options, $results, $redirects);
+                    $done();
+
+                    return;
+                }
+                if ($this->refusesRedirects) {
+                    $options['prevent_url_access_callable'] = static function (string $target) use ($url, &$redirects, $budgetEnded): bool {
+                        if ($budgetEnded($url)) {
+                            return true;
+                        }
+                        if ($target === '' || self::origin($target) === self::origin($url)) {
+                            return false;
+                        }
+                        $redirects[$url] = $target;
+
                         return true;
-                    }
-                    if ($target === '' || self::origin($target) === self::origin($url)) {
-                        return false;
-                    }
-                    $redirects[$url] = $target;
-
-                    return true;
-                };
-            }
-            $this->add($url, $url, $options, $results);
+                    };
+                }
+                $this->add($url, $url, $options, $results, $done);
+            };
         }
-        $this->downloader->wait();
+        $this->run($starts);
         // Composer replays the request's own headers to a redirect's target, so the request goes
         // again to that target without lockrot's credentials.
+        $starts = [];
         foreach ($redirects as $url => $target) {
-            if ($this->deadline->isPast()) {
-                $stopped[$url] = $url;
+            $starts[] = function (\Closure $done) use ($url, $target, $headers, &$results, &$stopped, $budgetEnded): void {
+                if ($this->deadline->isPast()) {
+                    $stopped[$url] = $url;
+                    $done();
 
-                continue;
-            }
-            // Composer's downloader throws a TypeError on a URL without a host, which would end the run,
-            // and without curl it reads a file:// URL from the disk.
-            if (!\in_array(strtolower((string) parse_url($target, \PHP_URL_SCHEME)), ['http', 'https'], true) || (string) parse_url($target, \PHP_URL_HOST) === '') {
-                $results[$url] = HttpResult::failure($url, 'redirect to a URL that is not http or https with a host', $this->clock->now());
+                    return;
+                }
+                // Composer's downloader throws a TypeError on a URL without a host, which would end the run,
+                // and without curl it reads a file:// URL from the disk.
+                if (!\in_array(strtolower((string) parse_url($target, \PHP_URL_SCHEME)), ['http', 'https'], true) || (string) parse_url($target, \PHP_URL_HOST) === '') {
+                    $results[$url] = HttpResult::failure($url, 'redirect to a URL that is not http or https with a host', $this->clock->now());
+                    $done();
 
-                continue;
-            }
-            $options = self::options($this->timeoutSeconds(), self::withoutCredentials($headers));
-            if ($this->refusesRedirects) {
-                $options['prevent_url_access_callable'] = static fn (): bool => $budgetEnded($url);
-            }
-            $this->add($url, $target, $options, $results);
+                    return;
+                }
+                $options = self::options($this->timeoutSeconds(), self::withoutCredentials($headers));
+                if ($this->refusesRedirects) {
+                    $options['prevent_url_access_callable'] = static fn (): bool => $budgetEnded($url);
+                }
+                $this->add($url, $target, $options, $results, $done);
+            };
         }
-        if ($redirects !== []) {
-            $this->downloader->wait();
+        if ($starts !== []) {
+            $this->run($starts);
         }
         foreach ($stopped as $url) {
             $results[$url] = HttpResult::failure($url, 'install-time budget spent', $this->clock->now());
@@ -226,17 +244,60 @@ final class ComposerHttpClient implements HttpClientInterface
     }
 
     /**
+     * Composer's downloader starts a request above its limit later, with the options of add(). So
+     * a start runs only when a slot is free, and it reads the time left then.
+     *
+     * @param list<\Closure(\Closure(): void): void> $starts each adds one request and calls its argument when that request ends
+     */
+    private function run(array $starts): void
+    {
+        $this->starts = $starts;
+        $this->running = 0;
+        $this->pump();
+        $this->downloader->wait();
+    }
+
+    private function pump(): void
+    {
+        // Without curl a request ends inside add(), so its end must not start the next one there.
+        if ($this->pumping) {
+            return;
+        }
+        $this->pumping = true;
+        while ($this->running < $this->maxParallel && $this->starts !== []) {
+            ++$this->running;
+            $start = array_shift($this->starts);
+            $start(function (): void {
+                --$this->running;
+                $this->pump();
+            });
+        }
+        $this->pumping = false;
+    }
+
+    /** The parallel limit of Composer's HttpDownloader. */
+    private static function composerMaxParallel(): int
+    {
+        $max = Platform::getEnv('COMPOSER_MAX_PARALLEL_HTTP');
+
+        return is_numeric($max) ? max(1, min(50, (int) $max)) : 12;
+    }
+
+    /**
      * @param array{http: array{timeout: int, header: list<string>}, retry-auth-failure: false, prevent_url_access_callable?: \Closure(string): bool} $options
      * @param array<string, HttpResult>                                                                                                        $results the answer for $url goes in here
+     * @param \Closure(): void                                                                                                                 $done    called when the request ends
      */
-    private function add(string $url, string $target, array $options, array &$results): void
+    private function add(string $url, string $target, array $options, array &$results, \Closure $done): void
     {
         $this->downloader->add($target, $options)->then(
-            function (Response $response) use ($url, &$results): void {
+            function (Response $response) use ($url, &$results, $done): void {
                 $results[$url] = new HttpResult($url, $response->getStatusCode(), $response->getBody(), $this->clock->now(), null, array_values($response->getHeaders()));
+                $done();
             },
-            function (\Throwable $e) use ($url, &$results): void {
+            function (\Throwable $e) use ($url, &$results, $done): void {
                 $results[$url] = $this->failed($url, $e);
+                $done();
             }
         );
     }

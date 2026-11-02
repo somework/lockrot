@@ -93,7 +93,9 @@ cap ([run notes](notes.md)) prints nothing on its own. The unknown-key line stil
 
 Once `install-time-budget` seconds have passed, the install-time check starts no new metadata,
 advisory or repository-activity request. A repository-activity request gets the time left as its
-timeout. Composer sets the timeout of a metadata or advisory request, and lockrot cannot shorten it.
+timeout when it starts. lockrot starts no more of them at once than Composer's parallel limit
+(`COMPOSER_MAX_PARALLEL_HTTP`), so no request waits in Composer's queue with an older timeout. A
+retry or a redirect on the same host keeps the timeout of its request. Composer sets the timeout of a metadata or advisory request, and lockrot cannot shorten it.
 So a metadata or advisory request that is already running can hold the install for Composer's
 timeout, and Composer can retry a failed transfer. With curl, the timeout of one metadata request is
 `default_socket_timeout` or 300 seconds, whichever is larger
@@ -125,7 +127,7 @@ grade can read milder than the one `composer lockrot` gives for the same package
 | The advisory check | The advisories that the lookup did not reach add nothing to the score, and the findings carry S10 `install_time_budget` | [`advisories_not_checked`](notes.md#advisories_not_checked) |
 | A monorepo parent's metadata | Split packages whose own tags have no trusted date stay unmeasured and carry S10 `undated_releases` ([dates from the monorepo](verdicts.md#dates-from-the-monorepo)) | None |
 | The repository activity check, before it began | lockrot does not read S3 and S4. Findings carry S10 `install_time_budget` | [`repository_activity_not_checked`](notes.md#repository_activity_not_checked) |
-| The repository activity check, part way | lockrot cuts the requests that are still running to the time left. Those that time out have no activity, and their findings carry S10 `fetch_failed` | [`repository_activity_unreachable`](notes.md#repository_activity_unreachable), a network failure |
+| The repository activity check, part way | Each request that is still running stops at the timeout it got when it started. Those that time out have no activity, and their findings carry S10 `fetch_failed` | [`repository_activity_unreachable`](notes.md#repository_activity_unreachable), a network failure |
 
 `composer require` and `composer update` reuse the metadata that Composer fetched in the same
 process, so they rarely run out. A `composer install` with a cold cache on a large lock (a fresh
