@@ -15,6 +15,7 @@ use Lockrot\Clock;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
+use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
@@ -564,9 +565,9 @@ final class RepositoryMetadataLoaderTest extends TestCase
         }
     }
 
-    public function testANonCanonicalRepositoryAnswersANameThatNoLaterRepositoryLists(): void
+    public function testANonCanonicalRepositoryAnswersEachNameThatNoLaterRepositoryLists(): void
     {
-        $first = $this->syntheticServer(['dup/pkg' => [$this->p2Version('dup/pkg', '1.0.0')]]);
+        $first = $this->syntheticServer(['dup/pkg' => [$this->p2Version('dup/pkg', '1.0.0')], 'dup/two' => [$this->p2Version('dup/two', '1.0.0')]]);
         $second = $this->syntheticServer(['other/pkg' => [$this->p2Version('other/pkg', '1.0.0')]]);
         try {
             $first->start();
@@ -576,10 +577,33 @@ final class RepositoryMetadataLoaderTest extends TestCase
                 Clock::fixed(self::FIXED)
             );
 
+            $batch = $loader->load(self::names(['dup/pkg', 'dup/two']));
+
+            self::assertSame([[], []], [$batch->failed(), $batch->notFound()]);
+            self::assertSame(
+                ['dup/pkg' => $first->url(), 'dup/two' => $first->url()],
+                array_map(static fn (PackageMetadata $meta): ?string => $meta->composerRepositoryUrl(), $batch->metadata())
+            );
+        } finally {
+            $first->stop();
+            $second->stop();
+        }
+    }
+
+    /** Composer gives the earlier of two `canonical: false` repositories the priority. */
+    public function testTheFirstOfTwoNonCanonicalRepositoriesAnswers(): void
+    {
+        [$first, $second] = $this->twoServersOfDupPkg();
+        try {
+            $loader = new RepositoryMetadataLoader(
+                [new FilterRepository($first->repositories()[0], ['canonical' => false]), new FilterRepository($second->repositories()[0], ['canonical' => false])],
+                Clock::fixed(self::FIXED)
+            );
+
             $meta = $loader->load(self::names(['dup/pkg']))->metadata()['dup/pkg'] ?? null;
 
             self::assertNotNull($meta);
-            self::assertSame($first->url(), $meta->composerRepositoryUrl());
+            self::assertSame([1, $first->url()], [$meta->releaseCount(), $meta->composerRepositoryUrl()]);
         } finally {
             $first->stop();
             $second->stop();

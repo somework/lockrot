@@ -102,7 +102,7 @@ final class MoveCheckersTest extends TestCase
      *
      * @dataProvider platformsThatComposerRefuses
      *
-     * @param array<string, mixed> $platform
+     * @param array<array-key, mixed> $platform
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('platformsThatComposerRefuses')]
     public function testAConfigPlatformValueThatComposerRefusesChecksNoMove(array $platform, ?string $configuredPhp): void
@@ -120,7 +120,7 @@ final class MoveCheckersTest extends TestCase
         self::assertSame($configuredPhp, $checker->configuredPhp());
     }
 
-    /** @return iterable<string, array{array<string, mixed>, ?string}> the platform and its configured php */
+    /** @return iterable<string, array{array<array-key, mixed>, ?string}> the platform and its configured php */
     public static function platformsThatComposerRefuses(): iterable
     {
         yield 'php false' => [['php' => false], null];
@@ -132,6 +132,7 @@ final class MoveCheckersTest extends TestCase
         yield 'php in capitals as false' => [['PHP' => false], null];
         yield 'php in capitals as false after a php' => [['php' => '8.4.3', 'PHP' => false], null];
         yield 'an extension as a constraint' => [['php' => '8.4.3', 'ext-intl' => '^1.0'], '8.4.3'];
+        yield 'a list, whose names are numbers' => [['8.4.3'], null];
     }
 
     /**

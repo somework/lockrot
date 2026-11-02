@@ -76,7 +76,7 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
                 continue;
             }
             $canonical = $filter === null || self::isCanonical($filter);
-            $asked = $filter === null ? $remaining : array_values(array_filter($remaining, static fn (string $name): bool => self::admits($filter, $name)));
+            $asked = $filter === null ? $remaining : self::kept($remaining, static fn (string $name): bool => self::admits($filter, $name));
             $batch = $this->loadFromRepository($inner, $asked, $installedByName);
             $url = $inner->getRepoConfig()['url'] ?? null;
             foreach ($batch->metadata() as $name => $meta) {
@@ -94,7 +94,7 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
                     $reasons[$name] = $reason;
                 }
             }
-            $remaining = array_values(array_diff($remaining, array_keys($metadata), array_keys($failed)));
+            $remaining = self::kept($remaining, static fn (string $name): bool => !isset($metadata[$name]) && !isset($failed[$name]));
         }
 
         $notFound = [];
@@ -115,6 +115,24 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
         }
 
         return new MetadataBatch($metadata, $notFound, $failed);
+    }
+
+    /**
+     * @param list<string> $names
+     * @param callable(string): bool $keep
+     *
+     * @return list<string>
+     */
+    private static function kept(array $names, callable $keep): array
+    {
+        $kept = [];
+        foreach ($names as $name) {
+            if ($keep($name)) {
+                $kept[] = $name;
+            }
+        }
+
+        return $kept;
     }
 
     /**
