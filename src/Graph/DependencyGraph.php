@@ -170,8 +170,8 @@ final class DependencyGraph
     }
 
     /**
-     * The keys of {@see chainsTo()} without its chains. Every finding reads them, and a chain per
-     * root and per package grows with the square of a lock with many roots.
+     * The keys of {@see chainsTo()} without its chains: a chain per root and per package grows with
+     * the square of a lock with many roots.
      *
      * @return list<string> sorted by name
      */

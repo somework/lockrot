@@ -157,7 +157,7 @@ final class DependencyGraphTest extends TestCase
         foreach (self::seededGraphs() as $seed => [$packages, $require, $requireDev]) {
             foreach ([false, true] as $dev) {
                 [$graph, $edges, $roots] = self::built($packages, $require, $requireDev, $dev);
-                foreach (array_merge(array_keys($packages), ['vendor/not-in-lock']) as $target) {
+                foreach (array_merge(array_keys($packages), ['vendor/not-in-lock', 'v/ghost']) as $target) {
                     self::assertSame(array_keys(self::perRootChains($edges, $roots, $target)), $graph->rootsReaching($target), "seed $seed, dev ".var_export($dev, true).", $target");
                 }
             }
