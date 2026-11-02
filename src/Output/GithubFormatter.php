@@ -155,7 +155,7 @@ final class GithubFormatter implements FormatterInterface
 
     /**
      * The Actions log renders ANSI sequences, and a line break would start a forged line inside an
-     * annotation, so neutralise() prints both as escapes. lockrot's own messages hold no line break.
+     * annotation, so neutralise() prints both as escapes.
      */
     private static function escapeData(string $value): string
     {
