@@ -206,6 +206,26 @@ class AnUndatedSharedCommitTagTakesTheLockTimeOfTheRunInputs(unittest.TestCase):
         self.assertEqual(self.LOCK_TIME, inputs['packages']['symfony/polyfill-intl-idn']['lock']['time'])
 
 
+class ACached404KeepsItsCacheTime(unittest.TestCase):
+    FINDING = dict(AnUndatedSharedCommitTagTakesTheLockTimeOfTheRunInputs.FINDING, age={'installed': {'at': '2025-01-01T00:00:00+00:00'}})
+    ACTIVITY = {'forge': 'github', 'host': 'github.com', 'repo': 'hoaproject/Consistency', 'event': None, 'archived': None, 'fetched_at': None,
+                'cached_at': '2026-09-28T08:00:00+00:00'}
+
+    def inputs(self, activity):
+        case = AnUndatedSharedCommitTagTakesTheLockTimeOfTheRunInputs().case(dict(self.FINDING, activity=activity), None)
+        return project_fixtures.inputs_of(case)['activity']
+
+    def test_a_not_found_activity_gives_the_hydrator_its_cache_time(self):
+        activity = self.inputs(dict(self.ACTIVITY, status='not_found', reason='repository_not_found'))
+
+        self.assertEqual('2026-09-28T08:00:00+00:00', activity['cached_at'])
+
+    def test_a_read_activity_gives_no_cache_time(self):
+        activity = self.inputs(dict(self.ACTIVITY, status='read', reason=None, event='push', archived=False, fetched_at='2026-10-01T16:04:32+00:00'))
+
+        self.assertNotIn('cached_at', activity)
+
+
 if __name__ == '__main__':
     unittest.main()
 

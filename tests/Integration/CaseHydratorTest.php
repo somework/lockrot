@@ -83,6 +83,25 @@ final class CaseHydratorTest extends TestCase
         self::assertContains(JsonPath::stringAt($case, ['finding', 'package']), $packages);
     }
 
+    /** Case not-found-cached‡ gives its 404 a cache time: lockrot serves that 404 from the cache and reports the time. */
+    public function testACached404HydratesFromTheCache(): void
+    {
+        $case = CaseHydrator::case('not-found-cached‡');
+        $cachedAt = JsonPath::stringAt($case, ['inputs', 'activity', 'cached_at']);
+
+        $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+
+        $activity = null;
+        foreach (JsonPath::arrayAt($document, ['findings']) as $row) {
+            self::assertIsArray($row);
+            if (JsonPath::stringAt($row, ['package']) === JsonPath::stringAt($case, ['finding', 'package'])) {
+                $activity = JsonPath::arrayAt($row, ['activity']);
+            }
+        }
+        self::assertNotNull($activity, 'the case package has a finding');
+        self::assertSame(['not_found', $cachedAt], [$activity['status'] ?? null, $activity['cached_at'] ?? null]);
+    }
+
     /**
      * Every case's recorded `finding`, with or without inputs, is a report-2 finding. It covers
      * nothing: its validations outlast the timeout of a mutation run, and they read no product code.

@@ -418,8 +418,11 @@ def package_facts(f, rows, lock_time=None):
         'abandoned': marking,
         # The lock's `source` names the repository, and the hydrator answers as the forge answered the model: `status` and
         # `reason` say how. A package that lockrot never asks still names its repository there.
-        'activity': {'forge': act['forge'], 'host': act['host'], 'repo': act['repo'], 'status': act['status'], 'reason': act['reason'],
-                     'pushed_at': push.get('at'), 'archived': act['archived']} if act.get('host') else None,
+        # A 404 keeps its cache time, so the hydrator serves it from the cache. A read answer stays fresh: its cache time is the
+        # model's own fetch, which no case is about.
+        'activity': dict({'forge': act['forge'], 'host': act['host'], 'repo': act['repo'], 'status': act['status'], 'reason': act['reason'],
+                          'pushed_at': push.get('at'), 'archived': act['archived']},
+                         **({'cached_at': act['cached_at']} if act['status'] == 'not_found' and act.get('cached_at') else {})) if act.get('host') else None,
     }
     if parent:
         facts['parent'] = parent

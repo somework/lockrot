@@ -197037,7 +197037,8 @@
      "status": "not_found",
      "reason": "repository_not_found",
      "pushed_at": null,
-     "archived": null
+     "archived": null,
+     "cached_at": "2026-09-28T08:00:00+00:00"
     },
     "dependents": {
      "lorisleiva/laravel-search-string": [
