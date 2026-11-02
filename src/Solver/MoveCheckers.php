@@ -40,13 +40,9 @@ final class MoveCheckers
      */
     public static function forProject(RootPackageInterface $root, LockFile $lock, ProjectConfig $project, Config $config, array $repositories, string $targetPhp, bool $offline, Deadline $deadline, string $advisoryScope = AdvisoryCoverage::SCOPE_ALL): MoveChecker
     {
-        $overrides = [];
-        $configured = $config->get('platform');
-        foreach (\is_array($configured) ? $configured : [] as $name => $version) {
-            if (!self::composerAccepts((string) $name, $version)) {
-                return new UncheckedMoves(MoveCheck::PLATFORM_CONFIG_INVALID, self::configuredPhp($config));
-            }
-            $overrides[strtolower((string) $name)] = $version;
+        $overrides = self::platformOverrides($config->get('platform'));
+        if ($overrides === null) {
+            return new UncheckedMoves(MoveCheck::PLATFORM_CONFIG_INVALID, self::configuredPhp($config));
         }
         $platformNames = array_keys($overrides);
         $configured = self::configuredPhp($config);
@@ -102,25 +98,37 @@ final class MoveCheckers
     }
 
     /**
-     * Whether Composer's PlatformRepository takes this `config.platform` entry: a platform package
-     * name, and a version that Composer's VersionParser normalises. False disables the package,
-     * but a disabled php (any case of the name) stops every update, so lockrot refuses it too.
+     * `config.platform` as Composer's PlatformRepository reads it, by lower-case name, or null
+     * when it refuses the config. The constructor checks each entry, and the last entry of a name
+     * in any letter case wins. Then each name must be a platform package with a version that
+     * VersionParser normalises. A disabled php stops every update, so lockrot refuses it too.
      *
-     * @param mixed $version
+     * @param mixed $configured
      *
-     * @phpstan-assert-if-true string|false $version
+     * @return array<string, string|false>|null
      */
-    private static function composerAccepts(string $name, $version): bool
+    private static function platformOverrides($configured): ?array
     {
-        if (!PlatformRepository::isPlatformPackage($name)) {
-            return false;
+        $entries = [];
+        foreach (\is_array($configured) ? $configured : [] as $name => $version) {
+            if ((!\is_string($version) && $version !== false) || ($name === 'php' && $version === false)) {
+                return null;
+            }
+            $entries[strtolower((string) $name)] = [(string) $name, $version];
         }
-        if ($version === false) {
-            return strtolower($name) !== 'php';
+        $overrides = [];
+        foreach ($entries as $lower => [$name, $version]) {
+            if (!PlatformRepository::isPlatformPackage($name) || ($version === false ? $lower === 'php' : !self::normalises($version))) {
+                return null;
+            }
+            $overrides[$lower] = $version;
         }
-        if (!\is_string($version)) {
-            return false;
-        }
+
+        return $overrides;
+    }
+
+    private static function normalises(string $version): bool
+    {
         try {
             (new ComposerVersionParser())->normalize($version);
 

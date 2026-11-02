@@ -134,15 +134,31 @@ final class MoveCheckersTest extends TestCase
         yield 'an extension as a constraint' => [['php' => '8.4.3', 'ext-intl' => '^1.0'], '8.4.3'];
     }
 
-    /** Composer disables a platform package other than php that `config.platform` sets to false, and normalises every string. */
-    public function testAConfigPlatformValueThatComposerAcceptsKeepsTheMoveCheck(): void
+    /**
+     * Composer disables a platform package other than php that `config.platform` sets to false,
+     * and normalises the last value of each name in any letter case.
+     *
+     * @dataProvider platformsThatComposerAccepts
+     *
+     * @param array<string, string|false> $platform
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('platformsThatComposerAccepts')]
+    public function testAConfigPlatformValueThatComposerAcceptsKeepsTheMoveCheck(array $platform): void
     {
         $config = new Config(false);
-        $config->merge(['config' => ['platform' => ['php' => '8.4.3', 'ext-intl' => false, 'lib-icu' => '72.1', 'ext-json' => '8.4.x-dev']]]);
+        $config->merge(['config' => ['platform' => $platform]]);
 
         $checker = MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]]), ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
 
         self::assertSame(MoveCheck::RESOLVES, $checker->baseline()->check()->result());
+    }
+
+    /** @return iterable<string, array{array<string, string|false>}> */
+    public static function platformsThatComposerAccepts(): iterable
+    {
+        yield 'a disabled extension, a library and a dev version' => [['php' => '8.4.3', 'ext-intl' => false, 'lib-icu' => '72.1', 'ext-json' => '8.4.x-dev']];
+        yield 'php false in capitals before a php' => [['PHP' => false, 'php' => '8.4.3']];
+        yield 'a constraint before a php in capitals' => [['php' => '^8.2', 'PHP' => '8.4.3']];
     }
 
     /** Composer lower-cases each `config.platform` name, so `PHP` is the project's php. */
