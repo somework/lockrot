@@ -18,8 +18,8 @@ final class ActivityBatch
 
     /**
      * @param array<string, RepositoryActivity>    $activity    keyed by {@see RepoRef::key()}
-     * @param array<string, list<string>>          $notFound    host => keys of repositories that it does not know or hides
-     * @param array<string, array<string, string>> $failed      host => (key => reason)
+     * @param array<string, list<string>>          $notFound    {@see RepoRef::forge()} => keys of repositories that it does not know or hides
+     * @param array<string, array<string, string>> $failed      {@see RepoRef::forge()} => (key => reason)
      * @param array<string, bool>                  $rateLimited {@see RepoRef::host()} of each host that answered "too many requests"
      */
     public function __construct(array $activity, array $notFound, array $failed, array $rateLimited)
@@ -41,25 +41,25 @@ final class ActivityBatch
         return $this->activity;
     }
 
-    /** @return list<string> keys, across hosts */
+    /** @return list<string> keys, across forges */
     public function notFound(): array
     {
         return array_merge([], ...array_values($this->notFound));
     }
 
-    /** @return list<string> keys, for one host */
+    /** @return list<string> keys, for one forge */
     public function notFoundOn(string $forge): array
     {
         return $this->notFound[$forge] ?? [];
     }
 
-    /** @return array<string, string> key => reason, across hosts */
+    /** @return array<string, string> key => reason, across forges */
     public function failed(): array
     {
         return array_merge([], ...array_values($this->failed));
     }
 
-    /** @return array<string, string> key => reason, for one host */
+    /** @return array<string, string> key => reason, for one forge */
     public function failedOn(string $forge): array
     {
         return $this->failed[$forge] ?? [];
