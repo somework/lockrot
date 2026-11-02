@@ -30,8 +30,9 @@ For a missing or wrong date, start at
 - The [Anonymous cap](notes.md#repository_activity_anonymous_cap) note counts the skipped packages
   per host.
 
-The lock needs no request: S5 reads the lock entry's `time` and `require.php`, and S6 a
-branch-snapshot version.
+S6 needs no request: it reads a branch-snapshot version in the lock. S5 reads the lock entry's
+`time` and `require.php`, and the Composer repository's tags decide whether that `time` is a
+release date ([Dates from the monorepo](verdicts.md#dates-from-the-monorepo)).
 
 Every request, to a repository or a host, goes through Composer's HTTP layer, so Composer's proxy
 and TLS settings apply to both.
@@ -239,9 +240,9 @@ run.
 
 | Symptom | Cause | Fix or reference |
 |---|---|---|
-| No S2 or S8, and S10 names `release_dates` | The Composer repository dates the newest tags only by a commit they share (a subtree split), and no monorepo parent dates them | [Left behind](verdicts.md#left-behind), [Dates from the monorepo](verdicts.md#dates-from-the-monorepo) |
+| No S2, S5 or S8, and S10 names `release_dates` | A release that the signal reads has no trusted date. The tag or the lock entry has no date, or the Composer repository dates the tag only by a commit that other tags share (a subtree split), and no monorepo parent dates it | [Left behind](verdicts.md#left-behind), [Dates from the monorepo](verdicts.md#dates-from-the-monorepo) |
 | A release date older than the release | The Composer repository dates a tag by its commit, so a tag cut on an old commit carries that commit's date | [Left behind](verdicts.md#left-behind) |
-| S5's release date is wrong | S5 reads the lock entry's `time`, the release date the Composer repository reported when the lock was last updated | Check the lock entry's `time` |
+| S5's release date is wrong | S5 reads the installed release's trusted date: the monorepo parent's date of the same version, else the lock entry's `time`. A `time` that is a commit other tags share is no release date, so S5 does not fire, and S10 names S5 | Check the lock entry's `time`, and see [Dates from the monorepo](verdicts.md#dates-from-the-monorepo) |
 | S10 names `repository_activity` with `no_token` or `anonymous_budget` | An anonymous run on GitHub or Bitbucket | Set `GITHUB_TOKEN`, or add bitbucket.org credentials to `auth.json` |
 | S10 names `repository_activity` with `install_time_budget` or `offline` | The install-time budget ran out, or `--offline` found no cached answer | [install-time.md](install-time.md), [Working offline](#working-offline) |
 | S10 with `rate_limit` or `fetch_failed`, or the [Rate limited](notes.md#repository_activity_rate_limited) or [Unreachable](notes.md#repository_activity_unreachable) note | The repository host refused or did not answer | Rerun. For a rate limit, add credentials for the repository host |

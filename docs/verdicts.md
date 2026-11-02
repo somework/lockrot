@@ -1216,7 +1216,7 @@ formats print only under `--all`, keeps its verdict and adds the same `checks mi
 | `repository_activity` | `offline` | `--offline` | S3, S4 |
 | `repository_activity` | `host_not_supported` | The repository is on a host that lockrot cannot ask ([host note](notes.md#repository_activity_host_not_supported)) | S3, S4 |
 | `repository_activity` | `not_from_composer_repository` | The package comes from vcs, or from an origin that lockrot cannot tell: lockrot asks no host for it | S3, S4 |
-| `release_metadata` | `not_from_composer_repository` | The same origins: no Composer repository serves its releases | S2, S8 |
+| `release_metadata` | `not_from_composer_repository` | The same origins: no Composer repository serves its releases | S2, S8. S11 too when S11 fires: a [capped](#capped) package then has `admits_newest` unread |
 | `release_dates` | `undated_releases` | A release that S2, S5 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it | S2 when the highest tag is undated. S5 when the installed release is undated, its lock date is before the GA of the target's major or absent, and the other two [S5 conditions](#old-promise) hold. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
 | `advisories` | `offline`, `install_time_budget`, `lookup_failed`, `no_feed` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
 | `releases` | `releases_unknown` | A counted advisory's fix is unknown because the package's release data did not come | S9 |
@@ -1250,9 +1250,11 @@ The skips of `checks_skipped[]`:
 | any | `accepted_by_config` | An [`accept-unchecked`](configuration.md#accept-unchecked) entry accepted the S10 entry. `unchecked_accepted[]` holds it |
 | any | `not_from_composer_repository` | The `path`, `artifact` and `package` origins above |
 
-- lockrot raises S10 only where the missing check could change the score. So a package whose S1
-  fired, or that an allowlist entry accepts whole, writes its maintenance gaps as skips. Its
-  `advisories` and `releases` gaps stay S10.
+- A package whose S1 fired, or that an allowlist entry accepts whole, drops its maintenance gaps
+  (`repository_activity`, `release_dates`, `release_metadata`) from S10. This filter does not ask
+  whether a gap could change the score. A raised S1 drops them also when an `ignore` entry accepts
+  `abandoned`, and a dropped gap can block S5 or S8. The `repository_activity` and
+  `release_metadata` gaps then show as skips. Its `advisories` and `releases` gaps stay S10.
 
 - Credentials for every host remove `no_token` and `anonymous_budget`. `rate_limit`, `fetch_failed`,
   `offline` and `install_time_budget` can still occur, and `release_dates` asks no host, so a fully
