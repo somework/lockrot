@@ -671,6 +671,7 @@ final class CaseHydrator
     {
         $versions = [];
         $aliases = [];
+        $repeated = [];
         foreach ($releases as $release) {
             self::assertArray($release);
             $version = JsonPath::stringAt($release, ['version']);
@@ -690,11 +691,13 @@ final class CaseHydrator
                 foreach (['v' === $version[0] ? $bare : 'v'.$bare, $bare.'.0'] as $alias) {
                     $aliases[] = (new ArrayLoader())->load(['version' => $alias] + $data);
                 }
+                // An undated branch names the last spelling of its highest tag: the release itself comes after its spellings.
+                $repeated[] = (new ArrayLoader())->load($data);
             }
             $versions[] = (new ArrayLoader())->load($data);
         }
 
-        return array_merge($versions, $aliases);
+        return array_merge($versions, $aliases, $repeated);
     }
 
     /**
