@@ -259,20 +259,24 @@ final class ComposerHttpClient implements HttpClientInterface
 
     private function pump(): void
     {
-        // Without curl a request ends inside add(), so its end must not start the next one there.
+        // A request can end inside add(): without curl, with the network off, or refused at its start.
+        // Its end must not start the next request one call deeper.
         if ($this->pumping) {
             return;
         }
         $this->pumping = true;
-        while ($this->running < $this->maxParallel && $this->starts !== []) {
-            ++$this->running;
-            $start = array_shift($this->starts);
-            $start(function (): void {
-                --$this->running;
-                $this->pump();
-            });
+        try {
+            while ($this->running < $this->maxParallel && $this->starts !== []) {
+                ++$this->running;
+                $start = array_shift($this->starts);
+                $start(function (): void {
+                    --$this->running;
+                    $this->pump();
+                });
+            }
+        } finally {
+            $this->pumping = false;
         }
-        $this->pumping = false;
     }
 
     /** The parallel limit of Composer's HttpDownloader. */
