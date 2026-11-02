@@ -268,7 +268,7 @@
                     ]
                 },
                 "cached_at": {
-                    "description": "The fetch time of the oldest cached answer behind this reading. Null when lockrot fetched every answer in this run, and unless `status` is `read`.",
+                    "description": "The fetch time of the oldest cached answer behind this reading: on `not_found`, the fetch time of the 404 that lockrot served from its cache. Null when lockrot fetched every answer in this run, and unless `status` is `read` or `not_found`.",
                     "oneOf": [
                         {
                             "$ref": "#/definitions/dateTime"
@@ -309,7 +309,7 @@
                     }
                 },
                 {
-                    "description": "`not_found`: the reason `repository_not_found`, a located repository, nothing read.",
+                    "description": "`not_found`: the reason `repository_not_found`, a located repository, nothing read; `cached_at` set on a 404 served from the cache.",
                     "properties": {
                         "status": {
                             "enum": [
@@ -340,7 +340,14 @@
                             "type": "null"
                         },
                         "cached_at": {
-                            "type": "null"
+                            "oneOf": [
+                                {
+                                    "$ref": "#/definitions/dateTime"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
                         }
                     }
                 },
@@ -510,7 +517,7 @@
             ],
             "properties": {
                 "composer_repository": {
-                    "description": "The name that Composer gives the repository, credentials stripped. It joins `run.advisory_lookup.repositories[]` and the notes.",
+                    "description": "The name that Composer gives the repository, credentials stripped. It joins `run.advisory_lookup.repositories[]` and the notes. Private data: the name echoes the host and path of the repository URL, so a Private Packagist repository names its organisation (`composer repo (https://repo.packagist.com/<org>/)`). Clear it before you publish a report.",
                     "type": "string",
                     "minLength": 1
                 },
@@ -673,7 +680,7 @@
             ],
             "properties": {
                 "composer_repository": {
-                    "description": "The name that Composer gives the repository, credentials stripped (the join key).",
+                    "description": "The name that Composer gives the repository, credentials stripped (the join key). Private data: the name echoes the host and path of the repository URL, so a Private Packagist repository names its organisation (`composer repo (https://repo.packagist.com/<org>/)`). Clear it before you publish a report.",
                     "type": "string",
                     "minLength": 1
                 },
@@ -3031,7 +3038,7 @@
             ],
             "properties": {
                 "check": {
-                    "description": "S10's check id: `repository_activity` (S3, S4), `release_dates` (the package's age, dated only by a shared commit), `advisories` (S9: the advisory lookup did not complete), `releases` (S9's fix part: releases could not be read), `release_metadata` (S2, S8: a package from a vcs or an unknown origin, whose release metadata no Composer repository serves). An open set.",
+                    "description": "S10's check id: `repository_activity` (S3, S4), `release_dates` (S2, S5, S8: a release that the signal reads has no trusted date, because the lock gives the installed release no time, its tag shares a commit with other tags, or the tag carries no date), `advisories` (S9: the advisory lookup did not complete), `releases` (S9's fix part: releases could not be read), `release_metadata` (S2, S8: a package from a vcs or an unknown origin, whose release metadata no Composer repository serves). An open set.",
                     "type": "string",
                     "pattern": "^[a-z][a-z0-9_]*$",
                     "x-known-values": [
@@ -3082,7 +3089,7 @@
             ],
             "properties": {
                 "check": {
-                    "description": "`repository_activity` (blocks S3, S4), `release_metadata` (S2, S8), `advisories` (S9), `release_branch` (S8 on a branch snapshot, which has no release branch), `repository_archived` (S3: the host's answer did not carry the archived flag, as an anonymous GitLab answer does not). An open set.",
+                    "description": "`repository_activity` (blocks S3, S4), `release_metadata` (S2, S8), `advisories` (S9), `release_branch` (S8 on a branch snapshot, which has no release branch), `repository_archived` (S3: the host's answer did not carry the archived flag, as an anonymous GitLab answer does not), `release_dates` (S2, S5, S8: the S10 `release_dates` gap of a package with S1 or a package that an allowlist entry accepts whole, which the S10 filter drops). An open set.",
                     "type": "string",
                     "pattern": "^[a-z][a-z0-9_]*$",
                     "x-known-values": [
@@ -3090,11 +3097,12 @@
                         "release_metadata",
                         "advisories",
                         "release_branch",
-                        "repository_archived"
+                        "repository_archived",
+                        "release_dates"
                     ]
                 },
                 "reason": {
-                    "description": "Why: `repository_not_found` is the host's 404 (an answer, not a gap), `host_not_supported` a host lockrot cannot ask on a package whose S10 the filter drops, `unparseable_version` an installed version Composer cannot parse, `accepted_by_config` an S10 check that the project accepted in `extra.lockrot.accept-unchecked`. The `unchecked_accepted[]` entry of the finding with the same check holds the S10 reason and the entry. An open set: read an unknown reason as another reason.",
+                    "description": "Why: `repository_not_found` is the host's 404 (an answer, not a gap), `host_not_supported` a host lockrot cannot ask on a package whose S10 the filter drops, `undated_releases` the reason of a `release_dates` skip (a release that the blocked signals read has no trusted date), `unparseable_version` an installed version Composer cannot parse, `accepted_by_config` an S10 check that the project accepted in `extra.lockrot.accept-unchecked`. The `unchecked_accepted[]` entry of the finding with the same check holds the S10 reason and the entry. An open set: read an unknown reason as another reason.",
                     "type": "string",
                     "pattern": "^[a-z][a-z0-9_]*$",
                     "x-known-values": [
@@ -3113,7 +3121,8 @@
                         "host_not_supported",
                         "repository_not_found",
                         "unparseable_version",
-                        "accepted_by_config"
+                        "accepted_by_config",
+                        "undated_releases"
                     ]
                 },
                 "blocks": {
@@ -3481,7 +3490,7 @@
                                     "uniqueItems": true
                                 },
                                 "ignored_platform": {
-                                    "description": "The platform patterns whose requirements the solve ignores, as `--ignore-platform-req` does, so the machine that runs lockrot decides no move. A name that composer.json `config.platform` sets is checked even when a pattern matches it (ruling R6-2).",
+                                    "description": "The platform patterns whose requirements the solve ignores, as `--ignore-platform-req` does, so the machine that runs lockrot decides no move. A name that composer.json `config.platform` sets is checked even when a pattern matches it.",
                                     "type": "array",
                                     "items": {
                                         "type": "string",
@@ -8643,7 +8652,7 @@
                     ]
                 },
                 {
-                    "description": "A `require` or `tag` move of a transitive or unreached package that composer.json does not list writes no `composer require` command: the root does not require the package (ruling R13).",
+                    "description": "A `require` or `tag` move of a transitive or unreached package that composer.json does not list writes no `composer require` command: the root does not require the package.",
                     "anyOf": [
                         {
                             "properties": {
@@ -12959,7 +12968,7 @@
                     ]
                 },
                 {
-                    "description": "`php` (old-promise: S5 `written_for_php`).",
+                    "description": "`php` (old-promise: S5 `written_for_php`; null when the constraint has no lower major, such as `*`, and the page pill then prints `php \"{constraint}\"`).",
                     "properties": {
                         "unit": {
                             "enum": [
@@ -12967,8 +12976,15 @@
                             ]
                         },
                         "value": {
-                            "type": "integer",
-                            "minimum": 1
+                            "oneOf": [
+                                {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
                         },
                         "source": {
                             "type": "null"
@@ -15095,7 +15111,7 @@
                             ]
                         },
                         "reason": {
-                            "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), `platform_config_invalid` (Composer refuses a `config.platform` entry of its merged config: `php: false`, a value that is neither a string nor false, or a name that is no platform package), `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note). An open set.",
+                            "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), `platform_config_invalid` (a `config.platform` entry of the merged config fails the validation of Composer's platform repository: php set to false in any letter case, a value that is neither a string nor false, a name that is no platform package, or a version string that Composer cannot normalize, such as `^8.2` or an ext-* value `^1.0`), `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note). An open set.",
                             "oneOf": [
                                 {
                                     "type": "string",
@@ -17131,7 +17147,7 @@
                                 ]
                             },
                             "released_years": {
-                                "description": "The age of the branch's newest release on the run clock: `highest_released`, or, when that is null, S8's `newest_release` for the same branch; null when neither dates it.",
+                                "description": "The age of the branch's newest release on the run clock: `highest_released`, or, when that is null, S8's `newest_release` for the same branch; null when neither dates it. When `highest_released` is null, the date is a lower bound of the highest tag's release (a commit its tags share, or a lower tag's own date), so the value is an upper bound on the age: the html bar reads \"at most\".",
                                 "oneOf": [
                                     {
                                         "$ref": "#/definitions/years"
@@ -17274,7 +17290,7 @@
                     "pattern": "^[0-9]+\\.[0-9]+$"
                 },
                 "excludes_target": {
-                    "description": "Exactly `installed_php.target_runs` false: no patch of the target minor meets `requires`.",
+                    "description": "Exactly `installed_php.target_runs` false: `requires` excludes the PHP at which the move check solves (https://lockrot.dev/verdicts/#within-reach).",
                     "type": "boolean"
                 },
                 "admits_newest": {
@@ -17298,7 +17314,7 @@
                                     "$ref": "#/definitions/branchLabel"
                                 },
                                 "blocking": {
-                                    "description": "What holds the release back: `project` (the project's lowest PHP is outside its `require.php`), `target` (no patch of the target minor is inside it); null when nothing does. Closed.",
+                                    "description": "What holds the release back: `project` (the project's lowest PHP is outside its `require.php`), `target` (it excludes the PHP at which the move check solves); null when nothing does. Closed.",
                                     "oneOf": [
                                         {
                                             "type": "string",
@@ -17649,6 +17665,7 @@
                 "newest_php",
                 "newest_within_reach",
                 "newest_years",
+                "newest_release_at_least",
                 "floor_php",
                 "floor_source",
                 "reachable_branch",
@@ -17657,6 +17674,7 @@
                 "reachable_php",
                 "reachable_admits",
                 "reachable_years",
+                "reachable_release_at_least",
                 "suggested_constraint",
                 "dated_by"
             ],
@@ -17699,6 +17717,10 @@
                 "newest_years": {
                     "description": "Age of `newest_release` on the run clock.",
                     "$ref": "#/definitions/years"
+                },
+                "newest_release_at_least": {
+                    "description": "True when the newest branch's highest tag has no trusted release date: `newest_release` is then the date of a commit its tags share, a lower bound, and `newest_years` an upper bound. The summary reads \"(on or after {date}, the date of a commit its tags share)\".",
+                    "type": "boolean"
                 },
                 "floor_php": {
                     "description": "What holds the newest branch back; null when within reach.",
@@ -17800,6 +17822,13 @@
                         {
                             "type": "null"
                         }
+                    ]
+                },
+                "reachable_release_at_least": {
+                    "description": "True when the reachable branch's highest tag has no trusted release date: `reachable_release` is then the date of a commit its tags share, a lower bound, and `reachable_years` an upper bound. Null with `reachable_branch`.",
+                    "type": [
+                        "boolean",
+                        "null"
                     ]
                 },
                 "suggested_constraint": {

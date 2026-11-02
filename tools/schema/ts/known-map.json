@@ -1335,7 +1335,8 @@
    "release_metadata",
    "advisories",
    "release_branch",
-   "repository_archived"
+   "repository_archived",
+   "release_dates"
   ],
   "open": true,
   "integer": false
@@ -1362,7 +1363,8 @@
    "host_not_supported",
    "repository_not_found",
    "unparseable_version",
-   "accepted_by_config"
+   "accepted_by_config",
+   "undated_releases"
   ],
   "open": true,
   "integer": false
