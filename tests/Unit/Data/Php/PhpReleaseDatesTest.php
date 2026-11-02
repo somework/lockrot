@@ -33,6 +33,14 @@ final class PhpReleaseDatesTest extends TestCase
         self::assertSame('5.3', $dates->minors(Clock::fixed('2026-10-01T00:00:00+00:00'))[0]);
     }
 
+    public function testShippedGaDateOfPhp86CountsFromItsDayOnly(): void
+    {
+        $dates = PhpReleaseDates::load();
+
+        self::assertSame(['8.4', '8.5'], \array_slice($dates->minors(Clock::fixed('2026-11-18T23:59:59+00:00')), -2));
+        self::assertSame(['8.5', '8.6'], \array_slice($dates->minors(Clock::fixed('2026-11-19T00:00:00+00:00')), -2));
+    }
+
     public function testMinorsSortsByVersionNotByFileOrder(): void
     {
         $path = tempnam(sys_get_temp_dir(), 'lockrot-php-ga-dates-');

@@ -364,6 +364,12 @@ maintainer.
       of the contract bundle. If the day changes after the merge, open a pull request into `main`
       that changes only that date and `docs/example-run.md`. Then tag its merge commit.
 
+    - Check `resources/php-ga-dates.json` against the PHP release schedule on php.net: the
+      schedule page of the next minor (`https://wiki.php.net/todo/php<major><minor>`) and
+      `https://www.php.net/releases/`. If php.net gives the GA date of a minor that the file does
+      not hold, add the date. lockrot counts a minor from its GA day on, so a later date changes no
+      output before that day. Check the file before you record `docs/example-run.md`.
+
     - Re-record `docs/example-run.md` with the command and the environment that the top of the
       page names (`GITHUB_TOKEN`, `COLUMNS`, the snapshot). Run a PHAR that you build from the
       release branch ([The PHAR](#the-phar)), with `LOCKROT_TODAY=<planned tag day>`. Set the
@@ -407,7 +413,9 @@ maintainer.
            check that the rc tag of step 4 starts does not count, because its branch is the tag.
            Then delete the branch.
         6. In lockrot-report, run `node scripts/contract.mjs repin <V>`. Set the version in
-           `CHANGELOG.md` and `package.json`. Commit only the version and the pin.
+           `CHANGELOG.md`, and run `npm version X.Y.Z --no-git-tag-version`. It sets `version` in
+           `package.json` and both `version` fields of `package-lock.json` (the root and
+           `packages[""]`). Commit only the version and the pin.
         7. Merge that commit into the renderer's `main`. Then tag `vX.Y.Z` on `main`.
         8. Run `tools/report/update-renderer vX.Y.Z`, and commit only the files that it writes. This
            commit must not change the contract bundle.
@@ -426,7 +434,6 @@ maintainer.
       the merge.
     - When the release changes the flag set, a schema number or the score model, the lockrot.dev
       change that reads it is merged. The lockrot.dev build stops on a set that it does not know.
-    - A lockrot-action release that `@v1` jobs need on the tag day is published.
     - Before the first final renderer tag, list the renderer's rulesets with
       `gh api repos/somework/lockrot-report/rulesets`. The list leaves out each ruleset's
       conditions and rules, so read each one with
@@ -469,6 +476,23 @@ maintainer.
    remove the version from `RECORDING_PENDING`. `SchemaEvolutionTest` fails when a release whose
    schemas changed has no recording, unless it is the newest release and waits in
    `RECORDING_PENDING`.
+8. After the GitHub release of step 6, release [lockrot-action](https://github.com/somework/lockrot-action)
+   when its `@v1` jobs need the new lockrot. For 0.14.0 that release is v1.2.0, which carries the
+   branch `feat/one-run-output`. Each merge and the release need the maintainer's approval.
+
+    1. Merge the branch of the action release into the action's `main`, with the release's
+       `CHANGELOG.md` section.
+    2. Run `gh workflow run update-lockrot.yml --repo somework/lockrot-action`, or wait for its
+       daily run. It opens the pull request `chore: lockrot X.Y.Z`, which sets `LOCKROT_VERSION`
+       and `LOCKROT_SHA256` in `lockrot.env` from the published PHAR.
+    3. Merge that pull request when its CI passes. Without the `UPDATE_TOKEN` secret, its CI does
+       not start: close and reopen the pull request to start it.
+    4. Run `gh release create v1.x.y --repo somework/lockrot-action --generate-notes` on that
+       `main`. The release moves the `v1` tag to its commit, and publishes the Docker image
+       `ghcr.io/somework/lockrot` for the lockrot version in `lockrot.env`.
+    5. Check that `v1` names the release commit
+       (`gh api repos/somework/lockrot-action/git/ref/tags/v1`), and that the `docker.yml` run
+       published the image `ghcr.io/somework/lockrot:X.Y.Z`.
 
 ## Related
 
