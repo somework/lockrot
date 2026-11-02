@@ -136,10 +136,13 @@ final class RepoLocator
 
             return [\is_int($port) ? $host.':'.$port : $host, (string) parse_url($url, \PHP_URL_PATH)];
         }
-        if (preg_match('{^(?:[A-Za-z0-9_.-]+@)?([A-Za-z0-9_.-]+):(.+)$}', $url, $m) === 1) {
+        // The user part can hold `user:token`: it never reaches the host, which reports print.
+        $hasUser = preg_match('{^[^/@]+@(.+)$}', $url, $m) === 1;
+        $rest = $hasUser ? $m[1] : $url;
+        if (preg_match('{^([A-Za-z0-9_.-]+):(.+)$}', $rest, $m) === 1) {
             return [$m[1], $m[2]];
         }
-        if (preg_match('{^[A-Za-z0-9_.-]+@([A-Za-z0-9_.-]+)/(.+)$}', $url, $m) === 1) {
+        if ($hasUser && preg_match('{^([A-Za-z0-9_.-]+)/(.+)$}', $rest, $m) === 1) {
             return [$m[1], $m[2]];
         }
 
