@@ -79,6 +79,14 @@ final class NotCheckedRule implements SignalRule
     /** A highest tag that the signal reads is on a commit that other tags share. */
     public const CAUSE_SHARED_COMMIT = 'shared_commit';
 
+    /** The words of each cause of a `release_dates` entry, one clause per cause. */
+    private const DATE_CAUSES = [
+        self::CAUSE_LOCK_UNDATED => 'the lock gives the installed release no date',
+        self::CAUSE_INSTALLED_SHARED_COMMIT => 'the installed release has no release date (its tag shares a commit with other tags, and no parent dates it)',
+        self::CAUSE_SHARED_COMMIT => 'the age of the package was not read (its newest releases are dated by a commit their tags share)',
+        self::CAUSE_TAG_UNDATED => 'the age of the package was not read (its newest releases carry no date)',
+    ];
+
     /** The S10 checks about the package's upkeep, which a raised S1 makes moot. */
     private const MAINTENANCE_CHECKS = ['repository_activity', 'release_dates', 'release_metadata'];
 
@@ -264,7 +272,9 @@ final class NotCheckedRule implements SignalRule
             return 'security advisories not checked ('.(self::ADVISORY_CAUSES[$entry->reason()] ?? $entry->reason()).'), so S9 could not be read';
         }
         if ($entry->check() === 'release_dates') {
-            return 'the age of the package was not read (its newest releases are dated by a commit their tags share), so '.ListWords::of($entry->blocks()).' could not measure it';
+            $causes = $entry->causes() === [] ? [self::CAUSE_SHARED_COMMIT => $entry->blocks()] : $entry->causes();
+
+            return implode('; ', array_map(static fn (string $cause, array $blocks): string => self::DATE_CAUSES[$cause].', so '.ListWords::of($blocks).(\in_array($cause, [self::CAUSE_LOCK_UNDATED, self::CAUSE_INSTALLED_SHARED_COMMIT], true) ? ' could not judge it' : ' could not measure it'), array_keys($causes), $causes));
         }
 
         throw new \LogicException('S10 has no words for the check '.$entry->check().'.');
