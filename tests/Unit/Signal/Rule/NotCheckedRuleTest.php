@@ -661,6 +661,17 @@ final class NotCheckedRuleTest extends TestCase
         self::assertSame([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S2]], self::releaseDatesCauses($kept[0]));
     }
 
+    public function testTheReleaseDatesSkipRestatesOnlyTheReleaseDatesEntry(): void
+    {
+        $dates = new Check('release_dates', 'undated_releases', [Signal::S2, Signal::S8], [NotCheckedRule::CAUSE_TAG_UNDATED => [Signal::S2, Signal::S8]]);
+        $activity = new Check('repository_activity', 'offline', [Signal::S3, Signal::S4]);
+        $s10 = static fn (Check ...$checks): Signal => new Signal(Signal::LEVEL_INFO, 'not checked', new NotCheckedData($checks));
+
+        self::assertEquals(new Check('release_dates', 'undated_releases', [Signal::S2, Signal::S8]), NotCheckedRule::releaseDatesSkip([$s10($activity, $dates)]));
+        self::assertNull(NotCheckedRule::releaseDatesSkip([$s10($activity)]));
+        self::assertNull(NotCheckedRule::releaseDatesSkip([]));
+    }
+
     /**
      * @param list<string> $sharedCommit normalized versions on a commit that three or more stable tags share.
      *                                   With no last release date, the version that S2 reads is one of them.

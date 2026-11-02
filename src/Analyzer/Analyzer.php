@@ -579,7 +579,9 @@ final class Analyzer
         // A maintenance gap cannot change a verdict that an entry accepts whole, or one that a
         // raised S1 already makes `abandoned`. It reads the raised S1, never the metadata's
         // abandoned bit: a marking that Composer's list ignores leaves S3 to decide.
+        $droppedDates = null;
         if (($entry !== null && $entry->acceptsAll()) || $this->hasSignal($signals, Signal::S1)) {
+            $droppedDates = NotCheckedRule::releaseDatesSkip($signals);
             $signals = NotCheckedRule::withoutMaintenanceGaps($signals);
         }
         [$signals, $accepted] = $this->acceptUnchecked($signals, $facts);
@@ -612,7 +614,7 @@ final class Analyzer
         return $finding
             ->withComposerJson($composerJsonRead, $graph->namedIn($package->name()))
             ->withFlags($flags, $facts->metadataStatus() === PackageFacts::METADATA_READ)
-            ->withDetails(FindingDetails::of($facts, $entry, $floor, $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts), $accepted));
+            ->withDetails(FindingDetails::of($facts, $entry, $floor, $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts), $accepted, $droppedDates));
     }
 
     /**
