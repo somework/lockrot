@@ -234,8 +234,8 @@ defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether the mov
         'reason': nul(("Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the "
                        "`moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), "
                        "`install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), "
-                       "`platform_config_invalid` (Composer refuses a `config.platform` value of its merged config: `php: false`, or a value that is neither a string "
-                       "nor false), `no_release_read` (no release of the row was read, so the move names no version), "
+                       "`platform_config_invalid` (Composer refuses a `config.platform` entry of its merged config: `php: false`, a value that is neither a string "
+                       "nor false, or a name that is no platform package), `no_release_read` (no release of the row was read, so the move names no version), "
                        "`pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: "
                        "the `move_check_failed` note). An open set (§8.2)."),
                       {'type': 'string', 'pattern': SNAKE, 'x-known-values': MOVE_CHECK_REASONS}),
@@ -1710,10 +1710,11 @@ defs['rootGate'] = obj("The run's gate (report-1's, §6.2) plus the finding coun
     'failing_by': arr(("One entry per `run.gates` value, in its order: how many findings fail that value (their `gate.by[]` names it). Zero counts are written. "
                        "`[]` when `run.gates` is `[]`."), ref('gateValueFailing')),
     'not_applied': arr(("What the gate could not judge, so it failed open: advisories that a grade or vulnerable value could not read because nothing checked them. "
-                        "Written in a check run with a grade or vulnerable value active. With `unchecked` also active, a finding's gap is left out only when the finding fails "
-                        "the `unchecked` value, because it then fails closed. Every other unchecked finding is counted: a skip reason (`not_from_composer_repository`, "
-                        "`unparseable_version`) or a `no_feed` that the project accepted, which carry no S10, and a finding that the baseline exempts "
-                        "from `unchecked` (ruling R8-41), so the gate fails open visibly (§6.2). One entry per reason, by `packages` descending, then by reason. The `packages` of the entries add up to the "
+                        "Written in a check run with a grade or vulnerable value active. With `unchecked` also active, a finding's gap is left out only when two conditions hold. "
+                        "The finding fails the `unchecked` value, and its S10 names the advisories. "
+                        "Every other unchecked finding is counted, so the gate fails open visibly (§6.2). "
+                        "Examples are a skip reason (`not_from_composer_repository`, `unparseable_version`) and an accepted `no_feed`, which carry no S10. "
+                        "A baseline exemption from `unchecked` (ruling R8-41) and a failure of `unchecked` on release dates alone also keep the gap. One entry per reason, by `packages` descending, then by reason. The `packages` of the entries add up to the "
                         "findings covered. `[]` otherwise, and when nothing is missing."), ref('gateNotApplied')),
     'text': dict(rendered('The `gate:` line of the text formats, `RunGateText` (text grammar 1).', ['gate', 'run.fail_on', 'run.fail_on_source', 'run.gates', 'run.mode',
                                                                                                   'run.target_php', 'run.target_php_source']), minLength=1),
