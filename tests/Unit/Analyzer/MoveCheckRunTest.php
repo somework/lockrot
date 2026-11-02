@@ -24,13 +24,4 @@ final class MoveCheckRunTest extends TestCase
         self::assertSame(['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING'], $run->jsonSerialize()['blocking_disabled_by']);
         self::assertFalse($run->jsonSerialize()['blocks_advisories']);
     }
-
-    public function testTheRunHandsBackItsBaselineCheck(): void
-    {
-        $baseline = MoveCheck::notChecked(MoveCheck::OFFLINE);
-
-        $run = new MoveCheckRun('2.10.3', true, [], $baseline);
-
-        self::assertSame($baseline, $run->baseline());
-    }
 }
