@@ -154,7 +154,7 @@ jobs:
       # VersionTest passes while Version::STRING and the newest dated CHANGELOG heading both name the
       # previous release, so only the base of the pull request shows a missing bump. A pull request
       # that changes no shipped file, such as a tag-day fix or a Dependabot bump, keeps the version.
-      # The renderer's release workflow checks package.json only, so its package-lock.json is read here.
+      # The vendored manifest carries no package-lock.json version, so the step reads the file at the vendored renderer commit.
       - name: The release pull request bumps the version
         if: github.event_name == 'pull_request' && github.base_ref == 'main'
         env: {BASE_SHA: '${{ github.event.pull_request.base.sha }}', GH_TOKEN: '${{ github.token }}'}

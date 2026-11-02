@@ -122,6 +122,12 @@ class AReleasePullRequest(unittest.TestCase):
             self.check('0.13.0', '0.14.0', lock=json.dumps({'version': '0.14.0', 'packages': []})),
         )
 
+    def test_a_renderer_manifest_without_a_version_fails(self):
+        self.assertEqual(
+            ['resources/report/manifest.json names no version'],
+            version_bump.renderer_lock_problems('{}', '{}'),
+        )
+
     def test_a_pull_request_that_ships_no_code_reads_no_renderer_lock(self):
         self.assertEqual([], self.check('0.13.0', '0.13.0', changed=['docs/example-run.md'], lock='not read'))
 

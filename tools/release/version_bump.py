@@ -62,6 +62,8 @@ def decoded(text: str) -> Any:
 def renderer_lock_problems(manifest: str, lock: str) -> List[str]:
     renderer = decoded(manifest)
     version = renderer.get('version') if isinstance(renderer, dict) else None
+    if not isinstance(version, str):
+        return ['resources/report/manifest.json names no version']
     data = decoded(lock)
     if not isinstance(data, dict):
         return ['package-lock.json of the vendored renderer is no JSON object']
