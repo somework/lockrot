@@ -153,19 +153,17 @@ final class GithubFormatter implements FormatterInterface
         return str_replace('##[', '##\x5B', TerminalText::neutralise(str_replace(["\r\n", "\r", "\n"], ' ', $line)));
     }
 
+    /**
+     * The Actions log renders ANSI sequences, and a line break would start a forged line inside an
+     * annotation, so neutralise() prints both as escapes. lockrot's own messages hold no line break.
+     */
     private static function escapeData(string $value): string
     {
-        return str_replace(['%', "\r", "\n"], ['%25', '%0D', '%0A'], self::neutralised($value));
+        return str_replace('%', '%25', TerminalText::neutralise($value));
     }
 
     private static function escapeProperty(string $value): string
     {
-        return str_replace(['%', "\r", "\n", ':', ','], ['%25', '%0D', '%0A', '%3A', '%2C'], self::neutralised($value));
-    }
-
-    /** The Actions log renders ANSI sequences. Line breaks stay, for the `%0A` of a workflow command. */
-    private static function neutralised(string $value): string
-    {
-        return TerminalText::neutraliseLines($value);
+        return str_replace(['%', ':', ','], ['%25', '%3A', '%2C'], TerminalText::neutralise($value));
     }
 }
