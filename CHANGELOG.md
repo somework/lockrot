@@ -42,6 +42,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   gap stops the install: `no_feed`, `lookup_failed` and an exhausted budget. Action: remove
   `unchecked` from that `fail-on`, or accept a `no_feed` gap in `accept-unchecked`.
   ([`install-time-strict`](docs/install-time.md#install-time-strict))
+- **Breaking:** **All formats:** package metadata follows `only`, `exclude` and `canonical`. When a
+  canonical repository is down, refuses the credentials or is missing from a cold offline cache,
+  each name it could serve reads `metadata_unavailable`. 0.13 asked a later repository.
+  `--strict-network` makes this exit 1. Action: limit the repository with `only`, or fix its
+  credentials or its cache. ([Which repository answers](docs/internals.md#two-passes))
 - **All formats:** a new flag `capped` (S11, 8 points) marks an installed release whose
   `require.php` stops below the newest PHP minor that the root php allows. It decides at once, and
   comes after `stale`, so `--fail-on=stale` keeps its reach. A baseline entry that records any
@@ -167,9 +172,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   loads no vcs, git or artifact repository. A move that needs another release of a name that
   such a repository serves reads `not_checked` with `unloaded_name`, unless its `only`, `exclude`
   or `canonical: false` leaves the name out. ([The move check](docs/verdicts.md#the-move-check))
-- **All formats:** a `config.platform` value that Composer refuses (`php: false`, a value that is no
-  string and not false, a name that is no platform package) makes the move check and `target_fix`
-  `not_checked` with `platform_config_invalid`. Composer stops every `composer update` on it.
+- **All formats:** a `config.platform` value that Composer refuses or that disables `php` makes the
+  move check and `target_fix` `not_checked` with `platform_config_invalid`. Examples are `php:
+  "^8.2"`, `ext-intl: "^1.0"` and `PHP: false`. Composer stops every `composer update` on it.
   ([The move check](docs/verdicts.md#the-move-check))
 - **json:** `security.update_now_command` holds no PHP raise step. Only the `update now:` line says
   to raise `require.php` first. ([Security](docs/schema.md#advisories-with-no-fix-expected))
@@ -307,10 +312,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with `--generate-baseline`, exits 2 before Composer starts. 0.13 took the last value, and ran
   the explanation with no baseline written. Action: give each option once, and run `--explain` in
   its own step. ([Exit codes](docs/ci.md#exit-codes))
-- **Breaking:** **CLI, Config:** `--target-php` and `LOCKROT_TARGET_PHP` take a major, a minor or
-  a patch with nothing after it, such as `8.4`. Any other value, such as `8.4-fpm` or `8.4 || 8.5`,
-  exits 2. 0.13 read the version at its start. Action: pass the version alone.
-  ([CLI options](docs/configuration.md#cli-options))
+- **Breaking:** **CLI, Config, Install-time:** `--target-php` and `LOCKROT_TARGET_PHP` take a
+  major, a minor or a patch with nothing after it. Another value, such as `8.4-fpm`, exits 2, and
+  at install time the check is skipped. 0.13 read the version at its start. Action: pass the
+  version alone. ([CLI options](docs/configuration.md#cli-options))
 - **Breaking:** **CLI:** a lock whose `packages`, `packages-dev`, `platform`, `platform-dev`,
   `platform-overrides` or `aliases` section Composer or lockrot cannot read, or that lists two
   names equal without case, exits 2. 0.13 read on past these sections. Action: run

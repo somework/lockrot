@@ -428,8 +428,8 @@ final class RepositoryMetadataLoaderTest extends TestCase
     }
 
     /**
-     * Composer stops on a transport failure of a canonical repository and asks no later one. The
-     * names fail with the repository's reason, and no later repository answers for them.
+     * Composer stops on a transport failure and asks no later repository. lockrot stops at a
+     * canonical repository: the names fail with its reason, and no later repository answers them.
      */
     public function testANameThatACanonicalRepositoryFailsOnIsNotOfferedToTheNext(): void
     {
@@ -470,7 +470,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
         }
     }
 
-    /** A repository with `canonical: false` claims no name in Composer, so its failure leaves the name to the next repository. */
+    /** lockrot reads a repository with `canonical: false` as a fallback, so its failure leaves the name to the next repository. */
     public function testANameThatANonCanonicalRepositoryFailsOnIsOfferedToTheNext(): void
     {
         $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);

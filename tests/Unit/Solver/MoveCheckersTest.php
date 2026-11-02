@@ -96,9 +96,9 @@ final class MoveCheckersTest extends TestCase
     }
 
     /**
-     * Ruling R8-37: Composer's PlatformRepository refuses each `config.platform` value that is no
-     * string and not false, a php of false and a name that is no platform package, so every
-     * `composer update` stops. No move resolves. The PHP window still reads the configured php.
+     * Ruling R8-37: Composer's PlatformRepository refuses each `config.platform` of the provider,
+     * or reads it as a disabled php, so every `composer update` stops. No move resolves. The PHP
+     * window still reads the configured php.
      *
      * @dataProvider platformsThatComposerRefuses
      *

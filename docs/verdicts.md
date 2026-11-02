@@ -821,10 +821,10 @@ Limits of the check:
   and `COMPOSER_MINIMAL_CHANGES`, as Composer does. It does not read
   `COMPOSER_PREFER_STABLE`, `COMPOSER_PREFER_LOWEST`, `COMPOSER_WITH_DEPENDENCIES` or
   `COMPOSER_WITH_ALL_DEPENDENCIES`.
-- It does not read `COMPOSER_IGNORE_PLATFORM_REQ` or `COMPOSER_IGNORE_PLATFORM_REQS`. The check
-  asks whether a release installs at the target PHP, and these variables only turn off Composer's
-  test of that. With one of them set, a printed command can install a release that the check
-  refuses or holds back.
+- It does not read `COMPOSER_IGNORE_PLATFORM_REQ` or `COMPOSER_IGNORE_PLATFORM_REQS`. These
+  variables make Composer ignore platform requirements, the php requirement included. The check
+  asks whether a release installs at the target PHP, so it keeps those requirements. With one of
+  the variables set, a printed command can install a release that the check refuses or holds back.
 - With `--offline`, a package that composer.json admits at `dev` needs its `~dev` file in
   Composer's cache. Without that file, the move is not checked (`check.reason` `offline`). From
   these repositories, such a package with tags and no dev version also reads `not_checked` with
@@ -894,10 +894,16 @@ Limits of the check:
   `composer_json_invalid`). Composer refuses such a file, for example for a requirement name that
   is no package name.
 - A run whose `config.platform` holds a value that Composer refuses checks no move (`check.reason`
-  `platform_config_invalid`). Composer refuses a name that is no platform package, a value that
-  is no string and not false, and a version that it cannot normalise, such as `^8.2`. A `php` of
-  false, in any letter case, also checks no move, because Composer then refuses or disables php.
-  Each `composer update` then stops. The run still writes its report.
+  `platform_config_invalid`). Each `composer update` then stops. The run still writes its report.
+  These values give that reason:
+
+    - a name that is no platform package
+    - a value that is no string and not false
+    - a version that Composer cannot normalise, such as `^8.2`
+    - a `php` of false in any letter case, which Composer refuses or reads as a disabled php
+
+    When two names differ only in letter case, Composer reads the last one, and so does the check.
+
 - The check does not read whether the lock has a `packages-dev` key. A lock without that key can
   get a move that resolves and its command, but Composer refuses an update with require-dev on
   such a lock.
