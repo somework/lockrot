@@ -22,6 +22,7 @@ if (\PHP_VERSION_ID < 70400) {
     exit(2);
 }
 
+$lockrotInProject = false;
 foreach ([
     __DIR__.'/../vendor/autoload.php',
     __DIR__.'/../../../autoload.php',
@@ -29,14 +30,18 @@ foreach ([
 ] as $autoload) {
     if (is_file($autoload)) {
         require $autoload;
+        $lockrotInProject = $autoload === __DIR__.'/../../../autoload.php';
         break;
     }
 }
 
 if (!class_exists(\Composer\Console\Application::class)) {
-    fwrite(\STDERR, "composer/composer is not installed; run composer install in build/phar\n");
+    fwrite(\STDERR, $lockrotInProject
+        ? "lockrot needs the composer/composer package 2.10 or newer, and the vendor directory of lockrot does not hold it. Run composer lockrot, run the PHAR (https://lockrot.dev/phar/), or require composer/composer.\n"
+        : "composer/composer is not installed; run composer install in build/phar\n");
     exit(2);
 }
+unset($lockrotInProject);
 
 // The floor of LockrotPlugin. The source script runs on the host project's composer/composer, which
 // can be older, and then a Composer method that lockrot calls is a fatal error. A source checkout of

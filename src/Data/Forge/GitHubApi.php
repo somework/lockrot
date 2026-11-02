@@ -68,7 +68,9 @@ final class GitHubApi implements ForgeApi
     public function activity(RepoRef $repo, array $json, \DateTimeImmutable $fetchedAt, ?\DateTimeImmutable $cachedAt): RepositoryActivity
     {
         $body = $json['repo'];
+        $archived = $body['archived'] ?? null;
 
-        return new RepositoryActivity($repo, ($body['archived'] ?? false) === true, JsonDate::parse($body['pushed_at'] ?? null), $fetchedAt, $cachedAt);
+        // A body without the flag, such as a proxy message, read nothing: the flag is unknown, never false.
+        return new RepositoryActivity($repo, \is_bool($archived) ? $archived : null, JsonDate::parse($body['pushed_at'] ?? null), $fetchedAt, $cachedAt, !\is_bool($archived));
     }
 }

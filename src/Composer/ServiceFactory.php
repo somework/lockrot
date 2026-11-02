@@ -128,7 +128,7 @@ final class ServiceFactory
     }
 
     /**
-     * HTTP for repository activity only. The deadline cuts each activity request to the time left
+     * HTTP for repository activity only. Each activity request gets the time left when it starts
      * ({@see ComposerHttpClient::timeoutSeconds()}). Repository metadata requests come from the
      * project's own ComposerRepository instances, whose HttpDownloader timeouts lockrot cannot set.
      * There, the deadline check of {@see \Lockrot\Data\Repository\RepositoryMetadataLoader} stops

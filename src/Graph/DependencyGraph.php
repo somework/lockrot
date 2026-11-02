@@ -170,6 +170,23 @@ final class DependencyGraph
     }
 
     /**
+     * The keys of {@see chainsTo()} without its chains: a chain per root and per package grows with
+     * the square of a lock with many roots.
+     *
+     * @return list<string> sorted by name
+     */
+    public function rootsReaching(string $target): array
+    {
+        if (!isset($this->edges[$target])) {
+            return [];
+        }
+        $roots = $this->reachedFrom[$target] ?? [];
+        sort($roots, \SORT_STRING);
+
+        return $roots;
+    }
+
+    /**
      * Every source is seeded in order, duplicates included, and a node is visited at its first
      * discovery through an edge to a locked package. This order decides the tie-breaks between
      * equally short chains: change it and the chains of real locks change.

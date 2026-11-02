@@ -1253,7 +1253,7 @@ The skips of `checks_skipped[]`:
 | `repository_activity` | `allowlisted` | An allowlist entry accepts the whole package, so lockrot does not ask the host |
 | `repository_activity` | `no_repository` | The package names no repository URL that lockrot can place |
 | `repository_activity` | `repository_not_found` | The host answered 404: an answer, not a gap |
-| `repository_archived` | `no_token`, `fetch_failed` | The host answered, without the archived flag: anonymous GitLab, or a failed GitLab project request. S3 cannot fire |
+| `repository_archived` | `no_token`, `fetch_failed` | The host answered, without the archived flag: anonymous GitLab (`no_token`), a failed GitLab project request, or a GitHub answer without the flag (`fetch_failed`). S3 cannot fire |
 | `release_metadata` | `unavailable`, `not_found` | The metadata did not come. The package reads `unknown` when nothing else counts, and [`--strict-network`](ci.md#exit-codes) fails on the fetch |
 | `release_branch` | `branch_snapshot` | A branch snapshot has no release branch for S8 |
 | `advisories` | `not_from_composer_repository` | `advisory-lookup: composer-repositories`, and the package is not from a Composer repository |

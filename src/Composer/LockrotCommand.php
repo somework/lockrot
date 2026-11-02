@@ -188,13 +188,10 @@ final class LockrotCommand extends BaseCommand
         }
         $this->quietRootVersionGuessing();
         try {
+            // Composer reads the lock here, so an unparsable lock fails here too.
             parent::initialize($input, $output);
         } catch (\Throwable $e) {
-            // After a failure here execute() and its finally block do not run, so restore the
-            // environment here and rethrow the original failure to Composer.
-            $this->restoreEnv();
-
-            throw $e;
+            $this->bootstrapError = $e;
         }
     }
 

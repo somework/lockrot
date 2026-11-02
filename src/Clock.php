@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot;
 
+use Lockrot\Exception\ConfigException;
+
 /** @internal */
 final class Clock
 {
@@ -32,13 +34,26 @@ final class Clock
      * configuration contract (docs/configuration.md, "Testing hooks"), so this method reads it and
      * LockrotConfig does not.
      *
+     * @throws ConfigException for a value that is no date
+     *
      * @param array<string, mixed> $env
      */
     public static function fromEnvironment(array $env): self
     {
         $today = $env['LOCKROT_TODAY'] ?? null;
-
-        return \is_string($today) && $today !== '' ? self::fixed($today) : new self();
+        if (!\is_string($today) || $today === '') {
+            return new self();
+        }
+        $malformed = new ConfigException('LOCKROT_TODAY must be an ISO 8601 date or date-time, such as "2026-09-14"; got "'.$today.'"');
+        // PHP also reads "tomorrow" and rolls 2026-02-30 over into March.
+        if (preg_match('{^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})(?:T|$)}', $today, $m) !== 1 || !checkdate((int) $m['month'], (int) $m['day'], (int) $m['year'])) {
+            throw $malformed;
+        }
+        try {
+            return self::fixed($today);
+        } catch (\Exception $e) {
+            throw $malformed;
+        }
     }
 
     public function now(): \DateTimeImmutable

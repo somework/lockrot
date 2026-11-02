@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit;
 
 use Lockrot\Clock;
+use Lockrot\Exception\ConfigException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -127,10 +128,37 @@ final class ClockTest extends TestCase
         );
     }
 
+    /** @return iterable<string, array{string}> */
+    public static function malformedTodays(): iterable
+    {
+        yield 'no date' => ['not-a-date'];
+        yield 'a relative date that PHP reads' => ['tomorrow'];
+        yield 'a day-first date' => ['14.09.2026'];
+        yield 'a day that the month does not have' => ['2026-02-30'];
+        yield 'a leap day in a common year' => ['2027-02-29'];
+        yield 'a time that PHP cannot read' => ['2026-09-14Tnoon'];
+    }
+
+    /**
+     * @dataProvider malformedTodays
+     */
+    #[DataProvider('malformedTodays')]
+    public function testAMalformedLockrotTodayIsAConfigErrorThatNamesTheVariableAndTheValue(string $today): void
+    {
+        try {
+            Clock::fromEnvironment(['LOCKROT_TODAY' => $today]);
+            self::fail('a malformed LOCKROT_TODAY must be refused');
+        } catch (ConfigException $e) {
+            self::assertStringContainsString('LOCKROT_TODAY', $e->getMessage());
+            self::assertStringContainsString('"'.$today.'"', $e->getMessage());
+        }
+    }
+
     /** @return iterable<string, array{string, string}> LOCKROT_TODAY, the instant it pins */
     public static function lockrotTodays(): iterable
     {
         yield 'a date' => ['2026-09-14', '2026-09-14T00:00:00+00:00'];
+        yield 'a leap day' => ['2028-02-29', '2028-02-29T00:00:00+00:00'];
         yield 'a date-time without an offset' => ['2026-09-14T10:30:00', '2026-09-14T10:30:00+00:00'];
         yield 'an explicit offset sets the instant' => ['2026-09-14T00:00:00+03:00', '2026-09-13T21:00:00+00:00'];
         yield 'an offset that ends the year a day early' => ['2026-12-31T23:30:00-05:00', '2027-01-01T04:30:00+00:00'];

@@ -10,6 +10,7 @@ use Lockrot\Data\Cache\CacheInterface;
 use Lockrot\Data\Http\CachingHttpClient;
 use Lockrot\Data\Http\HttpClientInterface;
 use Lockrot\Data\Http\HttpResult;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class CachingHttpClientTest extends TestCase
@@ -66,14 +67,14 @@ final class CachingHttpClientTest extends TestCase
         $calls = 0;
         $clock = Clock::fixed('2026-09-14T00:00:00+00:00');
         $cache = new ArrayCache();
-        $cache->set('https://a', new HttpResult('https://a', 200, 'old', $clock->now()->modify('-2 days')));
-        $fresh = new HttpResult('https://a', 200, 'new', $clock->now());
+        $cache->set('https://a', new HttpResult('https://a', 200, '["old"]', $clock->now()->modify('-2 days')));
+        $fresh = new HttpResult('https://a', 200, '["new"]', $clock->now());
         $client = new CachingHttpClient($this->inner(['https://a' => $fresh], $calls), $cache, self::TTL, $clock);
-        self::assertSame('new', $client->fetchAll(['https://a'], self::TOKEN)['https://a']->body());
+        self::assertSame('["new"]', $client->fetchAll(['https://a'], self::TOKEN)['https://a']->body());
         self::assertSame(1, $calls);
         $cached = $cache->get('https://a');
         self::assertNotNull($cached);
-        self::assertSame('new', $cached->body());
+        self::assertSame('["new"]', $cached->body());
     }
 
     /** The TTL is the age at which an entry stops being fresh, so an entry exactly that old is refetched. */
@@ -82,18 +83,18 @@ final class CachingHttpClientTest extends TestCase
         $calls = 0;
         $clock = Clock::fixed('2026-09-14T00:00:00+00:00');
         $cache = new ArrayCache();
-        $cache->set('https://a', new HttpResult('https://a', 200, 'old', $clock->now()->modify('-'.self::TTL.' seconds')));
-        $fresh = new HttpResult('https://a', 200, 'new', $clock->now());
+        $cache->set('https://a', new HttpResult('https://a', 200, '["old"]', $clock->now()->modify('-'.self::TTL.' seconds')));
+        $fresh = new HttpResult('https://a', 200, '["new"]', $clock->now());
         $client = new CachingHttpClient($this->inner(['https://a' => $fresh], $calls), $cache, self::TTL, $clock);
 
-        self::assertSame('new', $client->fetchAll(['https://a'], self::TOKEN)['https://a']->body());
+        self::assertSame('["new"]', $client->fetchAll(['https://a'], self::TOKEN)['https://a']->body());
         self::assertSame(1, $calls);
 
         $calls = 0;
-        $cache->set('https://a', new HttpResult('https://a', 200, 'old', $clock->now()->modify('-'.(self::TTL - 1).' seconds')));
+        $cache->set('https://a', new HttpResult('https://a', 200, '["old"]', $clock->now()->modify('-'.(self::TTL - 1).' seconds')));
         $client = new CachingHttpClient($this->inner(['https://a' => $fresh], $calls), $cache, self::TTL, $clock);
 
-        self::assertSame('old', $client->fetchAll(['https://a'], self::TOKEN)['https://a']->body());
+        self::assertSame('["old"]', $client->fetchAll(['https://a'], self::TOKEN)['https://a']->body());
         self::assertSame(0, $calls);
     }
 
@@ -116,11 +117,11 @@ final class CachingHttpClientTest extends TestCase
         $calls = 0;
         $clock = Clock::fixed('2026-09-14T00:00:00+00:00');
         $cache = new ArrayCache();
-        $cache->set('https://a', new HttpResult('https://a', 200, 'old', $clock->now()->modify('-30 days')));
+        $cache->set('https://a', new HttpResult('https://a', 200, '["old"]', $clock->now()->modify('-30 days')));
         $client = new CachingHttpClient($this->inner([], $calls), $cache, self::TTL, $clock, true);
         // Two misses, so a miss must not stop the batch at the first one.
         $results = $client->fetchAll(['https://a', 'https://b', 'https://c'], self::TOKEN);
-        self::assertSame('old', $results['https://a']->body());
+        self::assertSame('["old"]', $results['https://a']->body());
         self::assertTrue($results['https://b']->isFailure());
         self::assertSame('offline and not cached: https://b', $results['https://b']->error(), 'the message names the URL that was not cached');
         self::assertTrue($results['https://c']->isFailure());
@@ -133,9 +134,69 @@ final class CachingHttpClientTest extends TestCase
         $calls = 0;
         $clock = Clock::fixed('2026-09-14T00:00:00+00:00');
         $cache = new ArrayCache();
-        $cache->set('https://a', new HttpResult('https://a', 200, 'old', $clock->now()->modify('-3 days')));
+        $cache->set('https://a', new HttpResult('https://a', 200, '["old"]', $clock->now()->modify('-3 days')));
         $client = new CachingHttpClient($this->inner(['https://a' => HttpResult::failure('https://a', 'timeout', $clock->now())], $calls), $cache, self::TTL, $clock);
-        self::assertSame('old', $client->fetchAll(['https://a'], self::TOKEN)['https://a']->body());
+        self::assertSame('["old"]', $client->fetchAll(['https://a'], self::TOKEN)['https://a']->body());
+    }
+
+    /**
+     * @return iterable<string, array{HttpResult}>
+     */
+    public static function notAnswers(): iterable
+    {
+        $now = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
+
+        yield 'a login page with 200' => [new HttpResult('https://a', 200, '<html>sign in</html>', $now)];
+        yield 'a redirect left after the redirect cap' => [new HttpResult('https://a', 302, '', $now)];
+        yield 'a 200 JSON scalar' => [new HttpResult('https://a', 200, '"x"', $now)];
+    }
+
+    /**
+     * @dataProvider notAnswers
+     */
+    #[DataProvider('notAnswers')]
+    public function testAnAnswerThatIsNotJsonIsNotStoredAndKeepsTheOlderAnswer(HttpResult $refetched): void
+    {
+        $calls = 0;
+        $clock = Clock::fixed('2026-09-14T00:00:00+00:00');
+        $cache = new ArrayCache();
+        $cache->set('https://a', new HttpResult('https://a', 200, '{"old":true}', $clock->now()->modify('-3 days')));
+        $client = new CachingHttpClient($this->inner(['https://a' => $refetched], $calls), $cache, self::TTL, $clock);
+
+        $result = $client->fetchAll(['https://a'], self::TOKEN)['https://a'];
+
+        self::assertSame('{"old":true}', $result->body());
+        self::assertTrue($result->fromCache());
+        self::assertSame('{"old":true}', ($cache->get('https://a') ?? self::fail('the older answer stays'))->body());
+    }
+
+    /**
+     * @dataProvider notAnswers
+     */
+    #[DataProvider('notAnswers')]
+    public function testAnAnswerThatIsNotJsonWithNoOlderAnswerIsReturnedButNotStored(HttpResult $fetched): void
+    {
+        $calls = 0;
+        $clock = Clock::fixed('2026-09-14T00:00:00+00:00');
+        $cache = new ArrayCache();
+        $client = new CachingHttpClient($this->inner(['https://a' => $fetched], $calls), $cache, self::TTL, $clock);
+
+        self::assertSame($fetched->status(), $client->fetchAll(['https://a'], self::TOKEN)['https://a']->status());
+        self::assertNull($cache->get('https://a'));
+    }
+
+    public function testAFailedRefetchDoesNotReplayAnExpiredNotFound(): void
+    {
+        $calls = 0;
+        $clock = Clock::fixed('2026-09-14T00:00:00+00:00');
+        $cache = new ArrayCache();
+        $cache->set('https://a', new HttpResult('https://a', 404, '', $clock->now()->modify('-3 days')));
+        $client = new CachingHttpClient($this->inner(['https://a' => HttpResult::failure('https://a', 'install-time budget spent', $clock->now())], $calls), $cache, self::TTL, $clock);
+
+        $result = $client->fetchAll(['https://a'], self::TOKEN)['https://a'];
+
+        self::assertTrue($result->isFailure());
+        self::assertSame('install-time budget spent', $result->error());
     }
 
     public function testHeadersAreForwardedToInnerClient(): void
@@ -156,7 +217,7 @@ final class CachingHttpClientTest extends TestCase
                 $this->seenHeaders = $headers;
                 $out = [];
                 foreach ($urls as $url) {
-                    $out[$url] = new HttpResult($url, 200, 'ok', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'));
+                    $out[$url] = new HttpResult($url, 200, '["ok"]', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'));
                 }
                 return $out;
             }
@@ -227,14 +288,14 @@ final class CachingHttpClientTest extends TestCase
         $calls = 0;
         $clock = Clock::fixed('2026-09-14T00:00:00+00:00');
         $cache = new ArrayCache();
-        $cache->set('https://a', new HttpResult('https://a', 200, 'with token', $clock->now()->modify('-3 days')));
+        $cache->set('https://a', new HttpResult('https://a', 200, '["with token"]', $clock->now()->modify('-3 days')));
 
         $online = new CachingHttpClient($this->inner(['https://a' => HttpResult::failure('https://a', 'timeout', $clock->now())], $calls), $cache, self::TTL, $clock);
         self::assertSame('timeout', $online->fetchAll(['https://a'])['https://a']->error(), 'no fallback to the answer of a request with a token');
 
         $offline = new CachingHttpClient($this->inner([], $calls), $cache, self::TTL, $clock, true);
         self::assertSame('offline and not cached: https://a', $offline->fetchAll(['https://a'])['https://a']->error());
-        self::assertSame('with token', $offline->fetchAll(['https://a'], self::TOKEN)['https://a']->body());
+        self::assertSame('["with token"]', $offline->fetchAll(['https://a'], self::TOKEN)['https://a']->body());
     }
 
     /** A cache that stores no URL, such as Composer's, returns its key as the URL of an answer. */
@@ -256,13 +317,13 @@ final class CachingHttpClientTest extends TestCase
                 $this->envelopes[$key] = $result->toEnvelope();
             }
         };
-        $client = new CachingHttpClient($this->inner(['https://a' => new HttpResult('https://a', 200, 'not json', $clock->now())], $calls), $cache, self::TTL, $clock);
+        $client = new CachingHttpClient($this->inner(['https://a' => new HttpResult('https://a', 200, '["json"]', $clock->now())], $calls), $cache, self::TTL, $clock);
         $client->fetchAll(['https://a']);
         $cached = $client->fetchAll(['https://a'])['https://a'];
 
         self::assertTrue($cached->fromCache());
         self::assertSame('https://a', $cached->url());
-        self::assertSame('not json', $cached->body());
+        self::assertSame('["json"]', $cached->body());
         self::assertSame(1, $calls);
     }
 }

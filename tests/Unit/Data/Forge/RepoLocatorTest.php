@@ -36,6 +36,7 @@ final class RepoLocatorTest extends TestCase
         yield 'github ssh://' => ['ssh://git@github.com/o/r.git', [RepoRef::GITHUB, 'github.com', 'o/r']];
         yield 'github scp with a slash' => ['git@github.com/o/r.git', [RepoRef::GITHUB, 'github.com', 'o/r']];
         yield 'bare host and path is not a clone url' => ['github.com/o/r.git', null];
+        yield 'github slash form with a scheme-less token' => ['ghp_SECRET:x-oauth-basic@github.com/o/r', [RepoRef::GITHUB, 'github.com', 'o/r']];
         yield 'github owner with dot' => ['https://github.com/owner.name/repo', [RepoRef::GITHUB, 'github.com', 'owner.name/repo']];
         yield 'github trailing slash' => ['https://github.com/o/r/', [RepoRef::GITHUB, 'github.com', 'o/r']];
         yield 'github uppercase host' => ['https://GitHub.com/o/r.git', [RepoRef::GITHUB, 'github.com', 'o/r']];
@@ -182,6 +183,8 @@ final class RepoLocatorTest extends TestCase
         yield 'a Gitea host with a port' => ['https://gitea.example.com:3000/o/r.git', $unsupported, 'gitea.example.com:3000', null, null];
         yield 'the scp form' => ['git@codeberg.org:o/r.git', $unsupported, 'codeberg.org', null, null];
         yield 'userinfo dropped' => ['https://user:secret@Codeberg.org/o/r.git', $unsupported, 'codeberg.org', null, null];
+        yield 'scheme-less userinfo with a token dropped' => ['ghp_SECRET:x-oauth-basic@Codeberg.org/o/r', $unsupported, 'codeberg.org', null, null];
+        yield 'scheme-less userinfo before an scp path dropped' => ['token:x@codeberg.org:o/r.git', $unsupported, 'codeberg.org', null, null];
         yield 'the gitlab-domains host without its port' => ['https://gitlab.example.com/gitlab/g/p.git', $unsupported, 'gitlab.example.com', null, null];
         yield 'a github-domains host' => ['https://ghe.example.com/o/r.git', $unsupported, 'ghe.example.com', null, 'github-domains'];
         yield 'github.com/owner' => ['https://github.com/owner', $none, 'github.com', null, null];

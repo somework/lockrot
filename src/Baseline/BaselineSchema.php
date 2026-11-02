@@ -44,8 +44,9 @@ final class BaselineSchema
 
     /**
      * `json_decode(..., true)` turns `{}` into `[]`, and an advisory map keyed `"0"`, `"1"` into a
-     * list. So an empty `findings` and every non-empty `advisories` map become objects again. Every
-     * other value stays as read, so a real JSON array is rejected.
+     * list. So an empty `findings`, an empty `flags` or `advisories` and every list-shaped
+     * `advisories` become objects again. A hand-emptied map then fails the schema's
+     * one-item rule, not its type. Every other value stays as read, so a real JSON array is rejected.
      *
      * Do not replace {@see SchemaPayload} with the library's JSON round trip. That round trip
      * validates a key that starts with a NUL byte as an empty object, and throws on a number too
@@ -60,9 +61,16 @@ final class BaselineSchema
             $baseline['findings'] = new \stdClass();
         } elseif (\is_array($findings)) {
             foreach ($findings as $package => $entry) {
-                $advisories = \is_array($entry) ? ($entry['advisories'] ?? null) : null;
-                if (\is_array($advisories) && $advisories !== [] && JsonReader::isList($advisories)) {
-                    $entry['advisories'] = SchemaPayload::of($advisories, 'baseline file');
+                if (\is_array($entry)) {
+                    if (($entry['flags'] ?? null) === []) {
+                        $entry['flags'] = new \stdClass();
+                    }
+                    $advisories = $entry['advisories'] ?? null;
+                    if ($advisories === []) {
+                        $entry['advisories'] = new \stdClass();
+                    } elseif (\is_array($advisories) && JsonReader::isList($advisories)) {
+                        $entry['advisories'] = SchemaPayload::of($advisories, 'baseline file');
+                    }
                     $findings[$package] = $entry;
                 }
             }

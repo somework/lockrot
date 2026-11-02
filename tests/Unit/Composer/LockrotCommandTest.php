@@ -962,6 +962,36 @@ final class LockrotCommandTest extends TestCase
         }
     }
 
+    /** @return iterable<string, array{string}> */
+    public static function unparsableLocks(): iterable
+    {
+        yield 'a lock cut in half' => ['{"packages": [{"name": "phpzip/phpzip", "vers'];
+        yield 'an empty lock' => [''];
+        yield 'a lock with merge-conflict markers' => ["{\n<<<<<<< HEAD\n    \"content-hash\": \"a\"\n=======\n    \"content-hash\": \"b\"\n>>>>>>> topic\n}\n"];
+    }
+
+    /**
+     * Composer reads the lock while it builds its instance, before execute() runs. A failure there
+     * is "lockrot could not run" (docs/ci.md#exit-codes), never the exit 1 of a failed gate.
+     *
+     * @dataProvider unparsableLocks
+     */
+    #[DataProvider('unparsableLocks')]
+    public function testAnUnparsableLockNextToAComposerJsonIsExit2(string $lock): void
+    {
+        $dir = $this->tempDir('lockrot-badlock-');
+        file_put_contents($dir.'/composer.json', '{}');
+        file_put_contents($dir.'/composer.lock', $lock);
+        chdir($dir);
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json']);
+
+        self::assertSame(2, $code, $stderr);
+        self::assertSame('', $stdout);
+        self::assertStringContainsString('lockrot', $stderr);
+        self::assertStringContainsString('composer.lock', $stderr);
+    }
+
     public function testInvalidLockrotSchemaIsExit2(): void
     {
         $dir = sys_get_temp_dir().'/lockrot-badschema-'.bin2hex(random_bytes(8));
@@ -1671,13 +1701,13 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * Symfony's Command::run() calls initialize() with no try/catch, so a plugin's PRE_COMMAND_RUN
-     * listener that throws inside BaseCommand::initialize() must still leave COMPOSER_DISABLE_NETWORK
-     * and COMPOSER_ROOT_VERSION as initialize() found them, although execute() and its finally never
-     * run. The Composer instance built ahead of time via Application::getComposer() makes
-     * tryComposer() return it, which is what dispatches PRE_COMMAND_RUN at all.
+     * A plugin's PRE_COMMAND_RUN listener that throws inside BaseCommand::initialize() is a failure
+     * before the bootstrap: exit 2 (docs/ci.md#exit-codes). The run must still leave
+     * COMPOSER_DISABLE_NETWORK and COMPOSER_ROOT_VERSION as initialize() found them. The Composer
+     * instance built ahead of time via Application::getComposer() makes tryComposer() return it,
+     * which is what dispatches PRE_COMMAND_RUN at all.
      */
-    public function testInitializeRestoresTheEnvironmentWhenAPreCommandRunListenerThrows(): void
+    public function testAPreCommandRunListenerThatThrowsIsExit2AndRestoresTheEnvironment(): void
     {
         $server = self::$server;
         self::assertNotNull($server);
@@ -1714,15 +1744,12 @@ final class LockrotCommandTest extends TestCase
             Platform::clearEnv('COMPOSER_ROOT_VERSION');
             try {
                 $input = new ArrayInput(['--offline' => true, '--format' => 'json'], $command->getDefinition());
-                $thrown = null;
-                try {
-                    $command->run($input, new BufferedOutput());
-                } catch (\RuntimeException $e) {
-                    $thrown = $e;
-                }
+                $output = new SplitStreamOutput();
 
-                self::assertNotNull($thrown, 'a PRE_COMMAND_RUN listener throwing must propagate out of Command::run(), not be swallowed');
-                self::assertSame('a plugin listener blew up during initialize()', $thrown->getMessage());
+                $code = $command->run($input, $output);
+
+                self::assertSame(2, $code);
+                self::assertSame('', $output->fetch());
                 self::assertFalse(Platform::getEnv('COMPOSER_DISABLE_NETWORK'), 'the environment must be restored even though execute() never ran');
                 self::assertFalse(Platform::getEnv('COMPOSER_ROOT_VERSION'), 'the environment must be restored even though execute() never ran');
             } finally {

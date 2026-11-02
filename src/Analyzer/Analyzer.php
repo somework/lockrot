@@ -603,7 +603,7 @@ final class Analyzer
             $this->dataDate($meta, $activity),
             $note,
             $package->isDev(),
-            array_keys($graph->chainsTo($package->name())),
+            $graph->rootsReaching($package->name()),
             Libyears::measure($package, $meta, $facts->metadataStatus()),
             $package->origin(),
             AbandonedRule::replacementNamedBy($facts)

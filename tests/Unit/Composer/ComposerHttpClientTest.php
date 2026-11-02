@@ -11,10 +11,12 @@ use Composer\IO\IOInterface;
 use Composer\IO\NullIO;
 use Composer\Util\Http\Response;
 use Composer\Util\HttpDownloader;
+use Composer\Util\Platform;
 use Lockrot\Clock;
 use Lockrot\Composer\ComposerHttpClient;
 use Lockrot\Data\Http\HttpResult;
 use Lockrot\Deadline;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use React\Promise\Deferred;
 
@@ -246,14 +248,14 @@ final class ComposerHttpClientTest extends TestCase
      *
      * @return array{0: ComposerHttpClient, 1: ScriptedDownloader}
      */
-    private static function clientWith(array $script, ?Deadline $deadline = null): array
+    private static function clientWith(array $script, ?Deadline $deadline = null, ?int $maxParallel = null): array
     {
         $io = new NullIO();
         $config = new Config(false, sys_get_temp_dir());
         $downloader = new ScriptedDownloader($io, $config, $script);
 
         // The scripted downloader stops a redirect on any Composer, so a request with a token goes through it.
-        return [new ComposerHttpClient($downloader, $io, $config, Clock::fixed(self::NOW), $deadline, true), $downloader];
+        return [new ComposerHttpClient($downloader, $io, $config, Clock::fixed(self::NOW), $deadline, true, $maxParallel), $downloader];
     }
 
     /**
@@ -491,6 +493,151 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame([], $downloader->started, 'no request starts after the budget');
     }
 
+    /**
+     * Composer's downloader starts a queued request with the options of add(), so lockrot adds no
+     * request above the parallel limit and reads each timeout when a slot frees.
+     */
+    public function testARequestAboveTheParallelLimitStartsWithTheTimeLeftWhenASlotFrees(): void
+    {
+        $urls = ['https://a.example.com/1', 'https://a.example.com/2', 'https://a.example.com/3'];
+        $held = new \stdClass();
+        $now = static function () use ($held): float {
+            return ($held->downloader ?? null) instanceof ScriptedDownloader ? 3.0 * \count($held->downloader->started) : 0.0;
+        };
+        $io = new NullIO();
+        $config = new Config(false, sys_get_temp_dir());
+        $downloader = new ScriptedDownloader($io, $config, array_fill_keys($urls, [200, 'body']));
+        $held->downloader = $downloader;
+        $client = new ComposerHttpClient($downloader, $io, $config, Clock::fixed(self::NOW), Deadline::inSeconds(10.0, $now), true, 2);
+
+        $results = $client->fetchAll($urls);
+
+        $timeouts = [];
+        foreach ($downloader->requests as $request) {
+            $http = $request['options']['http'];
+            self::assertIsArray($http);
+            $timeouts[$request['url']] = $http['timeout'];
+        }
+        self::assertSame(['https://a.example.com/1' => 10, 'https://a.example.com/2' => 10, 'https://a.example.com/3' => 7], $timeouts, '3s gone when the first answer frees a slot');
+        self::assertSame(2, $downloader->mostInFlight);
+        self::assertSame(['body', 'body', 'body'], array_values(array_map(static fn (HttpResult $result): ?string => $result->body(), $results)));
+    }
+
+    public function testWithOneSlotAFailedRequestFreesItForTheNext(): void
+    {
+        [$client] = self::clientWith([
+            'https://a.example.com/1' => new TransportException('connection refused'),
+            'https://a.example.com/2' => [200, 'b'],
+        ], null, 1);
+
+        $results = $client->fetchAll(['https://a.example.com/1', 'https://a.example.com/2']);
+
+        self::assertSame([200, 'b', null], self::summarize($results)['https://a.example.com/2']);
+    }
+
+    public function testWithOneSlotEachRequestAfterTheBudgetReadsBudgetSpent(): void
+    {
+        $urls = ['https://a.example.com/1', 'https://a.example.com/2'];
+        [$client, $downloader] = self::clientWith(array_fill_keys($urls, [200, 'body']), Deadline::inSeconds(0.0, static fn (): float => 0.0), 1);
+
+        $results = $client->fetchAll($urls);
+
+        self::assertSame(array_fill_keys($urls, [0, null, 'install-time budget spent']), self::summarize($results));
+        self::assertSame([], $downloader->requests);
+    }
+
+    public function testWithOneSlotEachRedirectToAUrlWithoutAnHttpHostFails(): void
+    {
+        $first = 'https://api.github.com/repos/vendor/one';
+        $second = 'https://api.github.com/repos/vendor/two';
+        [$client] = self::clientWith([$first => 'file:///etc/passwd', $second => 'ftp://objects.example.com/two'], null, 1);
+
+        $results = $client->fetchAll([$first, $second], self::HEADERS);
+
+        $failure = [0, null, 'redirect to a URL that is not http or https with a host'];
+        self::assertSame([$first => $failure, $second => $failure], self::summarize($results));
+    }
+
+    /** A request that carries credentials blocks in add() without curl's redirect guard, so it must free its slot itself. */
+    public function testWithOneSlotARequestThatHoldsItsCredentialsFreesTheSlot(): void
+    {
+        $urls = ['https://api.github.com/repos/vendor/one', 'https://api.github.com/repos/vendor/two'];
+        $held = new \stdClass();
+        $now = static function () use ($held): float {
+            return ($held->downloader ?? null) instanceof ScriptedDownloader && $held->downloader->holding >= 1 ? 6.0 : 0.0;
+        };
+        $io = new NullIO();
+        $config = new Config(false, sys_get_temp_dir());
+        $downloader = new ScriptedDownloader($io, $config, []);
+        $held->downloader = $downloader;
+        $client = new ComposerHttpClient($downloader, $io, $config, Clock::fixed(self::NOW), Deadline::inSeconds(5.0, $now), false, 1);
+
+        $results = $client->fetchAll($urls, self::HEADERS);
+
+        self::assertSame(1, $downloader->holding, 'the budget ends inside the first request');
+        self::assertSame(array_fill_keys($urls, [0, null, 'install-time budget spent']), self::summarize($results));
+    }
+
+    public function testAFetchAfterOneThatThrewStartsItsRequests(): void
+    {
+        [$client] = self::clientWith(['https://a.example.com/1' => [200, 'a']]);
+        try {
+            $client->fetchAll(['']);
+            self::fail('the scripted downloader refuses an empty URL');
+        } catch (\InvalidArgumentException $e) {
+        }
+
+        $results = $client->fetchAll(['https://a.example.com/1']);
+
+        self::assertSame(['https://a.example.com/1' => [200, 'a', null]], self::summarize($results));
+    }
+
+    /** Without curl, or with Composer's network off, a request ends inside add(). Its end must not start the next request one call deeper. */
+    public function testARequestThatEndsInsideAddDoesNotStartTheNextOneDeeper(): void
+    {
+        $urls = array_map(static fn (int $i): string => 'https://a.example.com/'.$i, range(1, 30));
+        [$client, $downloader] = self::clientWith(array_fill_keys($urls, [200, 'body']), null, 2);
+        $downloader->answersInAdd = true;
+
+        $results = $client->fetchAll($urls);
+
+        self::assertCount(30, $downloader->depths);
+        self::assertCount(1, array_unique($downloader->depths));
+        self::assertSame(array_fill_keys($urls, 'body'), array_map(static fn (HttpResult $result): ?string => $result->body(), $results));
+    }
+
+    /** @return iterable<string, array{?string, int}> */
+    public static function parallelLimits(): iterable
+    {
+        yield 'Composer\'s default' => [null, 12];
+        yield 'COMPOSER_MAX_PARALLEL_HTTP' => ['3', 3];
+        yield 'below one' => ['0', 1];
+        yield 'above Composer\'s cap' => ['99', 50];
+        yield 'not a number' => ['many', 12];
+    }
+
+    /**
+     * @dataProvider parallelLimits
+     */
+    #[DataProvider('parallelLimits')]
+    public function testTheParallelLimitIsTheOneOfComposersDownloader(?string $variable, int $limit): void
+    {
+        // Composer reads $_SERVER and $_ENV before getenv(), so a value that CI exports must not win.
+        $before = Platform::getEnv('COMPOSER_MAX_PARALLEL_HTTP');
+        $variable === null ? Platform::clearEnv('COMPOSER_MAX_PARALLEL_HTTP') : Platform::putEnv('COMPOSER_MAX_PARALLEL_HTTP', $variable);
+        try {
+            $urls = array_map(static fn (int $i): string => 'https://a.example.com/'.$i, range(1, 60));
+            [$client, $downloader] = self::clientWith(array_fill_keys($urls, [200, 'body']));
+
+            $client->fetchAll($urls);
+        } finally {
+            $before === false ? Platform::clearEnv('COMPOSER_MAX_PARALLEL_HTTP') : Platform::putEnv('COMPOSER_MAX_PARALLEL_HTTP', $before);
+        }
+
+        self::assertSame($limit, $downloader->mostInFlight);
+        self::assertCount(60, $downloader->started);
+    }
+
     public function testAQueuedRedirectTargetDoesNotStartAfterTheBudgetEnds(): void
     {
         $url = 'https://api.github.com/repos/vendor/name';
@@ -508,7 +655,7 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame([$url], $downloader->started, 'the target does not start after the budget');
     }
 
-    /** The deadline is past for the first redirect, so it is past for each one after it. */
+    /** The deadline is past for the first redirect, so it is past for each one after it. With one slot, each stop frees it. */
     public function testEachRedirectTargetAfterTheBudgetReadsBudgetSpent(): void
     {
         $first = 'https://api.github.com/repos/vendor/one';
@@ -520,7 +667,7 @@ final class ComposerHttpClientTest extends TestCase
         [$client, $downloader] = self::clientWith([
             $first => 'https://objects.example.com/one',
             $second => 'https://objects.example.com/two',
-        ], Deadline::inSeconds(5.0, $now));
+        ], Deadline::inSeconds(5.0, $now), 1);
         $held->downloader = $downloader;
 
         $results = $client->fetchAll([$first, $second], self::HEADERS);
@@ -613,10 +760,18 @@ final class ScriptedDownloader extends HttpDownloader
     /** @var list<string> the requests that started in wait(), in order */
     public array $started = [];
     public int $waits = 0;
+    /** the most requests that were added and not yet answered at one time */
+    public int $mostInFlight = 0;
     /** the wait() calls that returned */
     public int $settled = 0;
     /** the times that it asked `prevent_url_access_callable` */
     public int $asked = 0;
+    /** the times that a request read its options to block until it ends */
+    public int $holding = 0;
+    /** answer a request inside add(), as Composer does without curl */
+    public bool $answersInAdd = false;
+    /** @var list<int> the call stack depth of each add() */
+    public array $depths = [];
 
     /** @var array<string, array{0: int, 1: string}|\Throwable|string> */
     private array $script;
@@ -645,11 +800,25 @@ final class ScriptedDownloader extends HttpDownloader
         }
         $options = \is_array($options) ? $options : [];
         $this->requests[] = ['url' => $url, 'options' => $options];
+        $this->depths[] = \count(debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS));
         /** @var Deferred<Response> $deferred */
         $deferred = new Deferred();
+        $promise = $deferred->promise();
+        if ($this->answersInAdd && $this->answers($url, $deferred, $options)) {
+            return $promise;
+        }
         $this->pending[] = [$url, $deferred, $options];
+        $this->mostInFlight = max($this->mostInFlight, \count($this->pending));
 
-        return $deferred->promise();
+        return $promise;
+    }
+
+    /** @return array<mixed> */
+    public function getOptions(): array
+    {
+        ++$this->holding;
+
+        return parent::getOptions();
     }
 
     /**
@@ -661,34 +830,54 @@ final class ScriptedDownloader extends HttpDownloader
     public function wait($index = null): void
     {
         ++$this->waits;
-        $pending = $this->pending;
-        $this->pending = [];
-        foreach ($pending as [$url, $deferred, $options]) {
-            $refuse = $options['prevent_url_access_callable'] ?? null;
-            if ($this->refuses($refuse, $url)) {
-                $deferred->reject(new TransportException('Access to "'.$url.'" is blocked.'));
-
-                continue;
-            }
-            $this->started[] = $url;
-            $answer = $this->script[$url] ?? null;
-            if (\is_string($answer)) {
-                if ($this->refuses($refuse, $answer)) {
-                    $deferred->reject(new TransportException('Access to "'.$answer.'" is blocked.'));
-
-                    continue;
-                }
-                $http = $options['http'] ?? [];
-                $this->followed[] = ['url' => $answer, 'header' => \is_array($http) ? ($http['header'] ?? null) : null];
-                $answer = $this->script[$answer] ?? null;
-            }
-            if ($answer instanceof \Throwable) {
-                $deferred->reject($answer);
-            } elseif (\is_array($answer)) {
-                $deferred->resolve(new Response(['url' => $url], $answer[0], [], $answer[1]));
+        $unanswered = [];
+        // As the real downloader, it also runs the requests that an answer's callback adds.
+        while ($this->pending !== []) {
+            $request = array_shift($this->pending);
+            if (!$this->answers($request[0], $request[1], $request[2])) {
+                $unanswered[] = $request;
             }
         }
+        $this->pending = $unanswered;
         ++$this->settled;
+    }
+
+    /**
+     * @param non-empty-string     $url
+     * @param Deferred<Response>   $deferred
+     * @param array<string, mixed> $options
+     *
+     * @return bool false when the script leaves the request without an answer
+     */
+    private function answers(string $url, Deferred $deferred, array $options): bool
+    {
+        $refuse = $options['prevent_url_access_callable'] ?? null;
+        if ($this->refuses($refuse, $url)) {
+            $deferred->reject(new TransportException('Access to "'.$url.'" is blocked.'));
+
+            return true;
+        }
+        $this->started[] = $url;
+        $answer = $this->script[$url] ?? null;
+        if (\is_string($answer)) {
+            if ($this->refuses($refuse, $answer)) {
+                $deferred->reject(new TransportException('Access to "'.$answer.'" is blocked.'));
+
+                return true;
+            }
+            $http = $options['http'] ?? [];
+            $this->followed[] = ['url' => $answer, 'header' => \is_array($http) ? ($http['header'] ?? null) : null];
+            $answer = $this->script[$answer] ?? null;
+        }
+        if ($answer instanceof \Throwable) {
+            $deferred->reject($answer);
+        } elseif (\is_array($answer)) {
+            $deferred->resolve(new Response(['url' => $url], $answer[0], [], $answer[1]));
+        } else {
+            return false;
+        }
+
+        return true;
     }
 
     /** @param mixed $refuse the request's `prevent_url_access_callable`, if any */

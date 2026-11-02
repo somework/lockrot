@@ -38,6 +38,23 @@ final class SourceEntryGuardTest extends TestCase
         self::assertSame('lockrot cannot run safely on a non-CLI SAPI with register_argc_argv=On. Aborting.'.\PHP_EOL, $process->getOutput());
     }
 
+    /** Most projects that install lockrot as a plugin do not require composer/composer. */
+    public function testTheSourceScriptInAProjectWithoutComposerNamesTheWaysToRunLockrot(): void
+    {
+        mkdir($this->dir.'/vendor/somework/lockrot/bin', 0777, true);
+        copy(\dirname(__DIR__, 2).'/bin/lockrot', $this->dir.'/vendor/somework/lockrot/bin/lockrot');
+        file_put_contents($this->dir.'/vendor/autoload.php', "<?php\n");
+
+        $process = new Process([\PHP_BINARY, $this->dir.'/vendor/somework/lockrot/bin/lockrot', '--version']);
+        $process->setTimeout(60)->run();
+
+        self::assertSame(2, $process->getExitCode(), $process->getErrorOutput());
+        self::assertSame('', $process->getOutput());
+        foreach (['composer/composer', 'composer lockrot', 'https://lockrot.dev/phar/'] as $way) {
+            self::assertStringContainsString($way, $process->getErrorOutput());
+        }
+    }
+
     /**
      * A host project installs lockrot beside its own composer/composer. The stub autoloader of the
      * host writes a line for each lockrot class that loads, so the exact stderr also proves that none
