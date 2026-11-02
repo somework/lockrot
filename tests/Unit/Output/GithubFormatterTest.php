@@ -100,7 +100,10 @@ final class GithubFormatterTest extends TestCase
         self::assertStringNotContainsString('a/r4', $out);
     }
 
-    /** The Actions log renders ANSI sequences, so a control character from the lock prints as an escape. */
+    /**
+     * The Actions log renders ANSI sequences, so a control character from the lock prints as an
+     * escape. A line feed too: it would start a forged line inside the annotation.
+     */
     public function testControlCharactersFromOutsidePrintAsEscapes(): void
     {
         $at = new \DateTimeImmutable(self::AT);
@@ -112,7 +115,8 @@ final class GithubFormatterTest extends TestCase
         $out = $this->formatter('none', null)->format($report);
 
         self::assertSame(0, preg_match('/[\x00-\x09\x0B-\x1F\x7F]|\xC2[\x80-\x9F]/', $out), 'no control character but the line feed');
-        self::assertStringContainsString('vendor/evil\x1B]52;c;cHduZWQ=\x07\x1B[2J\u{009B}31m%0Atail', $out);
+        self::assertStringContainsString('vendor/evil\x1B]52;c;cHduZWQ=\x07\x1B[2J\u{009B}31m\ntail', $out);
+        self::assertStringNotContainsString('%0A', $out);
     }
 
     private function formatter(string $failOn, ?string $lockPath): GithubFormatter
@@ -191,8 +195,8 @@ final class GithubFormatterTest extends TestCase
 
         $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report)));
 
-        self::assertStringStartsWith('::warning file=composer.lock,title=lockrot%3A critical — abandoned::acme/x%25y%0Az 1.0.0: 32 = abandoned 32.', $lines[0]);
-        self::assertSame('::notice title=lockrot::note with 100%25 and a comma, and a colon: here%0Aand a second line', $lines[1]);
+        self::assertStringStartsWith('::warning file=composer.lock,title=lockrot%3A critical — abandoned::acme/x%25y\nz 1.0.0: 32 = abandoned 32.', $lines[0]);
+        self::assertSame('::notice title=lockrot::note with 100%25 and a comma, and a colon: here\nand a second line', $lines[1]);
     }
 
     public function testAnAllowlistEntryThatAcceptsEveryFlagIsCarriedInTheMessage(): void

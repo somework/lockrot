@@ -298,9 +298,9 @@ mark.
   `unchecked` is a failing value and a finding fails it on an advisory gap. Otherwise it is
   `warning` (`minor`). Its message names each advisory repository that failed or that lockrot did
   not ask, with the reason.
-- **Text from the lock or a repository** in a `sarif` or `gitlab` message prints a control
-  character, a bidi control or another character that prints as nothing as an escape, such as
-  `\x1B`.
+- **Text from the lock or a repository** in a `github`, `sarif` or `gitlab` message prints a
+  control character, a line feed, a bidi control or another character that prints as nothing as an
+  escape, such as `\x1B` or `\n`.
 - **A finding with S10 and nothing counted** (score 0, whatever its verdict) gets its own
   `lockrot/unchecked` record when `unchecked` is active. `sarif` and `gitlab` also write it under
   `--all`.

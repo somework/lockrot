@@ -85,7 +85,7 @@ final class TerminalText
     }
 
     /** {@see self::neutralise()} for each line, with the line feeds between the lines kept. */
-    public static function neutraliseLines(string $text): string
+    private static function neutraliseLines(string $text): string
     {
         return implode("\n", array_map([self::class, 'neutralise'], explode("\n", $text)));
     }

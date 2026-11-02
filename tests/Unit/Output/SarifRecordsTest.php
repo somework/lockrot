@@ -67,7 +67,16 @@ final class SarifRecordsTest extends TestCase
     {
         $rule = SarifRecords::rule("lockrot/advisory/PKSA-x\x1B[31mRED\u{202E}", 'high', new Thresholds());
 
-        self::assertSame('Security advisory PKSA-x\\x1B[31mRED\\u{202E} affects the installed version', $rule['shortDescription']['text']);
+        self::assertSame('Security advisory PKSA-x\\x1B[31mRED\\u{{202E}} affects the installed version', $rule['shortDescription']['text']);
+    }
+
+    /** A rule text doubles each brace of a repository's advisory id, as a result message does (SARIF 2.1.0 §3.11.5). */
+    public function testABraceInAnAdvisoryIdIsDoubledInItsRule(): void
+    {
+        $rule = SarifRecords::rule('lockrot/advisory/PKSA-{0}}{', 'high', new Thresholds());
+
+        self::assertSame('Security advisory PKSA-{{0}}}}{{ affects the installed version', $rule['shortDescription']['text']);
+        self::assertSame('lockrot/advisory/PKSA-{0}}{', $rule['id']);
     }
 
     public function testTheAdvisoriesAreKnownOnlyWhenNoneIsNewReRatedOrWithALostFix(): void

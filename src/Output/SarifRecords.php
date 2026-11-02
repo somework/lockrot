@@ -146,7 +146,7 @@ final class SarifRecords
             return [
                 'id' => $ruleId,
                 'name' => $name,
-                'shortDescription' => ['text' => self::noLink(TerminalText::neutralise('Security advisory '.substr($name, \strlen('advisory/')).' affects the installed version'))],
+                'shortDescription' => self::message('Security advisory '.substr($name, \strlen('advisory/')).' affects the installed version'),
                 'fullDescription' => ['text' => 'A counted security advisory affects the installed version: '.$bucket->bucket().' severity.'],
                 'defaultConfiguration' => ['level' => FormatContext::LEVEL_WARNING],
                 'helpUri' => self::HELP_URI.'#security-advisories',
