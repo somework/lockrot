@@ -1362,6 +1362,13 @@
                         "S3",
                         "S4"
                     ]
+                },
+                {
+                    "check": "release_dates",
+                    "reason": "undated_releases",
+                    "blocks": [
+                        "S5"
+                    ]
                 }
             ],
             "unchecked_accepted": [],

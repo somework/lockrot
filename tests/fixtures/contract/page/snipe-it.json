@@ -4379,7 +4379,9 @@
                             "target": true
                         },
                         "newest_years": 0.6,
-                        "reachable_years": 0.6
+                        "reachable_years": 0.6,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -6122,7 +6124,9 @@
                             "target": true
                         },
                         "newest_years": 0.5,
-                        "reachable_years": 0.5
+                        "reachable_years": 0.5,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -6429,7 +6433,9 @@
                         "reachable_php": null,
                         "reachable_admits": null,
                         "newest_years": 0.8,
-                        "reachable_years": null
+                        "reachable_years": null,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": null
                     }
                 }
             ],
@@ -6740,7 +6746,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -8700,7 +8708,9 @@
                             "target": true
                         },
                         "newest_years": 0.4,
-                        "reachable_years": 0.4
+                        "reachable_years": 0.4,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -27655,6 +27665,13 @@
                     "blocks": [
                         "S3",
                         "S4"
+                    ]
+                },
+                {
+                    "check": "release_dates",
+                    "reason": "undated_releases",
+                    "blocks": [
+                        "S2"
                     ]
                 }
             ],

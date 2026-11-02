@@ -3682,6 +3682,109 @@
             "text": "require a tag \u2014 the newest is 1.6.2 (2019-01-23); 1.x needs php >=5.5, which require.php allows; it was released before your target PHP's major, so old-promise would count; stale stays"
         }
     },
+    "S10-lock-undated\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "vulnerable",
+            "merged": [
+                "left-behind"
+            ],
+            "fix_kind": "upgrade",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "5.x",
+            "version": "v5.4.52",
+            "newest": "v5.4.52",
+            "constraint": "^5.4.52",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2.5",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "target": null,
+                    "constraint": "^2.6",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-4wjj-gy1p-ft3r",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "symfony/monolog-bridge:^5.4.52"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "symfony/monolog-bridge",
+                    "v5.4.52",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "v2.8.52",
+            "held_by": [],
+            "if_applied": null,
+            "check": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "S10-tag-undated\u2021": {
+        "next_step": null
+    },
     "S5-parent-after-ga\u2021": {
         "next_step": {
             "kind": "require",
@@ -3766,6 +3869,111 @@
             "through": [],
             "also": [],
             "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "v2.8.52",
+            "held_by": [],
+            "if_applied": null,
+            "check": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "S5-star\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "left-behind",
+            "merged": [
+                "vulnerable"
+            ],
+            "fix_kind": "upgrade",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "5.x",
+            "version": "v5.4.52",
+            "newest": "v5.4.52",
+            "constraint": "^5.4.52",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2.5",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "target": null,
+                    "constraint": "^2.6",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-4wjj-gy1p-ft3r",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "symfony/monolog-bridge:^5.4.52"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "symfony/monolog-bridge",
+                    "v5.4.52",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "upgrade",
         "installed_branch_fixes": {
@@ -6158,6 +6366,78 @@
             "through": [],
             "also": [],
             "text": "raise require.php to >=8.2, then require a tag \u2014 the newest is 4.17.0 (2025-11-01); 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise)"
+        }
+    },
+    "capped-solve-pin\u2021": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "capped",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "4.17.0",
+            "newest": "4.17.0",
+            "constraint": "^4.17.0",
+            "latest": null,
+            "php_check": {
+                "requires": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.2",
+                "raise_size": "major"
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "basis": "admits_newest_php"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.2",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "laminas/laminas-code:^4.17.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "4.17.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.2, then require laminas/laminas-code ^4.17.0 \u2014 clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it"
         }
     },
     "capped-tag-unverified\u2021": {
@@ -13606,6 +13886,63 @@
         },
         "move_in": "next_step",
         "partial": null
+    },
+    "not-found-cached\u2021": {
+        "next_step": {
+            "kind": "find-alternative",
+            "source": "abandoned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "abandoned"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "transitive"
+            ],
+            "commands": [],
+            "through": [
+                {
+                    "package": "lorisleiva/laravel-search-string",
+                    "installed_version": "v1.3.0",
+                    "installed_requires": false,
+                    "newest_stable": {
+                        "version": "v1.3.0",
+                        "released": "2023-03-11T10:11:33+00:00"
+                    },
+                    "newest_requires": null,
+                    "newest_requires_unmeasured": "through_other_package",
+                    "local": false,
+                    "newest_is_installed": true
+                }
+            ],
+            "also": [],
+            "text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string"
+        }
     },
     "not-found\u2021": {
         "next_step": {

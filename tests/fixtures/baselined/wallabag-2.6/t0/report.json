@@ -2946,7 +2946,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 },
                 {
@@ -7400,7 +7402,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 },
                 {
@@ -25031,7 +25035,9 @@
                         "reachable_php": null,
                         "reachable_admits": null,
                         "newest_years": 0,
-                        "reachable_years": null
+                        "reachable_years": null,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": null
                     }
                 }
             ],
@@ -25436,7 +25442,9 @@
                             "target": true
                         },
                         "newest_years": 2.8,
-                        "reachable_years": 2.8
+                        "reachable_years": 2.8,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -26658,7 +26666,9 @@
                         "reachable_php": null,
                         "reachable_admits": null,
                         "newest_years": 0,
-                        "reachable_years": null
+                        "reachable_years": null,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": null
                     }
                 }
             ],
@@ -26994,7 +27004,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -36373,7 +36385,9 @@
                         "reachable_php": null,
                         "reachable_admits": null,
                         "newest_years": 0.1,
-                        "reachable_years": null
+                        "reachable_years": null,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": null
                     }
                 }
             ],
@@ -48199,6 +48213,13 @@
                         "S3",
                         "S4"
                     ]
+                },
+                {
+                    "check": "release_dates",
+                    "reason": "undated_releases",
+                    "blocks": [
+                        "S2"
+                    ]
                 }
             ],
             "unchecked_accepted": [],
@@ -49114,6 +49135,13 @@
                         "S3",
                         "S4"
                     ]
+                },
+                {
+                    "check": "release_dates",
+                    "reason": "undated_releases",
+                    "blocks": [
+                        "S2"
+                    ]
                 }
             ],
             "unchecked_accepted": [],
@@ -49283,6 +49311,13 @@
                     "blocks": [
                         "S3",
                         "S4"
+                    ]
+                },
+                {
+                    "check": "release_dates",
+                    "reason": "undated_releases",
+                    "blocks": [
+                        "S2"
                     ]
                 }
             ],

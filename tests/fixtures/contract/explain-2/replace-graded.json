@@ -31,7 +31,7 @@
                     "reasons": [
                         "marked"
                     ],
-                    "liveness_complete": true
+                    "liveness_complete": false
                 },
                 "headline": {
                     "unit": "reason",
@@ -154,7 +154,15 @@
             "ignored_count": 0
         },
         "checks_missing": [],
-        "checks_skipped": [],
+        "checks_skipped": [
+            {
+                "check": "release_dates",
+                "reason": "undated_releases",
+                "blocks": [
+                    "S2"
+                ]
+            }
+        ],
         "unchecked_accepted": [],
         "maintenance_judged": true,
         "metadata": {

@@ -2572,7 +2572,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 },
                 {
@@ -18241,7 +18243,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 },
                 {
@@ -19778,7 +19782,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 },
                 {
@@ -20521,7 +20527,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 },
                 {
@@ -22386,7 +22394,9 @@
                             "target": null
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 },
                 {
@@ -23827,7 +23837,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 },
                 {
@@ -24667,7 +24679,9 @@
                             "target": true
                         },
                         "newest_years": 0.3,
-                        "reachable_years": 0.3
+                        "reachable_years": 0.3,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 },
                 {
@@ -25285,7 +25299,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 },
                 {
@@ -26095,7 +26111,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 },
                 {
@@ -27834,7 +27852,9 @@
                             "target": true
                         },
                         "newest_years": 2.3,
-                        "reachable_years": 2.3
+                        "reachable_years": 2.3,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -28485,7 +28505,9 @@
                             "target": true
                         },
                         "newest_years": 0.1,
-                        "reachable_years": 0.1
+                        "reachable_years": 0.1,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -30900,7 +30922,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -31935,7 +31957,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 },
                 {
@@ -32535,7 +32559,9 @@
                             "target": true
                         },
                         "newest_years": 0.7,
-                        "reachable_years": 0.7
+                        "reachable_years": 0.7,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -33029,7 +33055,9 @@
                             "target": true
                         },
                         "newest_years": 0.6,
-                        "reachable_years": 0.6
+                        "reachable_years": 0.6,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -33439,7 +33467,9 @@
                             "target": true
                         },
                         "newest_years": 0.9,
-                        "reachable_years": 0.9
+                        "reachable_years": 0.9,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -33938,7 +33968,9 @@
                             "target": true
                         },
                         "newest_years": 2.3,
-                        "reachable_years": 2.3
+                        "reachable_years": 2.3,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -34350,7 +34382,9 @@
                             "target": true
                         },
                         "newest_years": 0.4,
-                        "reachable_years": 0.4
+                        "reachable_years": 0.4,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -34760,7 +34794,9 @@
                             "target": true
                         },
                         "newest_years": 0.4,
-                        "reachable_years": 0.4
+                        "reachable_years": 0.4,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -35103,7 +35139,9 @@
                             "target": true
                         },
                         "newest_years": 1.4,
-                        "reachable_years": 1.4
+                        "reachable_years": 1.4,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -35447,7 +35485,9 @@
                             "target": true
                         },
                         "newest_years": 0.6,
-                        "reachable_years": 0.6
+                        "reachable_years": 0.6,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -35790,7 +35830,9 @@
                             "target": true
                         },
                         "newest_years": 0.9,
-                        "reachable_years": 0.9
+                        "reachable_years": 0.9,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -36134,7 +36176,9 @@
                             "target": true
                         },
                         "newest_years": 1,
-                        "reachable_years": 1
+                        "reachable_years": 1,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -36505,7 +36549,9 @@
                             "target": true
                         },
                         "newest_years": 0.6,
-                        "reachable_years": 0.6
+                        "reachable_years": 0.6,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -36848,7 +36894,9 @@
                             "target": true
                         },
                         "newest_years": 0.4,
-                        "reachable_years": 0.4
+                        "reachable_years": 0.4,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -37308,7 +37356,9 @@
                             "target": true
                         },
                         "newest_years": 0.1,
-                        "reachable_years": 0.1
+                        "reachable_years": 0.1,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -37619,7 +37669,9 @@
                             "target": null
                         },
                         "newest_years": 1,
-                        "reachable_years": 1
+                        "reachable_years": 1,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -38057,7 +38109,9 @@
                             "target": true
                         },
                         "newest_years": 1.6,
-                        "reachable_years": 1.6
+                        "reachable_years": 1.6,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -38509,7 +38563,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -38880,7 +38936,9 @@
                             "target": true
                         },
                         "newest_years": 0.6,
-                        "reachable_years": 0.6
+                        "reachable_years": 0.6,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -39318,7 +39376,9 @@
                             "target": true
                         },
                         "newest_years": 0.9,
-                        "reachable_years": 0.9
+                        "reachable_years": 0.9,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -40015,7 +40075,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -40453,7 +40515,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -40890,7 +40954,9 @@
                             "target": true
                         },
                         "newest_years": 0.1,
-                        "reachable_years": 0.1
+                        "reachable_years": 0.1,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -41470,7 +41536,9 @@
                             "target": true
                         },
                         "newest_years": 0.2,
-                        "reachable_years": 0.2
+                        "reachable_years": 0.2,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -41921,7 +41989,9 @@
                             "target": true
                         },
                         "newest_years": 0.4,
-                        "reachable_years": 0.4
+                        "reachable_years": 0.4,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -42321,7 +42391,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -42759,7 +42831,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -43197,7 +43271,9 @@
                             "target": true
                         },
                         "newest_years": 0,
-                        "reachable_years": 0
+                        "reachable_years": 0,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -43664,7 +43740,9 @@
                             "target": true
                         },
                         "newest_years": 0.2,
-                        "reachable_years": 0.2
+                        "reachable_years": 0.2,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -46370,7 +46448,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -47350,7 +47428,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -48004,7 +48082,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -48658,7 +48736,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -49312,7 +49390,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -49900,7 +49978,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 and S8 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -50067,7 +50145,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 and S8 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -50233,7 +50311,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -50399,7 +50477,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2, S5 and S8 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 and S8 could not measure it; the lock gives the installed release no date, so S5 could not judge it",
                     "data": {
                         "unchecked": [
                             {
@@ -50568,7 +50646,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -52438,7 +52516,9 @@
                             "target": true
                         },
                         "newest_years": 2.1,
-                        "reachable_years": 2.1
+                        "reachable_years": 2.1,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 }
             ],
@@ -53220,6 +53300,13 @@
                         "S3",
                         "S4"
                     ]
+                },
+                {
+                    "check": "release_dates",
+                    "reason": "undated_releases",
+                    "blocks": [
+                        "S2"
+                    ]
                 }
             ],
             "unchecked_accepted": [],
@@ -53994,6 +54081,13 @@
                     "blocks": [
                         "S3",
                         "S4"
+                    ]
+                },
+                {
+                    "check": "release_dates",
+                    "reason": "undated_releases",
+                    "blocks": [
+                        "S2"
                     ]
                 }
             ],

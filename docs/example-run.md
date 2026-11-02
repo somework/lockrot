@@ -1755,7 +1755,9 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                             "target": true
                         },
                         "newest_years": 0.4,
-                        "reachable_years": 0.4
+                        "reachable_years": 0.4,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
                     }
                 },
                 {

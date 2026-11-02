@@ -228,7 +228,7 @@ flags
                PKSA-dwsq-ppd2-mb1x · reported 2026-05-26 · 2 points · fix: composer update to 1.x from v1.38.1
   feeds        packagist.org: 1 on record, 1 affects v1.37.0
   accepted     none
-  not checked  S3, S4 (allowlisted)
+  not checked  S3, S4 (allowlisted) · S5 (undated releases)
 
 repository metadata
      branch   highest tag   released     php        fixes
@@ -957,7 +957,7 @@ do        raise require.php to >=8.1, then require pagerfanta/twig ^4.9 — clea
           clears left-behind
 
 flags
-  left-behind  S8 · branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-08), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach
+  left-behind  S8 · branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (on or after 2025-03-08, the date of a commit its tags share), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach
   feeds        packagist.org: none on record
   pulls in     pulls in 1 flagged package: pagerfanta/core (left-behind)
   accepted     none
@@ -1060,7 +1060,7 @@ flags
   feeds        packagist.org: none on record
   pulls in     pulls in 3 flagged packages: web-token/jwt-library (vulnerable), paragonie/sodium_compat (vulnerable), brick/math (left-behind)
   accepted     none
-  not checked  nothing
+  not checked  S2 (undated releases)
 
 repository metadata
      branch   highest tag   released          php        fixes
@@ -1502,6 +1502,117 @@ repository metadata
    * 2.x      v2.8.52       2019-11-13   >=5.3.9        0 of 1
 branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
+== case S5-star‡
+symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
+          newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
+          last push            2026-09-23   less than three weeks ago     below push-warn-years 3
+          libyears 10.6 behind the newest stable release
+repository GitHub github.com/symfony/monolog-bridge: last push 2026-09-23 · fetched 2026-09-14
+
+score     36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high advisory]     critical from 32
+  maintenance  left-behind 16 (lead) · old-promise 4 (¼ of 16)
+  security     vulnerable 16 (high advisory CVE-2026-45077)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve
+          clears left-behind, old-promise and PKSA-4wjj-gy1p-ft3r
+
+flags
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  old-promise  S5 · released 2016-01-14 with php "*", before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
+    high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
+               PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
+  feeds        packagist.org: 1 on record, 1 affects v2.6.13
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php            fixes
+     8.x      v8.1.6        2026-08-30   >=8.4.1        1 of 1 · php floor raise; held by composer.json; after it: at most 16, high, if Composer resolves it
+     7.x      v7.4.18       2026-08-30   >=8.2          1 of 1 · php floor raise; held by composer.json; after it: at most 16, high, if Composer resolves it
+     6.x      v6.4.45       2026-08-30   >=8.1          1 of 1 · php floor raise; held by composer.json; after it: at most 16, high, if Composer resolves it
+     5.x      v5.4.52       2026-05-07   >=7.2.5        1 of 1 · upgrade (lowest fix); held by composer.json; after it: 0, ok, if Composer resolves it
+     4.x      v4.4.43       2022-06-16   >=7.1.3        0 of 1
+     3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
+   * 2.x      v2.8.52       2019-11-13   >=5.3.9        0 of 1
+branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
+
+== case S10-lock-undated‡
+symfony/monolog-bridge v2.6.13 — critical: left-behind · vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v2.6.13   not read (no date)
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
+          newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
+          last push            2026-09-23   less than three weeks ago     below push-warn-years 3
+          libyears not measured: no date
+repository GitHub github.com/symfony/monolog-bridge: last push 2026-09-23 · fetched 2026-09-14
+
+score     32 = left-behind 16 + vulnerable 16 [high advisory]     critical from 32
+  maintenance  left-behind 16 (lead)
+  security     vulnerable 16 (high advisory CVE-2026-45077)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require symfony/monolog-bridge ^5.4.52 — clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve
+          clears left-behind and PKSA-4wjj-gy1p-ft3r
+
+flags
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
+    high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
+               PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
+  feeds        packagist.org: 1 on record, 1 affects v2.6.13
+  accepted     none
+  not checked  S5 (undated releases)
+
+repository metadata
+     branch   highest tag   released     php            fixes
+     8.x      v8.1.6        2026-08-30   >=8.4.1        1 of 1 · php floor raise; held by composer.json; after it: 0, ok, if Composer resolves it
+     7.x      v7.4.18       2026-08-30   >=8.2          1 of 1 · php floor raise; held by composer.json; after it: 0, ok, if Composer resolves it
+     6.x      v6.4.45       2026-08-30   >=8.1          1 of 1 · php floor raise; held by composer.json; after it: 0, ok, if Composer resolves it
+     5.x      v5.4.52       2026-05-07   >=7.2.5        1 of 1 · upgrade (lowest fix); held by composer.json; after it: 0, ok, if Composer resolves it
+     4.x      v4.4.43       2022-06-16   >=7.1.3        0 of 1
+     3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
+   * 2.x      v2.8.52       2019-11-13   >=5.3.9        0 of 1
+branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
+
+== case S10-tag-undated‡
+scheb/2fa-google-authenticator v8.6.1 — ok
+  via pimcore/pimcore > scheb/2fa-google-authenticator: 1 hop from the nearest composer.json line; no line of composer.json names it
+
+age       installed  v8.6.1    not read (no date)
+          8.x                  not read (undated releases)
+          newest               not read (undated releases)
+          last push            2026-07-10   0.2 years ago                 below push-warn-years 3
+          libyears not measured: no date
+repository GitHub github.com/scheb/2fa-google-authenticator: last push 2026-07-10 · fetched 2026-09-14
+
+score     0
+  reach        via pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and pimcore/studio-ui-bundle: maintenance would be halved (none counts); security is never halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        nothing to do: nothing counts
+
+flags
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  S2 (undated releases)
+
+repository metadata
+     branch   highest tag   released     php                                            fixes
+   * 8.x      v8.6.1        undated      ~8.4.0 || ~8.5.0
+     7.x      v7.14.0       2026-01-24   ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0
+     6.x      v6.13.1       2024-11-29   ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0
+     5.x      v5.13.2       2022-01-03   —
+* the installed branch's highest tag has no release date — the repository leaves it undated, or dates it only by a commit other tags share (`commit …`: a subtree split, the day the directory last changed) — so S8 does not measure the branch
+
 == case S8-prerelease-installed‡
 symfony/monolog-bridge v2.9.0-RC1 — critical: left-behind · old-promise · vulnerable
   direct requirement (composer.json require)
@@ -1568,7 +1679,7 @@ flags
                PKSA-dwsq-ppd2-mb1x · reported 2026-05-26 · 2 points · fix: composer update to 1.x from v1.38.1
   feeds        packagist.org: 1 on record, 1 affects v1.37.0
   accepted     none
-  not checked  S3, S4 (allowlisted)
+  not checked  S3, S4 (allowlisted) · S5 (undated releases)
 
 repository metadata
      branch   highest tag   released     php        fixes
@@ -1598,7 +1709,7 @@ flags
                PKSA-dwsq-ppd2-mb1x · reported 2026-05-26 · 2 points · fix: fix unknown
   feeds        packagist.org: 1 on record, 1 affects v1.37.0
   accepted     none
-  not checked  S3, S4 (allowlisted)
+  not checked  S3, S4 (allowlisted) · S5 (undated releases)
 
 repository metadata
      branch   highest tag   released     php        fixes
@@ -3443,6 +3554,38 @@ repository metadata
      0.16.x   0.16.01.06    2016-01-06   —
 note: GitHub did not answer for 1 repositories (private, renamed or removed); repository activity missing
 
+== case not-found-cached‡
+hoa/consistency 1.17.05.02 — high: abandoned · old-promise
+  via lorisleiva/laravel-search-string > hoa/compiler > hoa/consistency: 2 hops from the nearest composer.json line; no line of composer.json names it
+
+age       installed  1.17.05.022017-05-02   9.4 years ago
+          1.x        1.17.05.022017-05-02   9.4 years ago                 past release-high-years 5
+          newest     2.17.08.292017-08-29   9.1 years ago                 past release-high-years 5
+          last push            not read (repository not found)
+          libyears 0.3 behind the newest stable release
+repository GitHub github.com/hoaproject/Consistency: the host answered 404 (private, renamed or removed)
+
+score     18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive     high from 16
+  maintenance  abandoned 32 (lead) · old-promise 4 (¼ of 16)
+  reach        via lorisleiva/laravel-search-string: maintenance halved; security is never halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string
+
+flags
+  abandoned    S1 high · marked abandoned by its registry; last release 2017-08-29 (9.1 years ago)
+  old-promise  S5 · released 2017-05-02 for PHP 5 (php ">=5.5.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  S3, S4 (repository not found)
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     2.x      2.17.08.29    2017-08-29   >=7.1
+   * 1.x      1.17.05.02    2017-05-02   >=5.5.0
+     0.16.x   0.16.01.06    2016-01-06   —
+note: GitHub did not answer for 1 repositories (private, renamed or removed); repository activity missing
+
 == case gitlab-anon‡
 hoa/consistency 1.17.05.02 — high: abandoned · old-promise
   via lorisleiva/laravel-search-string > hoa/compiler > hoa/consistency: 2 hops from the nearest composer.json line; no line of composer.json names it
@@ -4134,6 +4277,37 @@ do        composer update laminas/laminas-code (gets 4.17.0) — clears capped
 
 flags
   capped       S11 · requires php >=7.4, <8.2: it stops at 8.1, so 8.3, the newest PHP that the lock's platform allows, is excluded
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php                                  fixes
+   * 4.x      4.17.0        2025-11-01   ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0
+     3.x      3.5.1         2020-11-30   ^7.3 || ~8.0.0
+     2.x      2.6.3         2019-12-31   ^5.5 || 7.0.0 - 7.0.4 || ^7.0.6
+
+== case capped-solve-pin‡
+laminas/laminas-code 4.7.1 — medium: capped
+  direct requirement (composer.json require)
+
+age       installed  4.7.1     2022-11-21   3.9 years ago
+          4.x        4.17.0    2025-11-01   0.9 years ago                 below release-warn-years 3
+          newest     4.17.0    2025-11-01   0.9 years ago                 below release-warn-years 3
+          last push            2026-09-30   less than three weeks ago     below push-warn-years 3
+          libyears 3.0 behind the newest stable release
+repository GitHub github.com/laminas/laminas-code: last push 2026-09-30 · fetched 2026-09-14
+
+score     8 = capped 8     medium from 8
+  maintenance  capped 8 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        raise require.php to >=8.2, then require laminas/laminas-code ^4.17.0 — clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it
+          clears capped
+
+flags
+  capped       S11 · requires php >=8.4.6 <8.5: it stops at 8.4, so the newest PHP, 8.5, is excluded
   feeds        packagist.org: none on record
   accepted     none
   not checked  nothing
