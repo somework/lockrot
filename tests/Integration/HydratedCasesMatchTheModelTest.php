@@ -154,11 +154,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
      * @var array<string, array<string, list<array{list<string>, string}>>>
      */
     public const DIFFERENCES = [
-        'F' => [
-            'age_rows' => [
-                [['age.installed_unmeasured'], self::INSTALLED_COMMIT],
-            ],
-        ],
         'psr7' => [
             'moves' => [
                 [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
@@ -179,27 +174,12 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
-        'replace-graded' => [
-            'age_rows' => [
-                [['age.installed_unmeasured'], self::INSTALLED_COMMIT],
-            ],
-        ],
         'B-also‡' => [
             'moves' => [
                 [['next_step.also[].version', 'next_step.also[].commands'], self::MOVE_VERSION],
             ],
             'security' => [
                 [['details.metadata.branches[].fixes.if_applied.at_most', 'details.metadata.branches[].fixes.if_applied.total', 'details.metadata.branches[].fixes.if_applied.verdict'], self::IF_APPLIED],
-            ],
-        ],
-        'long-range‡' => [
-            'age_rows' => [
-                [['age.installed_unmeasured'], self::INSTALLED_COMMIT],
-            ],
-        ],
-        'affected-range-unknown‡' => [
-            'age_rows' => [
-                [['age.installed_unmeasured'], self::INSTALLED_COMMIT],
             ],
         ],
         'A-php-star‡' => [
@@ -358,7 +338,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
 
     private const PHP_STAR = 'The case sets the project\'s require.php to `*` or to a constraint that matches no PHP (‡), so the project has no lowest PHP. The model keeps the holder\'s own step of case A. lockrot judges the holder with no project lowest, which admits its newest line.';
 
-    private const INSTALLED_COMMIT = 'The model holds the date of a shared commit only for a branch\'s highest tag, so the hydrated lock gives the installed tag no date. lockrot then reads it as undated, not as dated by a commit its tags share.';
 
     private const BITBUCKET = 'The model marks the repository archived on Bitbucket (S3). Bitbucket\'s repository API has no archived field, so lockrot cannot raise S3 for a Bitbucket repository, and each later signal moves up one place.';
 

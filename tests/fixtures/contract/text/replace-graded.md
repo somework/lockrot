@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **critical** | `web-token/jwt-key-mgmt` | 3.4.3 | abandoned | `32 = abandoned 32`<br>**Do:** replace with web-token/jwt-library (named by its registry; itself high: vulnerable)<br>*abandoned:* marked abandoned by its registry, replacement: web-token/jwt-library<br>*age:* installed 3.4.3, release date not known (no date); last push 2025-05-07 (1.4 years ago)<br>pulls in 3 flagged packages: web-token/jwt-library (vulnerable), paragonie/sodium\_compat (vulnerable), brick/math (left-behind) | direct |
+| **critical** | `web-token/jwt-key-mgmt` | 3.4.3 | abandoned | `32 = abandoned 32`<br>**Do:** replace with web-token/jwt-library (named by its registry; itself high: vulnerable)<br>*abandoned:* marked abandoned by its registry, replacement: web-token/jwt-library<br>*age:* installed 3.4.3, release date not known (dated only by a commit its tags share); last push 2025-05-07 (1.4 years ago)<br>pulls in 3 flagged packages: web-token/jwt-library (vulnerable), paragonie/sodium\_compat (vulnerable), brick/math (left-behind) | direct |
 
 flags: abandoned 1
 depth: every flagged package is named in composer.json · direct 1

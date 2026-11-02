@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "29296ad3cea3acbc64c49064f6b7b99252f8048b2ac9f39deef86dd9b906a294",
+        "tests/fixtures/flags/cases.json": "e9c68b5f1a2943e3684dc25a00399a0992468fdb73b3d19eedce0877fbe07266",
         "tests/fixtures/flags/composite.json": "66f05cb5de67634a9a4c6cb977545c9bb07385a127971a53ceb51dc0d30d8a79",
-        "tests/fixtures/flags/provenance.json": "605cc3425b050547c8d261cd88867f7a245fc2208f2aa9c642fa63de338292a0"
+        "tests/fixtures/flags/provenance.json": "22e0736f6de029956aac0675ce9acac71018089eb12dee619bcafa9bdd5f27b7"
     },
     "version_mask": {
         "paths": [
@@ -50,7 +50,7 @@
     "case_lock": "each case is formatted beside a composer.lock of its lock entries, as tests/Support/CaseHydrator.php lockJson() lays it out",
     "model_goldens": {
         "compared": {
-            "age_line": 181,
+            "age_line": 186,
             "baseline_suffix": 184,
             "commands_cmd": 166,
             "commands_posix": 166,
@@ -60,7 +60,6 @@
             "score_text": 185
         },
         "inputs_differ": {
-            "age_line": 5,
             "baseline_suffix": 2,
             "commands_cmd": 20,
             "commands_posix": 20,

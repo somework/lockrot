@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| low | `symfony/polyfill-intl-idn` | v1.37.0 | vulnerable | `2 = vulnerable 2 [low advisory]`<br>**Do:** no move: no advisory names the versions it affects, so lockrot names no fix<br>*vulnerable:* 1 advisory: 1 low — fix not known on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence<br>*age:* installed v1.37.0, release date not known (no date); 1.x last released v1.43.0 2026-09-23 (less than three weeks ago), its newest release<br>*maintenance accepted (lockrot's list):* polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace | guzzlehttp/guzzle |
+| low | `symfony/polyfill-intl-idn` | v1.37.0 | vulnerable | `2 = vulnerable 2 [low advisory]`<br>**Do:** no move: no advisory names the versions it affects, so lockrot names no fix<br>*vulnerable:* 1 advisory: 1 low — fix not known on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence<br>*age:* installed v1.37.0, release date not known (dated only by a commit its tags share); 1.x last released v1.43.0 2026-09-23 (less than three weeks ago), its newest release<br>*maintenance accepted (lockrot's list):* polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace | guzzlehttp/guzzle |
 
 flags: vulnerable 1
 depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 · deepest: `symfony/polyfill-intl-idn`, 1 hop (`guzzlehttp/guzzle` › `symfony/polyfill-intl-idn`)

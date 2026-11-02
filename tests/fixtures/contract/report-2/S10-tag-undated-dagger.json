@@ -1230,7 +1230,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+                    "summary": "the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {

@@ -69,8 +69,8 @@ low (3)
           (gets v1.43.0) — clears the advisory
       vulnerable   1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts
                    xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence
-      age: installed v1.37.0, release date not known (no date); 1.x last released v1.43.0 2026-09-23 (less than
-           three weeks ago), its newest release
+      age: installed v1.37.0, release date not known (dated only by a commit its tags share); 1.x last released
+           v1.43.0 2026-09-23 (less than three weeks ago), its newest release
       maintenance accepted (lockrot's list)  polyfills for PHP extensions; released with Symfony and complete for the
                               API of the extension they replace
   friendsofsymfony/oauth2-php 1.3.1  via friendsofsymfony/oauth-server-bundle  ·  stale

@@ -1090,8 +1090,8 @@
             "unavailable": 0,
             "not_found": 0,
             "branch_snapshot": 1,
-            "shared_commit": 0,
-            "undated": 1,
+            "shared_commit": 1,
+            "undated": 0,
             "no_stable_release": 0,
             "undated_releases": 0
         },
@@ -5436,13 +5436,6 @@
                         "S3",
                         "S4"
                     ]
-                },
-                {
-                    "check": "release_dates",
-                    "reason": "undated_releases",
-                    "blocks": [
-                        "S5"
-                    ]
                 }
             ],
             "unchecked_accepted": [],
@@ -5484,7 +5477,7 @@
             "replacement": null,
             "replacement_url": null,
             "note": null,
-            "libyears_unmeasured": "undated",
+            "libyears_unmeasured": "shared_commit",
             "libyears_at_least": false,
             "direct": false,
             "dev": false,
@@ -5544,7 +5537,7 @@
             "libyears": null,
             "age": {
                 "installed": null,
-                "installed_unmeasured": "undated",
+                "installed_unmeasured": "shared_commit",
                 "release": {
                     "version": "v1.43.0",
                     "at": "2026-09-23T14:40:04+00:00",
