@@ -26,7 +26,7 @@ final class ValidateSignalsTest extends TestCase
         'S5' => ['target_php', 'target_major', 'ga_date', 'php_constraint', 'written_for_php', 'released'],
         'S6' => ['version', 'reason', 'has_stable_release', 'last_stable_release', 'last_stable_version', 'last_stable_dated_by', 'snapshot_time', 'tag_relation'],
         'S7' => ['flagged', 'packages'],
-        'S8' => ['branch', 'branch_last_release', 'branch_last_version', 'years', 'newest_branch', 'newest_version', 'newest_release', 'newest_php', 'newest_within_reach', 'newest_years', 'floor_php', 'floor_source', 'reachable_branch', 'reachable_version', 'reachable_release', 'reachable_php', 'reachable_admits', 'reachable_years', 'suggested_constraint', 'dated_by'],
+        'S8' => ['branch', 'branch_last_release', 'branch_last_version', 'years', 'newest_branch', 'newest_version', 'newest_release', 'newest_php', 'newest_within_reach', 'newest_years', 'floor_php', 'floor_source', 'reachable_branch', 'reachable_version', 'reachable_release', 'reachable_php', 'reachable_admits', 'reachable_years', 'reachable_release_at_least', 'suggested_constraint', 'dated_by', 'newest_release_at_least'],
         'S9' => ['advisories', 'releases_read', 'complete'],
         'S10' => ['unchecked', 'blocks'],
         'S11' => ['newest_php', 'newest_php_source', 'requires', 'stops_at', 'excludes_target', 'admits_newest'],
