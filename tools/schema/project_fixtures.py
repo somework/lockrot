@@ -380,11 +380,17 @@ def package_facts(f, rows):
     # A split package's tag shares its commit with its other spellings, so lockrot dates it by the monorepo's tag of the
     # same version (`dated_by`). The split tag keeps its own time: S5 reads it.
     parent = None
-    for part, version in (('installed', f['version']), ('branch_release', (age.get('branch_release') or {}).get('version'))):
-        dated = age.get(part) or {}
-        if dated.get('dated_by') and version in releases:
-            parent = parent or {'name': dated['dated_by'], 'releases': []}
-            parent['releases'].append({'version': version, 'time': dated['at']})
+    dated_by_parent = [((age.get(part) or {}).get('dated_by'), version, (age.get(part) or {}).get('at'))
+                       for part, version in (('installed', f['version']), ('branch_release', (age.get('branch_release') or {}).get('version')))]
+    # A branch that the model dates by the parent takes the parent's tags: lockrot dates it by the parent only when its
+    # highest tag shares its commit (PackageMetadata::datedBy()).
+    for r in rows:
+        dated_by_parent += [(r.get('dated_by'), r['highest'], r['highest_released']), (r.get('dated_by'), r['newest_dated'], r['newest_dated_released'])]
+    for name, version, at in dated_by_parent:
+        if name and at and version in releases:
+            parent = parent or {'name': name, 'releases': []}
+            if version not in [r['version'] for r in parent['releases']]:
+                parent['releases'].append({'version': version, 'time': at})
             releases[version]['shared_commit'] = True
     s5 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S5'), None) or {}
     if age.get('installed_unmeasured') == 'shared_commit' and f['version'] in releases:
