@@ -739,6 +739,7 @@ final class ScriptedDownloader extends HttpDownloader
     }
 
     /**
+     * @param non-empty-string     $url
      * @param Deferred<Response>   $deferred
      * @param array<string, mixed> $options
      *
