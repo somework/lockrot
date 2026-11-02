@@ -9,6 +9,7 @@ use Composer\IO\NullIO;
 use Composer\Package\BasePackage;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
+use Composer\Repository\FilterRepository;
 use Composer\Semver\Comparator;
 use Lockrot\Clock;
 use Lockrot\Data\Http\RecordedHttpClient;
@@ -18,6 +19,7 @@ use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
@@ -425,30 +427,174 @@ final class RepositoryMetadataLoaderTest extends TestCase
         self::assertSame(self::FIXED, $meta->dataDate()->format(\DATE_ATOM));
     }
 
-    public function testNamesThatFailedAgainstTheFirstRepositoryAreStillOfferedToTheSecond(): void
+    /**
+     * Composer stops on a transport failure of a canonical repository and asks no later one. The
+     * names fail with the repository's reason, and no later repository answers for them.
+     */
+    public function testANameThatACanonicalRepositoryFailsOnIsNotOfferedToTheNext(): void
     {
-        // A never-started server (unbound port, empty cache) ahead of a working one: every name
-        // fails against the first repository. A repository that could not answer has not
-        // established that the package is absent from the next one, so the names must fall through.
         $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         $working = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         $working->start();
         try {
             $loader = new RepositoryMetadataLoader(
-                array_merge($unreachable->repositories(), $working->repositories()),
+                array_merge([new FilterRepository($unreachable->repositories()[0], ['only' => ['phpzip/*']])], $working->repositories()),
                 Clock::fixed(self::FIXED)
             );
 
             $batch = $loader->load(self::names(['phpzip/phpzip', 'wallabag/rulerz']));
 
-            self::assertSame([], $batch->failed());
-            self::assertSame([], $batch->notFound());
-            self::assertArrayHasKey('phpzip/phpzip', $batch->metadata());
-            self::assertArrayHasKey('wallabag/rulerz', $batch->metadata());
+            self::assertSame(['phpzip/phpzip'], array_keys($batch->failed()));
+            self::assertSame(MetadataFailure::FETCH_FAILED, MetadataFailure::reason($batch->failed()['phpzip/phpzip']));
+            self::assertSame(['wallabag/rulerz'], array_keys($batch->metadata()));
         } finally {
             $working->stop();
             $unreachable->stop();
         }
+    }
+
+    public function testAPlainComposerRepositoryIsCanonicalSoItsFailureIsFinal(): void
+    {
+        $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $working = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $working->start();
+        try {
+            $loader = new RepositoryMetadataLoader(array_merge($unreachable->repositories(), $working->repositories()), Clock::fixed(self::FIXED));
+
+            $batch = $loader->load(self::names(['phpzip/phpzip']));
+
+            self::assertSame([[], ['phpzip/phpzip']], [array_keys($batch->metadata()), array_keys($batch->failed())]);
+        } finally {
+            $working->stop();
+            $unreachable->stop();
+        }
+    }
+
+    /** A repository with `canonical: false` claims no name in Composer, so its failure leaves the name to the next repository. */
+    public function testANameThatANonCanonicalRepositoryFailsOnIsOfferedToTheNext(): void
+    {
+        $unreachable = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $working = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $working->start();
+        try {
+            $loader = new RepositoryMetadataLoader(
+                array_merge([new FilterRepository($unreachable->repositories()[0], ['canonical' => false])], $working->repositories()),
+                Clock::fixed(self::FIXED)
+            );
+
+            $batch = $loader->load(self::names(['phpzip/phpzip', 'wallabag/rulerz']));
+
+            self::assertSame([[], []], [$batch->failed(), $batch->notFound()]);
+            self::assertSame(['phpzip/phpzip', 'wallabag/rulerz'], array_keys($batch->metadata()));
+        } finally {
+            $working->stop();
+            $unreachable->stop();
+        }
+    }
+
+    /** Composer asks a repository with `only` for the names that it admits, and that repository answers before the later ones. */
+    public function testARepositoryWithOnlyAnswersTheNamesThatItAdmits(): void
+    {
+        [$first, $second] = $this->twoServersOfDupPkg();
+        try {
+            $loader = new RepositoryMetadataLoader(
+                array_merge([new FilterRepository($first->repositories()[0], ['only' => ['dup/*']])], $second->repositories()),
+                Clock::fixed(self::FIXED)
+            );
+
+            $meta = $loader->load(self::names(['dup/pkg']))->metadata()['dup/pkg'] ?? null;
+
+            self::assertNotNull($meta);
+            self::assertSame([1, $first->url()], [$meta->releaseCount(), $meta->composerRepositoryUrl()]);
+        } finally {
+            $first->stop();
+            $second->stop();
+        }
+    }
+
+    /**
+     * @dataProvider filtersThatKeepTheNameOut
+     *
+     * @param array{only?: list<string>, exclude?: list<string>} $filter
+     */
+    #[DataProvider('filtersThatKeepTheNameOut')]
+    public function testARepositoryWhoseFilterKeepsTheNameOutLeavesItToTheNext(array $filter): void
+    {
+        [$first, $second] = $this->twoServersOfDupPkg();
+        try {
+            $loader = new RepositoryMetadataLoader(
+                array_merge([new FilterRepository($first->repositories()[0], $filter)], $second->repositories()),
+                Clock::fixed(self::FIXED)
+            );
+
+            $meta = $loader->load(self::names(['dup/pkg']))->metadata()['dup/pkg'] ?? null;
+
+            self::assertNotNull($meta);
+            self::assertSame([2, $second->url()], [$meta->releaseCount(), $meta->composerRepositoryUrl()]);
+        } finally {
+            $first->stop();
+            $second->stop();
+        }
+    }
+
+    /** @return iterable<string, array{array{only?: list<string>, exclude?: list<string>}}> */
+    public static function filtersThatKeepTheNameOut(): iterable
+    {
+        yield 'only another vendor' => [['only' => ['other/*']]];
+        yield 'exclude the name' => [['exclude' => ['dup/pkg']]];
+    }
+
+    /** In Composer, a later repository adds its versions to a `canonical: false` one. lockrot reads the later repository's metadata. */
+    public function testALaterRepositoryAnswersBeforeANonCanonicalOne(): void
+    {
+        [$first, $second] = $this->twoServersOfDupPkg();
+        try {
+            $loader = new RepositoryMetadataLoader(
+                array_merge([new FilterRepository($first->repositories()[0], ['canonical' => false])], $second->repositories()),
+                Clock::fixed(self::FIXED)
+            );
+
+            $meta = $loader->load(self::names(['dup/pkg']))->metadata()['dup/pkg'] ?? null;
+
+            self::assertNotNull($meta);
+            self::assertSame([2, $second->url()], [$meta->releaseCount(), $meta->composerRepositoryUrl()]);
+        } finally {
+            $first->stop();
+            $second->stop();
+        }
+    }
+
+    public function testANonCanonicalRepositoryAnswersANameThatNoLaterRepositoryLists(): void
+    {
+        $first = $this->syntheticServer(['dup/pkg' => [$this->p2Version('dup/pkg', '1.0.0')]]);
+        $second = $this->syntheticServer(['other/pkg' => [$this->p2Version('other/pkg', '1.0.0')]]);
+        try {
+            $first->start();
+            $second->start();
+            $loader = new RepositoryMetadataLoader(
+                array_merge([new FilterRepository($first->repositories()[0], ['canonical' => false])], $second->repositories()),
+                Clock::fixed(self::FIXED)
+            );
+
+            $meta = $loader->load(self::names(['dup/pkg']))->metadata()['dup/pkg'] ?? null;
+
+            self::assertNotNull($meta);
+            self::assertSame($first->url(), $meta->composerRepositoryUrl());
+        } finally {
+            $first->stop();
+            $second->stop();
+        }
+    }
+
+    /** @return array{FixtureRepositoryServer, FixtureRepositoryServer} the first serves dup/pkg 1.0.0, the second 1.0.0 and 2.0.0 */
+    private function twoServersOfDupPkg(): array
+    {
+        $first = $this->syntheticServer(['dup/pkg' => [$this->p2Version('dup/pkg', '1.0.0')]]);
+        $second = $this->syntheticServer(['dup/pkg' => [$this->p2Version('dup/pkg', '1.0.0'), $this->p2Version('dup/pkg', '2.0.0')]]);
+        $first->start();
+        $second->start();
+
+        return [$first, $second];
     }
 
     public function testAnUnreachableSecondRepositoryIsNeverConsultedOnceTheFirstResolved(): void
