@@ -1710,9 +1710,10 @@ defs['rootGate'] = obj("The run's gate (report-1's, §6.2) plus the finding coun
     'failing_by': arr(("One entry per `run.gates` value, in its order: how many findings fail that value (their `gate.by[]` names it). Zero counts are written. "
                        "`[]` when `run.gates` is `[]`."), ref('gateValueFailing')),
     'not_applied': arr(("What the gate could not judge, so it failed open: advisories that a grade or vulnerable value could not read because nothing checked them. "
-                        "Written in a check run with a grade or vulnerable value active. With `unchecked` also active, it counts only the packages whose advisories carry no S10 "
-                        "(a skip reason: `not_from_composer_repository`, `unparseable_version`, or a `no_feed` that the project accepted), because the "
-                        "others carry S10 and fail closed. One entry per reason, by `packages` descending, then by reason. The `packages` of the entries add up to the "
+                        "Written in a check run with a grade or vulnerable value active. With `unchecked` also active, a finding's gap is left out only when the finding fails "
+                        "the `unchecked` value, because it then fails closed. Every other unchecked finding is counted: a skip reason (`not_from_composer_repository`, "
+                        "`unparseable_version`) or a `no_feed` that the project accepted, which carry no S10, and a finding that the baseline exempts "
+                        "from `unchecked` (ruling R8-41), so the gate fails open visibly (§6.2). One entry per reason, by `packages` descending, then by reason. The `packages` of the entries add up to the "
                         "findings covered. `[]` otherwise, and when nothing is missing."), ref('gateNotApplied')),
     'text': dict(rendered('The `gate:` line of the text formats, `RunGateText` (text grammar 1).', ['gate', 'run.fail_on', 'run.fail_on_source', 'run.gates', 'run.mode',
                                                                                                   'run.target_php', 'run.target_php_source']), minLength=1),
