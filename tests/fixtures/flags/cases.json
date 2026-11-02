@@ -11844,7 +11844,7 @@
      {
       "name": "symfony/polyfill-intl-idn",
       "version": "v1.37.0",
-      "time": null,
+      "time": "2024-09-10T14:38:51+00:00",
       "php": ">=7.2",
       "dev": false,
       "origin": "packagist"
@@ -11862,7 +11862,7 @@
     "releases": [
      {
       "version": "v1.37.0",
-      "time": null,
+      "time": "2024-09-10T14:38:51+00:00",
       "php": ">=7.2",
       "shared_commit": true
      },
@@ -19069,7 +19069,7 @@
       "lock": {
        "name": "symfony/polyfill-intl-idn",
        "version": "v1.37.0",
-       "time": null,
+       "time": "2024-09-10T14:38:51+00:00",
        "php": ">=7.2",
        "dev": false,
        "origin": "packagist"
@@ -19077,7 +19077,7 @@
       "releases": [
        {
         "version": "v1.37.0",
-        "time": null,
+        "time": "2024-09-10T14:38:51+00:00",
         "php": ">=7.2",
         "shared_commit": true
        },
@@ -59110,7 +59110,7 @@
      {
       "name": "web-token/jwt-key-mgmt",
       "version": "3.4.3",
-      "time": null,
+      "time": "2024-02-22T07:19:34+00:00",
       "php": ">=8.1",
       "dev": false,
       "origin": "packagist"
@@ -59119,7 +59119,7 @@
     "releases": [
      {
       "version": "3.4.3",
-      "time": null,
+      "time": "2024-02-22T07:19:34+00:00",
       "php": ">=8.1",
       "shared_commit": true
      },
@@ -88218,7 +88218,7 @@
     "replacement": null,
     "replacement_url": null,
     "note": null,
-    "libyears_unmeasured": "shared_commit",
+    "libyears_unmeasured": "undated",
     "libyears_at_least": false,
     "direct": false,
     "dev": false,
@@ -88263,7 +88263,7 @@
     "libyears": null,
     "age": {
      "installed": null,
-     "installed_unmeasured": "shared_commit",
+     "installed_unmeasured": "undated",
      "release": null,
      "release_unmeasured": "undated_releases",
      "branch_release": null,
@@ -88466,7 +88466,7 @@
     "age_rows": [
      {
       "label": "installed",
-      "value": "v8.6.1 · release date not known (dated only by a commit its tags share)"
+      "value": "v8.6.1 · release date not known (no date)"
      },
      {
       "label": "last push",
@@ -88474,7 +88474,7 @@
      },
      {
       "label": null,
-      "value": "installed not read (dated only by a commit its tags share)"
+      "value": "installed not read (no date)"
      },
      {
       "label": null,
@@ -88500,7 +88500,7 @@
     "commands_posix": [],
     "commands_cmd": [],
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: installed v8.6.1, release date not known (dated only by a commit its tags share); last push 2026-07-10 (0.2 years ago)"
+    "age_line": "age: installed v8.6.1, release date not known (no date); last push 2026-07-10 (0.2 years ago)"
    },
    "inputs": {
     "root": {
@@ -88578,8 +88578,7 @@
      {
       "version": "v8.6.1",
       "time": null,
-      "php": "~8.4.0 || ~8.5.0",
-      "shared_commit": true
+      "php": "~8.4.0 || ~8.5.0"
      }
     ],
     "advisories": [],
@@ -92216,7 +92215,7 @@
      {
       "name": "symfony/polyfill-intl-idn",
       "version": "v1.37.0",
-      "time": null,
+      "time": "2024-09-10T14:38:51+00:00",
       "php": ">=7.2",
       "dev": false,
       "origin": "packagist"
@@ -92234,7 +92233,7 @@
     "releases": [
      {
       "version": "v1.37.0",
-      "time": null,
+      "time": "2024-09-10T14:38:51+00:00",
       "php": ">=7.2",
       "shared_commit": true
      },
@@ -93695,7 +93694,7 @@
      {
       "name": "symfony/polyfill-intl-idn",
       "version": "v1.37.0",
-      "time": null,
+      "time": "2024-09-10T14:38:51+00:00",
       "php": ">=7.2",
       "dev": false,
       "origin": "packagist"
@@ -93713,7 +93712,7 @@
     "releases": [
      {
       "version": "v1.37.0",
-      "time": null,
+      "time": "2024-09-10T14:38:51+00:00",
       "php": ">=7.2",
       "shared_commit": true
      },
@@ -250137,7 +250136,7 @@
   },
   {
    "id": "capped-solve-pin‡",
-   "label": "laminas-code whose installed release requires php >=8.4.6 <8.5, under config.platform.php 8.4.5 and target 8.4: S11 excludes_target, installed_php.target_runs and the installed branch row read the solve PHP 8.4.5, which the constraint excludes, although it admits 8.4.99 (R9-2, R9-40)",
+   "label": "laminas-code whose installed release requires php >=8.4.6 <8.5, under config.platform.php 8.4.5 and target 8.4: S11 excludes_target and installed_php.target_runs read the solve PHP 8.4.5, which the constraint excludes, although it admits 8.4.99; the branch rows read the same point (R9-2, R9-40)",
    "project": "wallabag",
    "run": {
     "project": "wallabag/wallabag",
@@ -251041,7 +251040,7 @@
     }
    },
    "synthetic_inputs": [
-    "the installed release and its branch row require php >=8.4.6 <8.5; config.platform.php 8.4.5 (‡)"
+    "the installed release requires php >=8.4.6 <8.5; config.platform.php 8.4.5 (‡)"
    ],
    "finding": {
     "package": "laminas/laminas-code",
@@ -251334,14 +251333,14 @@
        "newest_dated": "4.17.0",
        "newest_dated_released": "2025-11-01T09:38:14+00:00",
        "dated_by": null,
-       "php": ">=8.4.6 <8.5",
-       "highest_php": ">=8.4.6 <8.5",
-       "admits_target_php": false,
+       "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+       "highest_php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+       "admits_target_php": true,
        "admits_project_php": false,
        "php_blocked_by": "project",
-       "misses_target_php": "needs_newer",
+       "misses_target_php": null,
        "misses_project_php": "needs_newer",
-       "highest_admits_target_php": false,
+       "highest_admits_target_php": true,
        "highest_admits_project_php": false,
        "highest_misses_project_php": "needs_newer",
        "released_years": 0.9,
@@ -251491,8 +251490,8 @@
       ],
       "latest": "4.17.0",
       "age": "0.9y",
-      "php": ">=8.4.6 <8.5",
-      "php_words": "your target does not run it",
+      "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+      "php_words": "above your require.php",
       "bar": "4.17.0, released 0.9 years ago",
       "folded_in": null
      },

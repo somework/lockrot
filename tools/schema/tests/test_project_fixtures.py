@@ -166,6 +166,46 @@ class APackageThatIsNotFoundHasNoReleases(unittest.TestCase):
         self.assertEqual([{'version': 'v4.4.41', 'time': None, 'php': None}], facts['releases'])
 
 
+class AnUndatedSharedCommitTagTakesTheLockTimeOfTheRunInputs(unittest.TestCase):
+    """The installed tag shares its commit, and no case document dates it: the model's `run_inputs._lock_time` does."""
+    LOCK_TIME = '2024-09-10T14:38:51+00:00'
+    ROW = {'branch': '1.x', 'installed': True, 'highest': 'v1.38.0', 'highest_released': '2025-06-20T10:00:00+00:00', 'highest_commit_date': None,
+           'newest_dated': 'v1.38.0', 'newest_dated_released': '2025-06-20T10:00:00+00:00', 'dated_by': None, 'php': '>=7.2', 'highest_php': '>=7.2',
+           'fixes': None}
+    FINDING = {'package': 'symfony/polyfill-intl-idn', 'version': 'v1.37.0', 'dev': False, 'direct': False, 'named_in': [],
+               'chain': ['symfony/polyfill-intl-idn'], 'direct_dependents': [], 'origin': {'kind': 'packagist'}, 'installed_php': {'requires': '>=7.2'},
+               'signals': [], 'security': {'records': 0, 'ignored': [], 'unchecked_reason': None}, 'activity': {}, 'metadata': {'status': 'read'},
+               'depth_unmeasured': None, 'next_step': None, 'age': {'installed_unmeasured': 'shared_commit'}}
+    RUN = {'root_package': 'acme/app', 'project_php': None, 'target_php': '8.4', 'fail_on': 'high', 'include_dev': False, 'move_check': None}
+
+    def case(self, finding, run_inputs):
+        return {'finding': finding, 'run': self.RUN, 'details': {'metadata': {'branches': [self.ROW]}}, 'run_inputs': run_inputs}
+
+    def test_the_lock_entry_and_the_installed_release_take_the_lock_time(self):
+        inputs = project_fixtures.inputs_of(self.case(self.FINDING, {'_lock_time': {'symfony/polyfill-intl-idn': self.LOCK_TIME}}))
+
+        installed = next(r for r in inputs['releases'] if r['version'] == 'v1.37.0')
+        self.assertEqual(self.LOCK_TIME, inputs['lock'][0]['time'])
+        self.assertEqual({'time': self.LOCK_TIME, 'shared_commit': True}, {k: installed.get(k) for k in ('time', 'shared_commit')})
+
+    def test_a_date_that_the_case_documents_wins_over_the_lock_time(self):
+        s5 = {'id': 'S5', 'data': {'released': '2024-09-09T08:00:00+00:00'}}
+        finding = dict(self.FINDING, signals=[s5])
+
+        inputs = project_fixtures.inputs_of(self.case(finding, {'_lock_time': {'symfony/polyfill-intl-idn': self.LOCK_TIME}}))
+
+        self.assertEqual('2024-09-09T08:00:00+00:00', inputs['lock'][0]['time'])
+
+    def test_a_related_package_takes_its_lock_time(self):
+        root = dict(self.FINDING, package='acme/root-lib', version='1.0.0', age={'installed': {'at': '2025-01-01T00:00:00+00:00'}})
+        case = dict(self.case(root, {'_lock_time': {'symfony/polyfill-intl-idn': self.LOCK_TIME}}),
+                    related={'symfony/polyfill-intl-idn': {'finding': self.FINDING, 'details': {'metadata': {'branches': [self.ROW]}}}})
+
+        inputs = project_fixtures.inputs_of(case)
+
+        self.assertEqual(self.LOCK_TIME, inputs['packages']['symfony/polyfill-intl-idn']['lock']['time'])
+
+
 if __name__ == '__main__':
     unittest.main()
 

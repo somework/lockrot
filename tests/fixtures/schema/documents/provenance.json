@@ -1,6 +1,6 @@
 {
  "source": "security-axis/r3/docs",
- "model_run_date": "2026-11-02",
+ "model_run_date": "2026-11-03",
  "suite": "the model suite reports every step passed",
  "documents": {
   "corpus": 49,

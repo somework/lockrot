@@ -1,8 +1,8 @@
 {
  "pr": "7d",
  "source": {
-  "cases.json": "d7d018c83aea480a0cba310bfb4dce090f9f3dc44788d9b927352131220094fd",
-  "model_run_date": "2026-11-02"
+  "cases.json": "c1c3fca61560df275c3dbebf961f209184aab5a805843612bfb2ec7bf07fdea5",
+  "model_run_date": "2026-11-03"
  },
  "suite": "the model suite reports every step passed",
  "page_goldens": {

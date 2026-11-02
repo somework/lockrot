@@ -86,7 +86,7 @@
   "replacement": null,
   "replacement_url": null,
   "note": null,
-  "libyears_unmeasured": "shared_commit",
+  "libyears_unmeasured": "undated",
   "libyears_at_least": false,
   "direct": false,
   "dev": false,
@@ -131,7 +131,7 @@
   "libyears": null,
   "age": {
    "installed": null,
-   "installed_unmeasured": "shared_commit",
+   "installed_unmeasured": "undated",
    "release": null,
    "release_unmeasured": "undated_releases",
    "branch_release": null,
