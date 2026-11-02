@@ -211,6 +211,26 @@ final class NotCheckedRule implements SignalRule
     }
 
     /**
+     * The `release_dates` entry of S10 in $signals, as a skip: what {@see withoutMaintenanceGaps()}
+     * drops and no other skip restates. Null when S10 has no such entry.
+     *
+     * @param list<Signal> $signals
+     */
+    public static function releaseDatesSkip(array $signals): ?Check
+    {
+        foreach ($signals as $signal) {
+            $data = $signal->data();
+            foreach ($data instanceof NotCheckedData ? $data->checks() : [] as $entry) {
+                if ($entry->check() === 'release_dates') {
+                    return new Check($entry->check(), $entry->reason(), $entry->blocks());
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * The signals with S10 narrowed to $kept, its summary worded again. S10 goes when $kept is empty.
      *
      * @param list<Signal> $signals

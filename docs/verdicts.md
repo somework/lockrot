@@ -1256,6 +1256,7 @@ The skips of `checks_skipped[]`:
 | `repository_archived` | `no_token`, `fetch_failed` | The host answered, without the archived flag: anonymous GitLab (`no_token`), a failed GitLab project request, or a GitHub answer without the flag (`fetch_failed`). S3 cannot fire |
 | `release_metadata` | `unavailable`, `not_found` | The metadata did not come. The package reads `unknown` when nothing else counts, and [`--strict-network`](ci.md#exit-codes) fails on the fetch |
 | `release_branch` | `branch_snapshot` | A branch snapshot has no release branch for S8 |
+| `release_dates` | `undated_releases` | The S1 and allowlist filter below dropped the S10 `release_dates` entry. The skip keeps that entry's `blocks` |
 | `advisories` | `not_from_composer_repository` | `advisory-lookup: composer-repositories`, and the package is not from a Composer repository |
 | `advisories` | `unparseable_version` | Composer cannot parse the installed version |
 | any | `accepted_by_config` | An [`accept-unchecked`](configuration.md#accept-unchecked) entry accepted the S10 entry. `unchecked_accepted[]` holds it |
@@ -1264,8 +1265,8 @@ The skips of `checks_skipped[]`:
 - A package whose S1 fired, or that an allowlist entry accepts whole, drops its maintenance gaps
   (`repository_activity`, `release_dates`, `release_metadata`) from S10. This filter does not ask
   whether a gap could change the score. A raised S1 drops them also when an `ignore` entry accepts
-  `abandoned`, and a dropped gap can block S5 or S8. The `repository_activity` and
-  `release_metadata` gaps then show as skips. Its `advisories` and `releases` gaps stay S10.
+  `abandoned`, and a dropped gap can block S5 or S8. Each dropped gap then shows as a skip. Its
+  `advisories` and `releases` gaps stay S10.
 
 - Credentials for every host remove `no_token` and `anonymous_budget`. `rate_limit`, `fetch_failed`,
   `offline` and `install_time_budget` can still occur, and `release_dates` asks no host, so a fully

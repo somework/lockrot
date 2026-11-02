@@ -90,8 +90,9 @@ final class FindingDetails
      * @param list<Signal>          $signals         the finding's signals: S10 tells a gap from a skip
      * @param ?string               $metadataFailure what the repository that lists the package answered instead of its metadata
      * @param list<AcceptedCheck>     $accepted        the S10 entries that `accept-unchecked` accepted: each one is a skip
+     * @param ?Check                  $droppedDates    the `release_dates` gap that the S10 filter dropped, a skip
      */
-    public static function of(PackageFacts $facts, ?AllowlistEntry $entry, PhpFloor $floor, array $ignored, array $signals, ?string $metadataFailure, Age $age, array $accepted = []): self
+    public static function of(PackageFacts $facts, ?AllowlistEntry $entry, PhpFloor $floor, array $ignored, array $signals, ?string $metadataFailure, Age $age, array $accepted = [], ?Check $droppedDates = null): self
     {
         $package = $facts->package();
         $status = $facts->metadataStatus();
@@ -106,7 +107,7 @@ final class FindingDetails
             $status,
             $status === PackageFacts::METADATA_UNAVAILABLE && $metadataFailure !== null ? MetadataFailure::reason($metadataFailure) : null,
             $status === PackageFacts::METADATA_UNAVAILABLE ? $metadataFailure : null,
-            self::skippedChecks($facts, $signals, $reason, $accepted),
+            self::skippedChecks($facts, $signals, $reason, $accepted, $droppedDates),
             ['requires' => $requires, 'target_runs' => $requires === null ? null : $floor->admitsTarget($requires), 'project_allows' => $requires === null ? null : $floor->allowsProject($requires)],
             $entry,
             $check,
@@ -182,15 +183,16 @@ final class FindingDetails
     /**
      * The checks that did not run and raise no S10: the repository activity that lockrot did not
      * read, unless S10 holds it; the archived flag that a read did not carry; the release metadata
-     * that was not read, unless S10 holds it; S8 on a branch snapshot; the advisories of a package
-     * the lookup scope or an unparseable version leaves out.
+     * that was not read, unless S10 holds it; S8 on a branch snapshot; the release dates gap that
+     * the S10 filter dropped; the advisories of a package the lookup scope or an unparseable
+     * version leaves out.
      *
      * @param list<Signal>        $signals
      * @param list<AcceptedCheck> $accepted
      *
      * @return list<Check>
      */
-    private static function skippedChecks(PackageFacts $facts, array $signals, ?string $advisoryReason, array $accepted): array
+    private static function skippedChecks(PackageFacts $facts, array $signals, ?string $advisoryReason, array $accepted, ?Check $droppedDates): array
     {
         $inS10 = [];
         $capped = false;
@@ -225,6 +227,9 @@ final class FindingDetails
             }
         } elseif (ReleaseBranch::of($facts->package()->version()) === null) {
             $skipped[] = new Check('release_branch', 'branch_snapshot', [Signal::S8]);
+        }
+        if ($droppedDates !== null) {
+            $skipped[] = $droppedDates;
         }
         if (isset($acceptedSkips['advisories'])) {
             $skipped[] = $acceptedSkips['advisories'];
