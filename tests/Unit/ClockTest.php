@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit;
 
 use Lockrot\Clock;
+use Lockrot\Exception\ConfigException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -125,6 +126,17 @@ final class ClockTest extends TestCase
             '2026-09-14',
             Clock::fromEnvironment(['LOCKROT_TODAY' => '2026-09-14T00:00:00+00:00'])->now()->format('Y-m-d')
         );
+    }
+
+    public function testAMalformedLockrotTodayIsAConfigErrorThatNamesTheVariableAndTheValue(): void
+    {
+        try {
+            Clock::fromEnvironment(['LOCKROT_TODAY' => 'not-a-date']);
+            self::fail('a malformed LOCKROT_TODAY must be refused');
+        } catch (ConfigException $e) {
+            self::assertStringContainsString('LOCKROT_TODAY', $e->getMessage());
+            self::assertStringContainsString('"not-a-date"', $e->getMessage());
+        }
     }
 
     /** @return iterable<string, array{string, string}> LOCKROT_TODAY, the instant it pins */

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot;
 
+use Lockrot\Exception\ConfigException;
+
 /** @internal */
 final class Clock
 {
@@ -32,13 +34,21 @@ final class Clock
      * configuration contract (docs/configuration.md, "Testing hooks"), so this method reads it and
      * LockrotConfig does not.
      *
+     * @throws ConfigException for a value that is no date
+     *
      * @param array<string, mixed> $env
      */
     public static function fromEnvironment(array $env): self
     {
         $today = $env['LOCKROT_TODAY'] ?? null;
-
-        return \is_string($today) && $today !== '' ? self::fixed($today) : new self();
+        if (!\is_string($today) || $today === '') {
+            return new self();
+        }
+        try {
+            return self::fixed($today);
+        } catch (\Exception $malformed) {
+            throw new ConfigException('LOCKROT_TODAY must be an ISO 8601 date or date-time, such as "2026-09-14"; got "'.$today.'"');
+        }
     }
 
     public function now(): \DateTimeImmutable
