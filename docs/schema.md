@@ -612,6 +612,13 @@ A private registry is `kind: composer` with `registry: null`: its host is not wr
 Other parts of a report can name a private registry or a repository host, and `origin` does not
 change them:
 
+- each `composer_repository` in `run.advisory_lookup.repositories[]` and in a finding's
+  `security.feeds[]`. It is Composer's name for the repository and keeps the URL path, so
+  `composer repo (https://repo.packagist.com/<organisation>/)` names the organisation.
+
+- the `message` of a repository in `run.advisory_lookup.repositories[]` that failed. It quotes
+  Composer's error, which can name the repository URL.
+
 - a run note about a Composer repository that lockrot could not read (`advisories_unavailable`,
   `metadata_unavailable`, `monorepo_parent_unavailable`): its `text`, its `notes` entry, and a
   `message` or `composer_repository` in its `data`.
@@ -646,12 +653,25 @@ lockrot redacts what it quotes:
 
 The one absolute path a report carries is SARIF's `%SRCROOT%` ([ci.md](ci.md#-formatsarif)).
 
-To remove the registry label from `origin`, and only from `origin`, clear both keys. The document
-stays valid, since both can be null:
+To remove the registry label from `origin`, clear both keys. To remove the repository names, put
+`repository <i>` in each `composer_repository`. `<i>` is the index of that name in
+`run.advisory_lookup.repositories[]`, so a feed still joins its repository. A name that the list
+does not hold becomes `repository unlisted`. The recipe also replaces the `message` of a failed
+repository with `withheld`. The document stays valid:
 
 ```bash
-jq '.findings |= map(if .origin then .origin.registry = null | .origin.package_url = null else . end)' lockrot.json > lockrot.public.json
+jq '(.run.advisory_lookup.repositories | map(.composer_repository)) as $names
+  | .findings |= map(if .origin then .origin.registry = null | .origin.package_url = null else . end)
+  | .run.advisory_lookup.repositories |= map(if .message then .message = "withheld" else . end)
+  | walk(if type == "object" and (.composer_repository | type) == "string"
+      then .composer_repository as $name
+        | .composer_repository = "repository \(($names | index($name)) // "unlisted")"
+      else . end)' lockrot.json > lockrot.public.json
 ```
+
+The recipe does not change a run note. When a repository cannot be read, its note names the
+repository URL. Check `notes` and each `note_details[]` entry, its `text` and its `data`, before you
+publish the report.
 
 ## Validating in CI
 
