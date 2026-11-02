@@ -71,6 +71,7 @@ final class CoverageTest extends TestCase
         }
         $allowed = self::allowed();
         $missing = [];
+        $stale = $allowed;
         foreach (array_keys(self::SETS) as $name) {
             foreach (self::targets($schemas[$name]) as $key => $values) {
                 [$pointer] = explode(' ', $key);
@@ -80,7 +81,11 @@ final class CoverageTest extends TestCase
                     $got += $this->seen[Schemas::REPORT][$key] ?? [];
                 }
                 foreach ($values as $value) {
-                    if (!isset($got[$value]) && !isset($allowed[$name.' '.$pointer.' '.$value])) {
+                    if (isset($got[$value])) {
+                        continue;
+                    }
+                    unset($stale[$name.' '.$pointer.' '.$value]);
+                    if (!isset($allowed[$name.' '.$pointer.' '.$value])) {
                         $missing[] = $name.' '.$key.' '.json_encode($value);
                     }
                 }
@@ -88,6 +93,7 @@ final class CoverageTest extends TestCase
         }
 
         self::assertSame([], $missing, 'a listed value no document carries: add a document that writes it, or allow it with its reason');
+        self::assertSame([], array_keys($stale), 'an allowed value that a document carries, or that no schema lists at that pointer: delete its allow entry');
     }
 
     /**
@@ -293,12 +299,12 @@ final class CoverageTest extends TestCase
     private static function allowed(): array
     {
         $shared = [
-            [self::D.'alsoMove/properties/kind', ['replace', 'find-alternative', 'tag', 'update', 'raise-php', 'test', 'blocked', 'no-tag', 'no-move', 'no-single-fix'],
-                'an also[] move shares the move kinds, and every corpus and case also[] move is the security move beside a maintenance lead. next_step carries each other kind'],
-            [self::D.'alsoMove/properties/composer_moves_because/items', ['holders', 'transitive', 'unreached'], 'as alsoMove.kind: next_step.composer_moves_because carries every value'],
+            [self::D.'alsoMove/properties/kind', ['replace', 'find-alternative', 'tag', 'update', 'test', 'blocked', 'no-tag', 'no-move', 'no-single-fix'],
+                self::NOT_REACHED.' (an also[] move of this kind). An also[] move shares the move kinds, and next_step carries each of them'],
+            [self::D.'alsoMove/properties/composer_moves_because/items', ['transitive', 'unreached'], 'as alsoMove.kind: next_step.composer_moves_because carries every value'],
             [self::D.'alsoMove/properties/reason/oneOf/0', ['package_quiet', 'no_higher_release', 'higher_undated', 'releases_unknown', 'affected_range_unknown', 'metadata_not_read', 'local_package', 'no_release_admits'],
                 'as alsoMove.kind: a no-move reason belongs to a maintenance move, which no also[] move is'],
-            [self::D.'holder/oneOf/0/properties/next_step/oneOf/0/properties/kind', ['replace', 'find-alternative', 'tag', 'update', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix'],
+            [self::D.'holder/oneOf/0/properties/next_step/oneOf/0/properties/kind', ['tag', 'update', 'test', 'blocked', 'no-tag', 'no-fix', 'no-single-fix'],
                 "a holder's next_step copies the holding finding's own kind, and the finding's own next_step carries every other kind"],
             [self::D.'move/properties/reason/oneOf/0', ['no_higher_release', 'higher_undated'], self::NOT_REACHED.' (a left-behind lead with no higher branch releasing, or none dated)'],
             [self::D.'advisoriesNotCheckedReason', ['lookup_failed'], 'lockrot writes advisories_unavailable for a feed that fails, and RunNote::advisoriesNotChecked() refuses lookup_failed'],
@@ -314,16 +320,8 @@ final class CoverageTest extends TestCase
                 self::NOT_REACHED.' (a security.partial on a held package). next_step.if_applied.assumes carries each value'],
             [self::D.'branchFixes/properties/if_applied/oneOf/0/properties/assumes/items', ['no_new_advisories'],
                 self::NOT_REACHED.' (a branch row that fixes something beside an incomplete lookup). next_step.if_applied.assumes carries the value'],
-            [self::D.'noteUpdateNowNotChecked/properties/reason', ['baseline_refused', 'unloaded_name', 'offline', 'not_from_composer_repository', 'no_composer_json', 'composer_json_invalid', 'no_release_read', 'pass_cap', 'solver_error', 'advisory_lookup_incomplete'],
+            [self::D.'noteUpdateNowNotChecked/properties/reason', ['baseline_refused', 'unloaded_name', 'offline', 'not_from_composer_repository', 'no_composer_json', 'composer_json_invalid', 'no_release_read', 'pass_cap', 'solver_error', 'advisory_lookup_incomplete', 'platform_config_invalid'],
                 "the note's reason is a value of check.reason, which the move-check documents carry each. A document carries install_time_budget"],
-            [self::D.'targetFix/properties/reason/oneOf/0', ['advisory_lookup_incomplete'],
-                'R6-1: a target fix whose resolving solve holds a name that the advisory lookup did not read. The model documents predate the reason'],
-            ...array_map(static fn (string $pointer): array => [self::D.$pointer, ['platform_config_invalid'], 'R8-37: a config.platform value that Composer refuses. The model documents predate the reason'], [
-                'moveCheck/oneOf/0/properties/reason/oneOf/0', 'run/properties/move_check/oneOf/0/properties/reason/oneOf/0',
-                'explainRun/properties/move_check/oneOf/0/properties/reason/oneOf/0', 'targetFix/properties/reason/oneOf/0', 'noteUpdateNowNotChecked/properties/reason',
-            ]),
-            [self::D.'noteAdvisoriesDisabledByPolicy/properties/policy_key', ['COMPOSER_POLICY'],
-                'the variable that switches the policy off. The documents run under policy and policy.advisories'],
             [self::D.'noteAbandonedNotAuditedByComposer/properties/policy_key', ['COMPOSER_POLICY'],
                 'P1: COMPOSER_POLICY=0 also stops the abandoned audit. The model documents predate the key'],
             [self::D.'noteRepositoryActivityHostNotSupported/properties/hosts/items/properties/listed_in/oneOf/0', ['forgejo-domains'],
