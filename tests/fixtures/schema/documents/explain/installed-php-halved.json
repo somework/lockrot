@@ -315,7 +315,9 @@
       "target": null
      },
      "newest_years": 2.2,
-     "reachable_years": 2.2
+     "reachable_years": 2.2,
+     "newest_release_at_least": false,
+     "reachable_release_at_least": false
     }
    }
   ],

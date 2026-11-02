@@ -2930,7 +2930,9 @@
       "dated_by": "symfony/symfony",
       "reachable_php": ">=7.2.5",
       "newest_years": 0.1,
-      "reachable_years": 0.4
+      "reachable_years": 0.4,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": false
      }
     },
     {
@@ -3436,7 +3438,9 @@
       "reachable_php": null,
       "reachable_admits": null,
       "newest_years": 0.1,
-      "reachable_years": null
+      "reachable_years": null,
+      "newest_release_at_least": false,
+      "reachable_release_at_least": null
      }
     },
     {
