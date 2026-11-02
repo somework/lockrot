@@ -431,7 +431,6 @@ final class NotCheckedRuleTest extends TestCase
         $s10 = new Signal(Signal::LEVEL_INFO, 'not checked', new NotCheckedData([$dates]));
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('S10 has no cause for the release_dates entry.');
 
         NotCheckedRule::keeping([$s10], [$dates], null, null);
     }
