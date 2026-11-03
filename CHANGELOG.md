@@ -151,6 +151,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   cannot send the token to another API path of the repository host.
 - **All formats:** a repository URL without a scheme that holds credentials (`user:token@host/path`)
   gives `host` as the repository host. The token no longer reaches the report as the host name.
+- **All formats:** lockrot does not ask a repository for a package that its `only` or `exclude`
+  keeps out. When no repository with a feed admits the package, it reads `no_feed`, not `answered`
+  with 0 records.
 
 ### Added
 
@@ -504,9 +507,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--baseline` target never climbs above the share.
 - **All formats:** the move check stops at a canonical repository that fails on a package, as
   Composer does. A move that needs the package reads `not_checked` with `unloaded_name`.
-- **All formats:** lockrot does not ask a repository for a package that its `only` or `exclude`
-  keeps out. When no repository with a feed admits the package, it reads `no_feed`, not `answered`
-  with 0 records.
 - **CLI, Install-time:** a run with `LOCKROT_TODAY` stores no fetch time later than the real time
   in the cache of repository host answers.
 
