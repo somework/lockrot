@@ -40,17 +40,25 @@ final class SignalDataStub
 {
     private const DATE = '2021-05-05T00:00:00+00:00';
 
-    /** @param array<string, mixed> $d */
-    public static function of(string $id, array $d): SignalData
+    /**
+     * @param array<string, mixed> $d
+     * @param array<string, mixed> $run the report-2 `run` keys `target_php`, `project_php_lowest` and `php_window`, from
+     *                                  which S8 rebuilds its miss side (SPEC "The miss words of S8"). Without them, S8 has
+     *                                  no side and its sentence reads the floor at `floor_php`.
+     */
+    public static function of(string $id, array $d, array $run = []): SignalData
     {
-        $data = self::build($id, $d);
+        $data = self::build($id, $d, $run);
         self::assertWrites($data->jsonSerialize(), $d);
 
         return $data;
     }
 
-    /** @param array<string, mixed> $d */
-    private static function build(string $id, array $d): SignalData
+    /**
+     * @param array<string, mixed> $d
+     * @param array<string, mixed> $run
+     */
+    private static function build(string $id, array $d, array $run): SignalData
     {
         switch ($id) {
             case Signal::S1:
@@ -106,7 +114,8 @@ final class SignalDataStub
                         self::opt($d, 'suggested_constraint'),
                         ($d['reachable_release_at_least'] ?? false) === true
                     ),
-                    ($d['newest_release_at_least'] ?? false) === true
+                    ($d['newest_release_at_least'] ?? false) === true,
+                    self::newestMisses($d, $run)
                 );
             case Signal::S11:
                 $admits = $d['admits_newest'] ?? null;
@@ -121,6 +130,26 @@ final class SignalDataStub
 
                 return new NotCheckedData($checks === [] ? [new Check('repository_activity', 'no_token', [Signal::S3, Signal::S4])] : $checks);
         }
+    }
+
+    /**
+     * @param array<string, mixed> $d
+     * @param array<string, mixed> $run
+     */
+    private static function newestMisses(array $d, array $run): ?string
+    {
+        $newestPhp = self::opt($d, 'newest_php');
+        if ($run === [] || ($d['newest_within_reach'] ?? false) === true || $newestPhp === null) {
+            return null;
+        }
+        if (self::opt($d, 'floor_source') === PhpFloor::PROJECT) {
+            return (new PhpFloor(null, self::opt($run, 'project_php_lowest')))->missesProject($newestPhp);
+        }
+        $floor = new PhpFloor(self::opt($run, 'target_php'));
+        $window = $run['php_window'] ?? null;
+        $solvePhp = \is_array($window) && \is_array($window['target'] ?? null) ? self::opt($window['target'], 'php') : null;
+
+        return ($solvePhp === null ? $floor : $floor->solvedAt($solvePhp))->missesTarget($newestPhp);
     }
 
     /**
