@@ -238,6 +238,10 @@ final class LockrotConfig
      */
     private static function resolveTargetPhp(array $extra, array $env, array $cli, string $runtimePhp, ?string $platformPhp): array
     {
+        // As `--fail-on=` in resolveFailOn(): an unset CI variable must not judge another PHP.
+        if (($cli['target-php'] ?? null) === '') {
+            throw new ConfigException('--target-php must not be empty');
+        }
         // Whenever it is set, like LOCKROT_FAIL_ON in resolveFailOn().
         $fromEnv = $env['LOCKROT_TARGET_PHP'] ?? null;
         if (\is_string($fromEnv) && $fromEnv !== '' && !self::isTargetPhpValue($fromEnv)) {
