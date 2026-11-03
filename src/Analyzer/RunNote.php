@@ -221,7 +221,7 @@ final class RunNote
      * One line of the message, or the class when there is none: Composer's message for a partial
      * record runs to a `var_export()` dump of it. Only an unreachable repository is a network
      * failure, not one that answered with something unreadable. Composer's repository URL can keep
-     * a token, a login and a `?token=` on Composer 2.4 to 2.9: {@see RepositoryUrl::inText()}.
+     * a token, a login and a `?token=`: {@see RepositoryUrl::inText()}.
      */
     public static function advisoriesUnavailable(string $composerRepository, \Throwable $e): self
     {

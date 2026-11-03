@@ -22,7 +22,7 @@ final class ConfiguredRepositories
 {
     private const VCS_TYPES = ['vcs', 'git', 'github', 'gitlab', 'bitbucket', 'git-bitbucket', 'hg', 'svn', 'fossil', 'perforce'];
 
-    /** Root repository types of Composer 2.2 to 2.10. A plugin's types exist only after the root repositories. */
+    /** Root repository types of the lowest Composer that composer.json requires. A plugin's types exist only after the root repositories. */
     private const TYPES = ['vcs', 'git', 'github', 'gitlab', 'bitbucket', 'git-bitbucket', 'hg', 'svn', 'fossil', 'perforce', 'composer', 'package', 'artifact', 'path'];
 
     /** @var list<array{type: string, url: string, only: ?string, exclude: ?string, canonical: bool, packages: list<Definition>}> */
