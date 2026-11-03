@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-5Uw1fefSpN87QcHK5uTOJs08VZjIDbcGAzDLGFuc41E='; style-src 'sha256-SDpdSJmbXpiOWHYThyAKaaI3keLtRklgvAww99sGJlc='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-zlselO4zL28ltduyVdE/tUsmNXKHnIOsYS5Y5Em/qCI='; style-src 'sha256-Y3UQjsf0iVGyQV9ZbWgCK1Z0VhbhYl9g4Ps2oeyJVe0='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -6691,19 +6691,19 @@ a.ov-ex-row:hover {
   }
 }
 @media print {
-  .pd .tablewrap td.p2-flags:not(:first-child) {
-    white-space: normal;
-    min-width: 15em;
-  }
   .pd .tablewrap td.p2-flags .fp {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     margin-block: 1px;
   }
-  .pd .tablewrap td.p2-name:first-child {
-    overflow-wrap: normal;
-  }
   .pd .tablewrap .p2-unit {
-    white-space: nowrap;
+    white-space: normal;
+  }
+  .pd .tablewrap td.p2-name {
+    min-width: 8em;
+  }
+  .pd .tablewrap td.p2-ver,
+  .pd .tablewrap td.p2-age {
+    min-width: 6em;
   }
   .pd .tablewrap thead {
     display: table-header-group;
@@ -6819,7 +6819,7 @@ a.ov-ex-row:hover {
   appearance: none;
   justify-self: end;
   width: 24px;
-  height: 22px;
+  height: 24px;
   border: 1px solid var(--border);
   border-radius: var(--radius-s);
   background: var(--surface-2);
@@ -7549,9 +7549,6 @@ a.ov-ex-row:hover {
   .pd .tablewrap .lnk {
     border-bottom: 0;
   }
-  .pd .tablewrap td:not(:first-child) {
-    white-space: nowrap;
-  }
   .pd .tablewrap .pill {
     font-size: var(--text-xs);
     padding: 1px 4px;
@@ -8010,6 +8007,17 @@ a.ov-ex-row:hover {
 		return typeof value === "object" && value !== null && !Array.isArray(value);
 	}
 	//#endregion
+	//#region src/domain/rich.ts
+	function pieceText(piece) {
+		if (typeof piece === "string") return piece;
+		if ("code" in piece) return piece.code;
+		if ("strong" in piece) return piece.strong;
+		if ("jump" in piece) return (piece.lead ?? "") + piece.text;
+		return piece.text;
+	}
+	var plain = (rich) => rich.map(pieceText).join("");
+	var newTab = (name) => `${name}, opens in a new tab`;
+	//#endregion
 	//#region node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js
 	var f$1 = 0;
 	Array.isArray;
@@ -8058,6 +8066,7 @@ a.ov-ex-row:hover {
 									href: "https://lockrot.dev/",
 									target: "_blank",
 									rel: "noopener noreferrer",
+									"aria-label": newTab("lockrot"),
 									children: "lockrot"
 								})
 							})]
@@ -8331,17 +8340,6 @@ a.ov-ex-row:hover {
 		example: null,
 		section: null
 	};
-	//#endregion
-	//#region src/domain/rich.ts
-	function pieceText(piece) {
-		if (typeof piece === "string") return piece;
-		if ("code" in piece) return piece.code;
-		if ("strong" in piece) return piece.strong;
-		if ("jump" in piece) return (piece.lead ?? "") + piece.text;
-		return piece.text;
-	}
-	var plain = (rich) => rich.map(pieceText).join("");
-	var newTab = (name) => `${name}, opens in a new tab`;
 	//#endregion
 	//#region src/domain/pageVocabulary.ts
 	function wordFor(table, id) {
@@ -9140,7 +9138,6 @@ a.ov-ex-row:hover {
 		const value = typeof url === "string" ? url.trim() : "";
 		return /^https?:\/\/[^\s<>"']+$/i.test(value) ? value : null;
 	}
-	var NEW_TAB = ", opens in a new tab";
 	function hostOf(url) {
 		try {
 			return new URL(url).hostname.replace(/^www\./, "") || null;
@@ -9157,7 +9154,7 @@ a.ov-ex-row:hover {
 			links.push({
 				href: repo,
 				text: `${host} ↗${archived}`,
-				name: `${host} repository${archived}${NEW_TAB}`
+				name: newTab(`${host} repository${archived}`)
 			});
 		}
 		const registry = safeHref(origin.package_url);
@@ -9166,7 +9163,7 @@ a.ov-ex-row:hover {
 			links.push({
 				href: registry,
 				text: `${origin.registry ?? page} ↗`,
-				name: `${page} of this package${NEW_TAB}`
+				name: newTab(`${page} of this package`)
 			});
 		}
 		return links;
@@ -11389,6 +11386,93 @@ a.ov-ex-row:hover {
 		};
 	}
 	//#endregion
+	//#region src/domain/runState.ts
+	var RUN_DATA = { view: "run" };
+	var UNKNOWN_GRADE = {
+		view: "packages",
+		filters: { verdict: ["unknown"] }
+	};
+	var PHP_WINDOW_SECTION = "php-window";
+	var hasNote = ({ note_details: notes }, code) => notes.some((n) => n.code === code);
+	function lookupLine(report) {
+		const { security, counts, packages_checked: checked } = report;
+		const offline = hasNote(report, "offline");
+		const parts = [
+			...security.check === "not_run" ? ["no advisory check ran"] : [],
+			...security.check === "partial" ? ["the advisory lookup was partial"] : [],
+			...counts.unknown > 0 ? [{
+				count: `${String(counts.unknown)} of ${plural(checked, "package", "packages")}`,
+				link: UNKNOWN_GRADE,
+				rest: ` ${counts.unknown === 1 ? "has" : "have"} no grade, because lockrot read no metadata for ${counts.unknown === 1 ? "it" : "them"}`
+			}] : []
+		];
+		if (!offline && parts.length === 0) return null;
+		return {
+			kind: "lookup",
+			head: offline ? "Offline run" : "Incomplete data",
+			parts,
+			more: {
+				text: "What this run could not see",
+				link: RUN_DATA
+			}
+		};
+	}
+	function phpLine(report) {
+		const clauses = phpStateClauses(report);
+		if (clauses === null) return null;
+		return {
+			kind: "php",
+			head: "PHP",
+			parts: clauses,
+			more: {
+				text: "The PHP window",
+				link: {
+					...RUN_DATA,
+					section: PHP_WINDOW_SECTION
+				}
+			}
+		};
+	}
+	function allowlistLine(report) {
+		const note = report.note_details.find((n) => n.code === "ignore_does_not_cover_advisories");
+		if (note === void 0) return null;
+		const entries = note.data.entries;
+		const listed = Array.isArray(entries) ? entries.length : 0;
+		return {
+			kind: "allowlist",
+			head: null,
+			parts: ["extra.lockrot.ignore accepts maintenance flags, not advisories", ...listed > 0 ? [`${plural(listed, "package", "packages")} it lists still ${listed === 1 ? "counts" : "count"} for advisories`] : []],
+			more: {
+				text: "The run note",
+				link: RUN_DATA
+			}
+		};
+	}
+	function baselineLine({ baseline }) {
+		if (baseline === null) return null;
+		const count = (n, word) => `${String(n)} ${word}`;
+		const stale = baseline.stale;
+		return {
+			kind: "baseline",
+			head: `Against ${baseline.path}`,
+			parts: [
+				count(baseline.new, "new"),
+				count(baseline.worsened, "worsened"),
+				count(baseline.known, "known"),
+				...stale.length > 0 ? [`${plural(stale.length, "entry", "entries")} for packages that left the lock: ${stale.join(", ")}`] : []
+			],
+			more: null
+		};
+	}
+	function stateLines(report) {
+		return [
+			lookupLine(report),
+			phpLine(report),
+			allowlistLine(report),
+			baselineLine(report)
+		].filter((line) => line !== null);
+	}
+	//#endregion
 	//#region src/ui/context.ts
 	var ReportContext = X(null);
 	function useReport() {
@@ -11430,7 +11514,7 @@ a.ov-ex-row:hover {
 	function ago(years) {
 		return years === 0 ? "less than three weeks ago" : `${decimal(years, 1)} years ago`;
 	}
-	var agoAtMost = (years, atMost) => atMost ? `at most ${ago(years)}` : ago(years);
+	var agoAtMost = (years, atMost) => atMost && years !== 0 ? `at most ${ago(years)}` : ago(years);
 	//#endregion
 	//#region src/domain/ageRows.ts
 	function when(reading) {
@@ -11557,7 +11641,7 @@ a.ov-ex-row:hover {
 				move: moveBranch !== null && row.branch === moveBranch,
 				newest: i === 0 && !row.installed,
 				datedBy: row.installed ? release?.dated_by ?? null : row.dated_by,
-				atMost: !row.installed && row.highest_released === null && years !== 0,
+				atMost: !row.installed && row.highest_released === null,
 				age: shortAge(years),
 				foldedIn: folded[i] ?? null
 			};
@@ -11854,7 +11938,8 @@ a.ov-ex-row:hover {
 			]
 		});
 	}
-	function OutLink({ href, children, tabIndex, title, label }) {
+	function OutLink(props) {
+		const { href, children, tabIndex, title } = props;
 		const safe = safeHref(href);
 		if (safe === null) return u$1("span", {
 			className: "out",
@@ -11867,7 +11952,7 @@ a.ov-ex-row:hover {
 			rel: "noopener noreferrer",
 			tabIndex,
 			title,
-			"aria-label": label,
+			"aria-label": props.label === void 0 ? newTab(props.children) : props.label,
 			children
 		});
 	}
@@ -14301,7 +14386,7 @@ a.ov-ex-row:hover {
 			...grade === null ? [] : [plural(byVerdict[grade] ?? 0, `${grade} finding`, `${grade} findings`), `${String(worse)} of ${plural(checked, "package", "packages")} high or worse`],
 			...security.check === "partial" ? [lookupWord(security.check, null)] : [],
 			...counts.unknown > 0 ? [`${String(counts.unknown)} not judged`] : [],
-			...report.baseline !== null && known > 0 ? [`${String(known)} known to the baseline`] : []
+			...report.baseline !== null && known > 0 ? [`${plural(known, "graded finding", "graded findings")} known to the baseline`] : []
 		];
 		return {
 			grade,
@@ -14836,6 +14921,7 @@ a.ov-ex-row:hover {
 						className: "lnk",
 						href,
 						title,
+						"aria-label": newTab(words.text),
 						target: "_blank",
 						rel: "noopener noreferrer",
 						tabIndex: innerTabIndex(finding.package, cursor),
@@ -15240,6 +15326,7 @@ a.ov-ex-row:hover {
 			href,
 			target: "_blank",
 			rel: "noopener noreferrer",
+			"aria-label": newTab(children),
 			children
 		});
 	}
@@ -15949,6 +16036,7 @@ a.ov-ex-row:hover {
 							href: "https://lockrot.dev/",
 							target: "_blank",
 							rel: "noopener noreferrer",
+							"aria-label": newTab("lockrot"),
 							children: "lockrot"
 						}) }),
 						u$1("span", {
@@ -16849,93 +16937,6 @@ a.ov-ex-row:hover {
 		};
 	}
 	//#endregion
-	//#region src/domain/runState.ts
-	var RUN_DATA = { view: "run" };
-	var UNKNOWN_GRADE = {
-		view: "packages",
-		filters: { verdict: ["unknown"] }
-	};
-	var PHP_WINDOW_SECTION = "php-window";
-	var hasNote = ({ note_details: notes }, code) => notes.some((n) => n.code === code);
-	function lookupLine(report) {
-		const { security, counts, packages_checked: checked } = report;
-		const offline = hasNote(report, "offline");
-		const parts = [
-			...security.check === "not_run" ? ["no advisory check ran"] : [],
-			...security.check === "partial" ? ["the advisory lookup was partial"] : [],
-			...counts.unknown > 0 ? [{
-				count: `${String(counts.unknown)} of ${plural(checked, "package", "packages")}`,
-				link: UNKNOWN_GRADE,
-				rest: ` ${counts.unknown === 1 ? "has" : "have"} no grade, because lockrot read no metadata for ${counts.unknown === 1 ? "it" : "them"}`
-			}] : []
-		];
-		if (!offline && parts.length === 0) return null;
-		return {
-			kind: "lookup",
-			head: offline ? "Offline run" : "Incomplete data",
-			parts,
-			more: {
-				text: "What this run could not see",
-				link: RUN_DATA
-			}
-		};
-	}
-	function phpLine(report) {
-		const clauses = phpStateClauses(report);
-		if (clauses === null) return null;
-		return {
-			kind: "php",
-			head: "PHP",
-			parts: clauses,
-			more: {
-				text: "The PHP window",
-				link: {
-					...RUN_DATA,
-					section: PHP_WINDOW_SECTION
-				}
-			}
-		};
-	}
-	function allowlistLine(report) {
-		const note = report.note_details.find((n) => n.code === "ignore_does_not_cover_advisories");
-		if (note === void 0) return null;
-		const entries = note.data.entries;
-		const listed = Array.isArray(entries) ? entries.length : 0;
-		return {
-			kind: "allowlist",
-			head: null,
-			parts: ["extra.lockrot.ignore accepts maintenance flags, not advisories", ...listed > 0 ? [`${plural(listed, "package", "packages")} it lists still ${listed === 1 ? "counts" : "count"} for advisories`] : []],
-			more: {
-				text: "The run note",
-				link: RUN_DATA
-			}
-		};
-	}
-	function baselineLine({ baseline }) {
-		if (baseline === null) return null;
-		const count = (n, word) => `${String(n)} ${word}`;
-		const stale = baseline.stale;
-		return {
-			kind: "baseline",
-			head: `Against ${baseline.path}`,
-			parts: [
-				count(baseline.new, "new"),
-				count(baseline.worsened, "worsened"),
-				count(baseline.known, "known"),
-				...stale.length > 0 ? [`${plural(stale.length, "entry", "entries")} for packages that left the lock: ${stale.join(", ")}`] : []
-			],
-			more: null
-		};
-	}
-	function stateLines(report) {
-		return [
-			lookupLine(report),
-			phpLine(report),
-			allowlistLine(report),
-			baselineLine(report)
-		].filter((line) => line !== null);
-	}
-	//#endregion
 	//#region src/ui/ledger/Waffle.tsx
 	function Waffle({ runs }) {
 		return u$1("div", {
@@ -17716,6 +17717,7 @@ a.ov-ex-row:hover {
 					href,
 					target: "_blank",
 					rel: "noopener noreferrer",
+					"aria-label": newTab(text),
 					tabIndex,
 					children: text
 				}, text) : u$1("span", {
@@ -18562,14 +18564,16 @@ a.ov-ex-row:hover {
 			children: ids.join(" ")
 		});
 	}
-	function PackageRow({ finding, report, hideAccepted, showData }) {
+	function PackageRow({ finding, report, hideAccepted, showData, scoreHead }) {
 		const { state, dispatch, cursor } = useReport();
 		const run = report.run;
+		const id = g();
 		return u$1("tr", {
 			role: "row",
 			className: run.graded_verdicts.some((verdict) => verdict === finding.verdict) ? `p2-row ${toneClass(gradeTone(finding.verdict))}` : "p2-row is-ungraded",
 			"data-pkg": finding.package,
 			"aria-label": finding.package,
+			"aria-describedby": `${scoreHead} ${id}-score ${id}-verdict`,
 			"aria-current": state.pkg === finding.package ? "true" : void 0,
 			tabIndex: rowTabIndex(finding.package, cursor),
 			...openInteractions(finding.package, dispatch),
@@ -18603,12 +18607,14 @@ a.ov-ex-row:hover {
 				u$1("td", {
 					role: "cell",
 					className: "p2-verdict",
+					id: `${id}-verdict`,
 					"data-label": label("verdict"),
 					children: finding.verdict
 				}),
 				u$1("td", {
 					role: "cell",
 					className: "num p2-score",
+					id: `${id}-score`,
 					"data-label": label("score"),
 					children: finding.score.total
 				}),
@@ -18681,6 +18687,7 @@ a.ov-ex-row:hover {
 		const columns = PACKAGES_COLUMNS.filter((column) => showData || column.key !== "data");
 		const hideAccepted = state.filters.accepted.includes(HIDE_ACCEPTED);
 		const hintId = `${g()}-hint`;
+		const scoreHead = `${hintId}-score`;
 		if (rows.length === 0) return u$1("section", {
 			className: "p2",
 			"data-surface": "packages",
@@ -18722,6 +18729,7 @@ a.ov-ex-row:hover {
 									const arrow = active ? state.sortDesc ? " ↓" : " ↑" : "";
 									return u$1("th", {
 										role: "columnheader",
+										id: column.key === "score" ? scoreHead : void 0,
 										className: `p2-h-${column.key}`,
 										"aria-sort": active ? state.sortDesc ? "descending" : "ascending" : "none",
 										children: [printed ? u$1(S, { children: [column.label, u$1("span", {
@@ -18750,7 +18758,8 @@ a.ov-ex-row:hover {
 								finding,
 								report,
 								hideAccepted,
-								showData
+								showData,
+								scoreHead
 							}, finding.package))
 						})]
 					})
@@ -18778,21 +18787,25 @@ a.ov-ex-row:hover {
 	}
 	function ChildRow2({ finding, depth, note, report, first }) {
 		const { state, dispatch, cursor } = useReport();
+		const id = g();
 		return u$1("li", {
 			className: `r2-kid ${toneClass(gradeTone(finding.verdict))}`,
 			style: { "--depth": String(depth) },
 			"data-pkg": finding.package,
 			"aria-label": finding.package,
+			"aria-describedby": `${id}-score ${id}-grade`,
 			"aria-current": state.pkg === finding.package ? "true" : void 0,
 			tabIndex: rowTabIndex(finding.package, cursor, first),
 			...openInteractions(finding.package, dispatch),
 			children: [
 				u$1("span", {
 					className: "r2-grade",
+					id: `${id}-grade`,
 					children: finding.verdict
 				}),
 				u$1("span", {
 					className: "r2-score",
+					id: `${id}-score`,
 					children: [
 						u$1("span", {
 							className: "r2-lbl",
@@ -18827,8 +18840,14 @@ a.ov-ex-row:hover {
 		const printed = usePrinted();
 		const canOpen = row.count > 0;
 		const open = canOpen && (printed || isRowOpen(layout, row, input));
-		const kidsId = `${g()}-kids`;
+		const id = g();
+		const kidsId = `${id}-kids`;
 		const facts = radiusRowFacts(report, row);
+		const described = [
+			...row.self === null ? [] : [`${id}-self`],
+			...facts.count === null ? [] : [`${id}-count`],
+			...facts.mix === null && facts.note === null ? [] : [`${id}-mix`]
+		].join(" ");
 		const toggle = (event) => {
 			event.stopPropagation();
 			dispatch({
@@ -18841,6 +18860,7 @@ a.ov-ex-row:hover {
 			className: open ? "r2-row is-open" : "r2-row",
 			"data-pkg": row.package,
 			"aria-label": row.package,
+			"aria-describedby": described,
 			"aria-current": state.pkg === row.package ? "true" : void 0,
 			tabIndex: rowTabIndex(row.package, cursor, first.has(parentKey2(row.package))),
 			...openInteractions(row.package, dispatch),
@@ -18860,11 +18880,13 @@ a.ov-ex-row:hover {
 							version: row.version
 						}), row.self !== null && u$1("span", {
 							className: `r2-self ${toneClass(gradeTone(row.self.verdict))}`,
+							id: `${id}-self`,
 							children: RADIUS_WORDS.itself(row.self.verdict)
 						})]
 					}),
 					facts.count !== null && u$1("span", {
 						className: "r2-count",
+						id: `${id}-count`,
 						children: [
 							u$1("span", {
 								className: "r2-n",
@@ -18879,6 +18901,7 @@ a.ov-ex-row:hover {
 					}),
 					(facts.mix !== null || facts.note !== null) && u$1("span", {
 						className: "r2-mix",
+						id: `${id}-mix`,
 						children: [facts.mix ?? facts.note, row.count > 0 && row.unfiltered > row.count && u$1("span", {
 							className: "r2-also",
 							children: [" · ", RADIUS_WORDS.filtered(row.unfiltered - row.count)]
@@ -19368,7 +19391,10 @@ a.ov-ex-row:hover {
 			tabIndex: -1,
 			"aria-label": parts.title,
 			children: [
-				u$1("h3", { children: parts.title }),
+				u$1("h3", {
+					tabIndex: -1,
+					children: parts.title
+				}),
 				u$1(Ruler, { model: run.score_model }),
 				u$1("p", {
 					className: "run2-caption",
@@ -19410,6 +19436,7 @@ a.ov-ex-row:hover {
 									className: "run2-rule-body",
 									children: [u$1(OutLink, {
 										href: rule.href,
+										label: newTab(rule.label),
 										children: rule.known ? rule.label : u$1("code", { children: rule.label })
 									}), rule.text !== "" && u$1("span", {
 										className: "run2-rule-text",
@@ -20095,6 +20122,7 @@ a.ov-ex-row:hover {
 	}
 	//#endregion
 	//#region src/ui/App.tsx
+	var RUN_SECTIONS = [PHP_WINDOW_SECTION, SCORE_SECTION_ID];
 	function rowRequestFor(pkg, last) {
 		return {
 			kind: "row",
@@ -20357,7 +20385,7 @@ a.ov-ex-row:hover {
 			if (switcher !== null && !switcher.isConnected && (landed === null || landed === document.body)) document.getElementById(`${idBase}-panel`)?.focus({ preventScroll: true });
 		}, [state.view]);
 		h(() => {
-			if (state.view !== "run" || state.section === null) return;
+			if (state.view !== "run" || state.section === null || !RUN_SECTIONS.includes(state.section)) return;
 			const heading = document.getElementById(state.section)?.querySelector("h3");
 			if (heading == null) return;
 			if (typeof heading.scrollIntoView === "function") heading.scrollIntoView({ block: "start" });
@@ -20532,6 +20560,7 @@ a.ov-ex-row:hover {
 	//#endregion
 	//#region src/ui/Report1Screen.tsx
 	var OLDER_RELEASE = "https://github.com/somework/lockrot-report/releases/tag/v0.13.0";
+	var OLDER_RELEASE_NAME = "lockrot-report v0.13.0";
 	function Report1Screen({ version }) {
 		const writer = version === null ? "an older lockrot" : `lockrot ${version}`;
 		return u$1(ScreenFrame, {
@@ -20585,7 +20614,8 @@ a.ov-ex-row:hover {
 								href: OLDER_RELEASE,
 								target: "_blank",
 								rel: "noopener noreferrer",
-								children: "lockrot-report v0.13.0"
+								"aria-label": newTab(OLDER_RELEASE_NAME),
+								children: OLDER_RELEASE_NAME
 							})
 						] })]
 					})]
@@ -20615,7 +20645,7 @@ a.ov-ex-row:hover {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.10";
+	var version = "0.14.0-rc.11";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");
