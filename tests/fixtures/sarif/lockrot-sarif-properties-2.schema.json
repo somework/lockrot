@@ -118,7 +118,7 @@
       ],
       "properties": {
         "composer_repository": {
-          "description": "The name that Composer gives the repository, credentials stripped (the join key). Private data: the name echoes the host and path of the repository URL, so a Private Packagist repository names its organisation (`composer repo (https://repo.packagist.com/<org>/)`). Clear it before you publish a report.",
+          "description": "The name that Composer gives the repository, credentials stripped (the join key). Private data: the name echoes the host and path of the repository URL, so a Private Packagist repository names its organisation (`composer repo (https://repo.packagist.com/<org>/)`). The same name appears in `run.advisory_lookup.repositories[]`, in each finding's `security.feeds[]` and in the run notes, so a published report publishes it.",
           "type": "string",
           "minLength": 1
         },

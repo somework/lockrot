@@ -262,7 +262,7 @@
                 ],
                 "description": "One allowlist entry."
             },
-            "description": "The allowlist of the project: each entry accepts maintenance flags of the packages it matches, with a reason. An accepted flag is listed, muted, weighs 0 and reaches no gate. An entry never accepts an advisory. Accept advisories in the audit policy of Composer (`config.audit.ignore` on 2.4 to 2.9, `config.policy.advisories` on 2.10 and later), which `composer audit` reads too."
+            "description": "The allowlist of the project: each entry accepts maintenance flags of the packages it matches, with a reason. An accepted flag is listed, muted, weighs 0 and reaches no gate. An entry never accepts an advisory. Accept advisories in the policy of Composer for advisories (`config.policy.advisories`, which Composer 2.10 and later also fills from the legacy `config.audit.ignore`), which `composer audit` reads too."
         },
         "include-dev": {
             "description": "Whether packages-dev are analysed (`--dev`).",
