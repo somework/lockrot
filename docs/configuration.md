@@ -110,7 +110,7 @@ version. Without a `version` in composer.json, the move check solves the root at
 Variables that start with `LOCKROT_X_` are reserved for your own tooling
 ([reserved names](compatibility.md#names-reserved-for-extensions)).
 
-## Validation {#validation}
+## <a name="validation"></a>Validation {#validation}
 
 Every `composer lockrot` and PHAR run validates the whole configuration, and any error is exit `2`
 (unless `LOCKROT_DISABLE` is set). At install time an error is the `install-time check skipped`
