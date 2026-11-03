@@ -803,6 +803,9 @@ final class FindingTest extends TestCase
         yield 'capped' => [[new Signal(Signal::LEVEL_WARN, 'capped', SignalDataStub::of(Signal::S11, ['stops_at' => '8.1']))], FlagSet::CAPPED, ['unit' => 'php_minor', 'value' => '8.1', 'source' => null]];
         yield 'stale by its release' => [[$s2(Signal::LEVEL_WARN, 5.4)], FlagSet::STALE, ['unit' => 'years', 'value' => 5.4, 'source' => 'release']];
         yield 'stale by whole years' => [[$s2(Signal::LEVEL_WARN, 6.0)], FlagSet::STALE, ['unit' => 'years', 'value' => 6.0, 'source' => 'release']];
+        yield 'stale by its push alone' => [[$s4(Signal::LEVEL_WARN, 3.0)], FlagSet::STALE, ['unit' => 'years', 'value' => 3.0, 'source' => 'push']];
+        yield 'stale by the push with no release reading' => [[$s2(Signal::LEVEL_WARN, null), $s4(Signal::LEVEL_WARN, 3.0)], FlagSet::STALE, ['unit' => 'years', 'value' => 3.0, 'source' => 'push']];
+        yield 'stale by a push older than its release' => [[$s2(Signal::LEVEL_WARN, 4.7), $s4(Signal::LEVEL_HIGH, 5.4)], FlagSet::STALE, ['unit' => 'years', 'value' => 5.4, 'source' => 'push']];
         yield 'the release is older' => [[$s2(Signal::LEVEL_HIGH, 5.4), $s4(Signal::LEVEL_HIGH, 4.7)], FlagSet::SILENT, ['unit' => 'years', 'value' => 5.4, 'source' => 'release']];
         yield 'the push is older' => [[$s2(Signal::LEVEL_HIGH, 4.7), $s4(Signal::LEVEL_HIGH, 5.4)], FlagSet::SILENT, ['unit' => 'years', 'value' => 5.4, 'source' => 'push']];
         yield 'as old as each other' => [[$s2(Signal::LEVEL_HIGH, 5.0), $s4(Signal::LEVEL_HIGH, 5.0)], FlagSet::SILENT, ['unit' => 'years', 'value' => 5.0, 'source' => 'release']];

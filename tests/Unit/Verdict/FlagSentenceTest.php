@@ -90,6 +90,10 @@ final class FlagSentenceTest extends TestCase
         yield 'pinned to a branch snapshot' => [FlagSet::PINNED, [Signal::S6 => ['reason' => 'branch_snapshot', 'version' => 'dev-main']], 'pinned to branch snapshot dev-main'];
         yield 'pinned with no tagged release' => [FlagSet::PINNED, [Signal::S6 => ['reason' => 'no_stable_release', 'version' => '1.0.0-beta1']], 'pinned to 1.0.0-beta1'];
         yield 'whole years' => [FlagSet::STALE, [Signal::S2 => ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => 5]], 'last release 2021-05-05 (5.0 years ago)'];
+        yield 'stale by its push alone' => [FlagSet::STALE, [Signal::S4 => ['last_push' => '2021-05-05T00:00:00+00:00', 'years' => 5.4, 'event' => 'push']], 'last push 2021-05-05 (5.4 years ago)'];
+        yield 'stale by a push older than its release' => [FlagSet::STALE, [
+            Signal::S4 => ['last_push' => '2021-05-05T00:00:00+00:00', 'years' => 5.4, 'event' => 'push'], Signal::S2 => ['last_release' => '2022-01-10T00:00:00+00:00', 'years' => 4.7, 'dated_by' => null],
+        ], 'last release 2022-01-10 (4.7 years ago); last push 2021-05-05 (5.4 years ago)'];
     }
 
     public function testOnlyTheMaintenanceSignalsHaveASentenceHere(): void

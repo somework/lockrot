@@ -549,6 +549,16 @@ final class MoveTest extends TestCase
         self::assertSame($cleared, JsonPath::arrayAt($finding, ['security', 'gets', 'clears']));
     }
 
+    /** An incomplete advisory lookup cannot show that the partial release carries no new advisory. */
+    public function testAPartialFixOnAnIncompleteLookupAssumesNoNewAdvisories(): void
+    {
+        $over = ['advisories' => [self::advisory('PKSA-a', 'high', '<1.9.0'), self::advisory('PKSA-b', 'high', '>=1.0.0')]];
+        $offline = ['run' => ['target_php' => '8.4', 'project_php' => '>=7.4', 'fail_on' => 'high', 'include_dev' => false, 'advisories_unchecked' => 'offline']];
+
+        self::assertSame(['1.9.0', ['clears_hold']], self::partialAssumes(self::analyse($over)));
+        self::assertSame(['1.9.0', ['clears_hold', 'no_new_advisories']], self::partialAssumes(self::analyse($offline + $over)));
+    }
+
     public function testAnAdvisoryOnAVcsPackageNamesNoMoveBecauseItsReleasesWereNotRead(): void
     {
         $move = JsonPath::arrayAt(self::analyse(['releases' => null, 'lock' => [['origin' => 'vcs']], 'advisories' => [self::ADVISORY]]), ['next_step']);
@@ -709,6 +719,16 @@ final class MoveTest extends TestCase
             }
         }
         return ['root' => ['name' => 'acme/app', 'require' => $require], 'lock' => array_merge([$entry], $others)] + $rest;
+    }
+
+    /**
+     * @param array<mixed, mixed> $finding
+     *
+     * @return array{0: string, 1: array<mixed, mixed>} the partial release and what its `if_applied` assumes
+     */
+    private static function partialAssumes(array $finding): array
+    {
+        return [JsonPath::stringAt($finding, ['security', 'partial', 'version']), JsonPath::arrayAt($finding, ['security', 'partial', 'if_applied', 'assumes'])];
     }
 
     /** @return array{version: string, time: ?string, php: ?string} */
