@@ -8,12 +8,12 @@
 | ok | `acme/rt-glue` | 1.0.0 | ok | `0` | direct |
 | ok | `acme/rt-kernel` | 1.0.0 | ok | `0` | direct |
 
-flags: capped 1 · vulnerable 1 · 1 package carries more than one
-depth: every flagged package is named in composer.json · direct 1
-security: 1 vulnerable package · 1 advisory: 1 high
-libyears: 0.7 behind across all 3 packages · 0.7 from direct requirements · furthest behind symfony/routing v6.4.28 at 0.7
-advisories: 3 packages asked · packagist.org answered (4 on record for 1 package)
-moves: not checked, because Composer's solver refuses the lock itself (see the moves\_not\_checked note)
+flags: capped 1 · vulnerable 1 · 1 package carries more than one\
+depth: every flagged package is named in composer.json · direct 1\
+security: 1 vulnerable package · 1 advisory: 1 high\
+libyears: 0.7 behind across all 3 packages · 0.7 from direct requirements · furthest behind `symfony/routing` v6.4.28 at 0.7\
+advisories: 3 packages asked · packagist.org answered (4 on record for 1 package)\
+moves: not checked, because Composer's solver refuses the lock itself (see the moves\_not\_checked note)\
 php: the lock installs on PHP 8.1 to 8.4; `symfony/routing` excludes 8.5
 
 - note: moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: acme/rt-glue 1.0.0 requires acme/rt-tokens ^2.0.

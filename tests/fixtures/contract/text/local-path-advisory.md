@@ -6,11 +6,11 @@
 |---|---|---|---|---|---|
 | **critical** | `mautic/core-lib` | 4.3.x-dev | pinned · capped · vulnerable | `34 = pinned 16 + capped 2 [¼ of 8] + vulnerable 16 [high advisory]`<br>**Do:** no move: it is installed from a local path (your own package)<br>*pinned:* pinned to branch snapshot 4.3.x-dev<br>*capped:* requires php \>=7.4.0 \<8.1: it stops at 8.0, so the newest PHP, 8.5, is excluded<br>*vulnerable:* 5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process<br>pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise · vulnerable), symfony/http-foundation (left-behind · vulnerable) and 114 more | direct |
 
-flags: pinned 1 · capped 1 · vulnerable 1 · 1 package carries more than one
-depth: every flagged package is named in composer.json · direct 1
-security: 1 vulnerable package · 5 advisories: 1 high, 4 medium
-libyears: the one package could not be measured
-advisories: 1 package asked · packagist.org answered (230 on record for 44 packages)
+flags: pinned 1 · capped 1 · vulnerable 1 · 1 package carries more than one\
+depth: every flagged package is named in composer.json · direct 1\
+security: 1 vulnerable package · 5 advisories: 1 high, 4 medium\
+libyears: the one package could not be measured\
+advisories: 1 package asked · packagist.org answered (230 on record for 44 packages)\
 php: the lock installs on PHP 7.4 to 8.0, so your target, 8.4, is excluded; the update of the package that excludes it is not checked (the run checked no move)
 
 - note: 2 packages are not from a Composer repository: their release metadata and repository activity were not read

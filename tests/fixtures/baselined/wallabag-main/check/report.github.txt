@@ -76,4 +76,4 @@ depth: 51 of 72 flagged packages are named by no line of composer.json · direct
 security: 2 vulnerable packages · 3 advisories: 1 high, 2 medium
 update now: composer update 'phpseclib/phpseclib:^3.0.57'
 php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
-gate: fails · --fail-on=high · 11 findings fail it; 30 reach it and are known to the baseline · target php 8.4 (--target-php)
+gate: fails · --fail-on=high · 11 findings fail it; 30 reach it and the baseline exempts them · target php 8.4 (--target-php)

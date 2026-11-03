@@ -2,7 +2,7 @@
     "score_text": "0",
     "next_step_text": null,
     "gate_line": "gate 0 = min(0, 2 × 0) (the new facts bound it); new: 0",
-    "run_gate_line": "gate: passes · --fail-on=high,unchecked · no finding fails it; 1 reaches it and is known to the baseline · target php 8.4 (--target-php)",
+    "run_gate_line": "gate: passes · --fail-on=high,unchecked · no finding fails it; 1 reaches it and the baseline exempts it · target php 8.4 (--target-php)",
     "age_line": "age: installed v8.6.1, release date not known (dated only by a commit its tags share); last push 2026-07-10 (0.2 years ago)",
     "explain_age": [
         "installed  v8.6.1    not read (dated only by a commit its tags share)",

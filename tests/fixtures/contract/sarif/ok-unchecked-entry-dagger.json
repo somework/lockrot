@@ -130,7 +130,7 @@
                     "ruleIndex": 1,
                     "level": "note",
                     "message": {
-                        "text": "scheb/2fa-google-authenticator v8.6.1: the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it. checks missing: S2 (undated releases)."
+                        "text": "scheb/2fa-google-authenticator v8.6.1: the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it. checks missing: S2 (undated releases)."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "scheb/2fa-google-authenticator"
@@ -170,7 +170,7 @@
                 {
                     "executionSuccessful": true,
                     "exitCode": 0,
-                    "exitCodeDescription": "gate: passes \u00b7 --fail-on=high,unchecked \u00b7 no finding fails it; 1 reaches it and is known to the baseline \u00b7 target php 8.4 (--target-php)",
+                    "exitCodeDescription": "gate: passes \u00b7 --fail-on=high,unchecked \u00b7 no finding fails it; 1 reaches it and the baseline exempts it \u00b7 target php 8.4 (--target-php)",
                     "properties": {
                         "gate": {
                             "fails": false,
@@ -199,7 +199,7 @@
                                 }
                             ],
                             "not_applied": [],
-                            "text": "gate: passes \u00b7 --fail-on=high,unchecked \u00b7 no finding fails it; 1 reaches it and is known to the baseline \u00b7 target php 8.4 (--target-php)"
+                            "text": "gate: passes \u00b7 --fail-on=high,unchecked \u00b7 no finding fails it; 1 reaches it and the baseline exempts it \u00b7 target php 8.4 (--target-php)"
                         },
                         "fail_on": "high,unchecked",
                         "fail_on_source": "option",

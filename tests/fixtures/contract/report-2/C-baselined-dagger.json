@@ -1105,7 +1105,7 @@
             }
         ],
         "not_applied": [],
-        "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it; 1 reaches it and is known to the baseline \u00b7 target php 8.4 (--target-php)"
+        "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it; 1 reaches it and the baseline exempts it \u00b7 target php 8.4 (--target-php)"
     },
     "security": {
         "check": "complete",

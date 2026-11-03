@@ -6,10 +6,10 @@
 |---|---|---|---|---|---|
 | medium | `symfony/event-dispatcher-contracts` | v1.10.0 | left-behind | `8 = left-behind 16 ÷ 2 transitive`<br>**Do:** move symfony/event-dispatcher-contracts to ^2.5 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 35 more — clears left-behind; 2.x needs php \>=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of friendsofsymfony/user-bundle (v4.1.0), symfony/event-dispatcher (v8.1.5) and symfony/security-core (v8.1.8) still require it<br>*left-behind:* branch 1.x last released 2022-07-20 (4.2 years ago); 3.x released v3.7.1 (2026-06-05), needs php \>=8.1 above the project's php \>=7.4; 2.x released v2.5.4 (2024-09-25) | babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 35 more |
 
-flags: left-behind 1
-depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 · deepest: `symfony/event-dispatcher-contracts`, 1 hop (`friendsofsymfony/user-bundle` › `symfony/event-dispatcher-contracts`)
-libyears: 3.9 behind across the one package · 0.0 from direct requirements · furthest behind symfony/event-dispatcher-contracts v1.10.0 at 3.9
-advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+flags: left-behind 1\
+depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 · deepest: `symfony/event-dispatcher-contracts`, 1 hop (`friendsofsymfony/user-bundle` › `symfony/event-dispatcher-contracts`)\
+libyears: 3.9 behind across the one package · 0.0 from direct requirements · furthest behind `symfony/event-dispatcher-contracts` v1.10.0 at 3.9\
+advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)\
 php: the lock installs on PHP 7.4 to 8.5
 
 <sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
