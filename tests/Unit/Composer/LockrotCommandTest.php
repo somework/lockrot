@@ -1424,10 +1424,10 @@ final class LockrotCommandTest extends TestCase
         if ($manifest !== null) {
             file_put_contents($project.'/composer.json', (string) json_encode($manifest));
         }
-        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));
+        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0', 'require' => ['php-64bit' => '>=8.2']]], 'packages-dev' => []]));
         chdir($project);
         $home = $this->tempDir('lockrot-unchecked-platform-home-');
-        file_put_contents($home.'/config.json', '{"config": {"platform": {"php": "8.1.5"}}}');
+        file_put_contents($home.'/config.json', '{"config": {"platform": {"php": "8.1.5", "php-64bit": "8.2.0"}}}');
         $loader = $this->emptyLoader();
         $command = $this->buildCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?\Closure $checks = null): Analyzer => self::withChecks(self::testAnalyzer($loader, $lockrot, $clock), $checks));
 
@@ -1439,6 +1439,7 @@ final class LockrotCommandTest extends TestCase
             self::assertIsArray($json);
             self::assertSame(['8.1', $reason], [JsonPath::stringAt($json, ['run', 'target_php']), JsonPath::stringAt($json, ['run', 'move_check', 'reason'])]);
             self::assertSame(['8.1.5', '8.1.5'], [JsonPath::stringAt($json, ['run', 'php_window', 'target', 'php']), JsonPath::stringAt($json, ['run', 'php_window', 'platform_override'])]);
+            self::assertTrue(JsonPath::boolAt($json, ['run', 'php_window', 'target', 'inside']), 'php-64bit reads the global config.platform.php-64bit, not the php 8.1.5');
         });
     }
 

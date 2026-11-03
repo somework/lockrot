@@ -38,6 +38,8 @@ final class SolverChecker implements MoveChecker
     private array $notFromComposerRepository;
     private string $platformPhp;
     private ?string $configuredPhp;
+    /** @var string|false|null */
+    private $configuredPhp64bit;
     private bool $blocksAdvisories;
     private Deadline $deadline;
     private ?PoolAdvisories $advisories;
@@ -51,10 +53,12 @@ final class SolverChecker implements MoveChecker
      * @param list<string> $notFromComposerRepository the locked names that no Composer repository serves
      * @param string       $platformPhp              the php version that the solve runs at, as config.platform writes it
      * @param ?string      $configuredPhp            `config.platform.php` of Composer's merged config
+     * @param string|false|null $configuredPhp64bit  the `config.platform.php-64bit` that the solve's platform holds
      */
-    public function __construct(ComposerSolver $solver, array $notFromComposerRepository, string $platformPhp, bool $blocksAdvisories, Deadline $deadline, ?PoolAdvisories $advisories = null, ?string $configuredPhp = null)
+    public function __construct(ComposerSolver $solver, array $notFromComposerRepository, string $platformPhp, bool $blocksAdvisories, Deadline $deadline, ?PoolAdvisories $advisories = null, ?string $configuredPhp = null, $configuredPhp64bit = null)
     {
         $this->configuredPhp = $configuredPhp;
+        $this->configuredPhp64bit = $configuredPhp64bit;
         $this->advisories = $advisories;
         $this->solver = $advisories === null ? $solver : $solver->withAdvisories($advisories);
         $this->scan = new HoldScan($solver->root(), $solver->locked());
@@ -120,6 +124,11 @@ final class SolverChecker implements MoveChecker
     public function configuredPhp(): ?string
     {
         return $this->configuredPhp;
+    }
+
+    public function configuredPhp64bit()
+    {
+        return $this->configuredPhp64bit;
     }
 
     public function composerVersion(): string

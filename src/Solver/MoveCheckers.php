@@ -42,7 +42,7 @@ final class MoveCheckers
     {
         $overrides = self::platformOverrides($config->get('platform'));
         if ($overrides === null) {
-            return new UncheckedMoves(MoveCheck::PLATFORM_CONFIG_INVALID, self::configuredPhp($config));
+            return new UncheckedMoves(MoveCheck::PLATFORM_CONFIG_INVALID, self::configuredPhp($config), self::configuredPhp64bit($config));
         }
         $platformNames = array_keys($overrides);
         $configured = self::configuredPhp($config);
@@ -70,7 +70,7 @@ final class MoveCheckers
 
         $keptOut = $advisoryScope === AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES ? $notFromComposerRepository : [];
 
-        return new SolverChecker($solver, $notFromComposerRepository, $php, $blocking->blocks(), $deadline, new PoolAdvisories($blocking, static fn (array $names, bool $complete): ?array => $lookup->records($names, $complete), $keptOut), $configured);
+        return new SolverChecker($solver, $notFromComposerRepository, $php, $blocking->blocks(), $deadline, new PoolAdvisories($blocking, static fn (array $names, bool $complete): ?array => $lookup->records($names, $complete), $keptOut), $configured, $overrides['php-64bit'] ?? null);
     }
 
     /** `config.platform.php` of Composer's merged config: null when it is unset or `false`. */
@@ -80,6 +80,20 @@ final class MoveCheckers
         $php = \is_array($platform) ? array_change_key_case($platform, \CASE_LOWER)['php'] ?? null : null;
 
         return \is_string($php) ? $php : null;
+    }
+
+    /**
+     * `config.platform.php-64bit` of Composer's merged config: `false` disables the package, null
+     * when it is unset or no string.
+     *
+     * @return string|false|null
+     */
+    public static function configuredPhp64bit(Config $config)
+    {
+        $platform = $config->get('platform');
+        $php64bit = \is_array($platform) ? array_change_key_case($platform, \CASE_LOWER)['php-64bit'] ?? null : null;
+
+        return \is_string($php64bit) || $php64bit === false ? $php64bit : null;
     }
 
     /** Whether the printed `composer update` and `composer require` run with `--minimal-changes`, as UpdateCommand and RequireCommand read it. */

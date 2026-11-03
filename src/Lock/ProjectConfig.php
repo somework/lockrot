@@ -29,6 +29,8 @@ final class ProjectConfig
     /** @var array<string, mixed> */
     private array $lockrotExtra;
     private ?string $platformPhp;
+    /** @var string|false|null */
+    private $platformPhp64bit;
     private ?string $requirePhp;
     private ConfiguredRepositories $repositories;
     /** @var array<string, array<string, string>> section => lowercased package name => constraint */
@@ -83,7 +85,8 @@ final class ProjectConfig
         $config = $json['config'] ?? null;
         $platformRoot = \is_array($config) ? ($config['platform'] ?? null) : null;
         // Composer's PlatformRepository reads `config.platform` without case: the later key wins.
-        $platform = \is_array($platformRoot) ? (array_change_key_case($platformRoot, \CASE_LOWER)['php'] ?? null) : null;
+        $platforms = \is_array($platformRoot) ? array_change_key_case($platformRoot, \CASE_LOWER) : [];
+        $platform = $platforms['php'] ?? null;
         $requires = self::constraintsOf($json[self::REQUIRE] ?? null, false);
         $devRequires = self::constraintsOf($json[self::REQUIRE_DEV] ?? null, false);
         $requirePhp = self::constraintsOf($json[self::REQUIRE] ?? null, true)['php'] ?? '';
@@ -98,6 +101,8 @@ final class ProjectConfig
             $requirePhp !== '' ? $requirePhp : null,
             ConfiguredRepositories::fromManifest($json['repositories'] ?? null)
         );
+        $php64bit = $platforms['php-64bit'] ?? null;
+        $config->platformPhp64bit = \is_string($php64bit) || $php64bit === false ? $php64bit : null;
         foreach ([self::REQUIRE, self::REQUIRE_DEV, self::CONFLICT] as $section) {
             $config->constraints[$section] = self::constraintsOf($json[$section] ?? null, false);
         }
@@ -308,6 +313,17 @@ final class ProjectConfig
     public function platformPhp(): ?string
     {
         return $this->platformPhp;
+    }
+
+    /**
+     * `config.platform.php-64bit`, its key read without case as Composer reads it: `false` disables
+     * the package, null when it is no string.
+     *
+     * @return string|false|null
+     */
+    public function platformPhp64bit()
+    {
+        return $this->platformPhp64bit;
     }
 
     /**

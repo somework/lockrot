@@ -10,6 +10,8 @@ use Composer\Package\PackageInterface;
 use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
+use Composer\Semver\Constraint\MatchAllConstraint;
+use Composer\Semver\Constraint\MatchNoneConstraint;
 use Composer\Semver\VersionParser;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
@@ -80,8 +82,10 @@ final class PhpWindow implements \JsonSerializable
      * @param ?string      $configuredPhp `config.platform.php` of Composer's merged config, which
      *                                    `platform_override` holds; null reads composer.json's
      *                                    `config.platform.php`
+     * @param string|false|null $configuredPhp64bit `config.platform.php-64bit` of Composer's merged
+     *                                    config; null reads composer.json's
      */
-    public static function of(LockFile $lock, ProjectConfig $project, string $targetMinor, array $knownMinors, ?string $solvePhp = null, ?string $configuredPhp = null): ?self
+    public static function of(LockFile $lock, ProjectConfig $project, string $targetMinor, array $knownMinors, ?string $solvePhp = null, ?string $configuredPhp = null, $configuredPhp64bit = null): ?self
     {
         $rootProvides = $project->platformConstraints(ProjectConfig::PROVIDE) + $project->platformConstraints(ProjectConfig::REPLACE);
         if (array_intersect(array_keys($rootProvides), self::VERSIONED) !== []) {
@@ -113,8 +117,12 @@ final class PhpWindow implements \JsonSerializable
             if ($read === null) {
                 return null;
             }
-            [$sets[$set], $found] = $read;
-            $hosts = array_merge($hosts, $found);
+            $links = self::withPhp64bit($read[0], $configuredPhp64bit ?? $project->platformPhp64bit());
+            if ($links === null) {
+                return null;
+            }
+            $sets[$set] = $links;
+            $hosts = array_merge($hosts, $read[1]);
         }
         $hosts = array_unique($hosts);
         sort($hosts);
@@ -283,6 +291,31 @@ final class PhpWindow implements \JsonSerializable
         }
 
         return [$php, $hosts];
+    }
+
+    /**
+     * Composer's PlatformRepository gives `php-64bit` the version of `config.platform.php-64bit`,
+     * else of `php`. A set version or `false` makes each `php-64bit` link the same at every php.
+     * Null when the set version does not parse: Composer then refuses the config.
+     *
+     * @param list<PhpLink>     $links
+     * @param string|false|null $php64bit
+     *
+     * @return ?list<PhpLink>
+     */
+    private static function withPhp64bit(array $links, $php64bit): ?array
+    {
+        if ($php64bit === null) {
+            return $links;
+        }
+        try {
+            $at = $php64bit === false ? null : new Constraint('==', (new VersionParser())->normalize($php64bit));
+        } catch (\UnexpectedValueException $e) {
+            return null;
+        }
+
+        return array_map(static fn (array $link): array => $link[0]['target'] !== 'php-64bit' ? $link
+            : [$link[0], $at !== null && $link[1]->matches($at) ? new MatchAllConstraint() : new MatchNoneConstraint()], $links);
     }
 
     /**

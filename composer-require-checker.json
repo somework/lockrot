@@ -73,6 +73,7 @@
         "Composer\\Semver\\Constraint\\Constraint",
         "Composer\\Semver\\Constraint\\ConstraintInterface",
         "Composer\\Semver\\Constraint\\MatchAllConstraint",
+        "Composer\\Semver\\Constraint\\MatchNoneConstraint",
         "Composer\\Semver\\Constraint\\MultiConstraint",
         "Composer\\Semver\\Intervals",
         "Composer\\Semver\\VersionParser",

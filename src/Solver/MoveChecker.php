@@ -53,6 +53,14 @@ interface MoveChecker
     /** `config.platform.php` of Composer's merged config, null when it names none or when nothing solves. */
     public function configuredPhp(): ?string;
 
+    /**
+     * `config.platform.php-64bit` of Composer's merged config: `false` disables the package, null
+     * when it names none.
+     *
+     * @return string|false|null
+     */
+    public function configuredPhp64bit();
+
     /** The version of the Composer that solves, null when nothing solves. */
     public function composerVersion(): ?string;
 

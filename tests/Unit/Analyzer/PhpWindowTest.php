@@ -452,6 +452,50 @@ final class PhpWindowTest extends TestCase
         self::assertSame(['7.4.29', null], [$merged->platformOverride(), $unset->platformOverride()]);
     }
 
+    /** Composer's PlatformRepository gives `php-64bit` the version that `config.platform` sets, at every php. */
+    public function testAConfiguredPhp64bitIsTheVersionThatEachPhp64bitLinkReads(): void
+    {
+        $lock = ['packages' => [self::package('acme/a', ['php-64bit' => '>=8.2'])], 'packages-dev' => []];
+
+        $data = self::window($lock, ['config' => ['platform' => ['php-64bit' => '7.4.0']]]);
+
+        self::assertSame([false, []], [$data['target']['inside'], $data['without_dev']['minors']]);
+        self::assertTrue(self::window($lock)['target']['inside'], 'the control: php-64bit follows php');
+    }
+
+    public function testAConfiguredPhp64bitThatARequirementAdmitsKeepsTheTargetInside(): void
+    {
+        $data = self::window(['packages' => [self::package('acme/a', ['php-64bit' => '<8.0'])], 'packages-dev' => []], ['config' => ['platform' => ['PHP-64bit' => '7.4.0']]]);
+
+        self::assertTrue($data['target']['inside']);
+        self::assertSame(self::minors(), $data['without_dev']['minors']);
+    }
+
+    /** `config.platform.php-64bit: false` removes the package: each requirement of it fails, and no conflict matches. */
+    public function testADisabledPhp64bitFailsEachRequirementOfItAndMatchesNoConflict(): void
+    {
+        $disabled = ['config' => ['platform' => ['php-64bit' => false]]];
+
+        self::assertFalse(self::window(['packages' => [self::package('acme/a', ['php-64bit' => '*'])], 'packages-dev' => []], $disabled)['target']['inside']);
+        self::assertTrue(self::window(['packages' => [self::package('acme/a', [], ['php-64bit' => '*'])], 'packages-dev' => []], $disabled)['target']['inside']);
+    }
+
+    public function testAConfiguredPhp64bitThatDoesNotParseGivesNoWindow(): void
+    {
+        self::assertNull(PhpWindow::of(LockFile::fromArray(['packages' => [], 'packages-dev' => []]), ProjectConfig::fromArray(['config' => ['platform' => ['php-64bit' => 'not a version']]]), '8.4', self::minors()));
+    }
+
+    public function testThePhp64bitOfComposersMergedConfigWinsOverComposerJson(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [self::package('acme/a', ['php-64bit' => '>=8.2'])], 'packages-dev' => []]);
+        $project = ProjectConfig::fromArray(['config' => ['platform' => ['php-64bit' => '8.4.0']]]);
+
+        $window = PhpWindow::of($lock, $project, '8.4', self::minors(), null, null, '7.4.0');
+
+        self::assertNotNull($window);
+        self::assertFalse($window->toArray()['target']['inside']);
+    }
+
     public function testTheRootAliasOfALockedPackageAddsNoLink(): void
     {
         $window = self::window([

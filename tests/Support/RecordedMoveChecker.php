@@ -181,6 +181,11 @@ final class RecordedMoveChecker implements MoveChecker
         return self::text($this->run, 'config_php');
     }
 
+    public function configuredPhp64bit()
+    {
+        return null;
+    }
+
     public function composerVersion(): ?string
     {
         return self::text($this->run, 'composer');

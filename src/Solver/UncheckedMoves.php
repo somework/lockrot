@@ -14,12 +14,18 @@ final class UncheckedMoves implements MoveChecker
 {
     private string $reason;
     private ?string $configuredPhp;
+    /** @var string|false|null */
+    private $configuredPhp64bit;
 
-    /** @param ?string $configuredPhp `config.platform.php` of Composer's merged config, as {@see MoveCheckers::configuredPhp()} reads it */
-    public function __construct(string $reason, ?string $configuredPhp = null)
+    /**
+     * @param ?string           $configuredPhp      `config.platform.php` of Composer's merged config, as {@see MoveCheckers::configuredPhp()} reads it
+     * @param string|false|null $configuredPhp64bit as {@see MoveCheckers::configuredPhp64bit()} reads it
+     */
+    public function __construct(string $reason, ?string $configuredPhp = null, $configuredPhp64bit = null)
     {
         $this->reason = $reason;
         $this->configuredPhp = $configuredPhp;
+        $this->configuredPhp64bit = $configuredPhp64bit;
     }
 
     public function baseline(): CheckOutcome
@@ -55,6 +61,11 @@ final class UncheckedMoves implements MoveChecker
     public function configuredPhp(): ?string
     {
         return $this->configuredPhp;
+    }
+
+    public function configuredPhp64bit()
+    {
+        return $this->configuredPhp64bit;
     }
 
     public function composerVersion(): ?string

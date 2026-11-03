@@ -488,6 +488,10 @@ origin: Packagist, a private repository, vcs, a path or an archive. packages-dev
 - lockrot asks each configured Composer repository that publishes advisories. A repository without
   a feed is listed with the outcome `no_feed`.
 
+- lockrot does not ask a repository for a package that its `only` or `exclude` keeps out, as
+  Composer does not. The package's `security.feeds[]` omits that repository. When no repository
+  with a feed admits the package, the package reads `no_feed`.
+
 - While advisory blocking is on, [the move check](#the-move-check)
   asks for the advisories of each name that a solve loads and that no earlier lookup covered,
   such as a new dependency of a move.
@@ -795,7 +799,9 @@ Limits of the check:
   that `config.platform` sets, because that name is the project's own fact. `run.move_check` lists
   the patterns once per run (`ignored_platform`), and the `moves:` footer line names them.
 - It checks `php`, `php-64bit`, `composer-plugin-api`, `composer-runtime-api` and `composer`.
-  `php-64bit` takes the version of the solve's php on a 64-bit PHP. The other three take the
+  `php-64bit` takes the version that `config.platform.php-64bit` sets, else the version of the
+  solve's php on a 64-bit PHP. `config.platform.php-64bit: false` removes it from the solve. The
+  other three take the
   versions of the Composer that runs lockrot.
 - It solves at `config.platform.php` when that version is a stable release in the target PHP's minor, else at the
   newest patch of the target minor (`8.4.99`). Composer reads `8.4` as `8.4.0`. It keeps every
@@ -811,6 +817,9 @@ Limits of the check:
 - It reads package and path repositories as Composer reads them, and each serves the names that it
   declares. A canonical repository of any type that serves a name hides that name in every later
   repository.
+- When a canonical repository fails on a name, the check asks no later repository for it. Composer
+  stops the update on that failure. A solve that needs the name reads `not_checked` with
+  `unloaded_name`.
 - It does not load a vcs, git or artifact repository, because a load clones or downloads the
   repository. Such a repository serves only the names that the lock records with a `source` or
   `dist` URL equal to the repository URL. The URLs compare without case, a trailing `.git` or a
@@ -939,7 +948,9 @@ How lockrot reads the window:
 
 - It reads the `require` and `conflict` links on `php` and `php-64bit` of each package of the lock.
   On a 64-bit PHP, Composer gives `php-64bit` the version of `php`, so lockrot reads each link as a
-  version.
+  version. When `config.platform.php-64bit` sets a version, every link on `php-64bit` reads that
+  version at each PHP, as in the move check. When it is `false`, no requirement on `php-64bit`
+  holds and no conflict on it matches.
 - It reads the root's links per name: composer.json first, then the lock's `platform` for a name that
   composer.json lacks. A run without composer.json reads the lock's `platform` alone.
 - In the set with require-dev, a `require-dev` link replaces the `require` link of the same name.
@@ -972,7 +983,7 @@ How lockrot reads the window:
   Composer's answer to one update of the packages that exclude the target.
 
 The window is null when a package or the root provides or replaces `php` or `php-64bit`, or when a
-php link does not parse. It judges no package and changes no move.
+php link or `config.platform.php-64bit` does not parse. It judges no package and changes no move.
 
 #### <a name="the-update-that-admits-the-target"></a>The update that admits the target {#the-update-that-admits-the-target}
 
