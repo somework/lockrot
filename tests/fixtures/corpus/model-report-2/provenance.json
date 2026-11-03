@@ -1,7 +1,7 @@
 {
     "written_by": "security-axis/spec_flags_r3_docs.py reports <dir> <out> --cache tests/fixtures/corpus/cache --php-fit <file>, in the private model folder, then tools/corpus/differential.php --adopt-model",
     "model": {
-        "spec_flags_r3.py": "02a6b1c1757e6950e6bc924425a19e3e4637004a725facb46723257de6c9d447",
+        "spec_flags_r3.py": "4eed928705649c970807ed416a534b06c8b1cfa85c44dd4d6b30b3d3e50ea95e",
         "spec_flags_r3_docs.py": "367d047bec2d98fe8b772b3cd48a532384539bb0e3d3364764f104f5b08ae7ea"
     },
     "model_inputs": {
