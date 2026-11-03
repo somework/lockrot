@@ -489,7 +489,7 @@ validates with any object as its `data`.
 |---|---|---|
 | S4 | `event` | What the date is: `push` or `commit`. An open set |
 | S6 | `reason`, `has_stable_release`, `last_stable_release`, `last_stable_version`, `last_stable_dated_by`, `snapshot_time`, `tag_relation` | See [What S6 carries](verdicts.md#what-s6-carries) |
-| S8 | `suggested_constraint`, `reachable_branch`, `reachable_version`, `reachable_release`, `newest_release_at_least`, `reachable_release_at_least` | The newest higher branch that releases and is within reach ([Within reach](verdicts.md#within-reach)). `newest_release_at_least` and `reachable_release_at_least` are true when the branch's highest tag has no trusted date: the release date is then the date of a commit that its tags share, a lower bound. `reachable_release_at_least` is null exactly when `reachable_branch` is null |
+| S8 | `suggested_constraint`, `reachable_branch`, `reachable_version`, `reachable_release`, `newest_release_at_least`, `reachable_release_at_least` | The newest higher branch that releases and is within reach ([Within reach](verdicts.md#within-reach)). `newest_release_at_least` and `reachable_release_at_least` are true when S8 quotes the branch's highest tag and that tag has no trusted date: the release date is then the date of a commit that its tags share, a lower bound. They are false when S8 quotes a lower tag with its own date. `reachable_release_at_least` is null exactly when `reachable_branch` is null |
 | S9 | `advisories`, `releases_read`, `complete` | One row per counted advisory, the deciding one first: `id`, `cve`, `title`, `link`, `reported_at`, `severity`, `severity_published`, `affected_versions`, `counted`, `points`, `deciding`, `fix` and `baseline` |
 | S10 | `unchecked`, `blocks` | See [What was not checked](verdicts.md#what-was-not-checked) |
 | S11 | `newest_php`, `newest_php_source`, `requires`, `stops_at`, `excludes_target`, `admits_newest` | See [Capped](verdicts.md#capped) |
@@ -509,7 +509,9 @@ holds two decimals at most: a finding's `libyears`, `libyears.total`,
 
 ### The explanation
 
-The explanation's `finding` has a report finding's fields. `run` holds the report's `run` keys that
+The explanation's `finding` has a report finding's fields. An explanation reads no baseline:
+`finding.baseline` is null, and `finding.gate` is decided as if no baseline existed. So a finding
+that the baseline exempts in the report can fail the gate in its explanation. `run` holds the report's `run` keys that
 the explanation reads, `target_php`, `project_php` and `thresholds` among them. Its `php_window`
 holds only `platform_override`, which the move's text names, and `target`, and is null when the
 report has no PHP window. `explain-2.json`

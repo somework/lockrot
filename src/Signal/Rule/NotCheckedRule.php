@@ -83,8 +83,8 @@ final class NotCheckedRule implements SignalRule
     private const DATE_CAUSES = [
         self::CAUSE_LOCK_UNDATED => 'the lock gives the installed release no date',
         self::CAUSE_INSTALLED_SHARED_COMMIT => 'the installed release has no release date (its tag shares a commit with other tags, and no parent dates it)',
-        self::CAUSE_SHARED_COMMIT => 'the age of the package was not read (its newest releases are dated by a commit their tags share)',
-        self::CAUSE_TAG_UNDATED => 'the age of the package was not read (its newest releases carry no date)',
+        self::CAUSE_SHARED_COMMIT => 'the age of the package was not read (a release it reads is dated by a commit its tags share)',
+        self::CAUSE_TAG_UNDATED => 'the age of the package was not read (a release it reads carries no date)',
     ];
 
     /** The S10 checks about the package's upkeep, which a raised S1 makes moot. */
