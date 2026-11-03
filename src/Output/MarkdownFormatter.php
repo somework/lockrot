@@ -185,7 +185,7 @@ final class MarkdownFormatter implements FormatterInterface
             }
         }
         // A backslash before the line end is a hard break in CommonMark, so a renderer with soft
-        // breaks keeps the lines apart. self::text() doubles each backslash of the text before it.
+        // breaks keeps the lines apart.
         $last = \count($lines) - 1;
         $lines = array_map(static fn (string $line, int $index): string => $index < $last ? $line.'\\' : $line, $lines, array_keys($lines));
         $updateNow = RunFooter::updateNow($report);
