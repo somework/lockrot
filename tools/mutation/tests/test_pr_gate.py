@@ -311,6 +311,18 @@ class ChangedSince(Gate):
         self.assertEqual(1, code, summary)
         self.assertIn('`src/Signal/Openness.php` Plus (line 7)', summary)
 
+    def test_a_diff_prefix_in_the_git_config_keeps_the_changed_lines(self):
+        for option in ('diff.mnemonicPrefix', 'diff.noprefix'):
+            with self.subTest(option=option):
+                self.git('config', option, 'true')
+                self.write('src/Signal/Openness.php', SOURCE.replace('+ 0;', '+ 1;'))
+
+                code, summary = self.run_gate([log((7, 'Plus', '        return (int) $parts[0] + 1;'))], '', ('--changed', 'HEAD'))
+
+                self.assertEqual(1, code, summary)
+                self.assertIn('`src/Signal/Openness.php` Plus (line 7)', summary)
+                self.git('config', '--unset', option)
+
     def test_a_mutant_whose_node_spans_a_changed_line_fails(self):
         self.write('src/Signal/Openness.php', SOURCE.replace("explode('.', $v)", "explode(\n            '.',\n            $v\n        )"))
         self.git('commit', '-qam', 'split')
