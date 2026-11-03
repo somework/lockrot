@@ -395,7 +395,7 @@ The shape of one annotation:
   `(<severity> advisory)` after `vulnerable`. Key a script on the annotation's file and line, not
   its title. The level follows [How each format marks a finding](#how-each-format-marks-a-finding).
 - The message holds the score line, the move and the evidence of each counted flag. A transitive
-  finding's message ends with the direct requirements that reach it: `(via a, b)`
+  finding's message ends with the direct requirements that reach it: `(via a and b)`
   ([transitive exposure](verdicts.md#transitive-exposure)).
 - The report's notes, the stale-baseline note included, follow as `::notice title=lockrot::`
   lines.
@@ -487,7 +487,7 @@ new or fixed against the target branch
 - `check_name` is `lockrot/<flag>`. `categories` is `["Security"]` for `vulnerable` and
   `["Bug Risk"]` for the other flags.
 - `description` opens with the package, the version, the grade and the score line, then the flag's
-  evidence and the move, and for a transitive package ends with `(via a, b)`:
+  evidence and the move, and for a transitive package ends with `(via a and b)`:
 
     ```text
     <package> <version> — finding <verdict> (<score line>) — <flag>: <evidence>. Do: <move>.

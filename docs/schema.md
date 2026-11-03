@@ -344,7 +344,7 @@ Each finding's `gate`:
 | `exempt_by` | string or null | `baseline` when the finding reaches a value and the baseline is why it fails none. A grade value does not fail while the gate score stays below it. A flag value does not fail while the baseline entry covers each counted flag that reaches it. A `vulnerable` value does not fail while the entry knows each counted advisory that reaches it. An `unchecked` value does not fail while the gate score is 0. So a `known` finding is exempt from every value. Otherwise null. An open set |
 | `fails` | boolean | True exactly when `reaches_fail_on` is true, `exempt_by` is null and the root `fail_on_applied` is true |
 | `by` | array | `{value, kind, facts}` per value that the finding fails, naming the facts whose records are marked `error` |
-| `basis` | object or null | The baseline arithmetic: the score, what the new facts add, and the gate score `min(score, 2 × new)`. Null without a baseline entry |
+| `basis` | object or null | The baseline arithmetic. `score` is the gate score `min(score.total, 2 × new.total)`, not the full score, which stays in the finding's `score.total`. `verdict` is the gate score's band, and `cap` is `2 × new.total`. `limited_by` says which side set the gate score: `score`, `cap` or `equal`. `new` holds what the facts outside the baseline add. Null without a baseline entry: the gate score is then `score.total` |
 
 ### Run notes
 

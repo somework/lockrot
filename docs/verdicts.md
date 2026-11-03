@@ -379,10 +379,10 @@ S11's `data`:
 Abridged from a recorded run on wallabag's lock:
 
 ```text
-  lcobucci/clock 3.3.1  via lcobucci/jwt, scheb/2fa-trusted-device  ·  capped
+  lcobucci/clock 3.3.1  via lcobucci/jwt and scheb/2fa-trusted-device  ·  capped
       4 = capped 8 ÷ 2 transitive
-      do: raise require.php to >=8.4, then move lcobucci/clock to ^3.6.0 through lcobucci/jwt, scheb/2fa-trusted-device
-          — clears capped; …
+      do: raise require.php to >=8.4, then move lcobucci/clock to ^3.6.0 through lcobucci/jwt and
+          scheb/2fa-trusted-device — clears capped; …
       capped       requires php ~8.2.0 || ~8.3.0 || ~8.4.0: it stops at 8.4, so the newest PHP, 8.5, is excluded
 ```
 
@@ -619,10 +619,10 @@ lockrot drops.
 ### <a name="move"></a>The move {#move}
 
 A graded finding's `do:` line names one move: what to run, what it clears, and what holds it. JSON
-writes the move as `next_step`. Abridged from the [example run](example-run.md):
+writes the move as `next_step`. Abridged from a recorded run on wallabag's lock:
 
 ```text
-  phpseclib/phpseclib 3.0.55  via php-amqplib/php-amqplib, php-amqplib/rabbitmq-bundle  ·  vulnerable
+  phpseclib/phpseclib 3.0.55  via php-amqplib/php-amqplib and php-amqplib/rabbitmq-bundle  ·  vulnerable
       8 = vulnerable 8 [medium advisory]
       do: composer update 'phpseclib/phpseclib:^3.0.57'
           (gets 3.0.57) — clears the advisory; Composer's solver checked it against the lock
@@ -968,8 +968,10 @@ How lockrot reads the window:
   links.
 - `target.inside` says whether the set with require-dev admits the target PHP. When `with_dev` is
   null, `without_dev` decides. While `target.inside` is false, Composer refuses the baseline of
-  [the move check](#the-move-check), and every move is `not_checked`. `target_fix` then gives
-  Composer's answer to one update of the packages that exclude the target.
+  [the move check](#the-move-check), and every move is `not_checked`. The exception is a root
+  link that only the lock's `platform` or `platform-dev` holds (`target_fix.lock_platform`). The
+  move check does not read that link, so the baseline can resolve while `target.inside` is false.
+  `target_fix` gives Composer's answer to one update of the packages that exclude the target.
 
 The window is null when a package or the root provides or replaces `php` or `php-64bit`, or when a
 php link does not parse. It judges no package and changes no move.
