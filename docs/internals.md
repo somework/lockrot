@@ -222,9 +222,10 @@ public Drupal site locks showed both.
   `activity.cached_at`. When the refetch of an expired 404 fails, lockrot does not use that 404, because the
   repository can exist at the time of the refetch. The repository is then unchecked (S10).
 
-- lockrot keeps the answer to a request with its own credential header apart from the answer to a
-  request without one. So a run with a token asks again for a repository that answered 404 to a
-  run without a token. When lockrot has no token of its own for the host
+- lockrot keys each answer on its URL and on whether the request carried lockrot's own credential
+  header. So a run with a token asks again for a repository that answered 404 to a run without a
+  token. lockrot reads no answer that is stored under the URL alone, because that answer has no
+  credential state. When lockrot has no token of its own for the host
   ([Which credentials](#which-credentials)), a run with Composer's credentials and a run without
   them read one cached answer. After you add such credentials, run `composer clear-cache`.
 

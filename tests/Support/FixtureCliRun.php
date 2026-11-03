@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support;
 
+use Lockrot\Data\Forge\GitHubApi;
+use Lockrot\Data\Forge\RepoLocator;
+use Lockrot\Data\Http\CachingHttpClient;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Repository\MonorepoParents;
 use Symfony\Component\Process\Process;
@@ -29,16 +32,50 @@ final class FixtureCliRun
     private array $githubDirs;
     /** @var array<string, string> the local URL that serves each mirrored repository, by its own URL */
     private array $mirrors;
+    /** @var array<string, string> lockrot's activity-cache file of each GitHub recording, by the recording's file name */
+    private array $cacheFiles;
 
     /**
      * @param list<string>          $githubDirs
      * @param array<string, string> $mirrors
+     * @param list<string>          $sources the lock files and the recording directories that name the GitHub repositories
      */
-    private function __construct(FixtureRepositoryServer $server, array $githubDirs, array $mirrors)
+    private function __construct(FixtureRepositoryServer $server, array $githubDirs, array $mirrors, array $sources)
     {
         $this->server = $server;
         $this->githubDirs = $githubDirs;
         $this->mirrors = $mirrors;
+        $this->cacheFiles = self::cacheFiles($sources);
+    }
+
+    /**
+     * A recording's file name is the SHA-1 of its URL, and lockrot's cache file name is the SHA-1
+     * of its key. So the URL of each request comes from the GitHub URLs that the sources hold.
+     *
+     * @param list<string> $sources
+     *
+     * @return array<string, string>
+     */
+    private static function cacheFiles(array $sources): array
+    {
+        $locator = new RepoLocator();
+        $api = new GitHubApi();
+        $headers = GitHubApi::headersFor('recorded');
+        $files = [];
+        foreach ($sources as $source) {
+            foreach (is_dir($source) ? (glob($source.'/*.json') ?: []) : [$source] as $file) {
+                preg_match_all('{github\.com[:/]+([\w.-]+)/([\w.-]+)}', str_replace('\\/', '/', (string) file_get_contents($file)), $matches, \PREG_SET_ORDER);
+                foreach ($matches as $match) {
+                    $repo = $locator->locate('https://github.com/'.$match[1].'/'.$match[2]);
+                    if ($repo !== null) {
+                        $url = $api->requests($repo, true)['repo'];
+                        $files[sha1($url).'.json'] = sha1(CachingHttpClient::key($url, $headers)).'.json';
+                    }
+                }
+            }
+        }
+
+        return $files;
     }
 
     /**
@@ -64,7 +101,7 @@ final class FixtureCliRun
         }
         $server->start();
 
-        return new self($server, $githubDirs, $local);
+        return new self($server, $githubDirs, $local, array_merge($lockFiles, $p2Dirs, array_values(array_unique($mirrors))));
     }
 
     /**
@@ -114,8 +151,12 @@ final class FixtureCliRun
             $fetchedAt = (new \DateTimeImmutable($today))->format(\DATE_ATOM);
             foreach ($this->githubDirs as $dir) {
                 foreach (glob($dir.'/*.json') ?: [] as $answer) {
-                    $envelope = JsonPath::decodeFile($answer);
-                    file_put_contents($home.'/cache/lockrot/'.basename($answer), (string) json_encode(['fetched_at' => $fetchedAt] + $envelope, \JSON_UNESCAPED_SLASHES));
+                    $json = (string) json_encode(['fetched_at' => $fetchedAt] + JsonPath::decodeFile($answer), \JSON_UNESCAPED_SLASHES);
+                    // The URL alone is the key of an archive that keys a credentialed request on its URL.
+                    file_put_contents($home.'/cache/lockrot/'.basename($answer), $json);
+                    if (isset($this->cacheFiles[basename($answer)])) {
+                        file_put_contents($home.'/cache/lockrot/'.$this->cacheFiles[basename($answer)], $json);
+                    }
                 }
             }
             file_put_contents($home.'/config.json', (string) json_encode([
@@ -186,9 +227,10 @@ final class FixtureCliRun
     public function recordingsRead(Process $process): array
     {
         preg_match_all('{Downloading http://127\.0\.0\.1:\d+(/\S*)|Reading \S+/lockrot/([0-9a-f]{40}\.json) from cache}', $process->getErrorOutput(), $matches, \PREG_SET_ORDER);
+        $recordings = array_flip($this->cacheFiles);
         $read = [];
         foreach ($matches as $match) {
-            $read[] = ($match[2] ?? '') !== '' ? 'github/'.$match[2] : $this->originalOf($match[1] ?? '');
+            $read[] = ($match[2] ?? '') !== '' ? 'github/'.($recordings[$match[2]] ?? $match[2]) : $this->originalOf($match[1] ?? '');
         }
 
         return array_values(array_unique(array_filter($read)));

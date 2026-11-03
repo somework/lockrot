@@ -17,6 +17,12 @@ final class CachingHttpClient implements HttpClientInterface
      */
     private const ANONYMOUS_KEY = ' anonymous';
 
+    /**
+     * Ends the key of a request with a credential header. An entry under the URL alone has no
+     * credential state, such as an anonymous 404, so no request reads it.
+     */
+    private const CREDENTIALED_KEY = ' credentialed';
+
     private HttpClientInterface $inner;
     private CacheInterface $cache;
     private int $ttl;
@@ -49,9 +55,8 @@ final class CachingHttpClient implements HttpClientInterface
         /** @var array<string, HttpResult> $stale */
         $stale = [];
         $now = $this->clock->now()->getTimestamp();
-        $suffix = self::carriesCredentials($headers) ? '' : self::ANONYMOUS_KEY;
         foreach ($urls as $url) {
-            $cached = $this->cached($url, $url.$suffix);
+            $cached = $this->cached($url, self::key($url, $headers));
             $isFresh = $cached !== null && $now - $cached->fetchedAt()->getTimestamp() < $this->ttl;
             if ($cached !== null && ($this->offline || $isFresh)) {
                 $results[$url] = $cached->asCached();
@@ -74,7 +79,7 @@ final class CachingHttpClient implements HttpClientInterface
                     $results[$url] = $older !== null && !$older->isNotFound() ? $older->asCached() : $result;
                     continue;
                 }
-                $this->cache->set($url.$suffix, $result);
+                $this->cache->set(self::key($url, $headers), $result);
                 $results[$url] = $result;
             }
         }
@@ -86,6 +91,16 @@ final class CachingHttpClient implements HttpClientInterface
     private static function isAnswer(HttpResult $result): bool
     {
         return $result->isNotFound() || ($result->isOk() && $result->json() !== null);
+    }
+
+    /**
+     * The cache key of a request: its URL and whether it carries a credential header.
+     *
+     * @param list<string> $headers
+     */
+    public static function key(string $url, array $headers): string
+    {
+        return $url.(self::carriesCredentials($headers) ? self::CREDENTIALED_KEY : self::ANONYMOUS_KEY);
     }
 
     public static function isCredentialHeader(string $header): bool

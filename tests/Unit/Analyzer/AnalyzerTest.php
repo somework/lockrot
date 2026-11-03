@@ -1217,7 +1217,7 @@ final class AnalyzerTest extends TestCase
         $clock = Clock::fixed(F::NOW);
         $cache = new ArrayCache();
         $url = 'https://api.github.com/repos/vendor/pkg';
-        $cache->set($url, new HttpResult($url, 200, '{"archived":false,"pushed_at":"2015-01-01T00:00:00Z"}', new \DateTimeImmutable('2026-09-13T04:30:00+00:00')));
+        $cache->set($url.' credentialed', new HttpResult($url, 200, '{"archived":false,"pushed_at":"2015-01-01T00:00:00Z"}', new \DateTimeImmutable('2026-09-13T04:30:00+00:00')));
         $never = new class () implements HttpClientInterface {
             public function fetchAll(array $urls, array $headers = []): array
             {
