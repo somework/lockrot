@@ -66,6 +66,36 @@ final class LockLineIndexTest extends TestCase
         self::assertSame(10, LockLineIndex::fromString($json)->lineOf('acme/first'));
     }
 
+    /** json_decode() drops the earlier value of a repeated section key, so its entries name no line. */
+    public function testARepeatedSectionKeepsOnlyItsLastOccurrence(): void
+    {
+        $json = <<<'JSON'
+            {
+                "packages": [
+                    {
+                        "name": "acme/kept",
+                        "version": "1.0.0"
+                    }
+                ],
+                "packages-dev": [
+                    {
+                        "name": "acme/kept",
+                        "version": "2.0.0"
+                    },
+                    {
+                        "name": "acme/dropped",
+                        "version": "1.0.0"
+                    }
+                ],
+                "packages-dev": []
+            }
+            JSON;
+        $index = LockLineIndex::fromString($json);
+
+        self::assertSame(4, $index->lineOf('acme/kept'));
+        self::assertNull($index->lineOf('acme/dropped'));
+    }
+
     /** A string long enough to exhaust a backtracking pattern's JIT stack still counts its line's brace. */
     public function testAVeryLongStringBesideABraceKeepsTheDepth(): void
     {

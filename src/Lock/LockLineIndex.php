@@ -11,8 +11,9 @@ use Lockrot\Exception\ConfigException;
  * Only a member at depth 3 in `packages` or `packages-dev` counts (`authors[]` and
  * `extra.thanks.name` hold other names), at any indentation. A member that does not stand alone on
  * its line, as in a minified lock, has no line. Of two equal names the last wins, as in
- * json_decode(). A line whose strings PCRE cannot blank leaves no line at all: the depth after it
- * is unknown.
+ * json_decode(). A section key that the lock repeats keeps only the entries of its last
+ * occurrence, because json_decode() drops the earlier value. A line whose strings PCRE cannot blank
+ * leaves no line at all: the depth after it is unknown.
  *
  * @internal
  */
@@ -54,7 +55,7 @@ final class LockLineIndex
 
     public static function fromString(string $json): self
     {
-        $lines = [];
+        $sections = [];
         $section = null;
         $depth = 0;
 
@@ -68,6 +69,7 @@ final class LockLineIndex
 
             if ($depth === 1 && preg_match('/^\s*"([^"]+)"\s*:/', $line, $key) === 1) {
                 $section = $key[1];
+                $sections[$section] = [];
             }
             if (
                 $depth === self::ENTRY_DEPTH
@@ -76,7 +78,7 @@ final class LockLineIndex
             ) {
                 $name = json_decode('"'.$match[1].'"');
                 if (\is_string($name)) {
-                    $lines[PackageName::key($name)] = $index + 1;
+                    $sections[$section][PackageName::key($name)] = $index + 1;
                 }
             }
 
@@ -84,7 +86,7 @@ final class LockLineIndex
                 - substr_count($structure, '}') - substr_count($structure, ']');
         }
 
-        return new self($lines);
+        return new self(array_replace([], ...array_values(array_intersect_key($sections, array_flip(self::PACKAGE_SECTIONS)))));
     }
 
     public static function empty(): self
