@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 import unittest
 
@@ -60,6 +61,11 @@ class TheReleaseNotes(unittest.TestCase):
 
         self.assertTrue(notes.startswith('[Upgrading to 0.14](https://lockrot.dev/changes/0.14/) has the steps for each install.\n\nRegenerate'), notes)
 
+    def test_of_a_patch_release_do_not_open_with_the_upgrade_page(self):
+        changelog = CHANGELOG.replace('## [0.14.0] - 2026-11-20', '## [0.14.1] - 2026-11-21')
+
+        self.assertTrue(release_notes.notes('0.14.1', changelog, True).startswith('Regenerate'))
+
     def test_fail_on_a_version_without_a_dated_section(self):
         for version in ('0.15.0', 'Unreleased', '0.14'):
             with self.subTest(version=version), self.assertRaises(release_notes.NoSection):
@@ -73,17 +79,29 @@ class TheReleaseNotes(unittest.TestCase):
 class TheChangelogOfThisRepository(unittest.TestCase):
     def test_gives_each_dated_release_its_notes_without_a_relative_link(self):
         with open(os.path.join(ROOT, 'CHANGELOG.md'), encoding='utf-8') as handle:
-            changelog = handle.read()
+            changelog = handle.read().replace('## [Unreleased]', '## [99.0.0] - 2099-01-01', 1)
         versions = release_notes.DATED.findall(changelog)
         self.assertIn('0.13.0', versions)
+        self.assertIn('99.0.0', versions, 'the Unreleased section is the next release notes')
 
         for version in versions:
             with self.subTest(version=version):
                 notes = release_notes.notes(version, changelog, False)
 
                 self.assertNotIn('\n## ', notes)
-                self.assertNotRegex(notes, r'\]\((?!https?://|#)')
+                self.assertNotRegex(release_notes.CODE_SPAN.sub('', notes), r'\]\((?!https?://|#)')
         self.assertTrue(release_notes.notes('0.13.0', changelog, False).startswith('Act if you publish reports'))
+
+    def test_main_prints_the_notes_or_exits_1_without_a_section(self):
+        script = os.path.join(ROOT, 'tools', 'release', 'release_notes.py')
+
+        found = subprocess.run([sys.executable, script, '0.13.0'], capture_output=True, text=True)
+        missing = subprocess.run([sys.executable, script, '0.0.9'], capture_output=True, text=True)
+
+        self.assertEqual((0, ''), (found.returncode, found.stderr))
+        self.assertTrue(found.stdout.startswith('Act if you publish reports'), found.stdout[:80])
+        self.assertEqual((1, ''), (missing.returncode, missing.stdout))
+        self.assertIn('::error::CHANGELOG.md has no "## [0.0.9] - YYYY-MM-DD" section', missing.stderr)
 
     def test_main_reads_the_upgrade_page_of_the_minor(self):
         self.assertTrue(os.path.isfile(os.path.join(ROOT, release_notes.upgrade_page('0.14.0'))))

@@ -3,9 +3,9 @@
 
     python3 tools/release/release_notes.py <X.Y.Z>
 
-The notes open with a link to docs/changes/<X.Y>.md when that upgrade page exists. A link to docs/
-points at its lockrot.dev page, and another relative link at the file of the tag on GitHub, because
-GitHub resolves neither on a release page. Exits 1 without a dated section for the version, so a
+The notes of an X.Y.0 release open with a link to docs/changes/<X.Y>.md when that upgrade page
+exists. A link to docs/ points at its lockrot.dev page, and another relative link at the file of the
+tag on GitHub, because GitHub resolves neither on a release page. Exits 1 without a dated section for the version, so a
 release cannot go out without saying what changed. Standard library only, as tools/corpus.
 """
 
@@ -64,7 +64,7 @@ def section(changelog: str, version: str) -> str:
 
 def notes(version: str, changelog: str, has_upgrade_page: bool) -> str:
     body = absolute_links(section(changelog, version), version)
-    if not has_upgrade_page:
+    if not has_upgrade_page or version.split('.')[2] != '0':
         return body
     minor = version.rsplit('.', 1)[0]
     return '[Upgrading to %s](%schanges/%s/) has the steps for each install.\n\n%s' % (minor, SITE, minor, body)

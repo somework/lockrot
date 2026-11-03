@@ -472,7 +472,7 @@ maintainer.
     It builds, signs and attests the PHAR, runs it on PHP 7.4, then publishes the GitHub release
     and asks lockrot.dev to rebuild. Its step "The release notes come from the CHANGELOG section of
     the tag" writes the release body with `tools/release/release_notes.py`: the `## [X.Y.Z]`
-    section, with each relative link made absolute. A minor with an upgrade page
+    section, with each relative link made absolute. An `X.Y.0` release with an upgrade page
     (`docs/changes/X.Y.md`) gets a link to that page first.
 
     If the release widens a `-2` schema (a value of an open set, an optional field), the tag run
