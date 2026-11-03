@@ -173,7 +173,7 @@ final class MarkdownFormatter implements FormatterInterface
         $name = static function (string $package) use (&$spans, $nonce): string {
             $placeholder = \sprintf("\x00%s-%d\x00", $nonce, \count($spans));
             // The key is the placeholder as self::text() writes it, because the spans go in after it.
-            $spans[self::text($placeholder)] = self::code($package);
+            $spans[self::text($placeholder)] = self::code($package, false);
 
             return $placeholder;
         };
@@ -187,7 +187,7 @@ final class MarkdownFormatter implements FormatterInterface
         $updateNow = RunFooter::updateNow($report);
         if ($updateNow !== null) {
             $lines[] = '';
-            $lines[] = '**Update now:** '.self::text(RunFooter::platformStep($report)).self::code($updateNow);
+            $lines[] = '**Update now:** '.self::text(RunFooter::platformStep($report)).self::code($updateNow, false);
         }
         $notes = $report->notes();
         $stale = $baseline === null ? null : $baseline->staleNote();
@@ -242,14 +242,16 @@ final class MarkdownFormatter implements FormatterInterface
 
     /**
      * A code span. Backslash escapes do not apply inside one, so the delimiter is one backtick
-     * longer than the longest run inside, as CommonMark requires. `|` is still escaped: GitHub's
-     * table parser reads it before the code span. `##[` prints as `##\x5B`, as in the github format,
-     * because a job log that shows the comment reads it as a runner command.
+     * longer than the longest run inside, as CommonMark requires. In a table cell `|` is still
+     * escaped: GitHub's table parser reads it before the code span. `##[` prints as `##\x5B`, as in
+     * the github format, because a job log that shows the comment reads it as a runner command.
      */
-    private static function code(string $value): string
+    private static function code(string $value, bool $inCell = true): string
     {
-        $value = TerminalText::neutralise($value);
-        $value = str_replace(['|', '##['], ['\\|', '##\\x5B'], $value);
+        $value = str_replace('##[', '##\\x5B', TerminalText::neutralise($value));
+        if ($inCell) {
+            $value = str_replace('|', '\\|', $value);
+        }
         $longest = 0;
         preg_match_all('/`+/', $value, $runs);
         foreach ($runs[0] as $run) {
