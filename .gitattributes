@@ -28,6 +28,9 @@
 /bin/record-fixtures export-ignore
 /bin/record-demo export-ignore
 /bin/record-schema-evolution export-ignore
+/bin/refresh-monorepo-parents export-ignore
+/.claude export-ignore
+/.coderabbit.yaml export-ignore
 /tools export-ignore
 /docs export-ignore
 /mkdocs.yml export-ignore
