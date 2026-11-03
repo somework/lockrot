@@ -1223,8 +1223,8 @@ deepest: hoa/ustring and hoa/zformat, 4 hops (wallabag/rulerz › hoa/ruler › 
 - `named_in` lists the `composer.json` sections that name the package, or a name it replaces or
   provides: `require`, `require-dev`, or none. A name that the lock holds as a package of its own
   goes to that package, and the package that replaces or provides the name gets no section from
-  it. In a run without `--dev`, a package that `composer.json` names only in `require-dev` is
-  reached only through a walked package that requires it, else it is unreached.
+  it. A package that `composer.json` names only in `require-dev` is reached through others in a
+  run without `--dev`.
 
 - The root `rot_depth` counts the graded findings by reach, by depth, by section and by
   production and development, and names the deepest ones with their chain.
