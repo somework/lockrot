@@ -802,6 +802,15 @@
    "other_repositories": 0,
    "repositories": [
     {
+     "composer_repository": "composer repo (https://repo.example.org)",
+     "registry": null,
+     "outcome": "failed",
+     "reason": "transport",
+     "message": "The \"https://repo.example.org/api/security-advisories/\" file could not be downloaded (HTTP/2 503 )",
+     "packages_with_records": null,
+     "records": null
+    },
+    {
      "composer_repository": "composer repo (https://repo.packagist.org)",
      "registry": "packagist.org",
      "outcome": "answered",
@@ -961,7 +970,7 @@
  "include_dev": false,
  "not_from_composer_repository": 0,
  "packages_unchecked_accepted": 0,
- "network_failures": false,
+ "network_failures": true,
  "counts": {
   "critical": 0,
   "high": 1,
@@ -1214,8 +1223,21 @@
   "fix_unknown": 0
  },
  "data_date": "2026-10-01T17:39:09+00:00",
- "notes": [],
- "note_details": [],
+ "notes": [
+  "security advisories unavailable from https://repo.example.org: The \"https://repo.example.org/api/security-advisories/\" file could not be downloaded (HTTP/2 503 )"
+ ],
+ "note_details": [
+  {
+   "code": "advisories_unavailable",
+   "text": "security advisories unavailable from https://repo.example.org: The \"https://repo.example.org/api/security-advisories/\" file could not be downloaded (HTTP/2 503 )",
+   "docs_url": "https://lockrot.dev/notes/#advisories_unavailable",
+   "sets_network_failures": true,
+   "data": {
+    "composer_repository": "https://repo.example.org",
+    "message": "The \"https://repo.example.org/api/security-advisories/\" file could not be downloaded (HTTP/2 503 )"
+   }
+  }
+ ],
  "findings": [
   {
    "package": "laravel/framework",
@@ -1445,6 +1467,13 @@
     "unchecked_reason": "lookup_failed",
     "records": 28,
     "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.example.org)",
+      "registry": null,
+      "answer": "failed",
+      "records": null,
+      "reason": "lookup_failed"
+     },
      {
       "composer_repository": "composer repo (https://repo.packagist.org)",
       "registry": "packagist.org",

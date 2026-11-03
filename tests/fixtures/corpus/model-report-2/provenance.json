@@ -1,8 +1,8 @@
 {
     "written_by": "security-axis/spec_flags_r3_docs.py reports <dir> <out> --cache tests/fixtures/corpus/cache --php-fit <file>, in the private model folder, then tools/corpus/differential.php --adopt-model",
     "model": {
-        "spec_flags_r3.py": "fb7de742464da32d0f8aba805c39ac6e08010e7e14a1e6101545155b8ff30b9e",
-        "spec_flags_r3_docs.py": "7e6eec313944d58a90f0ac8535174830be1d4916369c67549a4a7b6ab7ad9207"
+        "spec_flags_r3.py": "02a6b1c1757e6950e6bc924425a19e3e4637004a725facb46723257de6c9d447",
+        "spec_flags_r3_docs.py": "367d047bec2d98fe8b772b3cd48a532384539bb0e3d3364764f104f5b08ae7ea"
     },
     "model_inputs": {
         "written_by": "php tools/corpus/differential.php --model-input <phar> <dir>",
@@ -1418,7 +1418,7 @@
     "outputs": {
         "BookStackApp_BookStack.json": "6d9aee64132ccc44c73b5b0076ae4c3b33950439a285eae8c0c6c719224ef1f4",
         "PrestaShop_PrestaShop.json": "f01553e0f6f4ea0371a94c49a0127a65d3d550074f148128b7141517a43a2a64",
-        "drupal_drupal.feed-failed.json": "efb43511e2e734b4d5b3afa80b4345316e684b3e137839a90b46aed061e4eba7",
+        "drupal_drupal.feed-failed.json": "1330c7b3915e42c56e3714bb760c29861efdc111e350c4af78f5c748e8964f7b",
         "drupal_drupal.json": "7ccd12c26944c138d1fc347f83d35556482a586830b9de65c8741e69a174ba9d",
         "firefly-iii_firefly-iii.json": "fbe3bbb1a174f061af3717cad51405b9138a79c94f1362c51e2869703a7c5025",
         "grokability_snipe-it.json": "d6745fe03bf85c789fea2736bcbba887d298fea6c70568fafa3bfd25398b2124",

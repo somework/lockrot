@@ -802,6 +802,15 @@
       "other_repositories": 5,
       "repositories": [
         {
+          "composer_repository": "composer repo (https://packages.drupal.org/8)",
+          "registry": "packages.drupal.org",
+          "outcome": "failed",
+          "reason": "transport",
+          "message": "curl error 7 while downloading https://packages.drupal.org/8/packages.json: Failed to connect to packages.drupal.org:443 over proxy 127.0.0.1 after 0 ms: Could not connect to server",
+          "packages_with_records": null,
+          "records": null
+        },
+        {
           "composer_repository": "composer repo (https://repo.packagist.org)",
           "registry": "packagist.org",
           "outcome": "answered",
@@ -1314,6 +1323,13 @@
         "records": 112,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -1637,6 +1653,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -1910,6 +1933,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -2182,6 +2212,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -2479,6 +2516,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -2785,6 +2829,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -3067,6 +3118,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -3239,6 +3297,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -3399,6 +3464,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -3557,6 +3629,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -3717,6 +3796,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -3875,6 +3961,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -4035,6 +4128,13 @@
         "records": 15,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -4193,6 +4293,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -4354,6 +4461,13 @@
         "records": 6,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -4513,6 +4627,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -4671,6 +4792,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -4832,6 +4960,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -4990,6 +5125,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -5150,6 +5292,13 @@
         "records": 6,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -5308,6 +5457,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -5468,6 +5624,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -5665,6 +5828,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -5923,6 +6093,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -6159,6 +6336,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -6343,6 +6527,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -6556,6 +6747,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -6741,6 +6939,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -6914,6 +7119,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -7072,6 +7284,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -7232,6 +7451,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -7391,6 +7617,13 @@
         "records": 2,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -7549,6 +7782,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -7710,6 +7950,13 @@
         "records": 1,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -7870,6 +8117,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -8028,6 +8282,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -8189,6 +8450,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -8347,6 +8615,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -8507,6 +8782,13 @@
         "records": 14,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -8665,6 +8947,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 8,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -8825,6 +9114,13 @@
         "records": 1,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -8984,6 +9280,13 @@
         "records": 3,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -9142,6 +9445,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -9307,6 +9617,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -9483,6 +9800,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -9651,6 +9975,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -9827,6 +10158,13 @@
         "records": 1,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -10000,6 +10338,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -10176,6 +10521,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -10350,6 +10702,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -10523,6 +10882,13 @@
         "records": 2,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -10681,6 +11047,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -10841,6 +11214,13 @@
         "records": 4,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -10999,6 +11379,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 3,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -11159,6 +11546,13 @@
         "records": 2,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -11317,6 +11711,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -11478,6 +11879,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -11637,6 +12045,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -11798,6 +12213,13 @@
         "records": 3,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -11956,6 +12378,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 0,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
@@ -12118,6 +12547,13 @@
         "records": 1,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -12278,6 +12714,13 @@
         "records": 5,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -12437,6 +12880,13 @@
         "records": 0,
         "feeds": [
           {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
+          {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",
             "answer": "answered",
@@ -12595,6 +13045,13 @@
         "unchecked_reason": "lookup_failed",
         "records": 26,
         "feeds": [
+          {
+            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+            "registry": "packages.drupal.org",
+            "answer": "failed",
+            "records": null,
+            "reason": "lookup_failed"
+          },
           {
             "composer_repository": "composer repo (https://repo.packagist.org)",
             "registry": "packagist.org",

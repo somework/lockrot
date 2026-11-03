@@ -173197,6 +173197,15 @@
      "other_repositories": 0,
      "repositories": [
       {
+       "composer_repository": "composer repo (https://repo.example.org)",
+       "registry": null,
+       "outcome": "failed",
+       "reason": "transport",
+       "message": "The \"https://repo.example.org/api/security-advisories/\" file could not be downloaded (HTTP/2 503 )",
+       "packages_with_records": null,
+       "records": null
+      },
+      {
        "composer_repository": "composer repo (https://repo.packagist.org)",
        "registry": "packagist.org",
        "outcome": "answered",
@@ -173349,7 +173358,7 @@
     }
    },
    "synthetic_inputs": [
-    "a Composer repository failed to return advisories: security.check partial, S10 advisories lookup_failed (‡)",
+    "the Composer repository https://repo.example.org failed in transport and packagist.org answered: security.check partial, S10 advisories lookup_failed (‡)",
     "next_step.held_by[], also[].held_by[] and the S9 rows' fix.held_by: the lock links of the corpus commit (LINKS)"
    ],
    "finding": {
@@ -173580,6 +173589,13 @@
      "unchecked_reason": "lookup_failed",
      "records": 28,
      "feeds": [
+      {
+       "composer_repository": "composer repo (https://repo.example.org)",
+       "registry": null,
+       "answer": "failed",
+       "records": null,
+       "reason": "lookup_failed"
+      },
       {
        "composer_repository": "composer repo (https://repo.packagist.org)",
        "registry": "packagist.org",
@@ -175077,6 +175093,18 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v9.52.16 released 2023-10-03 (3.0 years ago); 9.x last released v9.52.22 2026-08-12 (0.1 years ago); newest release v11.57.0 2026-09-29 (less than three weeks ago); last push 2026-09-30 (less than three weeks ago)"
    },
+   "run_notes": [
+    {
+     "code": "advisories_unavailable",
+     "text": "security advisories unavailable from https://repo.example.org: The \"https://repo.example.org/api/security-advisories/\" file could not be downloaded (HTTP/2 503 )",
+     "docs_url": "https://lockrot.dev/notes/#advisories_unavailable",
+     "sets_network_failures": true,
+     "data": {
+      "composer_repository": "https://repo.example.org",
+      "message": "The \"https://repo.example.org/api/security-advisories/\" file could not be downloaded (HTTP/2 503 )"
+     }
+    }
+   ],
    "inputs": {
     "root": {
      "name": "djaiss/monica",
@@ -175276,7 +175304,14 @@
      "project_php": "^8.1",
      "fail_on": "high",
      "include_dev": false,
-     "advisories_unchecked": "lookup_failed"
+     "advisories_unchecked": "lookup_failed",
+     "advisory_failures": [
+      {
+       "composer_repository": "composer repo (https://repo.example.org)",
+       "reason": "transport",
+       "message": "The \"https://repo.example.org/api/security-advisories/\" file could not be downloaded (HTTP/2 503 )"
+      }
+     ]
     },
     "packages": {
      "brick/math": {
