@@ -418,9 +418,11 @@ maintainer.
            `CHANGELOG.md`. Run `npm version X.Y.Z --no-git-tag-version`, which sets `version` in
            `package.json` and both `version` fields of `package-lock.json` (the root and
            `packages[""]`). Commit only the version and the pin.
-           The release pull request fails when `package-lock.json` names a version other than the
-           one in `package.json`. If it fails, fix `package-lock.json` on the renderer's `main`,
-           move the renderer tag `vX.Y.Z` onto that commit, and repeat step 8.
+           The renderer's `release.yml` refuses a tag when `package-lock.json` names a version
+           other than the one in `package.json`. That tag then has no release, and the renderer's
+           tag ruleset keeps it on its commit. If the tag run fails at that check, fix
+           `package-lock.json` on the renderer's `main`. Then do this step and step 7 again with
+           the next renderer version, and vendor that version in step 8.
         7. Merge that commit into the renderer's `main`. Then tag `vX.Y.Z` on `main`.
         8. Run `tools/report/update-renderer vX.Y.Z`, and commit only the files that it writes. This
            commit must not change the contract bundle.
