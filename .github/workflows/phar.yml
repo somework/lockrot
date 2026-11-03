@@ -182,10 +182,13 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
         with: {name: lockrot.phar, path: build}
+      - name: The release notes come from the CHANGELOG section of the tag
+        run: python3 tools/release/release_notes.py "${GITHUB_REF_NAME#v}" > "$RUNNER_TEMP/notes.md"
       # The TypeScript contract of report-2 ships as release assets only: types/ is export-ignored, so
       # the PHAR and the Composer dist do not carry it.
       - uses: softprops/action-gh-release@v3
         with:
+          body_path: ${{ runner.temp }}/notes.md
           # A moved d.ts file fails the release instead of a release without types.
           fail_on_unmatched_files: true
           files: |
