@@ -505,6 +505,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--baseline` target never climbs above the share.
 - **json:** `explain-2.json` holds no run relation on `php_window.target_fix`, a key that an
   explanation does not carry. ([The explanation](docs/schema.md#the-explanation))
+- **Move check:** the move check stops at a canonical repository that fails on a package, as
+  Composer does. A move that needs the package reads `not_checked` with `unloaded_name`.
+- **All formats:** lockrot does not ask a repository for a package that its `only` or `exclude`
+  keeps out. When no repository with a feed admits the package, it reads `no_feed`, not `answered`
+  with 0 records.
+- **CLI, Install-time:** a request with lockrot's credentials reads only answers cached with credentials.
+  After the upgrade, each run with a token fetches its GitHub answers once again.
+- **All formats:** the PHP window and `target_fix` read `config.platform.php-64bit` as the
+  move-check solve does. `false` removes it, and a value that does not parse gives no window.
+- **CLI, Install-time:** a run with `LOCKROT_TODAY` stores no fetch time later than the real time in the cache
+  of repository host answers.
 
 ## [0.13.0] - 2026-10-01
 
