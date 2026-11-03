@@ -376,4 +376,33 @@ final class CachingHttpClientTest extends TestCase
         self::assertSame('["json"]', $cached->body());
         self::assertSame(1, $calls);
     }
+
+    /** A real-clock test: a future LOCKROT_TODAY pins the answer that the run reads, not the time that the shared cache keeps. */
+    public function testAnAnswerUnderAFutureLockrotTodayIsStoredWithTheRealTime(): void
+    {
+        $calls = 0;
+        $clock = Clock::fromEnvironment(['LOCKROT_TODAY' => '2999-01-01']);
+        $cache = new ArrayCache();
+        $before = time();
+        $client = new CachingHttpClient($this->inner(['https://a' => new HttpResult('https://a', 200, '{}', $clock->now())], $calls), $cache, self::TTL, $clock);
+
+        $result = $client->fetchAll(['https://a'], self::TOKEN)['https://a'];
+
+        self::assertSame('2999-01-01T00:00:00+00:00', $result->fetchedAt()->format(\DATE_ATOM));
+        $stored = ($cache->get('https://a'.self::CREDENTIALED) ?? self::fail('the answer is stored'))->fetchedAt()->getTimestamp();
+        self::assertGreaterThanOrEqual($before, $stored);
+        self::assertLessThanOrEqual(time(), $stored);
+    }
+
+    public function testAnAnswerUnderAPastLockrotTodayIsStoredWithItsOwnTime(): void
+    {
+        $calls = 0;
+        $clock = Clock::fromEnvironment(['LOCKROT_TODAY' => '2026-09-14']);
+        $cache = new ArrayCache();
+        $client = new CachingHttpClient($this->inner(['https://a' => new HttpResult('https://a', 200, '{}', $clock->now())], $calls), $cache, self::TTL, $clock);
+
+        $client->fetchAll(['https://a'], self::TOKEN);
+
+        self::assertSame('2026-09-14T00:00:00+00:00', ($cache->get('https://a'.self::CREDENTIALED) ?? self::fail('the answer is stored'))->fetchedAt()->format(\DATE_ATOM));
+    }
 }

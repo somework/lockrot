@@ -488,9 +488,9 @@ origin: Packagist, a private repository, vcs, a path or an archive. packages-dev
 - lockrot asks each configured Composer repository that publishes advisories. A repository without
   a feed is listed with the outcome `no_feed`.
 
-- A repository whose `only` or `exclude` keeps a package out is not asked for that package, as
-  Composer does. The package's `security.feeds[]` omits that repository. A package that no feed
-  covers reads `no_feed`.
+- lockrot does not ask a repository for a package that its `only` or `exclude` keeps out, as
+  Composer does not. The package's `security.feeds[]` omits that repository. When no repository
+  with a feed admits the package, the package reads `no_feed`.
 
 - While advisory blocking is on, [the move check](#the-move-check)
   asks for the advisories of each name that a solve loads and that no earlier lookup covered,
@@ -800,7 +800,8 @@ Limits of the check:
   the patterns once per run (`ignored_platform`), and the `moves:` footer line names them.
 - It checks `php`, `php-64bit`, `composer-plugin-api`, `composer-runtime-api` and `composer`.
   `php-64bit` takes the version that `config.platform.php-64bit` sets, else the version of the
-  solve's php on a 64-bit PHP. The other three take the
+  solve's php on a 64-bit PHP. `config.platform.php-64bit: false` removes it from the solve. The
+  other three take the
   versions of the Composer that runs lockrot.
 - It solves at `config.platform.php` when that version is a stable release in the target PHP's minor, else at the
   newest patch of the target minor (`8.4.99`). Composer reads `8.4` as `8.4.0`. It keeps every
@@ -816,8 +817,9 @@ Limits of the check:
 - It reads package and path repositories as Composer reads them, and each serves the names that it
   declares. A canonical repository of any type that serves a name hides that name in every later
   repository.
-- When a canonical Composer repository fails on a name, the check asks no later repository for it,
-  as Composer does. A solve that needs the name reads `not_checked` with `unloaded_name`.
+- When a canonical repository fails on a name, the check asks no later repository for it. Composer
+  stops the update on that failure. A solve that needs the name reads `not_checked` with
+  `unloaded_name`.
 - It does not load a vcs, git or artifact repository, because a load clones or downloads the
   repository. Such a repository serves only the names that the lock records with a `source` or
   `dist` URL equal to the repository URL. The URLs compare without case, a trailing `.git` or a

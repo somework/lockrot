@@ -79,7 +79,7 @@ final class CachingHttpClient implements HttpClientInterface
                     $results[$url] = $older !== null && !$older->isNotFound() ? $older->asCached() : $result;
                     continue;
                 }
-                $this->cache->set(self::key($url, $headers), $result);
+                $this->cache->set(self::key($url, $headers), $this->stamped($result));
                 $results[$url] = $result;
             }
         }
@@ -118,6 +118,12 @@ final class CachingHttpClient implements HttpClientInterface
         }
 
         return false;
+    }
+
+    /** The answer with a fetch time no later than the real time, which a future LOCKROT_TODAY passes. */
+    private function stamped(HttpResult $result): HttpResult
+    {
+        return new HttpResult($result->url(), $result->status(), $result->body(), min($result->fetchedAt(), $this->clock->fetchTime()), $result->error());
     }
 
     /** A cache that stores no URL, such as Composer's, returns the key as the URL of the answer. */

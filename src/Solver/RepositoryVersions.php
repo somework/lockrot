@@ -208,6 +208,9 @@ final class RepositoryVersions implements VersionSource
                     $found = array_merge($found, $dev['namesFound']);
                 }
             } catch (\Exception $e) {
+                if ($this->deadline->isPast()) {
+                    return $this->overBudget([$name => null]);
+                }
                 $failed = true;
                 // Composer aborts on a failed canonical repository. A repository that lists the name answers for it:
                 // its tags without its dev versions are no answer.

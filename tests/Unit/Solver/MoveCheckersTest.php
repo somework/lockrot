@@ -218,6 +218,7 @@ final class MoveCheckersTest extends TestCase
         self::assertFalse($checker(['php-64bit' => false])->configuredPhp64bit());
         self::assertNull($checker(['php' => '8.4.1'])->configuredPhp64bit());
         self::assertSame('7.4.0', $checker(['php-64bit' => '7.4.0', 'php' => false])->configuredPhp64bit(), 'a config that Composer refuses');
+        self::assertFalse($checker(['PHP-64bit' => false, 'php' => false])->configuredPhp64bit(), 'a config that Composer refuses');
     }
 
     /** laminas at 8.4: lockrot set the php of the solve, so Composer's words about config.platform do not hold. */

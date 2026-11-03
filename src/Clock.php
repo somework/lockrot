@@ -66,8 +66,8 @@ final class Clock
     }
 
     /**
-     * The time that a fetched answer carries. LOCKROT_TODAY pins the ages only: an answer in the
-     * shared HTTP cache carries the real time, so a later run does not read it as fresh past its TTL.
+     * The real time under LOCKROT_TODAY, which pins the ages only. The shared HTTP cache keeps no
+     * later fetch time, so a later run does not read an answer as fresh past its TTL.
      */
     public function fetchTime(): \DateTimeImmutable
     {

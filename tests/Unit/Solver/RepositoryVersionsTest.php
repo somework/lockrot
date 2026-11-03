@@ -416,6 +416,22 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([], $later->asked);
     }
 
+    /** A request that fails after the deadline passed is a cost of the budget. */
+    public function testANameWhoseCanonicalRepositoryFailsAfterTheDeadlineIsOverTheBudget(): void
+    {
+        $clock = new class () {
+            public float $now = 0.0;
+            public int $failures = 0;
+        };
+        // The request of the batch fails within the budget, and the request of the name alone outlives it.
+        $failing = self::recording([], ['acme/lib'], static function () use ($clock): void {
+            $clock->now = ++$clock->failures === 2 ? 10.0 : $clock->now;
+        });
+        $versions = new RepositoryVersions([$failing, self::recording(['acme/lib' => ['1.0.0']])], [], false, Deadline::inSeconds(5.0, static fn (): float => $clock->now));
+
+        self::assertSame([[], VersionSource::BUDGET], [$versions->versions('acme/lib'), $versions->failure('acme/lib')]);
+    }
+
     public function testANameThatFailsInACanonicalFilterRepositoryIsFailedThoughALaterRepositoryListsIt(): void
     {
         $canonical = new FilterRepository(self::recording([], ['acme/lib']), ['only' => ['acme/*']]);

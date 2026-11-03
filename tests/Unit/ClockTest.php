@@ -190,7 +190,7 @@ final class ClockTest extends TestCase
     {
         $before = time();
 
-        $stamp = Clock::fromEnvironment(['LOCKROT_TODAY' => '2030-01-01'])->fetchTime()->getTimestamp();
+        $stamp = Clock::fromEnvironment(['LOCKROT_TODAY' => '2999-01-01'])->fetchTime()->getTimestamp();
 
         self::assertGreaterThanOrEqual($before, $stamp);
         self::assertLessThanOrEqual(time(), $stamp);
