@@ -102,6 +102,54 @@ final class CaseHydratorTest extends TestCase
         self::assertSame(['not_found', $cachedAt], [$activity['status'] ?? null, $activity['cached_at'] ?? null]);
     }
 
+    /** Case github-archived-unread‡ reads a GitHub answer without a boolean `archived`: lockrot skips S3 as `fetch_failed`. */
+    public function testAGitHubAnswerWithoutArchivedHydratesAsAFailedArchivedCheck(): void
+    {
+        $case = CaseHydrator::case('github-archived-unread‡');
+        self::assertNull(JsonPath::arrayAt($case, ['inputs', 'activity'])['archived'] ?? null, 'the case activity has no archived flag');
+
+        $finding = null;
+        foreach (JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::report($case)->toArray()), ['findings']) as $row) {
+            self::assertIsArray($row);
+            if (JsonPath::stringAt($row, ['package']) === JsonPath::stringAt($case, ['finding', 'package'])) {
+                $finding = $row;
+            }
+        }
+        self::assertNotNull($finding, 'the case package has a finding');
+
+        self::assertSame(
+            [['check' => 'repository_archived', 'reason' => 'fetch_failed', 'blocks' => ['S3']]],
+            JsonPath::arrayAt($finding, ['checks_skipped'])
+        );
+    }
+
+    /** lockrot gives `lookup_failed` only from a failed feed, so case partial-lookup‡ hydrates one beside the answered feed. */
+    public function testALookupFailedRunHydratesAFailedRepositoryBesideTheAnsweredOne(): void
+    {
+        $case = CaseHydrator::case('partial-lookup‡');
+        self::assertSame('lookup_failed', JsonPath::stringAt($case, ['finding', 'security', 'unchecked_reason']));
+
+        $report = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+        $finding = null;
+        foreach (JsonPath::arrayAt($report, ['findings']) as $row) {
+            self::assertIsArray($row);
+            if (JsonPath::stringAt($row, ['package']) === JsonPath::stringAt($case, ['finding', 'package'])) {
+                $finding = $row;
+            }
+        }
+        self::assertNotNull($finding, 'the case package has a finding');
+
+        self::assertSame(
+            ['partial', 'lookup_failed', 28, ['failed', 'answered']],
+            [
+                JsonPath::stringAt($finding, ['security', 'check']),
+                JsonPath::stringAt($finding, ['security', 'unchecked_reason']),
+                JsonPath::arrayAt($finding, ['security'])['records'] ?? null,
+                array_column(JsonPath::arrayAt($report, ['run', 'advisory_lookup', 'repositories']), 'outcome'),
+            ]
+        );
+    }
+
     /**
      * Every case's recorded `finding`, with or without inputs, is a report-2 finding. It covers
      * nothing: its validations outlast the timeout of a mutation run, and they read no product code.

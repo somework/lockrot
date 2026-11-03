@@ -836,7 +836,7 @@ final class CaseHydrator
         $api = [RepoRef::GITHUB => new GitHubApi(), RepoRef::GITLAB => new GitLabApi(), RepoRef::BITBUCKET => new BitbucketApi()][$repo->forge()];
         $pushedAt = $activity['pushed_at'] ?? null;
         $bodies = [
-            'repo' => ['archived' => $activity['archived'] ?? false, 'pushed_at' => $pushedAt],
+            'repo' => ['archived' => $activity['archived'] ?? null, 'pushed_at' => $pushedAt],
             'commits' => $repo->forge() === RepoRef::BITBUCKET ? ['values' => [['date' => $pushedAt]]] : [['committed_date' => $pushedAt]],
             'project' => ['archived' => $activity['archived'] ?? null],
         ];
@@ -880,11 +880,13 @@ final class CaseHydrator
      *
      * @param array<string, array{advisories: list<Advisory>, records: ?int, ignored: list<IgnoredAdvisory>}> $packages
      * @param list<Advisory>                                                                                 $others    those on other versions of the case's package
-     * @param ?string                                                                                        $unchecked why the lookup did not run (`offline`), null when it answered
+     * @param ?string                                                                                        $unchecked why the lookup did not run (`offline`), null when it answered. On `lookup_failed`, a second repository fails beside the answered one, because lockrot reads that reason only from a failed feed
      */
     private static function advisoryLoader(array $packages, array $others, ?string $unchecked): AdvisoryLoaderInterface
     {
         $repository = 'composer repo (https://repo.packagist.org)';
+        $failed = 'composer repo (https://repo.example.org)';
+        $answers = $unchecked === null || $unchecked === AdvisoryCoverage::LOOKUP_FAILED;
         $counted = [];
         $ignored = [];
         $every = [];
@@ -897,12 +899,16 @@ final class CaseHydrator
             $records = $facts['records'] ?? \count(array_unique(array_map(static fn (Advisory $advisory): string => $advisory->id(), $all)));
             $total += $records;
             $withRecords += $records === 0 ? 0 : 1;
-            $names[$name] = new AdvisoryNameCoverage($unchecked === null ? [AdvisoryFeed::answered($repository, $records)] : [], $unchecked === null ? $records : null, $unchecked);
+            $feeds = $unchecked === AdvisoryCoverage::LOOKUP_FAILED ? [AdvisoryFeed::failed($failed, null)] : [];
+            $names[$name] = new AdvisoryNameCoverage($answers ? array_merge($feeds, [AdvisoryFeed::answered($repository, $records)]) : [], $answers ? $records : null, $unchecked);
             $counted += $facts['advisories'] === [] ? [] : [$name => $facts['advisories']];
             $ignored += $facts['ignored'] === [] ? [] : [$name => $facts['ignored']];
             $every += $all === [] ? [] : [$name => $all];
         }
-        $repositories = [$unchecked === null ? AdvisoryRepository::of($repository, AdvisoryRepository::ANSWERED)->withRecords($total, $withRecords) : AdvisoryRepository::of($repository, AdvisoryRepository::NOT_ASKED, $unchecked)];
+        $repositories = $answers ? [AdvisoryRepository::of($repository, AdvisoryRepository::ANSWERED)->withRecords($total, $withRecords)] : [AdvisoryRepository::of($repository, AdvisoryRepository::NOT_ASKED, $unchecked)];
+        if ($unchecked === AdvisoryCoverage::LOOKUP_FAILED) {
+            array_unshift($repositories, AdvisoryRepository::of($failed, AdvisoryRepository::FAILED, AdvisoryCoverage::TRANSPORT));
+        }
         $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, $repositories, 0, $names);
         $batch = new AdvisoryBatch($counted, [], $ignored, $every, $coverage, $unchecked === null);
 
