@@ -532,6 +532,17 @@ final class ExplanationTest extends TestCase
         self::assertSame(['platform_override' => '7.4.29', 'target' => JsonPath::arrayAt(JsonPath::decoded($window->toArray()), ['target'])], JsonPath::arrayAt($array, ['run', 'php_window']));
     }
 
+    /** Without a run, the explanation writes the report's own include_dev, as the text reach line reads it. */
+    public function testTheFallbackRunWritesTheIncludeDevOfTheReport(): void
+    {
+        $finding = $this->finding('1.0.0', Verdict::STALE);
+        $report = new Report([$finding], [], new \DateTimeImmutable(F::NOW), 1, 0, null, null, true);
+
+        $array = (new Explanation($finding, F::facts(F::package()), new Thresholds(), '8.4', $report))->toArray();
+
+        self::assertTrue(JsonPath::boolAt($array, ['run', 'include_dev']));
+    }
+
     /**
          * The report's run and its row of the finding come first. The run carries the keys that
          * explain-2 lists, and the legacy block keeps report-1's reading.

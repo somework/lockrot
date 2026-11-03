@@ -7,6 +7,7 @@ namespace Lockrot\Explain;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
+use Lockrot\Config\Gate;
 use Lockrot\Clock;
 use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\ReleaseBranch;
@@ -183,7 +184,7 @@ final class Explanation
             throw new \LogicException('The report does not hold the finding of '.$package->name());
         }
         // Both command paths give the report its run. A caller that skips them passed the target PHP to the constructor.
-        $run = $this->report->run() ?? new RunSettings(null, null, $this->targetPhp, RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, $this->thresholds, $this->projectPhp);
+        $run = $this->report->run() ?? new RunSettings(null, null, $this->targetPhp, RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, $this->thresholds, $this->projectPhp, false, Gate::MODE_CHECK, $this->report->includesDev());
 
         return [
             'package' => $package->name(),
