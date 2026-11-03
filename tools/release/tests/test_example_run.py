@@ -137,7 +137,7 @@ $log = getenv('FAKE_LOG');
 file_put_contents($log, json_encode([getcwd(), array_slice($argv, 1), getenv('COLUMNS'), getenv('LOCKROT_TODAY'), getenv('COMPOSER_CACHE_DIR') !== false, is_file('composer.lock')])."\n", FILE_APPEND);
 foreach (array_slice($argv, 1) as $argument) {
     if (strpos($argument, '--output=json:') === 0) {
-        file_put_contents(substr($argument, 14), json_encode(['lockrot' => ['version' => '0.14.1'], 'notes' => getenv('FAKE_NOTES') ? [['code' => 'anonymous_cap']] : [], 'run' => ['score_model' => ['flags' => [['id' => 1]]]], 'exposure' => [], 'rot_depth' => ['by_depth' => []], 'findings' => [['package' => 'spomky-labs/otphp']]]));
+        file_put_contents(substr($argument, 14), json_encode(['lockrot' => ['version' => '0.14.1'], 'notes' => getenv('FAKE_NOTES') ? ['GitHub token not set: capped'] : [], 'run' => ['score_model' => ['flags' => [['id' => 1]]]], 'exposure' => [], 'rot_depth' => ['by_depth' => []], 'findings' => [['package' => 'spomky-labs/otphp']]]));
     }
 }
 echo basename(getcwd()) === 'clean_one' ? (getenv('FAKE_FLAGGED') ? "20 packages checked · 1 flagged\n" : "20 packages checked · nothing flagged\n") : "table output\n";

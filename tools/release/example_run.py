@@ -121,7 +121,7 @@ def report_of(path: str) -> Any:
     with open(path, encoding='utf-8') as handle:
         report = json.load(handle)
     if report.get('notes'):
-        raise RecordError('the report has run notes %s, and the page says that every source answered' % [note.get('code') for note in report['notes']])
+        raise RecordError('the report has run notes, and the page says that every source answered: %s' % ' '.join(map(str, report['notes'])))
     return report
 
 
