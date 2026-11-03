@@ -269,6 +269,8 @@ The document also carries `lockrot`, `package`, `version` and `generated_at`. Th
 - **Errors.** A package that is not in the lock, or that is in `packages-dev` on a run without
   `--dev`, is exit `2`. So is `--explain` with `--output`.
 - **Baseline.** Not read, so a missing or unreadable baseline does not stop an explanation.
+  `finding.baseline` is null, and lockrot decides `finding.gate` as if no baseline existed. So a
+  finding that the baseline exempts in the report can read `gate.fails` true in the explanation.
 
 In the release-branch table, S8 does not measure a branch whose highest tag is `undated` or dated
 only by a `commit <date>` that other tags share ([Left behind](verdicts.md#left-behind),

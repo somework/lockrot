@@ -967,10 +967,12 @@ How lockrot reads the window:
 - A set with no minor has `closest`: the known minors that the fewest links exclude, and those
   links.
 - `target.inside` says whether the set with require-dev admits the target PHP. When `with_dev` is
-  null, `without_dev` decides. While `target.inside` is false, Composer refuses the baseline of
-  [the move check](#the-move-check), and every move is `not_checked`. The exception is a root
-  link that only the lock's `platform` or `platform-dev` holds (`target_fix.lock_platform`). The
-  move check does not read that link, so the baseline can resolve while `target.inside` is false.
+  null, `without_dev` decides. When a package link or a composer.json link excludes the target,
+  Composer refuses the baseline of [the move check](#the-move-check), and every move is
+  `not_checked`. A php link that only the lock's `platform` holds gives `target.inside` false
+  while the baseline resolves. Each move then reads `resolves` or `refused`, and
+  `target_fix.lock_platform` holds that link. A tool reads `run.move_check.baseline`, not
+  `target.inside`, to learn whether the moves were checked.
   `target_fix` gives Composer's answer to one update of the packages that exclude the target.
 
 The window is null when a package or the root provides or replaces `php` or `php-64bit`, or when a
