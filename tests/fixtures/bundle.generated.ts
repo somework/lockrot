@@ -256185,7 +256185,7 @@ export const d_partial_lookup_dagger = {
     "include_dev": false,
     "not_from_composer_repository": 0,
     "packages_unchecked_accepted": 0,
-    "network_failures": false,
+    "network_failures": true,
     "counts": {
         "critical": 0,
         "high": 1,
@@ -256433,8 +256433,21 @@ export const d_partial_lookup_dagger = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "security advisories unavailable from composer repo (https://repo.example.org): The \"https://repo.example.org/api/security-advisories/\" file could not be downloaded (HTTP/2 503 )"
+    ],
+    "note_details": [
+        {
+            "code": "advisories_unavailable",
+            "text": "security advisories unavailable from composer repo (https://repo.example.org): The \"https://repo.example.org/api/security-advisories/\" file could not be downloaded (HTTP/2 503 )",
+            "docs_url": "https://lockrot.dev/notes/#advisories_unavailable",
+            "sets_network_failures": true,
+            "data": {
+                "composer_repository": "composer repo (https://repo.example.org)",
+                "message": "The \"https://repo.example.org/api/security-advisories/\" file could not be downloaded (HTTP/2 503 )"
+            }
+        }
+    ],
     "findings": [
         {
             "package": "laravel/framework",

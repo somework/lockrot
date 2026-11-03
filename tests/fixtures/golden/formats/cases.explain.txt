@@ -3183,6 +3183,7 @@ repository metadata
      6.x      v6.20.45      2024-11-12   ^7.2.5|^8.0 0 of 6
      5.x      v5.8.38       2020-04-14   ^7.1.3      0 of 6
      4.x      v4.2.22       2016-11-12   >=5.4.0     0 of 6
+note: security advisories unavailable from composer repo (https://repo.example.org): The "https://repo.example.org/api/security-advisories/" file could not be downloaded (HTTP/2 503 )
 
 == case partial-op‡
 geoip2/geoip2 v2.4.5 — critical: left-behind · old-promise · vulnerable

@@ -13,4 +13,6 @@ libyears: 3.0 behind across the one package · 3.0 from direct requirements · f
 advisories: 1 package asked · composer repo (https\://repo.example.org) lookup failed (network error: The "https\://repo.example.org/api/security-advisories/" file could not be downloaded (HTTP/2 503 )) · packagist.org answered (74 on record for 10 packages)\
 php: the lock installs on PHP 8.1 to 8.5
 
+- note: security advisories unavailable from composer repo (https\://repo.example.org): The "https\://repo.example.org/api/security-advisories/" file could not be downloaded (HTTP/2 503 )
+
 <sub>15 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
