@@ -811,6 +811,8 @@ Limits of the check:
 - It reads package and path repositories as Composer reads them, and each serves the names that it
   declares. A canonical repository of any type that serves a name hides that name in every later
   repository.
+- When a canonical Composer repository fails on a name, the check asks no later repository for it,
+  as Composer does. A solve that needs the name reads `not_checked` with `unloaded_name`.
 - It does not load a vcs, git or artifact repository, because a load clones or downloads the
   repository. Such a repository serves only the names that the lock records with a `source` or
   `dist` URL equal to the repository URL. The URLs compare without case, a trailing `.git` or a

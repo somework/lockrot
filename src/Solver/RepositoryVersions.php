@@ -20,7 +20,7 @@ use Lockrot\Deadline;
  * then `dev` for a name with no tagged release or one that the root admits at `dev`, as Composer's
  * repository loads a name's `~dev` file. Composer serves a file
  * that this process already fetched from its cache, so a name that the run read costs no request.
- * The first canonical repository that lists a name shadows the later ones. A repository with `only`,
+ * The first canonical repository that lists a name or fails on it shadows the later ones. A repository with `only`,
  * `exclude` or `canonical` is asked as Composer asks it, through its FilterRepository. A vcs or
  * other repository is not loaded. It serves the names that the lock records from its URL. A name
  * that it serves before a canonical repository lists the name is {@see VersionSource::SHADOWED}
@@ -209,8 +209,9 @@ final class RepositoryVersions implements VersionSource
                 }
             } catch (\Exception $e) {
                 $failed = true;
-                // A repository that lists the name answers for it: its tags without its dev versions are no answer.
-                if ($versions !== []) {
+                // Composer aborts on a failed canonical repository. A repository that lists the name answers for it:
+                // its tags without its dev versions are no answer.
+                if ($versions !== [] || self::isCanonical($repository)) {
                     break;
                 }
                 continue;
@@ -386,7 +387,12 @@ final class RepositoryVersions implements VersionSource
      */
     private static function filterAdmits(FilterRepository $repository, string $name): bool
     {
-        return \Closure::bind(fn (): bool => $this->canonical && $this->isAllowed($name), $repository, FilterRepository::class)();
+        return self::isCanonical($repository) && \Closure::bind(fn (): bool => $this->isAllowed($name), $repository, FilterRepository::class)();
+    }
+
+    private static function isCanonical(RepositoryInterface $repository): bool
+    {
+        return !$repository instanceof FilterRepository || \Closure::bind(fn (): bool => $this->canonical, $repository, FilterRepository::class)();
     }
 
     private static function base(BasePackage $package): BasePackage

@@ -255,9 +255,10 @@ final class RepositoryVersionsTest extends TestCase
     }
 
     /** A repository that fails is skipped whole: its dev versions are not read in place of the tagged ones. */
-    public function testARepositoryWhoseLoadFailsIsSkippedForTheNextOne(): void
+    public function testANonCanonicalRepositoryWhoseLoadFailsIsSkippedForTheNextOne(): void
     {
-        $versions = new RepositoryVersions([self::repository(['acme/lib' => ['dev-main']], true), self::repository(['acme/lib' => ['1.0.0']])], [], false, Deadline::never());
+        $nonCanonical = new FilterRepository(self::repository(['acme/lib' => ['dev-main']], true), ['canonical' => false]);
+        $versions = new RepositoryVersions([$nonCanonical, self::repository(['acme/lib' => ['1.0.0']])], [], false, Deadline::never());
 
         self::assertSame(['1.0.0'], self::pretty($versions->versions('acme/lib')));
     }
@@ -405,10 +406,29 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([null, VersionSource::FAILED], [$versions->failure('acme/good'), $versions->failure('acme/bad')]);
     }
 
-    /** A name that a later repository lists loads from there, though an earlier repository failed on it. */
-    public function testANameThatFailsInOneRepositoryLoadsFromTheNext(): void
+    /** Composer aborts on a failed canonical repository, so a later repository that lists the name is not asked. */
+    public function testANameThatFailsInACanonicalRepositoryIsFailedThoughALaterRepositoryListsIt(): void
     {
-        $versions = new RepositoryVersions([self::recording([], ['acme/lib']), self::recording(['acme/lib' => ['1.0.0']])], [], true, Deadline::never());
+        $later = self::recording(['acme/lib' => ['1.0.0']]);
+        $versions = new RepositoryVersions([self::recording([], ['acme/lib']), $later], [], false, Deadline::never());
+
+        self::assertSame([[], VersionSource::FAILED], [$versions->versions('acme/lib'), $versions->failure('acme/lib')]);
+        self::assertSame([], $later->asked);
+    }
+
+    public function testANameThatFailsInACanonicalFilterRepositoryIsFailedThoughALaterRepositoryListsIt(): void
+    {
+        $canonical = new FilterRepository(self::recording([], ['acme/lib']), ['only' => ['acme/*']]);
+        $versions = new RepositoryVersions([$canonical, self::recording(['acme/lib' => ['1.0.0']])], [], false, Deadline::never());
+
+        self::assertSame([[], VersionSource::FAILED], [$versions->versions('acme/lib'), $versions->failure('acme/lib')]);
+    }
+
+    /** A repository that is not canonical does not claim the name, so a later repository that lists it answers. */
+    public function testANameThatFailsInANonCanonicalRepositoryLoadsFromTheNext(): void
+    {
+        $nonCanonical = new FilterRepository(self::recording([], ['acme/lib']), ['canonical' => false]);
+        $versions = new RepositoryVersions([$nonCanonical, self::recording(['acme/lib' => ['1.0.0']])], [], true, Deadline::never());
 
         self::assertSame(['1.0.0'], self::pretty($versions->versions('acme/lib')));
         self::assertNull($versions->failure('acme/lib'));
