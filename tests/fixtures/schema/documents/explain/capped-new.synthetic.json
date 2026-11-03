@@ -23,11 +23,7 @@
    {
     "id": "capped",
     "role": "lead",
-    "baseline": {
-     "state": "new",
-     "since": null,
-     "covered_by": null
-    },
+    "baseline": null,
     "signal_ids": [
      "S11"
     ],
@@ -279,60 +275,13 @@
    },
    "push_unmeasured": null
   },
-  "baseline": {
-   "status": "worsened",
-   "recorded": {
-    "lead": null,
-    "flags": null,
-    "advisory_count": 1,
-    "first_seen": "2026-06-01",
-    "target_php": "8.4",
-    "fix_model": 1
-   },
-   "advisories_now": {
-    "known": 0,
-    "new": 0,
-    "re_rated": 0,
-    "fix_lost": 0
-   },
-   "worsened_by": [
-    {
-     "kind": "flag",
-     "id": "capped",
-     "why": "new",
-     "recorded": null,
-     "now": null
-    }
-   ]
-  },
+  "baseline": null,
   "gate": {
    "reaches_fail_on": false,
    "fails": false,
    "exempt_by": null,
    "by": [],
-   "basis": {
-    "score": 8,
-    "verdict": "medium",
-    "cap": 16,
-    "limited_by": "score",
-    "new": {
-     "total": 8,
-     "exact": 8,
-     "rounded_down": false,
-     "terms": [
-      {
-       "part": "maintenance",
-       "flag": "capped",
-       "role": "lead",
-       "weight": 8,
-       "divisor": 1,
-       "points": 8,
-       "contribution": 8
-      }
-     ],
-     "modifiers": []
-    }
-   }
+   "basis": null
   }
  },
  "lock": {

@@ -51366,7 +51366,7 @@
      {
       "id": "S10",
       "level": "info",
-      "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+      "summary": "the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it",
       "data": {
        "unchecked": [
         {
@@ -52926,7 +52926,7 @@
      {
       "id": "S10",
       "level": "info",
-      "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+      "summary": "the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it",
       "data": {
        "unchecked": [
         {
@@ -88240,7 +88240,7 @@
      {
       "id": "S10",
       "level": "info",
-      "summary": "the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
+      "summary": "the age of the package was not read (a release it reads carries no date), so S2 could not measure it",
       "data": {
        "unchecked": [
         {
@@ -112666,7 +112666,7 @@
     "baseline_suffix": "(baseline: old-promise covered by the recorded abandoned)",
     "commands_posix": [],
     "commands_cmd": [],
-    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it; 1 reaches it and is known to the baseline · target php 8.4 (--target-php)",
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it; 1 reaches it and the baseline exempts it · target php 8.4 (--target-php)",
     "age_line": "age: installed v3.4.47 released 2020-10-24 (5.9 years ago), the newest on 3.x; newest release v4.4.44 2022-07-28 (4.2 years ago); last push 2022-07-29 (4.2 years ago)"
    },
    "inputs": {
@@ -113743,7 +113743,7 @@
      {
       "id": "S10",
       "level": "info",
-      "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+      "summary": "the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it",
       "data": {
        "unchecked": [
         {
@@ -114035,7 +114035,7 @@
     "baseline_suffix": "(baseline: known)",
     "commands_posix": [],
     "commands_cmd": [],
-    "run_gate_line": "gate: passes · --fail-on=high,unchecked · no finding fails it; 1 reaches it and is known to the baseline · target php 8.4 (--target-php)",
+    "run_gate_line": "gate: passes · --fail-on=high,unchecked · no finding fails it; 1 reaches it and the baseline exempts it · target php 8.4 (--target-php)",
     "age_line": "age: installed v8.6.1, release date not known (dated only by a commit its tags share); last push 2026-07-10 (0.2 years ago)"
    },
    "inputs": {
@@ -172397,6 +172397,4171 @@
    }
   },
   {
+   "id": "partial-lookup‡",
+   "label": "security.partial on a partial advisory lookup: composer update installs v9.52.22 and clears 1 advisory, assuming that release carries no new advisory (no_new_advisories)",
+   "project": "monica",
+   "run": {
+    "project": "djaiss/monica",
+    "root_package": "djaiss/monica",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "project_php": "^8.1",
+    "project_php_lowest": "8.1.0",
+    "lock_file": "composer.lock",
+    "fail_on": "high",
+    "fail_on_source": "option",
+    "gates": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "threshold": "high"
+     }
+    ],
+    "strict_network": false,
+    "mode": "check",
+    "include_dev": false,
+    "thresholds": {
+     "release-warn-years": 3,
+     "release-high-years": 5,
+     "push-warn-years": 3,
+     "push-high-years": 5
+    },
+    "flag_ids": [
+     "abandoned",
+     "silent",
+     "pinned",
+     "left-behind",
+     "old-promise",
+     "stale",
+     "capped",
+     "vulnerable"
+    ],
+    "verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     "unknown",
+     "finished",
+     "ok"
+    ],
+    "graded_verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "signal_ids": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7",
+     "S8",
+     "S9",
+     "S10",
+     "S11"
+    ],
+    "fix_model": 1,
+    "text_grammar": 1,
+    "score_model": {
+     "id": 1,
+     "score_text_grammar": 1,
+     "flag_order": [
+      "abandoned",
+      "silent",
+      "pinned",
+      "left-behind",
+      "old-promise",
+      "stale",
+      "capped",
+      "vulnerable"
+     ],
+     "parts": [
+      {
+       "id": "maintenance",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale",
+        "capped"
+       ],
+       "combine": "lead_plus_share"
+      },
+      {
+       "id": "security",
+       "flag_ids": [
+        "vulnerable"
+       ],
+       "combine": "max"
+      }
+     ],
+     "flags": [
+      {
+       "id": "abandoned",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "abandoned",
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S1",
+        "S3"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "silent",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "silent",
+        "pinned",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-high-years",
+        "push-high-years"
+       ],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "pinned",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 22,
+       "max_maintenance_flags": [
+        "pinned",
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S6"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "left-behind",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 20,
+       "max_maintenance_flags": [
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S8"
+       ],
+       "thresholds": [
+        "release-warn-years"
+       ],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "old-promise",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 18,
+       "max_maintenance_flags": [
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S5"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "stale",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 10,
+       "max_maintenance_flags": [
+        "stale",
+        "capped"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-warn-years",
+        "push-warn-years"
+       ],
+       "basis": {
+        "v013_base": "medium",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "capped",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 8,
+       "max_maintenance_flags": [
+        "capped"
+       ],
+       "raised_by": [
+        "S11"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "vulnerable",
+       "part": "security",
+       "points": null,
+       "band": null,
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": null,
+       "max_maintenance_flags": null,
+       "raised_by": [
+        "S9"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "severities"
+       },
+       "points_from": "severities"
+      }
+     ],
+     "severities": [
+      {
+       "id": "critical",
+       "points": 32,
+       "band": "critical",
+       "points_no_reachable_fix": 64,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 4,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "high",
+       "points": 16,
+       "band": "high",
+       "points_no_reachable_fix": 32,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 3,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "medium",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "unrated",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": "medium",
+       "basis": {
+        "points": "counts_as"
+       }
+      },
+      {
+       "id": "low",
+       "points": 2,
+       "band": "low",
+       "points_no_reachable_fix": 4,
+       "band_no_reachable_fix": "low",
+       "gate_rank": 1,
+       "counts_as": null,
+       "basis": {
+        "points": "share",
+        "of": "medium",
+        "share": {
+         "num": 1,
+         "den": 4
+        }
+       }
+      }
+     ],
+     "fix_kinds": [
+      {
+       "id": "update",
+       "ease": 1,
+       "doubles": false
+      },
+      {
+       "id": "upgrade",
+       "ease": 2,
+       "doubles": false
+      },
+      {
+       "id": "raise-php",
+       "ease": 3,
+       "doubles": false
+      },
+      {
+       "id": "unknown",
+       "ease": 4,
+       "doubles": false
+      },
+      {
+       "id": "blocked",
+       "ease": 5,
+       "doubles": true
+      },
+      {
+       "id": "none",
+       "ease": 6,
+       "doubles": true
+      }
+     ],
+     "bands": [
+      {
+       "verdict": "critical",
+       "floor": 32
+      },
+      {
+       "verdict": "high",
+       "floor": 16
+      },
+      {
+       "verdict": "medium",
+       "floor": 8
+      },
+      {
+       "verdict": "low",
+       "floor": 1
+      }
+     ],
+     "zero_verdicts": [
+      {
+       "verdict": "finished",
+       "when": "allowlisted"
+      },
+      {
+       "verdict": "unknown",
+       "when": "no_metadata"
+      },
+      {
+       "verdict": "ok",
+       "when": "otherwise"
+      }
+     ],
+     "exact_unit": 0.5,
+     "rounding": "floor_once",
+     "max_total": 104,
+     "bar_max": 64,
+     "bar_overflow": "clip",
+     "exclusive_groups": [
+      {
+       "id": "liveness",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "stale"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "branch",
+       "flag_ids": [
+        "pinned",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_age",
+       "flag_ids": [
+        "silent",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_push",
+       "flag_ids": [
+        "left-behind",
+        "stale"
+       ],
+       "holds_unless": {
+        "threshold": "push-warn-years",
+        "below": "release-warn-years"
+       }
+      },
+      {
+       "id": "php_bound",
+       "flag_ids": [
+        "old-promise",
+        "capped"
+       ],
+       "holds_unless": null
+      }
+     ],
+     "sort": [
+      {
+       "key": "verdict",
+       "path": "verdict",
+       "dir": "order",
+       "order": [
+        [
+         "critical"
+        ],
+        [
+         "high"
+        ],
+        [
+         "medium"
+        ],
+        [
+         "low"
+        ],
+        [
+         "unknown"
+        ],
+        [
+         "finished",
+         "ok"
+        ]
+       ],
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "security",
+       "path": "score.parts.security.contribution",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "score",
+       "path": "score.exact",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "direct",
+       "path": "direct",
+       "dir": "true_first",
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "package",
+       "path": "package",
+       "dir": "asc",
+       "collation": "bytes",
+       "default": null
+      }
+     ],
+     "rules": [
+      {
+       "id": "counted",
+       "stage": 1,
+       "kind": "select",
+       "applies_to": "flags",
+       "accept_group": "liveness",
+       "accept_covers": "listed_and_below",
+       "why": "accepted-facts-shown-not-counted",
+       "doc": "score-counted",
+       "illustration": null
+      },
+      {
+       "id": "lead-first",
+       "stage": 2,
+       "kind": "select",
+       "applies_to": "maintenance",
+       "order": "flag_order",
+       "share": {
+        "num": 1,
+        "den": 1
+       },
+       "why": "strongest-fact-in-full",
+       "doc": "score-lead-first",
+       "illustration": null
+      },
+      {
+       "id": "corroborating-share",
+       "stage": 3,
+       "kind": "share",
+       "applies_to": "maintenance",
+       "share": {
+        "num": 1,
+        "den": 4
+       },
+       "why": "correlated-evidence",
+       "doc": "score-corroborating-share",
+       "illustration": {
+        "lead": "left-behind",
+        "flag": "old-promise",
+        "weight": 16,
+        "points": 4
+       }
+      },
+      {
+       "id": "advisory-points",
+       "stage": 4,
+       "kind": "lookup",
+       "applies_to": "security",
+       "table": "severities",
+       "why": "severity-points",
+       "doc": "score-advisory-points",
+       "illustration": null
+      },
+      {
+       "id": "no-reachable-fix-multiplier",
+       "stage": 5,
+       "kind": "multiply",
+       "applies_to": "advisory",
+       "factor": 2,
+       "when_fix": [
+        "none",
+        "blocked"
+       ],
+       "why": "one-band-up",
+       "doc": "score-no-reachable-fix-multiplier",
+       "illustration": {
+        "severity": "high",
+        "before": 16,
+        "after": 32,
+        "band_before": "high",
+        "band_after": "critical"
+       }
+      },
+      {
+       "id": "security-max",
+       "stage": 6,
+       "kind": "max",
+       "applies_to": "security",
+       "tie_break": [
+        {
+         "key": "points",
+         "dir": "desc",
+         "collation": null
+        },
+        {
+         "key": "severity",
+         "dir": "order",
+         "collation": null
+        },
+        {
+         "key": "id",
+         "dir": "asc",
+         "collation": "bytes"
+        }
+       ],
+       "why": "one-number-per-part",
+       "doc": "score-security-max",
+       "illustration": null
+      },
+      {
+       "id": "divide-reach",
+       "stage": 7,
+       "kind": "divide",
+       "applies_to": "maintenance",
+       "by": 2,
+       "when": [
+        "transitive",
+        "unreached"
+       ],
+       "why": "reach-halves-maintenance",
+       "doc": "score-divide-reach",
+       "illustration": {
+        "flag": "abandoned",
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "security-exempt-from-reach",
+       "stage": 8,
+       "kind": "exempt",
+       "applies_to": "security",
+       "of": "divide-reach",
+       "why": "exploitability-independent-of-reach",
+       "doc": "score-security-exempt-from-reach",
+       "illustration": {
+        "severity": "critical",
+        "reach": "transitive",
+        "total": 32
+       }
+      },
+      {
+       "id": "sum",
+       "stage": 9,
+       "kind": "combine",
+       "applies_to": "total",
+       "op": "sum",
+       "ratio_from": "medium",
+       "why": "parts-add",
+       "doc": "score-sum",
+       "illustration": {
+        "maintenance": 16,
+        "security": 16,
+        "total": 32,
+        "band": "critical",
+        "low_maintenance": 4,
+        "low_security": 4,
+        "low_total": 8,
+        "low_band": "medium"
+       }
+      },
+      {
+       "id": "divide-dev",
+       "stage": 10,
+       "kind": "divide",
+       "applies_to": "total",
+       "by": 2,
+       "when": [
+        "dev"
+       ],
+       "why": "dev-halves-total",
+       "doc": "score-divide-dev",
+       "illustration": {
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "floor-once",
+       "stage": 11,
+       "kind": "floor",
+       "applies_to": "total",
+       "why": "integer-band-edges",
+       "doc": "score-floor-once",
+       "illustration": {
+        "exact": 4.5,
+        "total": 4
+       }
+      },
+      {
+       "id": "band-floors",
+       "stage": 12,
+       "kind": "band",
+       "applies_to": "total",
+       "ratio": 2,
+       "ratio_from": "medium",
+       "why": "two-floor-parts-make-next",
+       "doc": "score-band-floors",
+       "illustration": null
+      },
+      {
+       "id": "zero-verdicts",
+       "stage": 13,
+       "kind": "zero",
+       "applies_to": "total",
+       "table": "zero_verdicts",
+       "why": "score-zero-says-why",
+       "doc": "score-zero-verdicts",
+       "illustration": null
+      },
+      {
+       "id": "sort",
+       "stage": 14,
+       "kind": "order",
+       "applies_to": "findings",
+       "why": "advisory-findings-first",
+       "doc": "score-sort",
+       "illustration": null
+      },
+      {
+       "id": "gate-bounded-new",
+       "stage": 15,
+       "kind": "gate",
+       "applies_to": "gate",
+       "cap_multiplier": 2,
+       "why": "new-fact-sets-level",
+       "doc": "score-gate-bounded-new",
+       "illustration": {
+        "score": 36,
+        "new": 16,
+        "gate": 32
+       }
+      },
+      {
+       "id": "baseline-cover",
+       "stage": 16,
+       "kind": "cover",
+       "applies_to": "gate",
+       "order": "flag_order",
+       "covers": "listed_and_below",
+       "why": "recorded-lead-covers-below",
+       "doc": "score-baseline-cover",
+       "illustration": null
+      }
+     ],
+     "docs": "https://lockrot.dev/verdicts/model-1/"
+    },
+    "score_rules_used": {
+     "counted": 0,
+     "lead-first": 0,
+     "corroborating-share": 0,
+     "advisory-points": 1,
+     "no-reachable-fix-multiplier": 0,
+     "security-max": 1,
+     "divide-reach": 0,
+     "security-exempt-from-reach": 0,
+     "sum": 0,
+     "divide-dev": 0,
+     "floor-once": 0,
+     "band-floors": 1,
+     "zero-verdicts": 0,
+     "sort": null,
+     "gate-bounded-new": 0,
+     "baseline-cover": 0
+    },
+    "advisory_lookup": {
+     "scope": "all",
+     "scope_source": "default",
+     "packages_asked": 1,
+     "packages_not_asked": 0,
+     "other_repositories": 0,
+     "repositories": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "outcome": "answered",
+       "reason": null,
+       "message": null,
+       "packages_with_records": 1,
+       "records": 28
+      }
+     ]
+    },
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/http-foundation",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/mailer",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/mime",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/process",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/routing",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/http-foundation",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/mailer",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/mime",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/process",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/routing",
+         "version": "v6.4.7",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     },
+     "target_fix": null
+    }
+   },
+   "synthetic_inputs": [
+    "a Composer repository failed to return advisories: security.check partial, S10 advisories lookup_failed (‡)",
+    "next_step.held_by[], also[].held_by[] and the S9 rows' fix.held_by: the lock links of the corpus commit (LINKS)"
+   ],
+   "finding": {
+    "package": "laravel/framework",
+    "version": "v9.52.16",
+    "branch": "9.x",
+    "installed_php": {
+     "requires": "^8.0.2",
+     "target_runs": true,
+     "project_allows": true
+    },
+    "verdict": "high",
+    "priority": "high",
+    "lead": null,
+    "rank": 9,
+    "flags": [
+     {
+      "id": "vulnerable",
+      "role": "security",
+      "baseline": null,
+      "signal_ids": [
+       "S9"
+      ],
+      "degree": null,
+      "headline": {
+       "unit": "advisories",
+       "value": 6,
+       "source": null
+      },
+      "summary": "6 advisories: 2 high, 2 medium, 1 unrated, 1 low — 1 of 6 fixed on 9.x; worst: PKSA-3r5d-mb8f-1qw9 Laravel Framework: CRLF injection in default email rule"
+     }
+    ],
+    "score": {
+     "model": 1,
+     "total": 16,
+     "exact": 16,
+     "rounded_down": false,
+     "band": {
+      "floor": 16,
+      "next": "critical",
+      "to_next": 16
+     },
+     "decided_by": "security",
+     "parts": {
+      "maintenance": {
+       "status": "none",
+       "contribution": 0,
+       "alone": {
+        "total": 0,
+        "verdict": null
+       }
+      },
+      "security": {
+       "status": "counted",
+       "contribution": 16,
+       "alone": {
+        "total": 16,
+        "verdict": "high"
+       },
+       "of": 6,
+       "tied": [
+        "PKSA-w7xr-vk7n-rstm"
+       ]
+      }
+     },
+     "terms": [
+      {
+       "part": "security",
+       "flag": "vulnerable",
+       "role": "security",
+       "advisory": "PKSA-3r5d-mb8f-1qw9",
+       "severity": "high",
+       "fix_kind": "raise-php",
+       "weight": 16,
+       "multiplier": 1,
+       "points": 16,
+       "contribution": 16
+      }
+     ],
+     "modifiers": [],
+     "accepted": [],
+     "without": [
+      {
+       "remove": {
+        "kind": "advisory",
+        "id": "PKSA-3r5d-mb8f-1qw9"
+       },
+       "revealed": [],
+       "total": 16,
+       "verdict": "high",
+       "lead": null,
+       "deciding_advisory": "PKSA-w7xr-vk7n-rstm",
+       "at_least": false
+      }
+     ],
+     "text": "16 = vulnerable 16 [high advisory]"
+    },
+    "next_step": {
+     "kind": "raise-php",
+     "source": "vulnerable",
+     "merged": [],
+     "fix_kind": "raise-php",
+     "reason": null,
+     "replacement": null,
+     "quiet_years": null,
+     "to_branch": "12.x",
+     "version": "v12.69.0",
+     "newest": "v12.69.3",
+     "constraint": "^12.69.0",
+     "latest": null,
+     "php_check": {
+      "requires": "^8.2",
+      "project_allows": false,
+      "target_runs": true,
+      "raise_to": ">=8.2",
+      "raise_size": "minor"
+     },
+     "crosses_major": true,
+     "held_by": [
+      {
+       "source": "root",
+       "package": null,
+       "version": null,
+       "link": "require",
+       "target": null,
+       "constraint": "^9.0",
+       "holder": null
+      },
+      {
+       "source": "package",
+       "package": "pragmarx/google2fa-laravel",
+       "version": "v2.2.0",
+       "link": "require",
+       "target": null,
+       "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+       "holder": {
+        "verdict": "ok",
+        "lead": null,
+        "flag_ids": [],
+        "replacement": null,
+        "direct": true,
+        "next_step": null
+       }
+      }
+     ],
+     "clears": [
+      {
+       "kind": "advisory",
+       "id": "PKSA-3r5d-mb8f-1qw9",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-w7xr-vk7n-rstm",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-8qx3-n5y5-vvnd",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-m5cs-t1y6-qpcs",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-mdq4-51ck-6kdq",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-d5tc-s1qs-h781",
+       "basis": "outside_range"
+      }
+     ],
+     "unverified": [],
+     "adds": [],
+     "leaves": [],
+     "clears_all": true,
+     "if_applied": {
+      "total": 0,
+      "verdict": "ok",
+      "lead": null,
+      "deciding_advisory": null,
+      "at_most": false,
+      "assumes": [
+       "clears_hold",
+       "composer_resolves",
+       "no_new_advisories"
+      ]
+     },
+     "check": null,
+     "moves_with": [],
+     "composer_moves_because": [
+      "holders",
+      "crosses_major"
+     ],
+     "commands": [
+      [
+       "composer",
+       "require",
+       "php:>=8.2",
+       "--no-update"
+      ],
+      [
+       "composer",
+       "require",
+       "laravel/framework:^12.69.0"
+      ],
+      [
+       "composer",
+       "why-not",
+       "laravel/framework",
+       "v12.69.0",
+       "--locked"
+      ]
+     ],
+     "through": [],
+     "also": [],
+     "text": "raise require.php to >=8.2, then require laravel/framework ^12.69.0 — clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+    },
+    "security": {
+     "status": "vulnerable",
+     "check": "partial",
+     "complete": false,
+     "unchecked_reason": "lookup_failed",
+     "records": 28,
+     "feeds": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "answer": "answered",
+       "records": 28,
+       "reason": null
+      }
+     ],
+     "worst": "high",
+     "counts": {
+      "critical": 0,
+      "high": 2,
+      "medium": 2,
+      "unrated": 1,
+      "low": 1
+     },
+     "ignored": [],
+     "ignored_count": 0,
+     "fix_kind": "raise-php",
+     "installed_branch_fixes": {
+      "fixed": 1,
+      "unknown": 0,
+      "of": 6,
+      "fix_kind": "update",
+      "lowest": "v9.52.17",
+      "newest": "v9.52.22",
+      "held_by": [],
+      "if_applied": {
+       "total": 16,
+       "verdict": "high",
+       "at_most": false,
+       "assumes": [
+        "clears_hold",
+        "no_new_advisories"
+       ]
+      },
+      "check": null
+     },
+     "move_in": "next_step",
+     "gets": {
+      "version": "v9.52.22",
+      "php_check": {
+       "requires": "^8.0.2",
+       "project_allows": true,
+       "target_runs": true,
+       "raise_to": null,
+       "raise_size": null
+      },
+      "clears": [
+       {
+        "kind": "advisory",
+        "id": "PKSA-w7xr-vk7n-rstm",
+        "basis": "outside_range"
+       }
+      ],
+      "clears_all": false
+     },
+     "partial": {
+      "version": "v9.52.22",
+      "clears": [
+       {
+        "kind": "advisory",
+        "id": "PKSA-w7xr-vk7n-rstm",
+        "basis": "outside_range"
+       }
+      ],
+      "unverified": [],
+      "clears_all": false,
+      "if_applied": {
+       "total": 16,
+       "verdict": "high",
+       "at_most": false,
+       "assumes": [
+        "clears_hold",
+        "no_new_advisories"
+       ]
+      }
+     }
+    },
+    "checks_missing": [
+     {
+      "check": "advisories",
+      "reason": "lookup_failed",
+      "blocks": [
+       "S9"
+      ]
+     }
+    ],
+    "checks_skipped": [],
+    "unchecked_accepted": [],
+    "maintenance_judged": true,
+    "metadata": {
+     "status": "read",
+     "reason": null,
+     "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "laravel/framework",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:14+00:00",
+     "cached_at": "2026-10-01T16:03:14+00:00"
+    },
+    "allowlist": null,
+    "abandoned_ignored": null,
+    "from_composer_repository": true,
+    "origin": {
+     "kind": "packagist",
+     "registry": "packagist.org",
+     "package_url": "https://packagist.org/packages/laravel/framework",
+     "local": false
+    },
+    "replacement": null,
+    "replacement_url": null,
+    "note": null,
+    "libyears_unmeasured": null,
+    "libyears_at_least": false,
+    "direct": true,
+    "dev": false,
+    "reach": "direct",
+    "chain": [
+     "laravel/framework"
+    ],
+    "depth": 0,
+    "depth_unmeasured": null,
+    "named_in": [
+     "require"
+    ],
+    "direct_dependents": [
+     "laravel/framework",
+     "pragmarx/google2fa-laravel"
+    ],
+    "signals": [
+     {
+      "id": "S7",
+      "level": "info",
+      "summary": "pulls in 11 flagged packages: league/commonmark (vulnerable), symfony/http-foundation (vulnerable), symfony/mime (vulnerable), symfony/process (vulnerable), nesbot/carbon (vulnerable) and 6 more",
+      "data": {
+       "flagged": 11,
+       "packages": [
+        {
+         "package": "league/commonmark",
+         "chain": [
+          "laravel/framework",
+          "league/commonmark"
+         ],
+         "verdict": "high",
+         "lead": null,
+         "flag_ids": [
+          "vulnerable"
+         ]
+        },
+        {
+         "package": "symfony/http-foundation",
+         "chain": [
+          "laravel/framework",
+          "symfony/http-foundation"
+         ],
+         "verdict": "high",
+         "lead": null,
+         "flag_ids": [
+          "vulnerable"
+         ]
+        },
+        {
+         "package": "symfony/mime",
+         "chain": [
+          "laravel/framework",
+          "symfony/mime"
+         ],
+         "verdict": "high",
+         "lead": null,
+         "flag_ids": [
+          "vulnerable"
+         ]
+        },
+        {
+         "package": "symfony/process",
+         "chain": [
+          "laravel/framework",
+          "symfony/process"
+         ],
+         "verdict": "high",
+         "lead": null,
+         "flag_ids": [
+          "vulnerable"
+         ]
+        },
+        {
+         "package": "nesbot/carbon",
+         "chain": [
+          "laravel/framework",
+          "nesbot/carbon"
+         ],
+         "verdict": "medium",
+         "lead": null,
+         "flag_ids": [
+          "vulnerable"
+         ]
+        },
+        {
+         "package": "symfony/mailer",
+         "chain": [
+          "laravel/framework",
+          "symfony/mailer"
+         ],
+         "verdict": "medium",
+         "lead": null,
+         "flag_ids": [
+          "vulnerable"
+         ]
+        },
+        {
+         "package": "symfony/routing",
+         "chain": [
+          "laravel/framework",
+          "symfony/routing"
+         ],
+         "verdict": "medium",
+         "lead": null,
+         "flag_ids": [
+          "vulnerable"
+         ]
+        },
+        {
+         "package": "brick/math",
+         "chain": [
+          "laravel/framework",
+          "brick/math"
+         ],
+         "verdict": "medium",
+         "lead": "left-behind",
+         "flag_ids": [
+          "left-behind"
+         ]
+        },
+        {
+         "package": "league/flysystem",
+         "chain": [
+          "laravel/framework",
+          "league/flysystem"
+         ],
+         "verdict": "low",
+         "lead": null,
+         "flag_ids": [
+          "vulnerable"
+         ]
+        },
+        {
+         "package": "symfony/polyfill-intl-idn",
+         "chain": [
+          "laravel/framework",
+          "egulias/email-validator",
+          "symfony/polyfill-intl-idn"
+         ],
+         "verdict": "low",
+         "lead": null,
+         "flag_ids": [
+          "vulnerable"
+         ]
+        },
+        {
+         "package": "league/config",
+         "chain": [
+          "laravel/framework",
+          "league/commonmark",
+          "league/config"
+         ],
+         "verdict": "low",
+         "lead": "stale",
+         "flag_ids": [
+          "stale"
+         ]
+        }
+       ]
+      }
+     },
+     {
+      "id": "S9",
+      "level": "high",
+      "summary": "6 security advisories affect v9.52.16 (PKSA-3r5d-mb8f-1qw9, CVE-2024-52301, CVE-2025-27515 and 3 more); 2 fixed in v12.60.0, 1 fixed in v9.52.17, 1 fixed in v10.48.29, 1 fixed in v12.61.1, 1 fixed in v12.69.0",
+      "data": {
+       "advisories": [
+        {
+         "id": "PKSA-3r5d-mb8f-1qw9",
+         "cve": null,
+         "title": "Laravel Framework: CRLF injection in default email rule",
+         "link": "https://github.com/advisories/GHSA-5vg9-5847-vvmq",
+         "reported_at": "2026-06-17T13:53:44+00:00",
+         "severity": "high",
+         "severity_published": "high",
+         "affected_versions": "<12.60.0|>=13.0.0,<=13.9.0",
+         "counted": true,
+         "points": 16,
+         "deciding": true,
+         "fix": {
+          "kind": "raise-php",
+          "to_branch": "12.x",
+          "version": "v12.60.0",
+          "newest": "v12.69.3",
+          "on_installed_branch": false,
+          "php": "^8.2",
+          "admits_target_php": true,
+          "admits_project_php": false,
+          "held_by": [
+           {
+            "source": "root",
+            "package": null,
+            "version": null,
+            "link": "require",
+            "target": null,
+            "constraint": "^9.0",
+            "holder": null
+           },
+           {
+            "source": "package",
+            "package": "pragmarx/google2fa-laravel",
+            "version": "v2.2.0",
+            "link": "require",
+            "target": null,
+            "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+            "holder": {
+             "verdict": "ok",
+             "lead": null,
+             "flag_ids": [],
+             "replacement": null,
+             "direct": true,
+             "next_step": null
+            }
+           }
+          ],
+          "reason": null
+         },
+         "baseline": null
+        },
+        {
+         "id": "PKSA-w7xr-vk7n-rstm",
+         "cve": "CVE-2024-52301",
+         "title": "Laravel environment manipulation via query string",
+         "link": "https://github.com/advisories/GHSA-gv7v-rgg6-548h",
+         "reported_at": "2024-11-12T15:29:00+00:00",
+         "severity": "high",
+         "severity_published": "high",
+         "affected_versions": "<6.20.45|>=7.0.0,<7.30.7|>=8.0.0,<8.83.28|>=9.0.0,<9.52.17|>=10.0.0,<10.48.23|>=11.0.0,<11.31.0",
+         "counted": true,
+         "points": 16,
+         "deciding": false,
+         "fix": {
+          "kind": "update",
+          "to_branch": "9.x",
+          "version": "v9.52.17",
+          "newest": "v9.52.22",
+          "on_installed_branch": true,
+          "php": "^8.0.2",
+          "admits_target_php": true,
+          "admits_project_php": true,
+          "held_by": [],
+          "reason": null
+         },
+         "baseline": null
+        },
+        {
+         "id": "PKSA-8qx3-n5y5-vvnd",
+         "cve": "CVE-2025-27515",
+         "title": "Laravel has a File Validation Bypass",
+         "link": "https://github.com/advisories/GHSA-78fx-h6xr-vch4",
+         "reported_at": "2025-03-05T19:09:39+00:00",
+         "severity": "medium",
+         "severity_published": "medium",
+         "affected_versions": "<10.48.29|>=11.0.0,<11.44.1|>=12.0.0,<12.1.1",
+         "counted": true,
+         "points": 8,
+         "deciding": false,
+         "fix": {
+          "kind": "upgrade",
+          "to_branch": "10.x",
+          "version": "v10.48.29",
+          "newest": "v10.50.3",
+          "on_installed_branch": false,
+          "php": "^8.1",
+          "admits_target_php": true,
+          "admits_project_php": true,
+          "held_by": [
+           {
+            "source": "root",
+            "package": null,
+            "version": null,
+            "link": "require",
+            "target": null,
+            "constraint": "^9.0",
+            "holder": null
+           }
+          ],
+          "reason": null
+         },
+         "baseline": null
+        },
+        {
+         "id": "PKSA-m5cs-t1y6-qpcs",
+         "cve": null,
+         "title": "Laravel Framework: Temporary Signed URL Path Confusion",
+         "link": "https://github.com/advisories/GHSA-crmm-hgp2-wgrp",
+         "reported_at": "2026-06-17T13:54:13+00:00",
+         "severity": "medium",
+         "severity_published": "medium",
+         "affected_versions": "<12.61.1|>=13.0.0,<13.12.0",
+         "counted": true,
+         "points": 8,
+         "deciding": false,
+         "fix": {
+          "kind": "raise-php",
+          "to_branch": "12.x",
+          "version": "v12.61.1",
+          "newest": "v12.69.3",
+          "on_installed_branch": false,
+          "php": "^8.2",
+          "admits_target_php": true,
+          "admits_project_php": false,
+          "held_by": [
+           {
+            "source": "root",
+            "package": null,
+            "version": null,
+            "link": "require",
+            "target": null,
+            "constraint": "^9.0",
+            "holder": null
+           },
+           {
+            "source": "package",
+            "package": "pragmarx/google2fa-laravel",
+            "version": "v2.2.0",
+            "link": "require",
+            "target": null,
+            "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+            "holder": {
+             "verdict": "ok",
+             "lead": null,
+             "flag_ids": [],
+             "replacement": null,
+             "direct": true,
+             "next_step": null
+            }
+           }
+          ],
+          "reason": null
+         },
+         "baseline": null
+        },
+        {
+         "id": "PKSA-mdq4-51ck-6kdq",
+         "cve": "CVE-2026-48019",
+         "title": "Laravel CRLF injection in default email rule",
+         "link": "https://github.com/laravel/framework/security/advisories/GHSA-5vg9-5847-vvmq",
+         "reported_at": "2026-05-19T18:13:00+00:00",
+         "severity": "unrated",
+         "severity_published": null,
+         "affected_versions": ">=9.0.0,<10.0.0|>=10.0.0,<11.0.0|>=11.0.0,<12.0.0|>=12.0.0,<12.60.0|>=13.0.0,<13.10.0",
+         "counted": true,
+         "points": 8,
+         "deciding": false,
+         "fix": {
+          "kind": "raise-php",
+          "to_branch": "12.x",
+          "version": "v12.60.0",
+          "newest": "v12.69.3",
+          "on_installed_branch": false,
+          "php": "^8.2",
+          "admits_target_php": true,
+          "admits_project_php": false,
+          "held_by": [
+           {
+            "source": "root",
+            "package": null,
+            "version": null,
+            "link": "require",
+            "target": null,
+            "constraint": "^9.0",
+            "holder": null
+           },
+           {
+            "source": "package",
+            "package": "pragmarx/google2fa-laravel",
+            "version": "v2.2.0",
+            "link": "require",
+            "target": null,
+            "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+            "holder": {
+             "verdict": "ok",
+             "lead": null,
+             "flag_ids": [],
+             "replacement": null,
+             "direct": true,
+             "next_step": null
+            }
+           }
+          ],
+          "reason": null
+         },
+         "baseline": null
+        },
+        {
+         "id": "PKSA-d5tc-s1qs-h781",
+         "cve": "CVE-2026-102279",
+         "title": "Laravel: XSS in Debug Page Information",
+         "link": "https://github.com/advisories/GHSA-jh5r-qr3c-85q8",
+         "reported_at": "2026-09-29T18:24:25+00:00",
+         "severity": "low",
+         "severity_published": "low",
+         "affected_versions": ">=13.0.0,<13.30.0|<12.69.0",
+         "counted": true,
+         "points": 2,
+         "deciding": false,
+         "fix": {
+          "kind": "raise-php",
+          "to_branch": "12.x",
+          "version": "v12.69.0",
+          "newest": "v12.69.3",
+          "on_installed_branch": false,
+          "php": "^8.2",
+          "admits_target_php": true,
+          "admits_project_php": false,
+          "held_by": [
+           {
+            "source": "root",
+            "package": null,
+            "version": null,
+            "link": "require",
+            "target": null,
+            "constraint": "^9.0",
+            "holder": null
+           },
+           {
+            "source": "package",
+            "package": "pragmarx/google2fa-laravel",
+            "version": "v2.2.0",
+            "link": "require",
+            "target": null,
+            "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+            "holder": {
+             "verdict": "ok",
+             "lead": null,
+             "flag_ids": [],
+             "replacement": null,
+             "direct": true,
+             "next_step": null
+            }
+           }
+          ],
+          "reason": null
+         },
+         "baseline": null
+        }
+       ],
+       "releases_read": true,
+       "complete": false
+      }
+     },
+     {
+      "id": "S10",
+      "level": "info",
+      "summary": "security advisories not checked in full (a Composer repository did not return them), so S9 may be incomplete",
+      "data": {
+       "unchecked": [
+        {
+         "check": "advisories",
+         "reason": "lookup_failed",
+         "blocks": [
+          "S9"
+         ]
+        }
+       ],
+       "blocks": [
+        "S9"
+       ]
+      }
+     }
+    ],
+    "evidence": "vulnerable: 6 advisories: 2 high, 2 medium, 1 unrated, 1 low — 1 of 6 fixed on 9.x; worst: PKSA-3r5d-mb8f-1qw9 Laravel Framework: CRLF injection in default email rule",
+    "allowlist_reason": null,
+    "data_date": "2026-10-01T17:39:09+00:00",
+    "libyears": 2.99,
+    "age": {
+     "installed": {
+      "at": "2023-10-03T13:02:30+00:00",
+      "years": 3,
+      "dated_by": null
+     },
+     "installed_unmeasured": null,
+     "release": {
+      "version": "v11.57.0",
+      "at": "2026-09-29T15:33:27+00:00",
+      "years": 0,
+      "level": null,
+      "dated_by": null
+     },
+     "release_unmeasured": null,
+     "branch_release": {
+      "version": "v9.52.22",
+      "at": "2026-08-12T03:46:05+00:00",
+      "years": 0.1,
+      "level": null,
+      "dated_by": null
+     },
+     "branch_release_unmeasured": null,
+     "push": {
+      "at": "2026-09-30T21:54:48+00:00",
+      "years": 0,
+      "level": null
+     },
+     "push_unmeasured": null
+    },
+    "baseline": null,
+    "gate": {
+     "reaches_fail_on": true,
+     "fails": true,
+     "exempt_by": null,
+     "by": [
+      {
+       "value": "high",
+       "kind": "grade",
+       "facts": [
+        {
+         "kind": "advisory",
+         "id": "PKSA-3r5d-mb8f-1qw9"
+        }
+       ]
+      }
+     ],
+     "basis": null
+    }
+   },
+   "details": {
+    "metadata": {
+     "installed_branch": "9.x",
+     "branches": [
+      {
+       "branch": "13.x",
+       "installed": false,
+       "highest": "v13.34.0",
+       "highest_released": "2026-09-29T12:46:21+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v13.34.0",
+       "newest_dated_released": "2026-09-29T12:46:21+00:00",
+       "dated_by": null,
+       "php": "^8.3",
+       "highest_php": "^8.3",
+       "admits_target_php": true,
+       "admits_project_php": false,
+       "php_blocked_by": "project",
+       "misses_target_php": null,
+       "misses_project_php": "needs_newer",
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "needs_newer",
+       "released_years": 0,
+       "fixes": {
+        "fixed": 6,
+        "unknown": 0,
+        "of": 6,
+        "fix_kind": "raise-php",
+        "lowest": "v13.30.0",
+        "newest": "v13.34.0",
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "target": null,
+          "constraint": "^9.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "pragmarx/google2fa-laravel",
+          "version": "v2.2.0",
+          "link": "require",
+          "target": null,
+          "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+          "holder": {
+           "verdict": "ok",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": true,
+           "next_step": null
+          }
+         }
+        ],
+        "if_applied": {
+         "total": 0,
+         "verdict": "ok",
+         "at_most": false,
+         "assumes": [
+          "clears_hold",
+          "composer_resolves",
+          "no_new_advisories"
+         ]
+        },
+        "check": null
+       }
+      },
+      {
+       "branch": "12.x",
+       "installed": false,
+       "highest": "v12.69.3",
+       "highest_released": "2026-09-29T12:53:25+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v12.69.3",
+       "newest_dated_released": "2026-09-29T12:53:25+00:00",
+       "dated_by": null,
+       "php": "^8.2",
+       "highest_php": "^8.2",
+       "admits_target_php": true,
+       "admits_project_php": false,
+       "php_blocked_by": "project",
+       "misses_target_php": null,
+       "misses_project_php": "needs_newer",
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "needs_newer",
+       "released_years": 0,
+       "fixes": {
+        "fixed": 6,
+        "unknown": 0,
+        "of": 6,
+        "fix_kind": "raise-php",
+        "lowest": "v12.69.0",
+        "newest": "v12.69.3",
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "target": null,
+          "constraint": "^9.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "pragmarx/google2fa-laravel",
+          "version": "v2.2.0",
+          "link": "require",
+          "target": null,
+          "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+          "holder": {
+           "verdict": "ok",
+           "lead": null,
+           "flag_ids": [],
+           "replacement": null,
+           "direct": true,
+           "next_step": null
+          }
+         }
+        ],
+        "if_applied": {
+         "total": 0,
+         "verdict": "ok",
+         "at_most": false,
+         "assumes": [
+          "clears_hold",
+          "composer_resolves",
+          "no_new_advisories"
+         ]
+        },
+        "check": null
+       }
+      },
+      {
+       "branch": "11.x",
+       "installed": false,
+       "highest": "v11.57.0",
+       "highest_released": "2026-09-29T15:33:27+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v11.57.0",
+       "newest_dated_released": "2026-09-29T15:33:27+00:00",
+       "dated_by": null,
+       "php": "^8.2",
+       "highest_php": "^8.2",
+       "admits_target_php": true,
+       "admits_project_php": false,
+       "php_blocked_by": "project",
+       "misses_target_php": null,
+       "misses_project_php": "needs_newer",
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "needs_newer",
+       "released_years": 0,
+       "fixes": {
+        "fixed": 2,
+        "unknown": 0,
+        "of": 6,
+        "fix_kind": "raise-php",
+        "lowest": "v11.44.1",
+        "newest": "v11.57.0",
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "target": null,
+          "constraint": "^9.0",
+          "holder": null
+         }
+        ],
+        "if_applied": {
+         "total": 16,
+         "verdict": "high",
+         "at_most": false,
+         "assumes": [
+          "clears_hold",
+          "composer_resolves",
+          "no_new_advisories"
+         ]
+        },
+        "check": null
+       }
+      },
+      {
+       "branch": "10.x",
+       "installed": false,
+       "highest": "v10.50.3",
+       "highest_released": "2026-08-12T03:46:26+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v10.50.3",
+       "newest_dated_released": "2026-08-12T03:46:26+00:00",
+       "dated_by": null,
+       "php": "^8.1",
+       "highest_php": "^8.1",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 0.1,
+       "fixes": {
+        "fixed": 2,
+        "unknown": 0,
+        "of": 6,
+        "fix_kind": "upgrade",
+        "lowest": "v10.48.29",
+        "newest": "v10.50.3",
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "target": null,
+          "constraint": "^9.0",
+          "holder": null
+         }
+        ],
+        "if_applied": {
+         "total": 16,
+         "verdict": "high",
+         "at_most": false,
+         "assumes": [
+          "clears_hold",
+          "composer_resolves",
+          "no_new_advisories"
+         ]
+        },
+        "check": null
+       }
+      },
+      {
+       "branch": "9.x",
+       "installed": true,
+       "highest": "v9.52.22",
+       "highest_released": "2026-08-12T03:46:05+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v9.52.22",
+       "newest_dated_released": "2026-08-12T03:46:05+00:00",
+       "dated_by": null,
+       "php": "^8.0.2",
+       "highest_php": "^8.0.2",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 0.1,
+       "fixes": {
+        "fixed": 1,
+        "unknown": 0,
+        "of": 6,
+        "fix_kind": "update",
+        "lowest": "v9.52.17",
+        "newest": "v9.52.22",
+        "held_by": [],
+        "if_applied": {
+         "total": 16,
+         "verdict": "high",
+         "at_most": false,
+         "assumes": [
+          "clears_hold",
+          "no_new_advisories"
+         ]
+        },
+        "check": null
+       }
+      },
+      {
+       "branch": "8.x",
+       "installed": false,
+       "highest": "v8.83.29",
+       "highest_released": "2024-11-20T15:55:41+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v8.83.29",
+       "newest_dated_released": "2024-11-20T15:55:41+00:00",
+       "dated_by": null,
+       "php": "^7.3|^8.0",
+       "highest_php": "^7.3|^8.0",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 1.9,
+       "fixes": {
+        "fixed": 0,
+        "unknown": 0,
+        "of": 6,
+        "fix_kind": null,
+        "lowest": null,
+        "newest": "v8.83.29",
+        "held_by": [],
+        "if_applied": null,
+        "check": null
+       }
+      },
+      {
+       "branch": "7.x",
+       "installed": false,
+       "highest": "v7.30.7",
+       "highest_released": "2024-11-12T15:42:13+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v7.30.7",
+       "newest_dated_released": "2024-11-12T15:42:13+00:00",
+       "dated_by": null,
+       "php": "^7.2.5|^8.0",
+       "highest_php": "^7.2.5|^8.0",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 1.9,
+       "fixes": {
+        "fixed": 0,
+        "unknown": 0,
+        "of": 6,
+        "fix_kind": null,
+        "lowest": null,
+        "newest": "v7.30.7",
+        "held_by": [],
+        "if_applied": null,
+        "check": null
+       }
+      },
+      {
+       "branch": "6.x",
+       "installed": false,
+       "highest": "v6.20.45",
+       "highest_released": "2024-11-12T15:42:46+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v6.20.45",
+       "newest_dated_released": "2024-11-12T15:42:46+00:00",
+       "dated_by": null,
+       "php": "^7.2.5|^8.0",
+       "highest_php": "^7.2.5|^8.0",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 1.9,
+       "fixes": {
+        "fixed": 0,
+        "unknown": 0,
+        "of": 6,
+        "fix_kind": null,
+        "lowest": null,
+        "newest": "v6.20.45",
+        "held_by": [],
+        "if_applied": null,
+        "check": null
+       }
+      },
+      {
+       "branch": "5.x",
+       "installed": false,
+       "highest": "v5.8.38",
+       "highest_released": "2020-04-14T14:14:36+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v5.5.50",
+       "newest_dated_released": "2020-08-18T13:47:57+00:00",
+       "dated_by": null,
+       "php": ">=7.0",
+       "highest_php": "^7.1.3",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": false,
+       "highest_admits_project_php": false,
+       "highest_misses_project_php": "stops_before",
+       "released_years": 6.5,
+       "fixes": {
+        "fixed": 0,
+        "unknown": 0,
+        "of": 6,
+        "fix_kind": null,
+        "lowest": null,
+        "newest": "v5.8.38",
+        "held_by": [],
+        "if_applied": null,
+        "check": null
+       }
+      },
+      {
+       "branch": "4.x",
+       "installed": false,
+       "highest": "v4.2.22",
+       "highest_released": "2016-11-12T01:41:37+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v4.2.22",
+       "newest_dated_released": "2016-11-12T01:41:37+00:00",
+       "dated_by": null,
+       "php": ">=5.4.0",
+       "highest_php": ">=5.4.0",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 9.9,
+       "fixes": {
+        "fixed": 0,
+        "unknown": 0,
+        "of": 6,
+        "fix_kind": null,
+        "lowest": null,
+        "newest": "v4.2.22",
+        "held_by": [],
+        "if_applied": null,
+        "check": null
+       }
+      }
+     ]
+    }
+   },
+   "golden": {
+    "score_text": "16 = vulnerable 16 [high advisory]",
+    "next_step_text": "raise require.php to >=8.2, then require laravel/framework ^12.69.0 — clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve",
+    "verdict_line": "High: 6 advisories affect your version. The worst is a high one (PKSA-3r5d-mb8f-1qw9: Laravel Framework: CRLF injection in default email rule).",
+    "readings": [],
+    "qualifiers": {
+     "reach": [
+      "Production: not in packages-dev",
+      "Required directly, and also through pragmarx/google2fa-laravel"
+     ],
+     "origin": null,
+     "not_judged": null,
+     "unchecked": [
+      "Advisories (S9) incomplete (lookup failed)"
+     ],
+     "not_run": [],
+     "php": null,
+     "php_edge": [],
+     "accepted": [],
+     "gate": [
+      "fails the run: grade high or above",
+      "Tripped by PKSA-3r5d-mb8f-1qw9"
+     ]
+    },
+    "moves": [
+     {
+      "heading": "The move",
+      "action": "Raise require.php to >=8.2, then require ^12.69.0",
+      "platform_step": null,
+      "command_note": "This shows which package holds the move.",
+      "moves_with": null,
+      "commands": [
+       "composer require 'php:>=8.2' --no-update",
+       "composer require 'laravel/framework:^12.69.0'",
+       "composer why-not laravel/framework v12.69.0 --locked"
+      ],
+      "commands_label": "Commands, in order",
+      "clears": "all 6 advisories",
+      "stays": null,
+      "not_checked": null,
+      "adds": [],
+      "php": {
+       "head": "12.x needs php ^8.2",
+       "lines": [
+        {
+         "answer": "no",
+         "text": "your require.php still allows 8.1 (a minor raise)"
+        },
+        {
+         "answer": "yes",
+         "text": "your target, 8.4, runs it"
+        }
+       ]
+      },
+      "after": {
+       "result": "0, ok",
+       "conditions": [
+        "if Composer resolves it (not checked: the run checked no move)",
+        "advisories on its new versions not checked"
+       ]
+      },
+      "composer": [
+       {
+        "text": "The packages that hold it may need to move too",
+        "items": []
+       },
+       {
+        "text": "A new major brings its own requirements, which lockrot does not solve",
+        "items": []
+       }
+      ]
+     }
+    ],
+    "held_by": [
+     {
+      "count": 2,
+      "shown": [
+       {
+        "name": "your composer.json",
+        "grade": null,
+        "meta": "requires ^9.0",
+        "step": null
+       },
+       {
+        "name": "pragmarx/google2fa-laravel v2.2.0",
+        "grade": null,
+        "meta": "requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+        "step": null
+       }
+      ],
+      "fold": null
+     }
+    ],
+    "security": {
+     "summary": [
+      "6 advisories:",
+      "28 on record for this name",
+      "fix: php floor raise",
+      "lookup partial (lookup failed)"
+     ],
+     "counts": [
+      "high 2",
+      "medium 2",
+      "unrated 1",
+      "low 1"
+     ],
+     "meanwhile": "Meanwhile, composer update laravel/framework installs v9.52.22, which clears 1 of its 6 advisories (16, high after it, if that release carries no new advisory)",
+     "caption": [
+      "By severity. Each affects your version, v9.52.16."
+     ],
+     "groups": [],
+     "rows": [
+      {
+       "name": "PKSA-3r5d-mb8f-1qw9",
+       "source": null,
+       "deciding": true,
+       "severity": "high",
+       "fix": "fix v12.60.0 on 12.x (php floor raise)",
+       "affects": "affects <12.60.0|>=13.0.0,<=13.9.0",
+       "ranges": null,
+       "same_as": null
+      },
+      {
+       "name": "CVE-2024-52301",
+       "source": "PKSA-w7xr-vk7n-rstm",
+       "deciding": false,
+       "severity": "high",
+       "fix": "fix v9.52.17 on 9.x, your branch (composer update)",
+       "affects": "affects 6 ranges",
+       "ranges": [
+        "<6.20.45|",
+        ">=7.0.0,<7.30.7|",
+        ">=8.0.0,<8.83.28|",
+        ">=9.0.0,<9.52.17|",
+        ">=10.0.0,<10.48.23|",
+        ">=11.0.0,<11.31.0"
+       ],
+       "same_as": null
+      },
+      {
+       "name": "CVE-2025-27515",
+       "source": "PKSA-8qx3-n5y5-vvnd",
+       "deciding": false,
+       "severity": "medium",
+       "fix": "fix v10.48.29 on 10.x (upgrade)",
+       "affects": "affects 3 ranges",
+       "ranges": [
+        "<10.48.29|",
+        ">=11.0.0,<11.44.1|",
+        ">=12.0.0,<12.1.1"
+       ],
+       "same_as": null
+      },
+      {
+       "name": "PKSA-m5cs-t1y6-qpcs",
+       "source": null,
+       "deciding": false,
+       "severity": "medium",
+       "fix": "fix v12.61.1 on 12.x (php floor raise)",
+       "affects": "affects <12.61.1|>=13.0.0,<13.12.0",
+       "ranges": null,
+       "same_as": null
+      },
+      {
+       "name": "CVE-2026-48019",
+       "source": "PKSA-mdq4-51ck-6kdq",
+       "deciding": false,
+       "severity": "unrated",
+       "fix": "fix v12.60.0 on 12.x (php floor raise)",
+       "affects": "affects 5 ranges",
+       "ranges": [
+        ">=9.0.0,<10.0.0|",
+        ">=10.0.0,<11.0.0|",
+        ">=11.0.0,<12.0.0|",
+        ">=12.0.0,<12.60.0|",
+        ">=13.0.0,<13.10.0"
+       ],
+       "same_as": null
+      },
+      {
+       "name": "CVE-2026-102279",
+       "source": "PKSA-d5tc-s1qs-h781",
+       "deciding": false,
+       "severity": "low",
+       "fix": "fix v12.69.0 on 12.x (php floor raise)",
+       "affects": "affects >=13.0.0,<13.30.0|<12.69.0",
+       "ranges": null,
+       "same_as": null
+      }
+     ],
+     "ignored": [],
+     "ladder": [
+      {
+       "branch": "9.x",
+       "marks": [
+        "your branch"
+       ],
+       "lines": [
+        "9.x your branch clears 1 of 6 from v9.52.17",
+        "composer update",
+        "after it: 16, high, advisories on its new versions not checked"
+       ]
+      },
+      {
+       "branch": "10.x",
+       "marks": [],
+       "lines": [
+        "10.x clears 2 of 6 from v10.48.29",
+        "upgrade · held by composer.json",
+        "after it: 16, high, if Composer resolves it, advisories on its new versions not checked"
+       ]
+      },
+      {
+       "branch": "11.x",
+       "marks": [],
+       "lines": [
+        "11.x clears 2 of 6 from v11.44.1",
+        "php floor raise · held by composer.json",
+        "after it: 16, high, if Composer resolves it, advisories on its new versions not checked"
+       ]
+      },
+      {
+       "branch": "12.x",
+       "marks": [
+        "the move"
+       ],
+       "lines": [
+        "12.x the move clears 6 of 6 from v12.69.0",
+        "php floor raise · held by every holder in Held by",
+        "after it: 0, ok, if Composer resolves it, advisories on its new versions not checked"
+       ]
+      },
+      {
+       "branch": "13.x",
+       "marks": [],
+       "lines": [
+        "13.x clears 6 of 6 from v13.30.0",
+        "php floor raise · held by every holder in Held by",
+        "after it: 0, ok, if Composer resolves it, advisories on its new versions not checked"
+       ]
+      }
+     ]
+    },
+    "branches_lead": [
+     "Your branch, 9.x, had its last release, v9.52.22, 0.1 years ago."
+    ],
+    "branch_rows": [
+     {
+      "branch": "13.x",
+      "marks": [
+       "newest"
+      ],
+      "latest": "v13.34.0",
+      "age": "< 3 wk",
+      "php": "^8.3",
+      "php_words": "above your require.php",
+      "bar": "v13.34.0, released less than three weeks ago",
+      "folded_in": null
+     },
+     {
+      "branch": "12.x",
+      "marks": [
+       "the move"
+      ],
+      "latest": "v12.69.3",
+      "age": "< 3 wk",
+      "php": "^8.2",
+      "php_words": "above your require.php",
+      "bar": "v12.69.3, released less than three weeks ago",
+      "folded_in": null
+     },
+     {
+      "branch": "11.x",
+      "marks": [],
+      "latest": "v11.57.0",
+      "age": "< 3 wk",
+      "php": "^8.2",
+      "php_words": "above your require.php",
+      "bar": "v11.57.0, released less than three weeks ago",
+      "folded_in": null
+     },
+     {
+      "branch": "10.x",
+      "marks": [],
+      "latest": "v10.50.3",
+      "age": "0.1y",
+      "php": "^8.1",
+      "php_words": null,
+      "bar": "v10.50.3, released 0.1 years ago",
+      "folded_in": null
+     },
+     {
+      "branch": "9.x",
+      "marks": [
+       "yours"
+      ],
+      "latest": "v9.52.22",
+      "age": "0.1y",
+      "php": "^8.0.2",
+      "php_words": null,
+      "bar": "v9.52.22, released 0.1 years ago",
+      "folded_in": null
+     },
+     {
+      "branch": "8.x",
+      "marks": [],
+      "latest": "v8.83.29",
+      "age": "1.9y",
+      "php": "^7.3|^8.0",
+      "php_words": null,
+      "bar": "v8.83.29, released 1.9 years ago",
+      "folded_in": "older"
+     },
+     {
+      "branch": "7.x",
+      "marks": [],
+      "latest": "v7.30.7",
+      "age": "1.9y",
+      "php": "^7.2.5|^8.0",
+      "php_words": null,
+      "bar": "v7.30.7, released 1.9 years ago",
+      "folded_in": "older"
+     },
+     {
+      "branch": "6.x",
+      "marks": [],
+      "latest": "v6.20.45",
+      "age": "1.9y",
+      "php": "^7.2.5|^8.0",
+      "php_words": null,
+      "bar": "v6.20.45, released 1.9 years ago",
+      "folded_in": "older"
+     },
+     {
+      "branch": "5.x",
+      "marks": [],
+      "latest": "v5.8.38",
+      "age": "6.5y",
+      "php": "^7.1.3",
+      "php_words": "your target does not run it",
+      "bar": "v5.8.38, released 6.5 years ago",
+      "folded_in": "older"
+     },
+     {
+      "branch": "4.x",
+      "marks": [],
+      "latest": "v4.2.22",
+      "age": "9.9y",
+      "php": ">=5.4.0",
+      "php_words": null,
+      "bar": "v4.2.22, released 9.9 years ago",
+      "folded_in": "older"
+     }
+    ],
+    "age_rows": [
+     {
+      "label": "installed",
+      "value": "v9.52.16 · 2023-10-03 · 3.0 years ago"
+     },
+     {
+      "label": "9.x last",
+      "value": "v9.52.22 · 2026-08-12 · 0.1 years ago"
+     },
+     {
+      "label": "most recent",
+      "value": "v11.57.0 · 2026-09-29 · less than three weeks ago"
+     },
+     {
+      "label": "last push",
+      "value": "2026-09-30 · less than three weeks ago"
+     }
+    ],
+    "security_row": [
+     "6 advisories: high 2, medium 2, unrated 1, low 1",
+     "28 on record for this name",
+     "fix: php floor raise",
+     "lookup partial (lookup failed)",
+     "Meanwhile, composer update laravel/framework installs v9.52.22, which clears 1 of its 6 advisories (16, high after it, if that release carries no new advisory)",
+     "9.x your branch clears 1 of 6 from v9.52.17",
+     "composer update",
+     "after it: 16, high, advisories on its new versions not checked",
+     "10.x clears 2 of 6 from v10.48.29",
+     "upgrade · held by composer.json",
+     "after it: 16, high, if Composer resolves it, advisories on its new versions not checked",
+     "11.x clears 2 of 6 from v11.44.1",
+     "php floor raise · held by composer.json",
+     "after it: 16, high, if Composer resolves it, advisories on its new versions not checked",
+     "12.x the move clears 6 of 6 from v12.69.0",
+     "php floor raise · held by every holder in Held by",
+     "after it: 0, ok, if Composer resolves it, advisories on its new versions not checked",
+     "13.x clears 6 of 6 from v13.30.0",
+     "php floor raise · held by every holder in Held by",
+     "after it: 0, ok, if Composer resolves it, advisories on its new versions not checked"
+    ],
+    "why": [
+     "16 · high from 16 · 16 points short of critical",
+     "vulnerable 16: high advisory PKSA-3r5d-mb8f-1qw9, the worst of 6 (tied with CVE-2024-52301); its own fix (php floor raise on 12.x) is reachable, so no × 2",
+     "the advisories alone make it high",
+     "without PKSA-3r5d-mb8f-1qw9: 16, high (tied: the others weigh the same)",
+     "composer update alone: 16, high (it clears 1 of its 6 advisories; advisories on that release not checked)",
+     "checks missing: advisories (S9) incomplete (lookup failed)"
+    ],
+    "gate_line": null,
+    "checks": "3 fired (S7, S9, S10) · 8 quiet · S9 incomplete (lookup failed)",
+    "baseline_suffix": null,
+    "commands_posix": [
+     "composer require 'php:>=8.2' --no-update",
+     "composer require 'laravel/framework:^12.69.0'",
+     "composer why-not laravel/framework v12.69.0 --locked"
+    ],
+    "commands_cmd": [
+     "composer require \"php:>=8.2\" --no-update",
+     "composer require \"laravel/framework:^12.69.0\"",
+     "composer why-not laravel/framework v12.69.0 --locked"
+    ],
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v9.52.16 released 2023-10-03 (3.0 years ago); 9.x last released v9.52.22 2026-08-12 (0.1 years ago); newest release v11.57.0 2026-09-29 (less than three weeks ago); last push 2026-09-30 (less than three weeks ago)"
+   },
+   "inputs": {
+    "root": {
+     "name": "djaiss/monica",
+     "require": {
+      "php": "^8.1",
+      "laravel/framework": "^9.0",
+      "pragmarx/google2fa-laravel": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "laravel/framework",
+      "version": "v9.52.16",
+      "time": "2023-10-03T13:02:30+00:00",
+      "php": "^8.0.2",
+      "dev": false,
+      "origin": "packagist"
+     },
+     {
+      "name": "pragmarx/google2fa-laravel",
+      "version": "v2.2.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "laravel/framework": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0"
+      }
+     }
+    ],
+    "releases": [
+     {
+      "version": "v10.48.29",
+      "time": null,
+      "php": "^8.1"
+     },
+     {
+      "version": "v10.50.3",
+      "time": "2026-08-12T03:46:26+00:00",
+      "php": "^8.1"
+     },
+     {
+      "version": "v11.44.1",
+      "time": null,
+      "php": "^8.2"
+     },
+     {
+      "version": "v11.57.0",
+      "time": "2026-09-29T15:33:27+00:00",
+      "php": "^8.2"
+     },
+     {
+      "version": "v12.60.0",
+      "time": null,
+      "php": "^8.2"
+     },
+     {
+      "version": "v12.61.1",
+      "time": null,
+      "php": "^8.2"
+     },
+     {
+      "version": "v12.69.0",
+      "time": null,
+      "php": "^8.2"
+     },
+     {
+      "version": "v12.69.3",
+      "time": "2026-09-29T12:53:25+00:00",
+      "php": "^8.2"
+     },
+     {
+      "version": "v13.30.0",
+      "time": null,
+      "php": "^8.3"
+     },
+     {
+      "version": "v13.34.0",
+      "time": "2026-09-29T12:46:21+00:00",
+      "php": "^8.3"
+     },
+     {
+      "version": "v4.2.22",
+      "time": "2016-11-12T01:41:37+00:00",
+      "php": ">=5.4.0"
+     },
+     {
+      "version": "v5.5.50",
+      "time": "2020-08-18T13:47:57+00:00",
+      "php": ">=7.0"
+     },
+     {
+      "version": "v5.8.38",
+      "time": "2020-04-14T14:14:36+00:00",
+      "php": "^7.1.3"
+     },
+     {
+      "version": "v6.20.45",
+      "time": "2024-11-12T15:42:46+00:00",
+      "php": "^7.2.5|^8.0"
+     },
+     {
+      "version": "v7.30.7",
+      "time": "2024-11-12T15:42:13+00:00",
+      "php": "^7.2.5|^8.0"
+     },
+     {
+      "version": "v8.83.29",
+      "time": "2024-11-20T15:55:41+00:00",
+      "php": "^7.3|^8.0"
+     },
+     {
+      "version": "v9.52.16",
+      "time": "2023-10-03T13:02:30+00:00",
+      "php": "^8.0.2"
+     },
+     {
+      "version": "v9.52.17",
+      "time": null,
+      "php": "^8.0.2"
+     },
+     {
+      "version": "v9.52.22",
+      "time": "2026-08-12T03:46:05+00:00",
+      "php": "^8.0.2"
+     }
+    ],
+    "advisories": [
+     {
+      "id": "PKSA-3r5d-mb8f-1qw9",
+      "cve": null,
+      "title": "Laravel Framework: CRLF injection in default email rule",
+      "link": "https://github.com/advisories/GHSA-5vg9-5847-vvmq",
+      "reported_at": "2026-06-17T13:53:44+00:00",
+      "severity": "high",
+      "affected_versions": "<12.60.0|>=13.0.0,<=13.9.0"
+     },
+     {
+      "id": "PKSA-w7xr-vk7n-rstm",
+      "cve": "CVE-2024-52301",
+      "title": "Laravel environment manipulation via query string",
+      "link": "https://github.com/advisories/GHSA-gv7v-rgg6-548h",
+      "reported_at": "2024-11-12T15:29:00+00:00",
+      "severity": "high",
+      "affected_versions": "<6.20.45|>=7.0.0,<7.30.7|>=8.0.0,<8.83.28|>=9.0.0,<9.52.17|>=10.0.0,<10.48.23|>=11.0.0,<11.31.0"
+     },
+     {
+      "id": "PKSA-8qx3-n5y5-vvnd",
+      "cve": "CVE-2025-27515",
+      "title": "Laravel has a File Validation Bypass",
+      "link": "https://github.com/advisories/GHSA-78fx-h6xr-vch4",
+      "reported_at": "2025-03-05T19:09:39+00:00",
+      "severity": "medium",
+      "affected_versions": "<10.48.29|>=11.0.0,<11.44.1|>=12.0.0,<12.1.1"
+     },
+     {
+      "id": "PKSA-m5cs-t1y6-qpcs",
+      "cve": null,
+      "title": "Laravel Framework: Temporary Signed URL Path Confusion",
+      "link": "https://github.com/advisories/GHSA-crmm-hgp2-wgrp",
+      "reported_at": "2026-06-17T13:54:13+00:00",
+      "severity": "medium",
+      "affected_versions": "<12.61.1|>=13.0.0,<13.12.0"
+     },
+     {
+      "id": "PKSA-mdq4-51ck-6kdq",
+      "cve": "CVE-2026-48019",
+      "title": "Laravel CRLF injection in default email rule",
+      "link": "https://github.com/laravel/framework/security/advisories/GHSA-5vg9-5847-vvmq",
+      "reported_at": "2026-05-19T18:13:00+00:00",
+      "severity": null,
+      "affected_versions": ">=9.0.0,<10.0.0|>=10.0.0,<11.0.0|>=11.0.0,<12.0.0|>=12.0.0,<12.60.0|>=13.0.0,<13.10.0"
+     },
+     {
+      "id": "PKSA-d5tc-s1qs-h781",
+      "cve": "CVE-2026-102279",
+      "title": "Laravel: XSS in Debug Page Information",
+      "link": "https://github.com/advisories/GHSA-jh5r-qr3c-85q8",
+      "reported_at": "2026-09-29T18:24:25+00:00",
+      "severity": "low",
+      "affected_versions": ">=13.0.0,<13.30.0|<12.69.0"
+     }
+    ],
+    "records": 28,
+    "ignored": [],
+    "abandoned": null,
+    "activity": {
+     "forge": "github",
+     "host": "github.com",
+     "repo": "laravel/framework",
+     "status": "read",
+     "reason": null,
+     "pushed_at": "2026-09-30T21:54:48+00:00",
+     "archived": false
+    },
+    "dependents": {},
+    "run": {
+     "target_php": "8.4",
+     "project_php": "^8.1",
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": "lookup_failed"
+    },
+    "packages": {
+     "brick/math": {
+      "lock": {
+       "name": "brick/math",
+       "version": "0.11.0",
+       "time": "2023-01-15T23:15:59+00:00",
+       "php": "^8.0",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "0.1.1",
+        "time": "2014-09-01T17:10:04+00:00",
+        "php": ">=5.5"
+       },
+       {
+        "version": "0.10.2",
+        "time": "2022-08-10T22:54:19+00:00",
+        "php": "^7.4 || ^8.0"
+       },
+       {
+        "version": "0.11.0",
+        "time": "2023-01-15T23:15:59+00:00",
+        "php": "^8.0"
+       },
+       {
+        "version": "0.12.3",
+        "time": "2025-02-28T13:11:00+00:00",
+        "php": "^8.1"
+       },
+       {
+        "version": "0.13.1",
+        "time": "2025-03-29T13:50:30+00:00",
+        "php": "^8.1"
+       },
+       {
+        "version": "0.14.8",
+        "time": "2026-02-10T14:33:43+00:00",
+        "php": "^8.2"
+       },
+       {
+        "version": "0.15.0",
+        "time": "2026-02-20T15:19:18+00:00",
+        "php": "^8.2"
+       },
+       {
+        "version": "0.16.2",
+        "time": "2026-03-15T00:45:41+00:00",
+        "php": "^8.2"
+       },
+       {
+        "version": "0.17.2",
+        "time": "2026-05-25T20:34:43+00:00",
+        "php": "^8.2"
+       },
+       {
+        "version": "0.18.0",
+        "time": "2026-06-14T18:21:03+00:00",
+        "php": "^8.2"
+       },
+       {
+        "version": "0.19.1",
+        "time": "2026-08-08T23:03:16+00:00",
+        "php": "^8.2"
+       },
+       {
+        "version": "0.2.2",
+        "time": "2015-06-04T10:18:26+00:00",
+        "php": ">=5.6"
+       },
+       {
+        "version": "0.20.0",
+        "time": "2026-08-28T20:53:19+00:00",
+        "php": "^8.2"
+       },
+       {
+        "version": "0.3.5",
+        "time": "2016-03-31T17:35:41+00:00",
+        "php": ">=5.6"
+       },
+       {
+        "version": "0.4.3",
+        "time": "2016-03-31T17:24:40+00:00",
+        "php": ">=5.6"
+       },
+       {
+        "version": "0.5.4",
+        "time": "2016-10-17T22:08:04+00:00",
+        "php": ">=5.6"
+       },
+       {
+        "version": "0.6.2",
+        "time": "2017-10-02T17:47:56+00:00",
+        "php": ">=7.1"
+       },
+       {
+        "version": "0.7.3",
+        "time": "2018-08-20T17:13:41+00:00",
+        "php": ">=7.1"
+       },
+       {
+        "version": "0.8.17",
+        "time": "2020-08-18T23:41:20+00:00",
+        "php": "^7.1|^8.0"
+       },
+       {
+        "version": "0.9.3",
+        "time": "2021-08-15T20:50:18+00:00",
+        "php": "^7.1 || ^8.0"
+       },
+       {
+        "version": "1.0.0",
+        "time": "2026-09-12T10:28:18+00:00",
+        "php": "^8.2"
+       }
+      ],
+      "advisories": [],
+      "records": 0,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "brick/math",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-09-25T20:04:37+00:00",
+       "archived": false
+      },
+      "chain": [
+       "laravel/framework",
+       "brick/math"
+      ],
+      "below": [
+       "laravel/framework",
+       "brick/math"
+      ]
+     },
+     "league/commonmark": {
+      "lock": {
+       "name": "league/commonmark",
+       "version": "2.4.2",
+       "time": "2024-02-02T11:59:32+00:00",
+       "php": "^7.4 || ^8.0",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "0.1.2",
+        "time": "2014-09-28T12:54:49+00:00",
+        "php": ">=5.3.0"
+       },
+       {
+        "version": "0.10.0",
+        "time": "2015-07-25T14:37:05+00:00",
+        "php": ">=5.4.8"
+       },
+       {
+        "version": "0.11.3",
+        "time": "2015-09-25T12:40:32+00:00",
+        "php": ">=5.4.8"
+       },
+       {
+        "version": "0.12.0",
+        "time": "2015-11-04T14:24:41+00:00",
+        "php": ">=5.4.8"
+       },
+       {
+        "version": "0.13.4",
+        "time": "2016-06-14T14:49:29+00:00",
+        "php": ">=5.4.8"
+       },
+       {
+        "version": "0.14.0",
+        "time": "2016-07-02T18:48:39+00:00",
+        "php": ">=5.4.8"
+       },
+       {
+        "version": "0.15.7",
+        "time": "2017-10-26T15:41:07+00:00",
+        "php": ">=5.4.8"
+       },
+       {
+        "version": "0.16.0",
+        "time": "2017-10-31T00:49:55+00:00",
+        "php": ">=5.4.8"
+       },
+       {
+        "version": "0.17.5",
+        "time": "2018-03-29T14:35:19+00:00",
+        "php": ">=5.6.5"
+       },
+       {
+        "version": "0.18.5",
+        "time": "2019-03-28T13:52:31+00:00",
+        "php": ">=5.6.5"
+       },
+       {
+        "version": "0.19.3",
+        "time": "2019-06-18T18:29:15+00:00",
+        "php": "^7.1"
+       },
+       {
+        "version": "0.2.1",
+        "time": "2014-11-10T01:30:28+00:00",
+        "php": ">=5.3.0"
+       },
+       {
+        "version": "0.3.0",
+        "time": "2014-11-29T01:57:18+00:00",
+        "php": ">=5.3.0"
+       },
+       {
+        "version": "0.4.0",
+        "time": "2014-12-15T18:53:02+00:00",
+        "php": ">=5.3.3"
+       },
+       {
+        "version": "0.5.1",
+        "time": "2014-12-27T15:58:34+00:00",
+        "php": ">=5.3.3"
+       },
+       {
+        "version": "0.6.1",
+        "time": "2015-01-25T16:08:20+00:00",
+        "php": ">=5.3.3"
+       },
+       {
+        "version": "0.7.2",
+        "time": "2015-03-08T17:48:53+00:00",
+        "php": ">=5.3.3"
+       },
+       {
+        "version": "0.8.0",
+        "time": "2015-04-29T18:01:46+00:00",
+        "php": ">=5.4.8"
+       },
+       {
+        "version": "0.9.0",
+        "time": "2015-06-19T00:39:51+00:00",
+        "php": ">=5.4.8"
+       },
+       {
+        "version": "1.6.7",
+        "time": "2022-01-13T17:18:13+00:00",
+        "php": "^7.1 || ^8.0"
+       },
+       {
+        "version": "2.10.0",
+        "time": null,
+        "php": "^7.4 || ^8.0"
+       },
+       {
+        "version": "2.10.3",
+        "time": "2026-09-21T13:07:34+00:00",
+        "php": "^7.4 || ^8.0"
+       },
+       {
+        "version": "2.4.2",
+        "time": "2024-02-02T11:59:32+00:00",
+        "php": "^7.4 || ^8.0"
+       },
+       {
+        "version": "2.6.0",
+        "time": null,
+        "php": "^7.4 || ^8.0"
+       },
+       {
+        "version": "2.7.0",
+        "time": null,
+        "php": "^7.4 || ^8.0"
+       },
+       {
+        "version": "2.9.0",
+        "time": null,
+        "php": "^7.4 || ^8.0"
+       },
+       {
+        "version": "2.9.1",
+        "time": null,
+        "php": "^7.4 || ^8.0"
+       }
+      ],
+      "advisories": [
+       {
+        "id": "PKSA-1q6p-sqkj-8mmj",
+        "cve": null,
+        "title": "league/commonmark: Denial of service via duplicate footnote definitions",
+        "link": "https://github.com/advisories/GHSA-jfm3-95jq-q3rf",
+        "reported_at": "2026-08-06T20:40:53+00:00",
+        "severity": "high",
+        "affected_versions": ">=1.5.0,<2.9.0"
+       },
+       {
+        "id": "PKSA-9q1p-3s19-bp1q",
+        "cve": null,
+        "title": "league/commonmark: Denial of service via crafted code fences, reference links, and emphasis delimiters",
+        "link": "https://github.com/advisories/GHSA-j8pm-gj4c-rq4x",
+        "reported_at": "2026-09-01T20:17:59+00:00",
+        "severity": "high",
+        "affected_versions": ">=0.6.0,<2.9.1"
+       },
+       {
+        "id": "PKSA-cqd6-fg4n-nxpf",
+        "cve": null,
+        "title": "league/commonmark: Denial of service via colliding heading slugs",
+        "link": "https://github.com/advisories/GHSA-mh25-x5hq-wrqp",
+        "reported_at": "2026-08-06T20:41:45+00:00",
+        "severity": "high",
+        "affected_versions": ">=2.0.0,<2.9.0"
+       },
+       {
+        "id": "PKSA-fndg-qryc-dyc9",
+        "cve": null,
+        "title": "league/commonmark's quadratic complexity bugs may lead to a denial of service",
+        "link": "https://github.com/advisories/GHSA-c2pc-g5qf-rfrf",
+        "reported_at": "2024-12-09T20:42:07+00:00",
+        "severity": "high",
+        "affected_versions": "<2.6.0"
+       },
+       {
+        "id": "PKSA-m4t9-vsgq-8khn",
+        "cve": null,
+        "title": "league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan",
+        "link": "https://github.com/advisories/GHSA-3q6v-r5mr-hxv8",
+        "reported_at": "2026-09-30T15:36:13+00:00",
+        "severity": "high",
+        "affected_versions": ">=2.0.0,<=2.10.1"
+       },
+       {
+        "id": "PKSA-mc58-w91n-f5gv",
+        "cve": null,
+        "title": "league/commonmark: Denial of service via adjacent inline attribute blocks",
+        "link": "https://github.com/advisories/GHSA-g2gp-3wwq-f4ph",
+        "reported_at": "2026-08-06T20:39:52+00:00",
+        "severity": "high",
+        "affected_versions": ">=1.5.0,<2.9.0"
+       },
+       {
+        "id": "PKSA-nv44-1b4d-6gjg",
+        "cve": null,
+        "title": "league/commonmark: Denial of service in the SmartPunct and Attributes extensions",
+        "link": "https://github.com/advisories/GHSA-jjv6-8j6v-6j52",
+        "reported_at": "2026-09-01T20:21:45+00:00",
+        "severity": "high",
+        "affected_versions": ">=1.5.0,<2.9.1"
+       },
+       {
+        "id": "PKSA-t21r-vtr5-3mdz",
+        "cve": "CVE-2026-71488",
+        "title": "league/commonmark: Quadratic-time denial of service when parsing crafted Markdown",
+        "link": "https://github.com/advisories/GHSA-2q4p-g7hv-5rgv",
+        "reported_at": "2026-08-06T20:37:20+00:00",
+        "severity": "high",
+        "affected_versions": ">=0.6.0,<2.9.0"
+       },
+       {
+        "id": "PKSA-zyf5-hrxv-hrd7",
+        "cve": null,
+        "title": "league/commonmark: Denial of service via distinctly-named attributes in the Attributes extension",
+        "link": "https://github.com/advisories/GHSA-8rr7-cvq3-gmfh",
+        "reported_at": "2026-09-01T20:28:40+00:00",
+        "severity": "high",
+        "affected_versions": ">=1.5.0,<2.10.0"
+       },
+       {
+        "id": "PKSA-21fb-n1x5-5nf7",
+        "cve": "CVE-2026-33347",
+        "title": "league/commonmark has an embed extension allowed_domains bypass",
+        "link": "https://github.com/advisories/GHSA-hh8v-hgvp-g3f5",
+        "reported_at": "2026-03-19T19:04:24+00:00",
+        "severity": "medium",
+        "affected_versions": ">=2.3.0,<=2.8.1"
+       },
+       {
+        "id": "PKSA-2cx9-ynrq-qdk3",
+        "cve": "CVE-2026-30838",
+        "title": "CommonMark has DisallowedRawHtml extension bypass via whitespace in HTML tag names",
+        "link": "https://github.com/advisories/GHSA-4v6x-c7xx-hw9f",
+        "reported_at": "2026-03-06T23:27:03+00:00",
+        "severity": "medium",
+        "affected_versions": ">=2.0.0,<=2.8.0"
+       },
+       {
+        "id": "PKSA-5mzr-szzf-z6cn",
+        "cve": null,
+        "title": "league/commonmark: Denial of service via deeply nested XML output",
+        "link": "https://github.com/advisories/GHSA-mj63-m3rc-8ppr",
+        "reported_at": "2026-08-06T20:42:54+00:00",
+        "severity": "medium",
+        "affected_versions": ">=2.0.0,<2.9.0"
+       },
+       {
+        "id": "PKSA-m2dq-1fhr-29b1",
+        "cve": null,
+        "title": "league/commonmark: DisallowedRawHtml bypassed when a disallowed tag name ends the raw-HTML literal",
+        "link": "https://github.com/advisories/GHSA-97jj-33gv-5xf9",
+        "reported_at": "2026-09-30T15:36:33+00:00",
+        "severity": "medium",
+        "affected_versions": ">=1.3.0,<=2.10.1"
+       },
+       {
+        "id": "PKSA-rqc2-tcc6-nc79",
+        "cve": "CVE-2025-46734",
+        "title": "league/commonmark contains a XSS vulnerability in Attributes extension",
+        "link": "https://github.com/advisories/GHSA-3527-qv2q-pfvx",
+        "reported_at": "2025-05-05T20:40:36+00:00",
+        "severity": "medium",
+        "affected_versions": ">=1.5.0,<2.7.0"
+       },
+       {
+        "id": "PKSA-scnn-p8mm-jbft",
+        "cve": "CVE-2026-71478",
+        "title": "league/commonmark: AttributesExtension href/src unsafe-link filter bypass via embedded control bytes",
+        "link": "https://github.com/advisories/GHSA-29pj-957v-52mc",
+        "reported_at": "2026-08-06T20:30:39+00:00",
+        "severity": "medium",
+        "affected_versions": ">=1.5.0,<=2.8.3"
+       }
+      ],
+      "records": 18,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "thephpleague/commonmark",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-10-01T00:09:44+00:00",
+       "archived": false
+      },
+      "chain": [
+       "laravel/framework",
+       "league/commonmark"
+      ],
+      "below": [
+       "laravel/framework",
+       "league/commonmark"
+      ]
+     },
+     "league/config": {
+      "lock": {
+       "name": "league/config",
+       "version": "v1.2.0",
+       "time": "2022-12-11T20:36:23+00:00",
+       "php": "^7.4 || ^8.0",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "v1.2.0",
+        "time": "2022-12-11T20:36:23+00:00",
+        "php": "^7.4 || ^8.0"
+       }
+      ],
+      "advisories": [],
+      "records": 0,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "thephpleague/config",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-10-01T03:50:25+00:00",
+       "archived": false
+      },
+      "chain": [
+       "laravel/framework",
+       "league/commonmark",
+       "league/config"
+      ],
+      "below": [
+       "laravel/framework",
+       "league/commonmark",
+       "league/config"
+      ]
+     },
+     "league/flysystem": {
+      "lock": {
+       "name": "league/flysystem",
+       "version": "3.27.0",
+       "time": "2024-04-07T19:17:50+00:00",
+       "php": "^8.0.2",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "0.1.20",
+        "time": "2014-01-08T16:38:22+00:00",
+        "php": null
+       },
+       {
+        "version": "0.2.15",
+        "time": "2014-03-11T07:44:38+00:00",
+        "php": null
+       },
+       {
+        "version": "0.3.5",
+        "time": "2014-04-17T10:14:09+00:00",
+        "php": null
+       },
+       {
+        "version": "0.4.5",
+        "time": "2014-05-13T19:56:59+00:00",
+        "php": null
+       },
+       {
+        "version": "0.5.12",
+        "time": "2014-11-05T13:39:29+00:00",
+        "php": ">=5.4.0"
+       },
+       {
+        "version": "1.1.10",
+        "time": "2022-10-04T09:16:37+00:00",
+        "php": "^7.2.5 || ^8.0"
+       },
+       {
+        "version": "2.5.0",
+        "time": "2022-09-17T21:02:32+00:00",
+        "php": "^7.2 || ^8.0"
+       },
+       {
+        "version": "3.27.0",
+        "time": "2024-04-07T19:17:50+00:00",
+        "php": "^8.0.2"
+       },
+       {
+        "version": "3.36.0",
+        "time": "2026-09-02T08:00:27+00:00",
+        "php": "^8.0.2"
+       }
+      ],
+      "advisories": [
+       {
+        "id": "PKSA-w9tt-7782-78jx",
+        "cve": "CVE-2026-102601",
+        "title": "Flysystem: WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed UTF-8 in the path, affecting every adapter",
+        "link": "https://github.com/advisories/GHSA-cxf4-7mrp-vvpr",
+        "reported_at": "2026-09-29T18:10:14+00:00",
+        "severity": "low",
+        "affected_versions": "<=3.35.2"
+       }
+      ],
+      "records": 2,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "thephpleague/flysystem",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-09-02T08:01:36+00:00",
+       "archived": false
+      },
+      "chain": [
+       "laravel/framework",
+       "league/flysystem"
+      ],
+      "below": [
+       "laravel/framework",
+       "league/flysystem"
+      ]
+     },
+     "nesbot/carbon": {
+      "lock": {
+       "name": "nesbot/carbon",
+       "version": "2.72.3",
+       "time": "2024-01-25T10:35:09+00:00",
+       "php": "^7.1.8 || ^8.0",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "1.39.1",
+        "time": "2019-10-14T05:51:36+00:00",
+        "php": ">=5.3.9"
+       },
+       {
+        "version": "2.72.3",
+        "time": "2024-01-25T10:35:09+00:00",
+        "php": "^7.1.8 || ^8.0"
+       },
+       {
+        "version": "2.72.6",
+        "time": null,
+        "php": "^7.1.8 || ^8.0"
+       },
+       {
+        "version": "2.73.0",
+        "time": "2025-01-08T20:10:23+00:00",
+        "php": "^7.1.8 || ^8.0"
+       },
+       {
+        "version": "3.14.1",
+        "time": "2026-09-27T12:07:26+00:00",
+        "php": "^8.1"
+       },
+       {
+        "version": "3.8.4",
+        "time": null,
+        "php": "^8.1"
+       }
+      ],
+      "advisories": [
+       {
+        "id": "PKSA-csyb-yc4p-mnbs",
+        "cve": "CVE-2025-22145",
+        "title": "Carbon has an arbitrary file include via unvalidated input passed to Carbon::setLocale",
+        "link": "https://github.com/advisories/GHSA-j3f9-p6hm-5w6q",
+        "reported_at": "2025-01-08T21:03:28+00:00",
+        "severity": "medium",
+        "affected_versions": "<2.72.6|>=3.0.0,<3.8.4"
+       }
+      ],
+      "records": 1,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "CarbonPHP/carbon",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-09-28T07:49:42+00:00",
+       "archived": false
+      },
+      "chain": [
+       "laravel/cashier",
+       "nesbot/carbon"
+      ],
+      "below": [
+       "laravel/framework",
+       "nesbot/carbon"
+      ]
+     },
+     "pragmarx/google2fa-laravel": {
+      "lock": {
+       "name": "pragmarx/google2fa-laravel",
+       "version": "v2.2.0",
+       "time": "2024-03-26T22:27:18+00:00",
+       "php": null,
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "v2.2.0",
+        "time": "2024-03-26T22:27:18+00:00",
+        "php": null
+       },
+       {
+        "version": "v2.3.1",
+        "time": "2026-03-17T21:00:23+00:00",
+        "php": null
+       }
+      ],
+      "advisories": [],
+      "records": 0,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "antonioribeiro/google2fa-laravel",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-07-18T12:44:57Z",
+       "archived": false
+      },
+      "chain": [
+       "pragmarx/google2fa-laravel"
+      ],
+      "below": null
+     },
+     "symfony/http-foundation": {
+      "lock": {
+       "name": "symfony/http-foundation",
+       "version": "v6.4.7",
+       "time": "2024-04-18T09:22:46+00:00",
+       "php": ">=8.1",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "v2.8.52",
+        "time": "2019-11-12T12:34:41+00:00",
+        "php": ">=5.3.9"
+       },
+       {
+        "version": "v3.4.47",
+        "time": "2020-10-24T10:57:07+00:00",
+        "php": "^5.5.9|>=7.0.8"
+       },
+       {
+        "version": "v4.4.49",
+        "time": "2022-11-04T16:17:57+00:00",
+        "php": ">=7.1.3"
+       },
+       {
+        "version": "v5.4.50",
+        "time": "2025-11-03T12:58:48+00:00",
+        "php": ">=7.2.5"
+       },
+       {
+        "version": "v6.4.14",
+        "time": null,
+        "php": ">=8.1"
+       },
+       {
+        "version": "v6.4.29",
+        "time": null,
+        "php": ">=8.1"
+       },
+       {
+        "version": "v6.4.41",
+        "time": null,
+        "php": ">=8.1"
+       },
+       {
+        "version": "v6.4.47",
+        "time": "2026-09-24T07:12:21+00:00",
+        "php": ">=8.1"
+       },
+       {
+        "version": "v6.4.7",
+        "time": "2024-04-18T09:22:46+00:00",
+        "php": ">=8.1"
+       },
+       {
+        "version": "v7.4.13",
+        "time": null,
+        "php": ">=8.2"
+       },
+       {
+        "version": "v7.4.20",
+        "time": "2026-09-24T07:12:44+00:00",
+        "php": ">=8.2"
+       },
+       {
+        "version": "v8.0.13",
+        "time": null,
+        "php": ">=8.4.1"
+       },
+       {
+        "version": "v8.1.8",
+        "time": "2026-09-24T07:13:53+00:00",
+        "php": ">=8.4.1"
+       }
+      ],
+      "advisories": [
+       {
+        "id": "PKSA-365x-2zjk-pt47",
+        "cve": "CVE-2025-64500",
+        "title": "Incorrect parsing of PATH_INFO can lead to limited authorization bypass",
+        "link": "https://symfony.com/blog/cve-2025-64500-incorrect-parsing-of-path-info-can-lead-to-limited-authorization-bypass",
+        "reported_at": "2025-11-12T11:09:14+00:00",
+        "severity": "high",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.50|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.29|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.3.7"
+       },
+       {
+        "id": "PKSA-y6py-qpv1-h52p",
+        "cve": "CVE-2026-48736",
+        "title": "IpUtils::PRIVATE_SUBNETS Omits IPv6 Transition Forms (6to4, NAT64, Teredo, IPv4-compatible): SSRF Bypass in NoPrivateNetworkHttpClient",
+        "link": "https://symfony.com/cve-2026-48736",
+        "reported_at": "2026-05-26T08:00:00+00:00",
+        "severity": "medium",
+        "affected_versions": ">=6.4.0,<6.4.41|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.13|>=8.0.0,<8.0.13"
+       },
+       {
+        "id": "PKSA-b35n-565h-rs4q",
+        "cve": "CVE-2024-50345",
+        "title": "Open redirect via browser-sanitized URLs",
+        "link": "https://symfony.com/cve-2024-50345",
+        "reported_at": "2024-11-05T08:00:00+00:00",
+        "severity": "low",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.46|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.14|>=7.0.0,<7.1.0|>=7.1.0,<7.1.7"
+       }
+      ],
+      "records": 14,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "symfony/http-foundation",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-10-01T08:32:10+00:00",
+       "archived": false
+      },
+      "chain": [
+       "laravel/framework",
+       "symfony/http-foundation"
+      ],
+      "below": [
+       "laravel/framework",
+       "symfony/http-foundation"
+      ]
+     },
+     "symfony/mailer": {
+      "lock": {
+       "name": "symfony/mailer",
+       "version": "v6.4.7",
+       "time": "2024-04-18T09:22:46+00:00",
+       "php": ">=8.1",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "v4.4.49",
+        "time": "2022-11-04T06:30:35+00:00",
+        "php": ">=7.1.3"
+       },
+       {
+        "version": "v5.4.52",
+        "time": "2026-05-11T06:39:31+00:00",
+        "php": ">=7.2.5"
+       },
+       {
+        "version": "v6.4.40",
+        "time": null,
+        "php": ">=8.1"
+       },
+       {
+        "version": "v6.4.46",
+        "time": "2026-09-14T23:26:17+00:00",
+        "php": ">=8.1"
+       },
+       {
+        "version": "v6.4.7",
+        "time": "2024-04-18T09:22:46+00:00",
+        "php": ">=8.1"
+       },
+       {
+        "version": "v7.4.12",
+        "time": null,
+        "php": ">=8.2"
+       },
+       {
+        "version": "v7.4.19",
+        "time": "2026-09-15T06:01:15+00:00",
+        "php": ">=8.2"
+       },
+       {
+        "version": "v8.0.12",
+        "time": null,
+        "php": ">=8.4.1"
+       },
+       {
+        "version": "v8.1.7",
+        "time": "2026-09-15T06:01:24+00:00",
+        "php": ">=8.4.1"
+       }
+      ],
+      "advisories": [
+       {
+        "id": "PKSA-28rh-rzzn-djk4",
+        "cve": "CVE-2026-45068",
+        "title": "Argument Injection in SendmailTransport via Dash-Prefixed Recipient Address",
+        "link": "https://symfony.com/cve-2026-45068",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "medium",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
+       }
+      ],
+      "records": 1,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "symfony/mailer",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-09-15T07:14:32+00:00",
+       "archived": false
+      },
+      "chain": [
+       "laravel/framework",
+       "symfony/mailer"
+      ],
+      "below": [
+       "laravel/framework",
+       "symfony/mailer"
+      ]
+     },
+     "symfony/mime": {
+      "lock": {
+       "name": "symfony/mime",
+       "version": "v6.4.7",
+       "time": "2024-04-18T09:22:46+00:00",
+       "php": ">=8.1",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "v4.4.47",
+        "time": "2022-10-03T15:15:11+00:00",
+        "php": ">=7.1.3"
+       },
+       {
+        "version": "v5.4.52",
+        "time": "2026-05-05T14:35:32+00:00",
+        "php": ">=7.2.5"
+       },
+       {
+        "version": "v6.4.40",
+        "time": null,
+        "php": ">=8.1"
+       },
+       {
+        "version": "v6.4.46",
+        "time": "2026-09-04T10:11:03+00:00",
+        "php": ">=8.1"
+       },
+       {
+        "version": "v6.4.7",
+        "time": "2024-04-18T09:22:46+00:00",
+        "php": ">=8.1"
+       },
+       {
+        "version": "v7.4.12",
+        "time": null,
+        "php": ">=8.2"
+       },
+       {
+        "version": "v7.4.19",
+        "time": "2026-09-04T10:45:44+00:00",
+        "php": ">=8.2"
+       },
+       {
+        "version": "v8.0.12",
+        "time": null,
+        "php": ">=8.4.1"
+       },
+       {
+        "version": "v8.1.7",
+        "time": "2026-09-04T11:02:17+00:00",
+        "php": ">=8.4.1"
+       }
+      ],
+      "advisories": [
+       {
+        "id": "PKSA-2n2k-66v2-bwg3",
+        "cve": "CVE-2026-45067",
+        "title": "Email Header / SMTP Command Injection via CRLF in Symfony\\Component\\Mime\\Address",
+        "link": "https://symfony.com/cve-2026-45067",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "high",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
+       },
+       {
+        "id": "PKSA-wtxr-p26d-nn42",
+        "cve": "CVE-2026-45070",
+        "title": "Email Header Injection via Non-Token Characters in Mime Parameter Names",
+        "link": "https://symfony.com/cve-2026-45070",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "medium",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
+       }
+      ],
+      "records": 3,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "symfony/mime",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-09-30T10:15:02+00:00",
+       "archived": false
+      },
+      "chain": [
+       "laravel/framework",
+       "symfony/mime"
+      ],
+      "below": [
+       "laravel/framework",
+       "symfony/mime"
+      ]
+     },
+     "symfony/polyfill-intl-idn": {
+      "lock": {
+       "name": "symfony/polyfill-intl-idn",
+       "version": "v1.29.0",
+       "time": "2024-01-29T20:11:03+00:00",
+       "php": ">=7.1",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "v1.29.0",
+        "time": "2024-01-29T20:11:03+00:00",
+        "php": ">=7.1"
+       },
+       {
+        "version": "v1.38.1",
+        "time": null,
+        "php": ">=7.2"
+       },
+       {
+        "version": "v1.43.0",
+        "time": "2026-09-23T14:40:04+00:00",
+        "php": ">=7.2"
+       }
+      ],
+      "advisories": [
+       {
+        "id": "PKSA-dwsq-ppd2-mb1x",
+        "cve": "CVE-2026-46644",
+        "title": "symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
+        "link": "https://symfony.com/cve-2026-46644",
+        "reported_at": "2026-05-26T08:00:00+00:00",
+        "severity": "low",
+        "affected_versions": ">=1.17.1,<1.38.1"
+       }
+      ],
+      "records": 1,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "symfony/polyfill-intl-idn",
+       "status": "not_read",
+       "reason": "allowlisted",
+       "pushed_at": null,
+       "archived": null
+      },
+      "chain": [
+       "laravel/framework",
+       "egulias/email-validator",
+       "symfony/polyfill-intl-idn"
+      ],
+      "below": [
+       "laravel/framework",
+       "egulias/email-validator",
+       "symfony/polyfill-intl-idn"
+      ]
+     },
+     "symfony/process": {
+      "lock": {
+       "name": "symfony/process",
+       "version": "v6.4.7",
+       "time": "2024-04-18T09:22:46+00:00",
+       "php": ">=8.1",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "v2.8.52",
+        "time": "2018-11-11T11:18:13+00:00",
+        "php": ">=5.3.9",
+        "shared_commit": true
+       },
+       {
+        "version": "v3.4.47",
+        "time": "2020-10-24T10:57:07+00:00",
+        "php": "^5.5.9|>=7.0.8"
+       },
+       {
+        "version": "v4.4.44",
+        "time": "2022-06-27T13:16:42+00:00",
+        "php": ">=7.1.3"
+       },
+       {
+        "version": "v5.4.51",
+        "time": "2026-01-26T15:53:37+00:00",
+        "php": ">=7.2.5"
+       },
+       {
+        "version": "v6.4.14",
+        "time": null,
+        "php": ">=8.1"
+       },
+       {
+        "version": "v6.4.33",
+        "time": null,
+        "php": ">=8.1"
+       },
+       {
+        "version": "v6.4.46",
+        "time": "2026-09-02T12:35:55+00:00",
+        "php": ">=8.1"
+       },
+       {
+        "version": "v6.4.7",
+        "time": "2024-04-18T09:22:46+00:00",
+        "php": ">=8.1"
+       },
+       {
+        "version": "v7.4.19",
+        "time": "2026-09-02T12:38:34+00:00",
+        "php": ">=8.2"
+       },
+       {
+        "version": "v7.4.5",
+        "time": null,
+        "php": ">=8.2"
+       },
+       {
+        "version": "v8.0.5",
+        "time": null,
+        "php": ">=8.4.1"
+       },
+       {
+        "version": "v8.1.7",
+        "time": "2026-09-02T12:40:29+00:00",
+        "php": ">=8.4.1"
+       }
+      ],
+      "advisories": [
+       {
+        "id": "PKSA-wws7-mr54-jsny",
+        "cve": "CVE-2024-51736",
+        "title": "Command execution hijack on Windows with Process class",
+        "link": "https://symfony.com/cve-2024-51736",
+        "reported_at": "2024-11-05T08:00:00+00:00",
+        "severity": "high",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.46|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.14|>=7.0.0,<7.1.0|>=7.1.0,<7.1.7"
+       },
+       {
+        "id": "PKSA-rkkf-636k-qjb3",
+        "cve": "CVE-2026-24739",
+        "title": "Symfony's incorrect argument escaping under MSYS2/Git Bash can lead to destructive file operations on Windows",
+        "link": "https://github.com/advisories/GHSA-r39x-jcww-82v6",
+        "reported_at": "2026-01-28T21:28:10+00:00",
+        "severity": "medium",
+        "affected_versions": ">=8.0,<8.0.5|>=7.4,<7.4.5|>=7.3,<7.3.11|>=6.4,<6.4.33|<5.4.51"
+       }
+      ],
+      "records": 2,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "symfony/process",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-09-22T19:06:15+00:00",
+       "archived": false
+      },
+      "chain": [
+       "laravel/framework",
+       "symfony/process"
+      ],
+      "below": [
+       "laravel/framework",
+       "symfony/process"
+      ]
+     },
+     "symfony/routing": {
+      "lock": {
+       "name": "symfony/routing",
+       "version": "v6.4.7",
+       "time": "2024-04-18T09:22:46+00:00",
+       "php": ">=8.1",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "v2.8.52",
+        "time": "2018-11-20T15:55:20+00:00",
+        "php": ">=5.3.9",
+        "shared_commit": true
+       },
+       {
+        "version": "v3.4.47",
+        "time": "2020-10-24T10:57:07+00:00",
+        "php": "^5.5.9|>=7.0.8"
+       },
+       {
+        "version": "v4.4.44",
+        "time": "2022-07-20T09:59:04+00:00",
+        "php": ">=7.1.3"
+       },
+       {
+        "version": "v5.4.53",
+        "time": "2026-05-22T19:02:28+00:00",
+        "php": ">=7.2.5"
+       },
+       {
+        "version": "v6.4.40",
+        "time": null,
+        "php": ">=8.1"
+       },
+       {
+        "version": "v6.4.41",
+        "time": null,
+        "php": ">=8.1"
+       },
+       {
+        "version": "v6.4.47",
+        "time": "2026-09-28T18:59:50+00:00",
+        "php": ">=8.1"
+       },
+       {
+        "version": "v6.4.7",
+        "time": "2024-04-18T09:22:46+00:00",
+        "php": ">=8.1"
+       },
+       {
+        "version": "v7.4.13",
+        "time": null,
+        "php": ">=8.2"
+       },
+       {
+        "version": "v7.4.20",
+        "time": "2026-09-28T19:09:50+00:00",
+        "php": ">=8.2"
+       },
+       {
+        "version": "v8.0.13",
+        "time": null,
+        "php": ">=8.4.1"
+       },
+       {
+        "version": "v8.1.8",
+        "time": "2026-09-28T19:13:15+00:00",
+        "php": ">=8.4.1"
+       }
+      ],
+      "advisories": [
+       {
+        "id": "PKSA-bf7t-jnpz-492k",
+        "cve": "CVE-2026-48784",
+        "title": "UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+        "link": "https://symfony.com/cve-2026-48784",
+        "reported_at": "2026-05-26T08:00:00+00:00",
+        "severity": "medium",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.53|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.41|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.13|>=8.0.0,<8.0.13"
+       },
+       {
+        "id": "PKSA-yc7t-91v9-99xs",
+        "cve": "CVE-2026-45065",
+        "title": "UrlGenerator Route-Requirement Bypass via Unanchored Regex Alternation → Off-Site //host URL Injection",
+        "link": "https://symfony.com/cve-2026-45065",
+        "reported_at": "2026-05-20T08:00:00+00:00",
+        "severity": "medium",
+        "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
+       }
+      ],
+      "records": 4,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "symfony/routing",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-09-29T14:09:10+00:00",
+       "archived": false
+      },
+      "chain": [
+       "laravel/framework",
+       "symfony/routing"
+      ],
+      "below": [
+       "laravel/framework",
+       "symfony/routing"
+      ]
+     }
+    }
+   }
+  },
+  {
    "id": "partial-op‡",
    "label": "geoip2/geoip2 with a high advisory only 3.x fixes (a php floor raise) and a medium one 2.13.0 fixes: security.partial clears old-promise and the medium advisory",
    "project": "prestashop-v8",
@@ -198592,6 +202757,1564 @@
     "activity": {
      "forge": "gitlab",
      "host": "gitlab.com",
+     "repo": "hoaproject/Consistency",
+     "status": "read",
+     "reason": null,
+     "pushed_at": "2021-04-28T21:38:16+00:00",
+     "archived": null
+    },
+    "dependents": {
+     "lorisleiva/laravel-search-string": [
+      {
+       "version": "v1.3.0",
+       "time": "2023-03-11T10:11:33+00:00",
+       "require": {}
+      }
+     ]
+    },
+    "run": {
+     "target_php": "8.4",
+     "project_php": "^8.1",
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    }
+   }
+  },
+  {
+   "id": "github-archived-unread‡",
+   "label": "hoa/consistency whose GitHub answer carries no archived flag: the push is read, the archived check is skipped (repository_archived fetch_failed), never read as not archived (RUNTIME-10)",
+   "project": "akaunting",
+   "run": {
+    "project": "akaunting/akaunting",
+    "root_package": "akaunting/akaunting",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "project_php": "^8.1",
+    "project_php_lowest": "8.1.0",
+    "lock_file": "composer.lock",
+    "fail_on": "high",
+    "fail_on_source": "option",
+    "gates": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "threshold": "high"
+     }
+    ],
+    "strict_network": false,
+    "mode": "check",
+    "include_dev": false,
+    "thresholds": {
+     "release-warn-years": 3,
+     "release-high-years": 5,
+     "push-warn-years": 3,
+     "push-high-years": 5
+    },
+    "flag_ids": [
+     "abandoned",
+     "silent",
+     "pinned",
+     "left-behind",
+     "old-promise",
+     "stale",
+     "capped",
+     "vulnerable"
+    ],
+    "verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     "unknown",
+     "finished",
+     "ok"
+    ],
+    "graded_verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "signal_ids": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7",
+     "S8",
+     "S9",
+     "S10",
+     "S11"
+    ],
+    "fix_model": 1,
+    "text_grammar": 1,
+    "score_model": {
+     "id": 1,
+     "score_text_grammar": 1,
+     "flag_order": [
+      "abandoned",
+      "silent",
+      "pinned",
+      "left-behind",
+      "old-promise",
+      "stale",
+      "capped",
+      "vulnerable"
+     ],
+     "parts": [
+      {
+       "id": "maintenance",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale",
+        "capped"
+       ],
+       "combine": "lead_plus_share"
+      },
+      {
+       "id": "security",
+       "flag_ids": [
+        "vulnerable"
+       ],
+       "combine": "max"
+      }
+     ],
+     "flags": [
+      {
+       "id": "abandoned",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "abandoned",
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S1",
+        "S3"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "silent",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "silent",
+        "pinned",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-high-years",
+        "push-high-years"
+       ],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "pinned",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 22,
+       "max_maintenance_flags": [
+        "pinned",
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S6"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "left-behind",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 20,
+       "max_maintenance_flags": [
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S8"
+       ],
+       "thresholds": [
+        "release-warn-years"
+       ],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "old-promise",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 18,
+       "max_maintenance_flags": [
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S5"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "stale",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 10,
+       "max_maintenance_flags": [
+        "stale",
+        "capped"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-warn-years",
+        "push-warn-years"
+       ],
+       "basis": {
+        "v013_base": "medium",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "capped",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 8,
+       "max_maintenance_flags": [
+        "capped"
+       ],
+       "raised_by": [
+        "S11"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "vulnerable",
+       "part": "security",
+       "points": null,
+       "band": null,
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": null,
+       "max_maintenance_flags": null,
+       "raised_by": [
+        "S9"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "severities"
+       },
+       "points_from": "severities"
+      }
+     ],
+     "severities": [
+      {
+       "id": "critical",
+       "points": 32,
+       "band": "critical",
+       "points_no_reachable_fix": 64,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 4,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "high",
+       "points": 16,
+       "band": "high",
+       "points_no_reachable_fix": 32,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 3,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "medium",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "unrated",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": "medium",
+       "basis": {
+        "points": "counts_as"
+       }
+      },
+      {
+       "id": "low",
+       "points": 2,
+       "band": "low",
+       "points_no_reachable_fix": 4,
+       "band_no_reachable_fix": "low",
+       "gate_rank": 1,
+       "counts_as": null,
+       "basis": {
+        "points": "share",
+        "of": "medium",
+        "share": {
+         "num": 1,
+         "den": 4
+        }
+       }
+      }
+     ],
+     "fix_kinds": [
+      {
+       "id": "update",
+       "ease": 1,
+       "doubles": false
+      },
+      {
+       "id": "upgrade",
+       "ease": 2,
+       "doubles": false
+      },
+      {
+       "id": "raise-php",
+       "ease": 3,
+       "doubles": false
+      },
+      {
+       "id": "unknown",
+       "ease": 4,
+       "doubles": false
+      },
+      {
+       "id": "blocked",
+       "ease": 5,
+       "doubles": true
+      },
+      {
+       "id": "none",
+       "ease": 6,
+       "doubles": true
+      }
+     ],
+     "bands": [
+      {
+       "verdict": "critical",
+       "floor": 32
+      },
+      {
+       "verdict": "high",
+       "floor": 16
+      },
+      {
+       "verdict": "medium",
+       "floor": 8
+      },
+      {
+       "verdict": "low",
+       "floor": 1
+      }
+     ],
+     "zero_verdicts": [
+      {
+       "verdict": "finished",
+       "when": "allowlisted"
+      },
+      {
+       "verdict": "unknown",
+       "when": "no_metadata"
+      },
+      {
+       "verdict": "ok",
+       "when": "otherwise"
+      }
+     ],
+     "exact_unit": 0.5,
+     "rounding": "floor_once",
+     "max_total": 104,
+     "bar_max": 64,
+     "bar_overflow": "clip",
+     "exclusive_groups": [
+      {
+       "id": "liveness",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "stale"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "branch",
+       "flag_ids": [
+        "pinned",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_age",
+       "flag_ids": [
+        "silent",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_push",
+       "flag_ids": [
+        "left-behind",
+        "stale"
+       ],
+       "holds_unless": {
+        "threshold": "push-warn-years",
+        "below": "release-warn-years"
+       }
+      },
+      {
+       "id": "php_bound",
+       "flag_ids": [
+        "old-promise",
+        "capped"
+       ],
+       "holds_unless": null
+      }
+     ],
+     "sort": [
+      {
+       "key": "verdict",
+       "path": "verdict",
+       "dir": "order",
+       "order": [
+        [
+         "critical"
+        ],
+        [
+         "high"
+        ],
+        [
+         "medium"
+        ],
+        [
+         "low"
+        ],
+        [
+         "unknown"
+        ],
+        [
+         "finished",
+         "ok"
+        ]
+       ],
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "security",
+       "path": "score.parts.security.contribution",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "score",
+       "path": "score.exact",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "direct",
+       "path": "direct",
+       "dir": "true_first",
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "package",
+       "path": "package",
+       "dir": "asc",
+       "collation": "bytes",
+       "default": null
+      }
+     ],
+     "rules": [
+      {
+       "id": "counted",
+       "stage": 1,
+       "kind": "select",
+       "applies_to": "flags",
+       "accept_group": "liveness",
+       "accept_covers": "listed_and_below",
+       "why": "accepted-facts-shown-not-counted",
+       "doc": "score-counted",
+       "illustration": null
+      },
+      {
+       "id": "lead-first",
+       "stage": 2,
+       "kind": "select",
+       "applies_to": "maintenance",
+       "order": "flag_order",
+       "share": {
+        "num": 1,
+        "den": 1
+       },
+       "why": "strongest-fact-in-full",
+       "doc": "score-lead-first",
+       "illustration": null
+      },
+      {
+       "id": "corroborating-share",
+       "stage": 3,
+       "kind": "share",
+       "applies_to": "maintenance",
+       "share": {
+        "num": 1,
+        "den": 4
+       },
+       "why": "correlated-evidence",
+       "doc": "score-corroborating-share",
+       "illustration": {
+        "lead": "left-behind",
+        "flag": "old-promise",
+        "weight": 16,
+        "points": 4
+       }
+      },
+      {
+       "id": "advisory-points",
+       "stage": 4,
+       "kind": "lookup",
+       "applies_to": "security",
+       "table": "severities",
+       "why": "severity-points",
+       "doc": "score-advisory-points",
+       "illustration": null
+      },
+      {
+       "id": "no-reachable-fix-multiplier",
+       "stage": 5,
+       "kind": "multiply",
+       "applies_to": "advisory",
+       "factor": 2,
+       "when_fix": [
+        "none",
+        "blocked"
+       ],
+       "why": "one-band-up",
+       "doc": "score-no-reachable-fix-multiplier",
+       "illustration": {
+        "severity": "high",
+        "before": 16,
+        "after": 32,
+        "band_before": "high",
+        "band_after": "critical"
+       }
+      },
+      {
+       "id": "security-max",
+       "stage": 6,
+       "kind": "max",
+       "applies_to": "security",
+       "tie_break": [
+        {
+         "key": "points",
+         "dir": "desc",
+         "collation": null
+        },
+        {
+         "key": "severity",
+         "dir": "order",
+         "collation": null
+        },
+        {
+         "key": "id",
+         "dir": "asc",
+         "collation": "bytes"
+        }
+       ],
+       "why": "one-number-per-part",
+       "doc": "score-security-max",
+       "illustration": null
+      },
+      {
+       "id": "divide-reach",
+       "stage": 7,
+       "kind": "divide",
+       "applies_to": "maintenance",
+       "by": 2,
+       "when": [
+        "transitive",
+        "unreached"
+       ],
+       "why": "reach-halves-maintenance",
+       "doc": "score-divide-reach",
+       "illustration": {
+        "flag": "abandoned",
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "security-exempt-from-reach",
+       "stage": 8,
+       "kind": "exempt",
+       "applies_to": "security",
+       "of": "divide-reach",
+       "why": "exploitability-independent-of-reach",
+       "doc": "score-security-exempt-from-reach",
+       "illustration": {
+        "severity": "critical",
+        "reach": "transitive",
+        "total": 32
+       }
+      },
+      {
+       "id": "sum",
+       "stage": 9,
+       "kind": "combine",
+       "applies_to": "total",
+       "op": "sum",
+       "ratio_from": "medium",
+       "why": "parts-add",
+       "doc": "score-sum",
+       "illustration": {
+        "maintenance": 16,
+        "security": 16,
+        "total": 32,
+        "band": "critical",
+        "low_maintenance": 4,
+        "low_security": 4,
+        "low_total": 8,
+        "low_band": "medium"
+       }
+      },
+      {
+       "id": "divide-dev",
+       "stage": 10,
+       "kind": "divide",
+       "applies_to": "total",
+       "by": 2,
+       "when": [
+        "dev"
+       ],
+       "why": "dev-halves-total",
+       "doc": "score-divide-dev",
+       "illustration": {
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "floor-once",
+       "stage": 11,
+       "kind": "floor",
+       "applies_to": "total",
+       "why": "integer-band-edges",
+       "doc": "score-floor-once",
+       "illustration": {
+        "exact": 4.5,
+        "total": 4
+       }
+      },
+      {
+       "id": "band-floors",
+       "stage": 12,
+       "kind": "band",
+       "applies_to": "total",
+       "ratio": 2,
+       "ratio_from": "medium",
+       "why": "two-floor-parts-make-next",
+       "doc": "score-band-floors",
+       "illustration": null
+      },
+      {
+       "id": "zero-verdicts",
+       "stage": 13,
+       "kind": "zero",
+       "applies_to": "total",
+       "table": "zero_verdicts",
+       "why": "score-zero-says-why",
+       "doc": "score-zero-verdicts",
+       "illustration": null
+      },
+      {
+       "id": "sort",
+       "stage": 14,
+       "kind": "order",
+       "applies_to": "findings",
+       "why": "advisory-findings-first",
+       "doc": "score-sort",
+       "illustration": null
+      },
+      {
+       "id": "gate-bounded-new",
+       "stage": 15,
+       "kind": "gate",
+       "applies_to": "gate",
+       "cap_multiplier": 2,
+       "why": "new-fact-sets-level",
+       "doc": "score-gate-bounded-new",
+       "illustration": {
+        "score": 36,
+        "new": 16,
+        "gate": 32
+       }
+      },
+      {
+       "id": "baseline-cover",
+       "stage": 16,
+       "kind": "cover",
+       "applies_to": "gate",
+       "order": "flag_order",
+       "covers": "listed_and_below",
+       "why": "recorded-lead-covers-below",
+       "doc": "score-baseline-cover",
+       "illustration": null
+      }
+     ],
+     "docs": "https://lockrot.dev/verdicts/model-1/"
+    },
+    "score_rules_used": {
+     "counted": 0,
+     "lead-first": 1,
+     "corroborating-share": 1,
+     "advisory-points": 0,
+     "no-reachable-fix-multiplier": 0,
+     "security-max": 0,
+     "divide-reach": 1,
+     "security-exempt-from-reach": 0,
+     "sum": 0,
+     "divide-dev": 0,
+     "floor-once": 0,
+     "band-floors": 1,
+     "zero-verdicts": 0,
+     "sort": null,
+     "gate-bounded-new": 0,
+     "baseline-cover": 0
+    },
+    "advisory_lookup": {
+     "scope": "all",
+     "scope_source": "default",
+     "packages_asked": 1,
+     "packages_not_asked": 0,
+     "other_repositories": 0,
+     "repositories": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "outcome": "answered",
+       "reason": null,
+       "message": null,
+       "packages_with_records": 0,
+       "records": 0
+      }
+     ]
+    },
+    "move_check": null,
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     },
+     "target_fix": null
+    }
+   },
+   "synthetic_inputs": [
+    "the GitHub repository answer for hoaproject/Consistency carries no `archived` key, so S3 is removed (‡)"
+   ],
+   "finding": {
+    "package": "hoa/consistency",
+    "version": "1.17.05.02",
+    "branch": "1.x",
+    "installed_php": {
+     "requires": ">=5.5.0",
+     "target_runs": true,
+     "project_allows": true
+    },
+    "verdict": "high",
+    "priority": "high",
+    "lead": "abandoned",
+    "rank": 6,
+    "flags": [
+     {
+      "id": "abandoned",
+      "role": "lead",
+      "baseline": null,
+      "signal_ids": [
+       "S1",
+       "S2",
+       "S4"
+      ],
+      "degree": {
+       "reasons": [
+        "marked"
+       ],
+       "liveness_complete": true
+      },
+      "headline": {
+       "unit": "reason",
+       "value": "marked",
+       "source": null
+      },
+      "summary": "marked abandoned by its registry; last release 2017-08-29 (9.1 years ago); last push 2021-04-28 (5.4 years ago)"
+     },
+     {
+      "id": "old-promise",
+      "role": "corroborating",
+      "baseline": null,
+      "signal_ids": [
+       "S5"
+      ],
+      "degree": null,
+      "headline": {
+       "unit": "php",
+       "value": 5,
+       "source": null
+      },
+      "summary": "released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+     }
+    ],
+    "score": {
+     "model": 1,
+     "total": 18,
+     "exact": 18,
+     "rounded_down": false,
+     "band": {
+      "floor": 16,
+      "next": "critical",
+      "to_next": 14
+     },
+     "decided_by": "maintenance",
+     "parts": {
+      "maintenance": {
+       "status": "counted",
+       "contribution": 18,
+       "alone": {
+        "total": 18,
+        "verdict": "high"
+       }
+      },
+      "security": {
+       "status": "clear",
+       "contribution": 0,
+       "alone": {
+        "total": 0,
+        "verdict": null
+       },
+       "of": 0,
+       "tied": []
+      }
+     },
+     "terms": [
+      {
+       "part": "maintenance",
+       "flag": "abandoned",
+       "role": "lead",
+       "weight": 32,
+       "divisor": 1,
+       "points": 32,
+       "contribution": 16
+      },
+      {
+       "part": "maintenance",
+       "flag": "old-promise",
+       "role": "corroborating",
+       "weight": 16,
+       "divisor": 4,
+       "points": 4,
+       "contribution": 2
+      }
+     ],
+     "modifiers": [
+      {
+       "reason": "transitive",
+       "applies_to": "maintenance",
+       "divide_by": 2,
+       "before": 36,
+       "after": 18
+      }
+     ],
+     "accepted": [],
+     "without": [
+      {
+       "remove": {
+        "kind": "flag",
+        "id": "abandoned"
+       },
+       "revealed": [
+        {
+         "flag": "silent",
+         "role": "lead"
+        }
+       ],
+       "total": 18,
+       "verdict": "high",
+       "lead": "silent",
+       "deciding_advisory": null,
+       "at_least": false
+      },
+      {
+       "remove": {
+        "kind": "flag",
+        "id": "old-promise"
+       },
+       "revealed": [],
+       "total": 16,
+       "verdict": "high",
+       "lead": "abandoned",
+       "deciding_advisory": null,
+       "at_least": false
+      }
+     ],
+     "text": "18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive"
+    },
+    "next_step": {
+     "kind": "find-alternative",
+     "source": "abandoned",
+     "merged": [],
+     "fix_kind": null,
+     "reason": null,
+     "replacement": null,
+     "quiet_years": null,
+     "to_branch": null,
+     "version": null,
+     "newest": null,
+     "constraint": null,
+     "latest": null,
+     "php_check": null,
+     "crosses_major": null,
+     "held_by": [],
+     "clears": [],
+     "unverified": [],
+     "adds": [],
+     "leaves": [
+      {
+       "kind": "flag",
+       "id": "abandoned"
+      },
+      {
+       "kind": "flag",
+       "id": "old-promise"
+      }
+     ],
+     "clears_all": false,
+     "if_applied": null,
+     "check": null,
+     "moves_with": [],
+     "composer_moves_because": [
+      "transitive"
+     ],
+     "commands": [],
+     "through": [
+      {
+       "package": "lorisleiva/laravel-search-string",
+       "installed_version": "v1.3.0",
+       "installed_requires": false,
+       "newest_stable": {
+        "version": "v1.3.0",
+        "released": "2023-03-11T10:11:33+00:00"
+       },
+       "newest_requires": null,
+       "newest_requires_unmeasured": "through_other_package",
+       "local": false,
+       "newest_is_installed": true
+      }
+     ],
+     "also": [],
+     "text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string"
+    },
+    "security": {
+     "status": "clear",
+     "check": "complete",
+     "complete": true,
+     "unchecked_reason": null,
+     "records": 0,
+     "feeds": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "answer": "answered",
+       "records": 0,
+       "reason": null
+      }
+     ],
+     "ignored": [],
+     "ignored_count": 0
+    },
+    "checks_missing": [],
+    "checks_skipped": [
+     {
+      "check": "repository_archived",
+      "reason": "fetch_failed",
+      "blocks": [
+       "S3"
+      ]
+     }
+    ],
+    "unchecked_accepted": [],
+    "maintenance_judged": true,
+    "metadata": {
+     "status": "read",
+     "reason": null,
+     "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "hoaproject/Consistency",
+     "event": "push",
+     "archived": null,
+     "fetched_at": "2026-10-01T16:04:32+00:00",
+     "cached_at": "2026-10-01T16:04:32+00:00"
+    },
+    "allowlist": null,
+    "abandoned_ignored": null,
+    "from_composer_repository": true,
+    "origin": {
+     "kind": "packagist",
+     "registry": "packagist.org",
+     "package_url": "https://packagist.org/packages/hoa/consistency",
+     "local": false
+    },
+    "replacement": null,
+    "replacement_url": null,
+    "note": null,
+    "libyears_unmeasured": null,
+    "libyears_at_least": false,
+    "direct": false,
+    "dev": false,
+    "reach": "transitive",
+    "chain": [
+     "lorisleiva/laravel-search-string",
+     "hoa/compiler",
+     "hoa/consistency"
+    ],
+    "depth": 2,
+    "depth_unmeasured": null,
+    "named_in": [],
+    "direct_dependents": [
+     "lorisleiva/laravel-search-string"
+    ],
+    "signals": [
+     {
+      "id": "S1",
+      "level": "high",
+      "summary": "marked abandoned by its repository",
+      "data": {
+       "replacement": null,
+       "marked_by": "repository",
+       "replacement_url": null
+      }
+     },
+     {
+      "id": "S2",
+      "level": "high",
+      "summary": "last release 2017-08-29 (9.1 years ago)",
+      "data": {
+       "last_release": "2017-08-29T13:46:07+00:00",
+       "last_version": "2.17.08.29",
+       "years": 9.1,
+       "dated_by": null
+      }
+     },
+     {
+      "id": "S4",
+      "level": "high",
+      "summary": "last push 2021-04-28 (5.4 years ago)",
+      "data": {
+       "last_push": "2021-04-28T21:38:16+00:00",
+       "repo": "hoaproject/Consistency",
+       "host": "github.com",
+       "years": 5.4,
+       "forge": "github",
+       "event": "push"
+      }
+     },
+     {
+      "id": "S5",
+      "level": "warn",
+      "summary": "released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+      "data": {
+       "target_php": "8.4",
+       "target_major": "8.0",
+       "ga_date": "2020-11-26",
+       "php_constraint": ">=5.5.0",
+       "written_for_php": 5,
+       "released": "2017-05-02T12:18:12+00:00"
+      }
+     }
+    ],
+    "evidence": "abandoned: marked abandoned by its registry; last release 2017-08-29 (9.1 years ago); last push 2021-04-28 (5.4 years ago); old-promise: released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+    "allowlist_reason": null,
+    "data_date": "2026-10-01T17:40:25+00:00",
+    "libyears": 0.33,
+    "age": {
+     "installed": {
+      "at": "2017-05-02T12:18:12+00:00",
+      "years": 9.4,
+      "dated_by": null
+     },
+     "installed_unmeasured": null,
+     "release": {
+      "version": "2.17.08.29",
+      "at": "2017-08-29T13:46:07+00:00",
+      "years": 9.1,
+      "level": "high",
+      "dated_by": null
+     },
+     "release_unmeasured": null,
+     "branch_release": {
+      "version": "1.17.05.02",
+      "at": "2017-05-02T12:18:12+00:00",
+      "years": 9.4,
+      "level": "high",
+      "dated_by": null
+     },
+     "branch_release_unmeasured": null,
+     "push": {
+      "at": "2021-04-28T21:38:16+00:00",
+      "years": 5.4,
+      "level": "high"
+     },
+     "push_unmeasured": null
+    },
+    "baseline": null,
+    "gate": {
+     "reaches_fail_on": true,
+     "fails": true,
+     "exempt_by": null,
+     "by": [
+      {
+       "value": "high",
+       "kind": "grade",
+       "facts": [
+        {
+         "kind": "flag",
+         "id": "abandoned"
+        }
+       ]
+      }
+     ],
+     "basis": null
+    }
+   },
+   "details": {
+    "metadata": {
+     "installed_branch": "1.x",
+     "branches": [
+      {
+       "branch": "2.x",
+       "installed": false,
+       "highest": "2.17.08.29",
+       "highest_released": "2017-08-29T13:46:07+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "2.17.08.29",
+       "newest_dated_released": "2017-08-29T13:46:07+00:00",
+       "dated_by": null,
+       "php": ">=7.1",
+       "highest_php": ">=7.1",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 9.1,
+       "fixes": null
+      },
+      {
+       "branch": "1.x",
+       "installed": true,
+       "highest": "1.17.05.02",
+       "highest_released": "2017-05-02T12:18:12+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "1.17.05.02",
+       "newest_dated_released": "2017-05-02T12:18:12+00:00",
+       "dated_by": null,
+       "php": ">=5.5.0",
+       "highest_php": ">=5.5.0",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 9.4,
+       "fixes": null
+      },
+      {
+       "branch": "0.16.x",
+       "installed": false,
+       "highest": "0.16.01.06",
+       "highest_released": "2016-01-06T07:02:13+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "0.16.01.06",
+       "newest_dated_released": "2016-01-06T07:02:13+00:00",
+       "dated_by": null,
+       "php": null,
+       "highest_php": null,
+       "admits_target_php": null,
+       "admits_project_php": null,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": null,
+       "highest_admits_project_php": null,
+       "highest_misses_project_php": null,
+       "released_years": 10.7,
+       "fixes": null
+      }
+     ]
+    }
+   },
+   "golden": {
+    "score_text": "18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive",
+    "next_step_text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string",
+    "verdict_line": "High: it is marked abandoned by its registry. No replacement is named.",
+    "readings": [
+     {
+      "flag": "old-promise",
+      "text": "It was written for PHP 5 and admits 8.4 untested."
+     }
+    ],
+    "qualifiers": {
+     "reach": [
+      "Production: not in packages-dev",
+      "Not required directly, through lorisleiva/laravel-search-string",
+      "Its maintenance counts half"
+     ],
+     "origin": null,
+     "not_judged": null,
+     "unchecked": [],
+     "not_run": [
+      "Its archived flag (request failed)"
+     ],
+     "php": null,
+     "php_edge": [],
+     "accepted": [],
+     "gate": [
+      "fails the run: grade high or above",
+      "Tripped by abandoned"
+     ]
+    },
+    "moves": [
+     {
+      "heading": "Next step",
+      "action": "Find a replacement; none is named",
+      "platform_step": null,
+      "command_note": null,
+      "moves_with": null,
+      "commands": [],
+      "commands_label": null,
+      "clears": null,
+      "stays": null,
+      "not_checked": null,
+      "adds": [],
+      "php": null,
+      "after": null,
+      "composer": [
+       {
+        "text": "Replace lorisleiva/laravel-search-string (hoa/compiler requires it)",
+        "items": []
+       }
+      ]
+     }
+    ],
+    "held_by": [
+     null
+    ],
+    "security": {
+     "summary": [
+      "no counted advisory",
+      "none on record for this name",
+      "lookup complete"
+     ],
+     "counts": [],
+     "meanwhile": null,
+     "caption": [],
+     "groups": [],
+     "rows": [],
+     "ignored": [],
+     "ladder": []
+    },
+    "branches_lead": [
+     "Your branch, 1.x, had its last release, 1.17.05.02, 9.4 years ago."
+    ],
+    "branch_rows": [
+     {
+      "branch": "2.x",
+      "marks": [
+       "newest"
+      ],
+      "latest": "2.17.08.29",
+      "age": "9.1y",
+      "php": ">=7.1",
+      "php_words": null,
+      "bar": "2.17.08.29, released 9.1 years ago",
+      "folded_in": null
+     },
+     {
+      "branch": "1.x",
+      "marks": [
+       "yours"
+      ],
+      "latest": "1.17.05.02",
+      "age": "9.4y",
+      "php": ">=5.5.0",
+      "php_words": null,
+      "bar": "1.17.05.02, released 9.4 years ago",
+      "folded_in": null
+     },
+     {
+      "branch": "0.16.x",
+      "marks": [],
+      "latest": "0.16.01.06",
+      "age": "10.7y",
+      "php": null,
+      "php_words": null,
+      "bar": "0.16.01.06, released 10.7 years ago",
+      "folded_in": null
+     }
+    ],
+    "age_rows": [
+     {
+      "label": "installed",
+      "value": "1.17.05.02 · 2017-05-02 · 9.4 years ago · the newest on 1.x"
+     },
+     {
+      "label": "most recent",
+      "value": "2.17.08.29 · 2017-08-29 · 9.1 years ago"
+     },
+     {
+      "label": "last push",
+      "value": "2021-04-28 · 5.4 years ago"
+     }
+    ],
+    "security_row": [
+     "no counted advisory",
+     "none on record for this name",
+     "lookup complete"
+    ],
+    "why": [
+     "18 · high from 16 · 14 points short of critical",
+     "abandoned 32 leads: the strongest maintenance fact counts in full",
+     "old-promise 4: ¼ of 16, beside abandoned (correlated evidence)",
+     "transitive: maintenance 36 ÷ 2 = 18",
+     "maintenance alone makes it high",
+     "without abandoned: 18, high (silent would show) · without old-promise: 16, high",
+     "checks not run: its archived flag (request failed)"
+    ],
+    "gate_line": null,
+    "checks": "4 fired (S1, S2, S4, S5) · 6 quiet · S3 not run (request failed)",
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": [],
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed 1.17.05.02 released 2017-05-02 (9.4 years ago), the newest on 1.x; newest release 2.17.08.29 2017-08-29 (9.1 years ago); last push 2021-04-28 (5.4 years ago)"
+   },
+   "inputs": {
+    "root": {
+     "name": "akaunting/akaunting",
+     "require": {
+      "php": "^8.1",
+      "lorisleiva/laravel-search-string": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "hoa/consistency",
+      "version": "1.17.05.02",
+      "time": "2017-05-02T12:18:12+00:00",
+      "php": ">=5.5.0",
+      "dev": false,
+      "origin": "packagist"
+     },
+     {
+      "name": "lorisleiva/laravel-search-string",
+      "version": "v1.3.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "hoa/compiler": "*"
+      }
+     },
+     {
+      "name": "hoa/compiler",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "hoa/consistency": "*"
+      }
+     }
+    ],
+    "releases": [
+     {
+      "version": "0.16.01.06",
+      "time": "2016-01-06T07:02:13+00:00",
+      "php": null
+     },
+     {
+      "version": "1.17.05.02",
+      "time": "2017-05-02T12:18:12+00:00",
+      "php": ">=5.5.0"
+     },
+     {
+      "version": "2.17.08.29",
+      "time": "2017-08-29T13:46:07+00:00",
+      "php": ">=7.1"
+     }
+    ],
+    "advisories": [],
+    "records": 0,
+    "ignored": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": null
+    },
+    "activity": {
+     "forge": "github",
+     "host": "github.com",
      "repo": "hoaproject/Consistency",
      "status": "read",
      "reason": null,

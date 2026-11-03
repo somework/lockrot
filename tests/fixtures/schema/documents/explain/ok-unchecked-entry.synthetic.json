@@ -108,7 +108,7 @@
    {
     "id": "S10",
     "level": "info",
-    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+    "summary": "the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it",
     "data": {
      "unchecked": [
       {
@@ -143,46 +143,24 @@
    },
    "push_unmeasured": null
   },
-  "baseline": {
-   "status": "known",
-   "recorded": {
-    "lead": "abandoned",
-    "flags": {
-     "abandoned": {
-      "known_since": "2026-06-01"
-     }
-    },
-    "advisory_count": 0,
-    "first_seen": "2026-06-01",
-    "target_php": "8.4",
-    "fix_model": 1
-   },
-   "advisories_now": {
-    "known": 0,
-    "new": 0,
-    "re_rated": 0,
-    "fix_lost": 0
-   },
-   "worsened_by": []
-  },
+  "baseline": null,
   "gate": {
    "reaches_fail_on": true,
-   "fails": false,
-   "exempt_by": "baseline",
-   "by": [],
-   "basis": {
-    "score": 0,
-    "verdict": null,
-    "cap": 0,
-    "limited_by": "cap",
-    "new": {
-     "total": 0,
-     "exact": 0,
-     "rounded_down": false,
-     "terms": [],
-     "modifiers": []
+   "fails": true,
+   "exempt_by": null,
+   "by": [
+    {
+     "value": "unchecked",
+     "kind": "unchecked",
+     "facts": [
+      {
+       "kind": "signal",
+       "id": "S2"
+      }
+     ]
     }
-   }
+   ],
+   "basis": null
   }
  },
  "lock": {

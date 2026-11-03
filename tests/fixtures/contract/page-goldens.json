@@ -4694,7 +4694,7 @@
         "2 of 16 packages flagged (13%): 2 graded high. Flags: silent 1, left-behind 1, old-promise 1.",
         "All 2 in production · 1 required directly, 1 pulled in · no security advisory · 5.3 libyears behind."
       ],
-      "grade_line": "Project grade: high · 2 high findings · 2 of 16 packages high or worse · 1 known to the baseline",
+      "grade_line": "Project grade: high · 2 high findings · 2 of 16 packages high or worse · 1 graded finding known to the baseline",
       "figure_line": "2 of 16 packages flagged · 6 ok · 8 finished",
       "load_line": "34 points on 2 flagged packages · 34 (100 %) from high or worse · score model 1",
       "panel": null,
@@ -17958,7 +17958,7 @@
         "113 of 210 packages flagged (54%): 15 graded critical, 69 high, 23 medium, 6 low. Flags: abandoned 27, silent 10, pinned 1, left-behind 54, old-promise 18, stale 12, capped 2, vulnerable 20.",
         "All 113 in production · 61 required directly, 52 pulled in · 64 security advisories on 20 packages (severity: 1 critical, 17 high, 30 medium, 3 unrated, 13 low) · fix by package: 8 composer update, 9 upgrade, 2 php floor raise, 1 no fix · at least 388.8 libyears behind."
       ],
-      "grade_line": "Project grade: critical · 15 critical findings · 84 of 210 packages high or worse · 46 known to the baseline",
+      "grade_line": "Project grade: critical · 15 critical findings · 84 of 210 packages high or worse · 46 graded findings known to the baseline",
       "figure_line": "113 of 210 packages flagged · 78 ok · 19 finished",
       "load_line": "1871 points on 113 flagged packages · 1666 (89 %) from high or worse · score model 1",
       "panel": null,

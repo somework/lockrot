@@ -23,11 +23,7 @@
    {
     "id": "left-behind",
     "role": "lead",
-    "baseline": {
-     "state": "known",
-     "since": "2026-06-01",
-     "covered_by": null
-    },
+    "baseline": null,
     "signal_ids": [
      "S8"
     ],
@@ -42,11 +38,7 @@
    {
     "id": "old-promise",
     "role": "corroborating",
-    "baseline": {
-     "state": "covered",
-     "since": "2026-06-01",
-     "covered_by": "left-behind"
-    },
+    "baseline": null,
     "signal_ids": [
      "S5"
     ],
@@ -454,11 +446,7 @@
         ],
         "reason": null
        },
-       "baseline": {
-        "state": "new",
-        "since": null,
-        "covered_by": null
-       }
+       "baseline": null
       }
      ],
      "releases_read": true,
@@ -500,39 +488,7 @@
    },
    "push_unmeasured": null
   },
-  "baseline": {
-   "status": "worsened",
-   "recorded": {
-    "lead": "left-behind",
-    "flags": {
-     "left-behind": {
-      "known_since": "2026-06-01"
-     }
-    },
-    "advisory_count": 0,
-    "first_seen": "2026-06-01",
-    "target_php": "8.4",
-    "fix_model": 1
-   },
-   "advisories_now": {
-    "known": 0,
-    "new": 1,
-    "re_rated": 0,
-    "fix_lost": 0
-   },
-   "worsened_by": [
-    {
-     "kind": "advisory",
-     "id": "PKSA-4wjj-gy1p-ft3r",
-     "why": "new",
-     "recorded": null,
-     "now": {
-      "severity": "high",
-      "fix_kind": "upgrade"
-     }
-    }
-   ]
-  },
+  "baseline": null,
   "gate": {
    "reaches_fail_on": true,
    "fails": true,
@@ -543,38 +499,17 @@
      "kind": "grade",
      "facts": [
       {
+       "kind": "flag",
+       "id": "left-behind"
+      },
+      {
        "kind": "advisory",
        "id": "PKSA-4wjj-gy1p-ft3r"
       }
      ]
     }
    ],
-   "basis": {
-    "score": 32,
-    "verdict": "critical",
-    "cap": 32,
-    "limited_by": "cap",
-    "new": {
-     "total": 16,
-     "exact": 16,
-     "rounded_down": false,
-     "terms": [
-      {
-       "part": "security",
-       "flag": "vulnerable",
-       "role": "security",
-       "advisory": "PKSA-4wjj-gy1p-ft3r",
-       "severity": "high",
-       "fix_kind": "upgrade",
-       "weight": 16,
-       "multiplier": 1,
-       "points": 16,
-       "contribution": 16
-      }
-     ],
-     "modifiers": []
-    }
-   }
+   "basis": null
   }
  },
  "lock": {
