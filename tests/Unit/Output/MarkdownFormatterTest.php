@@ -312,6 +312,21 @@ final class MarkdownFormatterTest extends TestCase
     }
 
     /**
+     * GitHub's table parser reads a `|` before a code span, so a cell escapes it. A footer line is no
+     * table row, and a backslash in a code span prints as itself (CommonMark).
+     */
+    public function testAPipeIsEscapedInATableCellAndNotInAFooterCodeSpan(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([(new FindingBuilder())->withPackage('evil/a|b')->withVerdict(Verdict::ABANDONED)->withChain(['acme/root', 'acme/mid', 'evil/a|b'])->withDataDate($at)->build()], [], $at, 1, 0);
+
+        $out = self::formatter()->format($report);
+
+        self::assertStringContainsString('| `evil/a\\|b` |', $out);
+        self::assertStringContainsString('deepest: `evil/a|b`, 2 hops (`acme/root` › `acme/mid` › `evil/a|b`)', $out);
+    }
+
+    /**
      * A footer line names packages as code spans. Text from a repository or the lock on any footer
      * line cannot stand in for one of them.
      */

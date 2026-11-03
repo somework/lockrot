@@ -70,17 +70,24 @@ final class BaselineFile
     }
 
     /**
-     * A file whose `lockrot.schema` is the integer 1 is refused before schema validation and before
-     * any gate decision (docs/baseline.md#a-baseline-1-file). No fact of it is read.
+     * A file whose `lockrot.schema` is the integer 1, or an integer above Baseline::SCHEMA, is
+     * refused before schema validation and before any gate decision
+     * (docs/baseline.md#a-baseline-1-file, docs/baseline.md#a-baseline-from-a-newer-lockrot). No
+     * fact of it is read.
      *
-     * @throws ConfigException when the file is missing, unreadable, not JSON, a baseline-1 file, or does
-     *                         not match resources/lockrot-baseline-2.schema.json
+     * @throws ConfigException when the file is missing, unreadable, not JSON, a baseline-1 file, from a
+     *                         newer lockrot, or does not match resources/lockrot-baseline-2.schema.json
      */
     public function read(): Baseline
     {
         $document = JsonReader::readObject($this->path);
-        if (self::numberIn($document['lockrot'] ?? null) === 1) {
+        $lockrot = $document['lockrot'] ?? null;
+        $number = self::numberIn($lockrot);
+        if ($number === 1) {
             throw new ConfigException($this->refusal());
+        }
+        if (\is_array($lockrot) && $number > Baseline::SCHEMA) {
+            throw new ConfigException($this->newerRefusal($number, $lockrot['version'] ?? null));
         }
 
         return Baseline::fromArray($document);
@@ -110,9 +117,34 @@ final class BaselineFile
     /** The release's major and minor stay true for every later release that reads baseline-2 only. */
     private function refusal(): string
     {
-        $line = preg_match('/^(\d+)\.(\d+)/', $this->release, $m) === 1 ? $m[1].'.'.$m[2] : $this->release;
+        return \sprintf('lockrot %s reads baseline-2 only, and %s is a baseline-1 file. Move it aside to review the findings, then run --generate-baseline: https://lockrot.dev/baseline/#moving-from-a-baseline-1-file', self::line($this->release) ?? $this->release, $this->displayPath);
+    }
 
-        return \sprintf('lockrot %s reads baseline-2 only, and %s is a baseline-1 file. Move it aside to review the findings, then run --generate-baseline: https://lockrot.dev/baseline/#moving-from-a-baseline-1-file', $line, $this->displayPath);
+    /**
+     * A new file in its place loses every `first_seen` and `known_since` date, so the message asks for
+     * an upgrade. The file's own version is printed only as a major and a minor above the running
+     * one, as it is file text.
+     *
+     * @param mixed $writer the `lockrot.version` of the file
+     */
+    private function newerRefusal(int $number, $writer): string
+    {
+        $running = self::line($this->release);
+        $line = \is_string($writer) ? self::line($writer) : null;
+        $newer = $line !== null && $running !== null && version_compare($line, $running, '>');
+
+        return \sprintf(
+            'lockrot %s reads baseline-2 only, and %s is a baseline-%d file, written by %s. Upgrade lockrot to read it: https://lockrot.dev/baseline/#a-baseline-from-a-newer-lockrot',
+            $running ?? $this->release,
+            $this->displayPath,
+            $number,
+            $newer ? 'lockrot '.$line : 'a newer lockrot'
+        );
+    }
+
+    private static function line(string $version): ?string
+    {
+        return preg_match('/^(\d+)\.(\d+)/', $version, $m) === 1 ? $m[1].'.'.$m[2] : null;
     }
 
     /**

@@ -191,7 +191,7 @@ final class Explanation
             'finding' => $row,
             'lock' => $this->lock(),
             'metadata' => $this->metadata(),
-            'run' => $run->toExplainArray($this->report->advisoryLookup(), $this->report->moveCheck()) + ['php_window' => $this->phpWindow()],
+            'run' => $run->toExplainArray($this->report->advisoryLookup(), $this->report->moveCheck(), $this->report->includesDev()) + ['php_window' => $this->phpWindow()],
             'generated_at' => self::date($this->report->generatedAt()),
             'notes' => $this->report->notes(),
             'note_details' => array_map(static fn (RunNote $note): array => $note->toArray(), $this->report->runNotes()),

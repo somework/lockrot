@@ -122,7 +122,7 @@ line instead ([install-time.md](install-time.md#never-fails-the-install)).
 - One run names each refusal of `fail-on` and of `ignore[].flags` first. Then it names each schema
   error of the values that those checks did not refuse. A check of an `ignore[]` entry after the
   schema, such as a date in `expires` that does not exist, stops at the first refusal.
-- An empty `--fail-on=` or `--baseline=` is an error, never a fall-back to the next source.
+- An empty `--fail-on=`, `--baseline=` or `--target-php=` is an error, never a fall-back to the next source.
 
 ### Unknown keys
 

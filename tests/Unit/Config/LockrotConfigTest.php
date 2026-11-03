@@ -276,6 +276,13 @@ final class LockrotConfigTest extends TestCase
         LockrotConfig::fromSources(['fail-on' => 'silent'], [], ['fail-on' => ''], '8.5.10', null);
     }
 
+    public function testAnEmptyCliTargetPhpIsRejectedRatherThanFallingThrough(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('--target-php must not be empty');
+        LockrotConfig::fromSources(['target-php' => '8.2'], [], ['target-php' => ''], '8.5.10', null);
+    }
+
     /** `none` is the absence of a threshold, not a priority level a run can fail on. */
     public function testThePriorityNoneIsTheSameNoneAsAlways(): void
     {
