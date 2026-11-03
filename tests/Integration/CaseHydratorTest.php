@@ -123,8 +123,8 @@ final class CaseHydratorTest extends TestCase
         );
     }
 
-    /** lockrot gives `lookup_failed` only from a failed feed, so case partial-lookup‡ hydrates one beside the answered feed. */
-    public function testALookupFailedRunHydratesAFailedRepositoryBesideTheAnsweredOne(): void
+    /** Case partial-lookup‡ hydrates the advisory repositories and the feeds that the model's run and finding hold, failed ones included. */
+    public function testALookupFailedRunHydratesTheModelsRepositoriesAndFeeds(): void
     {
         $case = CaseHydrator::case('partial-lookup‡');
         self::assertSame('lookup_failed', JsonPath::stringAt($case, ['finding', 'security', 'unchecked_reason']));
@@ -140,14 +140,8 @@ final class CaseHydratorTest extends TestCase
         self::assertNotNull($finding, 'the case package has a finding');
 
         self::assertSame(
-            ['partial', 'lookup_failed', 28, ['failed', 'answered'], true],
-            [
-                JsonPath::stringAt($finding, ['security', 'check']),
-                JsonPath::stringAt($finding, ['security', 'unchecked_reason']),
-                JsonPath::arrayAt($finding, ['security'])['records'] ?? null,
-                array_column(JsonPath::arrayAt($report, ['run', 'advisory_lookup', 'repositories']), 'outcome'),
-                \is_string(array_column(JsonPath::arrayAt($report, ['run', 'advisory_lookup', 'repositories']), 'message')[0] ?? null),
-            ]
+            self::lookupOf(JsonPath::arrayAt($case, ['run']), JsonPath::arrayAt($case, ['finding'])),
+            self::lookupOf(JsonPath::arrayAt($report, ['run']), $finding)
         );
     }
 
@@ -307,5 +301,26 @@ final class CaseHydratorTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         CaseHydrator::report(['id' => 'X', 'inputs' => null]);
+    }
+
+    /**
+     * @param array<mixed, mixed> $run
+     * @param array<mixed, mixed> $finding
+     *
+     * @return array<string, mixed> the security fields that the line reads, each repository's outcome and each feed's answer
+     */
+    private static function lookupOf(array $run, array $finding): array
+    {
+        $security = JsonPath::arrayAt($finding, ['security']);
+        $repositories = JsonPath::arrayAt($run, ['advisory_lookup', 'repositories']);
+        $feeds = JsonPath::arrayAt($security, ['feeds']);
+
+        return [
+            'check' => $security['check'] ?? null,
+            'unchecked_reason' => $security['unchecked_reason'] ?? null,
+            'records' => $security['records'] ?? null,
+            'repositories' => array_map(null, array_column($repositories, 'composer_repository'), array_column($repositories, 'outcome'), array_column($repositories, 'reason'), array_column($repositories, 'message')),
+            'feeds' => array_map(null, array_column($feeds, 'composer_repository'), array_column($feeds, 'answer'), array_column($feeds, 'reason')),
+        ];
     }
 }

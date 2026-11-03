@@ -116,6 +116,23 @@ class ACaseWithoutBranchRowsHydratesFromItsRunReleases(unittest.TestCase):
 
         self.assertEqual(['4.17.0', '4.7.1'], [r['version'] for r in inputs['releases']])
 
+    def test_a_failed_advisory_repository_of_the_run_joins_the_run_inputs(self):
+        failed = {'composer_repository': 'composer repo (https://repo.example.org)', 'registry': None, 'outcome': 'failed', 'reason': 'transport',
+                  'message': 'HTTP/2 503', 'packages_with_records': None, 'records': None}
+        answered = {'composer_repository': 'composer repo (https://repo.packagist.org)', 'registry': 'packagist.org', 'outcome': 'answered',
+                    'reason': None, 'message': None, 'packages_with_records': 1, 'records': 28}
+        run = dict(self.RUN, advisory_lookup={'scope': 'all', 'repositories': [failed, answered]})
+
+        inputs = project_fixtures.inputs_of({'finding': self.FINDING, 'run': run, 'run_inputs': {'_releases': self.RELEASES}})
+
+        self.assertEqual([{'composer_repository': 'composer repo (https://repo.example.org)', 'reason': 'transport', 'message': 'HTTP/2 503'}],
+                         inputs['run']['advisory_failures'])
+
+    def test_a_run_without_a_failed_advisory_repository_names_no_failures(self):
+        inputs = project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN, 'run_inputs': {'_releases': self.RELEASES}})
+
+        self.assertNotIn('advisory_failures', inputs['run'])
+
     def test_the_run_root_require_replaces_the_projected_constraint(self):
         finding = dict(self.FINDING, direct=True, named_in=['require'])
 
