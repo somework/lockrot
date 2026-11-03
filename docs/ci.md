@@ -157,7 +157,7 @@ gate: fails · --fail-on=high · 42 findings fail it · target php 8.4 (--target
   `(LOCKROT_FAIL_ON)`, `(extra.lockrot.fail-on)` or `(default)`.
 - Then how many findings fail it, per value when the list holds two or more:
   `1 finding fails it (left-behind 1, vulnerable-high 1)`. Findings that the baseline exempts are
-  counted apart: `1 reaches it and is known to the baseline`.
+  counted apart: `1 reaches it and the baseline exempts it`.
 - `--strict-network: a lookup failed` when `--strict-network` tripped.
 - One clause per gap that the gate could not read: `advisories not applied to 6 packages: not
   checked (offline)`. A grade or `vulnerable` value cannot fail on advisories that lockrot did not

@@ -710,7 +710,7 @@ defs['findingFlag'] = obj("A fired flag (§2.1, §7.6): facts only, no weight or
     'degree': d('Only facts no single signal holds (§2.1): `abandoned {reasons, liveness_complete}`, `silent`/`stale` `{liveness_complete}`, else null.',
                 {'oneOf': [ref('degreeAbandoned'), ref('degreeLiveness'), {'type': 'null'}]}),
     'headline': ref('headline'),
-    'summary': dict(rendered('The flag sentence, `FlagSentence` (§7.11); never empty. The `vulnerable` sentence also reads `security`, `branch` and the deciding term\'s `severity` in `score.terms`.', ['flags[].signal_ids', 'signals[].data', 'flags[].degree.liveness_complete', 'security', 'branch', 'score.terms']), minLength=1),
+    'summary': dict(rendered('The flag sentence, `FlagSentence` (§7.11); never empty. The `vulnerable` sentence also reads `security`, `branch` and the deciding term\'s `severity` in `score.terms`. The left-behind sentence words how S8\'s `newest_php` misses its floor at the floor\'s point: `run.project_php_lowest` for the project floor, the solve PHP `run.php_window.target.php` (X.Y.99 of `run.target_php` when the window is null) for the target floor.', ['flags[].signal_ids', 'signals[].data', 'flags[].degree.liveness_complete', 'security', 'branch', 'score.terms', 'run.project_php_lowest', 'run.target_php', 'run.php_window.target.php']), minLength=1),
 }, anyOf=[  # the flag id fixes its degree and its headline unit, in both published schemas
     {'description': '`abandoned`: reasons in its degree, headline `reason` archived or marked.',
      'properties': {'id': {'enum': ['abandoned']}, 'degree': ref('degreeAbandoned'),
@@ -923,8 +923,9 @@ defs['s8'] = sig_data("S8 (§2.1): the installed release branch stopped while a 
     'newest_php': nul("The newest branch's php requirement; null when it requires none.", {'type': 'string'}),
     'newest_within_reach': d('Whether its php admits the project floor and the target.', {'type': 'boolean'}),
     'newest_years': d('Age of `newest_release` on the run clock (round 2).', ref('years')),
-    'newest_release_at_least': d(("True when the newest branch's highest tag has no trusted release date: `newest_release` is then the date of a commit its tags share, "
-                                  "a lower bound, and `newest_years` an upper bound. The summary reads \"(on or after {date}, the date of a commit its tags share)\"."),
+    'newest_release_at_least': d(("True when `newest_version` is the newest branch's highest tag and that tag has no trusted release date: `newest_release` is then "
+                                  "the date of a commit its tags share, a lower bound, and `newest_years` an upper bound. False when S8 quotes a lower tag with its "
+                                  "own date. The summary reads \"(on or after {date}, the date of a commit its tags share)\"."),
                                  {'type': 'boolean'}),
     'floor_php': nul('What holds the newest branch back; null when within reach.', {'type': 'string'}),
     'floor_source': nul('Which floor `floor_php` is (`project target`), open; null when within reach.', {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['project', 'target']}),
@@ -937,8 +938,9 @@ defs['s8'] = sig_data("S8 (§2.1): the installed release branch stopped while a 
         'target': nul('null: no php declared.', {'type': 'boolean'}),
     })),
     'reachable_years': nul('Age of `reachable_release` on the run clock (round 2); null with `reachable_branch`.', ref('years')),
-    'reachable_release_at_least': nul(("True when the reachable branch's highest tag has no trusted release date: `reachable_release` is then the date of a commit its "
-                                       "tags share, a lower bound, and `reachable_years` an upper bound. Null with `reachable_branch`."), {'type': 'boolean'}),
+    'reachable_release_at_least': nul(("True when `reachable_version` is the reachable branch's highest tag and that tag has no trusted release date: `reachable_release` "
+                                       "is then the date of a commit its tags share, a lower bound, and `reachable_years` an upper bound. False when S8 quotes a lower tag "
+                                       "with its own date. Null with `reachable_branch`."), {'type': 'boolean'}),
     'suggested_constraint': nul('A caret constraint following the reachable branch; null when there is none.', {'type': 'string'}),
     'dated_by': ref('datedBy'),
 })
@@ -1010,8 +1012,8 @@ SIG_IDS = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11']
 defs['signal'] = obj("A signal (§2.1, §7.6): S1–S10 as in report-1 and S11 (report-2), with the data keys report-2 adds; typed per id by the branches below.", {
     'id': ref('signalId'),
     'level': ref('level'),
-    'summary': rendered('The signal sentence, `SignalSentence` (§7.11): S1–S6, S8 and S11 from their `data`, S7 from `data.packages[]`, S9 from `security` and the S9 rows, S10 from `data.unchecked[]` and, for `host_not_supported`, `activity.host`.',
-                        ['signals[].data', 'security', 'branch', 'activity.host']),
+    'summary': rendered('The signal sentence, `SignalSentence` (§7.11): S1–S6, S8 and S11 from their `data` (S8\'s miss words also read the floor\'s point: `run.project_php_lowest`, or the solve PHP `run.php_window.target.php`, X.Y.99 of `run.target_php` when the window is null), S7 from `data.packages[]`, S9 from `security` and the S9 rows, S10 from `data.unchecked[]` and, for `host_not_supported`, `activity.host`.',
+                        ['signals[].data', 'security', 'branch', 'activity.host', 'run.project_php_lowest', 'run.target_php', 'run.php_window.target.php']),
     'data': d('The facts, typed per `id`.', {'type': 'object'}),
 }, anyOf=[{'properties': {'id': {'enum': [s]}, 'data': ref(s.lower())}} for s in SIG_IDS] + [{
     'description': 'A signal whose id this schema does not list, from a later release or not from lockrot: its data is any object.',
@@ -1135,7 +1137,8 @@ REGISTRY = {'type': 'string', 'pattern': '^[a-z0-9][a-z0-9.-]*$', 'x-known-value
 defs['advisoryFeed'] = obj("What one advisory-capable Composer repository did for the name of this package (C75), in `run.advisory_lookup.repositories` order.", {
     'composer_repository': d(("The name that Composer gives the repository, credentials stripped. It joins `run.advisory_lookup.repositories[]` and the notes. "
                               "Private data: the name echoes the host and path of the repository URL, so a Private Packagist repository names its organisation "
-                              "(`composer repo (https://repo.packagist.com/<org>/)`). Clear it before you publish a report."),
+                              "(`composer repo (https://repo.packagist.com/<org>/)`). The same name appears in `run.advisory_lookup.repositories[]`, in each "
+                              "finding's `security.feeds[]` and in the run notes, so a published report publishes it."),
                              {'type': 'string', 'minLength': 1}),
     'registry': nul('The registry host for display, as `origin.registry` writes it. Null for another repository. An open set.', dict(REGISTRY)),
     'answer': closed(['answered', 'failed', 'not_asked'], 'What this feed did for this name. Closed.'),
@@ -1146,8 +1149,9 @@ defs['advisoryFeed'] = obj("What one advisory-capable Composer repository did fo
           {'description': '`failed`, `not_asked`: no count, a reason.', 'properties': {'answer': {'enum': ['failed', 'not_asked']}, 'records': _N, 'reason': {'type': 'string'}}}])
 defs['advisoryRepository'] = obj("One advisory-capable Composer repository of the run and what it did (C75), in configured order.", {
     'composer_repository': d(("The name that Composer gives the repository, credentials stripped (the join key). Private data: the name echoes the host and path of "
-                              "the repository URL, so a Private Packagist repository names its organisation (`composer repo (https://repo.packagist.com/<org>/)`). Clear it "
-                              "before you publish a report."), {'type': 'string', 'minLength': 1}),
+                              "the repository URL, so a Private Packagist repository names its organisation (`composer repo (https://repo.packagist.com/<org>/)`). The same "
+                              "name appears in `run.advisory_lookup.repositories[]`, in each finding's `security.feeds[]` and in the run notes, so a published "
+                              "report publishes it."), {'type': 'string', 'minLength': 1}),
     'registry': nul('The registry host for display. Null for another repository. An open set.', dict(REGISTRY)),
     'outcome': closed(['answered', 'failed', 'not_asked', 'no_feed'], 'What the repository did in this run. `no_feed`: it publishes no advisories. Closed.'),
     'reason': nul(("Why. On `not_asked`: `offline`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the "
@@ -1245,9 +1249,13 @@ FINDING = {
     'chain': arr('From the direct requirement down to this package; one element when direct; empty when no direct requirement reaches it (report-1).', ref('packageName')),
     'depth': ref('depth'),
     'depth_unmeasured': nul('Why `depth` is null (C77). Set exactly when `depth` is null.', ref('depthUnmeasured')),
-    'named_in': arr(("The composer.json sections whose keys name this package, or name a package that it replaces or provides (W12), `require` first. "
-                     "lockrot reads them whatever --dev says. Empty when no line names it, and in a run that read no composer.json (`depth_unmeasured` says so). "
-                     "Not a reach fact: a run without --dev reaches a require-dev package through others."), ref('composerJsonSection'), uniqueItems=True, maxItems=2),
+    'named_in': arr(("The composer.json sections whose keys name this package, or name a package that it replaces or provides (W12). "
+                     "A `require` key resolves among the production packages first, and among all packages when no production package satisfies it. "
+                     "A `require-dev` key resolves among all packages. In each set, a package of the named name wins, and else every package that replaces "
+                     "or provides the name gets the section. `require` first. lockrot reads them whatever --dev says. Empty when no line names it, and in a "
+                     "run that read no composer.json (`depth_unmeasured` says so). Not a reach fact: a run without --dev walks no require-dev root. "
+                     "A package that composer.json names in require-dev and not in require is reached when a package that the run walks requires it. "
+                     "Else its `depth` is null and `depth_unmeasured` is `unreached`."), ref('composerJsonSection'), uniqueItems=True, maxItems=2),
     'direct_dependents': arr('The direct requirements that reach it (report-1); a transitive move names them (§5.6).', ref('packageName')),
     'signals': arr('S1–S11 that fired, in id order (§7.6).', ref('signal')),
     'evidence': rendered("The join of the counted flags' `flags[].summary` (a flag counts when a `score.terms[].flag` names it) as `<id>: <summary>` in flag order; kept for jq (§7.6). "

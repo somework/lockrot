@@ -256,6 +256,14 @@ names the branch within reach. Abridged from the [example run](example-run.md):
                    ~8.4.0 || ~8.5.0 above the project's php >=8.2; 7.x released v7.14.0 (2026-06-12)
 ```
 
+After `needs php`, S8 says on which side the newest branch's php misses the floor, tested at
+the floor's point: the project's lowest PHP, or the PHP where the move check solves for the target.
+The report writes that PHP as `run.php_window.target.php`, and no run field writes it when
+`run.php_window` is null.
+The words name the sides of [The PHP test in `--explain`](#the-php-test-in-explain): `above` is
+`needs_newer`, `which stops before` is `stops_before`, `which skips` is `skips`, and `which no PHP
+runs` is `unsatisfiable`. The flag sentence of `left-behind` reads the same side.
+
 If no branch that releases is within reach, S8's clause ends `no releasing branch within reach`
 and suggests nothing: the way forward is a PHP upgrade, and the `do:` line says so. The flag stays
 `left-behind`. `report-2.json` types S8's `data`, `suggested_constraint` included
@@ -1215,8 +1223,14 @@ deepest: hoa/ustring and hoa/zformat, 4 hops (wallabag/rulerz › hoa/ruler › 
   `composer.json`.
 
 - `named_in` lists the `composer.json` sections that name the package, or a name it replaces or
-  provides: `require`, `require-dev`, or none. A package that `composer.json` names only in
-  `require-dev` is reached through others in a run without `--dev`.
+  provides: `require`, `require-dev`, or none. A `require` key resolves among the production
+  packages first, and among all packages when no production package satisfies it. A
+  `require-dev` key resolves among all packages. In each set, a package of the named name wins,
+  and else every package that replaces or provides the name gets the section.
+
+- `named_in` is no reach fact. A run without `--dev` walks no `require-dev` root. So a package
+  that `composer.json` names in `require-dev` and not in `require` is reached when a package that
+  the run walks requires it. Else its `depth` is null and `depth_unmeasured` is `unreached`.
 
 - The root `rot_depth` counts the graded findings by reach, by depth, by section and by
   production and development, and names the deepest ones with their chain.
@@ -1251,7 +1265,7 @@ formats print only under `--all`, keeps its verdict and adds the same `checks mi
 | `repository_activity` | `host_not_supported` | The repository is on a host that lockrot cannot ask ([host note](notes.md#repository_activity_host_not_supported)) | S3, S4 |
 | `repository_activity` | `not_from_composer_repository` | The package comes from vcs, or from an origin that lockrot cannot tell: lockrot asks no host for it | S3, S4 |
 | `release_metadata` | `not_from_composer_repository` | The same origins: no Composer repository serves its releases | S2, S8. S11 too when S11 fires: a [capped](#capped) package then has `admits_newest` unread |
-| `release_dates` | `undated_releases` | A release that S2, S5 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it. The summary gives one clause per cause. A cause is an undated lock entry, an installed tag on a shared commit, an undated tag, or tags dated by a shared commit | S2 when the highest tag is undated. S5 when the installed release is undated, its lock date is before the GA of the target's major or absent, and the other two [S5 conditions](#old-promise) hold. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
+| `release_dates` | `undated_releases` | A release that S2, S5 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it. The summary gives one clause per cause. A cause is an undated lock entry, an installed tag on a shared commit, or a release that S2 or S8 reads with no date or with the date of a commit that its tags share. That release is the newest stable release, the installed branch's newest release, or a higher branch's highest tag | S2 when the highest tag is undated. S5 when the installed release is undated, its lock date is before the GA of the target's major or absent, and the other two [S5 conditions](#old-promise) hold. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
 | `advisories` | `offline`, `install_time_budget`, `lookup_failed`, `no_feed` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
 | `releases` | `releases_unknown` | A counted advisory's fix is unknown because the package's release data did not come | S9 |
 

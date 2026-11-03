@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "id": "https://lockrot.dev/schema/explain-2.json",
     "title": "lockrot explanation",
-    "description": "The document `composer lockrot --explain=vendor/package --format=json` prints (explain-2, lockrot 0.14): the finding exactly as report-2 carries it, everything it was read from, and the run block every field of `run.score_model` refers to. Every human string in it is a rendering of fields in the same object or in `run`: strings carry `x-rendered-from`, and no consumer parses them. Objects are open: a field added later validates against this file unchanged. The number in the id changes only when a field is removed, renamed, made required or narrowed, or a closed set changes. Open sets carry a `pattern` and `x-known-values`; closed sets are enums.",
+    "description": "The document `composer lockrot --explain=vendor/package --format=json` prints (explain-2, lockrot 0.14): the finding as report-2 carries it, except that explain reads no baseline: `finding.baseline` is null and `finding.gate` is decided as if no baseline existed, so a finding that the baseline exempts in the report can read `gate.fails` true here. The document also carries everything the finding was read from, and the run block every field of `run.score_model` refers to. Every human string in it is a rendering of fields in the same object or in `run`: strings carry `x-rendered-from`, and no consumer parses them. Objects are open: a field added later validates against this file unchanged. The number in the id changes only when a field is removed, renamed, made required or narrowed, or a closed set changes. Open sets carry a `pattern` and `x-known-values`; closed sets are enums.",
     "type": "object",
     "required": [
         "$schema",
@@ -517,7 +517,7 @@
             ],
             "properties": {
                 "composer_repository": {
-                    "description": "The name that Composer gives the repository, credentials stripped. It joins `run.advisory_lookup.repositories[]` and the notes. Private data: the name echoes the host and path of the repository URL, so a Private Packagist repository names its organisation (`composer repo (https://repo.packagist.com/<org>/)`). Clear it before you publish a report.",
+                    "description": "The name that Composer gives the repository, credentials stripped. It joins `run.advisory_lookup.repositories[]` and the notes. Private data: the name echoes the host and path of the repository URL, so a Private Packagist repository names its organisation (`composer repo (https://repo.packagist.com/<org>/)`). The same name appears in `run.advisory_lookup.repositories[]`, in each finding's `security.feeds[]` and in the run notes, so a published report publishes it.",
                     "type": "string",
                     "minLength": 1
                 },
@@ -680,7 +680,7 @@
             ],
             "properties": {
                 "composer_repository": {
-                    "description": "The name that Composer gives the repository, credentials stripped (the join key). Private data: the name echoes the host and path of the repository URL, so a Private Packagist repository names its organisation (`composer repo (https://repo.packagist.com/<org>/)`). Clear it before you publish a report.",
+                    "description": "The name that Composer gives the repository, credentials stripped (the join key). Private data: the name echoes the host and path of the repository URL, so a Private Packagist repository names its organisation (`composer repo (https://repo.packagist.com/<org>/)`). The same name appears in `run.advisory_lookup.repositories[]`, in each finding's `security.feeds[]` and in the run notes, so a published report publishes it.",
                     "type": "string",
                     "minLength": 1
                 },
@@ -3666,75 +3666,6 @@
                     ]
                 },
                 {
-                    "description": "`run.php_window.target_fix.reason` is null on a `not_checked` fix exactly when `move_check` is null: a report built without the move check names no reason. A run that checks no move writes `move_check` and names its reason.",
-                    "anyOf": [
-                        {
-                            "not": {
-                                "properties": {
-                                    "php_window": {
-                                        "properties": {
-                                            "target_fix": {
-                                                "properties": {
-                                                    "check": {
-                                                        "enum": [
-                                                            "not_checked"
-                                                        ]
-                                                    }
-                                                },
-                                                "required": [
-                                                    "check"
-                                                ]
-                                            }
-                                        },
-                                        "required": [
-                                            "target_fix"
-                                        ]
-                                    }
-                                },
-                                "required": [
-                                    "php_window"
-                                ]
-                            }
-                        },
-                        {
-                            "properties": {
-                                "move_check": {
-                                    "type": "null"
-                                },
-                                "php_window": {
-                                    "properties": {
-                                        "target_fix": {
-                                            "properties": {
-                                                "reason": {
-                                                    "type": "null"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            "properties": {
-                                "move_check": {
-                                    "type": "object"
-                                },
-                                "php_window": {
-                                    "properties": {
-                                        "target_fix": {
-                                            "properties": {
-                                                "reason": {
-                                                    "type": "string"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
                     "description": "`project_php_lowest` is null when `project_php` is (no `require.php`, so no lowest).",
                     "anyOf": [
                         {
@@ -4343,7 +4274,7 @@
                     ]
                 },
                 "named_in": {
-                    "description": "The composer.json sections whose keys name this package, or name a package that it replaces or provides, `require` first. lockrot reads them whatever --dev says. Empty when no line names it, and in a run that read no composer.json (`depth_unmeasured` says so). Not a reach fact: a run without --dev reaches a require-dev package through others.",
+                    "description": "The composer.json sections whose keys name this package, or name a package that it replaces or provides. A `require` key resolves among the production packages first, and among all packages when no production package satisfies it. A `require-dev` key resolves among all packages. In each set, a package of the named name wins, and else every package that replaces or provides the name gets the section. `require` first. lockrot reads them whatever --dev says. Empty when no line names it, and in a run that read no composer.json (`depth_unmeasured` says so). Not a reach fact: a run without --dev walks no require-dev root. A package that composer.json names in require-dev and not in require is reached when a package that the run walks requires it. Else its `depth` is null and `depth_unmeasured` is `unreached`.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/composerJsonSection"
@@ -11424,7 +11355,7 @@
                     "$ref": "#/definitions/headline"
                 },
                 "summary": {
-                    "description": "The flag sentence, `FlagSentence`; never empty. The `vulnerable` sentence also reads `security`, `branch` and the deciding term's `severity` in `score.terms`. Prose, not contract; key on the fields it is rendered from.",
+                    "description": "The flag sentence, `FlagSentence`; never empty. The `vulnerable` sentence also reads `security`, `branch` and the deciding term's `severity` in `score.terms`. The left-behind sentence words how S8's `newest_php` misses its floor at the floor's point: `run.project_php_lowest` for the project floor, the solve PHP `run.php_window.target.php` (X.Y.99 of `run.target_php` when the window is null) for the target floor. Prose, not contract; key on the fields it is rendered from.",
                     "type": "string",
                     "x-rendered-from": [
                         "flags[].signal_ids",
@@ -11432,7 +11363,10 @@
                         "flags[].degree.liveness_complete",
                         "security",
                         "branch",
-                        "score.terms"
+                        "score.terms",
+                        "run.project_php_lowest",
+                        "run.target_php",
+                        "run.php_window.target.php"
                     ],
                     "minLength": 1
                 }
@@ -17719,7 +17653,7 @@
                     "$ref": "#/definitions/years"
                 },
                 "newest_release_at_least": {
-                    "description": "True when the newest branch's highest tag has no trusted release date: `newest_release` is then the date of a commit its tags share, a lower bound, and `newest_years` an upper bound. The summary reads \"(on or after {date}, the date of a commit its tags share)\".",
+                    "description": "True when `newest_version` is the newest branch's highest tag and that tag has no trusted release date: `newest_release` is then the date of a commit its tags share, a lower bound, and `newest_years` an upper bound. False when S8 quotes a lower tag with its own date. The summary reads \"(on or after {date}, the date of a commit its tags share)\".",
                     "type": "boolean"
                 },
                 "floor_php": {
@@ -17825,7 +17759,7 @@
                     ]
                 },
                 "reachable_release_at_least": {
-                    "description": "True when the reachable branch's highest tag has no trusted release date: `reachable_release` is then the date of a commit its tags share, a lower bound, and `reachable_years` an upper bound. Null with `reachable_branch`.",
+                    "description": "True when `reachable_version` is the reachable branch's highest tag and that tag has no trusted release date: `reachable_release` is then the date of a commit its tags share, a lower bound, and `reachable_years` an upper bound. False when S8 quotes a lower tag with its own date. Null with `reachable_branch`.",
                     "type": [
                         "boolean",
                         "null"
@@ -21394,13 +21328,16 @@
                     "$ref": "#/definitions/level"
                 },
                 "summary": {
-                    "description": "The signal sentence, `SignalSentence`: S1–S6, S8 and S11 from their `data`, S7 from `data.packages[]`, S9 from `security` and the S9 rows, S10 from `data.unchecked[]` and, for `host_not_supported`, `activity.host`. Prose, not contract; key on the fields it is rendered from.",
+                    "description": "The signal sentence, `SignalSentence`: S1–S6, S8 and S11 from their `data` (S8's miss words also read the floor's point: `run.project_php_lowest`, or the solve PHP `run.php_window.target.php`, X.Y.99 of `run.target_php` when the window is null), S7 from `data.packages[]`, S9 from `security` and the S9 rows, S10 from `data.unchecked[]` and, for `host_not_supported`, `activity.host`. Prose, not contract; key on the fields it is rendered from.",
                     "type": "string",
                     "x-rendered-from": [
                         "signals[].data",
                         "security",
                         "branch",
-                        "activity.host"
+                        "activity.host",
+                        "run.project_php_lowest",
+                        "run.target_php",
+                        "run.php_window.target.php"
                     ]
                 },
                 "data": {

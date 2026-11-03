@@ -228,8 +228,10 @@ final class Libyears
      * The footer line: docs/verdicts.md#libyears shows it. Items join with ` · ` like the counts
      * line, so the table folds between items, not inside one. `%F`, not `%f`: the decimal point
      * must not follow the process locale, which another plugin in the Composer process can set.
+     *
+     * @param ?callable(string): string $name writes a package name, as in {@see \Lockrot\Output\RunFooter::depth()}
      */
-    public function line(): string
+    public function line(?callable $name = null): string
     {
         $packages = $this->measured + $this->unmeasuredCount();
         if ($this->measured === 0) {
@@ -248,7 +250,7 @@ final class Libyears
         return implode(' · ', [
             $head,
             \sprintf('%.1F from direct requirements', $this->direct),
-            \sprintf('furthest behind %s %s at %.1F%s', $worst->package(), $worst->version(), $behind, $worst->isLibyearsAtLeast() ? ' or more' : ''),
+            \sprintf('furthest behind %s %s at %.1F%s', $name === null ? $worst->package() : $name($worst->package()), $worst->version(), $behind, $worst->isLibyearsAtLeast() ? ' or more' : ''),
         ]);
     }
 

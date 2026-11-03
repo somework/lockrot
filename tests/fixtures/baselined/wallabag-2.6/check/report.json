@@ -1468,7 +1468,7 @@
             }
         ],
         "not_applied": [],
-        "text": "gate: fails \u00b7 --fail-on=high \u00b7 46 findings fail it; 38 reach it and are known to the baseline \u00b7 target php 8.4 (--target-php)"
+        "text": "gate: fails \u00b7 --fail-on=high \u00b7 46 findings fail it; 38 reach it and the baseline exempts them \u00b7 target php 8.4 (--target-php)"
     },
     "security": {
         "check": "complete",
@@ -23908,7 +23908,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+                    "summary": "the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -24273,7 +24273,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+                    "summary": "the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -25504,7 +25504,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+                    "summary": "the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -25892,7 +25892,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+                    "summary": "the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {

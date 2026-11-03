@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support;
 
+use Composer\Downloader\TransportException;
 use Composer\Json\JsonFile;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
@@ -15,6 +16,7 @@ use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\PhpWindow;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Clock;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
@@ -397,7 +399,7 @@ final class CaseHydrator
             SignalSet::default($clock, new Thresholds(), $targetPhp, PhpReleaseDates::load(), $projectPhp, $lock->platform()['php'] ?? null),
             $clock,
             ($activity['reason'] ?? null) === NotCheckedRule::OFFLINE,
-            self::advisoryLoader($packages, self::advisories(\is_array($inputs['other_advisories'] ?? null) ? $inputs['other_advisories'] : []), \is_string($run['advisories_unchecked'] ?? null) ? $run['advisories_unchecked'] : null),
+            self::advisoryLoader($packages, self::advisories(\is_array($inputs['other_advisories'] ?? null) ? $inputs['other_advisories'] : []), \is_string($run['advisories_unchecked'] ?? null) ? $run['advisories_unchecked'] : null, self::advisoryFailures($run)),
             null,
             self::abandonedIgnore(\is_array($inputs['abandoned_ignore'] ?? null) ? $inputs['abandoned_ignore'] : null)
         );
@@ -836,7 +838,7 @@ final class CaseHydrator
         $api = [RepoRef::GITHUB => new GitHubApi(), RepoRef::GITLAB => new GitLabApi(), RepoRef::BITBUCKET => new BitbucketApi()][$repo->forge()];
         $pushedAt = $activity['pushed_at'] ?? null;
         $bodies = [
-            'repo' => ['archived' => $activity['archived'] ?? false, 'pushed_at' => $pushedAt],
+            'repo' => ['archived' => $activity['archived'] ?? null, 'pushed_at' => $pushedAt],
             'commits' => $repo->forge() === RepoRef::BITBUCKET ? ['values' => [['date' => $pushedAt]]] : [['committed_date' => $pushedAt]],
             'project' => ['archived' => $activity['archived'] ?? null],
         ];
@@ -875,16 +877,35 @@ final class CaseHydrator
     }
 
     /**
+     * @param array<mixed, mixed> $run
+     *
+     * @return list<array{composer_repository: string, reason: string, message: ?string}>
+     */
+    private static function advisoryFailures(array $run): array
+    {
+        $failures = [];
+        foreach (\is_array($run['advisory_failures'] ?? null) ? $run['advisory_failures'] : [] as $failure) {
+            self::assertArray($failure);
+            $failures[] = ['composer_repository' => JsonPath::stringAt($failure, ['composer_repository']), 'reason' => JsonPath::stringAt($failure, ['reason']), 'message' => self::optional($failure, 'message')];
+        }
+
+        return $failures;
+    }
+
+    /**
      * Each package's counted advisories, the ignored ones and the feeds' records: `records` counts
      * every advisory of the name on any version, else the advisories given count.
      *
      * @param array<string, array{advisories: list<Advisory>, records: ?int, ignored: list<IgnoredAdvisory>}> $packages
      * @param list<Advisory>                                                                                 $others    those on other versions of the case's package
-     * @param ?string                                                                                        $unchecked why the lookup did not run (`offline`), null when it answered
+     * @param ?string                                                                                        $unchecked why the lookup did not complete, null when it answered. Packagist answers a `lookup_failed` lookup, because another repository failed
+     * @param list<array{composer_repository: string, reason: string, message: ?string}>                   $failures  the repositories that failed beside the answered packagist one, as the model's run lists them
      */
-    private static function advisoryLoader(array $packages, array $others, ?string $unchecked): AdvisoryLoaderInterface
+    private static function advisoryLoader(array $packages, array $others, ?string $unchecked, array $failures): AdvisoryLoaderInterface
     {
         $repository = 'composer repo (https://repo.packagist.org)';
+        $answers = $unchecked === null || $unchecked === AdvisoryCoverage::LOOKUP_FAILED;
+        $failedFeeds = array_map(static fn (array $failure): AdvisoryFeed => AdvisoryFeed::failed($failure['composer_repository'], $failure['message']), $failures);
         $counted = [];
         $ignored = [];
         $every = [];
@@ -897,14 +918,19 @@ final class CaseHydrator
             $records = $facts['records'] ?? \count(array_unique(array_map(static fn (Advisory $advisory): string => $advisory->id(), $all)));
             $total += $records;
             $withRecords += $records === 0 ? 0 : 1;
-            $names[$name] = new AdvisoryNameCoverage($unchecked === null ? [AdvisoryFeed::answered($repository, $records)] : [], $unchecked === null ? $records : null, $unchecked);
+            $names[$name] = new AdvisoryNameCoverage($answers ? array_merge($failedFeeds, [AdvisoryFeed::answered($repository, $records)]) : [], $answers ? $records : null, $unchecked);
             $counted += $facts['advisories'] === [] ? [] : [$name => $facts['advisories']];
             $ignored += $facts['ignored'] === [] ? [] : [$name => $facts['ignored']];
             $every += $all === [] ? [] : [$name => $all];
         }
-        $repositories = [$unchecked === null ? AdvisoryRepository::of($repository, AdvisoryRepository::ANSWERED)->withRecords($total, $withRecords) : AdvisoryRepository::of($repository, AdvisoryRepository::NOT_ASKED, $unchecked)];
+        $failed = array_map(static fn (array $failure): AdvisoryRepository => AdvisoryRepository::of($failure['composer_repository'], AdvisoryRepository::FAILED, $failure['reason'], $failure['message']), $failures);
+        $repositories = array_merge($failed, [$answers ? AdvisoryRepository::of($repository, AdvisoryRepository::ANSWERED)->withRecords($total, $withRecords) : AdvisoryRepository::of($repository, AdvisoryRepository::NOT_ASKED, $unchecked)]);
         $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, $repositories, 0, $names);
-        $batch = new AdvisoryBatch($counted, [], $ignored, $every, $coverage, $unchecked === null);
+        $notes = array_map(static fn (array $failure): RunNote => RunNote::advisoriesUnavailable(
+            $failure['composer_repository'],
+            $failure['reason'] === AdvisoryCoverage::TRANSPORT ? new TransportException((string) $failure['message']) : new \RuntimeException((string) $failure['message'])
+        ), $failures);
+        $batch = new AdvisoryBatch($counted, $notes, $ignored, $every, $coverage, $unchecked === null);
 
         return new class ($batch) implements AdvisoryLoaderInterface {
             private AdvisoryBatch $batch;

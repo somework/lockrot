@@ -1,6 +1,6 @@
 ### lockrot: 72 of 271 packages flagged — critical 3 · high 38 · medium 10 · low 21
 
-**gate: fails** · --fail-on=high · 11 findings fail it; 30 reach it and are known to the baseline · target php 8.4 (--target-php)
+**gate: fails** · --fail-on=high · 11 findings fail it; 30 reach it and the baseline exempts them · target php 8.4 (--target-php)
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
@@ -77,14 +77,14 @@
 | low | `phar-io/version` | 3.2.1 | stale | `2 = (stale 8 ÷ 2 transitive) ÷ 2 dev (baseline: new package)`<br>**Do:** —<br>*stale:* last release 2022-02-21 (4.6 years ago) | phpunit/phpunit |
 | low | `react/cache` | v1.2.0 | stale | `2 = (stale 8 ÷ 2 transitive) ÷ 2 dev (baseline: new package)`<br>**Do:** —<br>*stale:* last release 2022-11-30 (3.9 years ago) | friendsofphp/php-cs-fixer |
 
-flags: abandoned 21 · silent 8 · pinned 4 · left-behind 23 · old-promise 18 · stale 15 · capped 1 · vulnerable 2 · 20 packages carry more than one
-depth: 51 of 72 flagged packages are named by no line of composer.json · direct 21 · 1 hop 30 · 2 hops 13 · 3 hops 6 · 4 hops 2 · 18 in packages-dev · deepest: `hoa/ustring` and `hoa/zformat`, 4 hops (`wallabag/rulerz` › `hoa/ruler` › `hoa/compiler` › `hoa/regex` › `hoa/ustring`)
-security: 2 vulnerable packages · 3 advisories: 1 high, 2 medium
-libyears: at least 264.2 behind across 265 of 271 packages · 132.7 from direct requirements · furthest behind sebastian/version 3.0.2 at 6.0
-pulled in by: `wallabag/rulerz-bundle` 15 · `wallabag/rulerz` 14 · `phpunit/phpunit` 13 · `wallabag/phpepub` 5 · `friendsofphp/php-cs-fixer` 3 · … and 27 more
-advisories: 271 packages asked · composer repo (http\://127.0.0.1) answered (187 on record for 53 packages)
-moves: checked with the solver of Composer 2.10.3 against the lock; ext-\*, lib-\*, php-debug, php-ipv6 and php-zts requirements not checked
-php: the lock installs on PHP 8.2 to 8.4; `lcobucci/clock` excludes 8.5
+flags: abandoned 21 · silent 8 · pinned 4 · left-behind 23 · old-promise 18 · stale 15 · capped 1 · vulnerable 2 · 20 packages carry more than one\
+depth: 51 of 72 flagged packages are named by no line of composer.json · direct 21 · 1 hop 30 · 2 hops 13 · 3 hops 6 · 4 hops 2 · 18 in packages-dev · deepest: `hoa/ustring` and `hoa/zformat`, 4 hops (`wallabag/rulerz` › `hoa/ruler` › `hoa/compiler` › `hoa/regex` › `hoa/ustring`)\
+security: 2 vulnerable packages · 3 advisories: 1 high, 2 medium\
+libyears: at least 264.2 behind across 265 of 271 packages · 132.7 from direct requirements · furthest behind `sebastian/version` 3.0.2 at 6.0\
+pulled in by: `wallabag/rulerz-bundle` 15 · `wallabag/rulerz` 14 · `phpunit/phpunit` 13 · `wallabag/phpepub` 5 · `friendsofphp/php-cs-fixer` 3 · … and 27 more\
+advisories: 271 packages asked · composer repo (http\://127.0.0.1) answered (187 on record for 53 packages)\
+moves: checked with the solver of Composer 2.10.3 against the lock; ext-\*, lib-\*, php-debug, php-ipv6 and php-zts requirements not checked\
+php: the lock installs on PHP 8.2 to 8.4; `lcobucci/clock` excludes 8.5\
 baseline: 47 known · 26 new · 2 worsened · 9 stale (lockrot-baseline.json)
 
 **Update now:** `composer update 'phpseclib/phpseclib:^3.0.57'`

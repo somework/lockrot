@@ -1,9 +1,9 @@
 {
     "sha256": {
         "resources/lockrot-baseline-2.schema.json": "b534ef575d0dbf8d4842ec1918c71f2aa066d1a74103fe17f8375d7e19e3677f",
-        "resources/lockrot-config-2.schema.json": "667609af1f7b8b2cedb45c9d2d39cf57be288a101379b70a151e4ffb98f04d06",
-        "resources/lockrot-explain-2.schema.json": "db6dd15762a4d34ef8ae1e8ea3ebb3edbc8fcaad86b701c05c2daae2984b5379",
-        "resources/lockrot-report-2.schema.json": "f06e405ec85b21c59d67e7ae52ff9e510af8aa1373b90c55102ba32e4e6fef6e",
+        "resources/lockrot-config-2.schema.json": "c2b4b739ea94ff4781df9c82ae954173b56e85693b555fd8c54de1a86f85d96c",
+        "resources/lockrot-explain-2.schema.json": "12ae8d6ec2b833a6cb3fb3d033e4c6a4c5db532044543ec44d78f447dcb769d6",
+        "resources/lockrot-report-2.schema.json": "60a64d6aae637aa94e6fa996feed5f3888e8f01f1d37f57b3bc73133cc837e40",
         "types/lockrot-report-2.d.ts": "5f3817a3d61fa64fa3249b37d7c20e358fbb0f3cb2a1f88b327b6816abefe5f0",
         "types/lockrot-report-2.known.d.ts": "c61ab34e0f788a3731160d114b9457047101611826fbf26cf9544399380ca344"
     }

@@ -2736,7 +2736,9 @@
               "target": true
             },
             "newest_years": 0.4,
-            "reachable_years": 0.4
+            "reachable_years": 0.4,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         },
         {
@@ -5482,7 +5484,7 @@
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -6624,7 +6626,9 @@
               "target": true
             },
             "newest_years": 0.1,
-            "reachable_years": 0.1
+            "reachable_years": 0.1,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -6925,7 +6929,9 @@
               "target": true
             },
             "newest_years": 0.7,
-            "reachable_years": 0.7
+            "reachable_years": 0.7,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -7237,7 +7243,9 @@
               "target": true
             },
             "newest_years": 0,
-            "reachable_years": 0
+            "reachable_years": 0,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -7565,13 +7573,15 @@
               "target": true
             },
             "newest_years": 0.7,
-            "reachable_years": 0.7
+            "reachable_years": 0.7,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         },
         {
           "id": "S10",
           "level": "info",
-          "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+          "summary": "the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it",
           "data": {
             "unchecked": [
               {
@@ -7901,7 +7911,9 @@
               "target": true
             },
             "newest_years": 0.3,
-            "reachable_years": 0.3
+            "reachable_years": 0.3,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -8221,7 +8233,9 @@
               "target": true
             },
             "newest_years": 0.3,
-            "reachable_years": 0.3
+            "reachable_years": 0.3,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -8575,13 +8589,15 @@
               "target": true
             },
             "newest_years": 0.7,
-            "reachable_years": 0.7
+            "reachable_years": 0.7,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         },
         {
           "id": "S10",
           "level": "info",
-          "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+          "summary": "the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it",
           "data": {
             "unchecked": [
               {
@@ -8928,13 +8944,15 @@
               "target": true
             },
             "newest_years": 0.7,
-            "reachable_years": 0.7
+            "reachable_years": 0.7,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         },
         {
           "id": "S10",
           "level": "info",
-          "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
+          "summary": "the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it",
           "data": {
             "unchecked": [
               {
@@ -9230,7 +9248,9 @@
               "target": true
             },
             "newest_years": 0.1,
-            "reachable_years": 0.1
+            "reachable_years": 0.1,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -11270,7 +11290,7 @@
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -11589,7 +11609,7 @@
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/exception requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/exception requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -11909,7 +11929,7 @@
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/consistency requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/consistency requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -12228,7 +12248,7 @@
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -12547,7 +12567,7 @@
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -12867,7 +12887,7 @@
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -13187,7 +13207,7 @@
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -13506,7 +13526,7 @@
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/compiler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -13826,7 +13846,7 @@
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz, wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -14144,7 +14164,7 @@
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/file requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/file requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -14464,7 +14484,7 @@
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/regex requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/regex requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -14785,7 +14805,7 @@
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/ruler requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -15104,7 +15124,7 @@
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/math requires it), wallabag/rulerz-bundle: replace or update wallabag/rulerz, wallabag/rulerz-bundle"
+        "text": "find a replacement (none named); it comes in through wallabag/rulerz (hoa/math requires it) and wallabag/rulerz-bundle: replace or update wallabag/rulerz and wallabag/rulerz-bundle"
       },
       "security": {
         "status": "clear",
@@ -17475,7 +17495,9 @@
               "target": true
             },
             "newest_years": 0,
-            "reachable_years": 0
+            "reachable_years": 0,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -17769,7 +17791,9 @@
               "target": true
             },
             "newest_years": 0.4,
-            "reachable_years": 0.6
+            "reachable_years": 0.6,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -18072,7 +18096,9 @@
               "target": true
             },
             "newest_years": 0.7,
-            "reachable_years": 0.7
+            "reachable_years": 0.7,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -18802,7 +18828,7 @@
           }
         ],
         "also": [],
-        "text": "raise require.php to >=8.4, then move lcobucci/clock to ^3.6.0 through lcobucci/jwt, scheb/2fa-trusted-device — clears capped; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 8.2 (a minor raise); the target php 8.4 runs it; what requires it must allow it; the newest release of lcobucci/jwt (5.6.1) no longer requires it"
+        "text": "raise require.php to >=8.4, then move lcobucci/clock to ^3.6.0 through lcobucci/jwt and scheb/2fa-trusted-device — clears capped; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 8.2 (a minor raise); the target php 8.4 runs it; what requires it must allow it; the newest release of lcobucci/jwt (5.6.1) no longer requires it"
       },
       "security": {
         "status": "clear",
@@ -24752,7 +24778,9 @@
               "target": true
             },
             "newest_years": 2.1,
-            "reachable_years": 2.1
+            "reachable_years": 2.1,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -37828,6 +37856,13 @@
           "blocks": [
             "S3",
             "S4"
+          ]
+        },
+        {
+          "check": "release_dates",
+          "reason": "undated_releases",
+          "blocks": [
+            "S2"
           ]
         }
       ],

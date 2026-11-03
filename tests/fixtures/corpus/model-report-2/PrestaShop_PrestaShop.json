@@ -4383,7 +4383,9 @@
               "target": true
             },
             "newest_years": 0.7,
-            "reachable_years": 0.7
+            "reachable_years": 0.7,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -4956,7 +4958,9 @@
               "target": true
             },
             "newest_years": 0.1,
-            "reachable_years": 0.1
+            "reachable_years": 0.1,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -5252,7 +5256,9 @@
               "target": true
             },
             "newest_years": 0.1,
-            "reachable_years": 0.1
+            "reachable_years": 0.1,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -11719,7 +11725,7 @@
           }
         ],
         "also": [],
-        "text": "move doctrine/collections to ^2.6 through beberlei/doctrineextensions, doctrine/orm, prestashop/ps_facetedsearch — clears left-behind; 2.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of doctrine/orm (3.7.5) and prestashop/ps_facetedsearch (5.1.0) still require it"
+        "text": "move doctrine/collections to ^2.6 through beberlei/doctrineextensions, doctrine/orm and prestashop/ps_facetedsearch — clears left-behind; 2.x needs php ^8.1, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of doctrine/orm (3.7.5) and prestashop/ps_facetedsearch (5.1.0) still require it"
       },
       "security": {
         "status": "clear",
@@ -11816,7 +11822,9 @@
               "target": true
             },
             "newest_years": 0.5,
-            "reachable_years": 0.7
+            "reachable_years": 0.7,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -12114,7 +12122,9 @@
             "reachable_php": null,
             "reachable_admits": null,
             "newest_years": 0.4,
-            "reachable_years": null
+            "reachable_years": null,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": null
           }
         }
       ],
@@ -12416,7 +12426,9 @@
               "target": true
             },
             "newest_years": 2.8,
-            "reachable_years": 2.8
+            "reachable_years": 2.8,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -28488,6 +28500,13 @@
             "S3",
             "S4"
           ]
+        },
+        {
+          "check": "release_dates",
+          "reason": "undated_releases",
+          "blocks": [
+            "S2"
+          ]
         }
       ],
       "unchecked_accepted": [],
@@ -38403,6 +38422,13 @@
           "blocks": [
             "S3",
             "S4"
+          ]
+        },
+        {
+          "check": "release_dates",
+          "reason": "undated_releases",
+          "blocks": [
+            "S2"
           ]
         }
       ],

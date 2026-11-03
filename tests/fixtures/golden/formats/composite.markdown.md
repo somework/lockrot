@@ -14,12 +14,12 @@
 | low | `symfony/polyfill-intl-idn` | v1.37.0 | vulnerable | `2 = vulnerable 2 [low advisory]`<br>**Do:** `composer update symfony/polyfill-intl-idn` (gets v1.43.0) — clears the advisory<br>*vulnerable:* 1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence<br>*age:* installed v1.37.0, release date not known (dated only by a commit its tags share); 1.x last released v1.43.0 2026-09-23 (less than three weeks ago), its newest release<br>*maintenance accepted (lockrot's list):* polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace | guzzlehttp/guzzle |
 | low | `friendsofsymfony/oauth2-php` | 1.3.1 | stale | `4 = stale 8 ÷ 2 transitive`<br>**Do:** —<br>*stale:* last release 2021-04-06 (5.5 years ago) | friendsofsymfony/oauth-server-bundle |
 
-flags: abandoned 1 · pinned 1 · left-behind 2 · old-promise 3 · stale 3 · vulnerable 5 · 5 packages carry more than one
-depth: 2 of 9 flagged packages are named by no line of composer.json · direct 7 · 1 hop 2 · deepest: `friendsofsymfony/oauth2-php` and `symfony/polyfill-intl-idn`, 1 hop (`friendsofsymfony/oauth-server-bundle` › `friendsofsymfony/oauth2-php`)
-security: 5 vulnerable packages · 29 advisories: 1 critical, 5 high, 12 medium, 2 unrated, 9 low
-libyears: 22.1 behind across 7 of 9 packages · 22.1 from direct requirements · furthest behind symfony/monolog-bridge v2.6.13 at 10.6
-pulled in by: `friendsofsymfony/oauth-server-bundle` 1 · `guzzlehttp/guzzle` 1
-advisories: 9 packages asked · packagist.org answered (49 on record for 6 packages)
+flags: abandoned 1 · pinned 1 · left-behind 2 · old-promise 3 · stale 3 · vulnerable 5 · 5 packages carry more than one\
+depth: 2 of 9 flagged packages are named by no line of composer.json · direct 7 · 1 hop 2 · deepest: `friendsofsymfony/oauth2-php` and `symfony/polyfill-intl-idn`, 1 hop (`friendsofsymfony/oauth-server-bundle` › `friendsofsymfony/oauth2-php`)\
+security: 5 vulnerable packages · 29 advisories: 1 critical, 5 high, 12 medium, 2 unrated, 9 low\
+libyears: 22.1 behind across 7 of 9 packages · 22.1 from direct requirements · furthest behind `symfony/monolog-bridge` v2.6.13 at 10.6\
+pulled in by: `friendsofsymfony/oauth-server-bundle` 1 · `guzzlehttp/guzzle` 1\
+advisories: 9 packages asked · packagist.org answered (49 on record for 6 packages)\
 php: the lock installs on PHP 7.2 to 8.5
 
 **Update now:** `composer update symfony/yaml symfony/polyfill-intl-idn`

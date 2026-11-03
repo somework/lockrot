@@ -19811,7 +19811,7 @@
                 {
                     "executionSuccessful": true,
                     "exitCode": 1,
-                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 46 findings fail it; 38 reach it and are known to the baseline \u00b7 target php 8.4 (--target-php)",
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 46 findings fail it; 38 reach it and the baseline exempts them \u00b7 target php 8.4 (--target-php)",
                     "properties": {
                         "gate": {
                             "fails": true,
@@ -19885,7 +19885,7 @@
                                 }
                             ],
                             "not_applied": [],
-                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 46 findings fail it; 38 reach it and are known to the baseline \u00b7 target php 8.4 (--target-php)"
+                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 46 findings fail it; 38 reach it and the baseline exempts them \u00b7 target php 8.4 (--target-php)"
                         },
                         "fail_on": "high",
                         "fail_on_source": "option",

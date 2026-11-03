@@ -93,7 +93,7 @@ final class RunGateText
         }
         $exempt = $gate->exemptByBaseline();
         if ($exempt > 0) {
-            $text .= '; '.($exempt === 1 ? '1 reaches it and is known to the baseline' : $exempt.' reach it and are known to the baseline');
+            $text .= '; '.($exempt === 1 ? '1 reaches it and the baseline exempts it' : $exempt.' reach it and the baseline exempts them');
         }
 
         return $text;

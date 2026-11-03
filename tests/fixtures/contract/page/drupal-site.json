@@ -30922,7 +30922,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (a release it reads carries no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -46448,7 +46448,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (a release it reads carries no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -46605,7 +46605,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S8 could not measure it",
+                    "summary": "the age of the package was not read (a release it reads is dated by a commit its tags share), so S8 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -46762,7 +46762,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S8 could not measure it",
+                    "summary": "the age of the package was not read (a release it reads is dated by a commit its tags share), so S8 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -47428,7 +47428,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (a release it reads carries no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -48082,7 +48082,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (a release it reads carries no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -48736,7 +48736,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (a release it reads carries no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -49390,7 +49390,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (a release it reads carries no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -49978,7 +49978,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 and S8 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (a release it reads carries no date), so S2 and S8 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -50145,7 +50145,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 and S8 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (a release it reads carries no date), so S2 and S8 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -50311,7 +50311,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (a release it reads carries no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
@@ -50477,7 +50477,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 and S8 could not measure it; the lock gives the installed release no date, so S5 could not judge it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (a release it reads carries no date), so S2 and S8 could not measure it; the lock gives the installed release no date, so S5 could not judge it",
                     "data": {
                         "unchecked": [
                             {
@@ -50646,7 +50646,7 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (its newest releases carry no date), so S2 could not measure it",
+                    "summary": "repository activity not checked (lockrot cannot ask git.drupalcode.org), so S3 and S4 could not be read; the age of the package was not read (a release it reads carries no date), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {

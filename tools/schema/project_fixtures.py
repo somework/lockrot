@@ -521,6 +521,10 @@ def inputs_of(case):
     inputs['dependents'] = dependents
     inputs['run'] = {'target_php': run['target_php'], 'project_php': run['project_php'], 'fail_on': run['fail_on'], 'include_dev': run['include_dev'],
                      'advisories_unchecked': f['security']['unchecked_reason']}
+    failures = [{k: r[k] for k in ('composer_repository', 'reason', 'message')}
+                for r in (run.get('advisory_lookup') or {}).get('repositories') or [] if r['outcome'] == 'failed']
+    if failures:
+        inputs['run']['advisory_failures'] = failures
     s7 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S7'), None) or {}
     below = {p['package']: p['chain'] for p in s7.get('packages', [])}
     related = case.get('related') or {}

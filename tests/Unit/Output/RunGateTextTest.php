@@ -51,7 +51,7 @@ final class RunGateTextTest extends TestCase
         $report = self::report(self::finding('a/stale', Verdict::STALE));
         $known = $report->withBaseline(BaselineComparison::compare(BaselineEntries::baseline([BaselineEntries::of('a/stale', '1.0.0', Verdict::STALE, '2026-01-01')]), $report, 'lockrot-baseline.json', ['a/stale']));
 
-        self::assertSame('gate: passes · --fail-on=stale · no finding fails it; 1 reaches it and is known to the baseline · target php 8.4 (--target-php)', self::text($known, 'stale'));
+        self::assertSame('gate: passes · --fail-on=stale · no finding fails it; 1 reaches it and the baseline exempts it · target php 8.4 (--target-php)', self::text($known, 'stale'));
     }
 
     public function testTwoKnownFindingsAndTwoValuesThatNothingFailsAreCountedWithoutValues(): void
@@ -60,7 +60,7 @@ final class RunGateTextTest extends TestCase
         $entries = [BaselineEntries::of('a/stale', '1.0.0', Verdict::STALE, '2026-01-01'), BaselineEntries::of('b/stale', '1.0.0', Verdict::STALE, '2026-01-01')];
         $known = $report->withBaseline(BaselineComparison::compare(BaselineEntries::baseline($entries), $report, 'lockrot-baseline.json', ['a/stale', 'b/stale']));
 
-        self::assertSame('gate: passes · --fail-on=stale,vulnerable · no finding fails it; 2 reach it and are known to the baseline · target php 8.4 (--target-php)', self::text($known, 'stale,vulnerable'));
+        self::assertSame('gate: passes · --fail-on=stale,vulnerable · no finding fails it; 2 reach it and the baseline exempts them · target php 8.4 (--target-php)', self::text($known, 'stale,vulnerable'));
     }
 
     public function testAGenerateRunSaysHowManyFindingsReachIt(): void

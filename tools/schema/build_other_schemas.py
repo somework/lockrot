@@ -59,6 +59,12 @@ PROSE = 'prose, not contract; key on the fields'
 
 
 # helpers
+def explain_run_relations(relations, window_keys, kept):
+    """report-2's run relations without those that read a key of `php_window` that explain-2 does not carry."""
+    dropped = ['"%s"' % k for k in window_keys if k not in kept]
+    return [r for r in relations if not any(k in json.dumps(r) for k in dropped)]
+
+
 def ref(name, desc=None):
     out = {}
     if desc:
@@ -672,6 +678,7 @@ def explain_schema():
         'oneOf': [{'description': 'The platform PHP of the lock and the target PHP against the window.', 'type': 'object', 'required': ['platform_override', 'target'],
                    'properties': {k: copy.deepcopy(window['oneOf'][0]['properties'][k]) for k in ('platform_override', 'target')}}, {'type': 'null'}]}
     D['explainRun']['required'].append('php_window')
+    D['explainRun']['allOf'] = explain_run_relations(D['explainRun']['allOf'], list(window['oneOf'][0]['properties']), ('platform_override', 'target'))
     lock = strip_optional(copy.deepcopy(E1['properties']['lock']))
     lock['properties']['php']['description'] = lock['properties']['php'].get('description', 'The entry\'s php requirement, null when it has none.')
     for k, dsc in [('dev', 'Whether the entry is in packages-dev.'), ('branch_snapshot', 'Whether the installed version is a branch snapshot.'),
@@ -702,8 +709,10 @@ def explain_schema():
         '$schema': DRAFT,
         'id': 'https://lockrot.dev/schema/explain-2.json',
         'title': 'lockrot explanation',
-        'description': ('The document `composer lockrot --explain=vendor/package --format=json` prints (explain-2, lockrot 0.14): the finding exactly as '
-                        'report-2 carries it, everything it was read from, and the run block every field of `run.score_model` refers to '
+        'description': ('The document `composer lockrot --explain=vendor/package --format=json` prints (explain-2, lockrot 0.14): the finding as '
+                        'report-2 carries it, except that explain reads no baseline: `finding.baseline` is null and `finding.gate` is decided as if no '
+                        'baseline existed, so a finding that the baseline exempts in the report can read `gate.fails` true here. The document also carries '
+                        'everything the finding was read from, and the run block every field of `run.score_model` refers to '
                         '(§7.7, §8.3). Every human string in it is a rendering of fields in the same object or in `run` (§7.11): '
                         'strings carry `x-rendered-from`, and no consumer parses them. Objects are open: a field added later validates against this '
                         'file unchanged. The number in the id changes only when a field is removed, renamed, made required or narrowed, or a closed set changes. Open sets carry a `pattern` and '
@@ -841,8 +850,9 @@ def config_schema():
     }
     ign = s['properties']['ignore']
     ign['description'] = ('The allowlist of the project: each entry accepts maintenance flags of the packages it matches, with a reason. An accepted '
-                          'flag is listed, muted, weighs 0 and reaches no gate. An entry never accepts an advisory. Accept advisories in the audit policy '
-                          'of Composer (`config.audit.ignore` on 2.4 to 2.9, `config.policy.advisories` on 2.10 and later), which `composer audit` reads too.')
+                          'flag is listed, muted, weighs 0 and reaches no gate. An entry never accepts an advisory. Accept advisories in the policy '
+                          'of Composer for advisories (`config.policy.advisories`, which Composer 2.10 and later also fills from the legacy '
+                          '`config.audit.ignore`), which `composer audit` reads too.')
     item = ign['items']
     item['description'] = 'One allowlist entry.'
     item['properties']['package']['description'] = 'The package name or a pattern with `*` wildcards (`symfony/*`).'

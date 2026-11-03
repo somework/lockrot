@@ -532,7 +532,7 @@ final class NotCheckedRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2, Signal::S5, Signal::S8]]], JsonPath::decoded($signal->data())['unchecked']);
-        self::assertSame('the age of the package was not read (its newest releases carry no date), so S2 and S8 could not measure it; the lock gives the installed release no date, so S5 could not judge it', $signal->summary());
+        self::assertSame('the age of the package was not read (a release it reads carries no date), so S2 and S8 could not measure it; the lock gives the installed release no date, so S5 could not judge it', $signal->summary());
     }
 
     /** A highest tag with no `time` is a tag without a date, not a shared commit. */
@@ -613,7 +613,7 @@ final class NotCheckedRuleTest extends TestCase
         self::assertSame([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S2], NotCheckedRule::CAUSE_LOCK_UNDATED => [Signal::S5], NotCheckedRule::CAUSE_TAG_UNDATED => [Signal::S8]], self::releaseDatesCauses($signal));
         self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2, Signal::S5, Signal::S8]]], JsonPath::decoded($signal->data())['unchecked'], 'the cause stays out of the JSON');
         self::assertSame(
-            'the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it; the lock gives the installed release no date, so S5 could not judge it; the age of the package was not read (its newest releases carry no date), so S8 could not measure it',
+            'the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it; the lock gives the installed release no date, so S5 could not judge it; the age of the package was not read (a release it reads carries no date), so S8 could not measure it',
             $signal->summary()
         );
     }
@@ -637,7 +637,7 @@ final class NotCheckedRuleTest extends TestCase
         self::assertNotNull($signal);
         self::assertSame([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S8], NotCheckedRule::CAUSE_TAG_UNDATED => [Signal::S8]], self::releaseDatesCauses($signal), 'the highest branch first, whatever order the repository lists');
         self::assertSame([Signal::S8], JsonPath::arrayAt(JsonPath::decoded($signal->data()), ['unchecked', 0, 'blocks']));
-        self::assertSame('the age of the package was not read (its newest releases are dated by a commit their tags share), so S8 could not measure it; the age of the package was not read (its newest releases carry no date), so S8 could not measure it', $signal->summary());
+        self::assertSame('the age of the package was not read (a release it reads is dated by a commit its tags share), so S8 could not measure it; the age of the package was not read (a release it reads carries no date), so S8 could not measure it', $signal->summary());
     }
 
     public function testTheCausesOfS8FollowTheBranchesHighestFirst(): void

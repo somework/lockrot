@@ -1942,7 +1942,7 @@
           }
         ],
         "also": [],
-        "text": "find a maintained alternative: nothing released for 6.9 years; it comes in through pear/archive_tar, pear/pear-core-minimal: replace or update pear/archive_tar, or replace pear/pear-core-minimal; the newest release of pear/pear-core-minimal (v1.10.18) still requires it"
+        "text": "find a maintained alternative: nothing released for 6.9 years; it comes in through pear/archive_tar and pear/pear-core-minimal: replace or update pear/archive_tar, or replace pear/pear-core-minimal; the newest release of pear/pear-core-minimal (v1.10.18) still requires it"
       },
       "security": {
         "status": "clear",

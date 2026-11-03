@@ -23,11 +23,7 @@
    {
     "id": "stale",
     "role": "lead",
-    "baseline": {
-     "state": "known",
-     "since": "2026-06-01",
-     "covered_by": null
-    },
+    "baseline": null,
     "signal_ids": [
      "S2"
     ],
@@ -44,11 +40,7 @@
    {
     "id": "capped",
     "role": "corroborating",
-    "baseline": {
-     "state": "covered",
-     "since": "2026-06-01",
-     "covered_by": "stale"
-    },
+    "baseline": null,
     "signal_ids": [
      "S11"
     ],
@@ -328,46 +320,13 @@
    },
    "push_unmeasured": null
   },
-  "baseline": {
-   "status": "known",
-   "recorded": {
-    "lead": "stale",
-    "flags": {
-     "stale": {
-      "known_since": "2026-06-01"
-     }
-    },
-    "advisory_count": 0,
-    "first_seen": "2026-06-01",
-    "target_php": "8.4",
-    "fix_model": 1
-   },
-   "advisories_now": {
-    "known": 0,
-    "new": 0,
-    "re_rated": 0,
-    "fix_lost": 0
-   },
-   "worsened_by": []
-  },
+  "baseline": null,
   "gate": {
    "reaches_fail_on": false,
    "fails": false,
    "exempt_by": null,
    "by": [],
-   "basis": {
-    "score": 0,
-    "verdict": null,
-    "cap": 0,
-    "limited_by": "cap",
-    "new": {
-     "total": 0,
-     "exact": 0,
-     "rounded_down": false,
-     "terms": [],
-     "modifiers": []
-    }
-   }
+   "basis": null
   }
  },
  "lock": {

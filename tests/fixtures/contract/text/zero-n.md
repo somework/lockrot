@@ -6,10 +6,10 @@
 |---|---|---|---|---|---|
 | medium | `hyvor/php-json-exporter` | 0.0.3 | stale | `8 = stale 8`<br>**Do:** —<br>*stale:* last release 2023-04-11 (3.5 years ago) | direct |
 
-flags: stale 1
-depth: every flagged package is named in composer.json · direct 1
-libyears: 0.0 behind across the one package
-advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+flags: stale 1\
+depth: every flagged package is named in composer.json · direct 1\
+libyears: 0.0 behind across the one package\
+advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)\
 php: the lock installs on PHP 8.2 to 8.5
 
 <sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

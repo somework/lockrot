@@ -5786,7 +5786,9 @@
               "target": null
             },
             "newest_years": 0.1,
-            "reachable_years": 0.1
+            "reachable_years": 0.1,
+            "newest_release_at_least": false,
+            "reachable_release_at_least": false
           }
         }
       ],
@@ -6566,7 +6568,7 @@
           }
         ],
         "also": [],
-        "text": "find a replacement (none named); it comes in through laminas/laminas-captcha, laminas/laminas-http: replace laminas/laminas-captcha, laminas/laminas-http; the newest release of laminas/laminas-http (2.23.0) still requires it"
+        "text": "find a replacement (none named); it comes in through laminas/laminas-captcha and laminas/laminas-http: replace laminas/laminas-captcha and laminas/laminas-http; the newest release of laminas/laminas-http (2.23.0) still requires it"
       },
       "security": {
         "status": "clear",
@@ -26454,6 +26456,13 @@
             "S3",
             "S4"
           ]
+        },
+        {
+          "check": "release_dates",
+          "reason": "undated_releases",
+          "blocks": [
+            "S2"
+          ]
         }
       ],
       "unchecked_accepted": [],
@@ -27044,6 +27053,13 @@
           "blocks": [
             "S3",
             "S4"
+          ]
+        },
+        {
+          "check": "release_dates",
+          "reason": "undated_releases",
+          "blocks": [
+            "S2"
           ]
         }
       ],

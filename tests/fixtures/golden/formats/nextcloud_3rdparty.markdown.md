@@ -14,12 +14,12 @@
 | low | `microsoft/azure-storage-common` | 1.5.2 | stale | `4 = stale 8 ÷ 2 transitive`<br>**Do:** —<br>*stale:* last release 2021-10-09 (4.9 years ago); last push 2023-07-18 (3.2 years ago) | microsoft/azure-storage-blob |
 | low | `pear/pear_exception` | v1.0.2 | stale | `4 = stale 8 ÷ 2 transitive`<br>**Do:** —<br>*stale:* last release 2021-03-21 (5.5 years ago) | pear/archive\_tar and pear/pear-core-minimal |
 
-flags: abandoned 1 · silent 2 · stale 6
-depth: 4 of 9 flagged packages are named by no line of composer.json · direct 5 · 1 hop 4 · deepest: `cweagans/composer-configurable-plugin`, `microsoft/azure-storage-common`, `pear/console_getopt` and 1 more, 1 hop (`cweagans/composer-patches` › `cweagans/composer-configurable-plugin`)
-security: no vulnerable package · advisories not checked
-libyears: at least 47.5 behind across all 94 packages · 13.3 from direct requirements · furthest behind punic/punic 3.8.1 at 3.5
-pulled in by: `pear/archive_tar` 2 · `pear/pear-core-minimal` 2 · `cweagans/composer-patches` 1 · `microsoft/azure-storage-blob` 1
-advisories: 0 packages asked, 94 not asked
+flags: abandoned 1 · silent 2 · stale 6\
+depth: 4 of 9 flagged packages are named by no line of composer.json · direct 5 · 1 hop 4 · deepest: `cweagans/composer-configurable-plugin`, `microsoft/azure-storage-common`, `pear/console_getopt` and 1 more, 1 hop (`cweagans/composer-patches` › `cweagans/composer-configurable-plugin`)\
+security: no vulnerable package · advisories not checked\
+libyears: at least 47.5 behind across all 94 packages · 13.3 from direct requirements · furthest behind `punic/punic` 3.8.1 at 3.5\
+pulled in by: `pear/archive_tar` 2 · `pear/pear-core-minimal` 2 · `cweagans/composer-patches` 1 · `microsoft/azure-storage-blob` 1\
+advisories: 0 packages asked, 94 not asked\
 php: the lock installs on PHP 8.3 to 8.5; Composer solves at 8.3.0 from config.platform.php
 
 - note: Repository activity not checked for 3 packages on hosts lockrot cannot ask: codeberg.org (3). A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host.

@@ -29,12 +29,19 @@
   },
   "next_step": null,
   "security": {
-   "status": "clear",
-   "check": "complete",
-   "complete": true,
-   "unchecked_reason": null,
+   "status": "unchecked",
+   "check": "partial",
+   "complete": false,
+   "unchecked_reason": "lookup_failed",
    "records": 0,
    "feeds": [
+    {
+     "composer_repository": "composer repo (https://repo.example.org)",
+     "registry": null,
+     "answer": "failed",
+     "records": null,
+     "reason": "lookup_failed"
+    },
     {
      "composer_repository": "composer repo (https://repo.packagist.org)",
      "registry": "packagist.org",
@@ -46,7 +53,15 @@
    "ignored": [],
    "ignored_count": 0
   },
-  "checks_missing": [],
+  "checks_missing": [
+   {
+    "check": "advisories",
+    "reason": "lookup_failed",
+    "blocks": [
+     "S9"
+    ]
+   }
+  ],
   "checks_skipped": [],
   "unchecked_accepted": [],
   "maintenance_judged": true,
@@ -93,7 +108,27 @@
   "direct_dependents": [
    "web-auth/webauthn-lib"
   ],
-  "signals": [],
+  "signals": [
+   {
+    "id": "S10",
+    "level": "info",
+    "summary": "security advisories not checked in full (a Composer repository did not return them), so S9 may be incomplete",
+    "data": {
+     "unchecked": [
+      {
+       "check": "advisories",
+       "reason": "lookup_failed",
+       "blocks": [
+        "S9"
+       ]
+      }
+     ],
+     "blocks": [
+      "S9"
+     ]
+    }
+   }
+  ],
   "evidence": "",
   "allowlist_reason": null,
   "data_date": "2026-10-01T17:41:33+00:00",
@@ -914,6 +949,15 @@
    "packages_not_asked": 0,
    "other_repositories": 0,
    "repositories": [
+    {
+     "composer_repository": "composer repo (https://repo.example.org)",
+     "registry": null,
+     "outcome": "failed",
+     "reason": "transport",
+     "message": "The \"https://repo.example.org/api/security-advisories/\" file could not be downloaded (HTTP/2 503 )",
+     "packages_with_records": null,
+     "records": null
+    },
     {
      "composer_repository": "composer repo (https://repo.packagist.org)",
      "registry": "packagist.org",

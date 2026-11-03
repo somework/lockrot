@@ -102,6 +102,55 @@ final class CaseHydratorTest extends TestCase
         self::assertSame(['not_found', $cachedAt], [$activity['status'] ?? null, $activity['cached_at'] ?? null]);
     }
 
+    /** Case github-archived-unread‡ reads a GitHub answer without a boolean `archived`: lockrot skips S3 as `fetch_failed`. */
+    public function testAGitHubAnswerWithoutArchivedHydratesAsAFailedArchivedCheck(): void
+    {
+        $case = CaseHydrator::case('github-archived-unread‡');
+        self::assertNull(JsonPath::arrayAt($case, ['inputs', 'activity'])['archived'] ?? null, 'the case activity has no archived flag');
+
+        $finding = null;
+        foreach (JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::report($case)->toArray()), ['findings']) as $row) {
+            self::assertIsArray($row);
+            if (JsonPath::stringAt($row, ['package']) === JsonPath::stringAt($case, ['finding', 'package'])) {
+                $finding = $row;
+            }
+        }
+        self::assertNotNull($finding, 'the case package has a finding');
+
+        self::assertSame(
+            [['check' => 'repository_archived', 'reason' => 'fetch_failed', 'blocks' => ['S3']]],
+            JsonPath::arrayAt($finding, ['checks_skipped'])
+        );
+    }
+
+    /** Case partial-lookup‡ hydrates the advisory repositories and the feeds that the model's run and finding hold, failed ones included. */
+    public function testALookupFailedRunHydratesTheModelsRepositoriesAndFeeds(): void
+    {
+        $case = CaseHydrator::case('partial-lookup‡');
+        self::assertSame('lookup_failed', JsonPath::stringAt($case, ['finding', 'security', 'unchecked_reason']));
+
+        $report = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+        $finding = null;
+        foreach (JsonPath::arrayAt($report, ['findings']) as $row) {
+            self::assertIsArray($row);
+            if (JsonPath::stringAt($row, ['package']) === JsonPath::stringAt($case, ['finding', 'package'])) {
+                $finding = $row;
+            }
+        }
+        self::assertNotNull($finding, 'the case package has a finding');
+
+        self::assertSame(
+            self::lookupOf(JsonPath::arrayAt($case, ['run']), JsonPath::arrayAt($case, ['finding'])),
+            self::lookupOf(JsonPath::arrayAt($report, ['run']), $finding)
+        );
+        $model = JsonPath::decodeFile(__DIR__.'/../fixtures/schema/documents/cases/partial-lookup-dagger.json');
+        self::assertSame(
+            [JsonPath::arrayAt($model, ['notes']), $model['network_failures'] ?? null],
+            [JsonPath::arrayAt($report, ['notes']), $report['network_failures'] ?? null],
+            'a failed repository writes the run note of the model document'
+        );
+    }
+
     /**
      * Every case's recorded `finding`, with or without inputs, is a report-2 finding. It covers
      * nothing: its validations outlast the timeout of a mutation run, and they read no product code.
@@ -258,5 +307,26 @@ final class CaseHydratorTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         CaseHydrator::report(['id' => 'X', 'inputs' => null]);
+    }
+
+    /**
+     * @param array<mixed, mixed> $run
+     * @param array<mixed, mixed> $finding
+     *
+     * @return array<string, mixed> the security fields that the line reads, each repository's outcome and each feed's answer
+     */
+    private static function lookupOf(array $run, array $finding): array
+    {
+        $security = JsonPath::arrayAt($finding, ['security']);
+        $repositories = JsonPath::arrayAt($run, ['advisory_lookup', 'repositories']);
+        $feeds = JsonPath::arrayAt($security, ['feeds']);
+
+        return [
+            'check' => $security['check'] ?? null,
+            'unchecked_reason' => $security['unchecked_reason'] ?? null,
+            'records' => $security['records'] ?? null,
+            'repositories' => array_map(null, array_column($repositories, 'composer_repository'), array_column($repositories, 'outcome'), array_column($repositories, 'reason'), array_column($repositories, 'message')),
+            'feeds' => array_map(null, array_column($feeds, 'composer_repository'), array_column($feeds, 'answer'), array_column($feeds, 'reason')),
+        ];
     }
 }

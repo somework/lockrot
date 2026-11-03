@@ -7882,6 +7882,63 @@
             "text": "require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45) \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; Composer's solver checked it against the lock"
         }
     },
+    "github-archived-unread\u2021": {
+        "next_step": {
+            "kind": "find-alternative",
+            "source": "abandoned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "abandoned"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "transitive"
+            ],
+            "commands": [],
+            "through": [
+                {
+                    "package": "lorisleiva/laravel-search-string",
+                    "installed_version": "v1.3.0",
+                    "installed_requires": false,
+                    "newest_stable": {
+                        "version": "v1.3.0",
+                        "released": "2023-03-11T10:11:33+00:00"
+                    },
+                    "newest_requires": null,
+                    "newest_requires_unmeasured": "through_other_package",
+                    "local": false,
+                    "newest_is_installed": true
+                }
+            ],
+            "also": [],
+            "text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string"
+        }
+    },
     "gitlab-anon\u2021": {
         "next_step": {
             "kind": "find-alternative",
@@ -14311,6 +14368,176 @@
                 "at_most": false,
                 "assumes": [
                     "clears_hold"
+                ]
+            }
+        }
+    },
+    "partial-lookup\u2021": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "raise-php",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "12.x",
+            "version": "v12.69.0",
+            "newest": "v12.69.3",
+            "constraint": "^12.69.0",
+            "latest": null,
+            "php_check": {
+                "requires": "^8.2",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.2",
+                "raise_size": "minor"
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "target": null,
+                    "constraint": "^9.0",
+                    "holder": null
+                },
+                {
+                    "source": "package",
+                    "package": "pragmarx/google2fa-laravel",
+                    "version": "v2.2.0",
+                    "link": "require",
+                    "target": null,
+                    "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                    "holder": {
+                        "verdict": "ok",
+                        "lead": null,
+                        "flag_ids": [],
+                        "direct": true,
+                        "replacement": null,
+                        "next_step": null
+                    }
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-3r5d-mb8f-1qw9",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-w7xr-vk7n-rstm",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-8qx3-n5y5-vvnd",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-m5cs-t1y6-qpcs",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-mdq4-51ck-6kdq",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-d5tc-s1qs-h781",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves",
+                    "no_new_advisories"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "holders",
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.2",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "laravel/framework:^12.69.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laravel/framework",
+                    "v12.69.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "raise-php",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 6,
+            "fix_kind": "update",
+            "lowest": "v9.52.17",
+            "newest": "v9.52.22",
+            "held_by": [],
+            "if_applied": {
+                "total": 16,
+                "verdict": "high",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "no_new_advisories"
+                ]
+            },
+            "check": null
+        },
+        "move_in": "next_step",
+        "partial": {
+            "version": "v9.52.22",
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-w7xr-vk7n-rstm",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "clears_all": false,
+            "if_applied": {
+                "total": 16,
+                "verdict": "high",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "no_new_advisories"
                 ]
             }
         }

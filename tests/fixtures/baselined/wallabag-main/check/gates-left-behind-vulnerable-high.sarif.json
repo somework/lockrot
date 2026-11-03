@@ -8779,7 +8779,7 @@
                 {
                     "executionSuccessful": true,
                     "exitCode": 1,
-                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=left-behind,vulnerable-high \u00b7 16 findings fail it (left-behind 16, vulnerable-high 1); 40 reach it and are known to the baseline \u00b7 target php 8.4 (--target-php)",
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=left-behind,vulnerable-high \u00b7 16 findings fail it (left-behind 16, vulnerable-high 1); 40 reach it and the baseline exempts them \u00b7 target php 8.4 (--target-php)",
                     "properties": {
                         "gate": {
                             "fails": true,
@@ -8827,7 +8827,7 @@
                                 }
                             ],
                             "not_applied": [],
-                            "text": "gate: fails \u00b7 --fail-on=left-behind,vulnerable-high \u00b7 16 findings fail it (left-behind 16, vulnerable-high 1); 40 reach it and are known to the baseline \u00b7 target php 8.4 (--target-php)"
+                            "text": "gate: fails \u00b7 --fail-on=left-behind,vulnerable-high \u00b7 16 findings fail it (left-behind 16, vulnerable-high 1); 40 reach it and the baseline exempts them \u00b7 target php 8.4 (--target-php)"
                         },
                         "fail_on": "left-behind,vulnerable-high",
                         "fail_on_source": "option",

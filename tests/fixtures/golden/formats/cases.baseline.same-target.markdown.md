@@ -1,6 +1,6 @@
 ### lockrot: 55 of 60 packages flagged — critical 11 · high 21 · medium 16 · low 7
 
-**gate: fails** · --fail-on=high,unchecked · 32 findings fail it (high 31, unchecked 3); 2 reach it and are known to the baseline · target php 8.4 (--target-php)
+**gate: fails** · --fail-on=high,unchecked · 32 findings fail it (high 31, unchecked 3); 2 reach it and the baseline exempts them · target php 8.4 (--target-php)
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
@@ -65,13 +65,13 @@
 | ok | `doctrine/annotations` | 2.0.2 | ok | `0`<br>*abandoned marking ignored* (policy.abandoned: doctrine/\*): the annotations reader goes with the ORM 3 upgrade | mautic/core-lib |
 | ok | `scheb/2fa-google-authenticator` | v8.6.1 | ok | `0 (baseline: known)`<br>`gate 0 = min(0, 2 × 0) (the new facts bound it); new: 0`<br>checks missing: S2 (undated releases) | pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more |
 
-flags: abandoned 7 · silent 1 · pinned 5 · left-behind 18 · old-promise 13 · stale 9 · capped 7 · vulnerable 19 · 21 packages carry more than one
-depth: 22 of 55 flagged packages are named by no line of composer.json · direct 32 · 1 hop 15 · 2 hops 4 · 4 hops 1 · unreached 3 · deepest: `robrichards/xmlseclibs`, 4 hops (`mautic/core-lib` › `lightsaml/sp-bundle` › `lightsaml/symfony-bridge` › `lightsaml/lightsaml` › `robrichards/xmlseclibs`) · 1 more is named only in require-dev, which this run did not walk (pass --dev)
-security: 19 vulnerable packages · 88 advisories: 3 critical, 29 high, 40 medium, 3 unrated, 13 low
-libyears: at least 134.3 behind across 50 of 60 packages · 77.1 from direct requirements · furthest behind symfony/monolog-bridge v2.6.13 at 10.6
-pulled in by: `mautic/core-lib` 7 · `guzzlehttp/guzzle` 2 · `laravel/framework` 2 · `akaunting/laravel-apexcharts` 1 · `friendsofsymfony/user-bundle` 1 · … and 8 more
-advisories: 60 packages asked · packagist.org answered (291 on record for 24 packages)
-php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 11 packages that exclude it is not checked (the run checked no move)
+flags: abandoned 7 · silent 1 · pinned 5 · left-behind 18 · old-promise 13 · stale 9 · capped 7 · vulnerable 19 · 21 packages carry more than one\
+depth: 22 of 55 flagged packages are named by no line of composer.json · direct 32 · 1 hop 15 · 2 hops 4 · 4 hops 1 · unreached 3 · deepest: `robrichards/xmlseclibs`, 4 hops (`mautic/core-lib` › `lightsaml/sp-bundle` › `lightsaml/symfony-bridge` › `lightsaml/lightsaml` › `robrichards/xmlseclibs`) · 1 more is named only in require-dev, which this run did not walk (pass --dev)\
+security: 19 vulnerable packages · 88 advisories: 3 critical, 29 high, 40 medium, 3 unrated, 13 low\
+libyears: at least 134.3 behind across 50 of 60 packages · 77.1 from direct requirements · furthest behind `symfony/monolog-bridge` v2.6.13 at 10.6\
+pulled in by: `mautic/core-lib` 7 · `guzzlehttp/guzzle` 2 · `laravel/framework` 2 · `akaunting/laravel-apexcharts` 1 · `friendsofsymfony/user-bundle` 1 · … and 8 more\
+advisories: 60 packages asked · packagist.org answered (291 on record for 24 packages)\
+php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 11 packages that exclude it is not checked (the run checked no move)\
 baseline: 3 known · 49 new · 4 worsened · 0 stale (lockrot-baseline.json)
 
 **Update now:** `composer update phpoffice/phpspreadsheet robrichards/xmlseclibs symfony/http-foundation league/commonmark typo3/html-sanitizer symfony/yaml symfony/polyfill-intl-idn`

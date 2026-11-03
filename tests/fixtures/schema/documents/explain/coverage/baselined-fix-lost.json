@@ -311,11 +311,7 @@
         "held_by": [],
         "reason": "no_release_outside_range"
        },
-       "baseline": {
-        "state": "fix_lost",
-        "since": "2026-09-24",
-        "covered_by": null
-       }
+       "baseline": null
       },
       {
        "id": "PKSA-8zx5-v2nz-58pb",
@@ -341,11 +337,7 @@
         "held_by": [],
         "reason": null
        },
-       "baseline": {
-        "state": "known",
-        "since": "2026-09-24",
-        "covered_by": null
-       }
+       "baseline": null
       },
       {
        "id": "PKSA-dpx1-78wg-1kqs",
@@ -371,11 +363,7 @@
         "held_by": [],
         "reason": null
        },
-       "baseline": {
-        "state": "known",
-        "since": "2026-09-24",
-        "covered_by": null
-       }
+       "baseline": null
       },
       {
        "id": "PKSA-gw7n-z4yx-7xjt",
@@ -401,11 +389,7 @@
         "held_by": [],
         "reason": null
        },
-       "baseline": {
-        "state": "known",
-        "since": "2026-09-24",
-        "covered_by": null
-       }
+       "baseline": null
       },
       {
        "id": "PKSA-1tmc-rt7x-12w6",
@@ -431,11 +415,7 @@
         "held_by": [],
         "reason": null
        },
-       "baseline": {
-        "state": "known",
-        "since": "2026-09-24",
-        "covered_by": null
-       }
+       "baseline": null
       },
       {
        "id": "PKSA-3mcc-k66d-pydb",
@@ -461,11 +441,7 @@
         "held_by": [],
         "reason": null
        },
-       "baseline": {
-        "state": "known",
-        "since": "2026-09-24",
-        "covered_by": null
-       }
+       "baseline": null
       },
       {
        "id": "PKSA-fbvq-z33h-r2np",
@@ -491,11 +467,7 @@
         "held_by": [],
         "reason": null
        },
-       "baseline": {
-        "state": "known",
-        "since": "2026-09-24",
-        "covered_by": null
-       }
+       "baseline": null
       },
       {
        "id": "PKSA-xx6c-6d96-db2w",
@@ -521,11 +493,7 @@
         "held_by": [],
         "reason": null
        },
-       "baseline": {
-        "state": "known",
-        "since": "2026-09-24",
-        "covered_by": null
-       }
+       "baseline": null
       },
       {
        "id": "PKSA-kvv6-36cr-fkzb",
@@ -551,11 +519,7 @@
         "held_by": [],
         "reason": null
        },
-       "baseline": {
-        "state": "known",
-        "since": "2026-09-24",
-        "covered_by": null
-       }
+       "baseline": null
       },
       {
        "id": "PKSA-yd6k-t2gh-1m43",
@@ -581,11 +545,7 @@
         "held_by": [],
         "reason": null
        },
-       "baseline": {
-        "state": "known",
-        "since": "2026-09-24",
-        "covered_by": null
-       }
+       "baseline": null
       },
       {
        "id": "PKSA-2wrf-1xmk-1pky",
@@ -611,11 +571,7 @@
         "held_by": [],
         "reason": null
        },
-       "baseline": {
-        "state": "known",
-        "since": "2026-09-24",
-        "covered_by": null
-       }
+       "baseline": null
       },
       {
        "id": "PKSA-g9zw-qxh8-pq8w",
@@ -641,11 +597,7 @@
         "held_by": [],
         "reason": null
        },
-       "baseline": {
-        "state": "known",
-        "since": "2026-09-24",
-        "covered_by": null
-       }
+       "baseline": null
       },
       {
        "id": "PKSA-n14z-jjjg-g8vd",
@@ -671,11 +623,7 @@
         "held_by": [],
         "reason": null
        },
-       "baseline": {
-        "state": "known",
-        "since": "2026-09-24",
-        "covered_by": null
-       }
+       "baseline": null
       },
       {
        "id": "PKSA-sjvz-tbbr-vwth",
@@ -701,11 +649,7 @@
         "held_by": [],
         "reason": null
        },
-       "baseline": {
-        "state": "known",
-        "since": "2026-09-24",
-        "covered_by": null
-       }
+       "baseline": null
       },
       {
        "id": "PKSA-yhcn-xrg3-68b1",
@@ -731,11 +675,7 @@
         "held_by": [],
         "reason": null
        },
-       "baseline": {
-        "state": "known",
-        "since": "2026-09-24",
-        "covered_by": null
-       }
+       "baseline": null
       }
      ],
      "releases_read": true,
@@ -777,38 +717,7 @@
    },
    "push_unmeasured": null
   },
-  "baseline": {
-   "status": "worsened",
-   "recorded": {
-    "lead": null,
-    "flags": null,
-    "advisory_count": 15,
-    "first_seen": "2026-09-24",
-    "target_php": "8.4",
-    "fix_model": 1
-   },
-   "advisories_now": {
-    "known": 14,
-    "new": 0,
-    "re_rated": 0,
-    "fix_lost": 1
-   },
-   "worsened_by": [
-    {
-     "kind": "advisory",
-     "id": "PKSA-h8hf-ytnd-5t9q",
-     "why": "fix_lost",
-     "recorded": {
-      "severity": "critical",
-      "fix_kind": "update"
-     },
-     "now": {
-      "severity": "critical",
-      "fix_kind": "none"
-     }
-    }
-   ]
-  },
+  "baseline": null,
   "gate": {
    "reaches_fail_on": true,
    "fails": true,
@@ -825,32 +734,7 @@
      ]
     }
    ],
-   "basis": {
-    "score": 64,
-    "verdict": "critical",
-    "cap": 128,
-    "limited_by": "score",
-    "new": {
-     "total": 64,
-     "exact": 64,
-     "rounded_down": false,
-     "terms": [
-      {
-       "part": "security",
-       "flag": "vulnerable",
-       "role": "security",
-       "advisory": "PKSA-h8hf-ytnd-5t9q",
-       "severity": "critical",
-       "fix_kind": "none",
-       "weight": 32,
-       "multiplier": 2,
-       "points": 64,
-       "contribution": 64
-      }
-     ],
-     "modifiers": []
-    }
-   }
+   "basis": null
   }
  },
  "lock": {
