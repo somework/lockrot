@@ -372,12 +372,15 @@ maintainer.
       an X.0 release before its day, so add an X.0 date only after that release. Check the file
       before you record `docs/example-run.md`.
 
-    - Re-record `docs/example-run.md` with the command and the environment that the top of the
-      page names (`GITHUB_TOKEN`, `COLUMNS`, the snapshot). Run a PHAR that you build from the
-      release branch ([The PHAR](#the-phar)), with `LOCKROT_TODAY=<planned tag day>`. Set the
-      sentence that starts "Recorded on" to "Recorded on <planned tag day> with lockrot X.Y.Z".
-      Then run `ExampleRunQuotesTest`. Fix each page that quotes a line that the recording
-      changed. If the tag day moves, record the page again for the date commit.
+    - Re-record `docs/example-run.md` with a PHAR that you build from the release branch
+      ([The PHAR](#the-phar)):
+      `GITHUB_TOKEN=<token> python3 tools/release/example_run.py build/lockrot.phar <planned tag day>`.
+      The script runs the page's command on the two snapshots that the page names, with
+      `LOCKROT_TODAY` set to that day. It writes the table, the abridged report, the clean run and
+      the sentence "Recorded on <day> with lockrot X.Y.Z". Then run `ExampleRunQuotesTest`. It
+      fails unless the page names `Version::STRING` and the day of its CHANGELOG heading. Fix each
+      page that quotes a line that the recording changed. If the tag day moves, record the page
+      again for the date commit.
 
     - Copy every `resources/lockrot-*.schema.json` file to
       `tests/fixtures/schema-evolution/schemas/X.Y.Z/` and pin their sha256 in `RELEASED_SCHEMAS`

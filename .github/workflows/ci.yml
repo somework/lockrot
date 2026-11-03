@@ -382,7 +382,8 @@ jobs:
       # The pull-request mutation gate and its shard configuration, also stdlib-only Python.
       - run: python -m compileall -q tools/mutation
       - run: python -m unittest discover -s tools/mutation/tests -t tools/mutation/tests
-      # The version-bump check of a release pull request, also stdlib-only Python.
+      # The release tools, also stdlib-only Python. The example-run recorder's test runs a stand-in
+      # PHAR with the runner's PHP.
       - run: python -m compileall -q tools/release
       - run: python -m unittest discover -s tools/release/tests -t tools/release/tests
   # The TypeScript contract of report-2 (types/, tools/schema/ts/emit_dts.py) and a second JSON

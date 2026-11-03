@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -30,6 +31,43 @@ final class ExampleRunQuotesTest extends TestCase
         }
 
         self::assertSame([], $missing, 'verdicts.md quotes lines that docs/example-run.md does not hold');
+    }
+
+    public function testTheRecordingNamesOneVersionAndOneDay(): void
+    {
+        [$day, $version, $page] = self::recording();
+        preg_match('/```json\n(.*?)\n```/s', $page, $json);
+        $report = json_decode((string) preg_replace('/^(\s*)…$/mu', '$1"…"', $json[1] ?? ''), true);
+
+        self::assertSame($version, $report['lockrot']['version'] ?? null, 'the JSON block of docs/example-run.md is of another lockrot');
+        self::assertStringStartsWith($day.'T', (string) ($report['generated_at'] ?? ''), 'the JSON block of docs/example-run.md is of another day');
+        self::assertSame(2, substr_count($page, 'Data as of '.$day.' '), 'the table and the clean run of docs/example-run.md are of the day that the page names');
+    }
+
+    /**
+     * A recording ahead of the release names a later version. The release pull request sets
+     * Version::STRING and its dated CHANGELOG heading, and the page then needs that day.
+     */
+    public function testTheRecordingIsOfTheReleaseOnItsDay(): void
+    {
+        [$day, $version] = self::recording();
+
+        if ($version !== Version::STRING) {
+            self::assertTrue(version_compare($version, Version::STRING, '>'), 'docs/example-run.md is a recording of lockrot '.$version.', older than '.Version::STRING.': re-record it');
+
+            return;
+        }
+        preg_match('/^## \['.preg_quote($version, '/').'\] - (\d{4}-\d{2}-\d{2})$/m', (string) file_get_contents(__DIR__.'/../../CHANGELOG.md'), $heading);
+        self::assertSame($heading[1] ?? null, $day, 'record docs/example-run.md on the day of the CHANGELOG heading of '.$version.' (tools/release/example_run.py)');
+    }
+
+    /** @return array{string, string, string} the day, the version and the page */
+    private static function recording(): array
+    {
+        $page = (string) file_get_contents(self::DOCS.'example-run.md');
+        self::assertSame(1, preg_match('/Recorded\s+on\s+(\d{4}-\d{2}-\d{2})\s+with\s+lockrot\s+(\d+\.\d+\.\d+)\s/', $page, $recorded));
+
+        return [$recorded[1], $recorded[2], $page];
     }
 
     /** @return list<string> the lines of each code block that follows a sentence naming the example run */
