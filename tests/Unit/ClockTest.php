@@ -184,4 +184,21 @@ final class ClockTest extends TestCase
         self::assertGreaterThanOrEqual($before, Clock::fromEnvironment([])->now()->getTimestamp());
         self::assertGreaterThanOrEqual($before, Clock::fromEnvironment(['LOCKROT_TODAY' => ''])->now()->getTimestamp());
     }
+
+    /** A real-clock test: LOCKROT_TODAY pins the ages, and an answer stored in the shared HTTP cache carries the real time. */
+    public function testAClockThatLockrotTodayPinsStampsAFetchWithTheRealTime(): void
+    {
+        $before = time();
+
+        $stamp = Clock::fromEnvironment(['LOCKROT_TODAY' => '2030-01-01'])->fetchTime()->getTimestamp();
+
+        self::assertGreaterThanOrEqual($before, $stamp);
+        self::assertLessThanOrEqual(time(), $stamp);
+    }
+
+    public function testAFixedClockStampsAFetchWithItsOwnTime(): void
+    {
+        self::assertSame('2026-09-14T00:00:00+00:00', Clock::fixed('2026-09-14')->fetchTime()->format(\DATE_ATOM));
+        self::assertGreaterThanOrEqual(time() - 1, (new Clock())->fetchTime()->getTimestamp());
+    }
 }

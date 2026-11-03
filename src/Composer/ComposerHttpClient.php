@@ -216,7 +216,7 @@ final class ComposerHttpClient implements HttpClientInterface
                 // Composer's downloader throws a TypeError on a URL without a host, which would end the run,
                 // and without curl it reads a file:// URL from the disk.
                 if (!\in_array(strtolower((string) parse_url($target, \PHP_URL_SCHEME)), ['http', 'https'], true) || (string) parse_url($target, \PHP_URL_HOST) === '') {
-                    $results[$url] = HttpResult::failure($url, 'redirect to a URL that is not http or https with a host', $this->clock->now());
+                    $results[$url] = HttpResult::failure($url, 'redirect to a URL that is not http or https with a host', $this->clock->fetchTime());
                     $done();
 
                     return;
@@ -232,11 +232,11 @@ final class ComposerHttpClient implements HttpClientInterface
             $this->run($starts);
         }
         foreach ($stopped as $url) {
-            $results[$url] = HttpResult::failure($url, 'install-time budget spent', $this->clock->now());
+            $results[$url] = HttpResult::failure($url, 'install-time budget spent', $this->clock->fetchTime());
         }
         foreach ($urls as $url) {
             if (!isset($results[$url])) {
-                $results[$url] = HttpResult::failure($url, 'no response', $this->clock->now());
+                $results[$url] = HttpResult::failure($url, 'no response', $this->clock->fetchTime());
             }
         }
 
@@ -296,7 +296,7 @@ final class ComposerHttpClient implements HttpClientInterface
     {
         $this->downloader->add($target, $options)->then(
             function (Response $response) use ($url, &$results, $done): void {
-                $results[$url] = new HttpResult($url, $response->getStatusCode(), $response->getBody(), $this->clock->now(), null, array_values($response->getHeaders()));
+                $results[$url] = new HttpResult($url, $response->getStatusCode(), $response->getBody(), $this->clock->fetchTime(), null, array_values($response->getHeaders()));
                 $done();
             },
             function (\Throwable $e) use ($url, &$results, $done): void {
@@ -313,7 +313,7 @@ final class ComposerHttpClient implements HttpClientInterface
 
         $body = $e instanceof TransportException ? $e->getResponse() : null;
 
-        return new HttpResult($url, $status, $body, $this->clock->now(), RepositoryUrl::inText($e->getMessage()), array_values(array_filter($headers, 'is_string')));
+        return new HttpResult($url, $status, $body, $this->clock->fetchTime(), RepositoryUrl::inText($e->getMessage()), array_values(array_filter($headers, 'is_string')));
     }
 
     /**
@@ -333,7 +333,7 @@ final class ComposerHttpClient implements HttpClientInterface
         for ($hop = 0; $hop <= self::MAX_REDIRECTS && $target !== ''; ++$hop) {
             // Each request blocks until it ends, so it takes only what the install-time budget has left.
             if ($this->deadline->isPast()) {
-                $results[$url] = HttpResult::failure($url, 'install-time budget spent', $this->clock->now());
+                $results[$url] = HttpResult::failure($url, 'install-time budget spent', $this->clock->fetchTime());
 
                 return;
             }
@@ -349,7 +349,7 @@ final class ComposerHttpClient implements HttpClientInterface
             $status = (int) RemoteFilesystem::findStatusCode($headers);
             $location = $status >= 300 && $status < 400 ? Response::findHeaderValue($headers, 'location') : null;
             if ($location === null || $location === '') {
-                $results[$url] = new HttpResult($url, $status, \is_string($body) ? $body : null, $this->clock->now(), null, $headers);
+                $results[$url] = new HttpResult($url, $status, \is_string($body) ? $body : null, $this->clock->fetchTime(), null, $headers);
 
                 return;
             }
@@ -361,7 +361,7 @@ final class ComposerHttpClient implements HttpClientInterface
             }
             $target = $next;
         }
-        $results[$url] = HttpResult::failure($url, 'too many redirects', $this->clock->now());
+        $results[$url] = HttpResult::failure($url, 'too many redirects', $this->clock->fetchTime());
     }
 
     /** A `Location` against the URL that answered it, as Composer's CurlDownloader reads it. */

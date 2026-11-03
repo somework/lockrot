@@ -289,6 +289,19 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame('2026-09-14', $results['https://a.example.com/1']->fetchedAt()->format('Y-m-d'));
     }
 
+    /** A real-clock test: a run with a future LOCKROT_TODAY stamps no answer with a future time. */
+    public function testAnAnswerUnderLockrotTodayCarriesTheRealFetchTime(): void
+    {
+        $io = new NullIO();
+        $config = new Config(false, sys_get_temp_dir());
+        $client = new ComposerHttpClient(new ScriptedDownloader($io, $config, ['https://a.example.com/1' => [200, '{"a":1}'], 'https://a.example.com/2' => [404, '']]), $io, $config, Clock::fromEnvironment(['LOCKROT_TODAY' => '2030-01-01']), null, true);
+
+        $results = $client->fetchAll(['https://a.example.com/1', 'https://a.example.com/2']);
+
+        self::assertLessThanOrEqual(time(), $results['https://a.example.com/1']->fetchedAt()->getTimestamp());
+        self::assertLessThanOrEqual(time(), $results['https://a.example.com/2']->fetchedAt()->getTimestamp());
+    }
+
     /**
      * A refused request keeps the transport's own status and message, so the caller can tell a 403
      * from "connection refused". Status 0 means "no HTTP answer to read a status from", which covers

@@ -12,6 +12,7 @@ final class Clock
     /** The year that every "years ago" and every libyears value counts in: 365.25 days. */
     public const SECONDS_PER_YEAR = 31557600;
     private \DateTimeImmutable $now;
+    private bool $pinnedByEnvironment = false;
 
     public function __construct(?\DateTimeImmutable $now = null)
     {
@@ -50,15 +51,27 @@ final class Clock
             throw $malformed;
         }
         try {
-            return self::fixed($today);
+            $clock = self::fixed($today);
         } catch (\Exception $e) {
             throw $malformed;
         }
+        $clock->pinnedByEnvironment = true;
+
+        return $clock;
     }
 
     public function now(): \DateTimeImmutable
     {
         return $this->now;
+    }
+
+    /**
+     * The time that a fetched answer carries. LOCKROT_TODAY pins the ages only: an answer in the
+     * shared HTTP cache carries the real time, so a later run does not read it as fresh past its TTL.
+     */
+    public function fetchTime(): \DateTimeImmutable
+    {
+        return $this->pinnedByEnvironment ? new \DateTimeImmutable('now', new \DateTimeZone('UTC')) : $this->now;
     }
 
     /**
