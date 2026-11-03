@@ -886,6 +886,7 @@ final class CaseHydrator
     {
         $repository = 'composer repo (https://repo.packagist.org)';
         $failed = 'composer repo (https://repo.example.org)';
+        $failure = 'The "https://repo.example.org/api/security-advisories/" file could not be downloaded (HTTP/2 503 )';
         $answers = $unchecked === null || $unchecked === AdvisoryCoverage::LOOKUP_FAILED;
         $counted = [];
         $ignored = [];
@@ -899,7 +900,7 @@ final class CaseHydrator
             $records = $facts['records'] ?? \count(array_unique(array_map(static fn (Advisory $advisory): string => $advisory->id(), $all)));
             $total += $records;
             $withRecords += $records === 0 ? 0 : 1;
-            $feeds = $unchecked === AdvisoryCoverage::LOOKUP_FAILED ? [AdvisoryFeed::failed($failed, null)] : [];
+            $feeds = $unchecked === AdvisoryCoverage::LOOKUP_FAILED ? [AdvisoryFeed::failed($failed, $failure)] : [];
             $names[$name] = new AdvisoryNameCoverage($answers ? array_merge($feeds, [AdvisoryFeed::answered($repository, $records)]) : [], $answers ? $records : null, $unchecked);
             $counted += $facts['advisories'] === [] ? [] : [$name => $facts['advisories']];
             $ignored += $facts['ignored'] === [] ? [] : [$name => $facts['ignored']];
@@ -907,7 +908,7 @@ final class CaseHydrator
         }
         $repositories = $answers ? [AdvisoryRepository::of($repository, AdvisoryRepository::ANSWERED)->withRecords($total, $withRecords)] : [AdvisoryRepository::of($repository, AdvisoryRepository::NOT_ASKED, $unchecked)];
         if ($unchecked === AdvisoryCoverage::LOOKUP_FAILED) {
-            array_unshift($repositories, AdvisoryRepository::of($failed, AdvisoryRepository::FAILED, AdvisoryCoverage::TRANSPORT));
+            array_unshift($repositories, AdvisoryRepository::of($failed, AdvisoryRepository::FAILED, AdvisoryCoverage::TRANSPORT, $failure));
         }
         $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, $repositories, 0, $names);
         $batch = new AdvisoryBatch($counted, [], $ignored, $every, $coverage, $unchecked === null);

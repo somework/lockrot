@@ -140,12 +140,13 @@ final class CaseHydratorTest extends TestCase
         self::assertNotNull($finding, 'the case package has a finding');
 
         self::assertSame(
-            ['partial', 'lookup_failed', 28, ['failed', 'answered']],
+            ['partial', 'lookup_failed', 28, ['failed', 'answered'], true],
             [
                 JsonPath::stringAt($finding, ['security', 'check']),
                 JsonPath::stringAt($finding, ['security', 'unchecked_reason']),
                 JsonPath::arrayAt($finding, ['security'])['records'] ?? null,
                 array_column(JsonPath::arrayAt($report, ['run', 'advisory_lookup', 'repositories']), 'outcome'),
+                \is_string(array_column(JsonPath::arrayAt($report, ['run', 'advisory_lookup', 'repositories']), 'message')[0] ?? null),
             ]
         );
     }
