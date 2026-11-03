@@ -38,7 +38,7 @@ From the run of a recorded project with a baseline, abridged:
       gate 36 = min(36, 2 × 32) (the score is lower); new: 32 = silent 32
 …
 baseline: 47 known · 26 new · 2 worsened · 9 stale (lockrot-baseline.json)
-gate: fails · --fail-on=high · 11 findings fail it; 30 reach it and are known to the baseline ·
+gate: fails · --fail-on=high · 11 findings fail it; 30 reach it and the baseline exempts them ·
 target php 8.4 (--target-php)
 ```
 
