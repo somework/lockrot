@@ -315,10 +315,11 @@ Annotations or Code Quality issues that do not land on the lock come from a proj
 subdirectory of the checkout. `github`, `sarif` and `gitlab` name the analysed lock by its path
 relative to the directory that lockrot runs in (`composer.lock`, `alt.lock` under
 `COMPOSER=alt.json`, `app/alt.lock` under `COMPOSER=app/alt.json`). When the lock lies outside that
-directory, they name it by its file name alone. For `github` and `gitlab`, GitHub and GitLab resolve
-that path against the checkout root, so `-d app` still names it `composer.lock`. `sarif` also
-carries the directory that the path is relative to, as `%SRCROOT%`
-([`--format=sarif`](#-formatsarif)).
+directory, they name it by its file name alone. GitHub, its code scanning included, and GitLab
+resolve that path against the repository root. `sarif` also carries the directory that the path
+is relative to, as `%SRCROOT%` ([`--format=sarif`](#-formatsarif)), but code scanning does not
+read it. So a run with `-d app` names the lock `composer.lock`, and each mark points at the
+`composer.lock` of the repository root, not at `app/composer.lock`.
 
 For a project in `app/`, run the [PHAR](phar.md#in-ci) from the checkout root with
 `COMPOSER=app/composer.json`, which names the lock `app/composer.lock`. The
@@ -395,7 +396,7 @@ The shape of one annotation:
   `(<severity> advisory)` after `vulnerable`. Key a script on the annotation's file and line, not
   its title. The level follows [How each format marks a finding](#how-each-format-marks-a-finding).
 - The message holds the score line, the move and the evidence of each counted flag. A transitive
-  finding's message ends with the direct requirements that reach it: `(via a, b)`
+  finding's message ends with the direct requirements that reach it: `(via a and b)`
   ([transitive exposure](verdicts.md#transitive-exposure)).
 - The report's notes, the stale-baseline note included, follow as `::notice title=lockrot::`
   lines.
@@ -451,7 +452,8 @@ steps:
 
 `originalUriBaseIds.%SRCROOT%` is the directory that the lock's path is relative to (the directory
 that lockrot runs in, or the lock's own when it lies outside it), as an absolute `file://` URL on
-the machine that ran lockrot. Code scanning resolves the lock's path against it. To publish the file
+the machine that ran lockrot. Code scanning does not read it: it resolves the lock's path against
+the repository root ([Where annotations point](#where-annotations-point)). To publish the file
 anywhere else, strip it first ([what a report reveals](schema.md#where-a-package-came-from)):
 
 ```bash
@@ -487,7 +489,7 @@ new or fixed against the target branch
 - `check_name` is `lockrot/<flag>`. `categories` is `["Security"]` for `vulnerable` and
   `["Bug Risk"]` for the other flags.
 - `description` opens with the package, the version, the grade and the score line, then the flag's
-  evidence and the move, and for a transitive package ends with `(via a, b)`:
+  evidence and the move, and for a transitive package ends with `(via a and b)`:
 
     ```text
     <package> <version> — finding <verdict> (<score line>) — <flag>: <evidence>. Do: <move>.

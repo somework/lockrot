@@ -26,12 +26,12 @@ then environment variable, then `extra.lockrot`, then the default.
 | Key | Type | Default | Effect | Option / variable |
 |---|---|---|---|---|
 | `fail-on` | string, or an array of strings | `none` | The values that make the run exit `1`: a grade, a flag, a `vulnerable` value and `unchecked`, at most one of each kind ([values](#fail-on-values), [choosing them](ci.md)) | `--fail-on`, `LOCKROT_FAIL_ON` |
-| `target-php` | string such as `"8.4"` | `config.platform.php`, else the running PHP | The PHP version the project runs on. S5 checks whether the installed release predates this PHP's major ([Old promise](verdicts.md#old-promise)), and S8 names only a branch that can install on it ([Within reach](verdicts.md#within-reach)). An advisory whose fix does not run on it is `blocked` and counts double ([Fix](verdicts.md#fix)). The move check solves at it ([The move check](verdicts.md#the-move-check)), and the PHP window says whether the lock installs on it ([The PHP window](verdicts.md#the-php-window)) | `--target-php`, `LOCKROT_TARGET_PHP` |
+| `target-php` | string, a major or a minor, such as `"8.4"` | `config.platform.php`, else the running PHP | The PHP version the project runs on. lockrot keeps only its minor: `8` reads as `8.0`, and a patch from another source reads as its minor. S5 checks whether the installed release predates this PHP's major ([Old promise](verdicts.md#old-promise)), and S8 names only a branch that can install on it ([Within reach](verdicts.md#within-reach)). An advisory whose fix does not run on it is `blocked` and counts double ([Fix](verdicts.md#fix)). The move check solves at it ([The move check](verdicts.md#the-move-check)), and the PHP window says whether the lock installs on it ([The PHP window](verdicts.md#the-php-window)) | `--target-php`, `LOCKROT_TARGET_PHP` |
 | `format` | string | `table` | What stdout gets: `table`, `json`, `github`, `sarif`, `gitlab`, `markdown` or `html` ([ci.md](ci.md)). The exit code is the same for every format | `--format` |
 | `include-dev` | boolean | `false` | Also check `packages-dev`. A development package's whole [score](verdicts.md#score) is halved | `--dev` (turns it on only) |
 | `baseline` | string | `lockrot-baseline.json` | The [baseline](baseline.md) file, relative to `composer.json` or absolute. A file that this key names must exist, except under `--generate-baseline`. The default file can be missing. Under `--generate-baseline`, a path named `composer.json` or `composer.lock`, the manifest or lock that `COMPOSER` names, or a name that Windows reads as another file (a trailing dot or space, a colon) is exit `2` | `--baseline` |
-| `release-warn-years` / `release-high-years` | integer ≥ 1 | `3` / `5` | Years without a stable release at which S2 ("no stable release") and S8 ("no stable release on the installed branch") reach `warn` / `high` ([signals](verdicts.md#the-signals)). lockrot refuses a high value below its warn value (exit 2) | — |
-| `push-warn-years` / `push-high-years` | integer ≥ 1 | `3` / `5` | Years without a push or commit at which S4 reaches `warn` / `high`. lockrot refuses a high value below its warn value (exit 2) | — |
+| `release-warn-years` / `release-high-years` | integer ≥ 1 | `3` / `5` | Years without a stable release at which S2 ("no stable release") and S8 ("no stable release on the installed branch") reach `warn` / `high` ([signals](verdicts.md#the-signals)). lockrot refuses a high value below its warn value (exit 2). An unset key counts as its default, so `"release-warn-years": 6` alone is exit 2 | — |
+| `push-warn-years` / `push-high-years` | integer ≥ 1 | `3` / `5` | Years without a push or commit at which S4 reaches `warn` / `high`. lockrot refuses a high value below its warn value (exit 2). An unset key counts as its default | — |
 | `ignore` | array | `[]` | Packages whose maintenance flags you accept, all of them or the ones an entry lists ([the allowlist](#the-allowlist)) | — |
 | `accept-unchecked` | array | `[]` | Checks that lockrot cannot run on a package and that no rerun can close, accepted with a reason ([accept-unchecked](#accept-unchecked)) | — |
 | `advisory-lookup` | `all` / `composer-repositories` | `all` | Which packages lockrot asks for security advisories: every package the run checks, or only the ones installed from a Composer repository ([Which advisories count](verdicts.md#which-advisories-count)) | — |
@@ -71,7 +71,7 @@ What each value fails the run on, and which to start with, is in [In CI](ci.md).
 |---|---|---|
 | `--format=<format>` | Output format for stdout. Values as for the `format` key | `format` |
 | `--fail-on=<values>` | The values that make this run exit `1`, comma-separated. Values as for the `fail-on` key | `LOCKROT_FAIL_ON`, `fail-on` |
-| `--target-php=<version>` | PHP version the project runs on: a major, a minor or a patch, such as `8.4`. A value with text after the version is exit `2` | `LOCKROT_TARGET_PHP`, `target-php` |
+| `--target-php=<version>` | PHP version the project runs on: a major, a minor or a patch, such as `8.4`. lockrot keeps only the minor: `8.4.2` reads as `8.4`, and `8` reads as `8.0`. The move check solves at the PHP that [its limits](verdicts.md#the-move-check) name. A value with text after the version is exit `2` | `LOCKROT_TARGET_PHP`, `target-php` |
 | `--dev` | Also check `packages-dev` | `include-dev` |
 | `--all` | List every checked package, not only graded ones (in `table`, under a final `not flagged` group) | — |
 | `--offline` | Never reach the network: repository metadata comes from Composer's cache, activity from lockrot's. lockrot reports a package that is missing from the cache as unavailable ([Working offline](internals.md#working-offline)) | — |
@@ -101,8 +101,11 @@ Exit codes are in [ci.md](ci.md#exit-codes).
 | `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN` | Personal access token, sent to gitlab.com only. `GITLAB_TOKEN` counts only when `CI_SERVER_URL`, `GITLAB_HOST`, `GL_HOST` and `GITLAB_URI` are each unset, empty or name gitlab.com. Without credentials, GitLab hides the archived flag (S3). A self-hosted instance uses Composer's `gitlab-token` or `gitlab-oauth` ([credentials](internals.md#repository-hosts-and-credentials)) |
 | `COMPOSER` | The manifest, as for every Composer command: `COMPOSER=alt.json composer lockrot` reads `extra.lockrot` from `alt.json`, analyses `alt.lock` and looks for the baseline next to `alt.json` |
 
-When `COMPOSER_ROOT_VERSION` is unset, lockrot sets it to `1.0.0` for the run, so Composer does not
-probe version control for the project's version.
+When `COMPOSER_ROOT_VERSION` is unset or empty, the PHAR and `vendor/somework/lockrot/bin/lockrot`
+set it to `1.0.0` for the run. Composer then does not probe version control for the project's
+version. Without a `version` in composer.json, the move check solves the root at `1.0.0`.
+`composer lockrot` keeps the root version that Composer guessed before lockrot started
+([limits of the move check](verdicts.md#the-move-check)).
 
 Variables that start with `LOCKROT_X_` are reserved for your own tooling
 ([reserved names](compatibility.md#names-reserved-for-extensions)).
@@ -266,6 +269,8 @@ The document also carries `lockrot`, `package`, `version` and `generated_at`. Th
 - **Errors.** A package that is not in the lock, or that is in `packages-dev` on a run without
   `--dev`, is exit `2`. So is `--explain` with `--output`.
 - **Baseline.** Not read, so a missing or unreadable baseline does not stop an explanation.
+  `finding.baseline` is null, and lockrot decides `finding.gate` as if no baseline existed. So a
+  finding that the baseline exempts in the report can read `gate.fails` true in the explanation.
 
 In the release-branch table, S8 does not measure a branch whose highest tag is `undated` or dated
 only by a `commit <date>` that other tags share ([Left behind](verdicts.md#left-behind),

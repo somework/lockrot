@@ -214,7 +214,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** a `gate:` line says whether the run fails, which `--fail-on` value and source
   decided it, and how many findings fail each value. json writes it as `gate.text`, with
   `failing_by`, `standing`, `failing_packages` and `not_applied`, each advisory gap that no
-  `unchecked` failure closes. A failing run with a report on stdout repeats the line on stderr.
+  `unchecked` failure closes. A failing run that writes `json`, `sarif`, `gitlab` or `html` to
+  stdout repeats the line on stderr.
   ([Reading the gate line](docs/ci.md#reading-the-gate-line))
 - **Config, json:** `extra.lockrot.accept-unchecked` accepts a check that lockrot did not run (a
   host it cannot ask, no advisory feed, a package from vcs or an unknown origin) by host,
@@ -317,17 +318,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the key a valid value, or drop it.
   ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 - **Breaking:** **Config:** a `release-high-years` below `release-warn-years`, or a
-  `push-high-years` below `push-warn-years`, exits 2. 0.13 read such thresholds. Action: set each
-  high threshold at or above its warn threshold.
+  `push-high-years` below `push-warn-years`, exits 2. An unset key counts as its default, so a
+  file that sets only `"release-warn-years": 6` exits 2. 0.13 read such thresholds. Action: set
+  each high threshold at or above its warn threshold.
   ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 - **Breaking:** **CLI:** a repeated `--fail-on`, `--baseline` or `--target-php`, or `--explain`
   with `--generate-baseline`, exits 2 before Composer starts. 0.13 took the last value, and ran
   the explanation with no baseline written. Action: give each option once, and run `--explain` in
   its own step. ([Exit codes](docs/ci.md#exit-codes))
 - **Breaking:** **CLI, Config, Install-time:** `--target-php` and `LOCKROT_TARGET_PHP` take a
-  major, a minor or a patch with nothing after it. Another value, such as `8.4-fpm`, exits 2, and
-  at install time the check is skipped. 0.13 read the version at its start. Action: pass the
-  version alone. ([CLI options](docs/configuration.md#cli-options))
+  major, a minor or a patch with nothing after it. lockrot keeps only the minor: `8.4.2` is `8.4`.
+  Another value, such as `8.4-fpm`, exits 2, and at install time the check is skipped. 0.13 read
+  the version at its start. Action: pass the version alone.
+  ([CLI options](docs/configuration.md#cli-options))
 - **Breaking:** **CLI:** a lock whose `packages`, `packages-dev`, `platform`, `platform-dev`,
   `platform-overrides` or `aliases` section Composer or lockrot cannot read, or that lists two
   names equal without case, exits 2. 0.13 read on past these sections. Action: run
@@ -439,8 +442,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   error that names the value. ([Testing hooks](docs/configuration.md#testing-hooks))
 - **All formats:** a lock URL with a long run of slashes does not stall the run.
 - **CLI:** a cached 404 from a run without a token does not hide a private repository from a later
-  run with a token. The activity cache keeps an answer per credential state, so the first run after
-  the upgrade fetches again each answer that it fetched without a token.
+  run with a token. The activity cache keeps an answer per credential state. A run with lockrot's
+  credentials uses its own cache key, so it reads no answer that 0.13 cached without credentials.
   ([Caching](docs/internals.md#caching))
 - **CLI:** the activity cache stores only a JSON answer or a 404, so a proxy page or a redirect
   does not replace a cached answer. A failed refetch of an expired 404 leaves the repository
