@@ -379,6 +379,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **json:** a `release_dates` gap that S1 or a whole-package allowlist entry drops from S10 shows in
   `checks_skipped[]` with the reason `undated_releases`, as the other dropped gaps do.
   ([What was not checked](docs/verdicts.md#what-was-not-checked))
+- **Breaking:** **CLI:** an empty `--target-php=` exits `2`, as an empty `--fail-on=` and
+  `--baseline=` do, and does not fall back to `LOCKROT_TARGET_PHP`, `extra.lockrot.target-php`,
+  `config.platform.php` or the running PHP. Action: if a CI step passes an unset variable, set it
+  or omit the option. ([Configuration](docs/configuration.md#validation))
+- **CLI:** the `--fail-on` help says that a finding which the baseline exempts does not fail.
+- **All formats:** the `gate:` line says `N reach it and the baseline exempts them`, not `are known
+  to the baseline`, because the count holds worsened findings that the baseline exempts too.
+- **markdown:** each footer line ends in a hard break, so a renderer with soft line breaks keeps
+  the lines apart. The `libyears:` line names its package as a code span, like the other footer
+  lines.
+- **All formats:** the S10 `release_dates` clause of S2 or S8 reads "a release it reads carries no
+  date" or "a release it reads is dated by a commit its tags share", because the clause can come
+  from one release, not from the newest ones. ([What was not checked](docs/verdicts.md#what-was-not-checked))
+- **Composer plugin:** the dist archive no longer ships `.claude/`, `.coderabbit.yaml` and
+  `bin/refresh-monorepo-parents`.
+- **PHAR:** the GitHub release of a tag carries its CHANGELOG section, with absolute links, and an
+  X.Y.0 release opens with a link to its upgrade page.
 
 ### Deprecated
 
@@ -476,6 +493,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   rule that the map holds at least one item. ([Baseline](docs/baseline.md))
 - **CLI:** a run on a lock with many direct requirements finishes faster. A large `--offline` run
   gains the most, because the dropped work took most of its time.
+- **Baseline:** a baseline file from a newer lockrot gets its own message, which asks for an
+  upgrade. The docs no longer advise deleting it, which would lose every `first_seen` date.
+  ([Baseline](docs/baseline.md#a-baseline-from-a-newer-lockrot))
+- **github, gitlab, sarif:** when a lock repeats a top-level `packages` or `packages-dev` key, an
+  annotation points at the entry that Composer reads.
+- **All formats:** the `left-behind` flag summary words the PHP miss at the PHP that S8 judged, so
+  it says `skips` where the S8 summary does.
+- **markdown:** a `|` in a footer code span prints as written, not as `\|`.
+- **CLI:** a UNC path keeps `//server/share` as its root, so a `..` in an `--output` or
+  `--baseline` target never climbs above the share.
+- **json:** `explain-2.json` holds no run relation on `php_window.target_fix`, a key that an
+  explanation does not carry. ([The explanation](docs/schema.md#the-explanation))
 
 ## [0.13.0] - 2026-10-01
 
