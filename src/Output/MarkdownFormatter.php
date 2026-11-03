@@ -179,11 +179,15 @@ final class MarkdownFormatter implements FormatterInterface
         };
         $baseline = $report->baseline();
         $lines = [];
-        foreach ([RunFooter::flags($report), RunFooter::depth($report, $name), RunFooter::security($report, false), $report->libyears()->line(), RunFooter::exposure($report, $name), RunFooter::advisories($report), RunFooter::moveCheck($report, $name), RunFooter::phpWindow($report, $name), $baseline === null ? null : $baseline->summaryLine()] as $line) {
+        foreach ([RunFooter::flags($report), RunFooter::depth($report, $name), RunFooter::security($report, false), $report->libyears()->line($name), RunFooter::exposure($report, $name), RunFooter::advisories($report), RunFooter::moveCheck($report, $name), RunFooter::phpWindow($report, $name), $baseline === null ? null : $baseline->summaryLine()] as $line) {
             if ($line !== null) {
                 $lines[] = strtr(self::text($line), $spans);
             }
         }
+        // A backslash before the line end is a hard break in CommonMark, so a renderer with soft
+        // breaks keeps the lines apart. self::text() doubles each backslash of the text before it.
+        $last = \count($lines) - 1;
+        $lines = array_map(static fn (string $line, int $index): string => $index < $last ? $line.'\\' : $line, $lines, array_keys($lines));
         $updateNow = RunFooter::updateNow($report);
         if ($updateNow !== null) {
             $lines[] = '';

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
+use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\MoveCheckRun;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunNote;
@@ -309,6 +310,34 @@ final class MarkdownFormatterTest extends TestCase
 
         self::assertStringContainsString('| `evil/a##\x5Berror]x` |', $out);
         self::assertStringNotContainsString('##[', $out);
+    }
+
+    public function testTheLibyearsLineNamesItsPackageAsACodeSpan(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([(new FindingBuilder())->withPackage('acme/old_name')->withVerdict(Verdict::ABANDONED)->withLibyears(LibyearsMeasurement::of(2.0))->withDataDate($at)->build()], [], $at, 1, 0);
+
+        $out = self::formatter()->format($report);
+
+        self::assertStringContainsString('furthest behind `acme/old_name` 1.0.0 at 2.0', $out);
+    }
+
+    /**
+     * A renderer with CommonMark soft breaks, such as a Markdown file, joins lines of one paragraph.
+     * A backslash at the end of a line is a hard break there and on GitHub.
+     */
+    public function testEachFooterLineButTheLastEndsInAHardBreak(): void
+    {
+        $out = self::formatter()->format(CaseHydrator::composite(), true);
+
+        $footer = array_values(array_filter(explode("\n", $out), static fn (string $line): bool => preg_match('/^(flags|depth|security|libyears|pulled in by|advisories|moves|php): /', $line) === 1));
+        self::assertGreaterThan(2, \count($footer), $out);
+        $last = array_pop($footer);
+        foreach ($footer as $line) {
+            self::assertMatchesRegularExpression('/(?<!\\\\)(?:\\\\\\\\)*\\\\$/', $line, 'an odd run of backslashes ends the line');
+        }
+        self::assertStringEndsNotWith('\\', $last);
+        self::assertStringContainsString($last."\n\n", $out, 'a blank line ends the footer block');
     }
 
     /**
