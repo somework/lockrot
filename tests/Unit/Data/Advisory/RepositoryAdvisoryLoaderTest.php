@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Data\Advisory;
 
 use Composer\Advisory\PartialSecurityAdvisory;
+use Composer\Downloader\TransportException;
 use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\FilterRepository;
@@ -814,6 +815,48 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         self::assertSame(1, $batch->coverage()->otherRepositories());
         self::assertSame([[AdvisoryCoverage::ANSWERED, null]], self::outcomes($batch));
+    }
+
+    /** Composer's FilterRepository does not ask its feed for a name that `only` or `exclude` keeps out. */
+    public function testANameThatAFilterKeepsOutOfTheOnlyFeedReadsNoFeed(): void
+    {
+        [$feed] = self::spy();
+
+        $batch = (new RepositoryAdvisoryLoader([new FilterRepository($feed, ['exclude' => ['acme/*']])]))->load(['acme/private' => '1.0.0', 'psr/log' => '1.0.0']);
+
+        $private = self::nameCoverage($batch, 'acme/private');
+        self::assertSame([[], null, AdvisoryCoverage::NO_FEED], [$private->feeds(), $private->records(), $private->reason()]);
+        self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 0], self::feed($batch, 'psr/log', 0));
+        self::assertNull(self::nameCoverage($batch, 'psr/log')->reason());
+    }
+
+    /** The failure of a feed that a filter keeps the name out of is not a failure of that name's lookup. */
+    public function testAFailedFeedThatAFilterKeepsANameOutOfLeavesThatNameAnswered(): void
+    {
+        $failing = new class () extends ArrayRepository implements AdvisoryProviderInterface {
+            public function getRepoName(): string
+            {
+                return 'failing repo';
+            }
+
+            public function hasSecurityAdvisories(): bool
+            {
+                return true;
+            }
+
+            public function getSecurityAdvisories(array $packageConstraintMap, bool $allowPartialAdvisories = false): array
+            {
+                throw new TransportException('The "https://failing.example/api/security-advisories/" file could not be downloaded');
+            }
+        };
+        [$feed] = self::spy();
+
+        $batch = (new RepositoryAdvisoryLoader([new FilterRepository($failing, ['only' => ['acme/*']]), $feed]))->load(['acme/private' => '1.0.0', 'psr/log' => '1.0.0']);
+
+        self::assertSame(AdvisoryCoverage::LOOKUP_FAILED, self::nameCoverage($batch, 'acme/private')->reason());
+        self::assertCount(1, self::nameCoverage($batch, 'psr/log')->feeds());
+        self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 0], self::feed($batch, 'psr/log', 0));
+        self::assertNull(self::nameCoverage($batch, 'psr/log')->reason());
     }
 
     public function testARepositoryWithoutAFeedLeavesTheLookupComplete(): void

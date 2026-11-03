@@ -178,10 +178,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         $notes = [];
         $checked = 0;
         $budgetSpent = false;
-        foreach ($this->repositories as $repository) {
-            if (!$repository instanceof AdvisoryProviderInterface || !self::isAdvisoryCapable($repository)) {
-                continue;
-            }
+        foreach ($this->capable() as $repository) {
             if ($budgetSpent || $this->deadline->isPast()) {
                 if (!$budgetSpent) {
                     $notes[] = RunNote::advisoriesNotChecked(RunNote::INSTALL_TIME_BUDGET, $checked);
@@ -236,6 +233,26 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
                 }
             }
         }
+    }
+
+    /**
+     * The repositories that {@see ask()} asks, in configured order: the index of each one is the
+     * index of its {@see AdvisoryRepository}.
+     *
+     * @return list<AdvisoryProviderInterface&RepositoryInterface>
+     */
+    private function capable(): array
+    {
+        return array_values(array_filter($this->repositories, static fn (RepositoryInterface $repository): bool => $repository instanceof AdvisoryProviderInterface && self::isAdvisoryCapable($repository)));
+    }
+
+    /**
+     * RepositoryManager::createRepository() moves `only` and `exclude` into FilterRepository's
+     * private state, which has no getter. Its getSecurityAdvisories() drops the names that they refuse.
+     */
+    private static function admits(RepositoryInterface $repository, string $name): bool
+    {
+        return !$repository instanceof FilterRepository || \Closure::bind(fn (): bool => $this->isAllowed($name), $repository, FilterRepository::class)();
     }
 
     /**
@@ -401,6 +418,8 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
     }
 
     /**
+     * A repository whose filter refuses the name is not asked for it, as for a repository without a feed.
+     *
      * @param list<AdvisoryRepository> $repositories
      * @param array<int, array<string, list<PartialSecurityAdvisory>>>                                                                               $answers
      */
@@ -409,6 +428,8 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         if ($notAsked !== null) {
             return new AdvisoryNameCoverage([], null, $notAsked);
         }
+        $sources = $this->capable();
+        $repositories = array_filter($repositories, static fn (int $index): bool => self::admits($sources[$index], $name), \ARRAY_FILTER_USE_KEY);
         $feeds = [];
         $ids = [];
         foreach ($repositories as $index => $repository) {
@@ -427,7 +448,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
 
     /**
      * @param list<AdvisoryFeed>                                $feeds
-     * @param list<AdvisoryRepository> $repositories
+     * @param array<int, AdvisoryRepository> $repositories
      */
     private static function incomplete(array $feeds, array $repositories, bool $unparseable): ?string
     {
