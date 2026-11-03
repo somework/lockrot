@@ -318,18 +318,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the key a valid value, or drop it.
   ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 - **Breaking:** **Config:** a `release-high-years` below `release-warn-years`, or a
-  `push-high-years` below `push-warn-years`, exits 2. An unset high key counts as its default, `5`,
-  so a file that sets only `"release-warn-years": 6` exits 2. 0.13 read such thresholds. Action:
-  set each high threshold at or above its warn threshold.
+  `push-high-years` below `push-warn-years`, exits 2. An unset key counts as its default, so a
+  file that sets only `"release-warn-years": 6` exits 2. 0.13 read such thresholds. Action: set
+  each high threshold at or above its warn threshold.
   ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 - **Breaking:** **CLI:** a repeated `--fail-on`, `--baseline` or `--target-php`, or `--explain`
   with `--generate-baseline`, exits 2 before Composer starts. 0.13 took the last value, and ran
   the explanation with no baseline written. Action: give each option once, and run `--explain` in
   its own step. ([Exit codes](docs/ci.md#exit-codes))
 - **Breaking:** **CLI, Config, Install-time:** `--target-php` and `LOCKROT_TARGET_PHP` take a
-  major, a minor or a patch with nothing after it. Another value, such as `8.4-fpm`, exits 2, and
-  at install time the check is skipped. 0.13 read the version at its start. lockrot keeps only
-  the minor: `8.4.2` reads as `8.4`, and `8` reads as `8.0`. Action: pass the version alone. ([CLI options](docs/configuration.md#cli-options))
+  major, a minor or a patch with nothing after it. lockrot keeps only the minor: `8.4.2` is `8.4`.
+  Another value, such as `8.4-fpm`, exits 2, and at install time the check is skipped. 0.13 read
+  the version at its start. Action: pass the version alone.
+  ([CLI options](docs/configuration.md#cli-options))
 - **Breaking:** **CLI:** a lock whose `packages`, `packages-dev`, `platform`, `platform-dev`,
   `platform-overrides` or `aliases` section Composer or lockrot cannot read, or that lists two
   names equal without case, exits 2. 0.13 read on past these sections. Action: run
