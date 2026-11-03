@@ -3,17 +3,20 @@
 
     GITHUB_TOKEN=<token> python3 tools/release/example_run.py <lockrot.phar> <YYYY-MM-DD>
 
-Runs the PHAR with LOCKROT_TODAY=<day> on a copy of each snapshot that the page names: the lock
-of the recorded run and the lock of the clean run. Each run gets an empty Composer home and cache,
-so no answer comes from a cache. Writes the table, the abridged JSON report and the clean run into
-their blocks, and the day and version into "Recorded on <day> with lockrot <version>"
-(CONTRIBUTING, "Cutting a release"). Standard library only, as tools/corpus.
+Runs the command of the page's bash block with LOCKROT_TODAY=<day> on a copy of each snapshot that
+the page links: the lock of the recorded run and the lock of the clean run. The clean run omits
+--output. Each run gets an empty Composer home and cache, so no answer comes from a cache. Refuses a
+report with a run note and a clean run that flags a package, because the page says that neither
+happened. Writes the table, the abridged JSON report and the clean run into their blocks, and the
+day and version into "Recorded on <day> with lockrot <version>" (CONTRIBUTING, "Cutting a
+release"). Standard library only, as tools/corpus.
 """
 
 import copy
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -27,7 +30,9 @@ CUT = '…'
 HEAD = {'exposure': 3, 'by_depth': 3}
 SCORE_MODEL_HEAD = 2
 RECORDED = re.compile(r'(Recorded\s+on\s+)(\S+)(\s+with\s+lockrot\s+)(\S+)')
-SNAPSHOT = re.compile(r'`(tests/fixtures/[^`]+)/composer\.lock`')
+SNAPSHOT = re.compile(r'\]\(https://github\.com/somework/lockrot/blob/main/(tests/fixtures/[^)\s]+)/composer\.lock\)')
+COMMAND = re.compile(r'```bash\nCOLUMNS=(\d+) php lockrot\.phar ([^\n]*)\n```')
+CLEAN_SUMMARY = ' · nothing flagged\n'
 DAY = re.compile(r'^\d{4}-\d{2}-\d{2}$')
 CLEAN = '\n## A clean run\n'
 
@@ -64,7 +69,7 @@ def snapshots(page: str) -> Tuple[str, str]:
     head, _, clean = page.partition(CLEAN)
     found = [SNAPSHOT.search(part) for part in (head.split('\n## ', 1)[0], clean)]
     if None in found:
-        raise RecordError('%s names no snapshot `tests/fixtures/<dir>/composer.lock` in its opening or its clean run' % PAGE)
+        raise RecordError('%s links no snapshot tests/fixtures/<dir>/composer.lock on main in its opening or its clean run' % PAGE)
     return found[0].group(1), found[1].group(1)
 
 
@@ -89,37 +94,58 @@ def splice(page: str, version: str, day: str, table: str, report: str, clean: st
     return command + '```bash\n' + rest + separator + replace_block(tail, 'text', clean)
 
 
-def run(phar: str, day: str, snapshot: str, root: str, work: str, arguments: List[str]) -> str:
+def command(page: str) -> Tuple[str, List[str]]:
+    found = COMMAND.search(page)
+    if found is None:
+        raise RecordError('%s has no ```bash block "COLUMNS=<n> php lockrot.phar <options>"' % PAGE)
+    arguments = shlex.split(found.group(2))
+    if not any(argument.startswith('--output=json:') for argument in arguments):
+        raise RecordError('the command of %s writes no --output=json:<file>' % PAGE)
+    return found.group(1), arguments
+
+
+def run(phar: str, day: str, columns: str, snapshot: str, root: str, work: str, arguments: List[str]) -> str:
     project = os.path.join(work, os.path.basename(snapshot))
     os.makedirs(project)
     for name in ('composer.json', 'composer.lock'):
         shutil.copyfile(os.path.join(root, snapshot, name), os.path.join(project, name))
     composer = tempfile.mkdtemp(dir=work)
-    env = dict(os.environ, COLUMNS='120', LOCKROT_TODAY=day, COMPOSER_HOME=composer, COMPOSER_CACHE_DIR=os.path.join(composer, 'cache'))
+    env = dict(os.environ, COLUMNS=columns, LOCKROT_TODAY=day, COMPOSER_HOME=composer, COMPOSER_CACHE_DIR=os.path.join(composer, 'cache'))
     done = subprocess.run(['php', phar] + arguments, cwd=project, env=env, capture_output=True, text=True)
     if done.returncode != 0:
         raise RecordError('lockrot exited %d on %s: %s' % (done.returncode, snapshot, done.stderr.strip()))
     return done.stdout
 
 
+def report_of(path: str) -> Any:
+    with open(path, encoding='utf-8') as handle:
+        report = json.load(handle)
+    if report.get('notes'):
+        raise RecordError('the report has run notes %s, and the page says that every source answered' % [note.get('code') for note in report['notes']])
+    return report
+
+
 def record(phar: str, day: str, root: str) -> None:
     if DAY.match(day) is None:
         raise RecordError('the day is %s, not YYYY-MM-DD' % day)
     phar = os.path.abspath(phar)
-    version = subprocess.run(['php', phar, '--version'], capture_output=True, text=True, check=True).stdout.strip()
+    version = subprocess.run(['php', phar, '--version'], capture_output=True, text=True).stdout.strip()
     if not version.startswith('lockrot '):
         raise RecordError('%s prints "%s", not "lockrot <version>"' % (phar, version))
     with open(os.path.join(root, PAGE), encoding='utf-8') as handle:
         page = handle.read()
     recorded, clean = snapshots(page)
+    columns, arguments = command(page)
+    output = next(argument for argument in arguments if argument.startswith('--output=json:'))[len('--output=json:'):]
     work = tempfile.mkdtemp(prefix='lockrot-example-run-')
     try:
-        table = run(phar, day, recorded, root, work, ['--target-php=8.4', '--output=json:lockrot.json'])
-        with open(os.path.join(work, os.path.basename(recorded), 'lockrot.json'), encoding='utf-8') as handle:
-            report = render(abridge(json.load(handle)))
-        clean_run = run(phar, day, clean, root, work, ['--target-php=8.4'])
+        table = run(phar, day, columns, recorded, root, work, arguments)
+        report = render(abridge(report_of(os.path.join(work, os.path.basename(recorded), output))))
+        clean_run = run(phar, day, columns, clean, root, work, [argument for argument in arguments if not argument.startswith('--output=')])
     finally:
         shutil.rmtree(work)
+    if CLEAN_SUMMARY not in clean_run.split('\n', 1)[0] + '\n' or '\nnote: ' in clean_run:
+        raise RecordError('the clean run flags a package or prints a run note: %s' % clean_run.strip())
     with open(os.path.join(root, PAGE), 'w', encoding='utf-8') as handle:
         handle.write(splice(page, version[len('lockrot '):], day, table, report, clean_run))
 

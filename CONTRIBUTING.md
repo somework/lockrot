@@ -375,11 +375,12 @@ maintainer.
     - Re-record `docs/example-run.md` with a PHAR that you build from the release branch
       ([The PHAR](#the-phar)):
       `GITHUB_TOKEN=<token> python3 tools/release/example_run.py build/lockrot.phar <planned tag day>`.
-      The script runs the page's command on the two snapshots that the page names, with
-      `LOCKROT_TODAY` set to that day. It writes the table, the abridged report, the clean run and
-      the sentence "Recorded on <day> with lockrot X.Y.Z". Then run `ExampleRunQuotesTest`. It
-      fails unless the page names `Version::STRING` and the day of its CHANGELOG heading. Fix each
-      page that quotes a line that the recording changed. If the tag day moves, record the page
+      The script runs the page's command on the two snapshots that the page links, with
+      `LOCKROT_TODAY` set to that day. It refuses a run with a run note and a clean run that flags a
+      package. It writes the table, the abridged report, the clean run and the sentence "Recorded on
+      <day> with lockrot X.Y.Z". Then run `ExampleRunQuotesTest`. It fails when the page names a
+      version before `Version::STRING`, or that version on another day than its CHANGELOG heading.
+      Fix each page that quotes a line that the recording changed. If the tag day moves, record the page
       again for the date commit.
 
     - Copy every `resources/lockrot-*.schema.json` file to
@@ -425,7 +426,8 @@ maintainer.
            other than the one in `package.json`. That tag then has no release, and the renderer's
            tag ruleset keeps it on its commit. If the tag run fails at that check, fix
            `package-lock.json` on the renderer's `main`. Then do this step and step 7 again with
-           the next renderer version, and vendor that version in step 8.
+           the next patch version of the renderer, and vendor that version in step 8. Name that
+           version in the CHANGELOG line that names the vendored renderer.
         7. Merge that commit into the renderer's `main`. Then tag `vX.Y.Z` on `main`.
         8. Run `tools/report/update-renderer vX.Y.Z`, and commit only the files that it writes. This
            commit must not change the contract bundle.

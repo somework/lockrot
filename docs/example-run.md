@@ -6,9 +6,9 @@ description: "A recorded lockrot run on wallabag's public composer.lock: the ful
 # Example run
 
 What lockrot prints on a real lock, and how to read it. Recorded on 2026-10-26 with lockrot 0.14.0
-on the snapshot `tests/fixtures/apps/wallabag_wallabag/composer.lock` of
-[wallabag](https://github.com/wallabag/wallabag)'s public lock in lockrot's repository, with
-`GITHUB_TOKEN` set, so no repository check was capped, and `COLUMNS=120`, so the wrapping is fixed.
+on [a snapshot](https://github.com/somework/lockrot/blob/main/tests/fixtures/apps/wallabag_wallabag/composer.lock)
+of [wallabag](https://github.com/wallabag/wallabag)'s public `composer.lock`, with `GITHUB_TOKEN`
+set, so no repository check was capped.
 
 ```bash
 COLUMNS=120 php lockrot.phar --target-php=8.4 --output=json:lockrot.json
@@ -1987,8 +1987,9 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
 
 ## A clean run
 
-Recorded with the same version, on the same date, on the `cakephp/app` skeleton
-`tests/fixtures/skeletons/cakephp/composer.lock`, whose lock has nothing to grade. The run exited `0` ([exit codes](ci.md#exit-codes)).
+Recorded with the same version, on the same date, on
+[a snapshot](https://github.com/somework/lockrot/blob/main/tests/fixtures/skeletons/cakephp/composer.lock)
+of the `cakephp/app` skeleton, whose lock has nothing to grade. The run exited `0` ([exit codes](ci.md#exit-codes)).
 
 ```text
 20 packages checked · nothing flagged

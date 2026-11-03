@@ -19,11 +19,11 @@ title: Example run
 # Example run
 
 Recorded on 2026-10-26 with lockrot 0.14.0
-on [wallabag](https://github.com/wallabag/wallabag)'s public `composer.lock`, as
-`tests/fixtures/apps/app_one/composer.lock` holds it.
+on [a snapshot](https://github.com/somework/lockrot/blob/main/tests/fixtures/apps/app_one/composer.lock)
+of [wallabag](https://github.com/wallabag/wallabag)'s public `composer.lock`.
 
 ```bash
-COLUMNS=120 php lockrot.phar --target-php=8.4 --output=json:lockrot.json
+COLUMNS=100 php lockrot.phar --target-php=8.3 --output=json:out.json
 ```
 
 ```text
@@ -38,7 +38,7 @@ old table
 
 ## A clean run
 
-Recorded on the skeleton `tests/fixtures/skeletons/clean_one/composer.lock`.
+Recorded on [the skeleton](https://github.com/somework/lockrot/blob/main/tests/fixtures/skeletons/clean_one/composer.lock).
 
 ```text
 old clean
@@ -116,11 +116,11 @@ class TheSplicedPage(unittest.TestCase):
     def test_holds_the_new_recording_and_keeps_the_prose(self):
         page = example_run.splice(PAGE, '0.14.1', '2026-11-20', 'new table\nline two\n', '{\n    "new": true\n}', 'new clean\n')
 
-        self.assertIn('Recorded on 2026-11-20 with lockrot 0.14.1\non [wallabag]', page)
+        self.assertIn('Recorded on 2026-11-20 with lockrot 0.14.1\non [a snapshot]', page)
         self.assertIn('```text\nnew table\nline two\n```\n\n## The same', page)
         self.assertIn('```json\n{\n    "new": true\n}\n```', page)
         self.assertIn('```text\nnew clean\n```\n\n## Related', page)
-        self.assertIn('```bash\nCOLUMNS=120 php lockrot.phar --target-php=8.4 --output=json:lockrot.json\n```', page)
+        self.assertIn('```bash\nCOLUMNS=100 php lockrot.phar --target-php=8.3 --output=json:out.json\n```', page)
         for old in ('old table', 'old clean', '"old"', '2026-10-26', '0.14.0'):
             self.assertNotIn(old, page)
 
@@ -137,10 +137,10 @@ $log = getenv('FAKE_LOG');
 file_put_contents($log, json_encode([getcwd(), array_slice($argv, 1), getenv('COLUMNS'), getenv('LOCKROT_TODAY'), getenv('COMPOSER_CACHE_DIR') !== false, is_file('composer.lock')])."\n", FILE_APPEND);
 foreach (array_slice($argv, 1) as $argument) {
     if (strpos($argument, '--output=json:') === 0) {
-        file_put_contents(substr($argument, 14), json_encode(['lockrot' => ['version' => '0.14.1'], 'run' => ['score_model' => ['flags' => [['id' => 1]]]], 'exposure' => [], 'rot_depth' => ['by_depth' => []], 'findings' => [['package' => 'spomky-labs/otphp']]]));
+        file_put_contents(substr($argument, 14), json_encode(['lockrot' => ['version' => '0.14.1'], 'notes' => getenv('FAKE_NOTES') ? [['code' => 'anonymous_cap']] : [], 'run' => ['score_model' => ['flags' => [['id' => 1]]]], 'exposure' => [], 'rot_depth' => ['by_depth' => []], 'findings' => [['package' => 'spomky-labs/otphp']]]));
     }
 }
-echo basename(getcwd()) === 'clean_one' ? "clean output\n" : "table output\n";
+echo basename(getcwd()) === 'clean_one' ? (getenv('FAKE_FLAGGED') ? "20 packages checked · 1 flagged\n" : "20 packages checked · nothing flagged\n") : "table output\n";
 '''
 
 
@@ -173,15 +173,33 @@ class TheRecorder(unittest.TestCase):
             page = handle.read()
         self.assertIn('Recorded on 2026-11-20 with lockrot 0.14.1', page)
         self.assertIn('```text\ntable output\n```', page)
-        self.assertIn('```text\nclean output\n```', page)
+        self.assertIn('```text\n20 packages checked · nothing flagged\n```', page)
         self.assertIn('"package": "spomky-labs/otphp"', page)
         with open(self.log, encoding='utf-8') as handle:
             calls = [json.loads(line) for line in handle]
-        self.assertEqual(['--target-php=8.4', '--output=json:lockrot.json'], calls[0][1])
-        self.assertEqual(['--target-php=8.4'], calls[1][1])
+        self.assertEqual(['--target-php=8.3', '--output=json:out.json'], calls[0][1])
+        self.assertEqual(['--target-php=8.3'], calls[1][1])
         for call in calls:
-            self.assertEqual(['120', '2026-11-20', True, True], call[2:])
-            self.assertFalse(call[0].startswith(self.root), 'the runs read copies of the snapshots')
+            self.assertEqual(['100', '2026-11-20', True, True], call[2:])
+            self.assertFalse(os.path.realpath(call[0]).startswith(os.path.realpath(self.root)), 'the runs read copies of the snapshots')
+
+    def test_refuses_a_run_with_a_run_note_or_a_flagged_clean_run(self):
+        for variable in ('FAKE_NOTES', 'FAKE_FLAGGED'):
+            with self.subTest(variable=variable):
+                os.environ[variable] = '1'
+                try:
+                    with self.assertRaises(example_run.RecordError):
+                        example_run.record(os.path.join(self.root, 'fake.phar'), '2026-11-20', self.root)
+                finally:
+                    del os.environ[variable]
+                with open(os.path.join(self.root, 'docs', 'example-run.md'), encoding='utf-8') as handle:
+                    self.assertEqual(PAGE, handle.read())
+
+    def test_refuses_a_phar_that_does_not_run(self):
+        self.write('fake.phar', '<?php exit(3);')
+
+        with self.assertRaises(example_run.RecordError):
+            example_run.record(os.path.join(self.root, 'fake.phar'), '2026-11-20', self.root)
 
     def test_refuses_a_day_that_is_no_date(self):
         with self.assertRaises(example_run.RecordError):
