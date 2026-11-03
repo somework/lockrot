@@ -41,6 +41,8 @@ use Lockrot\Signal\Data\LeftBehindData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Solver\MoveCheck;
+use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\RecordedMoveChecker;
@@ -819,6 +821,21 @@ final class AnalyzerTest extends TestCase
 
         self::assertNotNull($window);
         self::assertSame(['php' => '8.2.10', 'inside' => false], $window->toArray()['target']);
+    }
+
+    public function testThePhpWindowReadsThePhp64bitOfTheMoveChecksConfig(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [self::locked('vendor/pkg') + ['require' => ['php-64bit' => '>=8.2']]], 'packages-dev' => []]);
+        $analyzer = $this->analyzer($this->loader(['vendor/pkg' => $this->ancient()]), $this->http([]), true, new Allowlist([]), false, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, null, null, '8.4');
+        $inside = static function (Analyzer $analyzer) use ($lock): bool {
+            $window = $analyzer->analyze($lock, ProjectConfig::empty(), false)->phpWindow();
+            self::assertNotNull($window);
+
+            return $window->toArray()['target']['inside'];
+        };
+
+        self::assertFalse($inside($analyzer->withMoveChecks(MoveChecks::of(new UncheckedMoves(MoveCheck::BASELINE_REFUSED, null, '7.4.0')))));
+        self::assertTrue($inside($analyzer->withMoveChecks(MoveChecks::of(new UncheckedMoves(MoveCheck::BASELINE_REFUSED)))), 'the control: php-64bit follows php');
     }
 
     public function testWithMoveChecksReturnsAClonedInstanceLeavingOriginalWithoutChecks(): void

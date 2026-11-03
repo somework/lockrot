@@ -238,7 +238,7 @@ final class Analyzer
         $floor = $signals->phpFloor();
         $finder = new FixFinder($floor, LinkIndex::of($lock, $project));
         $baseline = $checker === null ? null : $checker->baseline();
-        $window = PhpWindow::of($lock, $project, $targetMinor, PhpReleaseDates::load()->minors($this->clock), $solvePhp, $configured);
+        $window = PhpWindow::of($lock, $project, $targetMinor, PhpReleaseDates::load()->minors($this->clock), $solvePhp, $configured, $checker === null ? null : $checker->configuredPhp64bit());
         $findings = [];
         $factsByPackage = [];
         $notInRepository = 0;

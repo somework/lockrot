@@ -20,6 +20,7 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Solver\ComposerSolver;
 use Lockrot\Solver\MoveCheck;
+use Lockrot\Solver\MoveChecker;
 use Lockrot\Solver\MoveCheckers;
 use Lockrot\Solver\MoveQuery;
 use Lockrot\Solver\SolverChecker;
@@ -200,6 +201,23 @@ final class MoveCheckersTest extends TestCase
 
         self::assertSame(['8.4.99', '7.4.29'], [$checker->platformPhp(), $checker->configuredPhp()]);
         self::assertNull(MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => []]), ProjectConfig::empty(), new Config(false), [], '8.4', false, Deadline::never())->configuredPhp());
+    }
+
+    /** The PHP window reads `php-64bit` from the config that the solve reads. */
+    public function testTheProjectsMoveCheckReportsTheConfiguredPhp64bit(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]]);
+        $checker = static function (array $platform) use ($lock): MoveChecker {
+            $config = new Config(false);
+            $config->merge(['config' => ['platform' => $platform]]);
+
+            return MoveCheckers::forProject(self::root(), $lock, ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
+        };
+
+        self::assertSame('7.4.0', $checker(['PHP-64bit' => '7.4.0'])->configuredPhp64bit());
+        self::assertFalse($checker(['php-64bit' => false])->configuredPhp64bit());
+        self::assertNull($checker(['php' => '8.4.1'])->configuredPhp64bit());
+        self::assertSame('7.4.0', $checker(['php-64bit' => '7.4.0', 'php' => false])->configuredPhp64bit(), 'a config that Composer refuses');
     }
 
     /** laminas at 8.4: lockrot set the php of the solve, so Composer's words about config.platform do not hold. */
