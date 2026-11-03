@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support;
 
+use Composer\Downloader\TransportException;
 use Composer\Json\JsonFile;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
@@ -15,6 +16,7 @@ use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\PhpWindow;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Clock;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
@@ -924,7 +926,11 @@ final class CaseHydrator
         $failed = array_map(static fn (array $failure): AdvisoryRepository => AdvisoryRepository::of($failure['composer_repository'], AdvisoryRepository::FAILED, $failure['reason'], $failure['message']), $failures);
         $repositories = array_merge($failed, [$answers ? AdvisoryRepository::of($repository, AdvisoryRepository::ANSWERED)->withRecords($total, $withRecords) : AdvisoryRepository::of($repository, AdvisoryRepository::NOT_ASKED, $unchecked)]);
         $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, $repositories, 0, $names);
-        $batch = new AdvisoryBatch($counted, [], $ignored, $every, $coverage, $unchecked === null);
+        $notes = array_map(static fn (array $failure): RunNote => RunNote::advisoriesUnavailable(
+            $failure['composer_repository'],
+            $failure['reason'] === AdvisoryCoverage::TRANSPORT ? new TransportException((string) $failure['message']) : new \RuntimeException((string) $failure['message'])
+        ), $failures);
+        $batch = new AdvisoryBatch($counted, $notes, $ignored, $every, $coverage, $unchecked === null);
 
         return new class ($batch) implements AdvisoryLoaderInterface {
             private AdvisoryBatch $batch;

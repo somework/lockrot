@@ -143,6 +143,12 @@ final class CaseHydratorTest extends TestCase
             self::lookupOf(JsonPath::arrayAt($case, ['run']), JsonPath::arrayAt($case, ['finding'])),
             self::lookupOf(JsonPath::arrayAt($report, ['run']), $finding)
         );
+        $model = JsonPath::decodeFile(__DIR__.'/../fixtures/schema/documents/cases/partial-lookup-dagger.json');
+        self::assertSame(
+            [JsonPath::arrayAt($model, ['notes']), $model['network_failures'] ?? null],
+            [JsonPath::arrayAt($report, ['notes']), $report['network_failures'] ?? null],
+            'a failed repository writes the run note of the model document'
+        );
     }
 
     /**
