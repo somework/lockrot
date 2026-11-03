@@ -383,7 +383,7 @@ final class CachingHttpClientTest extends TestCase
         $calls = 0;
         $clock = Clock::fromEnvironment(['LOCKROT_TODAY' => '2999-01-01']);
         $cache = new ArrayCache();
-        $before = time();
+        $before = $clock->fetchTime()->getTimestamp();
         $client = new CachingHttpClient($this->inner(['https://a' => new HttpResult('https://a', 200, '{}', $clock->now())], $calls), $cache, self::TTL, $clock);
 
         $result = $client->fetchAll(['https://a'], self::TOKEN)['https://a'];
@@ -391,7 +391,7 @@ final class CachingHttpClientTest extends TestCase
         self::assertSame('2999-01-01T00:00:00+00:00', $result->fetchedAt()->format(\DATE_ATOM));
         $stored = ($cache->get('https://a'.self::CREDENTIALED) ?? self::fail('the answer is stored'))->fetchedAt()->getTimestamp();
         self::assertGreaterThanOrEqual($before, $stored);
-        self::assertLessThanOrEqual(time(), $stored);
+        self::assertLessThanOrEqual($clock->fetchTime()->getTimestamp(), $stored);
     }
 
     public function testAnAnswerUnderAPastLockrotTodayIsStoredWithItsOwnTime(): void
