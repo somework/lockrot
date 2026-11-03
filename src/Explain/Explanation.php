@@ -8,7 +8,6 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Clock;
-use Lockrot\Config\Gate;
 use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Data\Repository\RepositoryUrl;
@@ -184,7 +183,7 @@ final class Explanation
             throw new \LogicException('The report does not hold the finding of '.$package->name());
         }
         // Both command paths give the report its run. A caller that skips them passed the target PHP to the constructor.
-        $run = $this->report->run() ?? new RunSettings(null, null, $this->targetPhp, RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, $this->thresholds, $this->projectPhp, false, Gate::MODE_CHECK, $this->report->includesDev());
+        $run = $this->report->run() ?? new RunSettings(null, null, $this->targetPhp, RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, $this->thresholds, $this->projectPhp);
 
         return [
             'package' => $package->name(),
@@ -192,7 +191,7 @@ final class Explanation
             'finding' => $row,
             'lock' => $this->lock(),
             'metadata' => $this->metadata(),
-            'run' => $run->toExplainArray($this->report->advisoryLookup(), $this->report->moveCheck()) + ['php_window' => $this->phpWindow()],
+            'run' => $run->toExplainArray($this->report->advisoryLookup(), $this->report->moveCheck(), $this->report->includesDev()) + ['php_window' => $this->phpWindow()],
             'generated_at' => self::date($this->report->generatedAt()),
             'notes' => $this->report->notes(),
             'note_details' => array_map(static fn (RunNote $note): array => $note->toArray(), $this->report->runNotes()),

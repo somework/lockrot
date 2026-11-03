@@ -402,10 +402,22 @@ final class LeftBehindRuleTest extends TestCase
         self::assertSame('branch 1.x last released 2022-06-09 (4.3 years ago); 3.x released 3.2.0 (2026-09-09), needs php ~8.1.0 || ~8.2.0 || ~8.3.0, which stops before the target PHP 8.4; 2.x released 2.11.1 (2026-09-02)', $signal->summary());
     }
 
-    /** The flag sentence words the miss at the solve PHP that S8 judged, not at the target minor's newest patch. */
-    public function testTheFlagSentenceWordsTheMissAtTheSolvePhp(): void
+    /** @return iterable<string, array{string}> the php of the newest branch, which skips 8.4.5 */
+    public static function phpsThatSkipTheSolvePhp(): iterable
     {
-        $meta = F::metadata([['3.2.0', '2026-09-09', '>=8.2 <8.4.5 || >=8.4.6'], ['2.11.1', '2026-09-02', '>=7.2'], ['1.27.1', '2022-06-09', '>=5.3.0']]);
+        yield 'admits the newest patch of the target minor' => ['>=8.2 <8.4.5 || >=8.4.6'];
+        yield 'stops before the newest patch of the target minor' => ['>=8.2 <8.4.5 || >=8.4.6 <8.4.50'];
+    }
+
+    /**
+     * The flag sentence words the miss at the solve PHP that S8 judged, not at the target minor's newest patch.
+     *
+     * @dataProvider phpsThatSkipTheSolvePhp
+     */
+    #[DataProvider('phpsThatSkipTheSolvePhp')]
+    public function testTheFlagSentenceWordsTheMissAtTheSolvePhp(string $php): void
+    {
+        $meta = F::metadata([['3.2.0', '2026-09-09', $php], ['2.11.1', '2026-09-02', '>=7.2'], ['1.27.1', '2022-06-09', '>=5.3.0']]);
 
         $signal = $this->rule((new PhpFloor('8.4', '>=8.2'))->solvedAt('8.4.5'))->evaluate(F::facts(F::package(['version' => '1.27.1']), $meta));
 

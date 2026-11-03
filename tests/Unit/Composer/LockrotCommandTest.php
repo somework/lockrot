@@ -2281,6 +2281,20 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('lockrot '.$major.'.'.$minor.' reads baseline-2 only, and lockrot-baseline.json is a baseline-1 file. Move it aside to review the findings, then run --generate-baseline: https://lockrot.dev/baseline/#moving-from-a-baseline-1-file', $stderr);
     }
 
+    /** A new file in place of a newer lockrot's baseline would lose its first_seen dates, so the write stops. */
+    public function testGenerateBaselineOverABaselineFromANewerLockrotExitsTwoAndKeepsTheFile(): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+        $newer = '{"lockrot": {"version": "99.0.0", "schema": 3}, "findings": {}}';
+        file_put_contents($dir.'/lockrot-baseline.json', $newer);
+
+        [$code, , $stderr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(2, $code, $stderr);
+        self::assertStringContainsString('is a baseline-3 file, written by lockrot 99.0. Upgrade lockrot to read it', $stderr);
+        self::assertSame($newer, file_get_contents($dir.'/lockrot-baseline.json'));
+    }
+
     /** `--generate-baseline` over a baseline-1 file writes a fresh baseline-2 and carries nothing forward. */
     public function testGenerateBaselineOverABaseline1FileWritesBaseline2(): void
     {

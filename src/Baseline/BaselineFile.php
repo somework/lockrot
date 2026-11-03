@@ -122,20 +122,23 @@ final class BaselineFile
 
     /**
      * A new file in its place loses every `first_seen` and `known_since` date, so the message asks for
-     * an upgrade. The file's own version is printed only as a major and a minor, as it is file text.
+     * an upgrade. The file's own version is printed only as a major and a minor above the running
+     * one, as it is file text.
      *
      * @param mixed $writer the `lockrot.version` of the file
      */
     private function newerRefusal(int $number, $writer): string
     {
+        $running = self::line($this->release);
         $line = \is_string($writer) ? self::line($writer) : null;
+        $newer = $line !== null && $running !== null && version_compare($line, $running, '>');
 
         return \sprintf(
             'lockrot %s reads baseline-2 only, and %s is a baseline-%d file, written by %s. Upgrade lockrot to read it: https://lockrot.dev/baseline/#a-baseline-from-a-newer-lockrot',
-            self::line($this->release) ?? $this->release,
+            $running ?? $this->release,
             $this->displayPath,
             $number,
-            $line === null ? 'a newer lockrot' : 'lockrot '.$line
+            $newer ? 'lockrot '.$line : 'a newer lockrot'
         );
     }
 

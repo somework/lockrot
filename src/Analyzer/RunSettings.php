@@ -140,11 +140,13 @@ final class RunSettings
     /**
      * explain-2's `run`: the settings that judge one package, in the order of {@see toArray()}.
      *
+     * @param ?bool $includeDev whether the report analysed packages-dev, which wins over the setting
+     *
      * @return array<string, mixed>
      */
-    public function toExplainArray(AdvisoryLookup $advisoryLookup, ?MoveCheckRun $moveCheck = null): array
+    public function toExplainArray(AdvisoryLookup $advisoryLookup, ?MoveCheckRun $moveCheck = null, ?bool $includeDev = null): array
     {
-        return $this->php() + $this->failOnKeys() + ['include_dev' => $this->includeDev] + $this->toModelArray()
+        return $this->php() + $this->failOnKeys() + ['include_dev' => $includeDev ?? $this->includeDev] + $this->toModelArray()
             + ['advisory_lookup' => $advisoryLookup, 'move_check' => $moveCheck];
     }
 

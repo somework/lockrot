@@ -96,6 +96,29 @@ final class LockLineIndexTest extends TestCase
         self::assertNull($index->lineOf('acme/dropped'));
     }
 
+    /** json_decode() reads an escaped key as its character, so `pack\u0061ges` repeats `packages`. */
+    public function testAnEscapedSectionKeyRepeatsTheSection(): void
+    {
+        $json = <<<'JSON'
+            {
+                "packages": [
+                    {
+                        "name": "acme/a",
+                        "version": "1.0.0"
+                    }
+                ],
+                "pack\u0061ges": [
+                    {
+                        "name": "acme/a",
+                        "version": "2.0.0"
+                    }
+                ]
+            }
+            JSON;
+
+        self::assertSame(10, LockLineIndex::fromString($json)->lineOf('acme/a'));
+    }
+
     /** A string long enough to exhaust a backtracking pattern's JIT stack still counts its line's brace. */
     public function testAVeryLongStringBesideABraceKeepsTheDepth(): void
     {

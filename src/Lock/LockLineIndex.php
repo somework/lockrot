@@ -68,8 +68,10 @@ final class LockLineIndex
             }
 
             if ($depth === 1 && preg_match('/^\s*"([^"]+)"\s*:/', $line, $key) === 1) {
-                $section = $key[1];
-                $sections[$section] = [];
+                $section = json_decode('"'.$key[1].'"');
+                if (\in_array($section, self::PACKAGE_SECTIONS, true)) {
+                    $sections[$section] = [];
+                }
             }
             if (
                 $depth === self::ENTRY_DEPTH
@@ -86,7 +88,7 @@ final class LockLineIndex
                 - substr_count($structure, '}') - substr_count($structure, ']');
         }
 
-        return new self(array_replace([], ...array_values(array_intersect_key($sections, array_flip(self::PACKAGE_SECTIONS)))));
+        return new self(array_replace([], ...array_values($sections)));
     }
 
     public static function empty(): self

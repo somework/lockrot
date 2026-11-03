@@ -173,7 +173,7 @@ final class MarkdownFormatter implements FormatterInterface
         $name = static function (string $package) use (&$spans, $nonce): string {
             $placeholder = \sprintf("\x00%s-%d\x00", $nonce, \count($spans));
             // The key is the placeholder as self::text() writes it, because the spans go in after it.
-            $spans[self::text($placeholder)] = self::code($package, false);
+            $spans[self::text($placeholder)] = self::lineCode($package);
 
             return $placeholder;
         };
@@ -187,7 +187,7 @@ final class MarkdownFormatter implements FormatterInterface
         $updateNow = RunFooter::updateNow($report);
         if ($updateNow !== null) {
             $lines[] = '';
-            $lines[] = '**Update now:** '.self::text(RunFooter::platformStep($report)).self::code($updateNow, false);
+            $lines[] = '**Update now:** '.self::text(RunFooter::platformStep($report)).self::lineCode($updateNow);
         }
         $notes = $report->notes();
         $stale = $baseline === null ? null : $baseline->staleNote();
@@ -263,5 +263,11 @@ final class MarkdownFormatter implements FormatterInterface
         }
 
         return $fence.$value.$fence;
+    }
+
+    /** A code span on a footer line, which is no table row. */
+    private static function lineCode(string $value): string
+    {
+        return self::code($value, false);
     }
 }
