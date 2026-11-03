@@ -184,7 +184,10 @@ final class PathTest extends TestCase
         yield 'repeated separators' => ['/app//sub///r.json', '/app/sub/r.json'];
         yield 'no climbing above the root' => ['/../../r.json', '/r.json'];
         yield 'no climbing above a drive' => ['C:\\..\\r.json', 'C:/r.json'];
-        yield 'a UNC share keeps its two leading separators' => ['\\\\server\\share\\..\\r.json', '//server/r.json'];
+        yield 'a UNC share keeps its two leading separators' => ['\\\\server\\share\\r.json', '//server/share/r.json'];
+        yield 'a parent never climbs above a UNC share' => ['\\\\srv\\share\\..\\other\\r.json', '//srv/share/other/r.json'];
+        yield 'two parents below a UNC share stop at the share' => ['//srv/share/a/../../../r.json', '//srv/share/r.json'];
+        yield 'a UNC share alone is its own root' => ['//srv/share/a/..', '//srv/share/'];
         yield 'a relative path keeps the parents it cannot fold' => ['../a/../../r.json', '../../r.json'];
         yield 'a name with dots is not a dot segment' => ['/app/..r/.x/r..json', '/app/..r/.x/r..json'];
     }

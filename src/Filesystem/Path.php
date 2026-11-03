@@ -74,8 +74,8 @@ final class Path
 
     /**
      * Folds `.` and `..` by spelling alone, the way Windows does before it looks at the disk. Nothing
-     * climbs above a root (`/`, a drive such as `C:/`, a UNC `//`). A relative path keeps the leading
-     * `..` it cannot fold.
+     * climbs above a root (`/`, a drive such as `C:/`, a UNC share such as `//server/share`). A
+     * relative path keeps the leading `..` it cannot fold.
      *
      * The disk is not consulted: on Unix a `..` after a symlinked directory is folded where the kernel
      * follows the link. {@see canonical()} resolves what exists first.
@@ -83,8 +83,9 @@ final class Path
     public static function normalize(string $path): string
     {
         $path = str_replace('\\', '/', $path);
-        // Always matches, if only the empty string: a relative path has no root.
-        $root = preg_match('{^(?:[A-Za-z]:)?/{0,2}}', $path, $match) === 1 ? $match[0] : '';
+        // Always matches, if only the empty string: a relative path has no root. Windows counts the
+        // share as part of a UNC root.
+        $root = preg_match('{^//[^/]+/[^/]+(?:/|$)|^(?:[A-Za-z]:)?/{0,2}}', $path, $match) === 1 ? $match[0] : '';
         $segments = [];
         foreach (explode('/', substr($path, \strlen($root))) as $segment) {
             if ($segment === '' || $segment === '.') {
