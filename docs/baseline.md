@@ -220,10 +220,11 @@ error. That run has no baseline.
 | `lockrot: baseline file is invalid: findings lists <package> twice, as <key> and <key>` | Two `findings` keys name one package: lockrot reads a key in lower case, as Composer reads a package name | Merge the two entries into one |
 | `lockrot: Cannot read <path>: …` | The file exists, but lockrot cannot read it | Fix its permissions |
 | `lockrot: lockrot <major>.<minor> reads baseline-2 only, and <path> is a baseline-1 file. Move it aside to review the findings, then run --generate-baseline: <link>`, such as `lockrot: lockrot 0.14 reads …` | The file is a baseline-1 file, written by lockrot 0.13 or earlier | [Move to baseline-2](#moving-from-a-baseline-1-file) |
+| `lockrot: lockrot <major>.<minor> reads baseline-2 only, and <path> is a baseline-<n> file, written by lockrot <major>.<minor>. Upgrade lockrot to read it: <link>` | A newer lockrot wrote the file | [Upgrade lockrot](#a-baseline-from-a-newer-lockrot) |
 
 `--generate-baseline` reads an existing file to keep its `first_seen` dates, so it stops on a
 damaged file too. Delete the file first. A baseline-1 file is the exception: `--generate-baseline`
-overwrites it.
+overwrites it. A file from a newer lockrot also stops it, and the fix is an upgrade.
 
 <a id="a-baseline-1-file"></a>
 
@@ -247,6 +248,15 @@ the key names exits `2` with `lockrot: <path> not found`, so remove the key for 
 the key back before `--generate-baseline`, which writes the path that the key names. The same
 commands work with the PHAR (`php lockrot.phar`). The new file starts every `first_seen` and `known_since` again on the day
 of the run. [Upgrading to 0.14](changes/0.14.md) has the steps for the action and the plugin.
+
+<a id="a-baseline-from-a-newer-lockrot"></a>
+
+### A baseline from a newer lockrot
+
+A newer lockrot can write a baseline with a higher `lockrot.schema`. That number increases only
+when an older lockrot can misread the new layout, so an older lockrot refuses the file and exits
+`2`. Upgrade lockrot to the release that the message names, or to a later one. Keep the file,
+because a new file starts every `first_seen` and `known_since` again on the day of the run.
 
 ## Install time
 

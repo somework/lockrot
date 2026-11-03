@@ -46,6 +46,31 @@ final class BaselineFileTest extends TestCase
         BaselineFile::resolve($dir, null, $release)->read();
     }
 
+    /** @return iterable<string, array{string, string}> */
+    public static function newerFiles(): iterable
+    {
+        $tail = ' Upgrade lockrot to read it: https://lockrot.dev/baseline/#a-baseline-from-a-newer-lockrot';
+        yield 'a release that names itself' => ['{"lockrot": {"version": "0.16.1", "schema": 3}, "findings": {}}', 'lockrot 0.14 reads baseline-2 only, and lockrot-baseline.json is a baseline-3 file, written by lockrot 0.16.'.$tail];
+        yield 'a version that is no release' => ['{"lockrot": {"version": "\u001b[2Jdev", "schema": 4}, "findings": {}}', 'lockrot 0.14 reads baseline-2 only, and lockrot-baseline.json is a baseline-4 file, written by a newer lockrot.'.$tail];
+    }
+
+    /**
+     * A file from a newer lockrot asks for an upgrade, because a new baseline file loses every first_seen date.
+     *
+     * @dataProvider newerFiles
+     */
+    #[DataProvider('newerFiles')]
+    public function testABaselineFromANewerLockrotAsksForAnUpgrade(string $json, string $message): void
+    {
+        $dir = $this->tempDir();
+        file_put_contents($dir.'/lockrot-baseline.json', $json);
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage($message);
+
+        BaselineFile::resolve($dir, null, '0.14.0')->read();
+    }
+
     /** @return iterable<string, array{string, ?int}> */
     public static function numbers(): iterable
     {
