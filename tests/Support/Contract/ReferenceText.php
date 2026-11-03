@@ -187,7 +187,7 @@ final class ReferenceText
             }
             $exempt = Fields::int(Fields::object($gate, 'exempt'), 'baseline');
             if ($exempt > 0) {
-                $count .= '; '.($exempt === 1 ? '1 reaches it and is known to the baseline' : $exempt.' reach it and are known to the baseline');
+                $count .= '; '.($exempt === 1 ? '1 reaches it and the baseline exempts it' : $exempt.' reach it and the baseline exempts them');
             }
             $parts[] = $count;
         } elseif ($gates !== []) {
