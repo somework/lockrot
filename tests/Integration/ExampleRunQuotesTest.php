@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
 
@@ -38,9 +39,10 @@ final class ExampleRunQuotesTest extends TestCase
         [$day, $version, $page] = self::recording();
         preg_match('/```json\n(.*?)\n```/s', $page, $json);
         $report = json_decode((string) preg_replace('/^(\s*)…$/mu', '$1"…"', $json[1] ?? ''), true);
+        self::assertIsArray($report, 'the JSON block of docs/example-run.md decodes');
 
-        self::assertSame($version, $report['lockrot']['version'] ?? null, 'the JSON block of docs/example-run.md is of another lockrot');
-        self::assertStringStartsWith($day.'T', (string) ($report['generated_at'] ?? ''), 'the JSON block of docs/example-run.md is of another day');
+        self::assertSame($version, JsonPath::stringAt($report, ['lockrot', 'version']), 'the JSON block of docs/example-run.md is of another lockrot');
+        self::assertStringStartsWith($day.'T', JsonPath::stringAt($report, ['generated_at']), 'the JSON block of docs/example-run.md is of another day');
         self::assertSame(2, substr_count($page, 'Data as of '.$day.' '), 'the table and the clean run of docs/example-run.md are of the day that the page names');
     }
 
@@ -65,7 +67,9 @@ final class ExampleRunQuotesTest extends TestCase
     private static function recording(): array
     {
         $page = (string) file_get_contents(self::DOCS.'example-run.md');
-        self::assertSame(1, preg_match('/Recorded\s+on\s+(\d{4}-\d{2}-\d{2})\s+with\s+lockrot\s+(\d+\.\d+\.\d+)\s/', $page, $recorded));
+        if (preg_match('/Recorded\s+on\s+(\d{4}-\d{2}-\d{2})\s+with\s+lockrot\s+(\d+\.\d+\.\d+)\s/', $page, $recorded) !== 1) {
+            self::fail('docs/example-run.md has no "Recorded on <day> with lockrot <version>" sentence');
+        }
 
         return [$recorded[1], $recorded[2], $page];
     }
