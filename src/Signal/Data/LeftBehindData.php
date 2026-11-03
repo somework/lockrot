@@ -29,12 +29,14 @@ final class LeftBehindData implements SignalData
     private ?string $floorSource;
     private ?ReachableBranch $reachable;
     private bool $newestAtLeast;
+    private ?string $newestMisses;
 
     /**
      * Each date is an ISO 8601 date and time, and each age is in years on the run clock.
      *
      * @param ?string $floorSource   `project` or `target`: the floor that the newest branch's php is above, null when it is within reach
      * @param bool    $newestAtLeast $newestVersion is the branch's highest tag, dated only by a commit its tags share: $newestRelease is a lower bound, $newestYears an upper one
+     * @param ?string $newestMisses  how $newestPhp misses the floor at the PHP that S8 judged, a PhpFloor `misses_*` value. Not in the JSON: the floor label cannot rebuild a solve PHP
      */
     public function __construct(
         string $branch,
@@ -51,7 +53,8 @@ final class LeftBehindData implements SignalData
         ?string $floorPhp,
         ?string $floorSource,
         ?ReachableBranch $reachable,
-        bool $newestAtLeast = false
+        bool $newestAtLeast = false,
+        ?string $newestMisses = null
     ) {
         $this->branch = $branch;
         $this->branchLastRelease = $branchLastRelease;
@@ -68,6 +71,7 @@ final class LeftBehindData implements SignalData
         $this->floorSource = $floorSource;
         $this->reachable = $reachable;
         $this->newestAtLeast = $newestAtLeast;
+        $this->newestMisses = $newestMisses;
     }
 
     public function signalId(): string
@@ -160,6 +164,11 @@ final class LeftBehindData implements SignalData
     public function isNewestAtLeast(): bool
     {
         return $this->newestAtLeast;
+    }
+
+    public function newestMisses(): ?string
+    {
+        return $this->newestMisses;
     }
 
     /** @return array{branch: string, branch_last_release: string, branch_last_version: ?string, years: ?float, newest_branch: string, newest_version: string, newest_release: string, newest_php: ?string, newest_within_reach: bool, floor_php: ?string, floor_source: ?string, reachable_branch: ?string, reachable_version: ?string, reachable_release: ?string, suggested_constraint: ?string, dated_by: ?string, reachable_php: ?string, reachable_admits: array{project: ?bool, target: ?bool}|null, newest_years: float, reachable_years: ?float, newest_release_at_least: bool, reachable_release_at_least: ?bool} */

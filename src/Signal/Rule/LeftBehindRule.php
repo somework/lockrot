@@ -137,7 +137,8 @@ final class LeftBehindRule implements SignalRule
                 $this->suggestedConstraint($facts->package()->name(), $reachable['version']),
                 $reachable['at_least']
             ),
-            $newest['at_least']
+            $newest['at_least'],
+            $blocking === null ? null : $this->floor->misses($blocking, $newest['php'])
         ));
     }
 

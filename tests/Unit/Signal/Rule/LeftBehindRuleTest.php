@@ -15,6 +15,8 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
+use Lockrot\Verdict\FlagSentence;
+use Lockrot\Verdict\FlagSet;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -398,6 +400,18 @@ final class LeftBehindRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('branch 1.x last released 2022-06-09 (4.3 years ago); 3.x released 3.2.0 (2026-09-09), needs php ~8.1.0 || ~8.2.0 || ~8.3.0, which stops before the target PHP 8.4; 2.x released 2.11.1 (2026-09-02)', $signal->summary());
+    }
+
+    /** The flag sentence words the miss at the solve PHP that S8 judged, not at the target minor's newest patch. */
+    public function testTheFlagSentenceWordsTheMissAtTheSolvePhp(): void
+    {
+        $meta = F::metadata([['3.2.0', '2026-09-09', '>=8.2 <8.4.5 || >=8.4.6'], ['2.11.1', '2026-09-02', '>=7.2'], ['1.27.1', '2022-06-09', '>=5.3.0']]);
+
+        $signal = $this->rule((new PhpFloor('8.4', '>=8.2'))->solvedAt('8.4.5'))->evaluate(F::facts(F::package(['version' => '1.27.1']), $meta));
+
+        self::assertNotNull($signal);
+        self::assertStringContainsString('which skips the target PHP 8.4;', $signal->summary());
+        self::assertStringContainsString("which skips the target's php 8.4;", FlagSentence::maintenance(FlagSet::LEFT_BEHIND, [$signal->data()]));
     }
 
     public function testABranchWhosePhpSkipsTheProjectsLowestPhpSaysSo(): void

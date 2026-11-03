@@ -164,7 +164,7 @@ final class FlagSentence
         }
         $project = $d->floorSource() === PhpFloor::PROJECT;
         $floor = $project ? new PhpFloor(null, $d->floorPhp()) : new PhpFloor($d->floorPhp());
-        $words = PhpFloor::missWords($floor->misses($project ? PhpFloor::PROJECT : PhpFloor::TARGET, $d->newestPhp()), \sprintf("the %s's php %s", $project ? 'project' : 'target', (string) $d->floorPhp()));
+        $words = PhpFloor::missWords($d->newestMisses() ?? $floor->misses($project ? PhpFloor::PROJECT : PhpFloor::TARGET, $d->newestPhp()), \sprintf("the %s's php %s", $project ? 'project' : 'target', (string) $d->floorPhp()));
         $out .= \sprintf('; %s, needs php %s%s', $newest, (string) $d->newestPhp(), $words);
         $reachable = $d->reachable();
         if ($reachable !== null) {
