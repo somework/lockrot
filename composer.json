@@ -45,9 +45,9 @@
         "friendsofphp/php-cs-fixer": "^3.70",
         "nikic/php-parser": "^5.1",
         "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^9.6 || ^10.5 || ^11.5",
-        "symfony/console": "^5.4",
-        "symfony/process": "^5.4"
+        "phpunit/phpunit": "^13.4.5",
+        "symfony/console": "^8.1",
+        "symfony/process": "^8.1"
     },
     "autoload": { "psr-4": { "Lockrot\\": "src/" } },
     "autoload-dev": { "psr-4": { "Lockrot\\Tests\\": "tests/" } },
