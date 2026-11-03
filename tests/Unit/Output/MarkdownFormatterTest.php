@@ -332,7 +332,7 @@ final class MarkdownFormatterTest extends TestCase
 
         $footer = array_values(array_filter(explode("\n", $out), static fn (string $line): bool => preg_match('/^(flags|depth|security|libyears|pulled in by|advisories|moves|php): /', $line) === 1));
         self::assertGreaterThan(2, \count($footer), $out);
-        $last = array_pop($footer);
+        [$last] = array_splice($footer, -1);
         foreach ($footer as $line) {
             self::assertMatchesRegularExpression('/(?<!\\\\)(?:\\\\\\\\)*\\\\$/', $line, 'an odd run of backslashes ends the line');
         }
