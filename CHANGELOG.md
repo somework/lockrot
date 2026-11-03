@@ -189,8 +189,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
   installs, with require-dev and without, and the links that set each edge. `platform_override`
   names `config.platform.php` from Composer's merged config, and `target.php` the `X.Y.Z` release
-  that the move check solves at. The text formats print a `php:` line.
-  ([The PHP window](docs/verdicts.md#the-php-window))
+  that the move check solves at. The window reads `config.platform.php-64bit` as that solve does.
+  The text formats print a `php:` line. ([The PHP window](docs/verdicts.md#the-php-window))
 - **json, table, markdown, github:** `run.php_window.target_fix` names the packages that exclude
   the target PHP, and the answer of Composer's solver to their update at the target: the command,
   the holds of a refusal, or the root links that no update can change. The `php:` line prints it,
@@ -341,6 +341,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with `register_argc_argv=On`. Action: upgrade composer/composer to 2.10 or later, or run the
   PHAR, with the CLI PHP.
   ([Exit codes](docs/ci.md#exit-codes))
+- **Breaking:** **CLI:** an empty `--target-php=` exits `2`, as an empty `--fail-on=` and
+  `--baseline=` do, and does not fall back to `LOCKROT_TARGET_PHP`, `extra.lockrot.target-php`,
+  `config.platform.php` or the running PHP. Action: if a CI step passes an unset variable, set it
+  or omit the option. ([Configuration](docs/configuration.md#validation))
 - **Baseline:** when a `--generate-baseline` run reads a baseline-2 file, its reports compare
   with that file, as a check run does. They carry the root `baseline` and each finding's `baseline`.
   ([What --generate-baseline does](docs/baseline.md#what-generate-baseline-does))
@@ -379,20 +383,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **json:** a `release_dates` gap that S1 or a whole-package allowlist entry drops from S10 shows in
   `checks_skipped[]` with the reason `undated_releases`, as the other dropped gaps do.
   ([What was not checked](docs/verdicts.md#what-was-not-checked))
-- **Breaking:** **CLI:** an empty `--target-php=` exits `2`, as an empty `--fail-on=` and
-  `--baseline=` do, and does not fall back to `LOCKROT_TARGET_PHP`, `extra.lockrot.target-php`,
-  `config.platform.php` or the running PHP. Action: if a CI step passes an unset variable, set it
-  or omit the option. ([Configuration](docs/configuration.md#validation))
 - **CLI:** the `--fail-on` help says that a finding which the baseline exempts does not fail.
 - **All formats:** the `gate:` line says `N reach it and the baseline exempts them`, not `are known
   to the baseline`, because the count holds worsened findings that the baseline exempts too.
-- **markdown:** each footer line ends in a hard break, so a renderer with soft line breaks keeps
-  the lines apart. The `libyears:` line names its package as a code span, like the other footer
-  lines.
+- **markdown:** each footer line but the last ends in a hard break, so a renderer with soft line
+  breaks keeps the lines apart. The `libyears:` line names its package as a code span, like the
+  other footer lines.
 - **All formats:** the S10 `release_dates` clause of S2 or S8 reads "a release it reads carries no
   date" or "a release it reads is dated by a commit its tags share", because the clause can come
   from one release, not from the newest ones. ([What was not checked](docs/verdicts.md#what-was-not-checked))
-- **Composer plugin:** the dist archive no longer ships `.claude/`, `.coderabbit.yaml` and
+- **CLI, Install-time:** the dist archive no longer ships `.claude/`, `.coderabbit.yaml` and
   `bin/refresh-monorepo-parents`.
 - **PHAR:** the GitHub release of a tag carries its CHANGELOG section, with absolute links, and an
   X.Y.0 release opens with a link to its upgrade page.
@@ -461,6 +461,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CLI:** a cached 404 from a run without a token does not hide a private repository from a later
   run with a token. The activity cache keeps an answer per credential state. A run with lockrot's
   credentials uses its own cache key, so it reads no answer that 0.13 cached without credentials.
+  After the upgrade, each run with a token fetches its GitHub answers once again.
   ([Caching](docs/internals.md#caching))
 - **CLI:** the activity cache stores only a JSON answer or a 404, so a proxy page or a redirect
   does not replace a cached answer. A failed refetch of an expired 404 leaves the repository
@@ -498,24 +499,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([Baseline](docs/baseline.md#a-baseline-from-a-newer-lockrot))
 - **github, gitlab, sarif:** when a lock repeats a top-level `packages` or `packages-dev` key, an
   annotation points at the entry that Composer reads.
-- **All formats:** the `left-behind` flag summary words the PHP miss at the PHP that S8 judged, so
-  it says `skips` where the S8 summary does.
 - **markdown:** a `|` in a footer code span prints as written, not as `\|`.
 - **CLI:** a UNC path keeps `//server/share` as its root, so a `..` in an `--output` or
   `--baseline` target never climbs above the share.
-- **json:** `explain-2.json` holds no run relation on `php_window.target_fix`, a key that an
-  explanation does not carry. ([The explanation](docs/schema.md#the-explanation))
-- **Move check:** the move check stops at a canonical repository that fails on a package, as
+- **All formats:** the move check stops at a canonical repository that fails on a package, as
   Composer does. A move that needs the package reads `not_checked` with `unloaded_name`.
 - **All formats:** lockrot does not ask a repository for a package that its `only` or `exclude`
   keeps out. When no repository with a feed admits the package, it reads `no_feed`, not `answered`
   with 0 records.
-- **CLI, Install-time:** a request with lockrot's credentials reads only answers cached with credentials.
-  After the upgrade, each run with a token fetches its GitHub answers once again.
-- **All formats:** the PHP window and `target_fix` read `config.platform.php-64bit` as the
-  move-check solve does. `false` removes it, and a value that does not parse gives no window.
-- **CLI, Install-time:** a run with `LOCKROT_TODAY` stores no fetch time later than the real time in the cache
-  of repository host answers.
+- **CLI, Install-time:** a run with `LOCKROT_TODAY` stores no fetch time later than the real time
+  in the cache of repository host answers.
 
 ## [0.13.0] - 2026-10-01
 
