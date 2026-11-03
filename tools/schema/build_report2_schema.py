@@ -1249,10 +1249,13 @@ FINDING = {
     'chain': arr('From the direct requirement down to this package; one element when direct; empty when no direct requirement reaches it (report-1).', ref('packageName')),
     'depth': ref('depth'),
     'depth_unmeasured': nul('Why `depth` is null (C77). Set exactly when `depth` is null.', ref('depthUnmeasured')),
-    'named_in': arr(("The composer.json sections whose keys name this package, or name a package that it replaces or provides (W12) when the lock holds no "
-                     "package of that name: a locked package of the named name wins, and its provider gets no section from that key. `require` first. "
-                     "lockrot reads them whatever --dev says. Empty when no line names it, and in a run that read no composer.json (`depth_unmeasured` says so). "
-                     "Not a reach fact: a run without --dev reaches a require-dev package through others."), ref('composerJsonSection'), uniqueItems=True, maxItems=2),
+    'named_in': arr(("The composer.json sections whose keys name this package, or name a package that it replaces or provides (W12). "
+                     "A `require` key resolves among the production packages first, and among all packages when no production package satisfies it. "
+                     "A `require-dev` key resolves among all packages. In each set, a package of the named name wins, and else every package that replaces "
+                     "or provides the name gets the section. `require` first. lockrot reads them whatever --dev says. Empty when no line names it, and in a "
+                     "run that read no composer.json (`depth_unmeasured` says so). Not a reach fact: a run without --dev walks no require-dev root. "
+                     "A package that composer.json names in require-dev and not in require is reached when a package that the run walks requires it. "
+                     "Else its `depth` is null and `depth_unmeasured` is `unreached`."), ref('composerJsonSection'), uniqueItems=True, maxItems=2),
     'direct_dependents': arr('The direct requirements that reach it (report-1); a transitive move names them (§5.6).', ref('packageName')),
     'signals': arr('S1–S11 that fired, in id order (§7.6).', ref('signal')),
     'evidence': rendered("The join of the counted flags' `flags[].summary` (a flag counts when a `score.terms[].flag` names it) as `<id>: <summary>` in flag order; kept for jq (§7.6). "

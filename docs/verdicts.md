@@ -258,6 +258,8 @@ names the branch within reach. Abridged from the [example run](example-run.md):
 
 After `needs php`, S8 says on which side the newest branch's php misses the floor, tested at
 the floor's point: the project's lowest PHP, or the PHP where the move check solves for the target.
+The report writes that PHP as `run.php_window.target.php`, and no run field writes it when
+`run.php_window` is null.
 The words name the sides of [The PHP test in `--explain`](#the-php-test-in-explain): `above` is
 `needs_newer`, `which stops before` is `stops_before`, `which skips` is `skips`, and `which no PHP
 runs` is `unsatisfiable`. The flag sentence of `left-behind` reads the same side.
@@ -1221,10 +1223,14 @@ deepest: hoa/ustring and hoa/zformat, 4 hops (wallabag/rulerz › hoa/ruler › 
   `composer.json`.
 
 - `named_in` lists the `composer.json` sections that name the package, or a name it replaces or
-  provides: `require`, `require-dev`, or none. A name that the lock holds as a package of its own
-  goes to that package, and the package that replaces or provides the name gets no section from
-  it. A package that `composer.json` names only in `require-dev` is reached through others in a
-  run without `--dev`.
+  provides: `require`, `require-dev`, or none. A `require` key resolves among the production
+  packages first, and among all packages when no production package satisfies it. A
+  `require-dev` key resolves among all packages. In each set, a package of the named name wins,
+  and else every package that replaces or provides the name gets the section.
+
+- `named_in` is no reach fact. A run without `--dev` walks no `require-dev` root. So a package
+  that `composer.json` names in `require-dev` and not in `require` is reached when a package that
+  the run walks requires it. Else its `depth` is null and `depth_unmeasured` is `unreached`.
 
 - The root `rot_depth` counts the graded findings by reach, by depth, by section and by
   production and development, and names the deepest ones with their chain.

@@ -4274,7 +4274,7 @@
                     ]
                 },
                 "named_in": {
-                    "description": "The composer.json sections whose keys name this package, or name a package that it replaces or provides when the lock holds no package of that name: a locked package of the named name wins, and its provider gets no section from that key. `require` first. lockrot reads them whatever --dev says. Empty when no line names it, and in a run that read no composer.json (`depth_unmeasured` says so). Not a reach fact: a run without --dev reaches a require-dev package through others.",
+                    "description": "The composer.json sections whose keys name this package, or name a package that it replaces or provides. A `require` key resolves among the production packages first, and among all packages when no production package satisfies it. A `require-dev` key resolves among all packages. In each set, a package of the named name wins, and else every package that replaces or provides the name gets the section. `require` first. lockrot reads them whatever --dev says. Empty when no line names it, and in a run that read no composer.json (`depth_unmeasured` says so). Not a reach fact: a run without --dev walks no require-dev root. A package that composer.json names in require-dev and not in require is reached when a package that the run walks requires it. Else its `depth` is null and `depth_unmeasured` is `unreached`.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/composerJsonSection"
