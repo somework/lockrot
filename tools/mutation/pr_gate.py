@@ -178,7 +178,9 @@ def changed_since(base: str, root: str) -> Ranges:
     Infection's --git-diff-lines."""
     found: Ranges = {}
     path = ''
-    for line in git(root, 'diff', '--no-ext-diff', '--no-color', '--unified=0', '--diff-filter=AM', base, '--', 'src').splitlines():
+    # The explicit prefixes override diff.noprefix and diff.mnemonicPrefix of a user's git config, and
+    # the parser keys each file on '+++ b/'.
+    for line in git(root, 'diff', '--no-ext-diff', '--no-color', '--src-prefix=a/', '--dst-prefix=b/', '--unified=0', '--diff-filter=AM', base, '--', 'src').splitlines():
         if line.startswith('+++ '):
             path = line[6:] if line.startswith('+++ b/') else ''
             found.setdefault(path, [])

@@ -372,12 +372,16 @@ maintainer.
       an X.0 release before its day, so add an X.0 date only after that release. Check the file
       before you record `docs/example-run.md`.
 
-    - Re-record `docs/example-run.md` with the command and the environment that the top of the
-      page names (`GITHUB_TOKEN`, `COLUMNS`, the snapshot). Run a PHAR that you build from the
-      release branch ([The PHAR](#the-phar)), with `LOCKROT_TODAY=<planned tag day>`. Set the
-      sentence that starts "Recorded on" to "Recorded on <planned tag day> with lockrot X.Y.Z".
-      Then run `ExampleRunQuotesTest`. Fix each page that quotes a line that the recording
-      changed. If the tag day moves, record the page again for the date commit.
+    - Re-record `docs/example-run.md` with a PHAR that you build from the release branch
+      ([The PHAR](#the-phar)):
+      `GITHUB_TOKEN=<token> python3 tools/release/example_run.py build/lockrot.phar <planned tag day>`.
+      The script runs the page's command on the two snapshots that the page links, with
+      `LOCKROT_TODAY` set to that day. It refuses a run with a run note and a clean run that flags a
+      package. It writes the table, the abridged report, the clean run and the sentence "Recorded on
+      <day> with lockrot X.Y.Z". Then run `ExampleRunQuotesTest`. It fails when the page names a
+      version before `Version::STRING`, or that version on another day than its CHANGELOG heading.
+      Fix each page that quotes a line that the recording changed. If the tag day moves, record the page
+      again for the date commit.
 
     - Copy every `resources/lockrot-*.schema.json` file to
       `tests/fixtures/schema-evolution/schemas/X.Y.Z/` and pin their sha256 in `RELEASED_SCHEMAS`
@@ -418,9 +422,12 @@ maintainer.
            `CHANGELOG.md`. Run `npm version X.Y.Z --no-git-tag-version`, which sets `version` in
            `package.json` and both `version` fields of `package-lock.json` (the root and
            `packages[""]`). Commit only the version and the pin.
-           The release pull request fails when `package-lock.json` names a version other than the
-           one in `package.json`. If it fails, fix `package-lock.json` on the renderer's `main`,
-           move the renderer tag `vX.Y.Z` onto that commit, and repeat step 8.
+           The renderer's `release.yml` refuses a tag when `package-lock.json` names a version
+           other than the one in `package.json`. That tag then has no release, and the renderer's
+           tag ruleset keeps it on its commit. If the tag run fails at that check, fix
+           `package-lock.json` on the renderer's `main`. Then do this step and step 7 again with
+           the next patch version of the renderer, and vendor that version in step 8. Name that
+           version in the CHANGELOG line that names the vendored renderer.
         7. Merge that commit into the renderer's `main`. Then tag `vX.Y.Z` on `main`.
         8. Run `tools/report/update-renderer vX.Y.Z`, and commit only the files that it writes. This
            commit must not change the contract bundle.
@@ -465,7 +472,10 @@ maintainer.
     - a tag whose archive prints another version
 
     It builds, signs and attests the PHAR, runs it on PHP 7.4, then publishes the GitHub release
-    and asks lockrot.dev to rebuild.
+    and asks lockrot.dev to rebuild. Its step "The release notes come from the CHANGELOG section of
+    the tag" writes the release body with `tools/release/release_notes.py`: the `## [X.Y.Z]`
+    section, with each relative link made absolute. An `X.Y.0` release with an upgrade page
+    (`docs/changes/X.Y.md`) gets a link to that page first.
 
     If the release widens a `-2` schema (a value of an open set, an optional field), the tag run
     of `phar.yml` fails at its schema check. lockrot.dev serves the previous tag's file under a

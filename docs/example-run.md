@@ -6,8 +6,9 @@ description: "A recorded lockrot run on wallabag's public composer.lock: the ful
 # Example run
 
 What lockrot prints on a real lock, and how to read it. Recorded on 2026-10-26 with lockrot 0.14.0
-on a snapshot of [wallabag](https://github.com/wallabag/wallabag)'s public `composer.lock`, with
-`GITHUB_TOKEN` set, so no repository check was capped, and `COLUMNS=120`, so the wrapping is fixed.
+on [a snapshot](https://github.com/somework/lockrot/blob/main/tests/fixtures/apps/wallabag_wallabag/composer.lock)
+of [wallabag](https://github.com/wallabag/wallabag)'s public `composer.lock`, with `GITHUB_TOKEN`
+set, so no repository check was capped.
 
 ```bash
 COLUMNS=120 php lockrot.phar --target-php=8.4 --output=json:lockrot.json
@@ -535,7 +536,7 @@ details.
 `--format=json` writes every field of the report. The `html` page carries it as its embedded data's
 `report` key ([`--format=html`](ci.md#-formathtml)). This is the same run's document, abridged to
 one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the rest of `exposure` and
-`rot_depth.by_depth`, and the rest of each list in `run.score_model`.
+`rot_depth.by_depth`, and the rest of each list of objects in `run.score_model`.
 
 ```json
 {
@@ -1986,8 +1987,9 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
 
 ## A clean run
 
-Recorded with the same version, on the same date, on a fresh `cakephp/app` skeleton whose lock has
-nothing to grade. The run exited `0` ([exit codes](ci.md#exit-codes)).
+Recorded with the same version, on the same date, on
+[a snapshot](https://github.com/somework/lockrot/blob/main/tests/fixtures/skeletons/cakephp/composer.lock)
+of the `cakephp/app` skeleton, whose lock has nothing to grade. The run exited `0` ([exit codes](ci.md#exit-codes)).
 
 ```text
 20 packages checked · nothing flagged
