@@ -64,4 +64,4 @@ depth: 22 of 55 flagged packages are named by no line of composer.json · direct
 security: 19 vulnerable packages · 88 advisories: 3 critical, 29 high, 40 medium, 3 unrated, 13 low
 update now: composer update phpoffice/phpspreadsheet robrichards/xmlseclibs symfony/http-foundation league/commonmark typo3/html-sanitizer symfony/yaml symfony/polyfill-intl-idn
 php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 11 packages that exclude it is not checked (the run checked no move)
-gate: fails · --fail-on=high,unchecked · 32 findings fail it (high 31, unchecked 3); 2 reach it and are known to the baseline · target php 8.4 (--target-php)
+gate: fails · --fail-on=high,unchecked · 32 findings fail it (high 31, unchecked 3); 2 reach it and the baseline exempts them · target php 8.4 (--target-php)
