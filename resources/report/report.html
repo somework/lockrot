@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ukmDnVz0YqsI05eOVv2hKt876pTI6FHIos3zs2Pb2k8='; style-src 'sha256-Um98l8mqWjAtgwLVCYOrDsy55YHcx4vOeeQhq1JF3pg='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-5Uw1fefSpN87QcHK5uTOJs08VZjIDbcGAzDLGFuc41E='; style-src 'sha256-SDpdSJmbXpiOWHYThyAKaaI3keLtRklgvAww99sGJlc='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -836,11 +836,13 @@ html {
 .shell-main {
   min-width: 0;
 }
-
 .shell-rail {
   position: sticky;
-  top: calc(var(--topbar-h) + 16px);
-  max-height: var(--sticky-room);
+  top: calc(var(--topbar-h) + 12px);
+  max-height: calc(var(--sticky-room) + 8px);
+  padding: 4px;
+  margin: -4px;
+  scroll-padding: 4px;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
@@ -7165,6 +7167,11 @@ a.ov-ex-row:hover {
   border-radius: var(--radius-s);
   font-size: var(--text-xs);
 }
+@media (any-pointer: coarse) and (not (any-pointer: fine)) {
+  .hint {
+    display: none;
+  }
+}
 
 .count-line {
   font-size: var(--text-s);
@@ -7505,7 +7512,7 @@ a.ov-ex-row:hover {
     padding: 3px 9px 3px 8px;
   }
   .pd .fhead,
-  .pd .advgroup > header {
+  .pd .advgroup > .al-group-head {
     break-after: avoid;
   }
   .pd .adv-list > :first-child {
@@ -7570,10 +7577,6 @@ a.ov-ex-row:hover {
     margin-top: 0;
     gap: 5px;
     break-inside: avoid;
-  }
-  .pd-run .note {
-    margin: 0;
-    padding: 6px 10px;
   }
   .pd-run .sect h3 {
     margin: 0 0 4px;
@@ -8435,10 +8438,15 @@ a.ov-ex-row:hover {
 		release_metadata: "its release metadata",
 		advisories: "its advisories",
 		release_branch: "its release branch",
-		release_dates: "release dates",
+		release_dates: "its release dates",
 		releases: "releases"
 	};
 	var skippedCheckWord = (id) => wordFor(SKIPPED_CHECKS, id);
+	var MISSING_CHECKS = {
+		...SKIPPED_CHECKS,
+		release_dates: "release dates"
+	};
+	var missingCheckWord = (id) => wordFor(MISSING_CHECKS, id);
 	var isKnownCheck = (id) => Object.hasOwn(SKIPPED_CHECKS, id);
 	var CHECK_REASON_WORDS = [
 		["baseline_refused", "Composer refuses the lock itself"],
@@ -10318,10 +10326,10 @@ a.ov-ex-row:hover {
 		if (severity === void 0) return null;
 		return term.multiplier === 2 ? severity.band_no_reachable_fix : severity.band;
 	}
-	function headlineWord({ headline }) {
+	function headlineWord({ headline }, f) {
 		switch (headline.unit) {
 			case "years": return headline.value === null ? "" : `${oneDecimal(headline.value)} y`;
-			case "php": return `PHP ${String(headline.value)}`;
+			case "php": return headline.value === null ? `php "${signalData(f, "S5")?.php_constraint ?? ""}"` : `PHP ${String(headline.value)}`;
 			case "reason": return headlineReasonWord(String(headline.value));
 			default: return String(headline.value);
 		}
@@ -10397,7 +10405,7 @@ a.ov-ex-row:hover {
 			const vulnerable = flag.id === "vulnerable";
 			return {
 				id: flag.id,
-				word: headlineWord(flag),
+				word: headlineWord(flag, f),
 				band: vulnerable ? term === void 0 ? null : securityBand(run, term) : flagBand(run, flag.id),
 				accepted,
 				title: null,
@@ -11422,6 +11430,7 @@ a.ov-ex-row:hover {
 	function ago(years) {
 		return years === 0 ? "less than three weeks ago" : `${decimal(years, 1)} years ago`;
 	}
+	var agoAtMost = (years, atMost) => atMost ? `at most ${ago(years)}` : ago(years);
 	//#endregion
 	//#region src/domain/ageRows.ts
 	function when(reading) {
@@ -11548,6 +11557,7 @@ a.ov-ex-row:hover {
 				move: moveBranch !== null && row.branch === moveBranch,
 				newest: i === 0 && !row.installed,
 				datedBy: row.installed ? release?.dated_by ?? null : row.dated_by,
+				atMost: !row.installed && row.highest_released === null && years !== 0,
 				age: shortAge(years),
 				foldedIn: folded[i] ?? null
 			};
@@ -11598,7 +11608,7 @@ a.ov-ex-row:hover {
 		return Math.min(100, Math.max(0, 100 - years / span * 100));
 	}
 	function laneWords(l) {
-		const released = l.years === null ? `${l.version}, undated` : `${l.version}, released ${ago(l.years)}`;
+		const released = l.years === null ? `${l.version}, undated` : `${l.version}, released ${agoAtMost(l.years, l.atMost)}`;
 		return l.datedBy === null ? released : `${released}, dated by ${l.datedBy}`;
 	}
 	function branchesLead(finding, metadata) {
@@ -11612,17 +11622,19 @@ a.ov-ex-row:hover {
 		const s8 = signalData(finding, "S8");
 		if (!s8) return [mine];
 		const reached = s8.reachable_branch !== null;
-		const [higher, version, years] = reached ? [
+		const [higher, version, years, atMost] = reached ? [
 			s8.reachable_branch,
 			s8.reachable_version,
-			s8.reachable_years
+			s8.reachable_years,
+			s8.reachable_release_at_least === true
 		] : [
 			s8.newest_branch,
 			s8.newest_version,
-			s8.newest_years
+			s8.newest_years,
+			s8.newest_release_at_least
 		];
 		if (higher === null) return [mine];
-		return [mine, `${higher === finding.next_step?.to_branch ? "The move's branch" : reached ? "The newest releasing branch within reach" : "The newest branch"}, ${higher}, released ${version ?? ""}${years === null ? "" : ` ${ago(years)}`}.`];
+		return [mine, `${higher === finding.next_step?.to_branch ? "The move's branch" : reached ? "The newest releasing branch within reach" : "The newest branch"}, ${higher}, released ${version ?? ""}${years === null ? "" : ` ${agoAtMost(years, atMost)}`}.`];
 	}
 	var TIMELINE_WORDS = {
 		branch: "branch",
@@ -11785,8 +11797,9 @@ a.ov-ex-row:hover {
 		const event = eventWord(activity.event ?? "push");
 		const last = age.push === null ? `no ${event} reported` : `last ${event} ${dateOf(age.push.at)}`;
 		const archivedFlagRead = finding.checks_skipped.find(({ check }) => check === "repository_archived");
-		return `${place}: ${last}${activity.archived === true ? ", archived" : activity.archived === null ? `, archived flag not read${archivedFlagRead === void 0 ? "" : ` (${causeWord(archivedFlagRead.reason, finding.origin.kind)})`}` : ""}${activity.fetched_at === null ? "" : ` · fetched ${dateOf(activity.fetched_at)}`}${activity.cached_at === null ? "" : ` (cached ${dateOf(activity.cached_at)})`}`;
+		return `${place}: ${last}${activity.archived === true ? ", archived" : activity.archived === null ? `, archived flag not read${archivedFlagRead === void 0 ? "" : ` (${causeWord(archivedFlagRead.reason, finding.origin.kind)})`}` : ""}${activity.fetched_at === null ? "" : ` · fetched ${dateOf(activity.fetched_at)}`}${cachedWords(finding)}`;
 	}
+	var cachedWords = ({ activity }) => activity.cached_at === null ? "" : ` (cached ${dateOf(activity.cached_at)})`;
 	function notReadLine(finding) {
 		const { activity } = finding;
 		if (activity.reason === "host_not_supported") return `lockrot cannot ask ${activity.host ?? ""} about repository activity`;
@@ -11797,7 +11810,7 @@ a.ov-ex-row:hover {
 		const { activity } = finding;
 		switch (activity.status) {
 			case "read": return readLine(finding);
-			case "not_found": return `${activity.forge === null ? "" : `${forgeWord(activity.forge)} `}${activity.host}/${activity.repo}: the host answered 404 (private, renamed or removed)`;
+			case "not_found": return `${activity.forge === null ? "" : `${forgeWord(activity.forge)} `}${activity.host}/${activity.repo}: the host answered 404 (private, renamed or removed)${cachedWords(finding)}`;
 			default: return notReadLine(finding);
 		}
 	}
@@ -13539,16 +13552,18 @@ a.ov-ex-row:hover {
 		const s8 = signalData(finding, "S8");
 		if (!s8) return reading(flag.id, flag.summary);
 		const reached = s8.reachable_branch !== null;
-		const [branch, version, years] = reached ? [
+		const [branch, version, years, atMost] = reached ? [
 			s8.reachable_branch,
 			s8.reachable_version,
-			s8.reachable_years
+			s8.reachable_years,
+			s8.reachable_release_at_least === true
 		] : [
 			s8.newest_branch,
 			s8.newest_version,
-			s8.newest_years
+			s8.newest_years,
+			s8.newest_release_at_least
 		];
-		const higher = `${branch} released ${version ?? ""}${years === null ? "" : ` ${ago(years)}`}`;
+		const higher = `${branch} released ${version ?? ""}${years === null ? "" : ` ${agoAtMost(years, atMost)}`}`;
 		if (ctx.hasBranchRows) {
 			const value = flag.headline.value;
 			const own = typeof value === "number" ? value : s8.years;
@@ -13558,7 +13573,7 @@ a.ov-ex-row:hover {
 		const head = `Branch ${s8.branch} had its last release ${ago(s8.years)}`;
 		if (reached) return reading(flag.id, `${head}, while ${higher}`);
 		const php = s8.newest_php === null ? "" : ` and needs php ${s8.newest_php}`;
-		return reading(flag.id, `${head}; the newest branch, ${s8.newest_branch}, released ${s8.newest_version} ${ago(s8.newest_years)}${php}`);
+		return reading(flag.id, `${head}; the newest branch, ${s8.newest_branch}, released ${s8.newest_version} ${agoAtMost(s8.newest_years, s8.newest_release_at_least)}${php}`);
 	}
 	function vulnerableReading(finding, flag, run, ctx) {
 		const score = isScoreGraded(finding.score) ? finding.score : null;
@@ -13601,7 +13616,8 @@ a.ov-ex-row:hover {
 			case "left-behind": return leftBehindReading(finding, flag, ctx);
 			case "old-promise": {
 				const s5 = signalData(finding, "S5");
-				return reading(flag.id, `It was written for PHP ${s5?.written_for_php ?? ""} and admits ${s5?.target_php ?? run.target_php} untested`);
+				const promise = s5?.written_for_php === null ? `released with php "${s5.php_constraint}"` : `written for PHP ${s5?.written_for_php ?? ""}`;
+				return reading(flag.id, `It was ${promise} and admits ${s5?.target_php ?? run.target_php} untested`);
 			}
 			case "capped": {
 				const s11 = signalData(finding, "S11");
@@ -14561,6 +14577,10 @@ a.ov-ex-row:hover {
 			className: "empty",
 			children: "Nothing is flagged."
 		});
+		if (reason === "emptyLock") return u$1("p", {
+			className: "empty",
+			children: "No packages in this lock."
+		});
 		return u$1("p", {
 			className: "empty",
 			children: [
@@ -15157,6 +15177,7 @@ a.ov-ex-row:hover {
 					className: "ov-link f2-strip-back",
 					href: "#",
 					onClick: (event) => {
+						if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
 						event.preventDefault();
 						dispatch({
 							type: "view",
@@ -16650,7 +16671,7 @@ a.ov-ex-row:hover {
 		const [only] = [...targets];
 		return targets.size === 1 && only !== null && only !== void 0 ? `raise PHP ${only}` : "raise PHP";
 	}
-	var notChecked = (check) => isKnownCheck(check) ? [{ text: `${skippedCheckWord(check)} not checked` }] : [{
+	var notChecked = (check) => isKnownCheck(check) ? [{ text: `${missingCheckWord(check)} not checked` }] : [{
 		text: check,
 		code: true
 	}, { text: " not checked" }];
@@ -17162,7 +17183,7 @@ a.ov-ex-row:hover {
 				children: [
 					line.head !== null && u$1("b", {
 						className: "ov-state-head",
-						children: [line.head, ": "]
+						children: [line.head, line.parts.length > 0 && ": "]
 					}),
 					line.parts.map((clause, at) => u$1(S, { children: [at > 0 && " · ", u$1(StateClauseText, { clause })] }, at)),
 					".",
@@ -18663,7 +18684,7 @@ a.ov-ex-row:hover {
 		if (rows.length === 0) return u$1("section", {
 			className: "p2",
 			"data-surface": "packages",
-			children: u$1(EmptyState, { reason: population2(report, "packages").length === 0 ? "clean" : "filtered" })
+			children: u$1(EmptyState, { reason: population2(report, "packages").length === 0 ? "emptyLock" : "filtered" })
 		});
 		return u$1("section", {
 			className: "p2",
@@ -19219,17 +19240,20 @@ a.ov-ex-row:hover {
 					share === void 0 ? "After the lead" : `After the lead, ${shareGlyph(share)}`,
 					"The previous release's band",
 					"With corroboration, at most"
-				],
+				].map((text) => ({ text })),
 				rows: weights
 			},
 			advisories: {
 				caption: "Advisories",
 				head: [
-					"Severity",
-					"Points",
-					"Band",
-					`${factor === void 0 ? "" : `${fill(PANEL_WORDS.factor, { factor: String(factor) }) ?? ""}: `}no reachable fix`,
-					"Band"
+					{ text: "Severity" },
+					{ text: "Points" },
+					{ text: "Band" },
+					{ text: `${factor === void 0 ? "" : `${fill(PANEL_WORDS.factor, { factor: String(factor) }) ?? ""}: `}no reachable fix` },
+					{
+						text: "Band",
+						name: "Band with no reachable fix"
+					}
 				],
 				rows: advisories
 			}
@@ -19288,11 +19312,15 @@ a.ov-ex-row:hover {
 	}
 	function Table({ table, model }) {
 		const id = g();
+		const wrap = A(null);
 		return u$1("div", {
+			ref: wrap,
 			className: "run2-table-wrap",
-			role: "region",
-			"aria-labelledby": id,
-			tabIndex: 0,
+			...useOverflowX(wrap) ? {
+				role: "region",
+				"aria-labelledby": id,
+				tabIndex: 0
+			} : {},
 			children: u$1("table", {
 				className: "run2-table",
 				children: [
@@ -19302,7 +19330,8 @@ a.ov-ex-row:hover {
 					}),
 					u$1("thead", { children: u$1("tr", { children: table.head.map((cell, index) => u$1("th", {
 						scope: "col",
-						children: cell
+						"aria-label": cell.name,
+						children: cell.text
 					}, index)) }) }),
 					u$1("tbody", { children: table.rows.map((row) => u$1("tr", { children: row.map((cell, index) => index === 0 ? u$1("th", {
 						scope: "row",
@@ -20297,8 +20326,12 @@ a.ov-ex-row:hover {
 		const currentView = A(state.view);
 		currentView.current = state.view;
 		const listFocused = A(false);
+		const focusedAtSwitch = A(null);
 		const dispatchTracked = q((action) => {
-			if (action.type === "view" && action.view !== currentView.current) tabChangedByReader.current = true;
+			if (action.type === "view" && action.view !== currentView.current) {
+				tabChangedByReader.current = true;
+				focusedAtSwitch.current = document.activeElement;
+			}
 			if (action.type === "focus") listFocused.current = true;
 			dispatch(action);
 		}, [dispatch]);
@@ -20318,6 +20351,10 @@ a.ov-ex-row:hover {
 			if (!tabChangedByReader.current) return;
 			tabChangedByReader.current = false;
 			window.scrollTo(0, 0);
+			const switcher = focusedAtSwitch.current;
+			focusedAtSwitch.current = null;
+			const landed = document.activeElement;
+			if (switcher !== null && !switcher.isConnected && (landed === null || landed === document.body)) document.getElementById(`${idBase}-panel`)?.focus({ preventScroll: true });
 		}, [state.view]);
 		h(() => {
 			if (state.view !== "run" || state.section === null) return;
@@ -20578,7 +20615,7 @@ a.ov-ex-row:hover {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.9";
+	var version = "0.14.0-rc.10";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");
