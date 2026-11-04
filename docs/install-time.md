@@ -209,9 +209,6 @@ lock. So a package from `composer require --dev … --dry-run` keeps its `packag
 With `include-dev` on, its score is halved for `dev`, as in `composer lockrot`. With `include-dev`
 off, the check skips it.
 
-A project with no lock yet, such as a new project that runs `composer install`, has no lock to
-read. The check then counts each package of the transaction as production.
-
 ## Related
 
 - [configuration.md](configuration.md#extralockrot-keys) — the `install-time`,
