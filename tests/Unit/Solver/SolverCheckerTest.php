@@ -1421,7 +1421,7 @@ final class SolverCheckerTest extends TestCase
         self::assertNotContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => 'acme/frame', 'constraint' => '^1.0'], self::rows($outcome->holds()));
     }
 
-    /** Ruling R12-2: the refusal names n/new, a dependency of the target that the lock does not hold, so no joint request lists it. */
+    /** The refusal names n/new, a dependency of the target that the lock does not hold, so no joint request lists it. */
     public function testARefusalHoldOnAnUnlockedDependencyMakesNoJointHolder(): void
     {
         $checker = self::checker(

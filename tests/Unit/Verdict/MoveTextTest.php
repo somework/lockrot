@@ -114,7 +114,7 @@ final class MoveTextTest extends TestCase
         self::assertStringNotContainsString('PHP line', $text);
     }
 
-    /** Ruling R12-9: the platform step is a sentence, so the move clause after it starts a new one. */
+    /** The platform step is a sentence, so the move clause after it starts a new one. */
     public function testTheMoveClauseAfterThePlatformStepStartsWithACapitalLetter(): void
     {
         $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, '8.1.0');
@@ -123,7 +123,7 @@ final class MoveTextTest extends TestCase
         self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 8.1.0. Require acme/lib ^2.0', MoveText::render($move));
     }
 
-    /** Ruling R12-9: the refused tail of the platform step is a sentence too. */
+    /** The refused tail of the platform step is a sentence too. */
     public function testTheMoveClauseAfterTheRefusedTailStartsWithACapitalLetter(): void
     {
         $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, '7.4.29', true);

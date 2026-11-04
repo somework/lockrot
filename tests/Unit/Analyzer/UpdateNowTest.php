@@ -147,7 +147,7 @@ final class UpdateNowTest extends TestCase
         self::assertNotContains('matomo/network', JsonPath::arrayAt($document, ['security', 'update_now']));
     }
 
-    /** Ruling R12-1: the old-promise update to 1.5.0 leads, and only the move to 2.x in also[] clears the advisory. */
+    /** The old-promise update to 1.5.0 leads, and only the move to 2.x in also[] clears the advisory. */
     public function testALeadUpdateThatClearsNoAdvisoryMakesNoMember(): void
     {
         $release = static fn (string $version, string $date): array => ['version' => $version, 'time' => $date.'T00:00:00+00:00', 'php' => '>=7.2'];
@@ -168,7 +168,7 @@ final class UpdateNowTest extends TestCase
         self::assertSame([[], null], [JsonPath::arrayAt($document, ['security', 'update_now']), JsonPath::arrayAt($document, ['security'])['update_now_command']]);
     }
 
-    /** Ruling R12-1: the newest 1.9.5 clears the advisory, but the solve installs 1.5.0, which it affects. */
+    /** The newest 1.9.5 clears the advisory, but the solve installs 1.5.0, which it affects. */
     public function testALeadUpdateWhoseInstalledReleaseClearsNoAdvisoryMakesNoMember(): void
     {
         $release = static fn (string $version, string $date): array => ['version' => $version, 'time' => $date.'T00:00:00+00:00', 'php' => '>=7.2'];

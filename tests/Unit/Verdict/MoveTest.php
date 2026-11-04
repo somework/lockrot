@@ -649,7 +649,7 @@ final class MoveTest extends TestCase
         self::assertNull(JsonPath::arrayAt($finding, ['security'])['partial']);
     }
 
-    /** Ruling R12-3: S5 never fires on a release without require.php, so a tag move to v1.0.0 from before the GA adds no old-promise. */
+    /** S5 never fires on a release without require.php, so a tag move to v1.0.0 from before the GA adds no old-promise. */
     public function testATagMoveToAReleaseWithoutPhpAddsNoOldPromise(): void
     {
         $move = JsonPath::arrayAt(self::analyse(['lock' => [['version' => 'dev-master', 'php' => '^7.2 || ^8.0']], 'releases' => [self::release('v1.0.0', '2019-01-01', null)]]), ['next_step']);
@@ -659,7 +659,7 @@ final class MoveTest extends TestCase
     }
 
     /**
-     * Ruling R12-3 reads the php of the tag that the move targets, the highest one, not that of a
+     * A tag move reads the php of the tag that it targets, the highest one, not that of a
      * later-dated backport on its line.
      *
      * @return iterable<string, array{list<array{version: string, time: ?string, php: ?string}>, list<array{kind: string, id: string, basis: ?string}>}>

@@ -170,7 +170,7 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame(['acme/holder'], $outcome->holders('acme/lib'));
     }
 
-    /** Ruling R12-2: the lock does not hold n/new, so it is no holder. Its package hold still drops the root requirement on it. */
+    /** The lock does not hold n/new, so it is no holder. Its package hold still drops the root requirement on it. */
     public function testAHolderThatTheLockDoesNotHoldIsNoHolderOfTheJointRequest(): void
     {
         $root = new Holder(Holder::ROOT, null, null, Holder::ROOT_REQUIRE, '^1.0', 'n/new');
