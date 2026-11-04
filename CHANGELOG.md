@@ -166,10 +166,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   key that turns Composer's advisory blocking off. The move check then blocks no advisory.
   `policy.advisories.audit: ignore` alone writes no run note `advisories_disabled_by_policy`.
   ([The move check](docs/verdicts.md#the-move-check))
-- **All formats:** Composer's solver checks each move against the lock, and the move
-  writes `check` with the release it `installs`. A refused move asks once more with its holders, and
-  `moves_with[]` names the holders that move. A move still refused names its holds in `held_by[]`
-  and prints only `composer why-not --locked`. A `composer.json` hold is one whose root constraint
+- **All formats:** Composer's solver checks each move against the lock, and the move writes `check`
+  with the release it `installs`. A refused move asks again with its holders in the lock, and
+  `moves_with[]` names those that move. A move still refused names its holds in `held_by[]` and
+  prints only `composer why-not --locked`. A `composer.json` hold is one whose root constraint
   excludes the release that the move wants. ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** the move check gives the answers of the Composer that runs lockrot. On Composer
   2.11, advisory blocking skips a root alias such as `dev-main as 1.0.0`. It checks a numeric branch
@@ -192,22 +192,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   move check and `target_fix` `not_checked` with `platform_config_invalid`. Examples are `php:
   "^8.2"`, `ext-intl: "^1.0"` and `PHP: false`. Composer stops every `composer update` on it.
   ([The move check](docs/verdicts.md#the-move-check))
-- **json:** `security.update_now_command` holds no PHP raise step. Only the `update now:` line says
-  to raise `require.php` first. ([Security](docs/schema.md#advisories-with-no-fix-expected))
+- **All formats:** `security.update_now` and the `update now:` line list a vulnerable package only
+  when its lead `update` move clears at least one of its advisories. `security.update_now_command`
+  holds no PHP raise step: only the `update now:` line says to raise `require.php` first.
+  ([Security](docs/schema.md#advisories-with-no-fix-expected))
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
-  installs, with require-dev and without, and the links that set each edge. `platform_override`
-  names `config.platform.php` from Composer's merged config, and `target.php` the `X.Y.Z` release
-  that the move check solves at. The window reads `config.platform.php-64bit` as that solve does.
-  The text formats print a `php:` line. ([The PHP window](docs/verdicts.md#the-php-window))
+  installs, with require-dev and without, and the links that set each edge. A target minor above
+  the newest known minor counts as one more. `platform_override` is Composer's merged
+  `config.platform.php`, and `target.php` the `X.Y.Z` release that the move check solves at. The
+  text formats print a `php:` line. ([The PHP window](docs/verdicts.md#the-php-window))
 - **json, table, markdown, github:** `run.php_window.target_fix` names the packages that exclude
   the target PHP, and the answer of Composer's solver to their update at the target: the command,
   the holds of a refusal, or the root links that no update can change. The `php:` line prints it,
   and marks a root hold on a packages-dev package " in require-dev".
   ([The update that admits the target](docs/verdicts.md#the-update-that-admits-the-target))
-- **json, table, markdown, github:** with a `--target-php` minor above the newest known minor, such
-  as 8.6 before its GA, `run.php_window` reads it as one more known minor. A set that admits the
-  target lists it in `minors`. A cap that excludes it shows `upper_edge` and its setter.
-  ([The PHP window](docs/verdicts.md#the-php-window))
 - **All formats, Install-time:** the run notes `moves_not_checked`, `move_check_failed`,
   `update_now_reduced`, `update_now_refused`, `update_now_not_checked` and `package_name_invalid`
   say what the move check and `update now:` did. A move whose solve throws an error reads
@@ -218,8 +216,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `ignore_does_not_cover_advisories` say when the baseline does not compare fix changes, and when an
   `ignore[]` entry meets a counted advisory. ([Run notes](docs/notes.md#baseline_target_differs))
 - **CLI, Config:** `--fail-on` takes a list, one value per kind: a grade, a flag (at or above in
-  flag order), `vulnerable` or `vulnerable-medium|high|critical`, and `unchecked`. ([In
-  CI](docs/ci.md))
+  flag order), `vulnerable` or `vulnerable-medium|high|critical`, and `unchecked`. lockrot trims
+  around each value the whitespace that the config-2 schema admits, Unicode spaces included.
+  ([In CI](docs/ci.md))
 - **Config:** `ignore[].flags` accepts named maintenance flags. A liveness word also accepts the
   words below it. Without it an entry accepts them all.
   ([The allowlist](docs/configuration.md#the-allowlist))
@@ -384,6 +383,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CLI:** the `--explain` text no longer prints `allowlisted: <reason>`, which 0.13 printed.
   `--explain --format=json` carries the entry in `finding.allowlist`, with its `by` and `reason`.
   ([Explaining one package](docs/configuration.md#explaining-one-package))
+- **CLI:** for a package with an unknown origin, the repository, age and libyears lines of
+  `--explain` give the cause as "origin unknown". 0.13 printed "not from a Composer repository".
+  ([Explaining one package](docs/configuration.md#explaining-one-package))
 - **json:** `libyears_unmeasured` and the keys of `libyears.unmeasured` follow `metadata.status`
   and `age`. `metadata_unavailable` is `unavailable` or `not_found`. `no_stable_release_date` is
   `shared_commit` or `undated` when the installed release has no trusted date. It is
@@ -527,19 +529,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Composer does. A move that needs the package reads `not_checked` with `unloaded_name`.
 - **CLI, Install-time:** a run with `LOCKROT_TODAY` stores no fetch time later than the real time
   in the cache of repository host answers.
-- **All formats:** `security.update_now` and the `update now:` line list a vulnerable package only
-  when its lead `update` move clears at least one of its advisories. A maintenance update that
-  leaves every advisory in place no longer appears there.
-  ([Security](docs/schema.md#advisories-with-no-fix-expected))
-- **All formats:** a joint request to update the holders of a refused move lists only packages that
-  the lock holds. A dependency that the lock lacks is no longer on the allow list or in
-  `moves_with[]`, with a pool version as `installed_version`.
-  ([The move check](docs/verdicts.md#the-move-check))
-- **All formats:** a tag move to a release that declares no `require.php` no longer says that
-  `old-promise` would count, and its `if_applied` does not count it. S5 never fires on such a
-  release. ([The move](docs/verdicts.md#move))
-- **All formats:** after the platform step sentence ("First set config.platform.php …"), the move
-  clause in `next_step.text` and in every text format starts with a capital letter.
 - **All formats:** S2 does not judge the date of a commit that three or more stable tags share, also
   when the highest version is an older pre-release on its own commit. The package age reads as not
   measured, and S10 names the shared commit.
@@ -551,14 +540,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   or a captive portal page) no longer stops the run. The names of that request read as release
   metadata unavailable (`fetch_failed`), as for a transport failure. This also applies to a monorepo
   parent that lockrot loads to date its split packages.
-- **All formats:** a `require-dev` key that names a package in `packages-dev` no longer lands in the
-  `named_in` of a prod package that provides the same name. Without `--dev`, that provider read
-  `["require-dev"]`, and `--explain` asked for `--dev`. ([Verdicts](docs/verdicts.md))
-- **CLI:** `--explain` words the age reason of a package with an unknown origin as "origin unknown",
-  as its repository line does. It said "not from a Composer repository".
-  ([Explaining one package](docs/configuration.md#explaining-one-package))
-- **table:** the `moves:` and `php:` footer lines fold at spaces on a narrow terminal, as a finding
-  does. A command that the `php:` line names stays whole on one line.
 - **CLI, Baseline:** a report or baseline that lockrot cannot write names the real reason, such as a
   read-only directory or a rename onto a directory. It printed "the file could not be created" for
   every failure under Composer. ([Exit codes](docs/ci.md#exit-codes))
@@ -566,8 +547,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a directory, before the analysis and before it writes any `--output` file. It exits 2 at once, not
   after the repository round.
   ([What --generate-baseline does](docs/baseline.md#what-generate-baseline-does))
-- **Config, CLI:** a `fail-on` value that is padded with a form feed or a vertical tab is accepted,
-  as the config-2 schema accepts it.
 - **Install-time:** the check takes the lock from Composer itself. Under `config.lock: false` or
   `--dry-run`, a require-dev package keeps its dev weight, and a stale `composer.lock` on disk
   decides nothing.
