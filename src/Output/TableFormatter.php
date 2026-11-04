@@ -171,16 +171,28 @@ final class TableFormatter implements FormatterInterface
             $report->libyears()->line(),
             RunFooter::exposure($report, $name),
             RunFooter::advisories($report),
-            RunFooter::moveCheck($report),
-            RunFooter::phpWindow($report, $name),
-            $baseline === null ? null : $baseline->summaryLine(),
         ];
+        $commands = [];
+        $code = static function (string $text) use (&$commands): string {
+            $commands[] = $text;
+
+            return $text;
+        };
+        $prose = [RunFooter::moveCheck($report), RunFooter::phpWindow($report, $code)];
         $wrap = max(self::MIN_WRAP_WIDTH, $this->context->terminalWidth());
         $lines = [];
         foreach ($texts as $text) {
             foreach ($text === null ? [] : self::wrapBetweenItems($text, $wrap) as $line) {
                 $lines[] = $line;
             }
+        }
+        foreach ($prose as $text) {
+            foreach ($text === null ? [] : self::wrapKeepingCommands($text, $wrap, $commands) as $line) {
+                $lines[] = $line;
+            }
+        }
+        foreach ($baseline === null ? [] : self::wrapBetweenItems($baseline->summaryLine(), $wrap) as $line) {
+            $lines[] = $line;
         }
         foreach (self::wrapBetweenItems(RunGateText::render($gate, $this->context->runOf($report)), $wrap) as $line) {
             $lines[] = $gate->fails() ? \sprintf('<fg=red>%s</fg=red>', $line) : $line;
@@ -223,17 +235,20 @@ final class TableFormatter implements FormatterInterface
     private const COMMANDS = ['composer lockrot --format=json', 'composer audit'];
 
     /**
+     * @param list<string> $commands more commands that $text names, before the neutraliser
+     *
      * @return list<string>
      */
-    private static function wrapKeepingCommands(string $text, int $wrap): array
+    private static function wrapKeepingCommands(string $text, int $wrap, array $commands = []): array
     {
+        $commands = array_merge(self::COMMANDS, array_map([TerminalText::class, 'neutralise'], $commands));
         $glued = [];
-        foreach (self::COMMANDS as $command) {
+        foreach ($commands as $command) {
             $glued[] = str_replace(' ', "\x1F", $command);
         }
         $lines = [];
         // The glue goes in after the neutraliser, which would print it.
-        foreach (self::wrapNeutralised(str_replace(self::COMMANDS, $glued, TerminalText::neutralise($text)), $wrap) as $line) {
+        foreach (self::wrapNeutralised(str_replace($commands, $glued, TerminalText::neutralise($text)), $wrap) as $line) {
             $lines[] = str_replace("\x1F", ' ', $line);
         }
 
