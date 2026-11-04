@@ -207,9 +207,9 @@ final class FixtureRepositoryServer
     /**
      * Serves the recorded answers of another `composer` repository below `/mirror/<n>` and returns
      * the URL to use in its place: its packages.json, the p2 answer of each served name that its
-     * `available-packages` or `available-package-patterns` admit (every name when neither list has an
-     * entry, case-insensitive), and its advisory API, which gives
-     * the recorded answer to any POST. Each answer is the envelope that `bin/record-fixtures --into`
+     * `available-packages` or `available-package-patterns` admit, and its advisory API, which gives
+     * the recorded answer to any POST. Names match without regard to case, and every name matches
+     * when neither list has an entry. Each answer is the envelope that `bin/record-fixtures --into`
      * wrote in $recordingDir for the original URL. With $advisoriesFail, packages.json names an
      * advisory API on a closed port. Call before {@see start()}.
      */

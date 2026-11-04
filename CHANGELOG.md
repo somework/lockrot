@@ -83,10 +83,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** S8 (`left-behind`) reads an installed pre-release above its branch's newest
   stable release against that release, so such a pre-release can carry S8.
   ([Within reach](docs/verdicts.md#within-reach))
-- **All formats:** S2, S5 (`old-promise`) and S8 (`left-behind`) judge no release that a commit
-  shared by a split's tags dates. For S2 that is the newest release, for S5 the installed release,
-  and for S8 the last release of the installed branch. Such a date no longer fires them, and S10
-  names the signal with `undated_releases`.
+- **All formats:** S5 (`old-promise`) judges no installed release that a commit shared by a
+  split's tags dates. S2 and S8 also judge no such date when a lower tag carries it. For S2 that is
+  the newest release, for S8 the last release of the installed branch. S10 names the signal with
+  `undated_releases`.
   ([What was not checked](docs/verdicts.md#what-was-not-checked))
 - **All formats:** S8, S11's `excludes_target` and the `--explain` branch rows test the target PHP
   at `config.platform.php` when it is a stable release in the target minor, as
