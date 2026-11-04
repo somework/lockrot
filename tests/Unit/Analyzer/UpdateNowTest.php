@@ -116,6 +116,8 @@ final class UpdateNowTest extends TestCase
     {
         $case = CaseHydrator::case('move-check‡');
         $inputs = JsonPath::arrayAt($case, ['inputs']);
+        // A joint request names only a holder that the lock holds.
+        $inputs['lock'] = [...JsonPath::arrayAt($inputs, ['lock']), ['name' => 'h/x', 'version' => '1.0.0', 'type' => 'library']];
         $inputs['checks'] = [
             '*' => [
                 'result' => 'refused', 'form' => null, 'reason' => null,

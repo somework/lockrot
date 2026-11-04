@@ -340,10 +340,11 @@ final class RootRecount
             $fixes[$kind] = ($fixes[$kind] ?? 0) + 1;
             $move = self::map($finding, 'next_step');
             if (isset($move['check'])) {
-                // With a move check, a member is a lead `update` that Composer's solver resolves inline.
+                // With a move check, a member is a lead `update` that clears an advisory and that Composer's solver resolves inline, with no holder.
                 $checked = true;
                 $check = self::map($move, 'check');
-                if (self::str($move, 'kind') === 'update' && self::str($check, 'result') === 'resolves' && self::str($check, 'form') === 'inline') {
+                $clearsAnAdvisory = \in_array('advisory', array_column(\is_array($move['clears'] ?? null) ? $move['clears'] : [], 'kind'), true);
+                if (self::str($move, 'kind') === 'update' && $clearsAnAdvisory && ($move['moves_with'] ?? []) === [] && self::str($check, 'result') === 'resolves' && self::str($check, 'form') === 'inline') {
                     $updateNow[self::str($finding, 'package')] = self::inlineArgument($move);
                 }
             } elseif ($kind === 'update' && CommandArgument::allPass(['composer', 'update', self::str($finding, 'package')])) {

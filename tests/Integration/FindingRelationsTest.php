@@ -38,12 +38,12 @@ final class FindingRelationsTest extends TestCase
         'cases/mc-blocking-off-both-dagger.json', 'cases/mc-blocking-off-dagger.json', 'cases/mc-canonical-package-dagger.json',
         'cases/mc-canonical-vcs-dagger.json', 'cases/mc-canonical-vcs-unmatched-dagger.json', 'cases/mc-composite-dagger.json',
         'cases/mc-dev-update-dagger.json', 'cases/mc-filter-only-dagger.json', 'cases/mc-gets-below-dagger.json', 'cases/mc-gets-next-form-dagger.json',
-        'cases/mc-inline-dagger.json', 'cases/mc-joint-dagger.json', 'cases/mc-joint-down-dagger.json', 'cases/mc-joint-retag-dagger.json', 'cases/mc-link-newest-dagger.json',
+        'cases/mc-inline-dagger.json', 'cases/mc-joint-dagger.json', 'cases/mc-joint-down-dagger.json', 'cases/mc-joint-retag-dagger.json', 'cases/mc-joint-unlocked-dagger.json', 'cases/mc-link-newest-dagger.json',
         'cases/mc-lookup-incomplete-dagger.json', 'cases/mc-lookup-kept-dagger.json', 'cases/mc-minimal-changes-dagger.json', 'cases/mc-newest-above-row-dagger.json',
         'cases/mc-package-hold-dagger.json', 'cases/mc-pass-cap-dagger.json', 'cases/mc-php-newest-dagger.json', 'cases/mc-raise-php-dagger.json',
         'cases/mc-replan-major-dagger.json', 'cases/mc-root-hold-dagger.json', 'cases/mc-root-version-dagger.json',
         'cases/mc-split-both-refused-dagger.json', 'cases/mc-split-dagger.json', 'cases/mc-split-maintenance-larger-dagger.json',
-        'cases/mc-split-not-checked-dagger.json', 'cases/mc-update-now-reduced-dagger.json', 'cases/mc-update-now-refused-dagger.json',
+        'cases/mc-split-not-checked-dagger.json', 'cases/mc-update-now-maintenance-dagger.json', 'cases/mc-update-now-reduced-dagger.json', 'cases/mc-update-now-refused-dagger.json',
         'cases/mc-with-all-dagger.json', 'cases/mc-with-deps-dagger.json', 'cases/xmlseclibs.json',
     ];
     private const CASES = __DIR__.'/../fixtures/flags/cases.json';
@@ -52,7 +52,7 @@ final class FindingRelationsTest extends TestCase
     public function testEveryFixtureDocumentHoldsEveryRelation(): void
     {
         $paths = self::documents();
-        self::assertCount(391, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
+        self::assertCount(406, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
         $broken = [];
         foreach (array_merge($paths, [self::COMPOSITE]) as $path) {
             $document = self::read($path);
