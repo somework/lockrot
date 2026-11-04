@@ -4219,6 +4219,9 @@
     "S8-higher-shared-untrusted\u2021": {
         "next_step": null
     },
+    "S8-higher-undated-stale\u2021": {
+        "next_step": null
+    },
     "S8-prerelease-installed\u2021": {
         "next_step": {
             "kind": "require",
@@ -17819,6 +17822,93 @@
             ],
             "also": [],
             "text": "move it to a tag \u2014 the newest on its own line is v4.4.44, through mautic/core-lib (2022-07-20), older than your snapshot (2024-09-25); review, or replace; 4.x needs php >=7.1.3; stale stays; what requires it must allow it"
+        }
+    },
+    "tag-higher-undated-stale\u2021": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "v4.4.44",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v4.4.44",
+                "released": "2022-07-20T09:59:04+00:00",
+                "is_installed": false,
+                "relation": "older",
+                "snapshot_time": "2024-09-25T14:11:13+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.1.3",
+                "project_allows": null,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "reason": "undated"
+                }
+            ],
+            "adds": [],
+            "leaves": [],
+            "clears_all": false,
+            "if_applied": {
+                "total": 8,
+                "verdict": "medium",
+                "lead": "left-behind",
+                "deciding_advisory": null,
+                "at_most": true,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "transitive"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "why-not",
+                    "symfony/event-dispatcher",
+                    "v4.4.44",
+                    "--locked"
+                ]
+            ],
+            "through": [
+                {
+                    "package": "mautic/core-lib",
+                    "installed_version": "5.0.0-dev",
+                    "installed_requires": null,
+                    "newest_stable": null,
+                    "newest_requires": null,
+                    "newest_requires_unmeasured": "not_from_composer_repository",
+                    "local": true,
+                    "newest_is_installed": null
+                }
+            ],
+            "also": [],
+            "text": "move it to a tag \u2014 the newest on its own line is v4.4.44, through mautic/core-lib (2022-07-20), older than your snapshot (2024-09-25); review, or replace; 4.x needs php >=7.1.3; not checked: left-behind; what requires it must allow it"
         }
     },
     "tag-highest-php\u2021": {
