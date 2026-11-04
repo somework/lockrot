@@ -65,6 +65,7 @@
         "Composer\\Repository\\PlatformRepository",
         "Composer\\Repository\\RepositoryFactory",
         "Composer\\Repository\\RepositoryInterface",
+        "Composer\\Repository\\RepositorySecurityException",
         "Composer\\Repository\\RepositorySet",
         "Composer\\Repository\\RootPackageRepository",
         "Composer\\Semver\\CompilingMatcher",
