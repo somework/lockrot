@@ -201,7 +201,7 @@ A baseline covers only graded findings. On an `ok` or `unknown` finding, a `fail
 stop clears when that check runs (set a token, raise the budget or rerun), or when an
 [`accept-unchecked`](configuration.md#accept-unchecked) entry accepts a gap that no rerun closes.
 
-## Under `--dry-run` {#a-note-on-the-dry-run-development-flag}
+## <a name="a-note-on-the-dry-run-development-flag"></a>Under `--dry-run` {#a-note-on-the-dry-run-development-flag}
 
 lockrot reads the lock from Composer, not from `composer.lock` on disk. Under `--dry-run` and with
 `config.lock` set to `false`, Composer keeps the updated lock in memory, and lockrot reads that
