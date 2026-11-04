@@ -224,8 +224,8 @@ $releaseSources = static function (string $name, array $answers): array {
 /**
  * Records each `composer` repository of the fixture's composer.json beside packagist.org. It
  * records the packages.json, the p2 answer of each name that `RecorderNames::repository()` selects
- * and the advisory answer for those names. A root that is no repository, or a repository that lists
- * locked names and has no `metadata-url`, counts as an unrecorded answer.
+ * and the advisory answer for those names. A root that is no repository, or a repository that
+ * `RecorderNames::unrecordable()` names, counts as an unrecorded answer.
  */
 $recordRepositories = static function (string $fixtureDir, LockFile $lock, string $dir) use ($fetch, $repositoryHttp, $record, $isRecorded, $trim, &$unrecorded): void {
     $manifest = json_decode((string) file_get_contents($fixtureDir.'/composer.json'), true);
@@ -248,9 +248,9 @@ $recordRepositories = static function (string $fixtureDir, LockFile $lock, strin
             continue;
         }
         $names = RecorderNames::repository($packages, array_map(static fn ($package): string => $package->name(), $lock->packages(false)));
-        if ($names !== [] && !\is_string($packages['metadata-url'] ?? null)) {
+        if (RecorderNames::unrecordable($packages, $names)) {
             ++$unrecorded;
-            fwrite(STDERR, \sprintf("not recorded: %s lists locked names and has no metadata-url\n", $root));
+            fwrite(STDERR, \sprintf("not recorded: %s lists packages and has no metadata-url\n", $root));
         }
         $port = parse_url($url, \PHP_URL_PORT);
         $base = (string) parse_url($url, \PHP_URL_SCHEME).'://'.(string) parse_url($url, \PHP_URL_HOST).($port === null || $port === false ? '' : ':'.$port);

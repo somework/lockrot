@@ -53,6 +53,22 @@ final class RecorderNames
     }
 
     /**
+     * True when the repository has no `metadata-url` and lists a locked name or serves packages
+     * through a Composer 1 list, which the recorder does not record.
+     *
+     * @param array<mixed, mixed> $packages the repository's packages.json
+     * @param list<string>        $names    {@see self::repository()}
+     */
+    public static function unrecordable(array $packages, array $names): bool
+    {
+        if (\is_string($packages['metadata-url'] ?? null)) {
+            return false;
+        }
+
+        return $names !== [] || !empty($packages['packages']) || !empty($packages['includes']) || !empty($packages['provider-includes']) || !empty($packages['providers-url']);
+    }
+
+    /**
      * @param mixed $list
      *
      * @return list<string>

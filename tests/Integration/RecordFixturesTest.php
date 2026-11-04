@@ -90,6 +90,17 @@ final class RecordFixturesTest extends TestCase
         self::assertSame(['a/prod', 'b/dev'], RecorderNames::advisory($lock, false));
     }
 
+    public function testARepositoryWithoutAMetadataUrlIsUnrecordedWhenItListsPackages(): void
+    {
+        self::assertTrue(RecorderNames::unrecordable(['available-packages' => ['acme/one']], ['acme/one']));
+        self::assertTrue(RecorderNames::unrecordable(['packages' => ['acme/one' => []]], []));
+        self::assertTrue(RecorderNames::unrecordable(['includes' => ['p/all.json' => []]], []));
+        self::assertTrue(RecorderNames::unrecordable(['providers-url' => '/p/%package%.json'], []));
+        self::assertTrue(RecorderNames::unrecordable(['provider-includes' => ['p/providers.json' => []]], []));
+        self::assertFalse(RecorderNames::unrecordable(['packages' => []], []));
+        self::assertFalse(RecorderNames::unrecordable(['metadata-url' => '/p2/%package%.json', 'packages' => ['acme/one' => []]], ['acme/one']));
+    }
+
     public function testARepositoryListsLockedNamesByPatternAndByExactName(): void
     {
         $locked = ['acme/one', 'acme/two', 'other/three', 'other/four'];
