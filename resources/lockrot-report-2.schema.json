@@ -24266,7 +24266,7 @@
           }
         },
         "update_now": {
-          "description": "The vulnerable packages whose lead move is an `update` that Composer's solver resolves inline, in report order; in a run that checks no move, the packages whose `security.fix_kind` is `update`. A name outside the command argument set of `next_step.commands` is left out.",
+          "description": "The vulnerable packages whose lead move is an `update` that clears at least one of its advisories and that Composer's solver resolves inline, in report order; in a run that checks no move, the packages whose `security.fix_kind` is `update`. A name outside the command argument set of `next_step.commands` is left out.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/packageName"

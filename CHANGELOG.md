@@ -282,9 +282,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **json:** each S9 row's `fix` writes `admits_target_php` and `admits_project_php`, the floor
   answers of a branch row asked of `fix.php`. ([Fix](docs/verdicts.md#fix))
 - **All formats:** S8 quotes a release as "on or after" its date when only a commit that other tags
-  share dates it. This holds for a branch's highest tag, for a lower tag, and for the higher
-  branches that a tag move reads. json marks the bound with `newest_release_at_least` and
-  `reachable_release_at_least`.
+  share dates it. This holds for a branch's highest tag and for a lower tag. json marks the bound
+  with `newest_release_at_least` and `reachable_release_at_least`.
   ([Dates from the monorepo](docs/verdicts.md#dates-from-the-monorepo))
 
 ### Changed
@@ -422,6 +421,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `bin/refresh-monorepo-parents`.
 - **PHAR:** the GitHub release of a tag carries its CHANGELOG section, with absolute links, and an
   X.Y.0 release opens with a link to its upgrade page.
+- **All formats:** a tag move reads the php of the highest tag, and adds old-promise only when that
+  tag declares `require.php`. ([The move](docs/verdicts.md#move))
 
 ### Deprecated
 

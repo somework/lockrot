@@ -1756,7 +1756,8 @@ defs['rootSecurity'] = obj("The root security block (SPEC root block, §7.6, §8
     'severities': obj('Counted advisories per severity, every severity present.', {k: COUNT(f'Counted `{k}` advisories.') for k in SEVERITIES}),
     'fixes': obj('Vulnerable findings per `security.fix_kind`, every known fix kind present (fix kinds are open: a later kind is an extra key).',
                  {k: COUNT(f'Findings whose `security.fix_kind` is `{k}`.') for k in FIX_KINDS}, additionalProperties=INT0),
-    'update_now': arr(("The vulnerable packages whose lead move is an `update` that Composer's solver resolves inline, in report order; in a run that checks no move, "
+    'update_now': arr(("The vulnerable packages whose lead move is an `update` that clears at least one of its advisories and that Composer's solver resolves inline, "
+                       "in report order; in a run that checks no move, "
                        "the packages whose `security.fix_kind` is `update` (§5.3). A name outside the command argument set of `next_step.commands` (§5.6) is left out."), ref('packageName')),
     'update_now_command': nul(("The one command the overview's \"Update now\" copies, as an argv list: `composer`, `update`, then each member with its constraint inline "
                                "(`vendor/pkg:^1.2`) in the order of `update_now`. Composer's solver checked it as one request: a member that the combined request refuses is "
