@@ -340,7 +340,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
     private const PHP_STAR = 'The case sets the project\'s require.php to `*` or to a constraint that matches no PHP (‡), so the project has no lowest PHP. The model keeps the holder\'s own step of case A. lockrot judges the holder with no project lowest, which admits its newest line.';
 
 
-    private const BITBUCKET = 'The model marks the repository archived on Bitbucket (S3). Bitbucket\'s repository API has no archived field, so lockrot cannot raise S3 for a Bitbucket repository, and each later signal moves up one place.';
+    private const BITBUCKET = 'The model marks the repository archived on Bitbucket (S3). Bitbucket\'s repository API has no archived field, so lockrot raises no S3 for a Bitbucket repository. The abandoned flag then lacks the `archived` reason, and its `degree.reasons` and `headline.value` differ.';
 
     private const TIE = 'The model removes S5 from the case to make the tie. The installed release requires php >=5.3.3 and is older than the PHP 8.0 release, so lockrot raises S5 (old-promise).';
 
