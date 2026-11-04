@@ -222,10 +222,11 @@ $releaseSources = static function (string $name, array $answers): array {
 };
 /**
  * Each `composer` repository of the fixture's composer.json beside packagist.org: its packages.json,
- * the p2 answer of each locked name that its `available-package-patterns` match, and the answer of
- * its advisory API for those names.
+ * the p2 answer of each locked name that its `available-packages` or `available-package-patterns` list,
+ * and the answer of its advisory API for those names. A root that is no repository, or a repository
+ * that lists locked names and has no `metadata-url`, counts as an unrecorded answer.
  */
-$recordRepositories = static function (string $fixtureDir, LockFile $lock, string $dir) use ($fetch, $repositoryHttp, $record, $isRecorded, $trim): void {
+$recordRepositories = static function (string $fixtureDir, LockFile $lock, string $dir) use ($fetch, $repositoryHttp, $record, $isRecorded, $trim, &$unrecorded): void {
     $manifest = json_decode((string) file_get_contents($fixtureDir.'/composer.json'), true);
     foreach (\is_array($manifest['repositories'] ?? null) ? $manifest['repositories'] : [] as $repository) {
         $url = \is_array($repository) && ($repository['type'] ?? null) === 'composer' && \is_string($repository['url'] ?? null) ? rtrim($repository['url'], '/') : null;
@@ -241,18 +242,15 @@ $recordRepositories = static function (string $fixtureDir, LockFile $lock, strin
         $result = HttpResult::fromEnvelopeJson($root, (string) @file_get_contents(RecordedHttpClient::pathFor($dir, $root)));
         $packages = $result === null || $result->body() === null ? null : json_decode($result->body(), true);
         if (!\is_array($packages)) {
+            ++$unrecorded;
+            fwrite(STDERR, \sprintf("not recorded: %s is no composer repository root\n", $root));
             continue;
         }
-        $patterns = array_map(static fn (string $pattern): string => '{^'.str_replace('\\*', '.*', preg_quote($pattern, '{')).'$}', $packages['available-package-patterns'] ?? []);
-        $names = array_values(array_filter(array_map(static fn ($package): string => $package->name(), $lock->packages(false)), static function (string $name) use ($patterns): bool {
-            foreach ($patterns as $pattern) {
-                if (preg_match($pattern, $name) === 1) {
-                    return true;
-                }
-            }
-
-            return false;
-        }));
+        $names = RecorderNames::repository($packages, array_map(static fn ($package): string => $package->name(), $lock->packages(false)));
+        if ($names !== [] && !\is_string($packages['metadata-url'] ?? null)) {
+            ++$unrecorded;
+            fwrite(STDERR, \sprintf("not recorded: %s lists locked names and has no metadata-url\n", $root));
+        }
         $port = parse_url($url, \PHP_URL_PORT);
         $base = (string) parse_url($url, \PHP_URL_SCHEME).'://'.(string) parse_url($url, \PHP_URL_HOST).($port === null || $port === false ? '' : ':'.$port);
         $resolve = static fn (string $target): string => preg_match('{^https?://}', $target) === 1 ? $target : $base.$target;

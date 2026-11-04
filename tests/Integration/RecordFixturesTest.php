@@ -77,6 +77,16 @@ final class RecordFixturesTest extends TestCase
         self::assertSame(['a/prod', 'b/dev'], RecorderNames::advisory($lock, false));
     }
 
+    public function testARepositoryListsLockedNamesByPatternAndByExactName(): void
+    {
+        $locked = ['acme/one', 'acme/two', 'other/three', 'other/four'];
+
+        self::assertSame(['acme/one', 'acme/two'], RecorderNames::repository(['available-package-patterns' => ['acme/*']], $locked));
+        self::assertSame(['other/four'], RecorderNames::repository(['available-packages' => ['other/four', 'x/unlocked']], $locked));
+        self::assertSame(['acme/one', 'acme/two', 'other/three'], RecorderNames::repository(['available-package-patterns' => ['acme/*'], 'available-packages' => ['other/three']], $locked));
+        self::assertSame([], RecorderNames::repository([], $locked));
+    }
+
     /**
      * @param array<string, array{int, list<string>}|array{int, list<string>, string}> $answers by URL
      * @param list<list<string>>                                                       $seen    the request headers of each call, in order

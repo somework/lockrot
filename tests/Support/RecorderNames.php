@@ -18,4 +18,42 @@ final class RecorderNames
     {
         return array_map(static fn ($package): string => $package->name(), $lock->packages(!$into));
     }
+
+    /**
+     * Composer lists the names of a repository in `available-packages` and, with `*` wildcards, in
+     * `available-package-patterns`.
+     *
+     * @param array<mixed, mixed> $packages the repository's packages.json
+     * @param list<string>        $locked
+     *
+     * @return list<string> the locked names that the repository lists, in lock order
+     */
+    public static function repository(array $packages, array $locked): array
+    {
+        $exact = self::strings($packages['available-packages'] ?? null);
+        $patterns = array_map(static fn (string $pattern): string => '{^'.str_replace('\\*', '.*', preg_quote($pattern, '{')).'$}', self::strings($packages['available-package-patterns'] ?? null));
+
+        return array_values(array_filter($locked, static function (string $name) use ($exact, $patterns): bool {
+            if (\in_array($name, $exact, true)) {
+                return true;
+            }
+            foreach ($patterns as $pattern) {
+                if (preg_match($pattern, $name) === 1) {
+                    return true;
+                }
+            }
+
+            return false;
+        }));
+    }
+
+    /**
+     * @param mixed $list
+     *
+     * @return list<string>
+     */
+    private static function strings($list): array
+    {
+        return \is_array($list) ? array_values(array_filter($list, 'is_string')) : [];
+    }
 }
