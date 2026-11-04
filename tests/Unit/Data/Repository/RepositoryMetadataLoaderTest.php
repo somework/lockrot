@@ -346,6 +346,34 @@ final class RepositoryMetadataLoaderTest extends TestCase
         rmdir($dir);
     }
 
+    /** A proxy or a captive portal answers 200 with a page that is not JSON: the names fail, and the run goes on. */
+    public function testAnAnswerThatIsNotJsonFailsTheNameAsATransportFailureDoes(): void
+    {
+        $dir = $this->tempDir('lockrot-not-json-');
+        $envelopeDir = $dir.'/envelopes';
+        self::assertTrue(mkdir($envelopeDir));
+        $lockPath = $dir.'/composer.lock';
+        file_put_contents($lockPath, (string) json_encode(['packages' => [['name' => 'test/not-json', 'version' => '1.0.0']]]));
+        file_put_contents(RecordedHttpClient::pathFor($envelopeDir, 'https://repo.packagist.org/p2/test/not-json.json'), (string) json_encode([
+            'status' => 200,
+            'fetched_at' => self::FIXED,
+            'body' => '<html>proxy login page</html>',
+            'error' => null,
+        ]));
+        $server = FixtureRepositoryServer::fromLockFiles([$lockPath], $envelopeDir);
+        $server->start();
+        try {
+            $batch = (new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::FIXED)))->load(self::names(['test/not-json']));
+
+            self::assertSame([], $batch->metadata());
+            self::assertSame([], $batch->notFound());
+            self::assertStringContainsString('does not contain valid JSON', $batch->failed()['test/not-json'] ?? '');
+            self::assertSame(MetadataFailure::FETCH_FAILED, MetadataFailure::reason($batch->failed()['test/not-json']));
+        } finally {
+            $server->stop();
+        }
+    }
+
     public function testOfflineWithColdCacheFailsEveryNameWithNetworkDisabledReason(): void
     {
         // Warm just the repository's root metadata online first (any successful load does that).

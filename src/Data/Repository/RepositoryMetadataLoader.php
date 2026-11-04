@@ -11,6 +11,7 @@ use Composer\Repository\FilterRepository;
 use Composer\Repository\RepositoryInterface;
 use Lockrot\Clock;
 use Lockrot\Deadline;
+use Seld\JsonLint\ParsingException;
 
 /** @internal */
 final class RepositoryMetadataLoader implements MetadataLoaderInterface
@@ -217,7 +218,8 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
 
             try {
                 $result = $repository->loadPackages(array_fill_keys($chunk, null), $acceptableStabilities, []);
-            } catch (\RuntimeException $e) {
+            } catch (\RuntimeException|ParsingException $e) {
+                // A ParsingException is an answer that does not parse: a proxy page instead of the file.
                 foreach ($chunk as $name) {
                     $failed[$name] = RepositoryUrl::inText($e->getMessage());
                 }
