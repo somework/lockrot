@@ -147,6 +147,27 @@ final class UpdateNowTest extends TestCase
         self::assertNotContains('matomo/network', JsonPath::arrayAt($document, ['security', 'update_now']));
     }
 
+    /** Ruling R12-1: the old-promise update to 1.5.0 leads, and only the move to 2.x in also[] clears the advisory. */
+    public function testALeadUpdateThatClearsNoAdvisoryMakesNoMember(): void
+    {
+        $release = static fn (string $version, string $date): array => ['version' => $version, 'time' => $date.'T00:00:00+00:00', 'php' => '>=7.2'];
+        $inputs = [
+            'root' => ['name' => 'acme/app', 'require' => ['php' => '>=7.4', 'a/b' => '^1.0']],
+            'lock' => [['name' => 'a/b', 'version' => '1.0.0', 'time' => '2019-01-01T00:00:00+00:00', 'php' => '>=7.2', 'dev' => false, 'origin' => 'packagist']],
+            'releases' => [$release('1.0.0', '2019-01-01'), $release('1.5.0', '2021-06-01'), $release('2.0.0', '2021-01-01')],
+            'advisories' => [['id' => 'PKSA-1', 'severity' => 'low', 'affected_versions' => '<2.0.0']],
+            'activity' => null,
+            'run' => ['target_php' => '8.4', 'project_php' => '>=7.4', 'fail_on' => 'high', 'include_dev' => false],
+            'checks' => ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]],
+        ];
+        $document = JsonPath::decoded(CaseHydrator::report(['id' => 'move', 'clock' => '2026-10-14T00:00:00+00:00', 'inputs' => $inputs])->toArray());
+        $move = JsonPath::arrayAt(self::finding($document, 'a/b'), ['next_step']);
+
+        self::assertSame(['update', '1.5.0', 'resolves', 'inline'], [$move['kind'], $move['version'], JsonPath::stringAt($move, ['check', 'result']), JsonPath::stringAt($move, ['check', 'form'])]);
+        self::assertNotContains('PKSA-1', array_column(JsonPath::arrayAt($move, ['clears']), 'id'));
+        self::assertSame([[], null], [JsonPath::arrayAt($document, ['security', 'update_now']), JsonPath::arrayAt($document, ['security'])['update_now_command']]);
+    }
+
     public function testTheCommandLeavesOutTheCandidateThatTheRefusalNamesAndANoteSaysWhy(): void
     {
         $document = self::documentOf('commonmark', [
