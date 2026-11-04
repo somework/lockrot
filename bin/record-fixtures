@@ -7,7 +7,8 @@ declare(strict_types=1);
 // Usage: GITHUB_TOKEN=... bin/record-fixtures [--gitlab-domain=<host> ...] [--into=<dir>] [fixtureDir ...]
 //
 // It records packages and packages-dev: a `--dev` test replays them. The advisory answer is one
-// packagist.org POST with every locked name, whatever its origin, as lockrot's lookup sends it.
+// packagist.org POST with every name that it records, whatever its origin, as lockrot's lookup sends it.
+// A request sends a token only to the host that it names, not to the target of a redirect.
 //
 // The script trims each p2 body to KEEP and each forge body to the keys that its ForgeApi reads. A
 // fixture with its own `http` directory keeps its answers there (p2, github, gitlab, advisories),
@@ -43,6 +44,8 @@ use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Repository\MonorepoParents;
 use Lockrot\Lock\LockFile;
 use Lockrot\Tests\Support\RecordedStatus;
+use Lockrot\Tests\Support\RecorderHttp;
+use Lockrot\Tests\Support\RecorderNames;
 
 const KEEP = ['name', 'version', 'version_normalized', 'time', 'abandoned', 'source', 'require', 'conflict', 'provide', 'replace', 'type', 'extra'];
 const REPOSITORY_BASE_URL = 'https://repo.packagist.org/p2/';
@@ -85,23 +88,7 @@ foreach ($names === null ? [$p2Dir, $ghDir, $advisoryDir] : [] as $dir) {
         mkdir($dir, 0777, true);
     }
 }
-// PHP's http wrapper sends the headers again to the host that a redirect names. So a request with a
-// token follows no redirect.
-$fetch = static function (string $url, array $headers, ?string $post = null, bool $follow = true): HttpResult {
-    $http = ['method' => $post === null ? 'GET' : 'POST', 'header' => implode("\r\n", array_merge(['User-Agent: lockrot-recorder'], $headers)), 'ignore_errors' => true, 'timeout' => 30, 'follow_location' => $follow ? 1 : 0];
-    if ($post !== null) {
-        $http['content'] = $post;
-    }
-    $ctx = stream_context_create(['http' => $http]);
-    $body = @file_get_contents($url, false, $ctx);
-    $status = 0;
-    foreach ($http_response_header ?? [] as $line) {
-        if (preg_match('{^HTTP/\S+\s+(\d{3})}', $line, $m) === 1) {
-            $status = (int) $m[1];
-        }
-    }
-    return new HttpResult($url, $status, $body === false ? null : $body, new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
-};
+$fetch = static fn (string $url, array $headers, ?string $post = null, bool $follow = true): HttpResult => RecorderHttp::fetch($url, $headers, $post, $follow, [RecorderHttp::class, 'stream']);
 $trim = static function (string $body, string $name): string {
     $json = json_decode($body, true);
     if (!\is_array($json) || !isset($json['packages'][$name])) {
@@ -302,7 +289,7 @@ foreach ($fixtures as $fixture) {
     }
     $advisoryPath = ($own !== null ? $own.'/advisories' : $advisoryDir).'/'.basename($fixture).'.json';
     if (!$isRecorded($advisoryPath)) {
-        $names = array_map(static fn ($package): string => $package->name(), $lock->packages(true));
+        $names = RecorderNames::advisory($lock, $into !== null);
         $result = $fetch(ADVISORY_API_URL, ['Content-Type: application/x-www-form-urlencoded'], http_build_query(['packages' => $names]));
         $store($advisoryPath, $result, $result->body());
         fwrite(STDERR, \sprintf("advisories %s (%d names) %d\n", $fixture, \count($names), $result->status()));
