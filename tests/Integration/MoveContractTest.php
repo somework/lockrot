@@ -38,7 +38,7 @@ final class MoveContractTest extends TestCase
         'many-dependents' => [[['version', 'commands'], self::VERSION]],
         'pagerfanta' => [[['version', 'commands'], self::VERSION]],
         'B-also‡' => [[['also.version', 'also.commands'], self::VERSION], [['rows.if_applied'], self::DATED]],
-        'tie‡' => [[['version', 'commands', 'unverified', 'if_applied', 'also.leaves'], self::TIE]],
+        'tie‡' => [[['version', 'commands'], self::VERSION], [['unverified', 'if_applied', 'also.leaves'], self::TIE]],
         'B-offline‡' => [[['version', 'commands'], self::VERSION]],
         'holder-vuln‡' => [[['version', 'commands'], self::VERSION]],
         'partial-op‡' => [[['version', 'commands'], self::VERSION]],
@@ -340,6 +340,18 @@ final class MoveContractTest extends TestCase
         }
         if (\is_array($partial) && \is_array($installed) && $partial['version'] === $installed['lowest']) {
             self::assertSame($installed['if_applied'], self::rerunRow($partial['if_applied']), 'security.partial and the installed row have the same score after it');
+        }
+    }
+
+    /** A listed `version` or `commands` of a move is the S8 cause, so the lowest-admitted-release check reads it. */
+    public function testEveryListedMoveVersionHasTheVersionReason(): void
+    {
+        foreach (self::DIFFERENCES as $id => $groups) {
+            foreach ($groups as [$fields, $reason]) {
+                if (array_intersect($fields, ['version', 'commands', 'also.version', 'also.commands']) !== []) {
+                    self::assertSame(self::VERSION, $reason, $id.': a listed version or commands needs the version reason');
+                }
+            }
         }
     }
 

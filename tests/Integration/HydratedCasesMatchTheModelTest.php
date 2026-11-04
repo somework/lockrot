@@ -203,7 +203,8 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['signals[S5]', 'flags[old-promise]', 'score.terms[].flag'], self::TIE],
             ],
             'moves' => [
-                [['signals[S5]', 'flags[old-promise]', 'next_step.version', 'next_step.commands', 'next_step.unverified[].id', 'next_step.unverified[].kind', 'next_step.if_applied.at_most', 'next_step.if_applied.total', 'next_step.if_applied.verdict', 'next_step.also[].leaves[].id', 'next_step.also[].leaves[].kind', 'score.terms[].flag'], self::TIE],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
+                [['signals[S5]', 'flags[old-promise]', 'next_step.unverified[].id', 'next_step.unverified[].kind', 'next_step.if_applied.at_most', 'next_step.if_applied.total', 'next_step.if_applied.verdict', 'next_step.also[].leaves[].id', 'next_step.also[].leaves[].kind', 'score.terms[].flag'], self::TIE],
             ],
             'security' => [
                 [['signals[S5]'], self::TIE],
@@ -533,6 +534,21 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         }
 
         return $out;
+    }
+
+    /** A listed `version` or `commands` of a move is the S8 cause, so the lowest-admitted-release check reads it. */
+    public function testEveryListedMoveVersionHasTheVersionReason(): void
+    {
+        $versioned = ['next_step.version', 'next_step.commands', 'next_step.also[].version', 'next_step.also[].commands'];
+        foreach (self::DIFFERENCES as $id => $lines) {
+            foreach ($lines as $line => $groups) {
+                foreach ($groups as [$paths, $reason]) {
+                    if (array_intersect($paths, $versioned) !== []) {
+                        self::assertSame(self::MOVE_VERSION, $reason, $id.' '.$line.': a listed version or commands needs the version reason');
+                    }
+                }
+            }
+        }
     }
 
     /** Each listed path is one that its line reads, and each list has a reason. */
