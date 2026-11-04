@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Verdict;
 
+use Lockrot\Config\ConfigSchema;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
@@ -62,6 +63,27 @@ final class FailOnTest extends TestCase
         self::assertSame($canonical, FailOn::parse($input)->value());
     }
 
+    /** @return iterable<string, array{string, string}> */
+    public static function unicodeWhitespace(): iterable
+    {
+        yield 'a next line after the value' => ["high\u{0085}", 'high'];
+        yield 'a no-break space after the value' => ["high\u{00A0}", 'high'];
+        yield 'both around a comma' => ["\u{00A0}high\u{0085},\u{00A0}stale\u{0085}", 'high,stale'];
+    }
+
+    /**
+     * The config-2 pattern runs as a `/u` regex, so its `\s` matches Unicode whitespace.
+     *
+     * @dataProvider unicodeWhitespace
+     */
+    #[DataProvider('unicodeWhitespace')]
+    public function testAValueThatTheConfigSchemaAcceptsParses(string $input, string $canonical): void
+    {
+        ConfigSchema::validate(['fail-on' => $input]);
+
+        self::assertSame($canonical, FailOn::parse($input)->value());
+    }
+
     public function testNoneHasNoValueAndNoKind(): void
     {
         self::assertTrue(FailOn::parse('none')->isNone());
@@ -92,6 +114,7 @@ final class FailOnTest extends TestCase
         yield 'empty' => ['', 'unknown value ""'];
         yield 'vulnerable-low' => ['vulnerable-low', 'LOCKROT_FAIL_ON: vulnerable-low is not a value: use "vulnerable": every counted advisory is at least low'];
         yield 'an array with an unknown value' => [['high', 'dead'], 'unknown value "dead"'];
+        yield 'a byte that is not UTF-8' => ["high\xFF", "unknown value \"high\xFF\""];
     }
 
     /**

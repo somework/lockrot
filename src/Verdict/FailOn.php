@@ -28,8 +28,11 @@ final class FailOn
     /** Each `vulnerable` value with the lowest raw severity it reaches. */
     public const VULNERABLE = ['vulnerable' => 'low', 'vulnerable-medium' => 'medium', 'vulnerable-high' => 'high', 'vulnerable-critical' => 'critical'];
 
-    /** What `\s` matches in the fail-on pattern of the config-2 schema, as Composer's validator runs it. */
-    private const WHITESPACE = " \t\n\r\x0B\f";
+    /**
+     * The `\s` of the config-2 fail-on pattern: the validator runs the pattern with the `u` modifier,
+     * so `\s` also matches Unicode whitespace such as U+0085 and U+00A0.
+     */
+    private const SURROUNDING_WHITESPACE = '/^\s+|\s+$/u';
 
     private const KIND_NOUNS = [self::KIND_GRADE => 'grades', self::KIND_FLAG => 'flags', self::KIND_VULNERABLE => 'vulnerable values', self::KIND_UNCHECKED => 'unchecked values'];
 
@@ -61,7 +64,7 @@ final class FailOn
         $byKind = [];
         $seen = [];
         foreach ($words as $word) {
-            $value = strtolower(trim($word, self::WHITESPACE));
+            $value = strtolower(preg_replace(self::SURROUNDING_WHITESPACE, '', $word) ?? $word);
             if ($value === 'vulnerable-low') {
                 throw new ConfigException($source.': vulnerable-low is not a value: use "vulnerable": every counted advisory is at least low');
             }
