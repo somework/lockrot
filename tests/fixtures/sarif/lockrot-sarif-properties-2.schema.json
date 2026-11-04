@@ -728,7 +728,8 @@
             "lookup_failed",
             "no_feed",
             "not_from_composer_repository",
-            "unparseable_version"
+            "unparseable_version",
+            "composer_json_invalid"
           ]
         }
       }

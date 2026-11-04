@@ -496,13 +496,14 @@
             }
         },
         "advisoriesNotCheckedReason": {
-            "description": "Why security advisories were not checked: `offline` (`--offline`; advisories are never served from a cache), `install_time_budget` (the install-time budget ran out), `lookup_failed` (every feed threw). An open set: read a reason you do not know as another reason.",
+            "description": "Why security advisories were not checked: `offline` (`--offline`; advisories are never served from a cache), `install_time_budget` (the install-time budget ran out), `lookup_failed` (every feed threw), `composer_json_invalid` (Composer cannot load composer.json, so the lookup asks no repository). An open set: read a reason you do not know as another reason.",
             "type": "string",
             "pattern": "^[a-z][a-z0-9_]*$",
             "x-known-values": [
                 "offline",
                 "install_time_budget",
-                "lookup_failed"
+                "lookup_failed",
+                "composer_json_invalid"
             ]
         },
         "advisoryFeed": {
@@ -3050,7 +3051,7 @@
                     ]
                 },
                 "reason": {
-                    "description": "Why it did not run: `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4). `no_feed`: no Composer repository of the run publishes advisories (S9). `not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). On a path, artifact or package origin, the same gaps are skips. An open set: read an unknown reason as another reason.",
+                    "description": "Why it did not run: `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4). `no_feed`: no Composer repository of the run publishes advisories (S9). `composer_json_invalid`: Composer cannot load the composer.json of the run, so the advisory lookup asks no repository (S9). `not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). On a path, artifact or package origin, the same gaps are skips. An open set: read an unknown reason as another reason.",
                     "type": "string",
                     "pattern": "^[a-z][a-z0-9_]*$",
                     "x-known-values": [
@@ -3065,7 +3066,8 @@
                         "lookup_failed",
                         "host_not_supported",
                         "no_feed",
-                        "not_from_composer_repository"
+                        "not_from_composer_repository",
+                        "composer_json_invalid"
                     ]
                 },
                 "blocks": {
@@ -4274,7 +4276,7 @@
                     ]
                 },
                 "named_in": {
-                    "description": "The composer.json sections whose keys name this package, or name a package that it replaces or provides. A `require` key resolves among the production packages first, and among all packages when no production package satisfies it. A `require-dev` key resolves among all packages. In each set, a package of the named name wins, and else every package that replaces or provides the name gets the section. `require` first. lockrot reads them whatever --dev says. Empty when no line names it, and in a run that read no composer.json (`depth_unmeasured` says so). Not a reach fact: a run without --dev walks no require-dev root. A package that composer.json names in require-dev and not in require is reached when a package that the run walks requires it. Else its `depth` is null and `depth_unmeasured` is `unreached`.",
+                    "description": "The composer.json sections whose keys name this package, or name a package that it replaces or provides. A `require` key resolves among the production packages first, and among all packages when no production package satisfies it. A `require-dev` key resolves among all packages. In each set, a package of the named name wins, and else every package that replaces or provides the name gets the section. `require` first. lockrot reads them whatever --dev says. Empty when no line names it, and in a run that read no composer.json (`depth_unmeasured` says so). Not a reach fact: a run without --dev walks no require-dev root. A package that composer.json names in require-dev and not in require is reached when a package that the run walks requires it. Else its `depth` is null and `depth_unmeasured` is `unreached`. A run with --dev walks each require-dev line as a root, so such a package has `depth` 0.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/composerJsonSection"
@@ -16975,7 +16977,7 @@
                                 ]
                             },
                             "admits_target_php": {
-                                "description": "Whether `php` admits the target PHP: true when some version of the target minor (`target_php`, 8.4 read as >=8.4.0 <8.5.0) satisfies it, false when none does and Composer resolving against the target would not install the branch. Null is no answer, never admitted: `php` is null or cannot be read.",
+                                "description": "Whether `php` admits the target PHP point: true when that point satisfies it, false when it does not and Composer resolving at that point would not install the branch. The point is `config.platform.php` when it is a stable release of the minor of `target_php`, else the newest patch of that minor (8.4 read as 8.4.99). 0.13 tested the whole minor (>=8.4.0 <8.5.0). Null is no answer, never admitted: `php` is null or cannot be read.",
                                 "type": [
                                     "boolean",
                                     "null"
@@ -17005,7 +17007,7 @@
                                 ]
                             },
                             "misses_target_php": {
-                                "description": "Which side of the target PHP `php` is on when it admits no version of the target minor (admits_target_php false), read against the whole minor as admits_target_php reads it (8.4 as >=8.4.0 <8.5.0): `needs_newer` when every PHP `php` admits is above the floor (a newer PHP is needed), `stops_before` when every PHP it admits is below the floor (the branch's support ends before it), `skips` when it admits PHP both below and above the floor but not the floor itself (`^7.4 || ~8.2.0` against 8.1), `unsatisfiable` when it admits no PHP at all (`>=9 <8`, or only a branch name). Null exactly where admits_target_php is not false: the floor is admitted, or there is no answer. Given for the target whatever php_blocked_by names, so a row the project already holds back still says how it misses the target. On the installed row it describes the branch's newest dated release, which may be the installed version itself or a newer one (see `php`); that version's own requirement is `lock.php`. The page quotes `php` as written; no bound is extracted from it. Values grow in minor releases; treat one you do not know as other.",
+                                "description": "Which side of the target PHP `php` is on when it does not admit the target PHP point (admits_target_php false), read at that point as admits_target_php reads it: `needs_newer` when every PHP `php` admits is above the floor (a newer PHP is needed), `stops_before` when every PHP it admits is below the floor (the branch's support ends before it), `skips` when it admits PHP both below and above the floor but not the floor itself (`^7.4 || ~8.2.0` against 8.1), `unsatisfiable` when it admits no PHP at all (`>=9 <8`, or only a branch name). Null exactly where admits_target_php is not false: the floor is admitted, or there is no answer. Given for the target whatever php_blocked_by names, so a row the project already holds back still says how it misses the target. On the installed row it describes the branch's newest dated release, which may be the installed version itself or a newer one (see `php`); that version's own requirement is `lock.php`. The page quotes `php` as written; no bound is extracted from it. Values grow in minor releases; treat one you do not know as other.",
                                 "oneOf": [
                                     {
                                         "type": "string",
@@ -17041,7 +17043,7 @@
                                 ]
                             },
                             "highest_admits_target_php": {
-                                "description": "`admits_target_php` asked of `highest_php`: whether the highest tag's php admits the target PHP. The Release branches line reads it beside `highest_php`. Null is no answer, never admitted.",
+                                "description": "`admits_target_php` asked of `highest_php`, at the same target PHP point: whether the highest tag's php admits it. The Release branches line reads it beside `highest_php`. Null is no answer, never admitted.",
                                 "oneOf": [
                                     {
                                         "type": "boolean"
@@ -17103,7 +17105,7 @@
                                 ]
                             }
                         },
-                        "description": "One release branch, highest first (the details block). Every key but `highest_php`, the three `highest_*` floor answers, `released_years` and `fixes` is 0.13's; find the installed row by `installed: true`, never by name."
+                        "description": "One release branch, highest first (the details block). Every key but `highest_php`, the three `highest_*` floor answers, `released_years` and `fixes` is 0.13's; find the installed row by `installed: true`, never by name. `admits_target_php` and `misses_target_php` keep their 0.13 names, and they test one PHP point."
                     }
                 },
                 "installed_branch": {
@@ -20473,7 +20475,7 @@
                     "type": "boolean"
                 },
                 "unchecked_reason": {
-                    "description": "Why the lookup did not complete: `offline install_time_budget lookup_failed`, and `not_from_composer_repository` (outside the composer-repositories scope), `unparseable_version`, `no_feed`; an open set; null on a complete lookup.",
+                    "description": "Why the lookup did not complete: `offline install_time_budget lookup_failed`, and `not_from_composer_repository` (outside the composer-repositories scope), `unparseable_version`, `no_feed`, and `composer_json_invalid` (Composer cannot load composer.json, so the lookup asks no repository); an open set; null on a complete lookup.",
                     "oneOf": [
                         {
                             "type": "string",
@@ -20484,7 +20486,8 @@
                                 "lookup_failed",
                                 "not_from_composer_repository",
                                 "unparseable_version",
-                                "no_feed"
+                                "no_feed",
+                                "composer_json_invalid"
                             ]
                         },
                         {
