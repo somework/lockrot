@@ -79,9 +79,29 @@ final class MoveText
         }
         $parts[] = [$text.self::checked($move->check()).self::movesWith($move), false];
         $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride(), $subject->isBaselineRefused());
-        array_unshift($parts, [$step, false]);
 
-        return self::joined($parts);
+        return self::joined(array_merge([[$step, false]], $step === '' ? $parts : self::sentenceStart($parts)));
+    }
+
+    /**
+     * The pieces with the first prose piece capitalized, as a sentence after the platform step
+     * starts. A command keeps its own spelling.
+     *
+     * @param list<array{0: string, 1: bool}> $parts
+     *
+     * @return list<array{0: string, 1: bool}>
+     */
+    private static function sentenceStart(array $parts): array
+    {
+        foreach ($parts as $index => [$text, $isCommand]) {
+            if ($text !== '') {
+                $parts[$index] = [$isCommand ? $text : ucfirst($text), $isCommand];
+
+                break;
+            }
+        }
+
+        return $parts;
     }
 
     /**

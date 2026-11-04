@@ -114,6 +114,15 @@ final class MoveTextTest extends TestCase
         self::assertStringNotContainsString('PHP line', $text);
     }
 
+    /** Ruling R12-9: the platform step is a sentence, so the move clause after it starts a new one. */
+    public function testTheMoveClauseAfterThePlatformStepStartsWithACapitalLetter(): void
+    {
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, '8.1.0');
+        $move = new Move(Move::REQUIRE, FlagSet::LEFT_BEHIND, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', '^2.0', null, null, true, [], [], [], [], [], null, [], [['composer', 'require', 'acme/lib:^2.0']], $subject);
+
+        self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 8.1.0. Require acme/lib ^2.0', MoveText::render($move));
+    }
+
     public function testAReplaceMoveWithNoReplacementSaysReplaceIt(): void
     {
         $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null);
@@ -380,6 +389,7 @@ final class MoveTextTest extends TestCase
         yield 'a platform step before the command' => [Move::UPDATE, FlagSet::VULNERABLE, '7.4.29', [$update], [['First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29. ', false], ['composer update acme/lib', true], [' (gets 2.0.0)', false]]];
         yield 'a command that no shell takes, before the named one' => [Move::UPDATE, FlagSet::VULNERABLE, null, [['composer', 'update', 'acme/lib;x'], $update], [['composer update acme/lib', true], [' (gets 2.0.0)', false]]];
         yield 'no command that a shell takes' => [Move::UPDATE, FlagSet::VULNERABLE, null, [['composer', 'update', 'acme/lib;x']], [['update it with Composer (gets 2.0.0)', false]]];
+        yield 'a platform step before prose' => [Move::UPDATE, FlagSet::VULNERABLE, '7.4.29', [['composer', 'update', 'acme/lib;x']], [['First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29. Update it with Composer (gets 2.0.0)', false]]];
         yield 'no command in the text' => [Move::FIND_ALTERNATIVE, FlagSet::ABANDONED, null, [], [['find a replacement (none named)', false]]];
     }
 
