@@ -39,7 +39,7 @@ final class Thresholds
     {
         $unsetKeys = [];
         $read = static function (string $key, int $default) use ($extra, &$unsetKeys): int {
-            if (!isset($extra[$key])) {
+            if (!\array_key_exists($key, $extra)) {
                 $unsetKeys[] = $key;
 
                 return $default;

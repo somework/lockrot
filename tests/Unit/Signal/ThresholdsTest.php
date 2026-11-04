@@ -104,7 +104,14 @@ final class ThresholdsTest extends TestCase
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('extra.lockrot.push-high-years (2) must not be below extra.lockrot.push-warn-years (3, the default of the unset key)');
-        Thresholds::fromArray(['push-high-years' => 2, 'push-warn-years' => null]);
+        Thresholds::fromArray(['push-high-years' => 2]);
+    }
+
+    public function testANullThresholdIsRefusedAsNoInteger(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('extra.lockrot.push-warn-years must be an integer');
+        Thresholds::fromArray(['push-warn-years' => null]);
     }
 
     public function testAHighEqualToItsWarnIsAccepted(): void
