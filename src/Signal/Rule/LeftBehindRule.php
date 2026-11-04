@@ -73,12 +73,7 @@ final class LeftBehindRule implements SignalRule
             if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $ownAt) {
                 continue;
             }
-            // A tag dated only by a commit its tags share is released on or after `at`: the highest
-            // tag with no trusted date, or a lower tag on a shared commit. A monorepo parent's date
-            // and a lower tag with a date of its own are quoted exactly.
-            $atLeast = ($release['highest']['at'] === null && $release['version'] === $release['highest']['pretty'])
-                || AgeMeasure::sharedCommitDates($metadata, $release);
-            $candidate = ['branch' => (string) $key, 'version' => $release['version'], 'at' => $release['at'], 'php' => $release['php'] ?? null, 'at_least' => $atLeast];
+            $candidate = ['branch' => (string) $key, 'version' => $release['version'], 'at' => $release['at'], 'php' => $release['php'] ?? null, 'at_least' => self::atLeast($metadata, $release)];
             if (self::newer($candidate, $newest)) {
                 $newest = $candidate;
             }
@@ -172,16 +167,32 @@ final class LeftBehindRule implements SignalRule
             return [];
         }
         $undated = [];
-        // A branch with no dated release has an undated highest tag too.
+        // A branch with no dated release has an undated highest tag too. A lower bound past the warn
+        // years cannot say that the branch stopped, so its release is undated as well.
         foreach ($higher as $release) {
             if ($release['highest']['at'] === null) {
                 $undated[] = $release['highest']['normalized'];
+            } elseif ($release['at'] !== null && self::atLeast($metadata, $release) && !$this->isAlive($release['at'])) {
+                $undated[] = $this->parser->normalize($release['version']);
             }
         }
         // Highest first, whatever order the repository lists the branches in.
         usort($undated, static fn (string $a, string $b): int => version_compare($b, $a));
 
         return $undated;
+    }
+
+    /**
+     * A tag dated only by a commit its tags share is released on or after `at`: the highest tag
+     * with no trusted date, or a lower tag on a shared commit. A monorepo parent's date and a lower
+     * tag with a date of its own are exact.
+     *
+     * @param array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string} $release
+     */
+    private static function atLeast(PackageMetadata $metadata, array $release): bool
+    {
+        return ($release['highest']['at'] === null && $release['version'] === $release['highest']['pretty'])
+            || AgeMeasure::sharedCommitDates($metadata, $release);
     }
 
     /** @param array{branch: string, version: string, at: \DateTimeImmutable, php: ?string, at_least: bool} $release */

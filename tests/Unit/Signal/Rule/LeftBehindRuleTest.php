@@ -612,6 +612,41 @@ final class LeftBehindRuleTest extends TestCase
         self::assertTrue($data['reachable_release_at_least']);
     }
 
+    /** A shared-commit date is only a lower bound: past the warn years, the higher branch is unmeasured, not quiet. */
+    public function testAStaleSharedCommitLowerBoundOnAHigherBranchIsAnUndatedRelease(): void
+    {
+        $meta = self::sharedCommitBranch('2019-06-01T00:00:00+00:00');
+        $facts = F::facts(F::package(['version' => '4.0.0']), $meta);
+
+        self::assertNull($this->rule()->evaluate($facts));
+        self::assertSame(['5.0.2.0'], $this->rule()->undatedReleases($facts));
+    }
+
+    /** A lower bound inside the warn years leaves the branch alive either way, so S8 fires and no release is undated. */
+    public function testASharedCommitLowerBoundInsideTheWarnYearsNeedsNoUndatedRelease(): void
+    {
+        $meta = self::sharedCommitBranch('2025-06-01T00:00:00+00:00');
+        $facts = F::facts(F::package(['version' => '4.0.0']), $meta);
+
+        self::assertNotNull($this->rule()->evaluate($facts));
+        self::assertSame([], $this->rule()->undatedReleases($facts));
+    }
+
+    /** 5.x: the highest tag 5.1.0 has a trusted 2018 date, and the newer-dated 5.0.2, 5.0.1 and 5.0.0 share a commit dated $shared. */
+    private static function sharedCommitBranch(string $shared): PackageMetadata
+    {
+        $loader = new ArrayLoader();
+        $on = static fn (string $version, string $commit, string $time): array => ['name' => 'vendor/pkg', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => $commit]];
+
+        return PackageMetadata::fromPackages('vendor/pkg', [
+            $loader->load($on('5.1.0', 'top', '2018-01-01T00:00:00+00:00')),
+            $loader->load($on('5.0.2', 'split', $shared)),
+            $loader->load($on('5.0.1', 'split', $shared)),
+            $loader->load($on('5.0.0', 'split', $shared)),
+            $loader->load($on('4.0.0', 'own', '2015-01-01T00:00:00+00:00')),
+        ], new \DateTimeImmutable(F::NOW));
+    }
+
     public function testAHigherBranchWithATrustedDateIsQuotedExactly(): void
     {
         $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '1.9.2']), F::metadata([['2.0.0', '2026-01-10'], ['1.9.2', '2019-03-02']])));
