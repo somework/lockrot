@@ -22,6 +22,9 @@ use Lockrot\Composer\ServiceFactory;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
+use Lockrot\Data\Advisory\AdvisoryIgnore;
+use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
+use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
@@ -154,7 +157,7 @@ final class LockrotCommandTest extends TestCase
     }
 
     /** The analyzer every test factory in this class builds: fixture metadata and recorded GitHub envelopes, never the network. */
-    private static function testAnalyzer(MetadataLoaderInterface $loader, LockrotConfig $lockrot, Clock $clock): Analyzer
+    private static function testAnalyzer(MetadataLoaderInterface $loader, LockrotConfig $lockrot, Clock $clock, ?AdvisoryLoaderInterface $advisories = null): Analyzer
     {
         $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
 
@@ -166,7 +169,8 @@ final class LockrotCommandTest extends TestCase
             BuiltinAllowlist::load(),
             SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()),
             $clock,
-            $lockrot->offline()
+            $lockrot->offline(),
+            $advisories
         );
     }
 
@@ -1385,6 +1389,51 @@ final class LockrotCommandTest extends TestCase
             self::assertIsArray($json);
             self::assertSame(['not_checked', MoveCheck::COMPOSER_JSON_INVALID], [JsonPath::stringAt($json, ['run', 'move_check', 'baseline']), JsonPath::stringAt($json, ['run', 'move_check', 'reason'])]);
         });
+    }
+
+    /**
+     * Ruling R12-24: the global config holds neither the project's repositories nor its ignore
+     * lists, so the advisory lookup does not fall back to it. Here the global config's repository
+     * holds an advisory that the global config ignores.
+     */
+    public function testAComposerJsonThatComposerCannotLoadLeavesTheAdvisoriesNotChecked(): void
+    {
+        $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $server->withAdvisoryApi(['doctrine/cache' => [['advisoryId' => 'PKSA-global', 'packageName' => 'doctrine/cache', 'remoteId' => 'PKSA-global', 'title' => 'Global', 'link' => 'https://example.test/PKSA-global', 'affectedVersions' => '<2.0', 'sources' => [], 'reportedAt' => '2024-03-01 12:00:00', 'severity' => 'high']]]);
+        $server->start();
+        $project = $this->tempDir('lockrot-invalid-manifest-advisories-');
+        file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/invalid-manifest-test', 'require' => ['acme/<<fg=red>>' => '1.0.0']]));
+        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'doctrine/cache', 'version' => '1.0.0']], 'packages-dev' => []]));
+        chdir($project);
+        $home = $this->tempDir('lockrot-invalid-manifest-advisories-home-');
+        file_put_contents($home.'/config.json', (string) json_encode(['config' => ['secure-http' => false, 'audit' => ['ignore' => ['PKSA-global']]], 'repositories' => ['packagist.org' => false, 'fixture' => ['type' => 'composer', 'url' => $server->url()]]]));
+        $loader = $this->emptyLoader();
+        $command = $this->buildCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock): Analyzer => self::testAnalyzer($loader, $lockrot, $clock, new RepositoryAdvisoryLoader($repositories, false, null, AdvisoryIgnore::fromConfig($config))));
+        $code = null;
+        $stdout = '';
+        $stderr = '';
+
+        try {
+            $this->withComposerEnv($this->tempDir('lockrot-invalid-manifest-advisories-cache-'), $home, function () use ($command, &$code, &$stdout, &$stderr): void {
+                [$code, $stdout, $stderr] = $this->runCommandWithSplitStreams($command, ['--format' => 'json', '--target-php' => '8.4']);
+            });
+            $requests = $server->advisoryRequests();
+        } finally {
+            $server->stop();
+        }
+
+        self::assertSame(0, $code, $stderr);
+        $json = json_decode($stdout, true);
+        self::assertIsArray($json);
+        self::assertSame([], $requests, 'no repository of the global config is asked');
+        self::assertSame(['not_run', 'composer_json_invalid', []], [JsonPath::stringAt($json, ['findings', 0, 'security', 'check']), JsonPath::stringAt($json, ['findings', 0, 'security', 'unchecked_reason']), JsonPath::arrayAt($json, ['findings', 0, 'security', 'feeds'])]);
+        $advisoryGaps = array_values(array_filter(JsonPath::arrayAt($json, ['findings', 0, 'checks_missing']), static fn ($entry): bool => \is_array($entry) && $entry['check'] === 'advisories'));
+        self::assertSame([['check' => 'advisories', 'reason' => 'composer_json_invalid', 'blocks' => ['S9']]], $advisoryGaps);
+        self::assertSame([[], 0], [JsonPath::arrayAt($json, ['run', 'advisory_lookup', 'repositories']), JsonPath::intAt($json, ['run', 'advisory_lookup', 'packages_asked'])]);
+        $index = array_search(RunNote::ADVISORIES_NOT_CHECKED, JsonPath::column($json, ['note_details'], 'code'), true);
+        self::assertIsInt($index, $stdout);
+        self::assertSame(['reason' => 'composer_json_invalid', 'composer_repositories_checked' => 0], JsonPath::arrayAt($json, ['note_details', $index, 'data']));
+        self::assertSame("security advisories not checked (Composer cannot load composer.json): no finding is graded for an advisory, and each next step's score after the move assumes its versions carry none", JsonPath::stringAt($json, ['notes', $index]));
     }
 
     /** Composer's merge puts composer.json's `config.platform` over the global one, also when Composer cannot load the file. */

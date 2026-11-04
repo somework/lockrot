@@ -86,7 +86,7 @@ final class RunNote
 
     public const ADVISORIES_OFFLINE = 'offline';
     public const INSTALL_TIME_BUDGET = 'install_time_budget';
-    public const ADVISORIES_NOT_CHECKED_REASONS = [self::ADVISORIES_OFFLINE, self::INSTALL_TIME_BUDGET];
+    public const ADVISORIES_NOT_CHECKED_REASONS = [self::ADVISORIES_OFFLINE, self::INSTALL_TIME_BUDGET, MoveCheck::COMPOSER_JSON_INVALID];
     /** The same reason strings as S10 carries on the findings that the note concerns. */
     public const REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS = [NotCheckedRule::BUDGET];
 
@@ -94,6 +94,7 @@ final class RunNote
     private const ADVISORIES_NOT_CHECKED_TEXT = [
         self::ADVISORIES_OFFLINE => 'security advisories not checked (offline)'.self::ADVISORIES_NOT_CHECKED_COST,
         self::INSTALL_TIME_BUDGET => 'security advisories not checked (install-time budget spent)'.self::ADVISORIES_NOT_CHECKED_COST,
+        MoveCheck::COMPOSER_JSON_INVALID => 'security advisories not checked (Composer cannot load composer.json)'.self::ADVISORIES_NOT_CHECKED_COST,
     ];
 
     private const ADVISORIES_NOT_CHECKED_COST = ': no finding is graded for an advisory, and each next step\'s score after the move assumes its versions carry none';

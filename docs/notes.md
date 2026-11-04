@@ -163,6 +163,7 @@ The advisory lookup did not run, or stopped before it asked every repository.
 |---|---|---|
 | `offline` | `--offline`: advisories are never served from a cache | 0 |
 | `install_time_budget` | The install-time budget ran out | Above 0 when the check was partial: advisories from the repositories asked are in the findings, and lockrot never asked the rest |
+| `composer_json_invalid` | Composer refuses the project's composer.json. The global config does not hold the project's repositories or advisory ignore lists, so lockrot asks no repository | 0 |
 
 ## Repository activity
 

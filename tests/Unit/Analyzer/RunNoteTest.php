@@ -138,6 +138,13 @@ final class RunNoteTest extends TestCase
             false,
             ['reason' => 'install_time_budget', 'composer_repositories_checked' => 2],
         ];
+        yield 'advisories under a composer.json that Composer refuses' => [
+            static fn (): RunNote => RunNote::advisoriesNotChecked('composer_json_invalid', 0),
+            'advisories_not_checked',
+            'security advisories not checked (Composer cannot load composer.json): no finding is graded for an advisory, and each next step\'s score after the move assumes its versions carry none',
+            false,
+            ['reason' => 'composer_json_invalid', 'composer_repositories_checked' => 0],
+        ];
         yield 'advisories off by the policy key' => [
             static fn (): RunNote => RunNote::advisoriesDisabledByPolicy('policy.advisories', false),
             'advisories_disabled_by_policy',
@@ -452,7 +459,7 @@ final class RunNoteTest extends TestCase
             'update_now_not_checked',
             'move_check_failed',
         ], RunNote::CODES);
-        self::assertSame(['offline', 'install_time_budget'], RunNote::ADVISORIES_NOT_CHECKED_REASONS);
+        self::assertSame(['offline', 'install_time_budget', 'composer_json_invalid'], RunNote::ADVISORIES_NOT_CHECKED_REASONS);
         self::assertSame(['install_time_budget'], RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS);
     }
 

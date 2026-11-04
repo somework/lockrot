@@ -24,6 +24,8 @@ use Lockrot\Config\Gate;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
 use Lockrot\Config\UnknownKeys;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
+use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
@@ -263,6 +265,11 @@ final class LockrotCommand extends BaseCommand
             // No time budget, unlike the install-time summary (docs/install-time.md#time-budget).
             $checks = static fn (): MoveChecks => MoveChecks::of($root === null ? new UncheckedMoves($hasComposerJson ? MoveCheck::COMPOSER_JSON_INVALID : MoveCheck::NO_COMPOSER_JSON, $platformPhp, MoveCheckers::configuredPhp64bit($config)) : MoveCheckers::forProject($root, $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), Deadline::never(), $lockrot->advisoryLookup()));
             $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never(), $checks, $lock->platform()['php'] ?? null);
+            if ($root === null && $hasComposerJson) {
+                // Fail closed: the global config holds neither the project's repositories nor its
+                // advisory ignore lists.
+                $analyzer = $analyzer->withAdvisories(RepositoryAdvisoryLoader::askingNone(AdvisoryCoverage::COMPOSER_JSON_INVALID, $lockrot->advisoryLookup(), $lockrot->advisoryLookupSource()));
+            }
             // Before the baseline is read: an explanation ignores it, so a missing or unreadable
             // baseline must not block it.
             if (\is_string($explain)) {

@@ -36,6 +36,8 @@ final class AdvisoryCoverage
     public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
     public const UNPARSEABLE_VERSION = 'unparseable_version';
     public const LOOKUP_FAILED = 'lookup_failed';
+    /** Composer refuses the project's composer.json, which holds its repositories and ignore lists. */
+    public const COMPOSER_JSON_INVALID = 'composer_json_invalid';
 
     private string $scope;
     private string $scopeSource;
