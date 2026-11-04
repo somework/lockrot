@@ -658,6 +658,34 @@ final class MoveTest extends TestCase
         self::assertStringNotContainsString('old-promise', JsonPath::stringAt($move, ['text']));
     }
 
+    /**
+     * Ruling R12-3 reads the php of the tag that the move targets, the highest one, not that of a
+     * later-dated backport on its line.
+     *
+     * @return iterable<string, array{list<array{version: string, time: ?string, php: ?string}>, list<array{kind: string, id: string, basis: ?string}>}>
+     */
+    public static function backports(): iterable
+    {
+        $promise = [['kind' => 'flag', 'id' => 'old-promise', 'basis' => 'released_before_ga']];
+        yield 'a highest tag without php beside a backport with php' => [[self::release('v1.5.0', '2019-01-01', null), self::release('v1.4.9', '2019-06-01', '>=7.2')], []];
+        yield 'a highest tag with php beside a backport without php' => [[self::release('v1.5.0', '2019-01-01', '>=7.2'), self::release('v1.4.9', '2019-06-01', null)], $promise];
+        yield 'an undated highest tag without php beside a backport with php' => [[self::release('v1.5.0', null, null), self::release('v1.4.9', '2019-06-01', '>=7.2')], []];
+    }
+
+    /**
+     * @dataProvider backports
+     *
+     * @param list<array{version: string, time: ?string, php: ?string}> $releases
+     * @param list<array{kind: string, id: string, basis: ?string}>     $adds
+     */
+    #[DataProvider('backports')]
+    public function testATagMoveReadsThePhpOfTheTagItTargets(array $releases, array $adds): void
+    {
+        $move = JsonPath::arrayAt(self::analyse(['lock' => [['version' => '1.x-dev', 'php' => '^7.2 || ^8.0']], 'releases' => $releases]), ['next_step']);
+
+        self::assertSame(['tag', 'v1.5.0', $adds, []], [$move['kind'], JsonPath::stringAt($move, ['latest', 'version']), $move['adds'], $move['unverified']]);
+    }
+
     /** With no release read, the test move names the installed release, dated as S5 reads it. */
     public function testAnOldPromiseWithoutReleaseDataTestsTheInstalledOne(): void
     {

@@ -262,7 +262,7 @@ final class MoveBuilder
         $unverified = [];
         $quiet = static fn (string $flag): bool => !\in_array($flag, $flags->fired(), true) && !\in_array($flag, $flags->acceptSet(), true);
         $target = $context->subject()->targetPhp();
-        $php = $row === null ? null : $row->php();
+        $php = $row === null ? null : $row->highestPhp();
         if ($row !== null && $quiet(FlagSet::LEFT_BEHIND)) {
             $state = self::leftBehindOn($row, $context);
             if ($state === 'fires') {
