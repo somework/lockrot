@@ -30,6 +30,8 @@ final class CheckOutcome
     private array $movesWith = [];
     private bool $joint = false;
     private ?ConstraintInterface $range = null;
+    /** @var list<string>|null */
+    private ?array $locked = null;
 
     /** @param list<Holder> $holds */
     public function __construct(MoveCheck $check, array $holds = [], ?string $problem = null)
@@ -117,8 +119,30 @@ final class CheckOutcome
         return $this->movesWith;
     }
 
-    /** @return list<string> the packages of the package holds other than $package, in hold order */
+    /**
+     * A copy whose {@see holders()} lists only the packages that the lock holds: Composer does not
+     * update a name that the lock does not hold, so it is no holder of a joint request.
+     *
+     * @param list<string> $names the names that the lock holds
+     */
+    public function withLocked(array $names): self
+    {
+        $clone = clone $this;
+        $clone->locked = $names;
+
+        return $clone;
+    }
+
+    /** @return list<string> the locked packages of the package holds other than $package, in hold order; each package when the outcome knows no lock */
     public function holders(string $package): array
+    {
+        $locked = $this->locked;
+
+        return array_values(array_filter($this->holdPackages($package), static fn (string $name): bool => $locked === null || \in_array($name, $locked, true)));
+    }
+
+    /** @return list<string> */
+    private function holdPackages(string $package): array
     {
         $holders = [];
         foreach ($this->holds as $hold) {
@@ -138,7 +162,7 @@ final class CheckOutcome
      */
     public function withoutRootOnHolders(): self
     {
-        $holders = $this->holders('');
+        $holders = $this->holdPackages('');
         $holds = array_values(array_filter($this->holds, static fn (Holder $hold): bool => $hold->source() !== Holder::ROOT
             || !\in_array($hold->link(), [Holder::REQUIRE, Holder::REQUIRE_DEV, Holder::ROOT_REQUIRE], true)
             || !\in_array($hold->target(), $holders, true)));

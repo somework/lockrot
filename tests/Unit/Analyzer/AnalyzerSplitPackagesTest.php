@@ -19,6 +19,7 @@ use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\MonorepoParents;
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
@@ -26,6 +27,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FakeHttpClient;
+use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
@@ -239,6 +241,28 @@ final class AnalyzerSplitPackagesTest extends TestCase
         self::assertCount(1, $details);
         self::assertSame(['parent' => 'laravel/framework', 'reason' => 'fetch_failed', 'message' => 'HTTP 503 from repo.packagist.org'], $details[0]->data());
         self::assertTrue($details[0]->setsNetworkFailures());
+    }
+
+    /** The parent's file is a proxy page, not JSON: the parent fails as a transport failure does, and the run goes on. */
+    public function testAParentAnswerThatIsNotJsonIsANoteAndANetworkFailure(): void
+    {
+        $releases = array_map(static fn (string $version): array => ['version' => $version, 'time' => '2022-01-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/illuminate/contracts.git', 'reference' => 'shared']], ['v8.83.27', 'v8.83.26', 'v8.83.25']);
+        $server = FixtureRepositoryServer::fromReleases(['illuminate/contracts' => $releases]);
+        $server->withMetadataAnswer('laravel/framework', '<html><body>proxy login</body></html>');
+
+        try {
+            $server->start();
+            $report = $this->analyzer(new RepositoryMetadataLoader($server->repositories(), Clock::fixed(F::NOW)), new MonorepoParents(['laravel/framework' => ['illuminate/contracts']]), new Thresholds(1, 1))
+                ->analyze($this->lock('illuminate/contracts@v8.83.27'), ProjectConfig::empty(), false);
+        } finally {
+            $server->stop();
+        }
+
+        $notes = self::metadataNotes($report);
+        self::assertCount(1, $notes);
+        self::assertStringStartsWith('Repository metadata unavailable for laravel/framework, which dates the packages split out of it: ', $notes[0]);
+        self::assertStringContainsString('does not contain valid JSON', $notes[0]);
+        self::assertTrue($report->hadNetworkFailures());
     }
 
     public function testAnExhaustedInstallTimeBudgetSkipsTheParentSilently(): void

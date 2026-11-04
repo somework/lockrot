@@ -55,6 +55,7 @@ final class NotCheckedRule implements SignalRule
         self::BUDGET => 'the install-time budget ran out',
         AdvisoryCoverage::LOOKUP_FAILED => 'an advisory repository failed',
         AdvisoryCoverage::NO_FEED => 'no configured repository publishes advisories',
+        AdvisoryCoverage::COMPOSER_JSON_INVALID => 'Composer cannot load composer.json',
     ];
 
     /** The words of the S10 entry for release data a counted advisory needed. */

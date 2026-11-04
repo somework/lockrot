@@ -73,10 +73,7 @@ final class LeftBehindRule implements SignalRule
             if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $ownAt) {
                 continue;
             }
-            // The highest tag itself, dated only by a commit its tags share, is released on or after `at`.
-            // A lower tag with a date of its own is quoted exactly.
-            $atLeast = $release['highest']['at'] === null && $release['version'] === $release['highest']['pretty'];
-            $candidate = ['branch' => (string) $key, 'version' => $release['version'], 'at' => $release['at'], 'php' => $release['php'] ?? null, 'at_least' => $atLeast];
+            $candidate = ['branch' => (string) $key, 'version' => $release['version'], 'at' => $release['at'], 'php' => $release['php'] ?? null, 'at_least' => AgeMeasure::releaseDateIsLowerBound($metadata, $release)];
             if (self::newer($candidate, $newest)) {
                 $newest = $candidate;
             }
@@ -143,8 +140,9 @@ final class LeftBehindRule implements SignalRule
     }
 
     /**
-     * The highest tags without a trusted date that leave S8 undecided, normalized, empty when S8
-     * misses nothing. It is the installed branch's own tag, with a higher branch to compare with.
+     * The tags without a trusted date that leave S8 undecided, normalized, empty when S8 misses
+     * nothing. It is the installed branch's highest tag, or its newest tag on a shared commit
+     * ({@see AgeMeasure::releaseDateIsLowerBound()}), with a higher branch to compare with.
      * Or it is a higher branch's tag, while the installed branch is quiet enough for a level and
      * S8 did not fire. A branch snapshot is on no release branch, so S8 misses nothing there.
      *
@@ -161,16 +159,21 @@ final class LeftBehindRule implements SignalRule
         $higher = array_filter($byBranch, static fn ($key): bool => ReleaseBranch::isAbove((string) $key, $branch), \ARRAY_FILTER_USE_KEY);
         $reading = $this->age->branchRelease($facts);
         if ($reading->unmeasured() === AgeMeasure::UNDATED_RELEASES) {
-            return $higher === [] ? [] : [$byBranch[$branch]['highest']['normalized']];
+            $own = $byBranch[$branch];
+
+            return $higher === [] ? [] : [$own['highest']['at'] === null ? $own['highest']['normalized'] : $this->parser->normalize($own['version'])];
         }
         if ($reading->level() === null || $this->evaluate($facts) !== null) {
             return [];
         }
         $undated = [];
-        // A branch with no dated release has an undated highest tag too.
+        // A branch with no dated release has an undated highest tag too. A lower bound past the warn
+        // years cannot say that the branch stopped, so its release is undated as well.
         foreach ($higher as $release) {
             if ($release['highest']['at'] === null) {
                 $undated[] = $release['highest']['normalized'];
+            } elseif ($release['at'] !== null && AgeMeasure::releaseDateIsLowerBound($metadata, $release) && !$this->isAlive($release['at'])) {
+                $undated[] = $this->parser->normalize($release['version']);
             }
         }
         // Highest first, whatever order the repository lists the branches in.

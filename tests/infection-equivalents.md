@@ -53,6 +53,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Analyzer/PhpWindow.php` TrueValue `$named = array_merge($named, self::byName($project->platformConstraints(ProjectConfig::REQUIRE_DEV), true));` — in lockOnlyLinks(): `array_diff_key()` reads only the keys of `$named`, so no code reads its dev mark.
 - `src/Analyzer/RunNote.php` CastString `$host = (string) $where->host();` — every entry of the host note comes from `LocatedRepository::unsupported()`, which always names a host.
 - `src/Analyzer/UpdateNow.php` CastString `return self::resolved($kept, $findings, RunNote::updateNowReduced(self::inReportOrder(array_keys(array_diff_key($inline, $kept)), $findings), (string) $outcome->problem()));` — a refused combined outcome always carries its problem text.
+- `src/Analyzer/UpdateNow.php` LogicalAnd `if ($finding->securityStanding()->isVulnerable() && $move !== null && $move->kind() === Move::UPDATE && $move->clearedAdvisories() !== [] && $move->movesWith() === [] && $check !== null && $check->isResolved() && $check->form() === MoveCheck::INLINE) {` — S9 holds only counted advisories (`AdvisoryRule`), so a move that clears an advisory belongs to a vulnerable finding.
 
 ## src/Baseline
 
@@ -130,10 +131,11 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in attribute(): a package name holds a `/`, so PHP never stores it as an integer key.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in coverage(): a package name holds a `/`, so PHP never stores it as an integer key.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` UnwrapArrayValues `return array_values(array_filter($copies, static function (PartialSecurityAdvisory $advisory) use ($versions): bool {` — the caller only iterates the result with `foreach`.
+- `src/Data/Advisory/RepositoryAdvisoryLoader.php` FalseValue `$loader = new self([], false, null, null, $scope, $scopeSource);` — in askingNone(): `notAskedReason()` reads `notAskedFor` before `offline`.
 
 ## src/Filesystem, src/Graph, src/Html, src/Json, src/Lock
 
-- `src/Filesystem/AtomicWriter.php` FunctionCallRemoval `error_clear_last();` — every failing call records its own warning, which replaces the last one.
+- `src/Filesystem/AtomicWriter.php` TrueValue `return true;` — in the handler of write(): with false, PHP's own handler also gets the warning, and the `@` of each call keeps it silent.
 - `src/Filesystem/AtomicWriter.php` IfNegation `if (\function_exists('fsync')) {` — on PHP 8.1 and later the negated condition only skips the fsync call, which no test can observe.
 - `src/Filesystem/Path.php` CastString `return strpos($path, $root) === 0 ? (string) substr($path, \strlen($root)) : null;` — `$root` ends in `/` and `$path` does not, so `$path` is longer and `substr()` never returns false.
 - `src/Filesystem/Path.php` LogicalOr, DecrementInteger x2 `if ($a['ino'] === 0 || $b['ino'] === 0) {` — the filesystems of CI and of developers report an inode. Only a Windows filesystem without a file index reaches the fallback.
@@ -205,6 +207,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Solver/PoolAdvisoryFeed.php` MethodCallRemoval `parent::__construct();` — `ArrayRepository::__construct()` with no packages adds none, and its first read creates the empty list.
 - `src/Solver/PoolAdvisoryFeed.php` FalseValue `public function getSecurityAdvisories(array $packageConstraintMap, bool $allowPartialAdvisories = false): array` — Composer's `RepositorySet` passes the argument on every call.
 - `src/Solver/PoolAdvisoryFeed.php` ArrayItemRemoval `return ['namesFound' => $answer['namesFound'], 'advisories' => $answer['advisories']];` — `RepositorySet::getSecurityAdvisoriesForConstraints()` reads only `advisories` of the answer.
+- `src/Solver/SolverChecker.php` UnwrapArrayValues `$this->lockedNames = array_values(array_map(static fn (BasePackage $package): string => $package->getName(), $solver->locked()->getPackages()));` — only `in_array()` in `CheckOutcome::holders()` reads the names, and `getPackages()` gives a list.
 
 ## src/Verdict
 

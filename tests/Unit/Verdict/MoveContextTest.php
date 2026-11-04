@@ -27,13 +27,13 @@ final class MoveContextTest extends TestCase
 {
     private const NOW = '2026-10-08T00:00:00+00:00';
 
-    /** The context counts two years back from its now. */
+    /** The context counts two years of 365.25 days back from its now, as S8 does: 730.5 days before 2026-10-08. */
     public function testALineReleasesOnlyAfterTheWarningYearsBeforeNow(): void
     {
         $context = self::context();
 
-        self::assertFalse($context->isReleasing(new \DateTimeImmutable('2024-10-08T00:00:00+00:00')));
-        self::assertTrue($context->isReleasing(new \DateTimeImmutable('2024-10-08T00:00:01+00:00')));
+        self::assertFalse($context->isReleasing(new \DateTimeImmutable('2024-10-07T12:00:00+00:00')));
+        self::assertTrue($context->isReleasing(new \DateTimeImmutable('2024-10-07T12:00:01+00:00')));
         self::assertFalse($context->isReleasing(null));
     }
 

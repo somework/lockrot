@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Signal;
 
+use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Clock;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Repository\PackageMetadata;
@@ -192,6 +193,22 @@ final class AgeMeasureTest extends TestCase
         self::assertTrue($measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.2.0']), $listed))->isMeasured());
         // Both refusals at once: the undated reason is the one given.
         self::assertUnmeasured(AgeMeasure::UNDATED_RELEASES, $measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.3.1']), $undatedHighest)));
+    }
+
+    /** A shared commit dates a tag before its release, so the branch would read older than it is, and S8 would fire early. */
+    public function testALowerTagOnASharedCommitDoesNotDateTheBranch(): void
+    {
+        $on = static fn (string $version, string $commit, string $time): array => ['name' => 'vendor/pkg', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => $commit]];
+        $loader = new ArrayLoader();
+        $metadata = PackageMetadata::fromPackages('vendor/pkg', array_map(static fn (array $release) => $loader->load($release), [
+            $on('2.0.0', 'two', self::ago(86400)),
+            $on('1.3.0', 'own', self::ago(6 * Clock::SECONDS_PER_YEAR)),
+            $on('1.2.7', 'split', self::ago(4 * Clock::SECONDS_PER_YEAR)),
+            $on('1.2.6', 'split', self::ago(4 * Clock::SECONDS_PER_YEAR)),
+            $on('1.2.5', 'split', self::ago(4 * Clock::SECONDS_PER_YEAR)),
+        ]), new \DateTimeImmutable(self::NOW));
+
+        self::assertUnmeasured(AgeMeasure::UNDATED_RELEASES, $this->measure()->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.3.0']), $metadata)));
     }
 
     /** A pre-release above the branch's newest stable release is not above the branch: S8 reads that stable release. */

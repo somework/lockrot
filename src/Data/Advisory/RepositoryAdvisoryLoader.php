@@ -37,6 +37,8 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
     private string $scope;
     private string $scopeSource;
     private VersionParser $parser;
+    /** Why this loader asks no repository, null when it asks them. */
+    private ?string $notAskedFor = null;
 
     /**
      * @param list<RepositoryInterface> $repositories the project's Composer repositories, in configured order
@@ -51,6 +53,20 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         $this->scope = $scope;
         $this->scopeSource = $scopeSource;
         $this->parser = new VersionParser();
+    }
+
+    /**
+     * A loader that asks no repository: every name reads as not asked for $reason, with its run note.
+     *
+     * @param string $reason one of {@see RunNote::ADVISORIES_NOT_CHECKED_REASONS}
+     * @param string $scope  one of {@see AdvisoryCoverage::SCOPES}
+     */
+    public static function askingNone(string $reason, string $scope, string $scopeSource): self
+    {
+        $loader = new self([], false, null, null, $scope, $scopeSource);
+        $loader->notAskedFor = $reason;
+
+        return $loader;
     }
 
     public function load(array $versionByName, array $notFromComposerRepository = [], array $aliasVersionsByName = []): AdvisoryBatch
@@ -140,6 +156,9 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
      */
     private function notAskedReason(array $asked): ?array
     {
+        if ($this->notAskedFor !== null) {
+            return [$this->notAskedFor, RunNote::advisoriesNotChecked($this->notAskedFor, 0)];
+        }
         if ($this->offline) {
             return [AdvisoryCoverage::OFFLINE, RunNote::advisoriesNotChecked(RunNote::ADVISORIES_OFFLINE, 0)];
         }

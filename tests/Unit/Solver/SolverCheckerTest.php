@@ -1421,6 +1421,26 @@ final class SolverCheckerTest extends TestCase
         self::assertNotContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => 'acme/frame', 'constraint' => '^1.0'], self::rows($outcome->holds()));
     }
 
+    /** The refusal names n/new, a dependency of the target that the lock does not hold, so no joint request lists it. */
+    public function testARefusalHoldOnAnUnlockedDependencyMakesNoJointHolder(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '*', 'acme/h' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/h', 'version' => '1.0.0']],
+            [
+                'acme/lib' => [['version' => '1.0.0'], ['version' => '2.0.0', 'require' => ['n/new' => '^1.0']]],
+                'acme/h' => [['version' => '1.0.0'], ['version' => '2.0.0']],
+                'n/new' => [['version' => '1.0.0', 'require' => ['acme/h' => '^2.0']]],
+            ]
+        );
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^2.0', '2.0.0', null, '2.0.0'));
+
+        self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
+        self::assertContains('n/new', array_column(self::rows($outcome->holds()), 'package'));
+        self::assertSame([], $outcome->holders('acme/lib'));
+    }
+
     /**
      * monica at 8.4, web-auth/webauthn-lib: the inline update installs 5.3.8, below the newest 5.3.9,
      * which needs a newer cbor-php. `-w` installs 5.3.9, so it is the move's form.

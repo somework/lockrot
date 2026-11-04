@@ -262,6 +262,24 @@ final class MoveTest extends TestCase
         self::assertSame(['blocked', 'vulnerable'], [JsonPath::stringAt($move, ['also', 0, 'kind']), JsonPath::stringAt($move, ['also', 0, 'source'])]);
     }
 
+    /**
+     * The tag 1.5.0 admits the target and came out before the PHP 8.0 GA, so the tag move adds
+     * old-promise. The later backport 1.4.9 excludes the target and does not decide that. The lock
+     * entry declares no php, so S5 does not fire on the installed snapshot.
+     */
+    public function testATagMoveReadsOldPromiseOnTheHighestTagBesideABackportThatExcludesTheTarget(): void
+    {
+        $finding = self::analyse([
+            'lock' => [['version' => '1.x-dev', 'php' => null]],
+            'root' => ['require' => ['a/b' => '1.x-dev']],
+            'releases' => [self::release('1.5.0', '2020-06-01', '>=7.2'), self::release('1.4.9', '2026-01-01', '>=7.2 <8.0')],
+        ]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        self::assertSame(['tag', 'pinned', '1.5.0'], [$move['kind'], $move['source'], JsonPath::stringAt($move, ['latest', 'version'])]);
+        self::assertSame('released_before_ga', array_column(JsonPath::arrayAt($move, ['adds']), 'basis', 'id')['old-promise'] ?? null);
+    }
+
     /** twig: PKSA-8zx5 `<=3.26.0` names no exclusive bound, and v3.27.0 clears every advisory. */
     public function testTwigRaisesPhpThenRequiresTheFirstReleaseThatClearsEveryAdvisory(): void
     {
@@ -647,6 +665,43 @@ final class MoveTest extends TestCase
 
         self::assertContains(['update', '1.5.0'], array_map(static fn ($move): array => \is_array($move) ? [$move['kind'], $move['version']] : [], $moves));
         self::assertNull(JsonPath::arrayAt($finding, ['security'])['partial']);
+    }
+
+    /** S5 never fires on a release without require.php, so a tag move to v1.0.0 from before the GA adds no old-promise. */
+    public function testATagMoveToAReleaseWithoutPhpAddsNoOldPromise(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse(['lock' => [['version' => 'dev-master', 'php' => '^7.2 || ^8.0']], 'releases' => [self::release('v1.0.0', '2019-01-01', null)]]), ['next_step']);
+
+        self::assertSame(['tag', [], []], [$move['kind'], $move['adds'], $move['unverified']]);
+        self::assertStringNotContainsString('old-promise', JsonPath::stringAt($move, ['text']));
+    }
+
+    /**
+     * A tag move reads the php of the tag that it targets, the highest one, not that of a
+     * later-dated backport on its line.
+     *
+     * @return iterable<string, array{list<array{version: string, time: ?string, php: ?string}>, list<array{kind: string, id: string, basis: ?string}>}>
+     */
+    public static function backports(): iterable
+    {
+        $promise = [['kind' => 'flag', 'id' => 'old-promise', 'basis' => 'released_before_ga']];
+        yield 'a highest tag without php beside a backport with php' => [[self::release('v1.5.0', '2019-01-01', null), self::release('v1.4.9', '2019-06-01', '>=7.2')], []];
+        yield 'a highest tag with php beside a backport without php' => [[self::release('v1.5.0', '2019-01-01', '>=7.2'), self::release('v1.4.9', '2019-06-01', null)], $promise];
+        yield 'an undated highest tag without php beside a backport with php' => [[self::release('v1.5.0', null, null), self::release('v1.4.9', '2019-06-01', '>=7.2')], []];
+    }
+
+    /**
+     * @dataProvider backports
+     *
+     * @param list<array{version: string, time: ?string, php: ?string}> $releases
+     * @param list<array{kind: string, id: string, basis: ?string}>     $adds
+     */
+    #[DataProvider('backports')]
+    public function testATagMoveReadsThePhpOfTheTagItTargets(array $releases, array $adds): void
+    {
+        $move = JsonPath::arrayAt(self::analyse(['lock' => [['version' => '1.x-dev', 'php' => '^7.2 || ^8.0']], 'releases' => $releases]), ['next_step']);
+
+        self::assertSame(['tag', 'v1.5.0', $adds, []], [$move['kind'], JsonPath::stringAt($move, ['latest', 'version']), $move['adds'], $move['unverified']]);
     }
 
     /** With no release read, the test move names the installed release, dated as S5 reads it. */

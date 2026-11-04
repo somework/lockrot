@@ -48,7 +48,7 @@ final class AgeText
             }
             $parts[] = $text;
         } elseif (!\in_array($installed->unmeasured(), self::SILENT_CAUSES, true)) {
-            $parts[] = 'installed '.$version.', release date not known ('.CauseWords::of((string) $installed->unmeasured()).')';
+            $parts[] = 'installed '.$version.', release date not known ('.FindingBlock::checkWords($finding, (string) $installed->unmeasured()).')';
         }
         if ($branchRelease !== null && $branchRelease->version() !== $version && ($release === null || $release->version() !== $branchRelease->version())) {
             $parts[] = $branch.' last released '.$branchRelease->version().' '.self::when($branchRelease);
@@ -86,7 +86,7 @@ final class AgeText
         foreach ($rows as [$name, $release, $reading, $limits]) {
             $head = str_pad($name, 11).str_pad($release ?? '', 10);
             if (!$reading->isMeasured()) {
-                $lines[] = $head.'not read ('.CauseWords::of((string) $reading->unmeasured()).')';
+                $lines[] = $head.'not read ('.FindingBlock::checkWords($finding, (string) $reading->unmeasured()).')';
                 continue;
             }
             $words = [];
@@ -103,7 +103,7 @@ final class AgeText
         $libyears = $finding->libyearsRounded();
         $unmeasured = $finding->libyearsUnmeasured();
         $lines[] = $libyears === null
-            ? 'libyears not measured: '.CauseWords::of((string) $unmeasured)
+            ? 'libyears not measured: '.FindingBlock::checkWords($finding, (string) $unmeasured)
             : 'libyears '.($finding->isLibyearsAtLeast() ? 'at least ' : '').number_format($libyears, 1, '.', '').' behind the newest stable release';
 
         return $lines;

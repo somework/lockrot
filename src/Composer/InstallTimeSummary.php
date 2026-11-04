@@ -125,13 +125,20 @@ final class InstallTimeSummary
             self::writeWarning($event->getIO(), 'lockrot: '.$warning);
         }
 
-        // `composer require` and `update` write the new lock before this event fires, so the file is
-        // normally the post-transaction state. `--dry-run` writes no lock, and a new project has none.
-        // LockFile::withPackages() overlays the transaction's packages in every case, so each
-        // package gets a node to chain through.
+        // Composer's Locker holds the lock of this transaction: an update sets it before this event
+        // fires, and keeps it in memory only under `--dry-run` or `config.lock: false`. A new
+        // project without an update has none. LockFile::withPackages() overlays the transaction's
+        // packages in every case, so each package gets a node to chain through.
         $lockPath = Factory::getLockFile($composerFile);
-        $lock = (is_file($lockPath) ? LockFile::fromFile($lockPath) : LockFile::empty())->withPackages($packages);
-        $packages = self::inMergedLock($lock, $packages);
+        $locker = $composer->getLocker();
+        $lock = ($locker->isLocked() ? LockFile::fromArray($locker->getLockData(), basename($lockPath)) : LockFile::empty())->withPackages($packages);
+        // As `composer lockrot` reads the lock: packages-dev only with include-dev, whatever
+        // Composer's dev mode installs.
+        $includeDev = $lockrot->includeDev();
+        $packages = self::inMergedLock($lock, $packages, $includeDev);
+        if ($packages === []) {
+            return;
+        }
 
         $deadline = Deadline::inSeconds((float) $lockrot->installTimeBudgetSeconds(), $this->monotonicNow);
         $repositories = array_values($composer->getRepositoryManager()->getRepositories());
@@ -140,7 +147,7 @@ final class InstallTimeSummary
         $checks = static fn (): MoveChecks => MoveChecks::of(MoveCheckers::forProject($composer->getPackage(), $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), $deadline, $lockrot->advisoryLookup()));
         $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $event->getIO(), $config, $repositories, $project, $lockrot, $env, $deadline, $checks, $lock->platform()['php'] ?? null);
 
-        $report = $analyzer->analyzePackages($packages, $lock, $project, $event->isDevMode());
+        $report = $analyzer->analyzePackages($packages, $lock, $project, $includeDev);
         // The baseline reaches the gate only: the block still reports everything that this
         // transaction brings in.
         // The run goes first: the baseline comparison reads its target PHP.
@@ -156,7 +163,7 @@ final class InstallTimeSummary
             $project->requirePhp(),
             $lockrot->strictNetwork(),
             Gate::MODE_CHECK,
-            $event->isDevMode()
+            $includeDev
         )), \dirname($composerFile), $lockrot, $lock);
         $lines = (new InstallSummaryFormatter())->format($report);
         if ($lines !== []) {
@@ -177,20 +184,21 @@ final class InstallTimeSummary
     /**
      * A transaction cannot say which section a package belongs to, so every entry arrives as prod
      * ({@see TransactionPackages::fromTransaction()}). Without this flag a `composer require --dev`
-     * package ranks one priority step too high. The merged lock carries the flag. Under `--dry-run`
-     * or in a project with no lock, the package stays prod ({@see LockFile::withPackages()}). The
-     * method drops a package that the merged lock skips as no Composer name, as the lock path does.
+     * package ranks one priority step too high. The merged lock carries the flag. When Composer's
+     * Locker holds no lock, the package stays prod ({@see LockFile::withPackages()}). The method
+     * drops a package that the merged lock skips as no Composer name, as the lock path does, and a
+     * packages-dev one without $includeDev.
      *
      * @param list<LockedPackage> $packages
      *
      * @return list<LockedPackage>
      */
-    private static function inMergedLock(LockFile $lock, array $packages): array
+    private static function inMergedLock(LockFile $lock, array $packages, bool $includeDev): array
     {
         $out = [];
         foreach ($packages as $package) {
             $merged = $lock->find($package->name());
-            if ($merged !== null) {
+            if ($merged !== null && ($includeDev || !$merged->isDev())) {
                 $out[] = $package->withDev($merged->isDev());
             }
         }

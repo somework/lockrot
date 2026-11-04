@@ -83,7 +83,11 @@ final class PackageMetadata
      * @var array<string, true>
      */
     private array $sharedCommitVersions;
-    /** The highest non-dev version, whose date S2 reads, is on a commit that SHARED_COMMIT_TAGS or more stable tags share. */
+    /**
+     * A commit that SHARED_COMMIT_TAGS or more stable tags share dates the highest non-dev
+     * version, or the newest dated version under a dated highest one. Then S10 names the shared
+     * commit, not an undated tag, as the cause of a null {@see $lastStableReleaseAt}.
+     */
     private bool $lastStableSharesItsCommit;
     /**
      * The stable releases above the installed version, ascending: every stable release for a
@@ -167,6 +171,7 @@ final class PackageMetadata
         $lastStableReleaseAt = null;
         $lastStableVersion = null;
         $lastStableNormalized = null;
+        $lastStableCommit = null;
         $highestStable = null;
         $type = null;
         $byBranch = [];
@@ -212,6 +217,7 @@ final class PackageMetadata
                         $lastStableReleaseAt = $releaseDate;
                         $lastStableVersion = $version->getPrettyVersion();
                         $lastStableNormalized = $version->getVersion();
+                        $lastStableCommit = self::commitOf($version);
                     }
                 }
                 // The branch view keeps the newest dated stable release per branch. A backport on a
@@ -278,9 +284,13 @@ final class PackageMetadata
             }
         }
         // The package's age is its highest tag's age. When that tag has no trusted date, an older
-        // dated tag is not the last release, and S2 has nothing to measure.
+        // dated tag is not the last release, and S2 has nothing to measure. S2 never reads a
+        // shared commit's date, also when a lower tag than the highest one carries the newest date.
         $highestShared = $highestCommit !== null && isset($tagsOnCommit[$highestCommit]) && $tagsOnCommit[$highestCommit] >= self::SHARED_COMMIT_TAGS;
-        if ($highestStable !== null && ($highestStable->getReleaseDate() === null || $highestShared)) {
+        $newestShared = $lastStableCommit !== null && isset($tagsOnCommit[$lastStableCommit]) && $tagsOnCommit[$lastStableCommit] >= self::SHARED_COMMIT_TAGS;
+        // An undated highest tag stays the cause that S10 names.
+        $lastStableShared = $highestShared || ($newestShared && $highestStable !== null && $highestStable->getReleaseDate() !== null);
+        if ($highestStable !== null && ($highestStable->getReleaseDate() === null || $lastStableShared)) {
             $lastStableReleaseAt = null;
             $lastStableVersion = null;
         }
@@ -326,7 +336,7 @@ final class PackageMetadata
             null,
             $sharedCommitVersions,
             $abandonedBy,
-            $highestShared
+            $lastStableShared
         );
         if ($installedVersion !== null) {
             $metadata->keepReleases($versions, $stable, $sharedCommitVersions, $dataDate, $installedVersion);
@@ -646,7 +656,8 @@ final class PackageMetadata
 
     /**
      * The newest release date of a non-dev version, pre-releases included, or the parent's date
-     * ({@see datedBy()}). Null when the highest tag has no trusted date.
+     * ({@see datedBy()}). Null when the highest tag has no trusted date, or when the newest date
+     * is that of a commit its tags share.
      */
     public function lastStableReleaseAt(): ?\DateTimeImmutable
     {

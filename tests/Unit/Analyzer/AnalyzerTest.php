@@ -15,7 +15,9 @@ use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
+use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Data\Cache\ArrayCache;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
@@ -785,6 +787,13 @@ final class AnalyzerTest extends TestCase
         $analyzer = $this->analyzer($this->loader(), $this->http([]), true, new Allowlist([]));
 
         self::assertNotSame($analyzer, $analyzer->withDeadline(Deadline::inSeconds(5.0)));
+    }
+
+    public function testWithAdvisoriesReturnsAClonedInstance(): void
+    {
+        $analyzer = $this->analyzer($this->loader(), $this->http([]), true, new Allowlist([]));
+
+        self::assertNotSame($analyzer, $analyzer->withAdvisories(RepositoryAdvisoryLoader::askingNone(AdvisoryCoverage::COMPOSER_JSON_INVALID, AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT)));
     }
 
     public function testTheBudgetReasonIsReportedWithoutASecondPrefix(): void

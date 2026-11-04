@@ -24,6 +24,8 @@ use Lockrot\Config\Gate;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
 use Lockrot\Config\UnknownKeys;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
+use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
@@ -263,6 +265,11 @@ final class LockrotCommand extends BaseCommand
             // No time budget, unlike the install-time summary (docs/install-time.md#time-budget).
             $checks = static fn (): MoveChecks => MoveChecks::of($root === null ? new UncheckedMoves($hasComposerJson ? MoveCheck::COMPOSER_JSON_INVALID : MoveCheck::NO_COMPOSER_JSON, $platformPhp, MoveCheckers::configuredPhp64bit($config)) : MoveCheckers::forProject($root, $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), Deadline::never(), $lockrot->advisoryLookup()));
             $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never(), $checks, $lock->platform()['php'] ?? null);
+            if ($root === null && $hasComposerJson) {
+                // Fail closed: the global config holds neither the project's repositories nor its
+                // advisory ignore lists.
+                $analyzer = $analyzer->withAdvisories(RepositoryAdvisoryLoader::askingNone(AdvisoryCoverage::COMPOSER_JSON_INVALID, $lockrot->advisoryLookup(), $lockrot->advisoryLookupSource()));
+            }
             // Before the baseline is read: an explanation ignores it, so a missing or unreadable
             // baseline must not block it.
             if (\is_string($explain)) {
@@ -564,7 +571,8 @@ final class LockrotCommand extends BaseCommand
 
     /**
      * A generated baseline can create its file, so it must not be a composer file or a file that
-     * COMPOSER names: SECURITY.md, "What lockrot does and does not do".
+     * COMPOSER names: SECURITY.md, "What lockrot does and does not do". Its place is checked as an
+     * `--output` place is, so a typo fails before a full repository round.
      *
      * @throws ConfigException naming the option, the key or the default file that gave the path
      */
@@ -573,6 +581,7 @@ final class LockrotCommand extends BaseCommand
         $source = \is_string($input->getOption('baseline')) ? '--baseline=' : ($lockrot->baseline() !== null ? 'extra.lockrot.baseline ' : 'the baseline ');
         $label = $source.$baseline->displayPath();
         ReportTargets::refuseComposerFile($baseline->path(), $label);
+        ReportTargets::refuseUnwritablePlace($baseline->path(), $baseline->displayPath(), $label);
         foreach ([[$composerFile, self::MANIFEST_REASON], [$lockPath, self::LOCK_REASON]] as [$path, $reason]) {
             if (Path::canonical($path) === Path::canonical($baseline->path()) || Path::sameFile($baseline->path(), $path)) {
                 throw new ConfigException($label.': '.$reason);

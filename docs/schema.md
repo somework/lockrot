@@ -178,6 +178,7 @@ names what to read for each report-1 field that report-2 removes or redefines.
 | `.run.flagged_verdicts` | `.run.graded_verdicts` for the grades, `.run.flag_ids` for the flags |
 | `.baseline.previous_verdict` | `.baseline.recorded.lead` (null for a package new to the baseline) |
 | S7's `.data.packages[].verdict`, `.unattributed[].verdict` | `.lead` on the same objects. `.verdict` there is the grade |
+| S7's `.data.flagged`, the root `.exposure[].flagged` and the set of `.unattributed[]` | the same fields, counted over graded packages. A package with only a counted advisory is in the count, and a package whose flags are all accepted is not |
 | gating on `.priority` and `.baseline.status` | `.gate.fails`. Under a baseline, `.priority` is the full grade, while the gate reads `min(score, 2 × new)` |
 | `.evidence` (every fact) | `.evidence` holds the summaries of the counted flags only. Read `[.flags[].summary]` for every flag that fired, accepted ones included, and `[.signals[].summary]` for the rest |
 | `.priority_basis` | `.score`: its `terms`, its `modifiers` and its `text` |
@@ -489,7 +490,7 @@ validates with any object as its `data`.
 |---|---|---|
 | S4 | `event` | What the date is: `push` or `commit`. An open set |
 | S6 | `reason`, `has_stable_release`, `last_stable_release`, `last_stable_version`, `last_stable_dated_by`, `snapshot_time`, `tag_relation` | See [What S6 carries](verdicts.md#what-s6-carries) |
-| S8 | `suggested_constraint`, `reachable_branch`, `reachable_version`, `reachable_release`, `newest_release_at_least`, `reachable_release_at_least` | The newest higher branch that releases and is within reach ([Within reach](verdicts.md#within-reach)). `newest_release_at_least` and `reachable_release_at_least` are true when S8 quotes the branch's highest tag and that tag has no trusted date: the release date is then the date of a commit that its tags share, a lower bound. They are false when S8 quotes a lower tag with its own date. `reachable_release_at_least` is null exactly when `reachable_branch` is null |
+| S8 | `suggested_constraint`, `reachable_branch`, `reachable_version`, `reachable_release`, `newest_release_at_least`, `reachable_release_at_least` | The newest higher branch that releases and is within reach ([Within reach](verdicts.md#within-reach)). `newest_release_at_least` and `reachable_release_at_least` are true when S8 quotes the branch's highest tag and that tag has no trusted date, or a lower tag that only a commit shared with other tags dates. The release date is then the date of a commit that its tags share, a lower bound. They are false when S8 quotes a lower tag with its own date. `reachable_release_at_least` is null exactly when `reachable_branch` is null |
 | S9 | `advisories`, `releases_read`, `complete` | One row per counted advisory, the deciding one first: `id`, `cve`, `title`, `link`, `reported_at`, `severity`, `severity_published`, `affected_versions`, `counted`, `points`, `deciding`, `fix` and `baseline` |
 | S10 | `unchecked`, `blocks` | See [What was not checked](verdicts.md#what-was-not-checked) |
 | S11 | `newest_php`, `newest_php_source`, `requires`, `stops_at`, `excludes_target`, `admits_newest` | See [Capped](verdicts.md#capped) |

@@ -18,7 +18,7 @@ export type OriginRegistry = "packagist.org" | "repo.packagist.com" | "wp-packag
 /** open set at #/definitions/signalId */
 export type SignalId = "S1" | "S2" | "S3" | "S4" | "S5" | "S6" | "S7" | "S8" | "S9" | "S10" | "S11" | (string & {});
 /** open set at #/definitions/advisoriesNotCheckedReason */
-export type AdvisoriesNotCheckedReason = "offline" | "install_time_budget" | "lookup_failed" | (string & {});
+export type AdvisoriesNotCheckedReason = "offline" | "install_time_budget" | "lookup_failed" | "composer_json_invalid" | (string & {});
 /** closed set at #/definitions/flag */
 export type Flag = "abandoned" | "silent" | "pinned" | "left-behind" | "old-promise" | "stale" | "capped" | "vulnerable";
 /** closed set at #/definitions/maintenanceFlag */
@@ -126,7 +126,7 @@ export type SecurityUncheckedStatus = "unchecked";
 /** open set at #/definitions/securityUnchecked/properties/check */
 export type SecurityUncheckedCheck = "partial" | "not_run" | (string & {});
 /** open set at #/definitions/securityUnchecked/properties/unchecked_reason/oneOf/0 */
-export type SecurityUncheckedUncheckedReason = "offline" | "install_time_budget" | "lookup_failed" | "not_from_composer_repository" | "unparseable_version" | "no_feed" | (string & {});
+export type SecurityUncheckedUncheckedReason = "offline" | "install_time_budget" | "lookup_failed" | "not_from_composer_repository" | "unparseable_version" | "no_feed" | "composer_json_invalid" | (string & {});
 /** closed set at #/definitions/headline/properties/unit */
 export type HeadlineUnit = "years" | "php" | "php_minor" | "reason" | "advisories";
 /** closed set at #/definitions/headline/properties/source/oneOf/0 */
@@ -170,7 +170,7 @@ export type FindingFlagId7 = "vulnerable";
 /** open set at #/definitions/checkMissing/properties/check */
 export type CheckMissingCheck = "repository_activity" | "release_dates" | "advisories" | "releases" | "release_metadata" | (string & {});
 /** open set at #/definitions/checkMissing/properties/reason */
-export type CheckMissingReason = "no_token" | "anonymous_budget" | "install_time_budget" | "rate_limit" | "fetch_failed" | "offline" | "undated_releases" | "releases_unknown" | "lookup_failed" | "host_not_supported" | "no_feed" | "not_from_composer_repository" | (string & {});
+export type CheckMissingReason = "no_token" | "anonymous_budget" | "install_time_budget" | "rate_limit" | "fetch_failed" | "offline" | "undated_releases" | "releases_unknown" | "lookup_failed" | "host_not_supported" | "no_feed" | "not_from_composer_repository" | "composer_json_invalid" | (string & {});
 /** open set at #/definitions/checkSkipped/properties/check */
 export type CheckSkippedCheck = "repository_activity" | "release_metadata" | "advisories" | "release_branch" | "repository_archived" | "release_dates" | (string & {});
 /** open set at #/definitions/checkSkipped/properties/reason */
@@ -496,7 +496,7 @@ export type NoteDetailCode26 = "package_name_invalid";
 /** open set at #/definitions/gateNotApplied/properties/check */
 export type GateNotAppliedCheck = "advisories" | (string & {});
 /** open set at #/definitions/gateNotApplied/properties/reason */
-export type GateNotAppliedReason = "offline" | "install_time_budget" | "lookup_failed" | "no_feed" | "not_from_composer_repository" | "unparseable_version" | (string & {});
+export type GateNotAppliedReason = "offline" | "install_time_budget" | "lookup_failed" | "no_feed" | "not_from_composer_repository" | "unparseable_version" | "composer_json_invalid" | (string & {});
 /** open set at #/definitions/rootGate/properties/tripped_by/items */
 export type RootGateTrippedByItem = "strict_network" | "fail_on" | (string & {});
 /** open set at #/definitions/rootSecurity/properties/check */

@@ -78,27 +78,33 @@ final class MaintenanceMove
         $alias = $context->installedBranch();
         $own = $alias === null ? null : $context->row($alias);
         if ($own !== null) {
-            $released = $own->highestReleased();
-            $at = $released === null ? null : $released->format(\DATE_ATOM);
-            $relation = $at === null || $snapshotTime === null ? null : self::relation($released, new \DateTimeImmutable($snapshotTime));
-
-            return self::tag($own, new Latest($own->highest(), $at, false, $relation, $snapshotTime));
+            return self::tag($own, self::highestTag($own, $snapshotTime));
         }
         $version = $s6 === null ? null : $s6->lastStableVersion();
         if ($s6 === null || $version === null) {
             return MoveDraft::of(Move::NO_TAG, FlagSet::PINNED);
         }
-        $row = null;
-        foreach ($context->rows() as $candidate) {
-            $row = $candidate->highest() === $version ? $candidate : $row;
+        $key = ReleaseBranch::of($version);
+        $branch = $key === null ? null : $context->row(ReleaseBranch::label($key));
+        if ($branch !== null) {
+            // The newest dated tag can be a backport below its branch's highest tag: the move requires the highest tag.
+            return self::tag($branch, self::highestTag($branch, $snapshotTime));
         }
 
-        return self::tag($row, new Latest($version, $s6->lastStableRelease(), false, $s6->tagRelation(), $snapshotTime));
+        return self::tag(null, new Latest($version, $s6->lastStableRelease(), false, $s6->tagRelation(), $snapshotTime));
+    }
+
+    private static function highestTag(BranchRow $row, ?string $snapshotTime): Latest
+    {
+        $released = $row->highestReleased();
+        $relation = $released === null || $snapshotTime === null ? null : self::relation($released, new \DateTimeImmutable($snapshotTime));
+
+        return new Latest($row->highest(), $released === null ? null : $released->format(\DATE_ATOM), false, $relation, $snapshotTime);
     }
 
     private static function tag(?BranchRow $row, Latest $latest): MoveDraft
     {
-        $kind = $row !== null && $row->admitsTargetPhp() === false ? Move::BLOCKED : Move::TAG;
+        $kind = $row !== null && $row->highestAdmitsTargetPhp() === false ? Move::BLOCKED : Move::TAG;
 
         return MoveDraft::of($kind, FlagSet::PINNED)->withLatest($latest, $row);
     }

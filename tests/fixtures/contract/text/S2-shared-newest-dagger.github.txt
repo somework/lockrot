@@ -1,0 +1,5 @@
+::warning file=composer.lock,line=4,title=lockrot%3A low — capped::ocramius/proxy-manager 2.2.4: 4 = capped 8 ÷ 2 transitive. Do: no move: no release above 2.2.4 admits PHP 8.5. capped: requires php ^7.2.0: it stops at 7.4, so the newest PHP, 8.5, is excluded. checks missing: S2 (undated releases). (via symfony/proxy-manager-bridge)
+flags: capped 1
+depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 · deepest: ocramius/proxy-manager, 1 hop (symfony/proxy-manager-bridge › ocramius/proxy-manager)
+php: the lock installs on PHP 7.2 to 7.4, so your target, 8.4, is excluded; the update of the package that excludes it is not checked (the run checked no move)
+gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

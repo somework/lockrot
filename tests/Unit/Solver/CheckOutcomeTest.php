@@ -170,6 +170,29 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame(['acme/holder'], $outcome->holders('acme/lib'));
     }
 
+    /** The lock does not hold n/new, so it is no holder. Its package hold still drops the root requirement on it. */
+    public function testAHolderThatTheLockDoesNotHoldIsNoHolderOfTheJointRequest(): void
+    {
+        $root = new Holder(Holder::ROOT, null, null, Holder::ROOT_REQUIRE, '^1.0', 'n/new');
+        $holds = [$root, new Holder(Holder::PACKAGE, 'acme/holder', '1.0.0', Holder::REQUIRE, '^1.0'), new Holder(Holder::PACKAGE, 'n/new', '1.0.0', Holder::REQUIRE, '^1.0')];
+        $outcome = new CheckOutcome(MoveCheck::refused(), $holds);
+
+        $locked = $outcome->withLocked(['acme/lib', 'acme/holder']);
+
+        self::assertSame([['acme/holder', 'n/new'], ['acme/holder']], [$outcome->holders('acme/lib'), $locked->holders('acme/lib')]);
+        self::assertNotContains($root, $locked->withoutRootOnHolders()->holds());
+    }
+
+    /** n/new comes first and the lock does not hold it: the holders that stay are a list from 0. */
+    public function testTheHoldersThatTheLockHoldsAreAList(): void
+    {
+        $holds = [new Holder(Holder::PACKAGE, 'n/new', '1.0.0', Holder::REQUIRE, '^1.0'), new Holder(Holder::PACKAGE, 'acme/holder', '1.0.0', Holder::REQUIRE, '^1.0')];
+
+        $locked = (new CheckOutcome(MoveCheck::refused(), $holds))->withLocked(['acme/lib', 'acme/holder']);
+
+        self::assertSame([0 => 'acme/holder'], $locked->holders('acme/lib'));
+    }
+
     public function testTheCopiesWithChangesAndWithoutRootOnHoldersLeaveTheOutcomeAsItWas(): void
     {
         $root = new Holder(Holder::ROOT, null, null, Holder::ROOT_REQUIRE, '^1.0', 'acme/holder');

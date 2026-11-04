@@ -530,6 +530,30 @@ final class PhpWindowTest extends TestCase
         self::assertSame('^7.0', $adapter->requirePhp(), 'the installed php link stays the package\'s own');
     }
 
+    public function testATargetAboveTheNewestKnownMinorIsReadAsOneMoreMinor(): void
+    {
+        $open = PhpWindow::of(LockFile::fromArray(['packages' => [self::package('acme/a', ['php' => '>=8.1'])], 'packages-dev' => []]), ProjectConfig::empty(), '8.6', self::minors());
+        self::assertNotNull($open);
+        self::assertSame(['8.1', '8.2', '8.3', '8.4', '8.5', '8.6'], $open->toArray()['without_dev']['minors']);
+        self::assertNull($open->toArray()['without_dev']['upper_edge']);
+        self::assertTrue($open->target()['inside']);
+        self::assertSame([...self::EVERY_MINOR, '8.6'], $open->knownMinors());
+
+        $capped = self::window(['packages' => [self::package('acme/a', ['php' => '<8.6'])], 'packages-dev' => []], [], '8.6')['without_dev'];
+        self::assertSame(self::EVERY_MINOR, $capped['minors']);
+        self::assertSame(['excludes' => '8.6', 'links' => ['require']], self::upper($capped));
+        self::assertSame('acme/a', $capped['upper_edge']['set_by'][0]['name'] ?? null);
+
+        $empty = LockFile::fromArray(['packages' => [], 'packages-dev' => []]);
+        self::assertSame(self::EVERY_MINOR, self::window(['packages' => [], 'packages-dev' => []], [], '7.5')['without_dev']['minors'], 'a target between known minors adds none');
+        $newest = PhpWindow::of($empty, ProjectConfig::empty(), '8.5', self::minors());
+        $noneKnown = PhpWindow::of($empty, ProjectConfig::empty(), '8.4', []);
+        self::assertNotNull($newest);
+        self::assertNotNull($noneKnown);
+        self::assertSame(self::EVERY_MINOR, $newest->knownMinors(), 'the newest known minor is not added twice');
+        self::assertSame(['8.4'], $noneKnown->knownMinors());
+    }
+
     /** @return list<string> */
     private static function minors(): array
     {

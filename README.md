@@ -160,8 +160,8 @@ Run the same command as a CI step, with `GITHUB_TOKEN` in the step's environment
 - **`--fail-on`** takes a grade (how much a finding matters here), a flag (one fact that lockrot
   observed), a `vulnerable` value (an advisory of that severity or worse) or `unchecked` (a check
   could not run).
-- **Exit codes:** `0` passed, `1` a finding reached `--fail-on` (or, with `--strict-network`, a
-  network lookup failed), `2` lockrot could not run or finish
+- **Exit codes:** `0` passed, `1` a finding failed `--fail-on` and the baseline does not exempt it
+  (or, with `--strict-network`, a network lookup failed), `2` lockrot could not run or finish
   ([Exit codes](https://lockrot.dev/ci/#exit-codes)).
 - **Formats:** `--format` takes `table` (default), `json`, `github` (annotations), `sarif` (code
   scanning), `gitlab` (Code Quality), `markdown` (PR comment) or `html` (one self-contained page).
@@ -231,9 +231,6 @@ What changed in each release is in the [changelog](https://lockrot.dev/changelog
 - **No inherited flags:** a package never gets a flag for what it depends on. Its evidence and the
   `pulled in by:` line say what it pulls in
   ([Transitive exposure](https://lockrot.dev/verdicts/#transitive-exposure)).
-- **`composer require --dev … --dry-run`:** the install-time summary can read a new package's
-  grade one band high
-  ([Under `--dry-run`](https://lockrot.dev/install-time/#a-note-on-the-dry-run-development-flag)).
 
 ## Roadmap
 

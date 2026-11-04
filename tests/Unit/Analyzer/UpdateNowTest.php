@@ -116,6 +116,8 @@ final class UpdateNowTest extends TestCase
     {
         $case = CaseHydrator::case('move-check‡');
         $inputs = JsonPath::arrayAt($case, ['inputs']);
+        // A joint request names only a holder that the lock holds.
+        $inputs['lock'] = [...JsonPath::arrayAt($inputs, ['lock']), ['name' => 'h/x', 'version' => '1.0.0', 'type' => 'library']];
         $inputs['checks'] = [
             '*' => [
                 'result' => 'refused', 'form' => null, 'reason' => null,
@@ -145,6 +147,48 @@ final class UpdateNowTest extends TestCase
         $document = self::documentOf('op-update', []);
 
         self::assertNotContains('matomo/network', JsonPath::arrayAt($document, ['security', 'update_now']));
+    }
+
+    /** The old-promise update to 1.5.0 leads, and only the move to 2.x in also[] clears the advisory. */
+    public function testALeadUpdateThatClearsNoAdvisoryMakesNoMember(): void
+    {
+        $release = static fn (string $version, string $date): array => ['version' => $version, 'time' => $date.'T00:00:00+00:00', 'php' => '>=7.2'];
+        $inputs = [
+            'root' => ['name' => 'acme/app', 'require' => ['php' => '>=7.4', 'a/b' => '^1.0']],
+            'lock' => [['name' => 'a/b', 'version' => '1.0.0', 'time' => '2019-01-01T00:00:00+00:00', 'php' => '>=7.2', 'dev' => false, 'origin' => 'packagist']],
+            'releases' => [$release('1.0.0', '2019-01-01'), $release('1.5.0', '2021-06-01'), $release('2.0.0', '2021-01-01')],
+            'advisories' => [['id' => 'PKSA-1', 'severity' => 'low', 'affected_versions' => '<2.0.0']],
+            'activity' => null,
+            'run' => ['target_php' => '8.4', 'project_php' => '>=7.4', 'fail_on' => 'high', 'include_dev' => false],
+            'checks' => ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]],
+        ];
+        $document = JsonPath::decoded(CaseHydrator::report(['id' => 'move', 'clock' => '2026-10-14T00:00:00+00:00', 'inputs' => $inputs])->toArray());
+        $move = JsonPath::arrayAt(self::finding($document, 'a/b'), ['next_step']);
+
+        self::assertSame(['update', '1.5.0', 'resolves', 'inline'], [$move['kind'], $move['version'], JsonPath::stringAt($move, ['check', 'result']), JsonPath::stringAt($move, ['check', 'form'])]);
+        self::assertNotContains('PKSA-1', array_column(JsonPath::arrayAt($move, ['clears']), 'id'));
+        self::assertSame([[], null], [JsonPath::arrayAt($document, ['security', 'update_now']), JsonPath::arrayAt($document, ['security'])['update_now_command']]);
+    }
+
+    /** The newest 1.9.5 clears the advisory, but the solve installs 1.5.0, which it affects. */
+    public function testALeadUpdateWhoseInstalledReleaseClearsNoAdvisoryMakesNoMember(): void
+    {
+        $release = static fn (string $version, string $date): array => ['version' => $version, 'time' => $date.'T00:00:00+00:00', 'php' => '>=7.2'];
+        $inputs = [
+            'root' => ['name' => 'acme/app', 'require' => ['php' => '>=7.4', 'a/b' => '^1.0']],
+            'lock' => [['name' => 'a/b', 'version' => '1.0.0', 'time' => '2019-01-01T00:00:00+00:00', 'php' => '>=7.2', 'dev' => false, 'origin' => 'packagist']],
+            'releases' => [$release('1.0.0', '2019-01-01'), $release('1.5.0', '2021-01-01'), $release('1.9.0', '2021-06-01'), $release('1.9.5', '2021-09-01')],
+            'advisories' => [['id' => 'PKSA-1', 'severity' => 'low', 'affected_versions' => '<1.9.0']],
+            'activity' => null,
+            'run' => ['target_php' => '8.4', 'project_php' => '>=7.4', 'fail_on' => 'high', 'include_dev' => false],
+            'checks' => ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => [], 'installs' => '1.5.0']],
+        ];
+        $document = JsonPath::decoded(CaseHydrator::report(['id' => 'move', 'clock' => '2026-10-14T00:00:00+00:00', 'inputs' => $inputs])->toArray());
+        $move = JsonPath::arrayAt(self::finding($document, 'a/b'), ['next_step']);
+
+        self::assertSame(['update', '1.5.0'], [$move['kind'], JsonPath::stringAt($move, ['check', 'installs'])]);
+        self::assertNotContains('PKSA-1', array_column(JsonPath::arrayAt($move, ['clears']), 'id'));
+        self::assertSame([[], null], [JsonPath::arrayAt($document, ['security', 'update_now']), JsonPath::arrayAt($document, ['security'])['update_now_command']]);
     }
 
     public function testTheCommandLeavesOutTheCandidateThatTheRefusalNamesAndANoteSaysWhy(): void

@@ -315,7 +315,7 @@ final class FindingBlock
         return ['maintenance accepted ('.(self::ALLOWLIST_BY[$entry->by()] ?? $entry->by()).')', $entry->reason()];
     }
 
-    /** The words of a check reason. An unknown origin reads its own words for `not_from_composer_repository`. */
+    /** The words of a check or age reason. An unknown origin reads its own words for `not_from_composer_repository`. */
     public static function checkWords(Finding $finding, string $reason): string
     {
         if ($reason === 'not_from_composer_repository' && !$finding->isFromComposerRepository() && $finding->origin()->kind() === PackageOrigin::UNKNOWN) {

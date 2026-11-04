@@ -7,8 +7,10 @@ description: "The block lockrot prints during composer require, update and insta
 
 With the [plugin installed](index.md#install), `composer require`, `composer update` and
 `composer install` print a block above Composer's operations list. It covers only the packages that
-the transaction installs or updates, not the whole lock. It never fails the install unless you set
-[`install-time-strict`](#install-time-strict).
+the transaction installs or updates, not the whole lock. It follows
+[`include-dev`](configuration.md#extralockrot-keys), as `composer lockrot` does: without it, the
+check skips each `packages-dev` package, even when Composer installs it. It never fails the install
+unless you set [`install-time-strict`](#install-time-strict).
 
 | To | Use |
 |---|---|
@@ -142,7 +144,7 @@ a lock, or lower it to spend less time on the check.
 |---|---|---|---|
 | A note in the block | Something the run could not see: an unreachable repository, an exhausted budget, a missing token | Continues, unless `install-time-strict` is on with `fail-on: unchecked` and a finding carries S10 | Look up its code in [run notes](notes.md) |
 | One `lockrot: install-time check skipped: …` line | lockrot could not run the check. Causes: a malformed `extra.lockrot` or lockrot environment variable. A value that Composer refuses in a blocking or policy variable, `config.policy` or `config.audit`. An unreadable `composer.lock`. An unreadable [baseline](baseline.md#install-time) file, a baseline-1 file included. An `extra.lockrot.baseline` that names a missing file. A defect in lockrot | Continues, and `install-time-strict` does not apply | Run `composer lockrot`. For a configuration problem, it names the problem and exits `2` ([exit codes](ci.md#exit-codes)) |
-| One `lockrot: Composer <version> is older than 2.10, so lockrot does nothing. …` line | The plugin runs on a Composer older than 2.10 | Continues, and `install-time-strict` does not apply | Upgrade Composer to 2.10 or later. To gate CI, run the [PHAR](phar.md) |
+| One `lockrot: Composer <version> is older than 2.10, so lockrot does nothing. …` line | The plugin runs on a Composer older than 2.10. `composer require` and `composer remove` can print it twice, because the plugin writes it on every activation | Continues, and `install-time-strict` does not apply | Upgrade Composer to 2.10 or later. To gate CI, run the [PHAR](phar.md) |
 | `lockrot: install-time-strict stopped the install; gate: fails …` and Composer exits `1` | [`install-time-strict`](#install-time-strict) is on and the gate fails | Stopped | See [after a stop](#install-time-strict) |
 
 ## <a name="install-time-strict"></a>`install-time-strict` {#install-time-strict}
@@ -199,11 +201,13 @@ A baseline covers only graded findings. On an `ok` or `unknown` finding, a `fail
 stop clears when that check runs (set a token, raise the budget or rerun), or when an
 [`accept-unchecked`](configuration.md#accept-unchecked) entry accepts a gap that no rerun closes.
 
-## Under `--dry-run` {#a-note-on-the-dry-run-development-flag}
+## <a name="a-note-on-the-dry-run-development-flag"></a>Under `--dry-run` {#a-note-on-the-dry-run-development-flag}
 
-Under `composer require --dev … --dry-run`, lockrot treats a package that is absent from the lock on
-disk as production, so its score is not halved for `dev` and its grade can read one band high.
-`composer lockrot` on the real lock has the flag.
+lockrot reads the lock through the locker of Composer. On a plain install, the locker reads
+`composer.lock`. Under `--dry-run` and with `config.lock` set to `false`, Composer keeps the
+updated lock in memory, and lockrot reads that lock. So a package from `composer require --dev … --dry-run` keeps its `packages-dev` membership.
+With `include-dev` on, its score is halved for `dev`, as in `composer lockrot`. With `include-dev`
+off, the check skips it.
 
 ## Related
 

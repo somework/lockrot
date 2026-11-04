@@ -427,11 +427,6 @@ low (7)
            v1.43.0 2026-09-23 (less than three weeks ago), its newest release
       maintenance accepted (lockrot's list)  polyfills for PHP extensions; released with Symfony and complete for the
                               API of the extension they replace
-  ocramius/proxy-manager 2.2.4  via symfony/proxy-manager-bridge  ·  stale · capped
-      5 = (stale 8 + capped 2 [¼ of 8]) ÷ 2 transitive (baseline: new package)
-      do: —
-      stale        last release 2022-03-05 (4.6 years ago)
-      capped       requires php ^7.2.0: it stops at 7.4, so the newest PHP, 8.5, is excluded
   jfcherng/php-color-output 2.0.2  via jfcherng/php-diff  ·  old-promise · stale
       4 = ((old-promise 16 + stale 2 [¼ of 8]) ÷ 2 transitive) ÷ 2 dev (4.5, rounded down) (baseline: new package)
       do: move jfcherng/php-color-output to ^3.0.0 through jfcherng/php-diff — clears old-promise; 3.x needs php
@@ -456,6 +451,12 @@ low (7)
       capped       requires php 8.1 - 8.4: it stops at 8.4, so the newest PHP, 8.5, is excluded
       age: installed v1.3.2 released 2024-10-06 (2.0 years ago); 1.x last released v1.3.6 2026-08-16 (0.1 years
            ago), its newest release; last push 2026-09-10 (0.1 years ago)
+  ocramius/proxy-manager 2.2.4  via symfony/proxy-manager-bridge  ·  capped
+      4 = capped 8 ÷ 2 transitive (baseline: new package)
+      do: no move: no release above 2.2.4 admits PHP 8.5
+      capped       requires php ^7.2.0: it stops at 7.4, so the newest PHP, 8.5, is excluded
+      age: installed 2.2.4 released 2022-03-05 (4.6 years ago); last push 2026-09-25 (less than three weeks ago)
+      checks missing: S2 (undated releases)
 
 not flagged (5)
   drupal/core 10.6.18  direct  ·  unknown
@@ -476,8 +477,8 @@ not flagged (5)
       checks missing: S2 (undated releases)
 
 60 packages checked · 55 flagged: critical 11 · high 21 · medium 16 · low 7
-flags: abandoned 7 · silent 1 · pinned 5 · left-behind 18 · old-promise 13 · stale 9 · capped 7 ·
-vulnerable 19 · 21 packages carry more than one
+flags: abandoned 7 · silent 1 · pinned 5 · left-behind 18 · old-promise 13 · stale 8 · capped 7 ·
+vulnerable 19 · 20 packages carry more than one
 depth: 22 of 55 flagged packages are named by no line of composer.json · direct 32 · 1 hop 15 · 2 hops 4 ·
 4 hops 1 · unreached 3 ·
 deepest: robrichards/xmlseclibs, 4 hops (mautic/core-lib › lightsaml/sp-bundle › lightsaml/symfony-bridge › lightsaml/lightsaml › robrichards/xmlseclibs) ·
@@ -491,10 +492,11 @@ furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: mautic/core-lib 7 · guzzlehttp/guzzle 2 · laravel/framework 2 · akaunting/laravel-apexcharts 1 ·
 friendsofsymfony/user-bundle 1 · … and 8 more
 advisories: 60 packages asked · packagist.org answered (291 on record for 24 packages)
-php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 11 packages that exclude it is not checked (the run checked no move)
+php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 11 packages that exclude it is not
+checked (the run checked no move)
 baseline: 3 known · 49 new · 4 worsened · 0 stale (lockrot-baseline.json)
 gate: fails · --fail-on=high,unchecked ·
-32 findings fail it (high 31, unchecked 3); 2 reach it and the baseline exempts them · target php 8.4 (--target-php)
+33 findings fail it (high 31, unchecked 4); 2 reach it and the baseline exempts them · target php 8.4 (--target-php)
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.
 note: the baseline was written for php 8.5 (the PHP running lockrot) and this run targets php 8.4 (--target-php): fix

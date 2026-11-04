@@ -7,12 +7,17 @@ namespace Lockrot\Tests\Unit\Output;
 use Lockrot\Allowlist\AcceptedCheck;
 use Lockrot\Allowlist\UncheckedAcceptanceEntry;
 use Lockrot\Analyzer\MoveCheckRun;
+use Lockrot\Analyzer\PhpWindow;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Analyzer\UpdateNow;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
+use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Lock\LockFile;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\TableFormatter;
@@ -26,6 +31,7 @@ use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
+use Lockrot\Tests\Support\RecordedMoveChecker;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Support\TextGolden;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
@@ -357,6 +363,50 @@ final class TableFormatterTest extends TestCase
         $report = self::report()->withMoveChecks(new MoveCheckRun('2.9.5', false, ['COMPOSER_NO_SECURITY_BLOCKING'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
 
         self::assertStringContainsString('against the lock, with advisory blocking turned off by COMPOSER_NO_SECURITY_BLOCKING; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked', self::formatter(400)->format($report));
+    }
+
+    /** The `moves:` and `php:` lines are prose: they fold at a space, and the command that the php line names stays whole. */
+    public function testTheMovesAndPhpLinesFoldAtSpacesAndKeepTheCommandWhole(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $lock = ['packages' => [['name' => 'acme/a', 'version' => '1.0.0', 'require' => ['php' => '<8.5']]], 'packages-dev' => [['name' => 'acme/tool', 'version' => '1.0.0', 'require' => ['php' => '<8.5']]]];
+        $window = PhpWindow::of(LockFile::fromArray($lock), ProjectConfig::fromArray([]), '8.5', PhpReleaseDates::load()->minors(new Clock($at)));
+        self::assertNotNull($window);
+        $report = self::report()
+            ->withMoveChecks(new MoveCheckRun('2.10.3', false, [], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], MoveChecks::of(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON))))
+            ->withPhpWindow($window->withTargetFix(new RecordedMoveChecker(['target_fix' => ['result' => 'resolves', 'form' => 'with-all-dependencies']], [])));
+        $moves = 'moves: checked with the solver of Composer 2.10.3 against the lock; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked';
+        $command = 'composer update acme/a acme/tool --with-all-dependencies';
+        $php = "php: the lock installs on PHP 5.3 to 8.4, so your target, 8.5, is excluded; Composer's solver at PHP 8.5 resolves: ".$command;
+
+        foreach ([40, 60] as $width) {
+            $lines = self::lines(self::formatter($width)->format($report));
+            $first = static fn (string $start): int => (int) key(preg_grep('/^'.preg_quote($start, '/').'/', $lines) ?: [-1 => '']);
+            [$at, $then, $gate] = [$first('moves: '), $first('php: '), $first('gate: ')];
+
+            self::assertSame($moves, implode(' ', \array_slice($lines, $at, $then - $at)), 'width '.$width);
+            self::assertSame($php, implode(' ', \array_slice($lines, $then, $gate - $then)), 'width '.$width);
+            self::assertNotEmpty(array_filter(\array_slice($lines, $then, $gate - $then), static fn (string $line): bool => strpos($line, $command) !== false), 'width '.$width);
+            foreach (\array_slice($lines, $at, $gate - $at) as $line) {
+                self::assertTrue(\strlen($line) <= $width || $line === $command, 'width '.$width.': '.$line);
+            }
+        }
+    }
+
+    /** A link target with a space and a control byte stays on one line in its neutralised form. */
+    public function testTheFootersHoldWithAControlByteStaysWhole(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $lock = ['packages' => [['name' => 'acme/a', 'version' => '1.0.0', 'require' => ['php' => '<8.5']]], 'packages-dev' => []];
+        $window = PhpWindow::of(LockFile::fromArray($lock), ProjectConfig::fromArray([]), '8.5', PhpReleaseDates::load()->minors(new Clock($at)));
+        self::assertNotNull($window);
+        $target = "acme/abcdefghijklmnopqrstuvwxyz0123 d\x1b";
+        $hold = ['source' => 'package', 'package' => 'acme/b', 'version' => '1.0.0', 'link' => 'require', 'constraint' => '^1.0', 'target' => $target];
+        $report = self::report()->withPhpWindow($window->withTargetFix(new RecordedMoveChecker(['target_fix' => ['result' => 'refused', 'holds' => [$hold]]], [])));
+
+        $lines = self::lines(self::formatter(40)->format($report));
+
+        self::assertNotEmpty(preg_grep('/acme\/abcdefghijklmnopqrstuvwxyz0123 d\\\\x1[bB]/', $lines), implode("\n", $lines));
     }
 
     private static function report(): Report

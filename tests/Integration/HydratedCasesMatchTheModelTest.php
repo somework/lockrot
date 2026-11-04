@@ -203,7 +203,8 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['signals[S5]', 'flags[old-promise]', 'score.terms[].flag'], self::TIE],
             ],
             'moves' => [
-                [['signals[S5]', 'flags[old-promise]', 'next_step.version', 'next_step.commands', 'next_step.unverified[].id', 'next_step.unverified[].kind', 'next_step.if_applied.at_most', 'next_step.if_applied.total', 'next_step.if_applied.verdict', 'next_step.also[].leaves[].id', 'next_step.also[].leaves[].kind', 'score.terms[].flag'], self::TIE],
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
+                [['signals[S5]', 'flags[old-promise]', 'next_step.unverified[].id', 'next_step.unverified[].kind', 'next_step.if_applied.at_most', 'next_step.if_applied.total', 'next_step.if_applied.verdict', 'next_step.also[].leaves[].id', 'next_step.also[].leaves[].kind', 'score.terms[].flag'], self::TIE],
             ],
             'security' => [
                 [['signals[S5]'], self::TIE],
@@ -322,6 +323,11 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
+        'S8-higher-shared-alive‡' => [
+            'moves' => [
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
+            ],
+        ],
         'php-edge-equal‡' => [
             'moves' => [
                 [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
@@ -339,7 +345,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
     private const PHP_STAR = 'The case sets the project\'s require.php to `*` or to a constraint that matches no PHP (‡), so the project has no lowest PHP. The model keeps the holder\'s own step of case A. lockrot judges the holder with no project lowest, which admits its newest line.';
 
 
-    private const BITBUCKET = 'The model marks the repository archived on Bitbucket (S3). Bitbucket\'s repository API has no archived field, so lockrot cannot raise S3 for a Bitbucket repository, and each later signal moves up one place.';
+    private const BITBUCKET = 'The model marks the repository archived on Bitbucket (S3). Bitbucket\'s repository API has no archived field, so lockrot raises no S3 for a Bitbucket repository. The abandoned flag then lacks the `archived` reason, and its `degree.reasons` and `headline.value` differ.';
 
     private const TIE = 'The model removes S5 from the case to make the tie. The installed release requires php >=5.3.3 and is older than the PHP 8.0 release, so lockrot raises S5 (old-promise).';
 
@@ -381,10 +387,8 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'next_step.also[].held_by[].holder.next_step.kind' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.to_branch' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.check' => self::ALSO_HELD,
-        'next_step.also[].check.form' => self::ALSO_CHECK,
         'next_step.also[].check.reason' => self::ALSO_CHECK,
         'run.move_check.reason' => 'No case of the model has a baseline that the move check does not reach.',
-        'next_step.also[].check.installs' => self::ALSO_CHECK,
         'next_step.also[].moves_with[].installed_version' => self::ALSO_CHECK,
         'next_step.also[].moves_with[].package' => self::ALSO_CHECK,
         'next_step.also[].moves_with[].version' => self::ALSO_CHECK,
@@ -404,7 +408,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
 
     private const ALSO_HELD = 'No also[] move of a case with inputs is held by a package that has a finding of its own.';
 
-    private const ALSO_CHECK = 'Each also[] move of a case with inputs that Composer\'s solver checks is refused, so no case gives it a form, a reason, an install or a joint move.';
+    private const ALSO_CHECK = 'No case with inputs gives an also[] move a check reason or a joint move.';
 
     private const NO_SOLVER_WORLD = 'The case has no solver inputs, so the recording checks no move and writes `run.move_check` null. The model writes the run\'s move check.';
 
@@ -533,6 +537,21 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         }
 
         return $out;
+    }
+
+    /** A listed `version` or `commands` of a move is the S8 cause, so the lowest-admitted-release check reads it. */
+    public function testEveryListedMoveVersionHasTheVersionReason(): void
+    {
+        $versioned = ['next_step.version', 'next_step.commands', 'next_step.also[].version', 'next_step.also[].commands'];
+        foreach (self::DIFFERENCES as $id => $lines) {
+            foreach ($lines as $line => $groups) {
+                foreach ($groups as [$paths, $reason]) {
+                    if (array_intersect($paths, $versioned) !== []) {
+                        self::assertSame(self::MOVE_VERSION, $reason, $id.' '.$line.': a listed version or commands needs the version reason');
+                    }
+                }
+            }
+        }
     }
 
     /** Each listed path is one that its line reads, and each list has a reason. */

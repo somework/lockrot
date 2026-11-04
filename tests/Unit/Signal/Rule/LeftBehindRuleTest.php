@@ -335,7 +335,7 @@ final class LeftBehindRuleTest extends TestCase
         $meta = new PackageMetadata('illuminate/contracts', false, null, true, new \DateTimeImmutable('2026-09-01'), 'v13.24.0', 2, null, 'library', new \DateTimeImmutable(F::NOW), [
             '13' => $branch('13.24.0', '2026-09-01T00:00:00+00:00', 'laravel/framework'),
             '8' => $branch('8.83.29', '2021-11-20T15:55:41+00:00', 'laravel/framework'),
-        ], [], 'laravel/framework');
+        ], [], 'laravel/framework', [], 'laravel/framework', ['13.24.0.0' => true]);
 
         $signal = $this->rule()->evaluate(F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v8.83.27']), $meta));
 
@@ -343,6 +343,7 @@ final class LeftBehindRuleTest extends TestCase
         self::assertSame(Signal::LEVEL_WARN, $signal->level());
         self::assertSame('branch 8.x last released 2021-11-20 (4.8 years ago, dated by laravel/framework); 13.x released 13.24.0 (2026-09-01)', $signal->summary());
         self::assertSame('laravel/framework', JsonPath::decoded($signal->data())['dated_by']);
+        self::assertFalse(JsonPath::decoded($signal->data())['newest_release_at_least'], 'the parent\'s date is a release\'s, though the split\'s own tag shares its commit');
         self::assertSame('^13.24', JsonPath::decoded($signal->data())['suggested_constraint']);
     }
 
@@ -587,6 +588,75 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNotNull($signal);
         self::assertStringEndsWith('; 2.x released 2.0.0 (2026-01-10)', $signal->summary());
         self::assertFalse(JsonPath::decoded($signal->data())['newest_release_at_least']);
+    }
+
+    /** A stale own-dated release does not say that the branch stopped while its higher top tag is undated. */
+    public function testAnUndatedTopTagAboveAStaleOwnDatedReleaseIsAnUndatedRelease(): void
+    {
+        $facts = F::facts(F::package(['version' => '1.9.2']), self::branches([
+            '2' => ['version' => '2.0.5', 'at' => new \DateTimeImmutable('2019-06-01T00:00:00+00:00'), 'highest' => ['normalized' => '2.1.0.0', 'pretty' => '2.1.0', 'at' => null, 'php' => null], 'php' => null],
+            '1' => self::row('1.9.2', '2019-03-02', '2019-03-02', null),
+        ]));
+
+        self::assertNull($this->rule()->evaluate($facts));
+        self::assertSame(['2.1.0.0'], $this->rule()->undatedReleases($facts));
+    }
+
+    /** A lower tag dated by a commit that its tags share gives a lower bound too, as the highest tag does. */
+    public function testALowerTagOnASharedCommitIsQuotedAsALowerBound(): void
+    {
+        $loader = new ArrayLoader();
+        $on = static fn (string $version, ?string $commit, ?string $time): array => array_filter(['name' => 'vendor/pkg', 'version' => $version, 'time' => $time, 'source' => $commit === null ? null : ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => $commit]]);
+        $meta = PackageMetadata::fromPackages('vendor/pkg', [
+            $loader->load($on('5.1.0', null, null)),
+            $loader->load($on('5.0.2', 'split', '2025-06-01T00:00:00+00:00')),
+            $loader->load($on('5.0.1', 'split', '2025-06-01T00:00:00+00:00')),
+            $loader->load($on('5.0.0', 'split', '2025-06-01T00:00:00+00:00')),
+            $loader->load($on('4.0.0', 'own', '2020-01-01T00:00:00+00:00')),
+        ], new \DateTimeImmutable(F::NOW));
+
+        $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '4.0.0']), $meta));
+
+        self::assertNotNull($signal);
+        self::assertStringEndsWith('; 5.x released 5.0.2 (on or after 2025-06-01, the date of a commit its tags share)', $signal->summary());
+        $data = JsonPath::decoded($signal->data());
+        self::assertTrue($data['newest_release_at_least']);
+        self::assertTrue($data['reachable_release_at_least']);
+    }
+
+    /** A shared-commit date is only a lower bound: past the warn years, the higher branch is unmeasured, not quiet. */
+    public function testAStaleSharedCommitLowerBoundOnAHigherBranchIsAnUndatedRelease(): void
+    {
+        $meta = self::sharedCommitBranch('2019-06-01T00:00:00+00:00');
+        $facts = F::facts(F::package(['version' => '4.0.0']), $meta);
+
+        self::assertNull($this->rule()->evaluate($facts));
+        self::assertSame(['5.0.2.0'], $this->rule()->undatedReleases($facts));
+    }
+
+    /** A lower bound inside the warn years leaves the branch alive either way, so S8 fires and no release is undated. */
+    public function testASharedCommitLowerBoundInsideTheWarnYearsNeedsNoUndatedRelease(): void
+    {
+        $meta = self::sharedCommitBranch('2025-06-01T00:00:00+00:00');
+        $facts = F::facts(F::package(['version' => '4.0.0']), $meta);
+
+        self::assertNotNull($this->rule()->evaluate($facts));
+        self::assertSame([], $this->rule()->undatedReleases($facts));
+    }
+
+    /** 5.x: the highest tag 5.1.0 has a trusted 2018 date, and the newer-dated 5.0.2, 5.0.1 and 5.0.0 share a commit dated $shared. */
+    private static function sharedCommitBranch(string $shared): PackageMetadata
+    {
+        $loader = new ArrayLoader();
+        $on = static fn (string $version, string $commit, string $time): array => ['name' => 'vendor/pkg', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => $commit]];
+
+        return PackageMetadata::fromPackages('vendor/pkg', [
+            $loader->load($on('5.1.0', 'top', '2018-01-01T00:00:00+00:00')),
+            $loader->load($on('5.0.2', 'split', $shared)),
+            $loader->load($on('5.0.1', 'split', $shared)),
+            $loader->load($on('5.0.0', 'split', $shared)),
+            $loader->load($on('4.0.0', 'own', '2015-01-01T00:00:00+00:00')),
+        ], new \DateTimeImmutable(F::NOW));
     }
 
     public function testAHigherBranchWithATrustedDateIsQuotedExactly(): void

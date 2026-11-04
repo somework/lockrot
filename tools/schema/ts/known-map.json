@@ -132,7 +132,8 @@
   "values": [
    "offline",
    "install_time_budget",
-   "lookup_failed"
+   "lookup_failed",
+   "composer_json_invalid"
   ],
   "open": true,
   "integer": false
@@ -916,7 +917,8 @@
    "lookup_failed",
    "not_from_composer_repository",
    "unparseable_version",
-   "no_feed"
+   "no_feed",
+   "composer_json_invalid"
   ],
   "open": true,
   "integer": false
@@ -1319,7 +1321,8 @@
    "lookup_failed",
    "host_not_supported",
    "no_feed",
-   "not_from_composer_repository"
+   "not_from_composer_repository",
+   "composer_json_invalid"
   ],
   "open": true,
   "integer": false
@@ -3620,7 +3623,8 @@
    "lookup_failed",
    "no_feed",
    "not_from_composer_repository",
-   "unparseable_version"
+   "unparseable_version",
+   "composer_json_invalid"
   ],
   "open": true,
   "integer": false

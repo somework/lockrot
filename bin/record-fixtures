@@ -7,7 +7,8 @@ declare(strict_types=1);
 // Usage: GITHUB_TOKEN=... bin/record-fixtures [--gitlab-domain=<host> ...] [--into=<dir>] [fixtureDir ...]
 //
 // It records packages and packages-dev: a `--dev` test replays them. The advisory answer is one
-// packagist.org POST with every locked name, whatever its origin, as lockrot's lookup sends it.
+// packagist.org POST with every name that it records, whatever its origin, as lockrot's lookup sends it.
+// A request sends a token only to the host that it names, not to the target of a redirect.
 //
 // The script trims each p2 body to KEEP and each forge body to the keys that its ForgeApi reads. A
 // fixture with its own `http` directory keeps its answers there (p2, github, gitlab, advisories),
@@ -43,6 +44,8 @@ use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Repository\MonorepoParents;
 use Lockrot\Lock\LockFile;
 use Lockrot\Tests\Support\RecordedStatus;
+use Lockrot\Tests\Support\RecorderHttp;
+use Lockrot\Tests\Support\RecorderNames;
 
 const KEEP = ['name', 'version', 'version_normalized', 'time', 'abandoned', 'source', 'require', 'conflict', 'provide', 'replace', 'type', 'extra'];
 const REPOSITORY_BASE_URL = 'https://repo.packagist.org/p2/';
@@ -85,23 +88,8 @@ foreach ($names === null ? [$p2Dir, $ghDir, $advisoryDir] : [] as $dir) {
         mkdir($dir, 0777, true);
     }
 }
-// PHP's http wrapper sends the headers again to the host that a redirect names. So a request with a
-// token follows no redirect.
-$fetch = static function (string $url, array $headers, ?string $post = null, bool $follow = true): HttpResult {
-    $http = ['method' => $post === null ? 'GET' : 'POST', 'header' => implode("\r\n", array_merge(['User-Agent: lockrot-recorder'], $headers)), 'ignore_errors' => true, 'timeout' => 30, 'follow_location' => $follow ? 1 : 0];
-    if ($post !== null) {
-        $http['content'] = $post;
-    }
-    $ctx = stream_context_create(['http' => $http]);
-    $body = @file_get_contents($url, false, $ctx);
-    $status = 0;
-    foreach ($http_response_header ?? [] as $line) {
-        if (preg_match('{^HTTP/\S+\s+(\d{3})}', $line, $m) === 1) {
-            $status = (int) $m[1];
-        }
-    }
-    return new HttpResult($url, $status, $body === false ? null : $body, new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
-};
+$clock = new Clock();
+$fetch = static fn (string $url, array $headers, ?string $post = null, bool $follow = true): HttpResult => RecorderHttp::fetch($url, $headers, $post, $follow, [RecorderHttp::class, 'stream'], $clock);
 $trim = static function (string $body, string $name): string {
     $json = json_decode($body, true);
     if (!\is_array($json) || !isset($json['packages'][$name])) {
@@ -128,7 +116,7 @@ $store = static function (string $path, HttpResult $result, ?string $body, bool 
 };
 $io = new NullIO();
 $composerConfig = Factory::createConfig($io);
-$repositoryHttp = new ComposerHttpClient(Factory::createHttpDownloader($io, $composerConfig), $io, $composerConfig, new Clock());
+$repositoryHttp = new ComposerHttpClient(Factory::createHttpDownloader($io, $composerConfig), $io, $composerConfig, $clock);
 $github = new GitHubApi();
 $githubHeaders = GitHubApi::headersFor(getenv('GITHUB_TOKEN') ?: null);
 $locator = new RepoLocator($gitlabDomains);
@@ -234,11 +222,12 @@ $releaseSources = static function (string $name, array $answers): array {
     return $urls;
 };
 /**
- * Each `composer` repository of the fixture's composer.json beside packagist.org: its packages.json,
- * the p2 answer of each locked name that its `available-package-patterns` match, and the answer of
- * its advisory API for those names.
+ * Records each `composer` repository of the fixture's composer.json beside packagist.org. It
+ * records the packages.json, the p2 answer of each name that `RecorderNames::repository()` selects
+ * and the advisory answer for those names. A root that is no repository, or a repository that
+ * `RecorderNames::unrecordable()` names, counts as an unrecorded answer.
  */
-$recordRepositories = static function (string $fixtureDir, LockFile $lock, string $dir) use ($fetch, $repositoryHttp, $record, $isRecorded, $trim): void {
+$recordRepositories = static function (string $fixtureDir, LockFile $lock, string $dir) use ($fetch, $repositoryHttp, $record, $isRecorded, $trim, &$unrecorded): void {
     $manifest = json_decode((string) file_get_contents($fixtureDir.'/composer.json'), true);
     foreach (\is_array($manifest['repositories'] ?? null) ? $manifest['repositories'] : [] as $repository) {
         $url = \is_array($repository) && ($repository['type'] ?? null) === 'composer' && \is_string($repository['url'] ?? null) ? rtrim($repository['url'], '/') : null;
@@ -254,18 +243,15 @@ $recordRepositories = static function (string $fixtureDir, LockFile $lock, strin
         $result = HttpResult::fromEnvelopeJson($root, (string) @file_get_contents(RecordedHttpClient::pathFor($dir, $root)));
         $packages = $result === null || $result->body() === null ? null : json_decode($result->body(), true);
         if (!\is_array($packages)) {
+            ++$unrecorded;
+            fwrite(STDERR, \sprintf("not recorded: %s is no composer repository root\n", $root));
             continue;
         }
-        $patterns = array_map(static fn (string $pattern): string => '{^'.str_replace('\\*', '.*', preg_quote($pattern, '{')).'$}', $packages['available-package-patterns'] ?? []);
-        $names = array_values(array_filter(array_map(static fn ($package): string => $package->name(), $lock->packages(false)), static function (string $name) use ($patterns): bool {
-            foreach ($patterns as $pattern) {
-                if (preg_match($pattern, $name) === 1) {
-                    return true;
-                }
-            }
-
-            return false;
-        }));
+        $names = RecorderNames::repository($packages, array_map(static fn ($package): string => $package->name(), $lock->packages(false)));
+        if (RecorderNames::unrecordable($packages, $names)) {
+            ++$unrecorded;
+            fwrite(STDERR, \sprintf("not recorded: %s is no repository root, or lists packages and has no metadata-url\n", $root));
+        }
         $port = parse_url($url, \PHP_URL_PORT);
         $base = (string) parse_url($url, \PHP_URL_SCHEME).'://'.(string) parse_url($url, \PHP_URL_HOST).($port === null || $port === false ? '' : ':'.$port);
         $resolve = static fn (string $target): string => preg_match('{^https?://}', $target) === 1 ? $target : $base.$target;
@@ -302,7 +288,7 @@ foreach ($fixtures as $fixture) {
     }
     $advisoryPath = ($own !== null ? $own.'/advisories' : $advisoryDir).'/'.basename($fixture).'.json';
     if (!$isRecorded($advisoryPath)) {
-        $names = array_map(static fn ($package): string => $package->name(), $lock->packages(true));
+        $names = RecorderNames::advisory($lock, $into !== null);
         $result = $fetch(ADVISORY_API_URL, ['Content-Type: application/x-www-form-urlencoded'], http_build_query(['packages' => $names]));
         $store($advisoryPath, $result, $result->body());
         fwrite(STDERR, \sprintf("advisories %s (%d names) %d\n", $fixture, \count($names), $result->status()));

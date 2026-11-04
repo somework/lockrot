@@ -9,6 +9,7 @@ use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\Constraint\MultiConstraint;
 use Composer\Semver\Intervals;
 use Composer\Semver\VersionParser;
+use Lockrot\Clock;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Data\Repository\StableRelease;
@@ -244,9 +245,10 @@ final class MoveContext
         return $s8 !== null && $s8->newestBranch() === $row->branch() ? new \DateTimeImmutable($s8->newestRelease()) : null;
     }
 
+    /** S8's reading of `release-warn-years` ({@see \Lockrot\Signal\Rule\LeftBehindRule}), so a tag move and S8 agree at the edge. */
     public function isReleasing(?\DateTimeImmutable $at): bool
     {
-        return $at !== null && $at > $this->now->modify('-'.$this->warnYears.' years');
+        return $at !== null && (new Clock($this->now))->yearsSince($at) < $this->warnYears;
     }
 
     /**

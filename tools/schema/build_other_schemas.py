@@ -259,7 +259,8 @@ def explain_metadata():
     rows = strip_optional(copy.deepcopy(E1['definitions']['metadata']))
     row = rows['properties']['branches']['items']
     row['description'] = ('One release branch, highest first (the details block, §7.6). Every key but `highest_php`, the three `highest_*` floor '
-                          'answers, `released_years` and `fixes` is 0.13\'s; find the installed row by `installed: true`, never by name.')
+                          'answers, `released_years` and `fixes` is 0.13\'s; find the installed row by `installed: true`, never by name. '
+                          '`admits_target_php` and `misses_target_php` keep their 0.13 names, and they test one PHP point.')
     row['properties']['branch']['description'] = 'The branch label as `ReleaseBranch::label()` writes it (`2.x`, `0.15.x`, `0.0.3`), the same label as `finding.branch`.'
     row['properties']['php'] = nullable({'type': 'string'}, 'The requirement of the branch\'s newest dated release, as the repository lists it, or of its '
                                                            'highest tag when no release on the branch has a date; null when it declares none. The floor answers (`admits_*`, `php_blocked_by`, `misses_*`) test it.')
@@ -269,9 +270,19 @@ def explain_metadata():
         'The requirement of the branch\'s highest tag (`highest`), as the repository lists it; null when it declares none. It differs from `php` '
         'when the newest dated release is not the highest tag (composer/composer 2.x: 2.10.3 beside the backport 2.2.30). The Release branches line '
         'prints it beside `highest`; the floor answers read `php`.')))] + list(props.items())[at:])
+    # admits_target_php and misses_target_php test one PHP point, where 0.13 tested the whole minor
+    row['properties']['admits_target_php']['description'] = (
+        'Whether `php` admits the target PHP point: true when that point satisfies it, false when it does not and Composer resolving at that point would '
+        'not install the branch. The point is `config.platform.php` when it is a stable release of the minor of `target_php`, else the newest patch of '
+        'that minor (8.4 read as 8.4.99). 0.13 tested the whole minor (>=8.4.0 <8.5.0). Null is no answer, never admitted: `php` is null or cannot be '
+        'read.')
+    miss = row['properties']['misses_target_php']
+    old = 'admits no version of the target minor (admits_target_php false), read against the whole minor as admits_target_php reads it (8.4 as >=8.4.0 <8.5.0)'
+    require(old in miss['description'], 'the 0.13 misses_target_php text changed')
+    miss['description'] = miss['description'].replace(old, 'does not admit the target PHP point (admits_target_php false), read at that point as admits_target_php reads it')
     known = row['properties']['misses_project_php']['oneOf'][0]
     row['properties']['highest_admits_target_php'] = nullable({'type': 'boolean'}, (
-        '`admits_target_php` asked of `highest_php`: whether the highest tag\'s php admits the target PHP. The Release branches line reads it beside '
+        '`admits_target_php` asked of `highest_php`, at the same target PHP point: whether the highest tag\'s php admits it. The Release branches line reads it beside '
         '`highest_php`. Null is no answer, never admitted.'))
     row['properties']['highest_admits_project_php'] = nullable({'type': 'boolean'}, (
         '`admits_project_php` asked of `highest_php`: whether the highest tag\'s php admits the lowest PHP the project\'s `require.php` promises. '

@@ -30,6 +30,7 @@ final class CauseWords
         'host_not_supported' => 'host not supported',
         'repository_not_found' => 'repository not found',
         'no_feed' => 'no repository publishes advisories',
+        'composer_json_invalid' => 'Composer cannot load composer.json',
         'unparseable_version' => 'version not readable',
         'accepted_by_config' => 'accepted by your accept-unchecked list',
         'no_versions' => 'no version left to read',

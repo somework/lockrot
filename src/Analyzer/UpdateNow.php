@@ -12,7 +12,8 @@ use Lockrot\Verdict\MoveChecks;
 
 /**
  * `security.update_now` and its command (D9). The candidates are the vulnerable findings whose lead
- * move is an `update` that Composer's solver resolves inline without a joint request of its holders.
+ * move is an `update` that clears at least one of their advisories and that Composer's solver
+ * resolves inline without a joint request of its holders.
  * The command updates them in one request. When Composer refuses them together, the command leaves
  * out the candidates that the refusal names and asks once more. The members are the names of a
  * command that Composer resolves: with none, `update now` is empty and a run note says why.
@@ -49,7 +50,7 @@ final class UpdateNow
         foreach ($findings as $finding) {
             $move = $finding->nextStep();
             $check = $move === null ? null : $move->check();
-            if ($finding->securityStanding()->isVulnerable() && $move !== null && $move->kind() === Move::UPDATE && $move->movesWith() === [] && $check !== null && $check->isResolved() && $check->form() === MoveCheck::INLINE) {
+            if ($finding->securityStanding()->isVulnerable() && $move !== null && $move->kind() === Move::UPDATE && $move->clearedAdvisories() !== [] && $move->movesWith() === [] && $check !== null && $check->isResolved() && $check->form() === MoveCheck::INLINE) {
                 $inline[$finding->package()] = '^'.ltrim((string) $move->version(), 'vV');
             }
         }

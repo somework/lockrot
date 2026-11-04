@@ -62,7 +62,7 @@ final class ContractBundle
      * that differs from the model's leaves its golden uncompared, so a lost input fails here. Keep
      * each floor at the count in provenance.json `model_goldens.compared` after a re-record.
      */
-    public const COMPARED_FLOOR = ['age_line' => 188, 'baseline_suffix' => 186, 'commands_cmd' => 168, 'commands_posix' => 168, 'gate_line' => 187, 'next_step_text' => 140, 'run_gate_line' => 188, 'score_text' => 187];
+    public const COMPARED_FLOOR = ['age_line' => 199, 'baseline_suffix' => 197, 'commands_cmd' => 178, 'commands_posix' => 178, 'gate_line' => 198, 'next_step_text' => 150, 'run_gate_line' => 199, 'score_text' => 198];
     /** The inputs of a command list: the move's argv. */
     private const COMMANDS = ['next_step.commands'];
     /** Up to this many score lines per grammar path of the sweep, as the model's score-lines.json keeps. */

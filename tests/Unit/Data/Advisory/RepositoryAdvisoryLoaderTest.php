@@ -709,6 +709,19 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertFalse($batch->complete());
     }
 
+    public function testALoaderThatAsksNoneReadsEveryNameAsNotAskedForItsReason(): void
+    {
+        $loader = RepositoryAdvisoryLoader::askingNone(AdvisoryCoverage::COMPOSER_JSON_INVALID, AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES, AdvisoryCoverage::SOURCE_CONFIG);
+
+        $batch = $loader->load(['doctrine/cache' => '2.2.0']);
+
+        self::assertSame([[RunNote::ADVISORIES_NOT_CHECKED, ['reason' => 'composer_json_invalid', 'composer_repositories_checked' => 0]]], array_map(static fn (RunNote $note): array => [$note->code(), $note->data()], $batch->notes()));
+        self::assertSame([[], 0, AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES, AdvisoryCoverage::SOURCE_CONFIG], [$batch->coverage()->repositories(), $batch->coverage()->otherRepositories(), $batch->coverage()->scope(), $batch->coverage()->scopeSource()]);
+        self::assertSame([[], 'composer_json_invalid'], [self::nameCoverage($batch, 'doctrine/cache')->feeds(), self::nameCoverage($batch, 'doctrine/cache')->reason()]);
+        self::assertFalse($batch->complete());
+        self::assertNull($loader->records(['doctrine/cache'], false));
+    }
+
     /** Composer's policy stops blocking, never `composer audit`: lockrot still asks and counts. */
     public function testAPolicyThatTurnsComposersAdvisoryChecksOffStillAsksAndNotesTheKey(): void
     {

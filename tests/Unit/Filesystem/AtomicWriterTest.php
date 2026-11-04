@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Filesystem;
 
+use Composer\Util\ErrorHandler;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Filesystem\AtomicWriter;
 use PHPUnit\Framework\TestCase;
@@ -122,6 +123,40 @@ final class AtomicWriterTest extends TestCase
         self::assertStringContainsString('fopen', $thrown->getMessage());
         self::assertStringNotContainsString('unlink', $thrown->getMessage());
         self::assertSame([], self::entries($dir));
+    }
+
+    /**
+     * bin/lockrot runs under Composer's error handler, which swallows a suppressed warning before
+     * error_get_last() can record it.
+     */
+    public function testUnderComposersErrorHandlerTheReasonIsTheFailedCall(): void
+    {
+        $dir = $this->tempDir();
+        mkdir($dir.'/r.json');
+        file_put_contents($dir.'/r.json/occupied', 'x');
+        $reporting = error_reporting();
+        ErrorHandler::register();
+        try {
+            $missingDirectory = self::failureOf($dir.'/no/r.json');
+            $occupiedTarget = self::failureOf($dir.'/r.json');
+        } finally {
+            restore_error_handler();
+            error_reporting($reporting);
+        }
+
+        self::assertStringContainsString('fopen', $missingDirectory);
+        self::assertStringContainsString('rename', $occupiedTarget);
+    }
+
+    private static function failureOf(string $path): string
+    {
+        try {
+            AtomicWriter::write($path, 'report', 'r.json');
+        } catch (ConfigException $e) {
+            return $e->getMessage();
+        }
+
+        self::fail('the write must fail');
     }
 
     /**

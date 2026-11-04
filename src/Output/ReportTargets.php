@@ -57,7 +57,7 @@ final class ReportTargets
             }
             self::refuseSameFileAs($target, \array_slice($targets, 0, $index));
             $seen[$canonical] = $target->option();
-            self::refuseUnwritablePlace($target);
+            self::refuseUnwritablePlace($target->path(), $target->displayPath(), $target->option());
         }
 
         return new self($targets);
@@ -114,17 +114,24 @@ final class ReportTargets
         }
     }
 
-    private static function refuseUnwritablePlace(ReportTarget $target): void
+    /**
+     * @param string $displayPath $path as the refusal shows it
+     * @param string $option      the option and its value, as the refusal names them
+     *
+     * @throws ConfigException when the directory of $path is missing or not a directory, or $path
+     *                         exists and is not a regular file
+     */
+    public static function refuseUnwritablePlace(string $path, string $displayPath, string $option): void
     {
-        $directory = \dirname($target->path());
+        $directory = \dirname($path);
         if (!is_dir($directory)) {
-            $shown = \dirname($target->displayPath());
+            $shown = \dirname($displayPath);
             throw new ConfigException(file_exists($directory)
-                ? $target->option().': '.$shown.' is not a directory'
-                : $target->option().': directory '.$shown.' does not exist; lockrot does not create directories');
+                ? $option.': '.$shown.' is not a directory'
+                : $option.': directory '.$shown.' does not exist; lockrot does not create directories');
         }
-        if (file_exists($target->path()) && !is_file($target->path())) {
-            throw new ConfigException($target->option().': '.$target->displayPath().' exists and is not a regular file');
+        if (file_exists($path) && !is_file($path)) {
+            throw new ConfigException($option.': '.$displayPath.' exists and is not a regular file');
         }
     }
 

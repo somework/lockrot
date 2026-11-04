@@ -164,7 +164,7 @@ Frozen for 1.x:
 | Note codes | Frozen reasons | Catch-all |
 |---|---|---|
 | [`metadata_unavailable`](notes.md#metadata_unavailable), [`monorepo_parent_unavailable`](notes.md#monorepo_parent_unavailable) | `offline`, `install_time_budget`, `no_versions` | `fetch_failed` |
-| [`advisories_not_checked`](notes.md#advisories_not_checked) | `offline`, `install_time_budget` | none |
+| [`advisories_not_checked`](notes.md#advisories_not_checked) | `offline`, `install_time_budget`, `composer_json_invalid` | none |
 | [`repository_activity_not_checked`](notes.md#repository_activity_not_checked) | `install_time_budget` | none |
 
 Not frozen:

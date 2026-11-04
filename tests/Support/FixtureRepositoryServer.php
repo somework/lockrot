@@ -208,7 +208,8 @@ final class FixtureRepositoryServer
      * Serves the recorded answers of another `composer` repository below `/mirror/<n>` and returns
      * the URL to use in its place: its packages.json, the p2 answer of each served name that its
      * `available-packages` or `available-package-patterns` admit, and its advisory API, which gives
-     * the recorded answer to any POST. Each answer is the envelope that `bin/record-fixtures --into`
+     * the recorded answer to any POST. Names match without regard to case, and every name matches
+     * when neither list has an entry. Each answer is the envelope that `bin/record-fixtures --into`
      * wrote in $recordingDir for the original URL. With $advisoriesFail, packages.json names an
      * advisory API on a closed port. Call before {@see start()}.
      */
@@ -235,13 +236,19 @@ final class FixtureRepositoryServer
             throw new \RuntimeException($url.' publishes its advisories only in its p2 files, which the recordings do not keep');
         }
         $listed = array_values(array_filter(\is_array($packages['available-packages'] ?? null) ? $packages['available-packages'] : [], 'is_string'));
-        $patterns = array_values(array_filter(\is_array($packages['available-package-patterns'] ?? null) ? $packages['available-package-patterns'] : ($listed === [] ? ['*'] : []), 'is_string'));
+        // Composer reads an empty list as no list, and then asks for every name.
+        $noList = empty($packages['available-packages']) && empty($packages['available-package-patterns']);
+        $patterns = array_values(array_filter(\is_array($packages['available-package-patterns'] ?? null) ? $packages['available-package-patterns'] : [], 'is_string'));
+        if ($noList) {
+            $patterns = ['*'];
+        }
+        $listedLower = array_map('strtolower', $listed);
         $served = ['available-packages' => $listed, 'available-package-patterns' => $patterns];
         if (\is_string($packages['metadata-url'] ?? null)) {
             $template = $resolve($packages['metadata-url']);
             $served['metadata-url'] = $local($template);
             foreach ($this->names as $name) {
-                $p2 = \in_array($name, $listed, true) || self::matchesAny($name, $patterns) ? $answer(str_replace('%package%', $name, $template)) : null;
+                $p2 = \in_array(strtolower($name), $listedLower, true) || self::matchesAny($name, $patterns) ? $answer(str_replace('%package%', $name, $template)) : null;
                 if ($p2 !== null) {
                     self::writeFile($this->docroot.str_replace('%package%', $name, $served['metadata-url']), $p2);
                 }
@@ -307,6 +314,16 @@ final class FixtureRepositoryServer
     public function withCorruptPackagesJson(): void
     {
         file_put_contents($this->docroot.'/packages.json', '{not json');
+    }
+
+    /** Serve $body as the p2 file of $name, such as a proxy page that is not JSON. Call before {@see start()}. */
+    public function withMetadataAnswer(string $name, string $body): void
+    {
+        $target = $this->docroot.'/p2/'.$name.'.json';
+        if (!is_dir(\dirname($target)) && !mkdir(\dirname($target), 0777, true) && !is_dir(\dirname($target))) {
+            throw new \RuntimeException('cannot create docroot directory: '.\dirname($target));
+        }
+        file_put_contents($target, $body);
     }
 
     public function start(): void

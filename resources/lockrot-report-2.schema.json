@@ -1287,13 +1287,14 @@
       ]
     },
     "advisoriesNotCheckedReason": {
-      "description": "Why security advisories were not checked: `offline` (`--offline`; advisories are never served from a cache), `install_time_budget` (the install-time budget ran out), `lookup_failed` (every feed threw). An open set: read a reason you do not know as another reason.",
+      "description": "Why security advisories were not checked: `offline` (`--offline`; advisories are never served from a cache), `install_time_budget` (the install-time budget ran out), `lookup_failed` (every feed threw), `composer_json_invalid` (Composer cannot load composer.json, so the lookup asks no repository). An open set: read a reason you do not know as another reason.",
       "type": "string",
       "pattern": "^[a-z][a-z0-9_]*$",
       "x-known-values": [
         "offline",
         "install_time_budget",
-        "lookup_failed"
+        "lookup_failed",
+        "composer_json_invalid"
       ]
     },
     "flag": {
@@ -8024,7 +8025,7 @@
           "type": "boolean"
         },
         "unchecked_reason": {
-          "description": "Why the lookup did not complete: `offline install_time_budget lookup_failed`, and `not_from_composer_repository` (outside the composer-repositories scope), `unparseable_version`, `no_feed`; an open set; null on a complete lookup.",
+          "description": "Why the lookup did not complete: `offline install_time_budget lookup_failed`, and `not_from_composer_repository` (outside the composer-repositories scope), `unparseable_version`, `no_feed`, and `composer_json_invalid` (Composer cannot load composer.json, so the lookup asks no repository); an open set; null on a complete lookup.",
           "oneOf": [
             {
               "type": "string",
@@ -8035,7 +8036,8 @@
                 "lookup_failed",
                 "not_from_composer_repository",
                 "unparseable_version",
-                "no_feed"
+                "no_feed",
+                "composer_json_invalid"
               ]
             },
             {
@@ -9084,7 +9086,7 @@
           ]
         },
         "reason": {
-          "description": "Why it did not run: `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4). `no_feed`: no Composer repository of the run publishes advisories (S9). `not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). On a path, artifact or package origin, the same gaps are skips. An open set: read an unknown reason as another reason.",
+          "description": "Why it did not run: `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4). `no_feed`: no Composer repository of the run publishes advisories (S9). `composer_json_invalid`: Composer cannot load the composer.json of the run, so the advisory lookup asks no repository (S9). `not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). On a path, artifact or package origin, the same gaps are skips. An open set: read an unknown reason as another reason.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*$",
           "x-known-values": [
@@ -9099,7 +9101,8 @@
             "lookup_failed",
             "host_not_supported",
             "no_feed",
-            "not_from_composer_repository"
+            "not_from_composer_repository",
+            "composer_json_invalid"
           ]
         },
         "blocks": {
@@ -13288,7 +13291,7 @@
           ]
         },
         "named_in": {
-          "description": "The composer.json sections whose keys name this package, or name a package that it replaces or provides. A `require` key resolves among the production packages first, and among all packages when no production package satisfies it. A `require-dev` key resolves among all packages. In each set, a package of the named name wins, and else every package that replaces or provides the name gets the section. `require` first. lockrot reads them whatever --dev says. Empty when no line names it, and in a run that read no composer.json (`depth_unmeasured` says so). Not a reach fact: a run without --dev walks no require-dev root. A package that composer.json names in require-dev and not in require is reached when a package that the run walks requires it. Else its `depth` is null and `depth_unmeasured` is `unreached`.",
+          "description": "The composer.json sections whose keys name this package, or name a package that it replaces or provides. A `require` key resolves among the production packages first, and among all packages when no production package satisfies it. A `require-dev` key resolves among all packages. In each set, a package of the named name wins, and else every package that replaces or provides the name gets the section. `require` first. lockrot reads them whatever --dev says. Empty when no line names it, and in a run that read no composer.json (`depth_unmeasured` says so). Not a reach fact: a run without --dev walks no require-dev root. A package that composer.json names in require-dev and not in require is reached when a package that the run walks requires it. Else its `depth` is null and `depth_unmeasured` is `unreached`. A run with --dev walks each require-dev line as a root, so such a package has `depth` 0.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/composerJsonSection"
@@ -23958,7 +23961,8 @@
             "lookup_failed",
             "no_feed",
             "not_from_composer_repository",
-            "unparseable_version"
+            "unparseable_version",
+            "composer_json_invalid"
           ]
         }
       }
@@ -24262,7 +24266,7 @@
           }
         },
         "update_now": {
-          "description": "The vulnerable packages whose lead move is an `update` that Composer's solver resolves inline, in report order; in a run that checks no move, the packages whose `security.fix_kind` is `update`. A name outside the command argument set of `next_step.commands` is left out.",
+          "description": "The vulnerable packages whose lead move is an `update` that clears at least one of its advisories and that Composer's solver resolves inline, in report order; in a run that checks no move, the packages whose `security.fix_kind` is `update`. A name outside the command argument set of `next_step.commands` is left out.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/packageName"

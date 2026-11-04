@@ -1,8 +1,8 @@
 {
  "pr": "7d",
  "source": {
-  "cases.json": "4bd45d7e27ff8f7eef59e8572dacbd0475b955e77eef706f7862c586da1d42df",
-  "model_run_date": "2026-11-03"
+  "cases.json": "b85eefc0c81cb1d9a00020171fe40d3ce33691e9e69fd288f612c1fe470ec00a",
+  "model_run_date": "2026-11-05"
  },
  "suite": "the model suite reports every step passed",
  "page_goldens": {
@@ -13,6 +13,8 @@
  "reverted": {},
  "cases_without_inputs": [
   "psr-log",
+  "S8-lower-tag-shared‡",
+  "branch-release-shared‡",
   "ok-ignored‡",
   "unknown-vuln‡",
   "ok-offline‡",
@@ -22,6 +24,7 @@
   "host-unsupported",
   "scope-registries‡",
   "no-feed‡",
+  "composer-json-invalid‡",
   "unparseable-version‡",
   "capped-unread‡",
   "host-accepted‡",

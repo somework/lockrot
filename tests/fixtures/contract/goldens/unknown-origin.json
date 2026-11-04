@@ -6,10 +6,10 @@
     "age_line": "age: installed 3.7.1, release date not known (no date)",
     "explain_age": [
         "installed  3.7.1     not read (no date)",
-        "3.x                  not read (not from a Composer repository)",
-        "newest               not read (not from a Composer repository)",
-        "last push            not read (not from a Composer repository)",
-        "libyears not measured: not from a Composer repository"
+        "3.x                  not read (origin unknown)",
+        "newest               not read (origin unknown)",
+        "last push            not read (origin unknown)",
+        "libyears not measured: origin unknown"
     ],
     "baseline_suffix": null,
     "commands_posix": [],

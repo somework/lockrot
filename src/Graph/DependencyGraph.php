@@ -50,20 +50,21 @@ final class DependencyGraph
      * replaces or provides it, as Composer's solver reads the lock. Root names are compared in lower
      * case, as Composer compares them. The `require` section and the prod packages resolve as
      * Composer's prod solve does: a prod package of the name or a prod provider wins over a dev
-     * package of the name, with or without $includeDev. `namedIn()` reads both root sections
-     * whatever $includeDev says.
+     * package of the name, with or without $includeDev. The `require-dev` section resolves among all
+     * packages, and `namedIn()` reads both root sections, whatever $includeDev says.
      */
     public static function fromLock(LockFile $lock, ProjectConfig $project, bool $includeDev): self
     {
         $prod = self::index($lock->packages(false));
-        $all = $includeDev ? self::index($lock->packages(true)) : $prod;
+        $every = self::index($lock->packages(true));
+        $all = $includeDev ? $every : $prod;
         $edges = [];
         foreach ($lock->packages($includeDev) as $package) {
             $edges[$package->name()] = self::resolve($package->requires(), $package->isDev() ? $all : $prod, $all);
         }
         $sections = [
             ProjectConfig::REQUIRE => self::resolve($project->directRequires(), $prod, $all),
-            ProjectConfig::REQUIRE_DEV => self::resolve($project->directDevRequires(), $all, $all),
+            ProjectConfig::REQUIRE_DEV => self::resolve($project->directDevRequires(), $every, $every),
         ];
         $roots = $sections[ProjectConfig::REQUIRE];
         if ($includeDev) {

@@ -138,6 +138,14 @@ final class Analyzer
         return $clone;
     }
 
+    public function withAdvisories(AdvisoryLoaderInterface $advisories): self
+    {
+        $clone = clone $this;
+        $clone->advisories = $advisories;
+
+        return $clone;
+    }
+
     /** A copy whose moves Composer's solver checks (docs/verdicts.md#the-move-check). */
     /** @param positive-int $passes the cap on the passes that ask Composer ({@see CHECK_PASSES}) */
     public function withMoveChecks(MoveChecks $checks, int $passes = self::CHECK_PASSES): self

@@ -28,6 +28,13 @@ final class FailOn
     /** Each `vulnerable` value with the lowest raw severity it reaches. */
     public const VULNERABLE = ['vulnerable' => 'low', 'vulnerable-medium' => 'medium', 'vulnerable-high' => 'high', 'vulnerable-critical' => 'critical'];
 
+    /**
+     * The `\s` of the config-2 fail-on pattern as lockrot's PHP validator reads it. That validator
+     * runs the pattern with the `u` modifier, so `\s` also matches Unicode whitespace such as U+0085
+     * and U+00A0. An ECMAScript validator also matches U+FEFF, which this pattern keeps.
+     */
+    private const SURROUNDING_WHITESPACE = '/^\s+|\s+$/u';
+
     private const KIND_NOUNS = [self::KIND_GRADE => 'grades', self::KIND_FLAG => 'flags', self::KIND_VULNERABLE => 'vulnerable values', self::KIND_UNCHECKED => 'unchecked values'];
 
     /** @var list<FailOnValue> in kind order */
@@ -58,7 +65,7 @@ final class FailOn
         $byKind = [];
         $seen = [];
         foreach ($words as $word) {
-            $value = strtolower(trim($word));
+            $value = strtolower(preg_replace(self::SURROUNDING_WHITESPACE, '', $word) ?? $word);
             if ($value === 'vulnerable-low') {
                 throw new ConfigException($source.': vulnerable-low is not a value: use "vulnerable": every counted advisory is at least low');
             }

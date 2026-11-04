@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "f9fd45fcddaddf2a6123d36f41818a3f3c4033c46b029d18e98917b553e733da",
+        "tests/fixtures/flags/cases.json": "ffc794f16bdafd8d4aacbdd7ac93c860a7512bed454af4244f7b847ccfd65aae",
         "tests/fixtures/flags/composite.json": "66f05cb5de67634a9a4c6cb977545c9bb07385a127971a53ceb51dc0d30d8a79",
-        "tests/fixtures/flags/provenance.json": "01bf985750e7b24b5149dfcd9a53b150f640f845c03cf038b99a068f3550bfe7"
+        "tests/fixtures/flags/provenance.json": "6913b7a5f3d7e6934f963aef0501e3c5700b856b9d288b58dcb86dd9355fa452"
     },
     "version_mask": {
         "paths": [
@@ -29,6 +29,8 @@
     ],
     "cases_without_inputs": [
         "psr-log",
+        "S8-lower-tag-shared‡",
+        "branch-release-shared‡",
         "ok-ignored‡",
         "unknown-vuln‡",
         "ok-offline‡",
@@ -38,6 +40,7 @@
         "host-unsupported",
         "scope-registries‡",
         "no-feed‡",
+        "composer-json-invalid‡",
         "unparseable-version‡",
         "capped-unread‡",
         "host-accepted‡",
@@ -50,21 +53,21 @@
     "case_lock": "each case is formatted beside a composer.lock of its lock entries, as tests/Support/CaseHydrator.php lockJson() lays it out",
     "model_goldens": {
         "compared": {
-            "age_line": 188,
-            "baseline_suffix": 186,
-            "commands_cmd": 168,
-            "commands_posix": 168,
-            "gate_line": 187,
-            "next_step_text": 140,
-            "run_gate_line": 188,
-            "score_text": 187
+            "age_line": 201,
+            "baseline_suffix": 199,
+            "commands_cmd": 180,
+            "commands_posix": 180,
+            "gate_line": 200,
+            "next_step_text": 152,
+            "run_gate_line": 201,
+            "score_text": 200
         },
         "inputs_differ": {
             "baseline_suffix": 2,
-            "commands_cmd": 20,
-            "commands_posix": 20,
+            "commands_cmd": 21,
+            "commands_posix": 21,
             "gate_line": 1,
-            "next_step_text": 48,
+            "next_step_text": 49,
             "score_text": 1
         }
     },

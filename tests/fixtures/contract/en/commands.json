@@ -389,6 +389,16 @@
             "argv": [
                 "composer",
                 "require",
+                "symfony/routing:^7.0.1"
+            ],
+            "posix": "composer require 'symfony/routing:^7.0.1'",
+            "cmd": "composer require \"symfony/routing:^7.0.1\"",
+            "powershell": "composer --% require \"symfony/routing:^7.0.1\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
                 "symfony/var-dumper:^5.4",
                 "--dev"
             ],

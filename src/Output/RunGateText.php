@@ -32,6 +32,7 @@ final class RunGateText
         'no_feed' => 'not checked (no repository publishes advisories)',
         'not_from_composer_repository' => 'not asked (advisory-lookup: composer-repositories)',
         'unparseable_version' => 'version not readable',
+        'composer_json_invalid' => 'not checked (Composer cannot load composer.json)',
     ];
 
     public static function render(Gate $gate, RunSettings $run): string
