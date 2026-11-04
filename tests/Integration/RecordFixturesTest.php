@@ -95,7 +95,8 @@ final class RecordFixturesTest extends TestCase
 
         self::assertSame($locked, RecorderNames::repository(['metadata-url' => '/p2/%package%.json'], $locked));
         self::assertSame($locked, RecorderNames::repository(['metadata-url' => '/p2/%package%.json', 'available-packages' => []], $locked));
-        self::assertSame([], RecorderNames::repository(['metadata-url' => '/p2/%package%.json', 'available-package-patterns' => []], $locked));
+        self::assertSame($locked, RecorderNames::repository(['metadata-url' => '/p2/%package%.json', 'available-package-patterns' => []], $locked), 'Composer reads an empty list as no list');
+        self::assertSame($locked, RecorderNames::repository(['metadata-url' => '/p2/%package%.json', 'available-packages' => [], 'available-package-patterns' => []], $locked));
         self::assertSame([], RecorderNames::repository([], $locked), 'no metadata-url means no p2 answer to record');
     }
 
