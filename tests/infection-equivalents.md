@@ -53,6 +53,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Analyzer/PhpWindow.php` TrueValue `$named = array_merge($named, self::byName($project->platformConstraints(ProjectConfig::REQUIRE_DEV), true));` — in lockOnlyLinks(): `array_diff_key()` reads only the keys of `$named`, so no code reads its dev mark.
 - `src/Analyzer/RunNote.php` CastString `$host = (string) $where->host();` — every entry of the host note comes from `LocatedRepository::unsupported()`, which always names a host.
 - `src/Analyzer/UpdateNow.php` CastString `return self::resolved($kept, $findings, RunNote::updateNowReduced(self::inReportOrder(array_keys(array_diff_key($inline, $kept)), $findings), (string) $outcome->problem()));` — a refused combined outcome always carries its problem text.
+- `src/Analyzer/UpdateNow.php` LogicalAnd `if ($finding->securityStanding()->isVulnerable() && $move !== null && $move->kind() === Move::UPDATE && $move->clearedAdvisories() !== [] && $move->movesWith() === [] && $check !== null && $check->isResolved() && $check->form() === MoveCheck::INLINE) {` — S9 holds only counted advisories (`AdvisoryRule`), so a move that clears an advisory belongs to a vulnerable finding.
 
 ## src/Baseline
 
@@ -130,6 +131,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in attribute(): a package name holds a `/`, so PHP never stores it as an integer key.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in coverage(): a package name holds a `/`, so PHP never stores it as an integer key.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` UnwrapArrayValues `return array_values(array_filter($copies, static function (PartialSecurityAdvisory $advisory) use ($versions): bool {` — the caller only iterates the result with `foreach`.
+- `src/Data/Advisory/RepositoryAdvisoryLoader.php` FalseValue `$loader = new self([], false, null, null, $scope, $scopeSource);` — in askingNone(): `unchecked()` reads `notAskedFor` before `offline`.
 
 ## src/Filesystem, src/Graph, src/Html, src/Json, src/Lock
 
@@ -205,9 +207,11 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Solver/PoolAdvisoryFeed.php` MethodCallRemoval `parent::__construct();` — `ArrayRepository::__construct()` with no packages adds none, and its first read creates the empty list.
 - `src/Solver/PoolAdvisoryFeed.php` FalseValue `public function getSecurityAdvisories(array $packageConstraintMap, bool $allowPartialAdvisories = false): array` — Composer's `RepositorySet` passes the argument on every call.
 - `src/Solver/PoolAdvisoryFeed.php` ArrayItemRemoval `return ['namesFound' => $answer['namesFound'], 'advisories' => $answer['advisories']];` — `RepositorySet::getSecurityAdvisoriesForConstraints()` reads only `advisories` of the answer.
+- `src/Solver/SolverChecker.php` UnwrapArrayValues `$this->lockedNames = array_values(array_map(static fn (BasePackage $package): string => $package->getName(), $solver->locked()->getPackages()));` — only `in_array()` in `CheckOutcome::holders()` reads the names, and `getPackages()` gives a list.
 
 ## src/Verdict
 
 - `src/Verdict/FindingDetails.php` CastString `$skipped[] = new Check('advisories', (string) $advisoryReason, [Signal::S9]);` — the `in_array()` guard admits two strings only.
 - `src/Verdict/FindingDetails.php` Coalesce `return ($check === null ? null : $check->installsBelow($version) ?? $check->installsAbove($version)) ?? $version;` — a release is below or above the version, never both, so at most one side is not null.
 - `src/Verdict/MoveText.php` Assignment `$text .= self::leaves($move).self::unverified($move);` — `$text` is the empty string before this line, so `=` writes the same text.
+- `src/Verdict/MoveText.php` Break_ `break;` — in sentenceStart(): every piece after the first non-empty one starts with a separator or a space, so `ucfirst()` leaves it unchanged.

@@ -393,6 +393,22 @@ final class TableFormatterTest extends TestCase
         }
     }
 
+    /** A link target with a space and a control byte stays on one line in its neutralised form. */
+    public function testTheFootersHoldWithAControlByteStaysWhole(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $lock = ['packages' => [['name' => 'acme/a', 'version' => '1.0.0', 'require' => ['php' => '<8.5']]], 'packages-dev' => []];
+        $window = PhpWindow::of(LockFile::fromArray($lock), ProjectConfig::fromArray([]), '8.5', PhpReleaseDates::load()->minors(new Clock($at)));
+        self::assertNotNull($window);
+        $target = "acme/abcdefghijklmnopqrstuvwxyz0123 d\x1b";
+        $hold = ['source' => 'package', 'package' => 'acme/b', 'version' => '1.0.0', 'link' => 'require', 'constraint' => '^1.0', 'target' => $target];
+        $report = self::report()->withPhpWindow($window->withTargetFix(new RecordedMoveChecker(['target_fix' => ['result' => 'refused', 'holds' => [$hold]]], [])));
+
+        $lines = self::lines(self::formatter(40)->format($report));
+
+        self::assertNotEmpty(preg_grep('/acme\/abcdefghijklmnopqrstuvwxyz0123 d\\\\x1[bB]/', $lines), implode("\n", $lines));
+    }
+
     private static function report(): Report
     {
         $at = new \DateTimeImmutable(self::AT);
