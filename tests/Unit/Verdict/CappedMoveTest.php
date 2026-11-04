@@ -78,6 +78,16 @@ final class CappedMoveTest extends TestCase
         self::assertContains(['kind' => 'flag', 'id' => 'pinned', 'basis' => 'tags_only'], JsonPath::decoded($move->clears()));
     }
 
+    /** The tag 2.1.0 stops below the newest PHP: the later-dated backport 2.0.9, which admits it, does not clear that. */
+    public function testATagMoveReadsCappedOnTheTagThatItTargets(): void
+    {
+        [$row, $context] = self::context([[Signal::S6, []]], ['2.1.0' => self::CAPPED_PHP, '2.0.9' => '>=8.1'], 'dev-main', '2026-01-01T00:00:00+00:00', ['2.0.9' => '2026-02-01T00:00:00+00:00']);
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::TAG, FlagSet::PINNED)->withLatest(new Latest('2.1.0', '2026-01-01T00:00:00+00:00', false, null, null), $row), [], null, $context);
+
+        self::assertContains(['kind' => 'flag', 'id' => 'capped', 'basis' => 'stops_below_newest_php'], JsonPath::decoded($move->adds()));
+    }
+
     /** The undated 3.x leaves left-behind on 2.x unverified, and the release's missing php leaves capped unverified. */
     public function testATagMoveKeepsItsOwnUnverifiedFactsBesideCapped(): void
     {
@@ -157,14 +167,15 @@ final class CappedMoveTest extends TestCase
      * @param list<array{string, array<string, mixed>}> $signals  each signal's id and data
      * @param array<string, ?string>                     $releases by version, the php that each requires
      * @param ?string                                    $time     the date of every release, null for undated releases
+     * @param array<string, string>                      $times    by version, a date that replaces `$time`
      *
      * @return array{0: BranchRow, 1: MoveContext}
      */
-    private static function context(array $signals, array $releases, string $installed = '1.0.0', ?string $time = '2026-01-01T00:00:00+00:00'): array
+    private static function context(array $signals, array $releases, string $installed = '1.0.0', ?string $time = '2026-01-01T00:00:00+00:00', array $times = []): array
     {
         $packages = [];
         foreach ($releases as $version => $php) {
-            $release = (new ArrayLoader())->load(['name' => 'a/b', 'version' => (string) $version] + ($time === null ? [] : ['time' => $time]) + ($php === null ? [] : ['require' => ['php' => $php]]));
+            $release = (new ArrayLoader())->load(['name' => 'a/b', 'version' => (string) $version] + (($times[$version] ?? $time) === null ? [] : ['time' => $times[$version] ?? $time]) + ($php === null ? [] : ['require' => ['php' => $php]]));
             self::assertInstanceOf(BasePackage::class, $release);
             $packages[] = $release;
         }

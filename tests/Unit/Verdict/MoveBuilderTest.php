@@ -266,6 +266,23 @@ final class MoveBuilderTest extends TestCase
         self::assertStringStartsWith('no move runs on the target: 2.x needs php >=8.2 and the target php 8.1 does not run it', $move->text());
     }
 
+    /** v1.5.0, the tag that the pinned move takes, needs PHP 8.5: the later-dated backport v1.4.9 does not move that PHP. */
+    public function testABlockedTagMoveNamesThePhpOfTheTagThatItTargets(): void
+    {
+        $facts = self::factsOf([['1.5.0', '2025-01-01', '>=8.5'], ['1.4.9', '2025-06-01', '>=7.2']]);
+        $floor = new PhpFloor('8.4', '>=7.4');
+        $row = BranchRow::all($facts, $floor, Clock::fixed(self::NOW))[0];
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
+        $context = new MoveContext($finding, new MoveSubject('a/b', '1.x-dev', true, [], '8.4', '7.4.0'), $facts->metadata(), [$row], null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true);
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::BLOCKED, FlagSet::PINNED)->withLatest(new Latest('1.5.0', '2025-01-01T00:00:00+00:00', false, 'newer', null), $row), [], null, $context);
+        $check = $move->phpCheck();
+
+        self::assertNotNull($check);
+        self::assertSame(['>=8.5', false], [$check->requires(), $check->targetRuns()]);
+    }
+
     /** composer.json does not require a/b: a resolved request becomes `composer update` with the constraint inline. */
     public function testATransitiveRequireThatComposerResolvesBecomesAnInlineUpdate(): void
     {

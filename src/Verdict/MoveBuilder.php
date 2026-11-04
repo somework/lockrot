@@ -51,7 +51,7 @@ final class MoveBuilder
         $phpCheck = null;
         if ($row !== null && (\in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED], true) || $draft->source() === FlagSet::PINNED)) {
             // A blocked move names the PHP of the release that keeps it off the target, a tag the branch top, the others the release that the target installs.
-            $php = $kind === Move::BLOCKED ? ($lower === null ? $row->php() : $lower->php()) : ($kind === Move::TAG ? $row->highestPhp() : $context->phpAtTarget($row, $lower, $newest));
+            $php = $kind === Move::BLOCKED ? ($lower !== null ? $lower->php() : ($latest !== null ? $row->highestPhp() : $row->php())) : ($kind === Move::TAG ? $row->highestPhp() : $context->phpAtTarget($row, $lower, $newest));
             $phpCheck = PhpCheck::of($php, $context->floor());
         }
         $checks = $context->checks();
@@ -75,13 +75,13 @@ final class MoveBuilder
             $clears = [MoveFact::on(MoveFact::FLAG, FlagSet::PINNED, MoveFact::TAGS_ONLY)];
             [$adds, $unverified] = self::tagRisks($row, $latest, $flags, $context);
             if ($row !== null && \in_array(FlagSet::CAPPED, self::countedMaintenance($finding), true)) {
-                [$cappedClears, $cappedUnverified] = self::cappedOn($row, $context);
+                [$cappedClears, $cappedUnverified] = self::cappedOn($row->highestPhp(), $context);
                 $clears = array_merge($clears, $cappedClears);
                 $unverified = array_merge($unverified, $cappedUnverified);
             }
         }
         if ($row !== null && \in_array($kind, array_merge(Move::ROW_KINDS, [Move::TAG]), true) && !\in_array(FlagSet::CAPPED, $flags->fired(), true)
-            && !\in_array(FlagSet::CAPPED, $flags->acceptSet(), true) && $judged !== null && $context->phpCap()->stopsBelow($judged->php()) === true) {
+            && !\in_array(FlagSet::CAPPED, $flags->acceptSet(), true) && $judged !== null && $context->phpCap()->stopsBelow($kind === Move::TAG ? $row->highestPhp() : $judged->php()) === true) {
             $adds[] = MoveFact::on(MoveFact::FLAG, FlagSet::CAPPED, MoveFact::STOPS_BELOW_NEWEST_PHP);
         }
         $cleared = self::keys(array_merge($clears, $unverified));
@@ -211,7 +211,7 @@ final class MoveBuilder
             }
         }
         if (\in_array(FlagSet::CAPPED, $flags, true)) {
-            [$cappedClears, $cappedUnverified] = self::cappedOn($row, $context);
+            [$cappedClears, $cappedUnverified] = self::cappedOn($row->php(), $context);
             $clears = array_merge($clears, $cappedClears);
             $unverified = array_merge($unverified, $cappedUnverified);
         }
@@ -234,14 +234,14 @@ final class MoveBuilder
     }
 
     /**
-     * Whether the row's newest release admits R: it clears `capped`, and a release that states no
-     * php leaves it unverified.
+     * Whether the release that the move installs admits R: it clears `capped`, and a release that
+     * states no php leaves it unverified.
      *
      * @return array{0: list<MoveFact>, 1: list<MoveFact>}
      */
-    private static function cappedOn(BranchRow $row, MoveContext $context): array
+    private static function cappedOn(?string $php, MoveContext $context): array
     {
-        $below = $context->phpCap()->stopsBelow($row->php());
+        $below = $context->phpCap()->stopsBelow($php);
         if ($below === null) {
             return [[], [MoveFact::unchecked(MoveFact::FLAG, FlagSet::CAPPED, MoveFact::NO_RELEASE_DATA)]];
         }
