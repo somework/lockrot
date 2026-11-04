@@ -45,7 +45,7 @@ The self-update key's fingerprint is the SHA-256 of its DER public key:
 | Action | What |
 |---|---|
 | **Reads** | `composer.json` and `composer.lock` (or the manifest `COMPOSER` names, and its lock), the baseline, Composer's configuration and credentials, lockrot's own cache, and the environment: the variables in [Environment overrides](docs/configuration.md#environment-overrides) and [Testing hooks](docs/configuration.md#testing-hooks), `COLUMNS` for the table width, and Composer's own |
-| **Writes** | The files you name: reports with `--output`, the baseline with `--generate-baseline`. Its repository-activity cache, under Composer's cache directory. With `self-update`, the PHAR |
+| **Writes** | The files you name: reports with `--output`, the baseline with `--generate-baseline`. Its repository-activity cache, under Composer's cache directory. Composer's repository metadata cache, written through Composer. With `self-update`, the PHAR |
 | **Never writes** | `composer.json` or `composer.lock` |
 | **Never runs** | In the PHAR, the inspected project's Composer plugins: it runs the project with `--no-plugins` |
 
