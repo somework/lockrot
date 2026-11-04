@@ -1,0 +1,17 @@
+{
+    "score_text": "4 = capped 8 ÷ 2 transitive",
+    "next_step_text": "no move: no release above 2.2.4 admits PHP 8.5",
+    "gate_line": null,
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed 2.2.4 released 2022-03-05 (4.6 years ago); last push 2026-09-25 (less than three weeks ago)",
+    "explain_age": [
+        "installed  2.2.4     2022-03-05   4.6 years ago",
+        "2.x                  not read (undated releases)",
+        "newest               not read (undated releases)",
+        "last push            2026-09-25   less than three weeks ago     below push-warn-years 3",
+        "libyears at least 0.0 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": []
+}
