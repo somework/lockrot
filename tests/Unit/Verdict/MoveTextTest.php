@@ -123,6 +123,15 @@ final class MoveTextTest extends TestCase
         self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 8.1.0. Require acme/lib ^2.0', MoveText::render($move));
     }
 
+    /** Ruling R12-9: the refused tail of the platform step is a sentence too. */
+    public function testTheMoveClauseAfterTheRefusedTailStartsWithACapitalLetter(): void
+    {
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, '7.4.29', true);
+        $move = new Move(Move::REQUIRE, FlagSet::LEFT_BEHIND, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', '^2.0', null, null, true, [], [], [], [], [], null, [], [['composer', 'require', 'acme/lib:^2.0']], $subject);
+
+        self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29.'.MoveText::REFUSED_POINTER.' Require acme/lib ^2.0', MoveText::render($move));
+    }
+
     public function testAReplaceMoveWithNoReplacementSaysReplaceIt(): void
     {
         $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null);

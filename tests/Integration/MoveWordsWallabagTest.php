@@ -66,7 +66,7 @@ final class MoveWordsWallabagTest extends TestCase
     #[DataProvider('scheb')]
     public function testAMoveWithCommandsFirstSetsThePlatformPhpOutsideTheTargetMinor(string $package): void
     {
-        self::assertStringStartsWith(self::PLATFORM_STEP.'raise require.php to >=8.0, then require '.$package.' ^6.13', JsonPath::stringAt(self::move('8.4', $package), ['text']));
+        self::assertStringStartsWith(self::PLATFORM_STEP.'Raise require.php to >=8.0, then require '.$package.' ^6.13', JsonPath::stringAt(self::move('8.4', $package), ['text']));
     }
 
     public function testAMoveWithoutCommandsTakesNoPlatformStep(): void
