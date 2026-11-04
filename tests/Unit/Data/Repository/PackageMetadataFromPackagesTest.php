@@ -323,6 +323,22 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame('2.0.0-RC1', $metadata->lastStableVersion());
     }
 
+    /** twig/string-extra: an old alpha of the next major on its own commit must not let S2 read the newer shared-commit date of a stable tag. */
+    public function testAnOlderPreReleaseAboveSharedTagsLeavesTheAgeUnmeasured(): void
+    {
+        $on = static fn (string $version, string $commit, string $time): array => ['name' => 'a/b', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]];
+        $alpha = $this->load($on('v4.0.0-alpha1', 'alpha', '2020-01-01T00:00:00+00:00'));
+        $shared = array_map(fn (string $version): CompletePackage => $this->load($on($version, 'split', '2021-01-01T00:00:00+00:00')), ['v3.1.0', 'v3.2.0', 'v3.3.0']);
+
+        foreach ([array_merge([$alpha], $shared), array_merge($shared, [$alpha])] as $order) {
+            $metadata = PackageMetadata::fromPackages('a/b', $order, new \DateTimeImmutable(self::FIXED));
+
+            self::assertNull($metadata->lastStableReleaseAt());
+            self::assertNull($metadata->lastStableVersion());
+            self::assertTrue($metadata->lastStableSharesItsCommit(), 'S10 names the shared commit as the cause');
+        }
+    }
+
     /** illuminate/support 10.x: tags share commits below the top, but v10.49.0 has its own — that one is dated. */
     public function testTagsSharingACommitBelowAHighestOnItsOwnLeaveTheHighestDated(): void
     {
