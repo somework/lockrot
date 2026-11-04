@@ -77,7 +77,7 @@ final class LeftBehindRule implements SignalRule
             // tag with no trusted date, or a lower tag on a shared commit. A monorepo parent's date
             // and a lower tag with a date of its own are quoted exactly.
             $atLeast = ($release['highest']['at'] === null && $release['version'] === $release['highest']['pretty'])
-                || (!isset($release['dated_by']) && $metadata->sharesItsCommit($release['version']));
+                || AgeMeasure::sharedCommitDates($metadata, $release);
             $candidate = ['branch' => (string) $key, 'version' => $release['version'], 'at' => $release['at'], 'php' => $release['php'] ?? null, 'at_least' => $atLeast];
             if (self::newer($candidate, $newest)) {
                 $newest = $candidate;
@@ -145,8 +145,9 @@ final class LeftBehindRule implements SignalRule
     }
 
     /**
-     * The highest tags without a trusted date that leave S8 undecided, normalized, empty when S8
-     * misses nothing. It is the installed branch's own tag, with a higher branch to compare with.
+     * The tags without a trusted date that leave S8 undecided, normalized, empty when S8 misses
+     * nothing. It is the installed branch's highest tag, or its newest tag on a shared commit
+     * ({@see AgeMeasure::sharedCommitDates()}), with a higher branch to compare with.
      * Or it is a higher branch's tag, while the installed branch is quiet enough for a level and
      * S8 did not fire. A branch snapshot is on no release branch, so S8 misses nothing there.
      *
@@ -163,7 +164,9 @@ final class LeftBehindRule implements SignalRule
         $higher = array_filter($byBranch, static fn ($key): bool => ReleaseBranch::isAbove((string) $key, $branch), \ARRAY_FILTER_USE_KEY);
         $reading = $this->age->branchRelease($facts);
         if ($reading->unmeasured() === AgeMeasure::UNDATED_RELEASES) {
-            return $higher === [] ? [] : [$byBranch[$branch]['highest']['normalized']];
+            $own = $byBranch[$branch];
+
+            return $higher === [] ? [] : [$own['highest']['at'] === null ? $own['highest']['normalized'] : $this->parser->normalize($own['version'])];
         }
         if ($reading->level() === null || $this->evaluate($facts) !== null) {
             return [];
