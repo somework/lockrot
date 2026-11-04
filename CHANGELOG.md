@@ -302,6 +302,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `medium`, and `severity_published` keeps the word that the repository published. S9's `title`
   drops its leading `<cve>: `. Action: match `unrated` and `medium`, and read `cve` for the id.
   ([Migrating](docs/schema.md#migrating-from-report-1))
+- **Breaking:** **json:** S7's `data.flagged` and `data.packages`, the root `exposure[].flagged` and
+  the `unattributed[]` set count graded packages. A package with only a counted advisory is in the
+  count, and a package whose flags are all accepted is not, so a count can differ from 0.13 on the
+  same lock. Action: compare these counts on the first run.
+  ([Migrating](docs/schema.md#migrating-from-report-1))
 - **Breaking:** **Distribution:** `docs/compatibility.md` no longer promises which lockrot-action
   major line follows lockrot 1.x. `@v1` runs 0.14 from lockrot-action v1.2.0 on, and with `version:
   latest` from this tag on. The Docker image's `latest` tag moves with v1.2.0. Action: to stay on

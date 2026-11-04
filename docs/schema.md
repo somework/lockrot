@@ -178,6 +178,7 @@ names what to read for each report-1 field that report-2 removes or redefines.
 | `.run.flagged_verdicts` | `.run.graded_verdicts` for the grades, `.run.flag_ids` for the flags |
 | `.baseline.previous_verdict` | `.baseline.recorded.lead` (null for a package new to the baseline) |
 | S7's `.data.packages[].verdict`, `.unattributed[].verdict` | `.lead` on the same objects. `.verdict` there is the grade |
+| S7's `.data.flagged`, the root `.exposure[].flagged` and the set of `.unattributed[]` | the same fields, counted over graded packages. A package with only a counted advisory is in the count, and a package whose flags are all accepted is not |
 | gating on `.priority` and `.baseline.status` | `.gate.fails`. Under a baseline, `.priority` is the full grade, while the gate reads `min(score, 2 × new)` |
 | `.evidence` (every fact) | `.evidence` holds the summaries of the counted flags only. Read `[.flags[].summary]` for every flag that fired, accepted ones included, and `[.signals[].summary]` for the rest |
 | `.priority_basis` | `.score`: its `terms`, its `modifiers` and its `text` |
