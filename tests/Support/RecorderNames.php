@@ -21,7 +21,9 @@ final class RecorderNames
 
     /**
      * Composer lists the names of a repository in `available-packages` and, with `*` wildcards, in
-     * `available-package-patterns`.
+     * `available-package-patterns`. A repository with a `metadata-url` and neither list is asked for
+     * every name, as {@see FixtureRepositoryServer::withMirror()} serves it on replay. Names match
+     * without regard to case.
      *
      * @param array<mixed, mixed> $packages the repository's packages.json
      * @param list<string>        $locked
@@ -30,11 +32,14 @@ final class RecorderNames
      */
     public static function repository(array $packages, array $locked): array
     {
-        $exact = self::strings($packages['available-packages'] ?? null);
-        $patterns = array_map(static fn (string $pattern): string => '{^'.str_replace('\\*', '.*', preg_quote($pattern, '{')).'$}', self::strings($packages['available-package-patterns'] ?? null));
+        $exact = array_map('strtolower', self::strings($packages['available-packages'] ?? null));
+        if ($exact === [] && !\is_array($packages['available-package-patterns'] ?? null) && \is_string($packages['metadata-url'] ?? null)) {
+            return $locked;
+        }
+        $patterns = array_map(static fn (string $pattern): string => '{^'.str_replace('\\*', '.*', preg_quote($pattern, '{')).'$}i', self::strings($packages['available-package-patterns'] ?? null));
 
         return array_values(array_filter($locked, static function (string $name) use ($exact, $patterns): bool {
-            if (\in_array($name, $exact, true)) {
+            if (\in_array(strtolower($name), $exact, true)) {
                 return true;
             }
             foreach ($patterns as $pattern) {

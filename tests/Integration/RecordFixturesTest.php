@@ -84,7 +84,18 @@ final class RecordFixturesTest extends TestCase
         self::assertSame(['acme/one', 'acme/two'], RecorderNames::repository(['available-package-patterns' => ['acme/*']], $locked));
         self::assertSame(['other/four'], RecorderNames::repository(['available-packages' => ['other/four', 'x/unlocked']], $locked));
         self::assertSame(['acme/one', 'acme/two', 'other/three'], RecorderNames::repository(['available-package-patterns' => ['acme/*'], 'available-packages' => ['other/three']], $locked));
-        self::assertSame([], RecorderNames::repository([], $locked));
+        self::assertSame(['acme/one'], RecorderNames::repository(['available-package-patterns' => ['ACME/ONE']], $locked));
+        self::assertSame(['other/four'], RecorderNames::repository(['available-packages' => ['Other/Four']], $locked));
+    }
+
+    public function testARepositoryWithoutAnyNameListIsAskedForEveryLockedName(): void
+    {
+        $locked = ['acme/one', 'other/three'];
+
+        self::assertSame($locked, RecorderNames::repository(['metadata-url' => '/p2/%package%.json'], $locked));
+        self::assertSame($locked, RecorderNames::repository(['metadata-url' => '/p2/%package%.json', 'available-packages' => []], $locked));
+        self::assertSame([], RecorderNames::repository(['metadata-url' => '/p2/%package%.json', 'available-package-patterns' => []], $locked));
+        self::assertSame([], RecorderNames::repository([], $locked), 'no metadata-url means no p2 answer to record');
     }
 
     /**
