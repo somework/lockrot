@@ -35,6 +35,8 @@ final class SolverChecker implements MoveChecker
     private ComposerSolver $solver;
     private HoldScan $scan;
     /** @var list<string> */
+    private array $lockedNames;
+    /** @var list<string> */
     private array $notFromComposerRepository;
     private string $platformPhp;
     private ?string $configuredPhp;
@@ -62,6 +64,7 @@ final class SolverChecker implements MoveChecker
         $this->advisories = $advisories;
         $this->solver = $advisories === null ? $solver : $solver->withAdvisories($advisories);
         $this->scan = new HoldScan($solver->root(), $solver->locked());
+        $this->lockedNames = array_values(array_map(static fn (BasePackage $package): string => $package->getName(), $solver->locked()->getPackages()));
         $this->notFromComposerRepository = $notFromComposerRepository;
         $this->platformPhp = $platformPhp;
         $this->blocksAdvisories = $blocksAdvisories;
@@ -349,7 +352,7 @@ final class SolverChecker implements MoveChecker
         $scanned = $target === null ? [] : $this->scan->of($target, (new VersionParser())->normalize($this->platformPhp));
 
         // A move publishes its holds, never Composer's problem text, which is costly to render.
-        $outcome = new CheckOutcome(MoveCheck::refused(), Holder::distinct(array_merge($last->holds(), $scanned)));
+        $outcome = (new CheckOutcome(MoveCheck::refused(), Holder::distinct(array_merge($last->holds(), $scanned))))->withLocked($this->lockedNames);
         if ($query->isRequire()) {
             return $outcome;
         }
