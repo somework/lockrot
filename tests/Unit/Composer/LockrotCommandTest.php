@@ -1398,6 +1398,46 @@ final class LockrotCommandTest extends TestCase
      */
     public function testAComposerJsonThatComposerCannotLoadLeavesTheAdvisoriesNotChecked(): void
     {
+        [$code, $stdout, $stderr, $requests] = $this->runOnAComposerJsonThatComposerCannotLoad([]);
+
+        self::assertSame(0, $code, $stderr);
+        $json = json_decode($stdout, true);
+        self::assertIsArray($json);
+        self::assertSame([], $requests, 'no repository of the global config is asked');
+        self::assertSame(['not_run', 'composer_json_invalid', []], [JsonPath::stringAt($json, ['findings', 0, 'security', 'check']), JsonPath::stringAt($json, ['findings', 0, 'security', 'unchecked_reason']), JsonPath::arrayAt($json, ['findings', 0, 'security', 'feeds'])]);
+        $advisoryGaps = array_values(array_filter(JsonPath::arrayAt($json, ['findings', 0, 'checks_missing']), static fn ($entry): bool => \is_array($entry) && $entry['check'] === 'advisories'));
+        self::assertSame([['check' => 'advisories', 'reason' => 'composer_json_invalid', 'blocks' => ['S9']]], $advisoryGaps);
+        self::assertSame([[], 0], [JsonPath::arrayAt($json, ['run', 'advisory_lookup', 'repositories']), JsonPath::intAt($json, ['run', 'advisory_lookup', 'packages_asked'])]);
+        $index = array_search(RunNote::ADVISORIES_NOT_CHECKED, JsonPath::column($json, ['note_details'], 'code'), true);
+        self::assertIsInt($index, $stdout);
+        self::assertSame(['reason' => 'composer_json_invalid', 'composer_repositories_checked' => 0], JsonPath::arrayAt($json, ['note_details', $index, 'data']));
+        self::assertSame("security advisories not checked (Composer cannot load composer.json): no finding is graded for an advisory, and each next step's score after the move assumes its versions carry none", JsonPath::stringAt($json, ['notes', $index]));
+    }
+
+    /** --explain runs the same lookup: no request reaches the global config's repository, and the advisories check names the reason. */
+    public function testAnExplainOnAComposerJsonThatComposerCannotLoadLeavesTheAdvisoriesNotChecked(): void
+    {
+        [$code, $stdout, $stderr, $requests] = $this->runOnAComposerJsonThatComposerCannotLoad(['--explain' => 'doctrine/cache']);
+
+        self::assertSame(0, $code, $stderr);
+        self::assertSame([], $requests, 'no repository of the global config is asked');
+        $json = json_decode($stdout, true);
+        self::assertIsArray($json);
+        self::assertSame(['doctrine/cache', 'not_run', 'composer_json_invalid'], [JsonPath::stringAt($json, ['package']), JsonPath::stringAt($json, ['finding', 'security', 'check']), JsonPath::stringAt($json, ['finding', 'security', 'unchecked_reason'])]);
+        $advisoryGaps = array_values(array_filter(JsonPath::arrayAt($json, ['finding', 'checks_missing']), static fn ($entry): bool => \is_array($entry) && $entry['check'] === 'advisories'));
+        self::assertSame([['check' => 'advisories', 'reason' => 'composer_json_invalid', 'blocks' => ['S9']]], $advisoryGaps);
+    }
+
+    /**
+     * A run on a composer.json that Composer cannot load. The global config's repository holds an
+     * advisory that the global config ignores.
+     *
+     * @param array<string, string> $options
+     *
+     * @return array{int, string, string, list<mixed>} the exit code, stdout, stderr and the advisory requests that reached the repository
+     */
+    private function runOnAComposerJsonThatComposerCannotLoad(array $options): array
+    {
         $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
         $server->withAdvisoryApi(['doctrine/cache' => [['advisoryId' => 'PKSA-global', 'packageName' => 'doctrine/cache', 'remoteId' => 'PKSA-global', 'title' => 'Global', 'link' => 'https://example.test/PKSA-global', 'affectedVersions' => '<2.0', 'sources' => [], 'reportedAt' => '2024-03-01 12:00:00', 'severity' => 'high']]]);
         $server->start();
@@ -1414,26 +1454,17 @@ final class LockrotCommandTest extends TestCase
         $stderr = '';
 
         try {
-            $this->withComposerEnv($this->tempDir('lockrot-invalid-manifest-advisories-cache-'), $home, function () use ($command, &$code, &$stdout, &$stderr): void {
-                [$code, $stdout, $stderr] = $this->runCommandWithSplitStreams($command, ['--format' => 'json', '--target-php' => '8.4']);
+            $this->withComposerEnv($this->tempDir('lockrot-invalid-manifest-advisories-cache-'), $home, function () use ($command, $options, &$code, &$stdout, &$stderr): void {
+                [$code, $stdout, $stderr] = $this->runCommandWithSplitStreams($command, $options + ['--format' => 'json', '--target-php' => '8.4']);
             });
             $requests = $server->advisoryRequests();
         } finally {
             $server->stop();
         }
 
-        self::assertSame(0, $code, $stderr);
-        $json = json_decode($stdout, true);
-        self::assertIsArray($json);
-        self::assertSame([], $requests, 'no repository of the global config is asked');
-        self::assertSame(['not_run', 'composer_json_invalid', []], [JsonPath::stringAt($json, ['findings', 0, 'security', 'check']), JsonPath::stringAt($json, ['findings', 0, 'security', 'unchecked_reason']), JsonPath::arrayAt($json, ['findings', 0, 'security', 'feeds'])]);
-        $advisoryGaps = array_values(array_filter(JsonPath::arrayAt($json, ['findings', 0, 'checks_missing']), static fn ($entry): bool => \is_array($entry) && $entry['check'] === 'advisories'));
-        self::assertSame([['check' => 'advisories', 'reason' => 'composer_json_invalid', 'blocks' => ['S9']]], $advisoryGaps);
-        self::assertSame([[], 0], [JsonPath::arrayAt($json, ['run', 'advisory_lookup', 'repositories']), JsonPath::intAt($json, ['run', 'advisory_lookup', 'packages_asked'])]);
-        $index = array_search(RunNote::ADVISORIES_NOT_CHECKED, JsonPath::column($json, ['note_details'], 'code'), true);
-        self::assertIsInt($index, $stdout);
-        self::assertSame(['reason' => 'composer_json_invalid', 'composer_repositories_checked' => 0], JsonPath::arrayAt($json, ['note_details', $index, 'data']));
-        self::assertSame("security advisories not checked (Composer cannot load composer.json): no finding is graded for an advisory, and each next step's score after the move assumes its versions carry none", JsonPath::stringAt($json, ['notes', $index]));
+        self::assertIsInt($code);
+
+        return [$code, $stdout, $stderr, array_values($requests)];
     }
 
     /** Composer's merge puts composer.json's `config.platform` over the global one, also when Composer cannot load the file. */

@@ -88,6 +88,17 @@ final class CappedMoveTest extends TestCase
         self::assertContains(['kind' => 'flag', 'id' => 'capped', 'basis' => 'stops_below_newest_php'], JsonPath::decoded($move->adds()));
     }
 
+    /** The tag 2.1.0 admits the newest PHP: the later-dated backport 2.0.9, capped below it, does not keep capped. */
+    public function testATagMoveClearsCappedOnTheTagThatItTargets(): void
+    {
+        [$row, $context] = self::context([[Signal::S6, []], [Signal::S11, []]], ['2.1.0' => '>=8.1', '2.0.9' => self::CAPPED_PHP], 'dev-main', '2026-01-01T00:00:00+00:00', ['2.0.9' => '2026-02-01T00:00:00+00:00']);
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::TAG, FlagSet::PINNED)->withLatest(new Latest('2.1.0', '2026-01-01T00:00:00+00:00', false, null, null), $row), [], null, $context);
+
+        self::assertContains(['kind' => 'flag', 'id' => 'capped', 'basis' => 'admits_newest_php'], JsonPath::decoded($move->clears()));
+        self::assertNotContains(['kind' => 'flag', 'id' => 'capped', 'basis' => 'stops_below_newest_php'], JsonPath::decoded($move->adds()));
+    }
+
     /** The undated 3.x leaves left-behind on 2.x unverified, and the release's missing php leaves capped unverified. */
     public function testATagMoveKeepsItsOwnUnverifiedFactsBesideCapped(): void
     {

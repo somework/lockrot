@@ -262,6 +262,24 @@ final class MoveTest extends TestCase
         self::assertSame(['blocked', 'vulnerable'], [JsonPath::stringAt($move, ['also', 0, 'kind']), JsonPath::stringAt($move, ['also', 0, 'source'])]);
     }
 
+    /**
+     * The tag 1.5.0 admits the target and came out before the PHP 8.0 GA, so the tag move adds
+     * old-promise. The later backport 1.4.9 excludes the target and does not decide that. The lock
+     * entry declares no php, so S5 does not fire on the installed snapshot.
+     */
+    public function testATagMoveReadsOldPromiseOnTheHighestTagBesideABackportThatExcludesTheTarget(): void
+    {
+        $finding = self::analyse([
+            'lock' => [['version' => '1.x-dev', 'php' => null]],
+            'root' => ['require' => ['a/b' => '1.x-dev']],
+            'releases' => [self::release('1.5.0', '2020-06-01', '>=7.2'), self::release('1.4.9', '2026-01-01', '>=7.2 <8.0')],
+        ]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        self::assertSame(['tag', 'pinned', '1.5.0'], [$move['kind'], $move['source'], JsonPath::stringAt($move, ['latest', 'version'])]);
+        self::assertSame('released_before_ga', array_column(JsonPath::arrayAt($move, ['adds']), 'basis', 'id')['old-promise'] ?? null);
+    }
+
     /** twig: PKSA-8zx5 `<=3.26.0` names no exclusive bound, and v3.27.0 clears every advisory. */
     public function testTwigRaisesPhpThenRequiresTheFirstReleaseThatClearsEveryAdvisory(): void
     {
