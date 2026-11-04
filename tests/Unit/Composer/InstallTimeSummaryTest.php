@@ -193,10 +193,11 @@ final class InstallTimeSummaryTest extends TestCase
      * in their own section of the lock — the state Composer leaves behind after `composer require
      * --dev`, which writes the new lock before dispatching PRE_OPERATIONS_EXEC.
      *
-     * @param array<string, mixed> $prodPackage entry for `require` and `packages`
-     * @param array<string, mixed> $devPackage  entry for `require-dev` and `packages-dev`
+     * @param array<string, mixed> $prodPackage  entry for `require` and `packages`
+     * @param array<string, mixed> $devPackage   entry for `require-dev` and `packages-dev`
+     * @param array<string, mixed> $extraLockrot merged on top of target-php 8.4
      */
-    private function projectWithDevRequire(array $prodPackage, array $devPackage): string
+    private function projectWithDevRequire(array $prodPackage, array $devPackage, array $extraLockrot = []): string
     {
         $dir = $this->tempDir('lockrot-install-time-dev-');
         [$prodName, $prodVersion] = self::nameAndVersionOf($prodPackage);
@@ -205,7 +206,7 @@ final class InstallTimeSummaryTest extends TestCase
             'name' => 'lockrot/install-time-dev-test',
             'require' => [$prodName => $prodVersion],
             'require-dev' => [$devName => $devVersion],
-            'extra' => ['lockrot' => ['target-php' => '8.4']],
+            'extra' => ['lockrot' => array_merge(['target-php' => '8.4'], $extraLockrot)],
         ]));
         file_put_contents($dir.'/composer.lock', (string) json_encode([
             'content-hash' => 'install-time-dev-test',
@@ -384,7 +385,7 @@ final class InstallTimeSummaryTest extends TestCase
      */
     public function testADevRequirementInTheTransactionIsRankedBelowAnEqualProdRequirement(): void
     {
-        $this->projectWithDevRequire(self::PHPZIP, self::BINSTRING);
+        $this->projectWithDevRequire(self::PHPZIP, self::BINSTRING, ['include-dev' => true]);
         $io = new BufferIO();
         $transaction = new Transaction([], [$this->loadPackage(self::BINSTRING), $this->loadPackage(self::PHPZIP)]);
         $event = $this->event($io, $transaction, true, true);
@@ -397,6 +398,22 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertIsInt($prod, $output);
         self::assertIsInt($dev, $output);
         self::assertLessThan($dev, $prod, 'the prod requirement outranks the equally flagged dev one:'."\n".$output);
+    }
+
+    /**
+     * A dev-mode install brings in packages-dev, and `composer lockrot` reads them only with
+     * include-dev. The install-time gate decides as `composer lockrot` does, so a strict install
+     * does not fail on a package that a baseline written without --dev never saw.
+     */
+    public function testWithoutIncludeDevADevModeInstallLeavesPackagesDevOut(): void
+    {
+        $this->projectWithDevRequire(self::PHPZIP, self::BINSTRING, ['fail-on' => 'high', 'install-time-strict' => true]);
+        $io = new BufferIO();
+        $transaction = new Transaction([], [$this->loadPackage(self::BINSTRING)]);
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($this->event($io, $transaction, true, true));
+
+        self::assertSame('', $io->getOutput());
     }
 
     public function testAPackageWithNothingToFlagPrintsNothing(): void
