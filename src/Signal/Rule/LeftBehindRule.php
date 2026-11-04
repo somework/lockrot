@@ -73,9 +73,11 @@ final class LeftBehindRule implements SignalRule
             if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $ownAt) {
                 continue;
             }
-            // The highest tag itself, dated only by a commit its tags share, is released on or after `at`.
-            // A lower tag with a date of its own is quoted exactly.
-            $atLeast = $release['highest']['at'] === null && $release['version'] === $release['highest']['pretty'];
+            // A tag dated only by a commit its tags share is released on or after `at`: the highest
+            // tag with no trusted date, or a lower tag on a shared commit. A monorepo parent's date
+            // and a lower tag with a date of its own are quoted exactly.
+            $atLeast = ($release['highest']['at'] === null && $release['version'] === $release['highest']['pretty'])
+                || (!isset($release['dated_by']) && $metadata->sharesItsCommit($release['version']));
             $candidate = ['branch' => (string) $key, 'version' => $release['version'], 'at' => $release['at'], 'php' => $release['php'] ?? null, 'at_least' => $atLeast];
             if (self::newer($candidate, $newest)) {
                 $newest = $candidate;

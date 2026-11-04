@@ -335,7 +335,7 @@ final class LeftBehindRuleTest extends TestCase
         $meta = new PackageMetadata('illuminate/contracts', false, null, true, new \DateTimeImmutable('2026-09-01'), 'v13.24.0', 2, null, 'library', new \DateTimeImmutable(F::NOW), [
             '13' => $branch('13.24.0', '2026-09-01T00:00:00+00:00', 'laravel/framework'),
             '8' => $branch('8.83.29', '2021-11-20T15:55:41+00:00', 'laravel/framework'),
-        ], [], 'laravel/framework');
+        ], [], 'laravel/framework', [], 'laravel/framework', ['13.24.0.0' => true]);
 
         $signal = $this->rule()->evaluate(F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v8.83.27']), $meta));
 
@@ -343,6 +343,7 @@ final class LeftBehindRuleTest extends TestCase
         self::assertSame(Signal::LEVEL_WARN, $signal->level());
         self::assertSame('branch 8.x last released 2021-11-20 (4.8 years ago, dated by laravel/framework); 13.x released 13.24.0 (2026-09-01)', $signal->summary());
         self::assertSame('laravel/framework', JsonPath::decoded($signal->data())['dated_by']);
+        self::assertFalse(JsonPath::decoded($signal->data())['newest_release_at_least'], 'the parent\'s date is a release\'s, though the split\'s own tag shares its commit');
         self::assertSame('^13.24', JsonPath::decoded($signal->data())['suggested_constraint']);
     }
 
@@ -587,6 +588,28 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNotNull($signal);
         self::assertStringEndsWith('; 2.x released 2.0.0 (2026-01-10)', $signal->summary());
         self::assertFalse(JsonPath::decoded($signal->data())['newest_release_at_least']);
+    }
+
+    /** A lower tag dated by a commit that its tags share gives a lower bound too, as the highest tag does. */
+    public function testALowerTagOnASharedCommitIsQuotedAsALowerBound(): void
+    {
+        $loader = new ArrayLoader();
+        $on = static fn (string $version, ?string $commit, ?string $time): array => array_filter(['name' => 'vendor/pkg', 'version' => $version, 'time' => $time, 'source' => $commit === null ? null : ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => $commit]]);
+        $meta = PackageMetadata::fromPackages('vendor/pkg', [
+            $loader->load($on('5.1.0', null, null)),
+            $loader->load($on('5.0.2', 'split', '2025-06-01T00:00:00+00:00')),
+            $loader->load($on('5.0.1', 'split', '2025-06-01T00:00:00+00:00')),
+            $loader->load($on('5.0.0', 'split', '2025-06-01T00:00:00+00:00')),
+            $loader->load($on('4.0.0', 'own', '2020-01-01T00:00:00+00:00')),
+        ], new \DateTimeImmutable(F::NOW));
+
+        $signal = $this->rule()->evaluate(F::facts(F::package(['version' => '4.0.0']), $meta));
+
+        self::assertNotNull($signal);
+        self::assertStringEndsWith('; 5.x released 5.0.2 (on or after 2025-06-01, the date of a commit its tags share)', $signal->summary());
+        $data = JsonPath::decoded($signal->data());
+        self::assertTrue($data['newest_release_at_least']);
+        self::assertTrue($data['reachable_release_at_least']);
     }
 
     public function testAHigherBranchWithATrustedDateIsQuotedExactly(): void
