@@ -203,9 +203,14 @@ stop clears when that check runs (set a token, raise the budget or rerun), or wh
 
 ## Under `--dry-run` {#a-note-on-the-dry-run-development-flag}
 
-Under `composer require --dev … --dry-run`, lockrot treats a package that is absent from the lock on
-disk as production, so its score is not halved for `dev` and its grade can read one band high.
-`composer lockrot` on the real lock has the flag.
+lockrot reads the lock from Composer, not from `composer.lock` on disk. Under `--dry-run` and with
+`config.lock` set to `false`, Composer keeps the updated lock in memory, and lockrot reads that
+lock. So a package from `composer require --dev … --dry-run` keeps its `packages-dev` membership.
+With `include-dev` on, its score is halved for `dev`, as in `composer lockrot`. With `include-dev`
+off, the check skips it.
+
+A project with no lock yet, such as a new project that runs `composer install`, has no lock to
+read. The check then counts each package of the transaction as production.
 
 ## Related
 
