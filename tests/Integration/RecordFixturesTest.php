@@ -45,6 +45,18 @@ final class RecordFixturesTest extends TestCase
         self::assertSame([['Accept: x', self::TOKEN, 'PRIVATE-TOKEN: secret'], ['Accept: x']], $seen);
     }
 
+    public function testARedirectToAnotherSchemeOrPortSendsNoCredential(): void
+    {
+        $seen = [];
+        RecorderHttp::fetch(self::GITHUB, [self::TOKEN], null, true, self::transport([
+            self::GITHUB => [301, ['Location: http://api.github.com/repos/a/b']],
+            'http://api.github.com/repos/a/b' => [301, ['Location: https://api.github.com:8443/repos/a/b']],
+            'https://api.github.com:8443/repos/a/b' => [200, [], 'moved'],
+        ], $seen), Clock::fixed('2026-01-01'));
+
+        self::assertSame([[self::TOKEN], [], []], $seen);
+    }
+
     public function testNoFollowReturnsTheRedirectAnswer(): void
     {
         $seen = [];

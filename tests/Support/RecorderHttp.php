@@ -10,7 +10,7 @@ use Lockrot\Data\Http\HttpResult;
 /**
  * The request of `bin/record-fixtures`. PHP's http wrapper sends the request headers again to the
  * host that a redirect names, so the recorder follows redirects itself and sends a credential only
- * to the host that it was meant for.
+ * to the scheme, host and port that it was meant for.
  */
 final class RecorderHttp
 {
@@ -24,10 +24,10 @@ final class RecorderHttp
      */
     public static function fetch(string $url, array $headers, ?string $post, bool $follow, callable $transport, Clock $clock): HttpResult
     {
-        $host = parse_url($url, \PHP_URL_HOST);
+        $origin = self::origin($url);
         $current = $url;
         for ($hop = 0;; ++$hop) {
-            $sent = parse_url($current, \PHP_URL_HOST) === $host ? $headers : array_values(array_filter($headers, static fn (string $header): bool => preg_match(self::CREDENTIAL_HEADER, $header) !== 1));
+            $sent = self::origin($current) === $origin ? $headers : array_values(array_filter($headers, static fn (string $header): bool => preg_match(self::CREDENTIAL_HEADER, $header) !== 1));
             $http = ['method' => $post === null ? 'GET' : 'POST', 'header' => implode("\r\n", array_merge(['User-Agent: lockrot-recorder'], $sent)), 'ignore_errors' => true, 'timeout' => 30, 'follow_location' => 0];
             if ($post !== null) {
                 $http['content'] = $post;
