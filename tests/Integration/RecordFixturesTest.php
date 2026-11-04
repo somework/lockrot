@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Lockrot\Clock;
 use Lockrot\Lock\LockFile;
 use Lockrot\Tests\Support\RecorderHttp;
 use Lockrot\Tests\Support\RecorderNames;
@@ -24,7 +25,7 @@ final class RecordFixturesTest extends TestCase
         $result = RecorderHttp::fetch(self::GITHUB, [self::TOKEN], null, true, self::transport([
             self::GITHUB => [301, ['Location: https://api.github.com/repositories/1']],
             'https://api.github.com/repositories/1' => [200, [], '{"id":1}'],
-        ], $seen));
+        ], $seen), Clock::fixed('2026-01-01'));
 
         self::assertSame(200, $result->status());
         self::assertSame('{"id":1}', $result->body());
@@ -38,7 +39,7 @@ final class RecordFixturesTest extends TestCase
         $result = RecorderHttp::fetch(self::GITHUB, ['Accept: x', self::TOKEN, 'PRIVATE-TOKEN: secret'], null, true, self::transport([
             self::GITHUB => [302, ['location: https://elsewhere.example/repo']],
             'https://elsewhere.example/repo' => [200, [], 'moved'],
-        ], $seen));
+        ], $seen), Clock::fixed('2026-01-01'));
 
         self::assertSame('moved', $result->body());
         self::assertSame([['Accept: x', self::TOKEN, 'PRIVATE-TOKEN: secret'], ['Accept: x']], $seen);
@@ -49,7 +50,7 @@ final class RecordFixturesTest extends TestCase
         $seen = [];
         $result = RecorderHttp::fetch(self::GITHUB, [self::TOKEN], null, false, self::transport([
             self::GITHUB => [301, ['Location: https://elsewhere.example/repo']],
-        ], $seen));
+        ], $seen), Clock::fixed('2026-01-01'));
 
         self::assertSame(301, $result->status());
         self::assertCount(1, $seen);
@@ -60,7 +61,7 @@ final class RecordFixturesTest extends TestCase
         $seen = [];
         $result = RecorderHttp::fetch(self::GITHUB, [], null, true, self::transport([
             self::GITHUB => [301, ['Location: '.self::GITHUB]],
-        ], $seen));
+        ], $seen), Clock::fixed('2026-01-01'));
 
         self::assertSame(301, $result->status());
         self::assertLessThan(10, \count($seen));

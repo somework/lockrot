@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support;
 
+use Lockrot\Clock;
 use Lockrot\Data\Http\HttpResult;
 
 /**
@@ -19,8 +20,9 @@ final class RecorderHttp
     /**
      * @param list<string>                                                                  $headers
      * @param callable(string, array<string, mixed>): array{string|false, list<string>} $transport body and response header lines of one request
+     * @param Clock                                                                     $clock     the fetch time of each result
      */
-    public static function fetch(string $url, array $headers, ?string $post, bool $follow, callable $transport): HttpResult
+    public static function fetch(string $url, array $headers, ?string $post, bool $follow, callable $transport, Clock $clock): HttpResult
     {
         $host = parse_url($url, \PHP_URL_HOST);
         $current = $url;
@@ -42,7 +44,7 @@ final class RecorderHttp
                 }
             }
             if (!$follow || $location === null || $status < 300 || $status > 399 || $hop >= self::MAX_REDIRECTS) {
-                return new HttpResult($url, $status, $body === false ? null : $body, new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
+                return new HttpResult($url, $status, $body === false ? null : $body, $clock->fetchTime());
             }
             $current = preg_match('{^https?://}i', $location) === 1 ? $location : self::origin($current).$location;
         }

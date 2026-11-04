@@ -88,7 +88,8 @@ foreach ($names === null ? [$p2Dir, $ghDir, $advisoryDir] : [] as $dir) {
         mkdir($dir, 0777, true);
     }
 }
-$fetch = static fn (string $url, array $headers, ?string $post = null, bool $follow = true): HttpResult => RecorderHttp::fetch($url, $headers, $post, $follow, [RecorderHttp::class, 'stream']);
+$clock = new Clock();
+$fetch = static fn (string $url, array $headers, ?string $post = null, bool $follow = true): HttpResult => RecorderHttp::fetch($url, $headers, $post, $follow, [RecorderHttp::class, 'stream'], $clock);
 $trim = static function (string $body, string $name): string {
     $json = json_decode($body, true);
     if (!\is_array($json) || !isset($json['packages'][$name])) {
@@ -115,7 +116,7 @@ $store = static function (string $path, HttpResult $result, ?string $body, bool 
 };
 $io = new NullIO();
 $composerConfig = Factory::createConfig($io);
-$repositoryHttp = new ComposerHttpClient(Factory::createHttpDownloader($io, $composerConfig), $io, $composerConfig, new Clock());
+$repositoryHttp = new ComposerHttpClient(Factory::createHttpDownloader($io, $composerConfig), $io, $composerConfig, $clock);
 $github = new GitHubApi();
 $githubHeaders = GitHubApi::headersFor(getenv('GITHUB_TOKEN') ?: null);
 $locator = new RepoLocator($gitlabDomains);
