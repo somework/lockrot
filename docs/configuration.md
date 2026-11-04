@@ -126,6 +126,10 @@ line instead ([install-time.md](install-time.md#never-fails-the-install)).
   error of the values that those checks did not refuse. A check of an `ignore[]` entry after the
   schema, such as a date in `expires` that does not exist, stops at the first refusal.
 - An empty `--fail-on=`, `--baseline=` or `--target-php=` is an error, never a fall-back to the next source.
+- When Composer refuses composer.json, lockrot reads release metadata and the abandoned ignore list
+  from the global Composer config. So if your project disables packagist.org, fix composer.json
+  first. The advisory lookup does not fall back: it reads as not run
+  ([`advisories_not_checked`](notes.md#advisories_not_checked)).
 
 ### Unknown keys
 
