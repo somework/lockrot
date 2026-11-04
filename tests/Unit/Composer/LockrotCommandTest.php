@@ -1392,7 +1392,7 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
-     * Ruling R12-24: the global config holds neither the project's repositories nor its ignore
+     * The global config holds neither the project's repositories nor its ignore
      * lists, so the advisory lookup does not fall back to it. Here the global config's repository
      * holds an advisory that the global config ignores.
      */
