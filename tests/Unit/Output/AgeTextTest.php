@@ -8,6 +8,9 @@ use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
+use Lockrot\Lock\ConfiguredRepositories;
+use Lockrot\Lock\OriginFacts;
+use Lockrot\Lock\PackageOrigin;
 use Lockrot\Output\AgeText;
 use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\AgeReading;
@@ -93,6 +96,23 @@ final class AgeTextTest extends TestCase
         self::assertSame('age: 5.x last released v5.4.45 2024-09-25 (2.0 years ago); newest release v8.1.5 2026-08-21 (0.1 years ago); last push 2026-09-25 (less than three weeks ago)', AgeText::line($finding));
     }
 
+    /** The age reasons take the words of the check reasons, so one block names one cause once. */
+    public function testAPackageOfUnknownOriginReadsOriginUnknownInEveryAgeLine(): void
+    {
+        $unknown = PackageOrigin::of('a/pkg', '1.0.0', new OriginFacts('', null, null, null, null), ConfiguredRepositories::none());
+        $notRead = AgeReading::unmeasuredBecause(AgeMeasure::NOT_FROM_COMPOSER_REPOSITORY);
+        $finding = self::finding('1.0.0', $notRead, $notRead, $notRead, $notRead, RepoRef::GITHUB, $unknown);
+
+        self::assertSame('age: installed 1.0.0, release date not known (origin unknown)', AgeText::line($finding));
+        self::assertSame([
+            'installed  1.0.0     not read (origin unknown)',
+            '1.x                  not read (origin unknown)',
+            'newest               not read (origin unknown)',
+            'last push            not read (origin unknown)',
+            'libyears not measured: origin unknown',
+        ], AgeText::block($finding, new Thresholds()));
+    }
+
     private static function installed(string $date, float $years, ?string $datedBy = null): AgeReading
     {
         return AgeReading::measured(new \DateTimeImmutable($date.'T10:00:00+00:00'), (int) round($years * 10), $years, null, $datedBy, null, AgeReading::INSTALLED);
@@ -108,9 +128,9 @@ final class AgeTextTest extends TestCase
         return AgeReading::measured(new \DateTimeImmutable($date.'T10:00:00+00:00'), (int) round($years * 10), $years, null, null, null, AgeReading::PUSH);
     }
 
-    private static function finding(string $version, AgeReading $installed, AgeReading $release, AgeReading $branchRelease, AgeReading $push, string $forge): Finding
+    private static function finding(string $version, AgeReading $installed, AgeReading $release, AgeReading $branchRelease, AgeReading $push, string $forge, ?PackageOrigin $origin = null): Finding
     {
-        $finding = (new FindingBuilder())->withPackage('a/pkg')->withVersion($version)->build();
+        $finding = (new FindingBuilder())->withPackage('a/pkg')->withVersion($version)->withOrigin($origin)->build();
         $activity = ActivityLookup::read(new RepositoryActivity(new RepoRef($forge, 'example.org', 'a/pkg'), false, null, new \DateTimeImmutable('2026-10-01T00:00:00+00:00')));
         $details = $finding->details();
 
