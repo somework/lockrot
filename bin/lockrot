@@ -48,7 +48,7 @@ unset($lockrotInProject);
 // Composer reports its branch, such as `2.10-dev+source`, so only the minor counts.
 preg_match('/^\d+\.\d+/', \Composer\Composer::getVersion(), $lockrotComposerMinor);
 if (version_compare($lockrotComposerMinor[0] ?? '0', '2.10', '<')) {
-    fwrite(\STDERR, 'lockrot requires the composer/composer package 2.10 or newer, not the '.\Composer\Composer::getVersion()." that it loads. Upgrade that package, or run the PHAR: https://lockrot.dev/phar/\n");
+    fwrite(\STDERR, 'lockrot requires the composer/composer package 2.10 or newer, not the '.\Composer\Composer::getVersion()." that it loads. Run composer lockrot, run the PHAR (https://lockrot.dev/phar/), or upgrade that package.\n");
     exit(2);
 }
 unset($lockrotComposerMinor);
