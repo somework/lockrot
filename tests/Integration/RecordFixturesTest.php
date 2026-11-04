@@ -57,6 +57,35 @@ final class RecordFixturesTest extends TestCase
         self::assertSame([[self::TOKEN], [], []], $seen);
     }
 
+    public function testARelativeRedirectResolvesAgainstTheCurrentUrl(): void
+    {
+        $seen = [];
+        $result = RecorderHttp::fetch('https://repo.example/p2/acme/a.json?x=1', [], null, true, self::transport([
+            'https://repo.example/p2/acme/a.json?x=1' => [302, ['Location: b.json']],
+            'https://repo.example/p2/acme/b.json' => [302, ['Location: ?y=2']],
+            'https://repo.example/p2/acme/b.json?y=2' => [302, ['Location: //mirror.example/p2/c.json']],
+            'https://mirror.example/p2/c.json' => [302, ['Location: /root.json']],
+            'https://mirror.example/root.json' => [200, [], 'found'],
+        ], $seen), Clock::fixed('2026-01-01'));
+
+        self::assertSame('found', $result->body());
+    }
+
+    public function testASeeOtherRedirectOfAPostAsksWithGet(): void
+    {
+        $methods = [];
+        $transport = static function (string $url, array $http) use (&$methods): array {
+            $methods[] = [$http['method'], $http['content'] ?? null];
+
+            return $url === self::GITHUB ? ['', ['HTTP/1.1 303 X', 'Location: /answer']] : ['done', ['HTTP/1.1 200 X']];
+        };
+
+        $result = RecorderHttp::fetch(self::GITHUB, [], 'packages=a', true, $transport, Clock::fixed('2026-01-01'));
+
+        self::assertSame('done', $result->body());
+        self::assertSame([['POST', 'packages=a'], ['GET', null]], $methods);
+    }
+
     public function testNoFollowReturnsTheRedirectAnswer(): void
     {
         $seen = [];
