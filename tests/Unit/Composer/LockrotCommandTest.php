@@ -2885,6 +2885,29 @@ final class LockrotCommandTest extends TestCase
     }
 
     /** @return iterable<string, array{string, string}> the `--baseline` path, the refusal */
+    public static function unwritableBaselines(): iterable
+    {
+        yield 'in a missing directory' => ['missing/b.json', 'directory missing does not exist; lockrot does not create directories'];
+        yield 'a directory' => ['b.json', 'b.json exists and is not a regular file'];
+    }
+
+    /** @dataProvider unwritableBaselines */
+    #[DataProvider('unwritableBaselines')]
+    public function testAGeneratedBaselineThatCannotBeAFileIsRefusedBeforeTheAnalysis(string $baseline, string $refusal): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+        mkdir($dir.'/b.json');
+        $called = false;
+
+        [$code, , $stderr] = $this->runCommandWithSplitStreams($this->recordingCommand($called), ['--generate-baseline' => true, '--baseline' => $baseline, '--output' => ['json:out.json'], '--target-php' => '8.4']);
+
+        self::assertSame(2, $code, $stderr);
+        self::assertSame(LockrotCommand::UPGRADE_NOTICE."\n".'lockrot: --baseline='.$baseline.': '.$refusal."\n", $stderr);
+        self::assertFalse($called, 'refused before the analysis');
+        self::assertFileDoesNotExist($dir.'/out.json');
+    }
+
+    /** @return iterable<string, array{string, string}> the `--baseline` path, the refusal */
     public static function composerNamedBaselines(): iterable
     {
         yield 'the manifest that COMPOSER names' => ['alt.json', 'that is the manifest COMPOSER names, which lockrot never writes'];

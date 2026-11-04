@@ -564,7 +564,8 @@ final class LockrotCommand extends BaseCommand
 
     /**
      * A generated baseline can create its file, so it must not be a composer file or a file that
-     * COMPOSER names: SECURITY.md, "What lockrot does and does not do".
+     * COMPOSER names: SECURITY.md, "What lockrot does and does not do". Its place is checked as an
+     * `--output` place is, so a typo fails before a full repository round.
      *
      * @throws ConfigException naming the option, the key or the default file that gave the path
      */
@@ -573,6 +574,7 @@ final class LockrotCommand extends BaseCommand
         $source = \is_string($input->getOption('baseline')) ? '--baseline=' : ($lockrot->baseline() !== null ? 'extra.lockrot.baseline ' : 'the baseline ');
         $label = $source.$baseline->displayPath();
         ReportTargets::refuseComposerFile($baseline->path(), $label);
+        ReportTargets::refuseUnwritablePlace($baseline->path(), $baseline->displayPath(), $label);
         foreach ([[$composerFile, self::MANIFEST_REASON], [$lockPath, self::LOCK_REASON]] as [$path, $reason]) {
             if (Path::canonical($path) === Path::canonical($baseline->path()) || Path::sameFile($baseline->path(), $path)) {
                 throw new ConfigException($label.': '.$reason);
