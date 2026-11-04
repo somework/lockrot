@@ -195,6 +195,13 @@ S8 fires when all of these hold:
 
 3. That higher branch's newest release is less than `release-warn-years` old.
 
+A higher branch counts by its newest dated release. When only a commit that its tags share dates
+that release, the date is a lower bound. The branch releases when that lower bound lies inside
+`release-warn-years`. When it lies past `release-warn-years`, lockrot cannot tell whether the branch
+releases. S8 then does not judge the branch, and [S10](#what-was-not-checked) `release_dates` blocks
+S8. A `tag` move and `score.without[]` read a higher branch in the same way. Such a branch puts
+`left-behind` in the move's `unverified[]`.
+
 If the last condition does not hold, every branch is quiet, which is S2's case (`stale` or
 `silent`). The flag is `left-behind` at either level, and the signal keeps the level. Abridged
 from the [example run](example-run.md):
@@ -228,9 +235,15 @@ S8 is not measured for:
 
 - A branch whose highest tag has no [trusted date](#dates-from-the-monorepo).
 
+- An installed branch whose newest dated release is a lower tag that only a commit shared with other
+  tags dates. `age.branch_release` is then null with `undated_releases`.
+
 The same rule applies to S2: if the package's highest tag has no trusted date, lockrot does not
 measure S2, and [S10](#what-was-not-checked) says so. `age.release` is then null with
-`age.release_unmeasured` `undated_releases`, also when older tags have a trusted date.
+`age.release_unmeasured` `undated_releases`, also when older tags have a trusted date. S2 never
+judges a date that a commit shares with other tags. When such a commit dates the newest stable
+release, `age.release` is null with `undated_releases` too. This holds also when the highest version
+is a pre-release on its own commit.
 
 ### Within reach
 
@@ -429,8 +442,8 @@ request on it.
 
 - S2 and S8 carry the parent as `dated_by`, and `--explain` marks the branch rows it supplied.
 
-- S8 can quote a branch's highest tag that only a commit shared with other tags dates. A release is
-  never older than its commit, so that date is a lower bound. The summary then says "on or after"
+- S8 can quote a branch's highest tag, or a lower tag, that only a commit shared with other tags
+  dates. A release is never older than its commit, so that date is a lower bound. The summary then says "on or after"
   the date. `newest_release_at_least` or `reachable_release_at_least` is true. `newest_years` or
   `reachable_years` is an upper bound.
 
@@ -671,6 +684,13 @@ writes the move as `next_step`. Abridged from a recorded run on wallabag's lock:
   --no-update`. That holds for each kind that runs a Composer request: `update`, `require`,
   `raise-php` and `tag`.
 
+- **The PHP of a tag.** A `tag` move reads the php of the tag that it targets, the branch's
+  highest tag, also when the snapshot's newest dated tag is a lower backport on that branch.
+  That php decides between `tag` and `blocked`, and the `old-promise` and `capped`
+  facts of the move read it. The move adds `old-promise` only when that tag declares `require.php`.
+  A `blocked` move to a tag names the php of the tag, and a `blocked` move with no tag names the
+  branch's `php`.
+
 - **What it clears.** `next_step.clears[]` names only what lockrot checked for every version the
   constraint admits. `unverified[]` names what it could not check, and `leaves[]` what the move
   does not touch.
@@ -694,8 +714,9 @@ writes the move as `next_step`. Abridged from a recorded run on wallabag's lock:
   that PHP, not at the target. `platform_override` is `config.platform.php` from Composer's merged
   config, the global `config.json` included. The line of each move with commands then starts with
   "First set config.platform.php to your PHP <target> release: Composer's config sets <version>."
-  So does the `update now:` line. The commands
-  stay the same. When `run.move_check.baseline` is `refused`, the sentence goes on with "Composer
+  So does the `update now:` line. After that sentence, a clause in words starts with a capital
+  letter, such as "Require a tag" or "Update it with Composer". A command keeps its case. The
+  commands stay the same. When `run.move_check.baseline` is `refused`, the sentence goes on with "Composer
   still refuses the lock itself: the moves_not_checked note names the first cause." The run note
   [`moves_not_checked`](notes.md#moves_not_checked) names the cause of Composer's first problem.
 
@@ -753,9 +774,9 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
   line then reads "(gets 5.3.8, below the newest 5.3.9)", and `security.gets.version` reads
   `check.installs`.
 - **A joint request.** When Composer refuses a move, lockrot asks once more: the move and an update
-  of each package that a package hold names. The joint request resolves only when it installs the
-  package inside the move's constraint and changes the release of a holder. Then `held_by[]` is
-  empty on the move, on its branch row and on the S9 `fix` at its release, and `moves_with[]`
+  of each package that a package hold names and that the lock holds. The joint request resolves
+  only when it installs the package inside the move's constraint and changes the release of a
+  holder. Then `held_by[]` is empty on the move, on its branch row and on the S9 `fix` at its release, and `moves_with[]`
   names each holder whose release the joint request changes. The joint
   request moves the packages that require the package. So the `transitive` reason adds no words,
   and the `unreached` words end at "lockrot found no path from your requirements to it". The step
@@ -785,7 +806,8 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
   removes the `require-dev` line, whatever the terminal answers. The line reads "require <package>
   <constraint>, which removes it from require-dev". The php step does the same when `require-dev`
   lists php.
-- **Update now.** lockrot solves the candidates of `update now:` as one request. A move that
+- **Update now.** A candidate of `update now:` is a finding whose lead move is an `update` that
+  clears at least one advisory. lockrot solves the candidates as one request. A move that
   resolves only through a joint request is no candidate: its own step moves its holders. It leaves out the
   candidates that Composer refuses together with the others, and writes a run note. The members of
   `security.update_now` are the names of the command that Composer resolves. When Composer refuses
@@ -1275,7 +1297,7 @@ formats print only under `--all`, keeps its verdict and adds the same `checks mi
 | `repository_activity` | `host_not_supported` | The repository is on a host that lockrot cannot ask ([host note](notes.md#repository_activity_host_not_supported)) | S3, S4 |
 | `repository_activity` | `not_from_composer_repository` | The package comes from vcs, or from an origin that lockrot cannot tell: lockrot asks no host for it | S3, S4 |
 | `release_metadata` | `not_from_composer_repository` | The same origins: no Composer repository serves its releases | S2, S8. S11 too when S11 fires: a [capped](#capped) package then has `admits_newest` unread |
-| `release_dates` | `undated_releases` | A release that S2, S5 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it. The summary gives one clause per cause. A cause is an undated lock entry, an installed tag on a shared commit, or a release that S2 or S8 reads with no date or with the date of a commit that its tags share. That release is the newest stable release, the installed branch's newest release, or a higher branch's highest tag | S2 when the highest tag is undated. S5 when the installed release is undated, its lock date is before the GA of the target's major or absent, and the other two [S5 conditions](#old-promise) hold. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
+| `release_dates` | `undated_releases` | A release that S2, S5 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it. The summary gives one clause per cause. A cause is an undated lock entry, an installed tag on a shared commit, or a release that S2 or S8 reads with no date or with the date of a commit that its tags share. That release is the newest stable release, the installed branch's newest release, or a higher branch's highest tag | S2 when the highest tag is undated. S5 when the installed release is undated, its lock date is before the GA of the target's major or absent, and the other two [S5 conditions](#old-promise) hold. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch is untrusted, the installed branch has no release for `release-warn-years`, and S8 did not fire. A higher branch is untrusted when its release is undated, or when only a shared commit past `release-warn-years` dates it. Never S8 on a branch snapshot, which has no release branch |
 | `advisories` | `offline`, `install_time_budget`, `lookup_failed`, `no_feed`, `composer_json_invalid` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
 | `releases` | `releases_unknown` | A counted advisory's fix is unknown because the package's release data did not come | S9 |
 
