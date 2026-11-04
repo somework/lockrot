@@ -527,4 +527,23 @@ final class DependencyGraphTest extends TestCase
         self::assertSame(['vendor/split'], DependencyGraph::fromLock($lock, $project, true)->shortestChain('vendor/split'));
         self::assertSame([], DependencyGraph::fromLock($lock, $project, false)->shortestChain('vendor/split'), 'a require-dev root is walked only with --dev');
     }
+
+    /** A require-dev key resolves to the dev package of its name, not to a prod provider, without `--dev` too. */
+    public function testARequireDevKeyResolvesAmongTheDevPackagesWhateverDevSays(): void
+    {
+        $lock = LockFile::fromArray([
+            'packages' => [
+                ['name' => 'a/a', 'version' => '1.0.0', 'require' => ['p/p' => '^1']],
+                ['name' => 'p/p', 'version' => '1.0.0', 'provide' => ['foo/x' => '1.0.0']],
+            ],
+            'packages-dev' => [
+                ['name' => 'foo/x', 'version' => '1.0.0'],
+            ],
+        ]);
+        $project = ProjectConfig::fromArray(['require' => ['a/a' => '^1'], 'require-dev' => ['foo/x' => '^1']]);
+
+        foreach ([false, true] as $dev) {
+            self::assertSame([], DependencyGraph::fromLock($lock, $project, $dev)->namedIn('p/p'), 'dev '.var_export($dev, true));
+        }
+    }
 }
