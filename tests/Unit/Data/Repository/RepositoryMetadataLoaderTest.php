@@ -10,6 +10,7 @@ use Composer\Package\BasePackage;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
 use Composer\Repository\FilterRepository;
+use Composer\Repository\RepositorySecurityException;
 use Composer\Semver\Comparator;
 use Lockrot\Clock;
 use Lockrot\Data\Http\RecordedHttpClient;
@@ -721,6 +722,38 @@ final class RepositoryMetadataLoaderTest extends TestCase
         }
     }
 
+    /** @return iterable<string, array{class-string<\Throwable>}> */
+    public static function refusedAnswers(): iterable
+    {
+        yield 'a broken signature' => [RepositorySecurityException::class];
+        yield 'a logic error of the repository' => [\LogicException::class];
+    }
+
+    /**
+     * ComposerRepository::fetchFile() refuses an answer with an exception that is no RuntimeException.
+     * The names fail, and the run goes on.
+     *
+     * @dataProvider refusedAnswers
+     *
+     * @param class-string<\Throwable> $throws
+     */
+    #[DataProvider('refusedAnswers')]
+    public function testARefusedAnswerFailsTheNamesOfItsChunk(string $throws): void
+    {
+        $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $server->start();
+        try {
+            $names = \array_slice($this->wallabagNames(), 0, 2);
+            $loader = new RepositoryMetadataLoader([$this->repositoryFailingFor($server, $names[0], self::CHUNK_FAILURE, $throws)], Clock::fixed(self::FIXED));
+
+            $failed = $loader->load(self::names($names))->failed();
+
+            self::assertSame([self::CHUNK_FAILURE, self::CHUNK_FAILURE], [$failed[$names[0]] ?? null, $failed[$names[1]] ?? null]);
+        } finally {
+            $server->stop();
+        }
+    }
+
     /**
      * Offline, a repository that throws while reading its cache fails the name with its own message,
      * not the offline reason: the run notes read that as `fetch_failed`, the catch-all, which is what
@@ -930,13 +963,16 @@ final class RepositoryMetadataLoaderTest extends TestCase
      * containing $name, standing in for a repository whose root metadata is readable but whose
      * file for one package is not.
      */
-    private function repositoryFailingFor(FixtureRepositoryServer $server, string $name, string $message = self::CHUNK_FAILURE): ComposerRepository
+    /** @param class-string<\Throwable> $throws */
+    private function repositoryFailingFor(FixtureRepositoryServer $server, string $name, string $message = self::CHUNK_FAILURE, string $throws = \RuntimeException::class): ComposerRepository
     {
         $io = new NullIO();
         $config = $server->config();
         $repository = new class (['type' => 'composer', 'url' => $server->url()], $io, $config, Factory::createHttpDownloader($io, $config)) extends ComposerRepository {
             public string $failFor = '';
             public string $message = '';
+            /** @var class-string<\Throwable> */
+            public string $throws = \RuntimeException::class;
 
             /**
              * @param array<string, \Composer\Semver\Constraint\ConstraintInterface|null> $packageNameMap
@@ -950,7 +986,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
             {
                 // The map is name => constraint-or-null, so isset() misses every entry.
                 if (\array_key_exists($this->failFor, $packageNameMap)) {
-                    throw new \RuntimeException($this->message);
+                    throw new $this->throws($this->message);
                 }
 
                 return parent::loadPackages($packageNameMap, $acceptableStabilities, $stabilityFlags, $alreadyLoaded);
@@ -958,6 +994,7 @@ final class RepositoryMetadataLoaderTest extends TestCase
         };
         $repository->failFor = $name;
         $repository->message = $message;
+        $repository->throws = $throws;
 
         return $repository;
     }
