@@ -543,7 +543,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   after the repository round.
   ([What --generate-baseline does](docs/baseline.md#what-generate-baseline-does))
 - **Install-time:** the check takes the lock from Composer itself. Under `config.lock: false` or
-  `--dry-run`, a require-dev package keeps its dev weight, and a stale `composer.lock` on disk
+  `--dry-run`, a require-dev package stays a dev package, and a stale `composer.lock` on disk
   decides nothing.
   ([Under `--dry-run`](docs/install-time.md#a-note-on-the-dry-run-development-flag))
 

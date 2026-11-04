@@ -129,7 +129,8 @@ line instead ([install-time.md](install-time.md#never-fails-the-install)).
 - When Composer refuses composer.json, lockrot reads release metadata and the abandoned ignore list
   from the global Composer config. So if your project disables packagist.org, fix composer.json
   first. The advisory lookup does not fall back: it reads as not run
-  ([`advisories_not_checked`](notes.md#advisories_not_checked)).
+  ([`advisories_not_checked`](notes.md#advisories_not_checked)). The hosts that such a run contacts
+  are in [SECURITY.md](https://github.com/somework/lockrot/blob/main/SECURITY.md#what-lockrot-does-and-does-not-do).
 
 ### Unknown keys
 

@@ -86,6 +86,10 @@ the list of its packages gets only the names on that list. lockrot sends no vers
 packages from a Composer repository
 ([Which advisories count](docs/verdicts.md#which-advisories-count)).
 
+When Composer refuses `composer.json`, lockrot asks the repositories of the global Composer config
+for release metadata. It sends no advisory lookup in that run
+([Validation](docs/configuration.md#validation)).
+
 The move check asks Composer's solver about each move, and the solver loads the metadata of each
 package that a solve needs. A file that the run already fetched comes from Composer's cache, so
 only a package that the run did not read costs a request: a new dependency of a move, or a `~dev`

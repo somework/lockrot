@@ -203,9 +203,9 @@ stop clears when that check runs (set a token, raise the budget or rerun), or wh
 
 ## <a name="a-note-on-the-dry-run-development-flag"></a>Under `--dry-run` {#a-note-on-the-dry-run-development-flag}
 
-lockrot reads the lock from Composer, not from `composer.lock` on disk. Under `--dry-run` and with
-`config.lock` set to `false`, Composer keeps the updated lock in memory, and lockrot reads that
-lock. So a package from `composer require --dev … --dry-run` keeps its `packages-dev` membership.
+lockrot reads the lock through the locker of Composer. On a plain install, the locker reads
+`composer.lock`. Under `--dry-run` and with `config.lock` set to `false`, Composer keeps the
+updated lock in memory, and lockrot reads that lock. So a package from `composer require --dev … --dry-run` keeps its `packages-dev` membership.
 With `include-dev` on, its score is halved for `dev`, as in `composer lockrot`. With `include-dev`
 off, the check skips it.
 
