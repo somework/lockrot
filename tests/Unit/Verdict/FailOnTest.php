@@ -27,6 +27,7 @@ final class FailOnTest extends TestCase
         yield 'a raw severity' => ['vulnerable-high', 'vulnerable-high', 'vulnerable', 'high'];
         yield 'unchecked' => ['unchecked', 'unchecked', 'unchecked', null];
         yield 'upper case, padded' => ['  Critical ', 'critical', 'grade', 'critical'];
+        yield 'padded with each character of \s in the config-2 pattern' => [" \t\n\x0B\f\rhigh \t\n\x0B\f\r", 'high', 'grade', 'high'];
     }
 
     /** @dataProvider oneValue */
@@ -46,6 +47,7 @@ final class FailOnTest extends TestCase
         yield 'whitespace around commas' => ['left-behind, vulnerable-high', 'left-behind,vulnerable-high'];
         yield 'every kind' => ['unchecked,vulnerable,stale,low', 'low,stale,vulnerable,unchecked'];
         yield 'a JSON array from config' => [['vulnerable-high', ' left-behind'], 'left-behind,vulnerable-high'];
+        yield 'a form feed around a comma' => ["high\f,\fstale", 'high,stale'];
         yield 'none' => ['none', 'none'];
     }
 

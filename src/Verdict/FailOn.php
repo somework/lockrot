@@ -28,6 +28,9 @@ final class FailOn
     /** Each `vulnerable` value with the lowest raw severity it reaches. */
     public const VULNERABLE = ['vulnerable' => 'low', 'vulnerable-medium' => 'medium', 'vulnerable-high' => 'high', 'vulnerable-critical' => 'critical'];
 
+    /** What `\s` matches in the fail-on pattern of the config-2 schema, as Composer's validator runs it. */
+    private const WHITESPACE = " \t\n\r\x0B\f";
+
     private const KIND_NOUNS = [self::KIND_GRADE => 'grades', self::KIND_FLAG => 'flags', self::KIND_VULNERABLE => 'vulnerable values', self::KIND_UNCHECKED => 'unchecked values'];
 
     /** @var list<FailOnValue> in kind order */
@@ -58,7 +61,7 @@ final class FailOn
         $byKind = [];
         $seen = [];
         foreach ($words as $word) {
-            $value = strtolower(trim($word));
+            $value = strtolower(trim($word, self::WHITESPACE));
             if ($value === 'vulnerable-low') {
                 throw new ConfigException($source.': vulnerable-low is not a value: use "vulnerable": every counted advisory is at least low');
             }
