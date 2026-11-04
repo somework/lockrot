@@ -142,7 +142,7 @@ final class LeftBehindRule implements SignalRule
     /**
      * The tags without a trusted date that leave S8 undecided, normalized, empty when S8 misses
      * nothing. It is the installed branch's highest tag, or its newest tag on a shared commit
-     * ({@see AgeMeasure::sharedCommitDates()}), with a higher branch to compare with.
+     * ({@see AgeMeasure::releaseDateIsLowerBound()}), with a higher branch to compare with.
      * Or it is a higher branch's tag, while the installed branch is quiet enough for a level and
      * S8 did not fire. A branch snapshot is on no release branch, so S8 misses nothing there.
      *

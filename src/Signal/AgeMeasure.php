@@ -202,7 +202,7 @@ final class AgeMeasure
      *
      * @param array{version: string, dated_by?: string} $branch a {@see PackageMetadata::latestStableByBranch()} entry
      */
-    public static function sharedCommitDates(PackageMetadata $metadata, array $branch): bool
+    private static function sharedCommitDates(PackageMetadata $metadata, array $branch): bool
     {
         return !isset($branch['dated_by']) && $metadata->sharesItsCommit($branch['version']);
     }

@@ -27,7 +27,7 @@ final class BranchRow
     private ?\DateTimeImmutable $highestCommitDate;
     private string $newestDated;
     private ?\DateTimeImmutable $newestDatedReleased;
-    private bool $newestDatedAtLeast;
+    private bool $newestDatedAtLeast = false;
     private ?string $datedBy;
     private ?string $php;
     private ?string $highestPhp;
@@ -124,7 +124,6 @@ final class BranchRow
         $row->highestCommitDate = null;
         $row->newestDated = $release->pretty();
         $row->newestDatedReleased = $release->at();
-        $row->newestDatedAtLeast = false;
         $row->datedBy = null;
         $row->php = $php;
         $row->highestPhp = $php;
