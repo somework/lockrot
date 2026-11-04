@@ -93,11 +93,18 @@ final class ThresholdsTest extends TestCase
         Thresholds::fromArray(['push-warn-years' => 4, 'push-high-years' => 3]);
     }
 
-    public function testAWarnAboveTheDefaultHighIsRefused(): void
+    public function testAWarnAboveTheDefaultHighIsRefusedAndNamesTheDefault(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('extra.lockrot.release-high-years (5) must not be below extra.lockrot.release-warn-years (6)');
+        $this->expectExceptionMessage('extra.lockrot.release-high-years (5, the default of the unset key) must not be below extra.lockrot.release-warn-years (6)');
         Thresholds::fromArray(['release-warn-years' => 6]);
+    }
+
+    public function testAHighBelowTheDefaultWarnIsRefusedAndNamesTheDefault(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('extra.lockrot.push-high-years (2) must not be below extra.lockrot.push-warn-years (3, the default of the unset key)');
+        Thresholds::fromArray(['push-high-years' => 2, 'push-warn-years' => null]);
     }
 
     public function testAHighEqualToItsWarnIsAccepted(): void

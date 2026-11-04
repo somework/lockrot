@@ -14,15 +14,16 @@ final class Thresholds
     private int $pushWarnYears;
     private int $pushHighYears;
 
-    public function __construct(int $releaseWarnYears = 3, int $releaseHighYears = 5, int $pushWarnYears = 3, int $pushHighYears = 5)
+    /** @param list<string> $unsetKeys the `extra.lockrot` keys that give their default, as a refusal names them */
+    public function __construct(int $releaseWarnYears = 3, int $releaseHighYears = 5, int $pushWarnYears = 3, int $pushHighYears = 5, array $unsetKeys = [])
     {
         foreach ([$releaseWarnYears, $releaseHighYears, $pushWarnYears, $pushHighYears] as $value) {
             if ($value < 1) {
                 throw new ConfigException('Threshold years must be positive integers');
             }
         }
-        self::refuseHighBelowWarn('release', $releaseWarnYears, $releaseHighYears);
-        self::refuseHighBelowWarn('push', $pushWarnYears, $pushHighYears);
+        self::refuseHighBelowWarn('release', $releaseWarnYears, $releaseHighYears, $unsetKeys);
+        self::refuseHighBelowWarn('push', $pushWarnYears, $pushHighYears, $unsetKeys);
         $this->releaseWarnYears = $releaseWarnYears;
         $this->releaseHighYears = $releaseHighYears;
         $this->pushWarnYears = $pushWarnYears;
@@ -36,8 +37,14 @@ final class Thresholds
      */
     public static function fromArray(array $extra): self
     {
-        $read = static function (string $key, int $default) use ($extra): int {
-            $value = $extra[$key] ?? $default;
+        $unsetKeys = [];
+        $read = static function (string $key, int $default) use ($extra, &$unsetKeys): int {
+            if (!isset($extra[$key])) {
+                $unsetKeys[] = $key;
+
+                return $default;
+            }
+            $value = $extra[$key];
             if (!\is_int($value)) {
                 throw new ConfigException(\sprintf('extra.lockrot.%s must be an integer', $key));
             }
@@ -45,7 +52,7 @@ final class Thresholds
             return $value;
         };
 
-        return new self($read('release-warn-years', 3), $read('release-high-years', 5), $read('push-warn-years', 3), $read('push-high-years', 5));
+        return new self($read('release-warn-years', 3), $read('release-high-years', 5), $read('push-warn-years', 3), $read('push-high-years', 5), $unsetKeys);
     }
 
     public function releaseWarnYears(): int
@@ -92,10 +99,14 @@ final class Thresholds
     }
 
     /** A high level below its warn level makes an age `high` before it is `warn`, and the exclusive groups of the score model stop holding. */
-    private static function refuseHighBelowWarn(string $what, int $warn, int $high): void
+    /** @param list<string> $unsetKeys */
+    private static function refuseHighBelowWarn(string $what, int $warn, int $high, array $unsetKeys): void
     {
-        if ($high < $warn) {
-            throw new ConfigException(\sprintf('extra.lockrot.%1$s-high-years (%3$d) must not be below extra.lockrot.%1$s-warn-years (%2$d)', $what, $warn, $high));
+        if ($high >= $warn) {
+            return;
         }
+        $shown = static fn (string $key, int $value): string => \in_array($key, $unsetKeys, true) ? $value.', the default of the unset key' : (string) $value;
+
+        throw new ConfigException(\sprintf('extra.lockrot.%1$s-high-years (%3$s) must not be below extra.lockrot.%1$s-warn-years (%2$s)', $what, $shown($what.'-warn-years', $warn), $shown($what.'-high-years', $high)));
     }
 }
