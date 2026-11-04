@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Analyzer;
 
-use Composer\IO\NullIO;
-use Composer\Package\BasePackage;
-use Composer\Package\Loader\ArrayLoader;
-use Composer\Repository\ComposerRepository;
-use Composer\Util\Filesystem;
-use Composer\Util\HttpDownloader;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
@@ -33,13 +27,12 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FakeHttpClient;
-use Lockrot\Tests\Support\HermeticComposerConfig;
+use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
-use Seld\JsonLint\ParsingException;
 
 final class AnalyzerSplitPackagesTest extends TestCase
 {
@@ -253,42 +246,22 @@ final class AnalyzerSplitPackagesTest extends TestCase
     /** The parent's file is a proxy page, not JSON: the parent fails as a transport failure does, and the run goes on. */
     public function testAParentAnswerThatIsNotJsonIsANoteAndANetworkFailure(): void
     {
-        $io = new NullIO();
-        $home = sys_get_temp_dir().'/lockrot-not-json-'.bin2hex(random_bytes(8));
-        $config = HermeticComposerConfig::create($home);
-        $repository = new class (['url' => 'https://repo.example.org'], $io, $config, new HttpDownloader($io, $config)) extends ComposerRepository {
-            /**
-             * @param array<string, \Composer\Semver\Constraint\ConstraintInterface|null> $packageNameMap
-             * @param array<'alpha'|'beta'|'dev'|'RC'|'stable', 0|5|10|15|20>             $acceptableStabilities
-             * @param array<string, 0|5|10|15|20>                                         $stabilityFlags
-             * @param array<string, array<string, \Composer\Package\PackageInterface>>    $alreadyLoaded
-             *
-             * @return array{namesFound: array<string>, packages: array<BasePackage>}
-             */
-            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = [])
-            {
-                if (\array_key_exists('laravel/framework', $packageNameMap)) {
-                    throw new ParsingException('"https://repo.example.org/p2/laravel/framework.json" does not contain valid JSON');
-                }
-                $loader = new ArrayLoader();
-                $packages = [];
-                foreach (['v8.83.27', 'v8.83.26', 'v8.83.25'] as $version) {
-                    $packages[] = $loader->load(['name' => 'illuminate/contracts', 'version' => $version, 'time' => '2022-01-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/illuminate/contracts.git', 'reference' => 'shared']]);
-                }
-
-                return ['namesFound' => ['illuminate/contracts'], 'packages' => $packages];
-            }
-        };
-        $loader = new RepositoryMetadataLoader([$repository], Clock::fixed(F::NOW));
+        $releases = array_map(static fn (string $version): array => ['version' => $version, 'time' => '2022-01-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/illuminate/contracts.git', 'reference' => 'shared']], ['v8.83.27', 'v8.83.26', 'v8.83.25']);
+        $server = FixtureRepositoryServer::fromReleases(['illuminate/contracts' => $releases]);
+        $server->withMetadataAnswer('laravel/framework', '<html><body>proxy login</body></html>');
 
         try {
-            $report = $this->analyzer($loader, new MonorepoParents(['laravel/framework' => ['illuminate/contracts']]), new Thresholds(1, 1))
+            $server->start();
+            $report = $this->analyzer(new RepositoryMetadataLoader($server->repositories(), Clock::fixed(F::NOW)), new MonorepoParents(['laravel/framework' => ['illuminate/contracts']]), new Thresholds(1, 1))
                 ->analyze($this->lock('illuminate/contracts@v8.83.27'), ProjectConfig::empty(), false);
         } finally {
-            (new Filesystem())->removeDirectory($home);
+            $server->stop();
         }
 
-        self::assertSame(['Repository metadata unavailable for laravel/framework, which dates the packages split out of it: "https://repo.example.org/p2/laravel/framework.json" does not contain valid JSON'], self::metadataNotes($report));
+        $notes = self::metadataNotes($report);
+        self::assertCount(1, $notes);
+        self::assertStringStartsWith('Repository metadata unavailable for laravel/framework, which dates the packages split out of it: ', $notes[0]);
+        self::assertStringContainsString('does not contain valid JSON', $notes[0]);
         self::assertTrue($report->hadNetworkFailures());
     }
 

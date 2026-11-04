@@ -316,6 +316,16 @@ final class FixtureRepositoryServer
         file_put_contents($this->docroot.'/packages.json', '{not json');
     }
 
+    /** Serve $body as the p2 file of $name, such as a proxy page that is not JSON. Call before {@see start()}. */
+    public function withMetadataAnswer(string $name, string $body): void
+    {
+        $target = $this->docroot.'/p2/'.$name.'.json';
+        if (!is_dir(\dirname($target)) && !mkdir(\dirname($target), 0777, true) && !is_dir(\dirname($target))) {
+            throw new \RuntimeException('cannot create docroot directory: '.\dirname($target));
+        }
+        file_put_contents($target, $body);
+    }
+
     public function start(): void
     {
         $this->server->start('/packages.json');
