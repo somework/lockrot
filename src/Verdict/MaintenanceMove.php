@@ -84,18 +84,14 @@ final class MaintenanceMove
         if ($s6 === null || $version === null) {
             return MoveDraft::of(Move::NO_TAG, FlagSet::PINNED);
         }
-        $row = null;
-        foreach ($context->rows() as $candidate) {
-            $row = $candidate->highest() === $version ? $candidate : $row;
-        }
         $key = ReleaseBranch::of($version);
-        $branch = $row === null && $key !== null ? $context->row(ReleaseBranch::label($key)) : null;
+        $branch = $key === null ? null : $context->row(ReleaseBranch::label($key));
         if ($branch !== null) {
-            // The newest dated tag is a backport below its branch's highest tag: the move requires the highest tag.
+            // The newest dated tag can be a backport below its branch's highest tag: the move requires the highest tag.
             return self::tag($branch, self::highestTag($branch, $snapshotTime));
         }
 
-        return self::tag($row, new Latest($version, $s6->lastStableRelease(), false, $s6->tagRelation(), $snapshotTime));
+        return self::tag(null, new Latest($version, $s6->lastStableRelease(), false, $s6->tagRelation(), $snapshotTime));
     }
 
     private static function highestTag(BranchRow $row, ?string $snapshotTime): Latest

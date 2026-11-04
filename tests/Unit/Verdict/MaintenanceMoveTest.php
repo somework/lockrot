@@ -255,6 +255,26 @@ final class MaintenanceMoveTest extends TestCase
         self::assertSame([$kind, '1.x', 'v1.5.0', '2025-01-01T00:00:00+00:00', 'newer'], [$draft->kind(), self::branch($draft), $latest->version(), $latest->released(), $latest->relation()]);
     }
 
+    /** With no branch row of S6's newest tag, the tag move reads S6, and the snapshot is never that tag. */
+    public function testASnapshotWithNoBranchRowOfItsNewestTagTargetsTheTagThatS6Names(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => 'dev-master', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $locked = $lock->find('a/b');
+        self::assertNotNull($locked);
+        $facts = new PackageFacts($locked, PackageMetadata::fromPackages('a/b', [], new \DateTimeImmutable(self::NOW), 'dev-master'), null, []);
+        $floor = new PhpFloor('8.4');
+        $s6 = new Signal(Signal::LEVEL_WARN, 'pinned', SignalDataStub::of(Signal::S6, ['version' => 'dev-master', 'reason' => 'branch_snapshot', 'has_stable_release' => true,
+            'last_stable_release' => '2025-06-01T00:00:00+00:00', 'last_stable_version' => 'v1.4.9', 'last_stable_dated_by' => null, 'snapshot_time' => '2024-01-01T00:00:00+00:00', 'tag_relation' => 'newer']));
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('dev-master')->withSignals([$s6])->build();
+        $context = new MoveContext($finding, new MoveSubject('a/b', 'dev-master', true, [], '8.4', null), $facts->metadata(), BranchRow::all($facts, $floor, Clock::fixed(self::NOW)), null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true);
+
+        $draft = MaintenanceMove::draft($context, FlagSet::PINNED);
+        $latest = $draft->latest();
+
+        self::assertNotNull($latest);
+        self::assertSame([Move::TAG, 'v1.4.9', '2025-06-01T00:00:00+00:00', 'newer', false], [$draft->kind(), $latest->version(), $latest->released(), $latest->relation(), $latest->isInstalled()]);
+    }
+
     /** @return iterable<string, array{string, string, ?string, string, string}> */
     public static function unreadRows(): iterable
     {
