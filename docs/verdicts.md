@@ -479,6 +479,10 @@ When the lookup does not run, or runs in part, the finding carries S10 `{check: 
 
 - No configured repository publishes advisories (`no_feed`).
 
+- Composer refuses the project's composer.json (`composer_json_invalid`). lockrot then asks no
+  repository, because the global config holds neither the project's repositories nor its ignore
+  lists.
+
 What the lookup found still counts. A package with no counted advisory then reads `unchecked`,
 never `clear`, in `security.status`. The note [`advisories_not_checked`](notes.md#advisories_not_checked)
 names the reason.
@@ -917,7 +921,8 @@ Limits of the check:
 - A run without composer.json checks no move (`check.reason` `no_composer_json`).
 - A run whose composer.json Composer cannot load checks no move (`check.reason`
   `composer_json_invalid`). Composer refuses such a file, for example for a requirement name that
-  is no package name.
+  is no package name. The advisory lookup of that run does not run either
+  ([Security advisories](#security-advisories)).
 - A run whose `config.platform` holds a value that Composer refuses checks no move (`check.reason`
   `platform_config_invalid`). Each `composer update` then stops. The run still writes its report.
   These values give that reason:
@@ -1271,7 +1276,7 @@ formats print only under `--all`, keeps its verdict and adds the same `checks mi
 | `repository_activity` | `not_from_composer_repository` | The package comes from vcs, or from an origin that lockrot cannot tell: lockrot asks no host for it | S3, S4 |
 | `release_metadata` | `not_from_composer_repository` | The same origins: no Composer repository serves its releases | S2, S8. S11 too when S11 fires: a [capped](#capped) package then has `admits_newest` unread |
 | `release_dates` | `undated_releases` | A release that S2, S5 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it. The summary gives one clause per cause. A cause is an undated lock entry, an installed tag on a shared commit, or a release that S2 or S8 reads with no date or with the date of a commit that its tags share. That release is the newest stable release, the installed branch's newest release, or a higher branch's highest tag | S2 when the highest tag is undated. S5 when the installed release is undated, its lock date is before the GA of the target's major or absent, and the other two [S5 conditions](#old-promise) hold. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
-| `advisories` | `offline`, `install_time_budget`, `lookup_failed`, `no_feed` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
+| `advisories` | `offline`, `install_time_budget`, `lookup_failed`, `no_feed`, `composer_json_invalid` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
 | `releases` | `releases_unknown` | A counted advisory's fix is unknown because the package's release data did not come | S9 |
 
 S10's `data` lists each missing check as `unchecked` (`{check, reason, blocks}`) and every blocked
