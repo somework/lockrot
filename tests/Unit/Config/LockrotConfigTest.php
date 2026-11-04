@@ -208,7 +208,7 @@ final class LockrotConfigTest extends TestCase
     public function testAVPrefixedTargetPhpOptionIsStillRefused(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('target-php must look like "8.4"; got "v8.4"');
+        $this->expectExceptionMessage('--target-php takes a major, a minor or a patch version, such as "8.4" or "8.4.2", with nothing before or after it; got "v8.4"');
         LockrotConfig::fromSources([], [], ['target-php' => 'v8.4'], '8.5.10', 'v8.4.1');
     }
 
@@ -217,7 +217,7 @@ final class LockrotConfigTest extends TestCase
     public function testATargetPhpOptionWithTextAfterTheVersionIsRefused(string $value): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('target-php must look like "8.4"; got "'.$value.'"');
+        $this->expectExceptionMessage('--target-php takes a major, a minor or a patch version, such as "8.4" or "8.4.2", with nothing before or after it; got "'.$value.'"');
         LockrotConfig::fromSources([], [], ['target-php' => $value], '8.5.10', null);
     }
 
@@ -226,7 +226,7 @@ final class LockrotConfigTest extends TestCase
     public function testALockrotTargetPhpWithTextAfterTheVersionIsRefused(string $value): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('LOCKROT_TARGET_PHP must look like "8.4"; got "'.$value.'"');
+        $this->expectExceptionMessage('LOCKROT_TARGET_PHP takes a major, a minor or a patch version, such as "8.4" or "8.4.2", with nothing before or after it; got "'.$value.'"');
         LockrotConfig::fromSources([], ['LOCKROT_TARGET_PHP' => $value], [], '8.5.10', null);
     }
 
@@ -318,7 +318,7 @@ final class LockrotConfigTest extends TestCase
     public static function invalidEnvironmentUnderAnOption(): iterable
     {
         yield 'LOCKROT_FAIL_ON' => [['LOCKROT_FAIL_ON' => 'dead'], 'LOCKROT_FAIL_ON: unknown value "dead"'];
-        yield 'LOCKROT_TARGET_PHP' => [['LOCKROT_TARGET_PHP' => 'latest'], 'LOCKROT_TARGET_PHP must look like "8.4"; got "latest"'];
+        yield 'LOCKROT_TARGET_PHP' => [['LOCKROT_TARGET_PHP' => 'latest'], 'LOCKROT_TARGET_PHP takes a major, a minor or a patch version, such as "8.4" or "8.4.2", with nothing before or after it; got "latest"'];
     }
 
     public function testAnInvalidVariableIsNamedWhereItWouldHaveWon(): void

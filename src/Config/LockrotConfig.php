@@ -24,6 +24,9 @@ final class LockrotConfig
     public const INSTALL_TIME_VALUES = ['on', 'off'];
     public const INSTALL_TIME_ON = 'on';
 
+    /** The refusal of a value that {@see isTargetPhpValue()} does not take: the setting, then the value. */
+    private const TARGET_PHP_VALUE = '%s takes a major, a minor or a patch version, such as "8.4" or "8.4.2", with nothing before or after it; got "%s"';
+
     private ?string $project;
     private FailOn $failOn;
     private string $targetPhp;
@@ -245,7 +248,7 @@ final class LockrotConfig
         // Whenever it is set, like LOCKROT_FAIL_ON in resolveFailOn().
         $fromEnv = $env['LOCKROT_TARGET_PHP'] ?? null;
         if (\is_string($fromEnv) && $fromEnv !== '' && !self::isTargetPhpValue($fromEnv)) {
-            throw new ConfigException('LOCKROT_TARGET_PHP must look like "8.4"; got "'.$fromEnv.'"');
+            throw new ConfigException(\sprintf(self::TARGET_PHP_VALUE, 'LOCKROT_TARGET_PHP', $fromEnv));
         }
         [$target, $source] = self::pickWithSource([
             RunSettings::SOURCE_OPTION => $cli['target-php'] ?? null,
@@ -253,7 +256,10 @@ final class LockrotConfig
             RunSettings::SOURCE_CONFIG => $extra['target-php'] ?? null,
             RunSettings::SOURCE_PLATFORM => $platformPhp === null ? null : self::asComposerReads($platformPhp),
         ], $runtimePhp, RunSettings::SOURCE_RUNTIME);
-        if (!($source === RunSettings::SOURCE_OPTION ? self::isTargetPhpValue($target) : self::looksLikePhpVersion($target))) {
+        if ($source === RunSettings::SOURCE_OPTION && !self::isTargetPhpValue($target)) {
+            throw new ConfigException(\sprintf(self::TARGET_PHP_VALUE, '--target-php', $target));
+        }
+        if (!self::looksLikePhpVersion($target)) {
             throw new ConfigException('target-php must look like "8.4"; got "'.$target.'"');
         }
 
