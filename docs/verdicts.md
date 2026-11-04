@@ -970,10 +970,6 @@ How lockrot reads the window:
   `minors` lists, and no edge names that link.
 - A known minor is a PHP minor whose GA date is on or before the run's date. A known minor is in
   `minors` when every requirement admits its newest patch (`8.4.99`) and no conflict matches it.
-- A target minor above the newest known minor, such as 8.6 before its GA, counts as one more known
-  minor of the window. A set that admits it lists it in `minors`. A cap that excludes it gives
-  `upper_edge` with `excludes` set to that minor, and `set_by` lists the links of the cap. The
-  `capped` flag and the other tests of known minors do not count this minor.
 - lockrot reads the target's minor at the PHP that [the move check](#the-move-check) solves at
   instead, and `target.php` holds that PHP. lockrot reads `config.platform.php` from Composer's
   config, the global `config.json` included, also in a run that checks no move. A cap inside a minor, such as `<8.4.5`, leaves that minor out.
@@ -981,6 +977,11 @@ How lockrot reads the window:
   a later patch of that minor. So with `config.platform.php` 8.4.0, a patch floor such as
   `>=8.4.2` keeps 8.4 in the window, and `lower_edge.php` reads 8.4.2. A cap below that PHP leaves
   the minor out.
+- A target minor above the newest known minor, such as 8.6 before its GA, counts as one more known
+  minor of the window. A set that admits it lists it in `minors`. A cap that excludes it gives
+  `upper_edge` with `excludes` set to that minor, and `set_by` lists the links of the cap. The
+  edges, `gaps` and the `php:` line read this minor too. [`capped`](#capped) does not: its R and
+  `stops_at`, and the `capped` test of a move, read the known minors without it.
 - lockrot reads the edges and `gaps` on the known minors. PHP 6 and PHP 7.5 to 7.9 do not exist, so
   `~7.4.0 || ~8.0.0` has no gap.
 - `lower_edge.php` is the lowest PHP of the first minor in the window. `lower_edge.set_by` lists the
