@@ -251,8 +251,8 @@ final class MoveBuilder
     /**
      * What a tag move raises that counts, in flag order: left-behind on a line that stopped
      * releasing while a higher one does (S8's rule on the tag's row), and old-promise on a tag
-     * released before the target major's GA with an open php. A fact lockrot cannot date is
-     * unverified.
+     * released before the target major's GA with an open php. S5 reads only a declared php, so a
+     * tag without one adds no old-promise. A fact lockrot cannot date is unverified.
      *
      * @return array{0: list<MoveFact>, 1: list<MoveFact>}
      */
@@ -271,7 +271,7 @@ final class MoveBuilder
                 $unverified[] = MoveFact::unchecked(MoveFact::FLAG, FlagSet::LEFT_BEHIND, MoveFact::UNDATED);
             }
         }
-        if ($row !== null && $row->admitsTargetPhp() !== false && $quiet(FlagSet::OLD_PROMISE) && ($php === null || ($target !== null && (new ConstraintOpenness())->isOpenEndedFor($php, $target)))) {
+        if ($row !== null && $row->admitsTargetPhp() !== false && $quiet(FlagSet::OLD_PROMISE) && $php !== null && $target !== null && (new ConstraintOpenness())->isOpenEndedFor($php, $target)) {
             $released = $latest === null ? null : $latest->released();
             $ga = $context->ga();
             if ($released === null) {

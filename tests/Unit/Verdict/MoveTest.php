@@ -649,6 +649,15 @@ final class MoveTest extends TestCase
         self::assertNull(JsonPath::arrayAt($finding, ['security'])['partial']);
     }
 
+    /** Ruling R12-3: S5 never fires on a release without require.php, so a tag move to v1.0.0 from before the GA adds no old-promise. */
+    public function testATagMoveToAReleaseWithoutPhpAddsNoOldPromise(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse(['lock' => [['version' => 'dev-master', 'php' => '^7.2 || ^8.0']], 'releases' => [self::release('v1.0.0', '2019-01-01', null)]]), ['next_step']);
+
+        self::assertSame(['tag', [], []], [$move['kind'], $move['adds'], $move['unverified']]);
+        self::assertStringNotContainsString('old-promise', JsonPath::stringAt($move, ['text']));
+    }
+
     /** With no release read, the test move names the installed release, dated as S5 reads it. */
     public function testAnOldPromiseWithoutReleaseDataTestsTheInstalledOne(): void
     {
