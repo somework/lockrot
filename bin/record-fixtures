@@ -223,8 +223,7 @@ $releaseSources = static function (string $name, array $answers): array {
 };
 /**
  * Each `composer` repository of the fixture's composer.json beside packagist.org: its packages.json,
- * the p2 answer of each locked name that its `available-packages` or `available-package-patterns` list,
- * and the answer of its advisory API for those names. A root that is no repository, or a repository
+ * the p2 answer of each locked name that `RecorderNames::repository()` selects, and the answer of its advisory API for those names. A root that is no repository, or a repository
  * that lists locked names and has no `metadata-url`, counts as an unrecorded answer.
  */
 $recordRepositories = static function (string $fixtureDir, LockFile $lock, string $dir) use ($fetch, $repositoryHttp, $record, $isRecorded, $trim, &$unrecorded): void {
