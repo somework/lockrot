@@ -131,7 +131,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in attribute(): a package name holds a `/`, so PHP never stores it as an integer key.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` CastString `$name = (string) $name;` — in coverage(): a package name holds a `/`, so PHP never stores it as an integer key.
 - `src/Data/Advisory/RepositoryAdvisoryLoader.php` UnwrapArrayValues `return array_values(array_filter($copies, static function (PartialSecurityAdvisory $advisory) use ($versions): bool {` — the caller only iterates the result with `foreach`.
-- `src/Data/Advisory/RepositoryAdvisoryLoader.php` FalseValue `$loader = new self([], false, null, null, $scope, $scopeSource);` — in askingNone(): `unchecked()` reads `notAskedFor` before `offline`.
+- `src/Data/Advisory/RepositoryAdvisoryLoader.php` FalseValue `$loader = new self([], false, null, null, $scope, $scopeSource);` — in askingNone(): `notAskedReason()` reads `notAskedFor` before `offline`.
 
 ## src/Filesystem, src/Graph, src/Html, src/Json, src/Lock
 
@@ -214,4 +214,3 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Verdict/FindingDetails.php` CastString `$skipped[] = new Check('advisories', (string) $advisoryReason, [Signal::S9]);` — the `in_array()` guard admits two strings only.
 - `src/Verdict/FindingDetails.php` Coalesce `return ($check === null ? null : $check->installsBelow($version) ?? $check->installsAbove($version)) ?? $version;` — a release is below or above the version, never both, so at most one side is not null.
 - `src/Verdict/MoveText.php` Assignment `$text .= self::leaves($move).self::unverified($move);` — `$text` is the empty string before this line, so `=` writes the same text.
-- `src/Verdict/MoveText.php` Break_ `break;` — in sentenceStart(): every piece after the first non-empty one starts with a separator or a space, so `ucfirst()` leaves it unchanged.

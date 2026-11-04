@@ -123,6 +123,15 @@ final class MoveTextTest extends TestCase
         self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 8.1.0. Require acme/lib ^2.0', MoveText::render($move));
     }
 
+    /** Only the first clause after the platform step starts the sentence: the update after a raise stays in it. */
+    public function testOnlyTheFirstClauseAfterThePlatformStepStartsWithACapitalLetter(): void
+    {
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null, null, '8.1.0');
+        $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '1.x', '1.2.5', '1.2.5', null, null, PhpCheck::of('>=8.1', new PhpFloor('8.4', '>=7.4')), false, [], [], [], [], [], null, [], [['composer', 'require', 'php:>=8.1']], $subject);
+
+        self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 8.1.0. Raise require.php to >=8.1, then update it with Composer', MoveText::render($move));
+    }
+
     /** The refused tail of the platform step is a sentence too. */
     public function testTheMoveClauseAfterTheRefusedTailStartsWithACapitalLetter(): void
     {
