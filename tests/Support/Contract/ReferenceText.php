@@ -27,7 +27,7 @@ final class ReferenceText
         'evidence' => ['flags[].id', 'flags[].summary', 'score.terms[].flag'],
         'gate_line' => ['gate.basis', 'score.total'],
         'age_line' => ['age', 'version', 'branch', 'activity.event'],
-        'explain_age' => ['age', 'version', 'branch', 'activity.event', 'run.thresholds', 'libyears', 'libyears_at_least', 'libyears_unmeasured'],
+        'explain_age' => ['age', 'version', 'branch', 'activity.event', 'run.thresholds', 'libyears', 'libyears_at_least', 'libyears_unmeasured', 'origin.kind'],
         'baseline_suffix' => ['baseline', 'flags[].id', 'flags[].baseline', 'signals[].id', 'signals[].data.advisories[].id', 'signals[].data.advisories[].cve', 'run.target_php', 'run.fix_model'],
     ];
 
@@ -98,7 +98,11 @@ final class ReferenceText
             $text .= '; '.$through;
         }
 
-        return self::platformStep($move, $in).$text.self::checked(Fields::nullableObject($move, 'check')).self::movesWith($move);
+        $step = self::platformStep($move, $in);
+        // After the platform step a clause in words starts a sentence, and a command keeps its case.
+        $text = $step === '' || strpos($text, 'composer ') === 0 ? $text : ucfirst($text);
+
+        return $step.$text.self::checked(Fields::nullableObject($move, 'check')).self::movesWith($move);
     }
 
     /**
@@ -295,6 +299,9 @@ final class ReferenceText
         $version = Fields::string($in, 'version');
         $thresholds = Fields::object(Fields::object($in, 'run'), 'thresholds');
         $names = Fields::object($words, 'reading');
+        $unknownOrigin = (Fields::object($in, 'origin')['kind'] ?? null) === 'unknown';
+        // An unknown origin reads its own words for `not_from_composer_repository` (§5.8).
+        $because = static fn (string $id): string => $unknownOrigin && $id === 'not_from_composer_repository' ? 'origin unknown' : self::word(Fields::table($reasons, 'words'), $id);
         $rows = [
             ['installed', Fields::string($names, 'installed'), $version, null],
             ['branch_release', str_replace('{branch}', self::branchOf($in, $version), Fields::string($names, 'branch_release')), null, 'release'],
@@ -307,7 +314,7 @@ final class ReferenceText
             $released = $shown ?? ($reading === null ? null : ($reading['version'] ?? null));
             $head = str_pad($name, 11).str_pad(\is_string($released) ? $released : '', 10);
             if ($reading === null) {
-                $lines[] = $head.strtr(Fields::string($words, 'not_read'), ['{reading} ' => '', '{reason words}' => self::word(Fields::table($reasons, 'words'), Fields::string($age, $key.'_unmeasured'))]);
+                $lines[] = $head.strtr(Fields::string($words, 'not_read'), ['{reading} ' => '', '{reason words}' => $because(Fields::string($age, $key.'_unmeasured'))]);
                 continue;
             }
             $notes = [];
@@ -326,7 +333,7 @@ final class ReferenceText
         $libyears = $in['libyears'] ?? null;
         $lines[] = \is_int($libyears) || \is_float($libyears)
             ? 'libyears '.(Fields::bool($in, 'libyears_at_least') ? 'at least ' : '').number_format((float) $libyears, 1, '.', '').' behind the newest stable release'
-            : 'libyears not measured: '.self::word(Fields::table($reasons, 'words'), Fields::string($in, 'libyears_unmeasured'));
+            : 'libyears not measured: '.$because(Fields::string($in, 'libyears_unmeasured'));
 
         return $lines;
     }
