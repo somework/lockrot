@@ -590,6 +590,18 @@ final class LeftBehindRuleTest extends TestCase
         self::assertFalse(JsonPath::decoded($signal->data())['newest_release_at_least']);
     }
 
+    /** A stale own-dated release does not say that the branch stopped while its higher top tag is undated. */
+    public function testAnUndatedTopTagAboveAStaleOwnDatedReleaseIsAnUndatedRelease(): void
+    {
+        $facts = F::facts(F::package(['version' => '1.9.2']), self::branches([
+            '2' => ['version' => '2.0.5', 'at' => new \DateTimeImmutable('2019-06-01T00:00:00+00:00'), 'highest' => ['normalized' => '2.1.0.0', 'pretty' => '2.1.0', 'at' => null, 'php' => null], 'php' => null],
+            '1' => self::row('1.9.2', '2019-03-02', '2019-03-02', null),
+        ]));
+
+        self::assertNull($this->rule()->evaluate($facts));
+        self::assertSame(['2.1.0.0'], $this->rule()->undatedReleases($facts));
+    }
+
     /** A lower tag dated by a commit that its tags share gives a lower bound too, as the highest tag does. */
     public function testALowerTagOnASharedCommitIsQuotedAsALowerBound(): void
     {

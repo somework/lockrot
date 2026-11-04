@@ -295,10 +295,10 @@ final class MoveBuilder
         $parser = new VersionParser();
         $own = $row->highestReleased();
         $above = array_filter($context->rows(), static fn (BranchRow $other): bool => version_compare($parser->normalize($other->highest()), $parser->normalize($row->highest()), '>'));
-        // A higher row reads as in S8: by its newest dated release, a shared-commit date as a lower
-        // bound that leaves the row unknown once it is past release-warn-years.
+        // A higher row reads as in S8 and S10: by its newest dated release, and unknown once that is
+        // past release-warn-years while its highest tag is undated or the date is a lower bound.
         $alive = array_filter($above, static fn (BranchRow $other): bool => $context->isReleasing($other->newestDatedReleased()));
-        $undatedAbove = array_filter($above, static fn (BranchRow $other): bool => !$context->isReleasing($other->newestDatedReleased()) && ($other->newestDatedReleased() === null || $other->newestDatedAtLeast())) !== [];
+        $undatedAbove = array_filter($above, static fn (BranchRow $other): bool => !$context->isReleasing($other->newestDatedReleased()) && ($other->highestReleased() === null || $other->newestDatedAtLeast())) !== [];
         if ($own === null) {
             return $alive !== [] || $undatedAbove ? 'unknown' : 'quiet';
         }

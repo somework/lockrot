@@ -285,7 +285,7 @@ final class MoveBuilderTest extends TestCase
     }
 
     /**
-     * @return array<string, array{list<array{string, string, string}>, list<array{string, string, string}>, list<array{string, string}>, list<array{string, string}>}>
+     * @return array<string, array{list<array{string, string, string}>, list<array{string, string, ?string}>, list<array{string, string}>, list<array{string, string}>}>
      */
     public static function higherRows(): array
     {
@@ -295,6 +295,7 @@ final class MoveBuilderTest extends TestCase
             'a higher top tag dated by a shared commit inside the warn years is alive' => [$own, [['2.1.0', 'split', '2025-06-01'], ['2.0.1', 'split', '2025-06-01'], ['2.0.0', 'split', '2025-06-01']], [['left-behind', 'branch_not_releasing']], []],
             'a stale shared-commit lower bound on a higher branch is unknown' => [$own, [['2.1.0', 'top', '2018-06-01'], ['2.0.2', 'split', '2019-06-01'], ['2.0.1', 'split', '2019-06-01'], ['2.0.0', 'split', '2019-06-01']], [], [['left-behind', 'undated']]],
             'a stale trusted date on a higher branch is not alive' => [$own, [['2.0.0', 'own20', '2019-06-01']], [], []],
+            'an undated top tag above a stale own-dated release is unknown' => [$own, [['2.1.0', 'top21', null], ['2.0.5', 'own205', '2019-06-01']], [], [['left-behind', 'undated']]],
         ];
     }
 
@@ -304,7 +305,7 @@ final class MoveBuilderTest extends TestCase
      * @dataProvider higherRows
      *
      * @param list<array{string, string, string}> $own
-     * @param list<array{string, string, string}> $higher
+     * @param list<array{string, string, ?string}> $higher
      * @param list<array{string, string}>         $adds
      * @param list<array{string, string}>         $unverified
      */
@@ -313,7 +314,7 @@ final class MoveBuilderTest extends TestCase
     {
         $packages = [];
         foreach (array_merge($higher, $own) as [$version, $commit, $date]) {
-            $release = (new ArrayLoader())->load(['name' => 'a/b', 'version' => $version, 'time' => $date.'T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]]);
+            $release = (new ArrayLoader())->load(['name' => 'a/b', 'version' => $version, 'time' => $date === null ? null : $date.'T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]]);
             self::assertInstanceOf(BasePackage::class, $release);
             $packages[] = $release;
         }
