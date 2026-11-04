@@ -136,6 +136,9 @@ final class InstallTimeSummary
         // Composer's dev mode installs.
         $includeDev = $lockrot->includeDev();
         $packages = self::inMergedLock($lock, $packages, $includeDev);
+        if ($packages === []) {
+            return;
+        }
 
         $deadline = Deadline::inSeconds((float) $lockrot->installTimeBudgetSeconds(), $this->monotonicNow);
         $repositories = array_values($composer->getRepositoryManager()->getRepositories());
@@ -181,10 +184,10 @@ final class InstallTimeSummary
     /**
      * A transaction cannot say which section a package belongs to, so every entry arrives as prod
      * ({@see TransactionPackages::fromTransaction()}). Without this flag a `composer require --dev`
-     * package ranks one priority step too high. The merged lock carries the flag. Under `--dry-run`
-     * or in a project with no lock, the package stays prod ({@see LockFile::withPackages()}). The
-     * method drops a package that the merged lock skips as no Composer name, as the lock path does,
-     * and a packages-dev one without $includeDev.
+     * package ranks one priority step too high. The merged lock carries the flag. When Composer's
+     * Locker holds no lock, the package stays prod ({@see LockFile::withPackages()}). The method
+     * drops a package that the merged lock skips as no Composer name, as the lock path does, and a
+     * packages-dev one without $includeDev.
      *
      * @param list<LockedPackage> $packages
      *

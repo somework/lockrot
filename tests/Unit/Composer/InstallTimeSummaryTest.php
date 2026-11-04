@@ -430,6 +430,23 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertSame('', $io->getOutput());
     }
 
+    public function testATransactionOfOnlyPackagesDevWithoutIncludeDevBuildsNoAnalyzer(): void
+    {
+        $this->projectWithDevRequire(self::PHPZIP, self::BINSTRING);
+        $io = new BufferIO();
+        $called = false;
+        $recording = static function () use (&$called): Analyzer {
+            $called = true;
+
+            throw new \LogicException('the run analyses no package');
+        };
+
+        (new InstallTimeSummary($recording))->onPreOperationsExec($this->event($io, new Transaction([], [$this->loadPackage(self::BINSTRING)]), true, true));
+
+        self::assertFalse($called);
+        self::assertSame('', $io->getOutput());
+    }
+
     public function testAPackageWithNothingToFlagPrintsNothing(): void
     {
         $this->project([], [self::PSR_LOG]);
