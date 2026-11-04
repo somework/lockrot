@@ -263,6 +263,10 @@ new file starts every `first_seen` and `known_since` again on the day of the run
 `install-time-strict` uses the same comparison: a `known` finding does not stop a
 `composer require`, and the compact block still lists it ([install-time.md](install-time.md)).
 
+The install-time check follows `include-dev`, as `composer lockrot` does, so generate the baseline
+with the same setting. With `include-dev` on, it grades each `packages-dev` package of the
+transaction, and a baseline generated without it has no entry for them.
+
 At install time, a baseline problem that `composer lockrot` reports as exit `2` skips the check
 and does not fail the install
 ([When the install continues and when it stops](install-time.md#never-fails-the-install)). A
