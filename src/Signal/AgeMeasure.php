@@ -184,6 +184,19 @@ final class AgeMeasure
     }
 
     /**
+     * Whether the branch's `at` is only a lower bound of its release: the highest tag with no trusted
+     * date, or a tag on a shared commit ({@see self::sharedCommitDates()}). A monorepo parent's
+     * date and a lower tag with a date of its own are exact.
+     *
+     * @param array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string} $branch a {@see PackageMetadata::latestStableByBranch()} entry
+     */
+    public static function releaseDateIsLowerBound(PackageMetadata $metadata, array $branch): bool
+    {
+        return ($branch['highest']['at'] === null && $branch['version'] === $branch['highest']['pretty'])
+            || self::sharedCommitDates($metadata, $branch);
+    }
+
+    /**
      * Whether the branch's date is that of a commit its tag shares with other stable tags. The tag
      * was released on or after that date. A monorepo parent's date is a release's.
      *

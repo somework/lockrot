@@ -27,6 +27,7 @@ final class BranchRow
     private ?\DateTimeImmutable $highestCommitDate;
     private string $newestDated;
     private ?\DateTimeImmutable $newestDatedReleased;
+    private bool $newestDatedAtLeast;
     private ?string $datedBy;
     private ?string $php;
     private ?string $highestPhp;
@@ -80,6 +81,7 @@ final class BranchRow
             $row->highestCommitDate = $sharedCommit ? $release['at'] : null;
             $row->newestDated = $release['version'];
             $row->newestDatedReleased = $release['at'];
+            $row->newestDatedAtLeast = $release['at'] !== null && AgeMeasure::releaseDateIsLowerBound($metadata, $release);
             $row->datedBy = $release['dated_by'] ?? null;
             $row->php = $release['php'] ?? null;
             $row->highestPhp = $release['highest']['php'];
@@ -122,6 +124,7 @@ final class BranchRow
         $row->highestCommitDate = null;
         $row->newestDated = $release->pretty();
         $row->newestDatedReleased = $release->at();
+        $row->newestDatedAtLeast = false;
         $row->datedBy = null;
         $row->php = $php;
         $row->highestPhp = $php;
@@ -174,6 +177,12 @@ final class BranchRow
     public function newestDatedReleased(): ?\DateTimeImmutable
     {
         return $this->newestDatedReleased;
+    }
+
+    /** Whether {@see self::newestDatedReleased()} is only a lower bound: a date of a commit that the tag shares. */
+    public function newestDatedAtLeast(): bool
+    {
+        return $this->newestDatedAtLeast;
     }
 
     public function datedBy(): ?string

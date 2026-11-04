@@ -26,6 +26,7 @@ use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveQuery;
 use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\FindingBuilder;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\RecordedMoveChecker;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\FlagSet;
@@ -281,6 +282,55 @@ final class MoveBuilderTest extends TestCase
 
         self::assertNotNull($check);
         self::assertSame(['>=8.5', false], [$check->requires(), $check->targetRuns()]);
+    }
+
+    /**
+     * @return array<string, array{list<array{string, string, string}>, list<array{string, string, string}>, list<array{string, string, string}>}>
+     */
+    public static function higherRows(): array
+    {
+        $own = [['1.5.0', 'own15', '2018-01-01']];
+
+        return [
+            'a higher top tag dated by a shared commit inside the warn years is alive' => [$own, [['2.1.0', 'split', '2025-06-01'], ['2.0.1', 'split', '2025-06-01'], ['2.0.0', 'split', '2025-06-01']], [['left-behind', 'branch_not_releasing']], []],
+            'a stale shared-commit lower bound on a higher branch is unknown' => [$own, [['2.1.0', 'top', '2018-06-01'], ['2.0.2', 'split', '2019-06-01'], ['2.0.1', 'split', '2019-06-01'], ['2.0.0', 'split', '2019-06-01']], [], [['left-behind', 'undated']]],
+            'a stale trusted date on a higher branch is not alive' => [$own, [['2.0.0', 'own20', '2019-06-01']], [], []],
+        ];
+    }
+
+    /**
+     * The tag move reads a higher row as S8 does: by its newest dated release, a shared-commit date as a lower bound.
+     *
+     * @dataProvider higherRows
+     *
+     * @param list<array{string, string, string}> $own
+     * @param list<array{string, string, string}> $higher
+     * @param list<array{string, string}>         $adds
+     * @param list<array{string, string}>         $unverified
+     */
+    #[DataProvider('higherRows')]
+    public function testATagMoveReadsAHigherRowByItsNewestDatedRelease(array $own, array $higher, array $adds, array $unverified): void
+    {
+        $packages = [];
+        foreach (array_merge($higher, $own) as [$version, $commit, $date]) {
+            $release = (new ArrayLoader())->load(['name' => 'a/b', 'version' => $version, 'time' => $date.'T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]]);
+            self::assertInstanceOf(BasePackage::class, $release);
+            $packages[] = $release;
+        }
+        $locked = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]])->find('a/b');
+        self::assertNotNull($locked);
+        $facts = new PackageFacts($locked, PackageMetadata::fromPackages('a/b', $packages, new \DateTimeImmutable(self::NOW), '1.0.0.0'), null, []);
+        $floor = new PhpFloor(null);
+        $rows = BranchRow::all($facts, $floor, Clock::fixed(self::NOW));
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
+        $context = new MoveContext($finding, new MoveSubject('a/b', '1.x-dev', true, [], null, null), $facts->metadata(), $rows, null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 3, null, [], [], true);
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::TAG, FlagSet::PINNED)->withLatest(new Latest('1.5.0', '2018-01-01T00:00:00+00:00', false, 'newer', null), $rows[1]), [], null, $context);
+
+        $facts = static fn (array $list): array => array_values(array_map(static fn (array $fact): array => [$fact['id'], $fact['reason'] ?? $fact['basis'] ?? null], array_filter(JsonPath::decoded($list), static fn (array $fact): bool => $fact['id'] === 'left-behind')));
+        self::assertSame($adds, $facts($move->adds()), 'adds');
+        self::assertSame($unverified, $facts($move->unverified()), 'unverified');
     }
 
     /** composer.json does not require a/b: a resolved request becomes `composer update` with the constraint inline. */

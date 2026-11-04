@@ -288,15 +288,17 @@ final class MoveBuilder
     /**
      * S8's rule on one row, as if a release there were installed: `fires` when its newest release is
      * older than release-warn-years and a higher branch released within them, `unknown`
-     * when a date it needs is missing, else `quiet`.
+     * when a date it needs is missing or is a lower bound past them, else `quiet`.
      */
     private static function leftBehindOn(BranchRow $row, MoveContext $context): string
     {
         $parser = new VersionParser();
         $own = $row->highestReleased();
         $above = array_filter($context->rows(), static fn (BranchRow $other): bool => version_compare($parser->normalize($other->highest()), $parser->normalize($row->highest()), '>'));
-        $undatedAbove = array_filter($above, static fn (BranchRow $other): bool => $other->highestReleased() === null) !== [];
-        $alive = array_filter($above, static fn (BranchRow $other): bool => $context->isReleasing($other->highestReleased()));
+        // A higher row reads as in S8: by its newest dated release, a shared-commit date as a lower
+        // bound that leaves the row unknown once it is past release-warn-years.
+        $alive = array_filter($above, static fn (BranchRow $other): bool => $context->isReleasing($other->newestDatedReleased()));
+        $undatedAbove = array_filter($above, static fn (BranchRow $other): bool => !$context->isReleasing($other->newestDatedReleased()) && ($other->newestDatedReleased() === null || $other->newestDatedAtLeast())) !== [];
         if ($own === null) {
             return $alive !== [] || $undatedAbove ? 'unknown' : 'quiet';
         }
