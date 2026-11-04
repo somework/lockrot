@@ -186,6 +186,43 @@ final class MaintenanceMoveTest extends TestCase
         self::assertSame([Move::NO_MOVE, 'metadata_not_read'], [$draft->kind(), $draft->reason()]);
     }
 
+    /** @return iterable<string, array{?string, ?string, string}> */
+    public static function backportShapes(): iterable
+    {
+        yield 'the highest tag states no php, the backport excludes the target' => [null, '^7.2', Move::TAG];
+        yield 'the highest tag excludes the target, the backport admits it' => ['^7.2', '>=7.2', Move::BLOCKED];
+    }
+
+    /**
+     * a/b 1.x-dev is pinned, and its 1.x line has a backport v1.4.9 that is dated after v1.5.0. The
+     * tag move targets v1.5.0, so the php of v1.5.0 decides whether target 8.4 blocks it.
+     *
+     * @dataProvider backportShapes
+     */
+    #[DataProvider('backportShapes')]
+    public function testAPinnedTagMoveIsBlockedOnlyByThePhpOfTheTagThatItTargets(?string $highestPhp, ?string $backportPhp, string $kind): void
+    {
+        $packages = [];
+        foreach (['v1.5.0' => ['2025-01-01', $highestPhp], 'v1.4.9' => ['2025-06-01', $backportPhp]] as $version => [$at, $php]) {
+            $release = (new ArrayLoader())->load(['name' => 'a/b', 'version' => $version, 'time' => $at.'T00:00:00+00:00'] + ($php === null ? [] : ['require' => ['php' => $php]]));
+            self::assertInstanceOf(BasePackage::class, $release);
+            $packages[] = $release;
+        }
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.x-dev', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $locked = $lock->find('a/b');
+        self::assertNotNull($locked);
+        $facts = new PackageFacts($locked, PackageMetadata::fromPackages('a/b', $packages, new \DateTimeImmutable(self::NOW), '1.x-dev'), null, []);
+        $floor = new PhpFloor('8.4');
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.x-dev')->build();
+        $context = new MoveContext($finding, new MoveSubject('a/b', '1.x-dev', true, [], '8.4', null), $facts->metadata(), BranchRow::all($facts, $floor, Clock::fixed(self::NOW)), null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true);
+
+        $draft = MaintenanceMove::draft($context, FlagSet::PINNED);
+        $latest = $draft->latest();
+
+        self::assertNotNull($latest);
+        self::assertSame([$kind, '1.x', 'v1.5.0'], [$draft->kind(), self::branch($draft), $latest->version()]);
+    }
+
     /** @return iterable<string, array{string, string, ?string, string, string}> */
     public static function unreadRows(): iterable
     {

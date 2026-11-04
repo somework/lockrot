@@ -98,7 +98,7 @@ final class MaintenanceMove
 
     private static function tag(?BranchRow $row, Latest $latest): MoveDraft
     {
-        $kind = $row !== null && $row->admitsTargetPhp() === false ? Move::BLOCKED : Move::TAG;
+        $kind = $row !== null && $row->highestAdmitsTargetPhp() === false ? Move::BLOCKED : Move::TAG;
 
         return MoveDraft::of($kind, FlagSet::PINNED)->withLatest($latest, $row);
     }

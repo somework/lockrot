@@ -272,7 +272,7 @@ final class MoveBuilder
                 $unverified[] = MoveFact::unchecked(MoveFact::FLAG, FlagSet::LEFT_BEHIND, MoveFact::UNDATED);
             }
         }
-        if ($row !== null && $row->admitsTargetPhp() !== false && $quiet(FlagSet::OLD_PROMISE) && $php !== null && $target !== null && (new ConstraintOpenness())->isOpenEndedFor($php, $target)) {
+        if ($row !== null && $row->highestAdmitsTargetPhp() !== false && $quiet(FlagSet::OLD_PROMISE) && $php !== null && $target !== null && (new ConstraintOpenness())->isOpenEndedFor($php, $target)) {
             $released = $latest === null ? null : $latest->released();
             $ga = $context->ga();
             if ($released === null) {
