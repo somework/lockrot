@@ -28,26 +28,36 @@ final class AtomicWriter
         // Unique per run, and in the target's own directory so the rename stays on one filesystem and
         // atomic: two concurrent runs must not rename each other's half-written file.
         $temporary = \sprintf('%s.%d-%s.tmp', $path, getmypid(), uniqid('', true));
-        // Cleared first so reason() reports this write's own failure, not an earlier warning.
-        error_clear_last();
-        $handle = @fopen($temporary, 'xb');
-        if ($handle === false) {
-            // Nothing of ours to clean up: whatever sits at the name, if anything, is not this run's.
-            throw new ConfigException('Cannot write '.$displayPath.': '.self::reason());
-        }
-        $written = @fwrite($handle, $contents);
-        // Data on disk before the rename: else a power loss can leave the target empty (PHP 8.1+).
-        if (\function_exists('fsync')) {
-            @fsync($handle);
-        }
-        $closed = @fclose($handle);
-        if ($written !== \strlen($contents) || !$closed || !self::keepPermissions($path, $temporary) || !@rename($temporary, $path)) {
-            // Read before the cleanup: unlink() can record a failure of its own, which
-            // else replaces the reason the caller needs.
-            $reason = self::reason();
-            @unlink($temporary);
+        $failure = null;
+        // Not error_get_last(): Composer's ErrorHandler returns true for a suppressed warning, so
+        // PHP never records it there.
+        set_error_handler(static function (int $level, string $message) use (&$failure): bool {
+            $failure = $message;
 
-            throw new ConfigException('Cannot write '.$displayPath.': '.$reason);
+            return true;
+        });
+        try {
+            $handle = @fopen($temporary, 'xb');
+            if ($handle === false) {
+                // Nothing of ours to clean up: whatever sits at the name, if anything, is not this run's.
+                throw new ConfigException('Cannot write '.$displayPath.': '.self::reason($failure));
+            }
+            $written = @fwrite($handle, $contents);
+            // Data on disk before the rename: else a power loss can leave the target empty (PHP 8.1+).
+            if (\function_exists('fsync')) {
+                @fsync($handle);
+            }
+            $closed = @fclose($handle);
+            if ($written !== \strlen($contents) || !$closed || !self::keepPermissions($path, $temporary) || !@rename($temporary, $path)) {
+                // Read before the cleanup: unlink() can record a failure of its own, which
+                // else replaces the reason the caller needs.
+                $reason = self::reason($failure);
+                @unlink($temporary);
+
+                throw new ConfigException('Cannot write '.$displayPath.': '.$reason);
+            }
+        } finally {
+            restore_error_handler();
         }
     }
 
@@ -58,11 +68,9 @@ final class AtomicWriter
         return $mode === false || @chmod($temporary, $mode & 0777);
     }
 
-    private static function reason(): string
+    /** @param ?string $failure the last warning of the write, null for a short write without one */
+    private static function reason(?string $failure): string
     {
-        $error = error_get_last();
-        $message = $error === null ? null : $error['message'];
-
-        return \is_string($message) && $message !== '' ? $message : 'the file could not be created';
+        return $failure ?? 'the write failed';
     }
 }
