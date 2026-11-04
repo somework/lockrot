@@ -83,7 +83,11 @@ final class PackageMetadata
      * @var array<string, true>
      */
     private array $sharedCommitVersions;
-    /** The highest non-dev version, or the version with the newest date, is on a commit that SHARED_COMMIT_TAGS or more stable tags share. */
+    /**
+     * A commit that SHARED_COMMIT_TAGS or more stable tags share dates the highest non-dev
+     * version, or the newest dated version under a dated highest one. Then S10 names the shared
+     * commit, not an undated tag, as the cause of a null {@see $lastStableReleaseAt}.
+     */
     private bool $lastStableSharesItsCommit;
     /**
      * The stable releases above the installed version, ascending: every stable release for a
@@ -652,7 +656,8 @@ final class PackageMetadata
 
     /**
      * The newest release date of a non-dev version, pre-releases included, or the parent's date
-     * ({@see datedBy()}). Null when the highest tag has no trusted date.
+     * ({@see datedBy()}). Null when the highest tag has no trusted date, or when the newest date
+     * is that of a commit its tags share.
      */
     public function lastStableReleaseAt(): ?\DateTimeImmutable
     {

@@ -323,7 +323,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame('2.0.0-RC1', $metadata->lastStableVersion());
     }
 
-    /** twig/string-extra: an old alpha of the next major on its own commit must not let S2 read the newer shared-commit date of a stable tag. */
+    /** An old alpha of the next major on its own commit must not let S2 read the newer shared-commit date of a stable tag. */
     public function testAnOlderPreReleaseAboveSharedTagsLeavesTheAgeUnmeasured(): void
     {
         $on = static fn (string $version, string $commit, string $time): array => ['name' => 'a/b', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]];
