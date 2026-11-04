@@ -1,7 +1,7 @@
 {
  "pr": "7d",
  "source": {
-  "cases.json": "77e9d7d476c4180631cfdca529d74d9855245e3eb222155e89837e3e5e027b23",
+  "cases.json": "fb8c36b6dfd250684ec7c4495cba00ac2fd686272cf9ac68b4f617e8c8ffedd2",
   "model_run_date": "2026-11-05"
  },
  "suite": "the model suite reports every step passed",
