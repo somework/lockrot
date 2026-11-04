@@ -29,8 +29,9 @@ final class FailOn
     public const VULNERABLE = ['vulnerable' => 'low', 'vulnerable-medium' => 'medium', 'vulnerable-high' => 'high', 'vulnerable-critical' => 'critical'];
 
     /**
-     * The `\s` of the config-2 fail-on pattern: the validator runs the pattern with the `u` modifier,
-     * so `\s` also matches Unicode whitespace such as U+0085 and U+00A0.
+     * The `\s` of the config-2 fail-on pattern as lockrot's PHP validator reads it. That validator
+     * runs the pattern with the `u` modifier, so `\s` also matches Unicode whitespace such as U+0085
+     * and U+00A0. An ECMAScript validator also matches U+FEFF, which this pattern keeps.
      */
     private const SURROUNDING_WHITESPACE = '/^\s+|\s+$/u';
 
