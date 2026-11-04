@@ -52,15 +52,21 @@ final class RecorderNames
         }));
     }
 
+    private const ROOT_KEYS = ['packages', 'metadata-url', 'available-packages', 'available-package-patterns', 'includes', 'provider-includes', 'providers-url'];
+
     /**
-     * True when the repository has no `metadata-url` and lists a locked name or serves packages
-     * through a Composer 1 list, which the recorder does not record.
+     * True when the root holds no key of a repository root, such as an error answer. True also
+     * when it has no `metadata-url` and lists a locked name or serves packages through a Composer 1
+     * list, which the recorder does not record.
      *
      * @param array<mixed, mixed> $packages the repository's packages.json
      * @param list<string>        $names    {@see self::repository()}
      */
     public static function unrecordable(array $packages, array $names): bool
     {
+        if (array_intersect(self::ROOT_KEYS, array_keys($packages)) === []) {
+            return true;
+        }
         if (\is_string($packages['metadata-url'] ?? null)) {
             return false;
         }
