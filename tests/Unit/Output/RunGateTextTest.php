@@ -10,6 +10,8 @@ use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\Gate;
 use Lockrot\Config\GateNotApplied;
 use Lockrot\Config\GateStanding;
+use Lockrot\Json\KnownValues;
+use Lockrot\Json\Schemas;
 use Lockrot\Output\FailedValue;
 use Lockrot\Output\RunGateText;
 use Lockrot\Signal\Data\Check;
@@ -154,7 +156,16 @@ final class RunGateTextTest extends TestCase
         yield 'no_feed' => ['no_feed', 'not checked (no repository publishes advisories)'];
         yield 'not_from_composer_repository' => ['not_from_composer_repository', 'not asked (advisory-lookup: composer-repositories)'];
         yield 'unparseable_version' => ['unparseable_version', 'version not readable'];
+        yield 'composer_json_invalid' => ['composer_json_invalid', 'not checked (Composer cannot load composer.json)'];
         yield 'an unknown reason' => ['future_reason', 'future_reason'];
+    }
+
+    /** A known reason that the gate line printed as its id would read as an unknown one. */
+    public function testEachKnownReasonOfReport2HasItsWords(): void
+    {
+        $known = JsonPath::arrayAt(JsonPath::decodeFile(Schemas::path(Schemas::REPORT, 2)), ['definitions', 'gateNotApplied', 'properties', 'reason', KnownValues::KEYWORD]);
+
+        self::assertSame([], array_values(array_diff($known, array_keys(RunGateText::NOT_APPLIED))));
     }
 
     /** @dataProvider reasons */
