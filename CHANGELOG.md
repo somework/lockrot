@@ -112,6 +112,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   space. It exits 2 on every OS, so it never writes over the project's Composer files. Action: if
   your baseline has such a name, rename the file and set `baseline` or `--baseline` to the new name.
   ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
+- **Breaking:** **CLI:** when Composer refuses `composer.json`, the advisory lookup asks no
+  repository, where 0.13 asked those of the global config. `security.check` reads `not_run`, and
+  S10 and the run note `advisories_not_checked` name `composer_json_invalid`. `--fail-on=unchecked`
+  then exits 1. Action: fix `composer.json` until `composer validate` passes.
+  ([Run notes](docs/notes.md#advisories_not_checked))
 - **All formats:** advisories are looked up by name for every package the run checks (packages-dev
   with `--dev`), so the names of packages from vcs, a path, an archive or an origin lockrot cannot
   tell now reach each Composer repository that publishes advisories. Action: set
@@ -156,11 +161,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** lockrot does not ask a repository for a package that its `only` or `exclude`
   keeps out. When no repository with a feed admits the package, it reads `no_feed`, not `answered`
   with 0 records.
-- **All formats:** when Composer refuses `composer.json`, lockrot no longer falls back to the global
-  config for advisories. It asks no repository, and the advisory check reads as not run
-  (`security.unchecked_reason` `composer_json_invalid`). The run note `advisories_not_checked`
-  names the cause. 0.13 asked Packagist, and counted advisories that `config.audit.ignore` hides.
-  ([Run notes](docs/notes.md#advisories_not_checked))
 
 ### Added
 
