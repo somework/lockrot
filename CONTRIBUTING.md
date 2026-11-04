@@ -441,9 +441,13 @@ maintainer.
    `php build/lockrot.phar --version` prints the new version.
 3. Before the merge, check what the tag needs outside this repository:
 
-    - Main's ruleset requires each job of the release pull request's `ci.yml` run, by its job
-      name. A ruleset requires a check by its name, so a red job outside the list does not stop
-      the merge.
+    - List the required checks of main's ruleset, and compare them with `.github/workflows/ci.yml`.
+      Run `gh api repos/somework/lockrot/rulesets`, then
+      `gh api repos/somework/lockrot/rulesets/<id>` for the ruleset of `main`, and read the
+      `context` of each `required_status_checks` entry. Each job of `ci.yml` needs one entry, named
+      as its `name:` key reads, or by its job id when it has none. A matrix job needs one entry for
+      each row. A ruleset requires a check by its name, so a red job outside the list does not
+      stop the merge. Add each missing entry to the ruleset before the merge.
     - When the release changes the flag set, a schema number or the score model, the lockrot.dev
       change that reads it is merged. The lockrot.dev build stops on a set that it does not know.
     - Before the first final renderer tag, list the renderer's rulesets with
