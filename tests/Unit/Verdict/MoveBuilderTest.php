@@ -285,7 +285,7 @@ final class MoveBuilderTest extends TestCase
     }
 
     /**
-     * @return array<string, array{list<array{string, string, string}>, list<array{string, string, string}>, list<array{string, string, string}>}>
+     * @return array<string, array{list<array{string, string, string}>, list<array{string, string, string}>, list<array{string, string}>, list<array{string, string}>}>
      */
     public static function higherRows(): array
     {
@@ -328,7 +328,17 @@ final class MoveBuilderTest extends TestCase
 
         $move = MoveBuilder::build(MoveDraft::of(Move::TAG, FlagSet::PINNED)->withLatest(new Latest('1.5.0', '2018-01-01T00:00:00+00:00', false, 'newer', null), $rows[1]), [], null, $context);
 
-        $facts = static fn (array $list): array => array_values(array_map(static fn (array $fact): array => [$fact['id'], $fact['reason'] ?? $fact['basis'] ?? null], array_filter(JsonPath::decoded($list), static fn (array $fact): bool => $fact['id'] === 'left-behind')));
+        $facts = static function (array $list): array {
+            $found = [];
+            foreach (JsonPath::decoded($list) as $fact) {
+                self::assertIsArray($fact);
+                if (JsonPath::stringAt($fact, ['id']) === 'left-behind') {
+                    $found[] = ['left-behind', $fact['reason'] ?? $fact['basis'] ?? null];
+                }
+            }
+
+            return $found;
+        };
         self::assertSame($adds, $facts($move->adds()), 'adds');
         self::assertSame($unverified, $facts($move->unverified()), 'unverified');
     }
