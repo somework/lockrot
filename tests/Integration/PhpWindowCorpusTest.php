@@ -21,8 +21,8 @@ use PHPUnit\Framework\TestCase;
 final class PhpWindowCorpusTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures/';
-    /** A target outside the known minors reads every minor at X.Y.99, as G-A set `platform-overrides.php`. */
-    private const NO_KNOWN_MINOR = '9.9';
+    /** A target below the known minors reads every minor at X.Y.99, as G-A set `platform-overrides.php`. */
+    private const NO_KNOWN_MINOR = '5.2';
 
     /** @var array<string, array{0: string, 1: string}> lock => [with require-dev, without], each `first to last` or `none` */
     private const WINDOWS = [

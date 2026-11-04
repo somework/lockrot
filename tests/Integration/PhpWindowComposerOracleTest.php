@@ -63,8 +63,8 @@ final class PhpWindowComposerOracleTest extends TestCase
         $minors = PhpReleaseDates::load()->minors(Clock::fixed(self::RECORDED_ON));
         self::assertSame($minors, $asked, $lock.': the recording asked about every known minor');
         $dir = self::FIXTURES.$lock;
-        // A target outside the known minors reads every minor at X.Y.99, the PHP that the recording set.
-        $window = PhpWindow::of(LockFile::fromFile($dir.'/composer.lock'), ProjectConfig::fromFile($dir.'/composer.json'), '9.9', $minors);
+        // A target below the known minors reads every minor at X.Y.99, the PHP that the recording set.
+        $window = PhpWindow::of(LockFile::fromFile($dir.'/composer.lock'), ProjectConfig::fromFile($dir.'/composer.json'), '5.2', $minors);
         self::assertNotNull($window, $lock);
         $data = $window->toArray();
 
