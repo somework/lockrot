@@ -125,12 +125,13 @@ final class InstallTimeSummary
             self::writeWarning($event->getIO(), 'lockrot: '.$warning);
         }
 
-        // `composer require` and `update` write the new lock before this event fires, so the file is
-        // normally the post-transaction state. `--dry-run` writes no lock, and a new project has none.
-        // LockFile::withPackages() overlays the transaction's packages in every case, so each
-        // package gets a node to chain through.
+        // Composer's Locker holds the lock of this transaction: an update sets it before this event
+        // fires, and keeps it in memory only under `--dry-run` or `config.lock: false`. A new
+        // project without an update has none. LockFile::withPackages() overlays the transaction's
+        // packages in every case, so each package gets a node to chain through.
         $lockPath = Factory::getLockFile($composerFile);
-        $lock = (is_file($lockPath) ? LockFile::fromFile($lockPath) : LockFile::empty())->withPackages($packages);
+        $locker = $composer->getLocker();
+        $lock = ($locker->isLocked() ? LockFile::fromArray($locker->getLockData(), basename($lockPath)) : LockFile::empty())->withPackages($packages);
         // As `composer lockrot` reads the lock: packages-dev only with include-dev, whatever
         // Composer's dev mode installs.
         $includeDev = $lockrot->includeDev();

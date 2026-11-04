@@ -9,15 +9,19 @@ use Composer\Config;
 use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Transaction;
 use Composer\Factory;
+use Composer\Installer\InstallationManager;
 use Composer\Installer\InstallerEvent;
 use Composer\Installer\InstallerEvents;
 use Composer\IO\BufferIO;
 use Composer\IO\IOInterface;
+use Composer\Json\JsonFile;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
+use Composer\Package\Locker;
 use Composer\Package\RootPackage;
 use Composer\Repository\RepositoryFactory;
 use Composer\Repository\RepositoryInterface;
+use Composer\Util\Loop;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
@@ -240,7 +244,7 @@ final class InstallTimeSummaryTest extends TestCase
         return (new ArrayLoader())->load($entry);
     }
 
-    private function event(BufferIO $io, Transaction $transaction, bool $executeOperations = true, bool $devMode = false): InstallerEvent
+    private function event(BufferIO $io, Transaction $transaction, bool $executeOperations = true, bool $devMode = false, ?Locker $locker = null): InstallerEvent
     {
         $server = self::$server;
         self::assertNotNull($server);
@@ -249,8 +253,17 @@ final class InstallTimeSummaryTest extends TestCase
         $composer->setConfig($config);
         $composer->setPackage(new RootPackage('__root__', '1.0.0.0', '1.0.0'));
         $composer->setRepositoryManager(RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config)));
+        $composer->setLocker($locker ?? self::locker($io, $config));
 
         return new InstallerEvent(InstallerEvents::PRE_OPERATIONS_EXEC, $composer, $io, $devMode, $executeOperations, $transaction);
+    }
+
+    /** The Locker that Composer's Factory builds for the project in the working directory. */
+    private static function locker(IOInterface $io, Config $config): Locker
+    {
+        $composerFile = Factory::getComposerFile();
+
+        return new Locker($io, new JsonFile(Factory::getLockFile($composerFile)), new InstallationManager(new Loop(Factory::createHttpDownloader($io, $config)), $io), (string) file_get_contents($composerFile));
     }
 
     /**
@@ -320,6 +333,7 @@ final class InstallTimeSummaryTest extends TestCase
         $composer->setConfig($config);
         $composer->setPackage(new RootPackage('__root__', '1.0.0.0', '1.0.0'));
         $composer->setRepositoryManager(RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config)));
+        $composer->setLocker(self::locker($io, $config));
 
         (new InstallTimeSummary(\Closure::fromCallable([$this, 'targetRecordingAnalyzerFactory'])))->onPreOperationsExec(new InstallerEvent(InstallerEvents::PRE_OPERATIONS_EXEC, $composer, $io, false, true, new Transaction([], [$this->loadPackage(self::PHPZIP)])));
 
@@ -1008,6 +1022,27 @@ final class InstallTimeSummaryTest extends TestCase
         (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
         self::assertStringContainsString('phpzip/phpzip', $io->getOutput());
+    }
+
+    /**
+     * With `config.lock: false`, Composer keeps the lock that the update resolved in memory only.
+     * The dev package keeps its dev weight, and a stale file on disk does not decide it.
+     */
+    public function testWithLockFalseTheLockComesFromComposersLocker(): void
+    {
+        $server = self::$server;
+        self::assertNotNull($server);
+        $dir = $this->projectWithDevRequire(self::PHPZIP, self::BINSTRING, ['include-dev' => true]);
+        file_put_contents($dir.'/composer.lock', (string) json_encode(['packages' => [self::BINSTRING], 'packages-dev' => []]));
+        $io = new BufferIO();
+        $locker = self::locker($io, $server->config());
+        $locker->setLockData([$this->loadPackage(self::PHPZIP)], [$this->loadPackage(self::BINSTRING)], [], [], [], 'stable', [], false, false, [], false);
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($this->event($io, new Transaction([], [$this->loadPackage(self::BINSTRING)]), true, true, $locker));
+
+        $output = $io->getOutput();
+        self::assertStringContainsString('grandt/binstring 1.0.0', $output);
+        self::assertStringNotContainsString('critical', $output);
     }
 
     /**
