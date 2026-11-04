@@ -190,7 +190,7 @@ final class MoveBuilder
      * @param list<string> $advisories ids
      * @param ?BranchRow   $branch     the branch row of $row, which dates the branch as S8 does: a row
      *                                 of a release below the newest is dated by the branch's newest dated release
-     * @param ?StableRelease $installs the release below the newest that the solve installs: old-promise reads its date (ruling R2-1)
+     * @param ?StableRelease $installs the release below the newest that the solve installs: old-promise reads its date (ruling R2-1), and an advisory that affects it stays
      *
      * @return array{0: list<MoveFact>, 1: list<MoveFact>}
      */
@@ -224,7 +224,8 @@ final class MoveBuilder
             }
             if ($newest === null) {
                 $unverified[] = MoveFact::unchecked(MoveFact::ADVISORY, $id, MoveFact::NO_RELEASE_DATA);
-            } elseif (!MoveContext::reaches($range, $lower->release()->normalized(), $newest->normalized())) {
+            } elseif (!MoveContext::reaches($range, $lower->release()->normalized(), $newest->normalized())
+                && ($installs === null || !MoveContext::reaches($range, $installs->normalized(), $installs->normalized()))) {
                 $clears[] = MoveFact::on(MoveFact::ADVISORY, $id, MoveFact::OUTSIDE_RANGE);
             }
         }
