@@ -83,8 +83,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** S8 (`left-behind`) reads an installed pre-release above its branch's newest
   stable release against that release, so such a pre-release can carry S8.
   ([Within reach](docs/verdicts.md#within-reach))
-- **All formats:** S5 (`old-promise`) reads the installed release's trusted date. A date that a
-  split's tags share no longer fires it: S10 then names S5 with `undated_releases`.
+- **All formats:** S2, S5 (`old-promise`) and S8 (`left-behind`) judge no release that a commit
+  shared by a split's tags dates. For S2 that is the newest release, for S5 the installed release,
+  and for S8 the last release of the installed branch. Such a date no longer fires them, and S10
+  names the signal with `undated_releases`.
   ([What was not checked](docs/verdicts.md#what-was-not-checked))
 - **All formats:** S8, S11's `excludes_target` and the `--explain` branch rows test the target PHP
   at `config.platform.php` when it is a stable release in the target minor, as
@@ -529,13 +531,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Composer does. A move that needs the package reads `not_checked` with `unloaded_name`.
 - **CLI, Install-time:** a run with `LOCKROT_TODAY` stores no fetch time later than the real time
   in the cache of repository host answers.
-- **All formats:** S2 does not judge the date of a commit that three or more stable tags share, also
-  when the highest version is an older pre-release on its own commit. The package age reads as not
-  measured, and S10 names the shared commit.
-  ([What was not checked](docs/verdicts.md#what-was-not-checked))
-- **All formats:** S8 reads the installed branch's last release as not measured
-  (`branch_release_unmeasured` `undated_releases`) when the shared commit of a lower tag dates it.
-  S8 then does not fire on that date.
 - **All formats:** a Composer repository that answers HTTP 200 with a body that is not JSON (a proxy
   or a captive portal page) no longer stops the run. The names of that request read as release
   metadata unavailable (`fetch_failed`), as for a transport failure. This also applies to a monorepo
