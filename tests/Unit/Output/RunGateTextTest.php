@@ -163,7 +163,11 @@ final class RunGateTextTest extends TestCase
     /** A known reason that the gate line printed as its id would read as an unknown one. */
     public function testEachKnownReasonOfReport2HasItsWords(): void
     {
-        $known = JsonPath::arrayAt(JsonPath::decodeFile(Schemas::path(Schemas::REPORT, 2)), ['definitions', 'gateNotApplied', 'properties', 'reason', KnownValues::KEYWORD]);
+        $known = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(Schemas::path(Schemas::REPORT, 2)), ['definitions', 'gateNotApplied', 'properties', 'reason', KnownValues::KEYWORD]) as $reason) {
+            self::assertIsString($reason);
+            $known[] = $reason;
+        }
 
         self::assertSame([], array_values(array_diff($known, array_keys(RunGateText::NOT_APPLIED))));
     }
