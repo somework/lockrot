@@ -530,7 +530,6 @@ final class PhpWindowTest extends TestCase
         self::assertSame('^7.0', $adapter->requirePhp(), 'the installed php link stays the package\'s own');
     }
 
-    /** A target above the newest known minor counts as one more known minor, so I38 holds. */
     public function testATargetAboveTheNewestKnownMinorIsReadAsOneMoreMinor(): void
     {
         $open = PhpWindow::of(LockFile::fromArray(['packages' => [self::package('acme/a', ['php' => '>=8.1'])], 'packages-dev' => []]), ProjectConfig::empty(), '8.6', self::minors());
