@@ -323,6 +323,11 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
             ],
         ],
+        'S8-higher-shared-alive‡' => [
+            'moves' => [
+                [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
+            ],
+        ],
         'php-edge-equal‡' => [
             'moves' => [
                 [['next_step.version', 'next_step.commands'], self::MOVE_VERSION],
@@ -382,10 +387,8 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'next_step.also[].held_by[].holder.next_step.kind' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.to_branch' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.check' => self::ALSO_HELD,
-        'next_step.also[].check.form' => self::ALSO_CHECK,
         'next_step.also[].check.reason' => self::ALSO_CHECK,
         'run.move_check.reason' => 'No case of the model has a baseline that the move check does not reach.',
-        'next_step.also[].check.installs' => self::ALSO_CHECK,
         'next_step.also[].moves_with[].installed_version' => self::ALSO_CHECK,
         'next_step.also[].moves_with[].package' => self::ALSO_CHECK,
         'next_step.also[].moves_with[].version' => self::ALSO_CHECK,
@@ -405,7 +408,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
 
     private const ALSO_HELD = 'No also[] move of a case with inputs is held by a package that has a finding of its own.';
 
-    private const ALSO_CHECK = 'Each also[] move of a case with inputs that Composer\'s solver checks is refused, so no case gives it a form, a reason, an install or a joint move.';
+    private const ALSO_CHECK = 'No case with inputs gives an also[] move a check reason or a joint move.';
 
     private const NO_SOLVER_WORLD = 'The case has no solver inputs, so the recording checks no move and writes `run.move_check` null. The model writes the run\'s move check.';
 

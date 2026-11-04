@@ -30,6 +30,8 @@ final class RecordedMoveChecker implements MoveChecker
     private array $combinedAsked = [];
     /** @var list<MoveQuery> */
     private array $queries = [];
+    /** @var list<string>|null the names that the case's lock holds, null when the case does not pass them */
+    private ?array $locked = null;
 
     /**
      * @param array<string, array<mixed, mixed>> $checks key => `{result, form, reason, installs, holds, problem}`, with
@@ -42,6 +44,19 @@ final class RecordedMoveChecker implements MoveChecker
         $this->checks = $checks;
         $this->run = $run;
         $this->strict = $strict;
+    }
+
+    /**
+     * A copy whose outcomes name only the holders that the lock holds, as {@see \Lockrot\Solver\SolverChecker} reads them.
+     *
+     * @param list<string> $names the names that the case's lock holds
+     */
+    public function withLocked(array $names): self
+    {
+        $clone = clone $this;
+        $clone->locked = $names;
+
+        return $clone;
     }
 
     public function baseline(): CheckOutcome
@@ -59,7 +74,12 @@ final class RecordedMoveChecker implements MoveChecker
         }
         $check = $this->recorded($query->key(), '*');
 
-        return $check === null ? new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME)) : $this->unread($check) ?? self::outcome($check, $query->package());
+        if ($check === null) {
+            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME));
+        }
+        $outcome = $this->unread($check) ?? self::outcome($check, $query->package());
+
+        return $this->locked === null ? $outcome : $outcome->withLocked($this->locked);
     }
 
     /**

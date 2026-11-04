@@ -294,8 +294,9 @@ final class CaseHydrator
      * The move checks that a case's `inputs.checks` records, or null when it records none.
      *
      * @param array<mixed, mixed> $inputs a case's `inputs` block
+     * @param list<string>|null   $locked the names that the case's lock holds, null to keep every holder
      */
-    public static function moveChecksOf(array $inputs): ?MoveChecks
+    public static function moveChecksOf(array $inputs, ?array $locked = null): ?MoveChecks
     {
         if (!\is_array($inputs['checks'] ?? null)) {
             return null;
@@ -308,7 +309,9 @@ final class CaseHydrator
 
         // A case with a `solver_world` records every request, so another request fails the test. A world whose vcs
         // repository serves a name of the lock records no request of a move: lockrot reads that move as unloaded_name.
-        return MoveChecks::of(new RecordedMoveChecker($checks, $run, $world !== null && !self::shadowsALockedName($world)));
+        $checker = new RecordedMoveChecker($checks, $run, $world !== null && !self::shadowsALockedName($world));
+
+        return MoveChecks::of($locked === null ? $checker : $checker->withLocked($locked));
     }
 
     /** @param array<mixed, mixed> $world a case's `inputs.solver_world.world` */
@@ -411,7 +414,7 @@ final class CaseHydrator
             $analyzer = $analyzer->withAllowlist($analyzer->allowlist()->merge(new Allowlist([new AllowlistEntry(self::optional($entry, 'pattern') ?? $package, self::optional($entry, 'version'), self::optional($entry, 'reason') ?? 'accepted by the test', $expires === null ? null : new \DateTimeImmutable($expires), AllowlistEntry::BY_PROJECT, $accept)])));
         }
 
-        $checks = self::moveChecksOf($inputs);
+        $checks = self::moveChecksOf($inputs, array_values(array_map(static fn (BasePackage $locked): string => $locked->getName(), $lock->lockedRepository()->getPackages())));
         if ($checks !== null) {
             $passes = $inputs['check_passes'] ?? Analyzer::CHECK_PASSES;
             $analyzer = $analyzer->withMoveChecks($checks, \is_int($passes) && $passes > 0 ? $passes : Analyzer::CHECK_PASSES);

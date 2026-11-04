@@ -273,6 +273,40 @@ class AParentThatDatesABranchRowHoldsItsTags(unittest.TestCase):
         self.assertNotIn('parent', project_fixtures.package_facts(finding, [dict(self.ROW, dated_by=None)]))
 
 
+class ACaseThatAReadsLowerTagDatedByASharedCommitIsNotHydrated(unittest.TestCase):
+    ROWS = [{'branch': '4.x', 'highest': 'v4.9.1', 'installed': False}, {'branch': '3.x', 'highest': 'v3.8.0', 'installed': True, 'highest_released': '2023-04-15T16:39:14+00:00'}]
+
+    @staticmethod
+    def case(s8=None, branch_release_unmeasured=None):
+        signals = [] if s8 is None else [{'id': 'S8', 'data': s8}]
+        return {'run': {}, 'finding': {'metadata': {'status': 'read'}, 'signals': signals, 'age': {'branch_release_unmeasured': branch_release_unmeasured}},
+                'details': {'metadata': {'branches': ACaseThatAReadsLowerTagDatedByASharedCommitIsNotHydrated.ROWS}}}
+
+    def test_an_s8_lower_bound_on_a_tag_that_is_no_rows_highest_is_not_hydrated(self):
+        self.assertEqual('lower-tag-shared', project_fixtures.unhydrated(self.case({'newest_version': 'v4.9.0', 'newest_release_at_least': True})))
+
+    def test_an_s8_lower_bound_on_a_rows_highest_tag_hydrates(self):
+        self.assertIsNone(project_fixtures.unhydrated(self.case({'newest_version': 'v4.9.1', 'newest_release_at_least': True})))
+        self.assertIsNone(project_fixtures.unhydrated(self.case({'newest_version': 'v4.9.0', 'newest_release_at_least': False})))
+
+    def test_an_undated_branch_release_beside_a_dated_highest_tag_is_not_hydrated(self):
+        self.assertEqual('lower-tag-shared', project_fixtures.unhydrated(self.case(branch_release_unmeasured='undated_releases')))
+
+    def test_an_undated_branch_release_beside_an_undated_highest_tag_hydrates(self):
+        rows = [dict(self.ROWS[1], highest_released=None)]
+        case = dict(self.case(branch_release_unmeasured='undated_releases'), details={'metadata': {'branches': rows}})
+
+        self.assertIsNone(project_fixtures.unhydrated(case))
+
+
+class AWorldCaseLocksOnlyWhatTheWorldsLockHolds(unittest.TestCase):
+    def test_a_holder_that_the_worlds_lock_does_not_hold_leaves_the_case_lock(self):
+        entries = [{'name': 'guzzlehttp/guzzle'}, {'name': 'acme/gz-bridge'}, {'name': 'psr/log'}]
+        world = {'packages': [{'name': 'guzzlehttp/guzzle'}], 'packages-dev': [{'name': 'psr/log'}]}
+
+        self.assertEqual([{'name': 'guzzlehttp/guzzle'}, {'name': 'psr/log'}], project_fixtures.world_lock(entries, world))
+
+
 class ACaseWhoseDesignedRowsMissItsNewestReleaseIsNotHydrated(unittest.TestCase):
     @staticmethod
     def case(newest, world=True):

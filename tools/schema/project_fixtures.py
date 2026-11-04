@@ -550,6 +550,7 @@ def inputs_of(case):
         # the hydrator serves only these, and the real-solver test serves the world itself.
         checks = {k: dict(a, reason=None) for k, a in world['answers'].items()}
         inputs['solver_world'] = world
+        inputs['lock'] = world_lock(inputs['lock'], world['world']['lock'])
         own = world['world']['repo'].get(f['package'])
         if own is not None and 'releases' in inputs:
             inputs['releases'] = world_releases(own, inputs['releases'])
@@ -576,6 +577,13 @@ def inputs_of(case):
         # The project's vcs repository serves the package: lockrot names its origin from it.
         inputs['root']['repositories'] = [{'type': 'vcs', 'url': 'https://%s/%s.git' % (act['host'], act['repo'])}]
     return inputs
+
+
+def world_lock(entries, lock):
+    """The case's lock entries that the solver world's lock holds, the case's package first: a holder that the world's
+    lock does not hold is no locked package, so no joint request names it."""
+    held = {e['name'] for section in ('packages', 'packages-dev') for e in lock.get(section) or []}
+    return entries[:1] + [e for e in entries[1:] if e['name'] in held]
 
 
 def lock_links(lock, links):
@@ -653,8 +661,8 @@ def recorded_checks(f, rows):
 
 def unhydrated(case):
     """Why the hydrator cannot rebuild the case, or None: an advisory lookup scope other than `all`, an accept-unchecked
-    entry of the project, registry dates on a package that no registry serves, or a solver world whose designed branch
-    rows lack the branch of its newest stable release."""
+    entry of the project, registry dates on a package that no registry serves, a lower tag that a shared commit dates,
+    or a solver world whose designed branch rows lack the branch of its newest stable release."""
     if (case['run'].get('advisory_lookup') or {}).get('scope', 'all') != 'all':
         return 'advisory-lookup'
     if any(c['reason'] == 'accepted_by_config' for c in case['finding'].get('checks_skipped') or []):
@@ -662,14 +670,32 @@ def unhydrated(case):
     if case['finding']['metadata']['status'] == 'not_from_composer_repository' and ((case['finding'].get('age') or {}).get('installed') or {}).get('dated_by'):
         # A variant that keeps a registry's dates on a package that no registry serves: no lock gives both.
         return 'registry-dates'
+    details_rows = rows_of(case.get('details'))
+    if lower_tag_shared(case['finding'], details_rows):
+        # The model dates a lower tag by a commit that its tags share, and the exported rows do not say which commit.
+        return 'lower-tag-shared'
     newest = (((case['finding'].get('age') or {}).get('release')) or {}).get('version') or ''
-    rows = [r['branch'] for r in rows_of(case.get('details'))]
+    rows = [r['branch'] for r in details_rows]
     if case.get('solver_world') is not None and rows and newest and '-' not in newest and not on_branch(newest, rows):
         # lockrot opens a row for each branch of the releases, and the model designs the rows of a solver world.
         # A repository release on another branch (guzzlehttp/psr7 3.0.0 beside the 2.x row of the mc-update-now cases)
         # gets a row that the model does not design, and its move check has no recorded answer.
         return 'designed-rows'
     return None
+
+
+def lower_tag_shared(finding, rows):
+    """Whether a shared commit dates a lower tag that the finding reads: S8 quotes, as a lower bound, a tag that is no
+    row's highest, or the installed branch release is undated while that row's highest tag has a date."""
+    highest = {r.get('highest') for r in rows}
+    s8 = next((s for s in finding.get('signals') or [] if s['id'] == 'S8'), None)
+    data = s8['data'] if s8 is not None else {}
+    for version, at_least in (('newest_version', 'newest_release_at_least'), ('reachable_version', 'reachable_release_at_least')):
+        if data.get(at_least) and data.get(version) and data[version] not in highest:
+            return True
+    installed = next((r for r in rows if r.get('installed')), None)
+    return ((finding.get('age') or {}).get('branch_release_unmeasured') == 'undated_releases' and installed is not None
+            and installed.get('highest_released') is not None)
 
 
 def on_branch(version, branches):
