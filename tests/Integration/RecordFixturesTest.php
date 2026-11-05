@@ -6,8 +6,8 @@ namespace Lockrot\Tests\Integration;
 
 use Lockrot\Clock;
 use Lockrot\Lock\LockFile;
-use Lockrot\Tests\Support\RecorderHttp;
 use Lockrot\Tests\Support\RecordedStatus;
+use Lockrot\Tests\Support\RecorderHttp;
 use Lockrot\Tests\Support\RecorderNames;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
