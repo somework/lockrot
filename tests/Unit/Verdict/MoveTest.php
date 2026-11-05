@@ -758,6 +758,15 @@ final class MoveTest extends TestCase
         self::assertSame([null, 'undated_releases'], [JsonPath::arrayAt($finding, ['age'])['release'], JsonPath::arrayAt($finding, ['age'])['release_unmeasured']]);
     }
 
+    /** Ruling R13-A: the test move names the newest tag that S6 reads, not the installed release, when a higher one exists. */
+    public function testAnOldPromiseTestMoveNamesTheNewestTagWhoseDateIsNotTrusted(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse(['releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('v2.0.0', '2020-01-01', '>=7.2'), ['shared_commit' => true] + self::release('v1.9.3', '2020-06-01', '>=7.2')]]), ['next_step']);
+
+        self::assertSame(['test', 'test it on PHP 8.4'], [$move['kind'], $move['text']]);
+        self::assertSame(['version' => 'v1.9.3', 'released' => null, 'is_installed' => false, 'relation' => null, 'snapshot_time' => null], $move['latest']);
+    }
+
     /**
      * @param array<mixed, mixed> $finding
      *
