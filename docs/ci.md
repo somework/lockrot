@@ -159,9 +159,10 @@ gate: fails · --fail-on=high · 42 findings fail it · target php 8.4 (--target
   `1 finding fails it (left-behind 1, vulnerable-high 1)`. Findings that the baseline exempts are
   counted apart: `1 reaches it and the baseline exempts it`.
 - `--strict-network: a lookup failed` when `--strict-network` tripped.
-- One clause per gap that the gate could not read: `advisories not applied to 6 packages: not
-  checked (offline)`. A grade or `vulnerable` value cannot fail on advisories that lockrot did not
-  check, and the clause says so.
+- One clause per gap of packages whose advisories lockrot did not check (`unchecked`):
+  `advisories not applied to 6 packages: not checked (offline)`. A grade or `vulnerable` value
+  cannot fail on those advisories, and the clause says so. A partial lookup gets no clause: it
+  shows as `security.check` `partial` with its run note, and `--strict-network` fails on it.
 - Last, the target PHP and its source. `(the running PHP)` says that nothing pinned it.
 
 The JSON report writes the line as `gate.text` and the gate data as fields: `gate.failing_by`
