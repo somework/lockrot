@@ -346,8 +346,11 @@ foreach ($gitlabRepos as [$ref, $dir]) {
             fwrite(STDERR, "rate limited; wait for the window and re-run\n");
             exit(1);
         }
-        if (\in_array($result->status(), [200, 404], true)) {
+        if (RecordedStatus::keepsGitlab($result->status())) {
             $record($dir, $result, $keep($result->body(), $role === 'commits' ? GITLAB_COMMIT_KEYS : GITLAB_PROJECT_KEYS, $role === 'commits'));
+        } else {
+            ++$unrecorded;
+            fwrite(STDERR, \sprintf("not recorded: %s %d\n", $result->url(), $result->status()));
         }
     }
 }
