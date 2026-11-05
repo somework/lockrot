@@ -725,8 +725,10 @@ Composer's solver resolves with the constraint inline, with one command for all 
 
 The table, markdown, github, gitlab and sarif formats, `--explain` and the install-time block print
 each command in its POSIX form, for a POSIX shell. `commands[]` carries the argv of each command for
-other shells. For cmd.exe or PowerShell, render `commands[]` as
-[The move](schema.md#the-move) shows, or use the copy menu of the html page. The gitlab report
+other shells. A Windows shell user takes the command from the copy menu of the html page, or quotes
+it for that shell: a pasted POSIX line can lose the caret of `package:^X` and pin the exact version
+with no error. For cmd.exe or PowerShell, render `commands[]` as
+[The move](schema.md#the-move) shows. The gitlab report
 carries no run notes, so read the `moves_not_checked` note that a move points at in another
 format.
 
