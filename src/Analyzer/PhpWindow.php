@@ -417,7 +417,7 @@ final class PhpWindow implements \JsonSerializable
         $patch = self::lowestPatch($links, $minor);
         if ($patch === null) {
             // Only the target point admits the minor: config.platform.php names a patch past the range.
-            return ['php' => $point($minor), 'set_by' => self::clean(self::failing($links, $minor.'.'.MoveCheckers::NEWEST_PATCH))];
+            return ['php' => self::releaseOf($point($minor)), 'set_by' => self::clean(self::failing($links, $minor.'.'.MoveCheckers::NEWEST_PATCH))];
         }
         $below = $patch > 0 ? $minor.'.'.($patch - 1) : (isset($minors[$first - 1]) ? $point($minors[$first - 1]) : null);
 

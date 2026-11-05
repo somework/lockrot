@@ -251,6 +251,29 @@ final class PhpWindowTest extends TestCase
         }
     }
 
+    /**
+     * Only the pinned point admits the minor, so the lower edge is that point. The schema reads it as X.Y.Z.
+     *
+     * @dataProvider pinsPastTheRange
+     */
+    #[DataProvider('pinsPastTheRange')]
+    public function testTheLowerEdgeOfAPinPastTheRangeIsItsXyzRelease(string $pin, string $require, string $expected): void
+    {
+        $window = self::window(['packages' => [self::package('acme/a', ['php' => $require])], 'packages-dev' => []], ['config' => ['platform' => ['php' => $pin]]], '8.4');
+
+        self::assertNotNull($window['without_dev']['lower_edge']);
+        self::assertSame($expected, $window['without_dev']['lower_edge']['php']);
+        self::assertMatchesRegularExpression('/^[0-9]+\.[0-9]+\.[0-9]+$/', $window['without_dev']['lower_edge']['php']);
+    }
+
+    /** @return iterable<string, array{string, string, string}> */
+    public static function pinsPastTheRange(): iterable
+    {
+        yield 'v prefix' => ['v8.4.100', '>=8.4.100', '8.4.100'];
+        yield 'patch suffix' => ['8.4.1-p1', '>8.4.1 <8.4.2', '8.4.1'];
+        yield 'four segments' => ['8.4.1.2', '>=8.4.1.1 <8.4.2', '8.4.1'];
+    }
+
     /** R3-6: config.platform.php 8.2.0 and a floor of 8.2.1. PHP 8.2.1 installs the lock, so 8.2 is in and is the lower edge. */
     public function testAPatchFloorInsideTheTargetMinorIsTheLowerEdge(): void
     {
