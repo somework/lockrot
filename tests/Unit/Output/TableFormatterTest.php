@@ -266,6 +266,16 @@ final class TableFormatterTest extends TestCase
         self::assertContains('baseline: 1 known · 2 new · 0 worsened · 0 stale (lockrot-baseline.json)', $lines);
     }
 
+    public function testABaselineEntryForAPackageNoLongerInTheLockEndsInANote(): void
+    {
+        $report = self::report();
+        $names = array_map(static fn ($finding): string => $finding->package(), $report->findings());
+        $baseline = BaselineEntries::baseline([BaselineEntries::of('a/departed', '1.0.0', Verdict::SILENT, '2026-01-15')]);
+        $lines = self::lines(self::formatter(200, 'high')->format($report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names))));
+
+        self::assertContains('note: baseline lists 1 package no longer in composer.lock: a/departed', $lines);
+    }
+
     public function testAnAllowlistEntryThatAcceptsEveryFlagGetsItsLine(): void
     {
         $at = new \DateTimeImmutable(self::AT);
