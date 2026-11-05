@@ -24,7 +24,7 @@ use Lockrot\Verdict\Finding;
  *
  * @internal
  *
- * @phpstan-type Lock array{php: ?string, released: ?string, repository: ?string, from_composer_repository: bool, dev: bool, branch_snapshot: bool, type: ?string}
+ * @phpstan-type Lock array{php: ?string, released: ?string, repository: ?string, from_composer_repository: bool, dev: bool, branch_snapshot: bool, type: string}
  * @phpstan-type Metadata array<string, mixed>
  */
 final class Explanation

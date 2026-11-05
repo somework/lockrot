@@ -79,6 +79,12 @@ final class ProjectIgnoreListTest extends TestCase
         ProjectIgnoreList::fromExtra(['ignore' => [['package' => 'a/b', 'reason' => 'x', 'expires' => $expires]]]);
     }
 
+    public function testAnExpiryWithATrailingNewlineThrows(): void
+    {
+        $this->expectException(ConfigException::class);
+        ProjectIgnoreList::fromExtra(['ignore' => [['package' => 'a/b', 'reason' => 'x', 'expires' => "2027-01-01\n"]]]);
+    }
+
     /** @return iterable<string, array{string}> */
     public static function impossibleDates(): iterable
     {

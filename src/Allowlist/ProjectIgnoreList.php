@@ -124,7 +124,7 @@ final class ProjectIgnoreList
             return null;
         }
         $matches = [];
-        if (!\is_string($expires) || preg_match('{^(\d{4})-(\d{2})-(\d{2})$}', $expires, $matches) !== 1) {
+        if (!\is_string($expires) || preg_match('{^(\d{4})-(\d{2})-(\d{2})$}D', $expires, $matches) !== 1) {
             throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] (%s) "expires" must be YYYY-MM-DD', $index, $package));
         }
         if (!checkdate((int) $matches[2], (int) $matches[3], (int) $matches[1])) {

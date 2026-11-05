@@ -98,8 +98,11 @@ final class Thresholds
         return null;
     }
 
-    /** A high level below its warn level makes an age `high` before it is `warn`, and the exclusive groups of the score model stop holding. */
-    /** @param list<string> $unsetKeys */
+    /**
+     * A high level below its warn level makes an age `high` before it is `warn`, and the exclusive groups of the score model stop holding.
+     *
+     * @param list<string> $unsetKeys
+     */
     private static function refuseHighBelowWarn(string $what, int $warn, int $high, array $unsetKeys): void
     {
         if ($high >= $warn) {
