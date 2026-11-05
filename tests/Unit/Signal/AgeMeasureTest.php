@@ -191,8 +191,8 @@ final class AgeMeasureTest extends TestCase
         self::assertUnmeasured(AgeMeasure::ABOVE_LISTED_RELEASES, $measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.2.1']), $listed)));
         // The highest listed tag itself is not above anything.
         self::assertTrue($measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.2.0']), $listed))->isMeasured());
-        // Both refusals at once: the undated reason is the one given.
-        self::assertUnmeasured(AgeMeasure::UNDATED_RELEASES, $measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.3.1']), $undatedHighest)));
+        // Both refusals at once: no date of the row would measure a version above it, so that reason is the one given.
+        self::assertUnmeasured(AgeMeasure::ABOVE_LISTED_RELEASES,$measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.3.1']), $undatedHighest)));
     }
 
     /** A shared commit dates a tag before its release, so the branch would read older than it is, and S8 would fire early. */

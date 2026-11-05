@@ -126,13 +126,14 @@ final class AgeMeasure
         if ($own === null) {
             return AgeReading::unmeasuredBecause(self::NO_BRANCH_ROW);
         }
-        $at = $own['at'];
-        if ($at === null || $own['highest']['at'] === null || self::sharedCommitDates($metadata, $own)) {
-            return AgeReading::unmeasuredBecause(self::UNDATED_RELEASES);
-        }
+        // Before the date test: no date of the row closes this gap, so it is no S10 release_dates gap.
         // A pre-release above the branch's newest stable release is still on that branch: S8 judges that release.
         if ($aliasLine === null && VersionParser::parseStability($version) === 'stable' && $this->isAhead($version, $own['highest']['normalized'])) {
             return AgeReading::unmeasuredBecause(self::ABOVE_LISTED_RELEASES);
+        }
+        $at = $own['at'];
+        if ($at === null || $own['highest']['at'] === null || self::sharedCommitDates($metadata, $own)) {
+            return AgeReading::unmeasuredBecause(self::UNDATED_RELEASES);
         }
 
         return $this->reading($at, $own['version'], $own['dated_by'] ?? null, [$this->thresholds->releaseWarnYears(), $this->thresholds->releaseHighYears()], AgeReading::RELEASE);

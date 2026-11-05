@@ -609,6 +609,16 @@ final class NotCheckedRuleTest extends TestCase
         self::assertSame([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S8]], self::releaseDatesCauses($signal));
     }
 
+    /** An installed stable version above its row's highest tag leaves S8 unmeasured whether that tag is dated or not, so no date would close a gap. */
+    public function testAnInstalledVersionAboveAnUndatedHighestTagHasNoReleaseDatesGap(): void
+    {
+        $metadata = F::metadata([['v3.0.0', '2026-01-01T00:00:00+00:00'], ['v2.5.0', null]]);
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v2.5.1']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertNull($signal);
+    }
+
     /** One entry, one cause per kind of missing date, in the order of the signals that each blocks. */
     public function testEachBlockedSignalKeepsItsOwnCause(): void
     {
