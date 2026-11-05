@@ -17,8 +17,8 @@ use Lockrot\Deadline;
 
 /**
  * Loads a name's versions from the project's Composer, package and path repositories: the tagged stabilities first,
- * then `dev` for a name with no tagged release or one that the root admits at `dev`, as Composer's
- * repository loads a name's `~dev` file. Composer serves a file
+ * then `dev` for a name that the root admits at `dev`, as Composer's repository loads a name's `~dev` file.
+ * A name that only a `~dev` file lists is not claimed by a root that refuses `dev`. Composer serves a file
  * that this process already fetched from its cache, so a name that the run read costs no request.
  * The first canonical repository that lists a name or fails on it shadows the later ones. A repository with `only`,
  * `exclude` or `canonical` is asked as Composer asks it, through its FilterRepository. A vcs or
@@ -141,6 +141,9 @@ final class RepositoryVersions implements VersionSource
             $found = [];
             foreach ([self::STABLE, self::DEV] as $stabilities) {
                 $asked = array_diff_key($pending, $listed) + $tagged;
+                if ($stabilities === self::DEV) {
+                    $asked = array_filter($asked, fn (string $name): bool => $this->admitsDev($name), \ARRAY_FILTER_USE_KEY);
+                }
                 if ($asked !== [] && $this->deadline->isPast()) {
                     // A name that this repository's tags answered and that needs no dev versions is loaded.
                     $this->overBudget(array_diff_key($pending, array_diff_key($found, $asked)));
@@ -196,7 +199,7 @@ final class RepositoryVersions implements VersionSource
                 $tags = $repository->loadPackages([$name => null], self::STABLE, []);
                 $versions = self::named($tags, $name);
                 $found = $tags['namesFound'];
-                if ($versions === [] || $this->admitsDev($name)) {
+                if ($this->admitsDev($name)) {
                     if ($this->deadline->isPast()) {
                         return $this->overBudget([$name => null]);
                     }
