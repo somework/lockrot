@@ -145,6 +145,14 @@ final class TokensTest extends TestCase
         self::assertSame(['GITHUB_TOKEN' => 'https://'], Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => 'https://'], null)->withheld());
     }
 
+    public function testAnUnparseableIssuerWithCredentialsIsWithheldWithoutThem(): void
+    {
+        $withheld = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => 'https://ci:SECRETVALUE@ghe.example:99999'], null)->withheld();
+
+        self::assertArrayHasKey('GITHUB_TOKEN', $withheld);
+        self::assertStringNotContainsString('SECRETVALUE', $withheld['GITHUB_TOKEN']);
+    }
+
     public function testLockrotsOwnGitlabTokenHasNoIssuerCheck(): void
     {
         $tokens = Tokens::fromEnvironment(['LOCKROT_GITLAB_TOKEN' => 'a', 'GITLAB_TOKEN' => 'g', 'CI_SERVER_URL' => 'https://gitlab.example.com'], null);

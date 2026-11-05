@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Forge;
 
+use Lockrot\Data\Repository\RepositoryUrl;
+
 /**
  * Only lockrot's own tokens: Composer's HTTP layer applies its own credentials ({@see ForgeAuth}).
- * A token goes only to the host that issued it. `GITHUB_TOKEN` and `GITLAB_TOKEN` count only when
- * each issuer variable of their platform is unset, empty, or names the public host. Otherwise the
- * token is withheld, never sent elsewhere. The issuer variables are those of the CI systems and of
+ * `GITHUB_TOKEN` and `GITLAB_TOKEN` count only when each issuer environment variable of their
+ * platform is unset, empty, or names the public host. Otherwise the token is withheld, never sent
+ * elsewhere. An issuer that only a gh or glab config file names is not read. The issuer variables are those of the CI systems and of
  * the gh and glab tools, and each can hold a URL or a bare host. lockrot's own names stand for the
  * public host.
  *
@@ -86,7 +88,7 @@ final class Tokens
             }
             $host = self::host($url);
             if ($host !== $publicHost) {
-                $withheld[$name] = $host ?? $url;
+                $withheld[$name] = $host ?? RepositoryUrl::inText($url);
 
                 return null;
             }
