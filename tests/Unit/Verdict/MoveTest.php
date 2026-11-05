@@ -714,6 +714,69 @@ final class MoveTest extends TestCase
     }
 
     /**
+     * Ruling R13-A: a snapshot of a package with a stable tag never gets `no-tag`. S6 names the tag
+     * whose date S2 does not trust, with no date, and the move targets the highest tag of its row.
+     *
+     * @return iterable<string, array{0: list<array<string, mixed>>, 1: string, 2: string, 3: string, 4: non-empty-string, 5?: string}>
+     */
+    public static function untrustedNewestTags(): iterable
+    {
+        yield 'a dated highest tag beside a newer-dated lower tag on a shared commit' => [
+            [self::release('v2.0.0', '2024-01-01', '>=7.2'), ['shared_commit' => true] + self::release('v1.9.3', '2025-06-01', '>=7.2')],
+            'v1.9.3', '1.x', 'v1.9.3', 'require a tag — the newest is v1.9.3; 1.x needs php >=7.2, which require.php allows',
+        ];
+        yield 'an older dated alpha above stable tags on a shared commit' => [
+            array_merge([self::release('v4.0.0-alpha1', '2020-01-01', '>=7.2')], array_map(static fn (string $version): array => ['shared_commit' => true] + self::release($version, '2021-01-01', '>=7.2'), ['v3.1.0', 'v3.2.0', 'v3.3.0'])),
+            'v3.3.0', '3.x', 'v3.3.0', 'require a tag — the newest is v3.3.0; 3.x needs php >=7.2, which require.php allows',
+        ];
+        yield 'a highest tag on a shared commit' => [
+            array_map(static fn (string $version): array => ['shared_commit' => true] + self::release($version, '2023-06-05', '^8.1'), ['v10.13.1', 'v10.20.0', 'v10.49.0']),
+            'v10.49.0', '10.x', 'v10.49.0', 'require a tag — the newest is v10.49.0; 10.x needs php ^8.1, which require.php allows', '>=8.1',
+        ];
+        yield 'a highest tag on a shared commit above a tag on its own commit' => [
+            array_merge([self::release('v1.0.0', '2019-01-01', '>=7.2')], array_map(static fn (string $version): array => ['shared_commit' => true] + self::release($version, '2023-06-05', '>=7.2'), ['v2.0.0', 'v2.0.1', 'v2.0.2'])),
+            'v2.0.2', '2.x', 'v2.0.2', 'require a tag — the newest is v2.0.2; 2.x needs php >=7.2, which require.php allows',
+        ];
+    }
+
+    /**
+     * @dataProvider untrustedNewestTags
+     *
+     * @param list<array<string, mixed>> $releases
+     * @param non-empty-string           $text
+     */
+    #[DataProvider('untrustedNewestTags')]
+    public function testASnapshotWhoseNewestTagHasNoTrustedDateRequiresATagWithNoDate(array $releases, string $s6Version, string $branch, string $target, string $text, string $projectPhp = '>=7.4'): void
+    {
+        $run = ['target_php' => '8.4', 'project_php' => $projectPhp, 'fail_on' => 'high', 'include_dev' => false];
+        $finding = self::analyse(['lock' => [['version' => 'dev-master']], 'root' => ['require' => ['php' => $projectPhp]], 'run' => $run, 'releases' => $releases]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        self::assertSame(['tag', $branch, ['version' => $target, 'released' => null, 'is_installed' => false, 'relation' => null]], [$move['kind'], $move['to_branch'], array_diff_key(JsonPath::arrayAt($move, ['latest']), ['snapshot_time' => true])]);
+        self::assertStringStartsWith($text, JsonPath::stringAt($move, ['text']));
+        self::assertSame([$s6Version, null, null], self::s6Version($finding));
+        self::assertSame([null, 'undated_releases'], [JsonPath::arrayAt($finding, ['age'])['release'], JsonPath::arrayAt($finding, ['age'])['release_unmeasured']]);
+    }
+
+    /**
+     * @param array<mixed, mixed> $finding
+     *
+     * @return array{mixed, mixed, mixed} S6's `last_stable_version`, `last_stable_release` and `tag_relation`
+     */
+    private static function s6Version(array $finding): array
+    {
+        foreach (JsonPath::arrayAt($finding, ['signals']) as $signal) {
+            self::assertIsArray($signal);
+            if ($signal['id'] === 'S6') {
+                $data = JsonPath::arrayAt($signal, ['data']);
+
+                return [$data['last_stable_version'], $data['last_stable_release'], $data['tag_relation']];
+            }
+        }
+        self::fail('no S6');
+    }
+
+    /**
      * @param array<mixed, mixed> $case
      *
      * @return array<mixed, mixed> the case package's finding as report-2 writes it

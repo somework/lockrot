@@ -250,7 +250,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
         $sharedHighest = PackageMetadata::fromPackages('a/b', [$top, $middle, $lower], new \DateTimeImmutable(self::FIXED));
         self::assertTrue($sharedHighest->hasStableRelease());
         self::assertNull($sharedHighest->lastStableReleaseAt(), 'the package\'s age is its highest tag\'s, and that one is dated by no release');
-        self::assertNull($sharedHighest->lastStableVersion());
+        self::assertSame('v10.49.0', $sharedHighest->lastStableVersion(), 'S6 and the moves name the highest tag with no date');
         self::assertTrue($sharedHighest->lastStableSharesItsCommit(), 'S10 names the shared commit as the cause');
         self::assertFalse(PackageMetadata::fromPackages('a/b', [$top, $middle, $lower, $unique], new \DateTimeImmutable(self::FIXED))->lastStableSharesItsCommit());
     }
@@ -334,7 +334,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
             $metadata = PackageMetadata::fromPackages('a/b', $order, new \DateTimeImmutable(self::FIXED));
 
             self::assertNull($metadata->lastStableReleaseAt());
-            self::assertNull($metadata->lastStableVersion());
+            self::assertSame('v3.3.0', $metadata->lastStableVersion(), 'the newest tag by date, with no date');
             self::assertTrue($metadata->lastStableSharesItsCommit(), 'S10 names the shared commit as the cause');
         }
     }
@@ -453,7 +453,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame(3, $meta->releaseCount());
     }
 
-    public function testNoDatesLeavesLastStableNull(): void
+    public function testNoDatesLeaveTheLastStableDateNullAndNameTheHighestTag(): void
     {
         $version = $this->load(['name' => 'a/b', 'version' => '1.0.0']);
 
@@ -461,7 +461,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
 
         self::assertTrue($meta->hasStableRelease());
         self::assertNull($meta->lastStableReleaseAt());
-        self::assertNull($meta->lastStableVersion());
+        self::assertSame('1.0.0', $meta->lastStableVersion());
     }
 
     public function testTypeComesFromTheFirstVersionAndTheRepositoryFromTheHighest(): void
@@ -564,7 +564,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
         $unknown = PackageMetadata::fromPackages('a/b', [$lts, $undated], new \DateTimeImmutable(self::FIXED));
         self::assertTrue($unknown->hasStableRelease());
         self::assertNull($unknown->lastStableReleaseAt());
-        self::assertNull($unknown->lastStableVersion());
+        self::assertSame('2.0.0', $unknown->lastStableVersion(), 'the undated highest tag');
 
         $known = PackageMetadata::fromPackages('a/b', [$lts, $undated, $datedHighest], new \DateTimeImmutable(self::FIXED));
         self::assertSame('2.0.1', $known->lastStableVersion());
