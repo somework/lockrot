@@ -720,8 +720,8 @@ writes the move as `next_step`. Abridged from a recorded run on wallabag's lock:
   still refuses the lock itself: the moves_not_checked note names the first cause." The run note
   [`moves_not_checked`](notes.md#moves_not_checked) names the cause of Composer's first problem.
 
-The `update now:` footer line lists every package whose `update` move Composer's solver resolves
-with the constraint inline, with one command for all of them.
+The `update now:` footer line lists the candidates of the Update now step below, whose `update` move
+Composer's solver resolves with the constraint inline, with one command for all of them.
 
 The table, markdown, github, gitlab and sarif formats, `--explain` and the install-time block print
 each command in its POSIX form, for a POSIX shell. `commands[]` carries the argv of each command for
