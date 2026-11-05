@@ -32,6 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   so a left-behind package with only medium or low advisories can drop a grade. Action: if you gate
   at `critical` or `high`, run once without the gate and compare each finding's verdict.
   ([The score](docs/verdicts.md#score))
+- **Config:** the default target PHP reads `config.platform.php` from Composer's merged config, the
+  global `config.json` included, and reads a `v`-prefixed value as Composer does. 0.13 ignored the
+  global file. A machine that sets it can judge another PHP than before, so a grade or the gate can
+  change on an unchanged lock. Action: pin `--target-php` (or `LOCKROT_TARGET_PHP`, or
+  `extra.lockrot.target-php`) to keep the old target. ([Configuration](docs/configuration.md))
 - **Breaking:** **CLI:** `--fail-on=unchecked` also fails when advisories or an advisory's release
   data were not read, when a repository host cannot be asked, and on a package from vcs or an
   unknown origin. A path package and a package outside the `composer-repositories` scope are skips.
@@ -500,9 +505,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   repeated `packages` key.
 - **CLI:** the `--explain` branch table keeps its columns in place when a tag holds a control or
   zero-width character. ([Explaining one package](docs/configuration.md#explaining-one-package))
-- **Config:** the default target PHP reads `config.platform.php` from Composer's merged config, the
-  global `config.json` included, and reads a `v`-prefixed value as Composer does.
-  ([Configuration](docs/configuration.md))
 - **All formats:** a GitHub secondary rate limit that answers 403 without rate-limit headers gives
   the reason `rate_limit` and the note `repository_activity_rate_limited`.
 - **Install-time:** without ext-curl, the install-time check stops repository activity requests at
