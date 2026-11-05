@@ -164,7 +164,7 @@ S6's evidence reads the same whether or not the package ever released. Its `data
 | `version` | The installed version, as the lock writes it |
 | `reason` | `branch_snapshot` when the installed version is a branch (checked first), `no_stable_release` when it is not and the repository lists no tagged version. An [open set](schema.md#open-sets) |
 | `has_stable_release` | Whether the repository lists any tagged version. A pre-release counts, a branch does not. Null when lockrot loaded no repository metadata for the package (a `vcs` or `path` entry, a package the repository does not list, metadata that did not load) |
-| `last_stable_release`, `last_stable_version` | The newest *dated* tagged release, which is not always the highest tag. Null with no tagged release, with no metadata, or when the highest tag has no date lockrot trusts and no [monorepo parent](#dates-from-the-monorepo) dates it |
+| `last_stable_release`, `last_stable_version` | The newest *dated* tagged release, a pre-release included, which is not always the highest tag. Both are null with no tagged release or with no metadata. `last_stable_release` is also null when the highest tag has no date lockrot trusts and no [monorepo parent](#dates-from-the-monorepo) dates it, while `last_stable_version` stays set. A set `last_stable_release` implies a set `last_stable_version` |
 | `last_stable_dated_by` | The monorepo parent that dated that release, else null |
 | `snapshot_time` | For a snapshot, the lock's `time`: the date of the commit the branch pointed at, not a release. Null for `no_stable_release`, and when the lock entry has no `time` |
 | `tag_relation` | How the newest tag compares with the snapshot: `older`, `newer` or `same`, else null. An [open set](schema.md#open-sets) |
