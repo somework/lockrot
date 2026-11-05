@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-zlselO4zL28ltduyVdE/tUsmNXKHnIOsYS5Y5Em/qCI='; style-src 'sha256-Y3UQjsf0iVGyQV9ZbWgCK1Z0VhbhYl9g4Ps2oeyJVe0='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Skrm3OfVy2dXaZDrBaVae4LjqzQGkRPs/WTbTDwH6Dc='; style-src 'sha256-1u9G8Ll+yquXZIjZgB8x6k66Stf7zuARsdkitoCBpzI='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -3257,6 +3257,7 @@ button.pill {
     border-bottom: none;
   }
   a.d3-adv-id::after,
+  a.d3-adv-src::after,
   .detail-head-line a.out::after {
     content: " " attr(href);
     font: 400 var(--text-xs) var(--mono);
@@ -8470,6 +8471,7 @@ a.ov-ex-row:hover {
 		allowlisted: "allowlisted",
 		anonymous_budget: "anonymous request budget spent",
 		branch_snapshot: "a branch snapshot has no release branch",
+		composer_json_invalid: "Composer cannot load composer.json",
 		fetch_failed: "request failed",
 		host_not_supported: "host not supported",
 		install_time_budget: "install-time budget spent",
@@ -10277,12 +10279,12 @@ a.ov-ex-row:hover {
 		const rows = sorted.map((row, at) => {
 			const first = row.cve ? firstOfCve.get(row.cve) : void 0;
 			if (row.cve && first === void 0) firstOfCve.set(row.cve, at);
-			const name = row.cve ?? row.id;
 			return {
-				name,
-				href: safeHref(row.link),
-				linkName: newTab(name),
-				source: row.cve !== null && row.cve !== row.id ? row.id : null,
+				ids: advisorySourceIds(row).map(({ text, href }) => ({
+					text,
+					href,
+					linkName: newTab(text)
+				})),
 				deciding: row.deciding,
 				severity: row.severity,
 				fix: advisoryFixWords$1(row.fix),
@@ -10889,6 +10891,7 @@ a.ov-ex-row:hover {
 			noCve: false
 		}];
 	}
+	var advisorySourceIds = (row) => advisoryIds(row).filter(({ noCve }) => !noCve);
 	var advisoryRowLabel2 = ({ finding, row }) => `${finding.package}, ${row.severity}, ${row.cve ?? row.id}`;
 	var ADVISORY_HEAD = {
 		sev: "Severity",
@@ -12009,11 +12012,15 @@ a.ov-ex-row:hover {
 			...collapsed ? ["is-collapsed"] : [],
 			...tone === null ? [] : ["is-toned", toneClass(tone)]
 		].join(" ");
+		const printed = usePrinted();
 		const words = laneWords(lane);
+		const hidden = collapsed && !printed;
 		return u$1("div", {
 			role: "row",
 			className: classes,
 			"data-branch": lane.branch,
+			"aria-hidden": hidden || void 0,
+			inert: hidden || void 0,
 			children: [
 				u$1("span", {
 					role: "rowheader",
@@ -13353,6 +13360,7 @@ a.ov-ex-row:hover {
 			}, i))
 		})] });
 	}
+	var idClass = (at) => at === 0 ? "d3-adv-id" : "d3-adv-src";
 	function AdvisoryRow({ row, rowId, at, run, withTag, reveal }) {
 		const { sameAs } = row;
 		return u$1("li", {
@@ -13362,21 +13370,17 @@ a.ov-ex-row:hover {
 				className: "d3-adv-head",
 				children: [
 					withTag && u$1(S, { children: [severityTag(run, row.severity), " "] }),
-					row.href === null ? u$1("span", {
-						className: "d3-adv-id",
-						children: row.name
+					row.ids.map((id, i) => u$1(S, { children: [i > 0 && " ", id.href === null ? u$1("span", {
+						className: idClass(i),
+						children: id.text
 					}) : u$1("a", {
-						className: "lnk d3-adv-id",
-						href: row.href,
+						className: `lnk ${idClass(i)}`,
+						href: id.href,
 						target: "_blank",
 						rel: "noopener noreferrer",
-						"aria-label": row.linkName,
-						children: row.name
-					}),
-					row.source !== null && u$1(S, { children: [" ", u$1("span", {
-						className: "d3-adv-src",
-						children: row.source
-					})] }),
+						"aria-label": id.linkName,
+						children: id.text
+					})] }, id.text)),
 					row.deciding && u$1(S, { children: [" ", u$1("span", {
 						className: "d3-rung-mark",
 						children: SECURITY_WORDS.deciding
@@ -13394,7 +13398,7 @@ a.ov-ex-row:hover {
 						children: SECURITY_WORDS.separator
 					}), u$1(Affects$1, {
 						affects: row.affects,
-						advisory: row.source ?? row.name
+						advisory: row.ids.at(-1)?.text ?? ""
 					})] }),
 					sameAs !== null && u$1("span", {
 						className: "d3-adv-same",
@@ -13670,9 +13674,8 @@ a.ov-ex-row:hover {
 		return reading(flag.id, n === 1 ? `${capitalize(severityPhrase(run, term.severity, true))} affects your version` : ` affect your version. The ${worst} is ${severityPhrase(run, term.severity, false)}`, {
 			count: n === 1 ? null : `${n} advisories`,
 			advisory: {
-				name: deciding.cve ?? deciding.id,
-				title: deciding.title,
-				href: safeHref(deciding.link)
+				ids: advisorySourceIds(deciding),
+				title: deciding.title
 			},
 			after: branchFixWords(finding, n, ctx.installedRung)
 		});
@@ -13723,11 +13726,11 @@ a.ov-ex-row:hover {
 			r.text,
 			...advisory === null ? [] : [
 				" (",
-				advisory.href === null ? advisory.name : {
-					href: advisory.href,
-					text: advisory.name,
-					name: newTab(advisory.name)
-				},
+				...advisory.ids.flatMap(({ text, href }, at) => [...at > 0 ? [" "] : [], href === null ? text : {
+					href,
+					text,
+					name: newTab(text)
+				}]),
 				advisory.title === null ? ")" : `: ${advisory.title})`
 			],
 			...r.after === null ? [] : [`. ${r.after}`],
@@ -20645,7 +20648,7 @@ a.ov-ex-row:hover {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.11";
+	var version = "0.14.0-rc.12";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");
