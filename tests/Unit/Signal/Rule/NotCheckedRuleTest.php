@@ -619,6 +619,17 @@ final class NotCheckedRuleTest extends TestCase
         self::assertNull($signal);
     }
 
+    /** A parent dates the newest release and the installed tag sits on its own commit: no shared commit causes the gap. */
+    public function testAnInstalledTagOnItsOwnCommitIsNotBlamedOnASharedCommit(): void
+    {
+        $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
+        $metadata = new PackageMetadata('vendor/pkg', false, null, true, new \DateTimeImmutable('2021-08-30T00:00:00+00:00'), 'v4.4.31', 3, null, 'library', new \DateTimeImmutable(self::NOW), [], [], 'acme/parent');
+        $facts = new PackageFacts(F::package(['version' => 'v4.4.30', 'time' => '2020-10-01T00:00:00+00:00', 'php' => '>=7.1.3']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []);
+
+        self::assertFalse($metadata->sharesItsCommit('v4.4.30'));
+        self::assertArrayNotHasKey(NotCheckedRule::CAUSE_INSTALLED_SHARED_COMMIT, self::releaseDatesCauses($rule->evaluate($facts)));
+    }
+
     /** One entry, one cause per kind of missing date, in the order of the signals that each blocks. */
     public function testEachBlockedSignalKeepsItsOwnCause(): void
     {
