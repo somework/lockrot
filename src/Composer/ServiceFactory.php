@@ -151,6 +151,7 @@ final class ServiceFactory
         $configuredCacheDir = $config->get('cache-dir');
         $cacheDir = rtrim(\is_string($configuredCacheDir) ? $configuredCacheDir : sys_get_temp_dir(), '/').'/lockrot/';
         $composerCache = new Cache($io, $cacheDir);
+        $composerCache->setReadOnly((bool) $config->get('cache-read-only'));
 
         return $composerCache->isEnabled() ? new ComposerCacheAdapter($composerCache) : new ArrayCache();
     }

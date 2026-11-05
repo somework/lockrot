@@ -10,8 +10,9 @@ use Lockrot\Data\Http\HttpResult;
 use Lockrot\Json\JsonWriter;
 
 /**
- * A disabled or read-only cache needs no guard here: Composer\Cache::read() and ::write() check
- * isEnabled() themselves, so a read is a miss and a write does nothing. The cache is best effort:
+ * A disabled cache needs no guard here: Composer\Cache::read() and ::write() check isEnabled()
+ * themselves, so a read is a miss and a write does nothing. A read-only cache (the caller sets
+ * Cache::setReadOnly()) still serves reads, and its write does nothing. The cache is best effort:
  * a read that throws is a miss and a write that throws is dropped. Composer\Cache::write() rethrows
  * an ErrorException when its retry fails, as on a rename that another process blocks, and a failed
  * read throws one through Composer's error handler.
