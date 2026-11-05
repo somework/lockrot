@@ -29,7 +29,7 @@ When lockrot runs in a container, pass `-e GITHUB_SERVER_URL` with `-e GITHUB_TO
 ([Which credentials](internals.md#which-credentials)).
 
 `--fail-on` takes a comma-separated list, at most one value of each kind. A finding fails the run
-when it reaches any value of the list:
+when it reaches a value of the list and the baseline does not exempt it:
 
 | Fail the build on | Value | Kind |
 |---|---|---|
