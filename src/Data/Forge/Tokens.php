@@ -88,7 +88,7 @@ final class Tokens
             }
             $host = self::host($url);
             if ($host !== $publicHost) {
-                $withheld[$name] = $host ?? RepositoryUrl::inText($url);
+                $withheld[$name] = $host ?? RepositoryUrl::shown(strpos($url, '://') === false ? 'https://'.$url : $url) ?? RepositoryUrl::inText($url);
 
                 return null;
             }

@@ -151,6 +151,9 @@ final class TokensTest extends TestCase
 
         self::assertArrayHasKey('GITHUB_TOKEN', $withheld);
         self::assertStringNotContainsString('SECRETVALUE', $withheld['GITHUB_TOKEN']);
+
+        $bare = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GH_HOST' => 'ci:SECRETVALUE@ghe.example:99999'], null)->withheld();
+        self::assertStringNotContainsString('SECRETVALUE', $bare['GITHUB_TOKEN']);
     }
 
     public function testLockrotsOwnGitlabTokenHasNoIssuerCheck(): void
