@@ -309,16 +309,21 @@ final class BaselinedScenario
         }
         $packages = array_values(array_unique($shapes));
         sort($packages);
+        $run = $check->run();
+        if ($run === null) {
+            throw new \LogicException('the check has no run settings');
+        }
+        $plain = $analysis->report()->withRun($run);
         foreach ($packages as $package) {
             $finding = null;
-            foreach ($check->findings() as $each) {
+            foreach ($plain->findings() as $each) {
                 $finding = $each->package() === $package ? $each : $finding;
             }
             $facts = $analysis->facts($package);
             if ($facts === null || $finding === null) {
                 throw new \LogicException('no facts for '.$package);
             }
-            $this->put('check/explain/'.str_replace('/', '--', $package).'.json', (new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), self::TARGET_PHP, $check, self::projectPhp($this->scenario['after']))));
+            $this->put('check/explain/'.str_replace('/', '--', $package).'.json', (new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), self::TARGET_PHP, $plain, self::projectPhp($this->scenario['after']))));
         }
 
         return $packages;
