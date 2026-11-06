@@ -362,7 +362,8 @@ maintainer.
       planned tag day. If the final tag falls on another day, add a commit to the release pull
       request that changes only that date and `docs/example-run.md`. That commit changes no file
       of the contract bundle. If the day changes after the merge, open a pull request into `main`
-      that changes only that date and `docs/example-run.md`. Then tag its merge commit.
+      that changes only that date and `docs/example-run.md`. Then tag the commit that its merge
+      writes on `main`.
 
     - Check `resources/php-ga-dates.json` against the PHP release schedule on php.net: the
       schedule page of the next minor (`https://wiki.php.net/todo/php<major><minor>`) and
@@ -448,9 +449,10 @@ maintainer.
       for the ruleset of `main`. Each job of `ci.yml` needs one entry, named as its `name:` key
       reads, or by its job id when it has none. A matrix job needs one entry for each row. A ruleset
       requires a check by its name, so a red job outside the list does not stop the merge. Add each
-      missing entry to the ruleset before the merge. Remove each required context that no job or
-      matrix row of `ci.yml` produces: no run reports it, so the pull request waits for it with no
-      way to bypass. A context that a matrix row once produced is stale after the matrix changes.
+      missing entry to the ruleset before the merge. Read the matrix rows that a pull request into
+      `main` runs. Remove each required context that no job or such row of `ci.yml` produces: no
+      run reports it, so the pull request waits for it with no way to bypass. A context of a
+      removed matrix row is stale.
     - When the release changes the flag set, a schema number or the score model, the lockrot.dev
       change that reads it is merged. The lockrot.dev build stops on a set that it does not know.
     - Before the first final renderer tag, list the renderer's rulesets with
@@ -462,8 +464,10 @@ maintainer.
       `update-renderer` then cannot name one source commit for the release.
 
 4. Squash merge the release pull request into `main` with CI green. GitHub refuses a rebase merge
-   of more than 100 commits, and the ruleset of `main` requires a linear history, so a release
-   branch of that size merges only as a squash. The integration branch keeps the commit history.
+   of more than 100 commits
+   ([repository limits](https://docs.github.com/en/repositories/creating-and-managing-repositories/repository-limits)),
+   and the ruleset of `main` requires a linear history, so a release branch of that size merges
+   only as a squash. The release branch keeps the commit history.
    Write the squash message as a release summary: the subject names the version, and the body
    lists the user-visible changes of the CHANGELOG section. Do not keep the default
    concatenation of every commit message. Remove `## Review notes` from the message. On a pull
@@ -476,7 +480,7 @@ maintainer.
 5. When a schema file changes, `.github/workflows/schemas.yml` asks lockrot.dev to publish it.
    Approve the `schemas` environment of the lockrot.dev run, then check that each new schema URL
    answers (`curl -fsI https://lockrot.dev/schema/<document>-<number>.json`).
-6. When the `ci.yml` push run of the merge commit on `main` passes, tag the commit `vX.Y.Z` and
+6. When the `ci.yml` push run of the squash commit on `main` passes, tag the commit `vX.Y.Z` and
    push the tag. `.github/workflows/phar.yml` refuses these tags:
 
     - a tag that is not on `main`, or whose `ci.yml` push run on `main` did not pass
@@ -507,6 +511,9 @@ maintainer.
 8. After the GitHub release of step 6, release [lockrot-action](https://github.com/somework/lockrot-action)
    when its `@v1` jobs need the new lockrot. For lockrot 0.14.0, the action release is v1.2.0 from
    the branch `feat/one-run-output`. Each merge and the release need the maintainer's approval.
+9. Start the next release branch from the squash commit on `main`. The old release branch holds
+   commits that `main` does not, so a second pull request from it shows them again and conflicts
+   where later commits change the same lines.
 
     1. Merge the branch of the action release into the action's `main`, with the release's
        `CHANGELOG.md` section.
