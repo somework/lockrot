@@ -95,10 +95,6 @@ final class Tokens
         return $token;
     }
 
-    /**
-     * Normalised as {@see RepoRef::host()} is, so the port stays. A value without a scheme is a
-     * bare host. Null when the value does not parse.
-     */
     /** An issuer that does not parse is shown without what precedes its last `@`: userinfo can hold any character, a `/` included. */
     private static function withoutUserinfo(string $url): string
     {
@@ -111,6 +107,10 @@ final class Tokens
         return ($scheme !== false && $scheme < $at ? substr($url, 0, $scheme + 3) : '').substr($url, $at + 1);
     }
 
+    /**
+     * Normalised as {@see RepoRef::host()} is, so the port stays. A value without a scheme is a
+     * bare host. Null when the value does not parse.
+     */
     private static function host(string $url): ?string
     {
         $parts = RepoLocator::hostAndPath(strpos($url, '://') === false ? 'https://'.$url : $url);
