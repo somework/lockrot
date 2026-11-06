@@ -565,13 +565,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([Under `--dry-run`](docs/install-time.md#a-note-on-the-dry-run-development-flag))
 - **All formats:** S6 `last_stable_version` is set whenever the package has a tag, also when the
   newest date is a shared commit's. A pinned snapshot with a tag gets a `tag` move, never `no-tag`,
-  and it targets a stable tag, never a pre-release. An old-promise test move does not call the
-  installed release the newest beside a higher tag.
+  and it targets a stable tag, or the pre-release when no stable tag exists. An old-promise test
+  move names a higher tag, else the installed release with the date that S5 judges.
   ([What S6 carries](docs/verdicts.md#what-s6-carries))
 - **table, github, markdown, Install-time:** on the `update now:` line, the raise clause after the
   platform sentence starts with a capital letter, as in the finding's `do:` line.
-- **json:** `run.php_window.*.lower_edge.php` is X.Y.Z when `config.platform.php` is `v8.4.100`,
-  `8.4.1-p1` or `8.4.1.2`. ([The PHP window](docs/verdicts.md#the-php-window))
+- **All formats:** the PHP window reads a `config.platform.php` pin such as `v8.4.100`, `8.4.1-p1`
+  or `8.4.1.2` at its X.Y.Z release, and `run.php_window.*.lower_edge.php` is X.Y.Z. A range that
+  only the suffix meets, such as `>8.4.1` for `8.4.1-p1`, keeps the minor out of the window.
+  ([The PHP window](docs/verdicts.md#the-php-window))
+- **All formats:** an installed split tag on its own commit, whose newest release a parent dates,
+  reads `parent_split` in `age.installed_unmeasured` and `libyears_unmeasured`, and the root
+  `libyears.unmeasured` counts it. Its S10 `release_dates` clause no longer says that the tag
+  shares a commit. ([Dates from the monorepo](docs/verdicts.md#dates-from-the-monorepo))
 - **All formats:** the S9 summary names its first three advisories in the display order of their
   severities (critical, high, medium, unrated, low), so an unrated advisory comes before a low one.
   ([Security advisories](docs/verdicts.md#security-advisories))
