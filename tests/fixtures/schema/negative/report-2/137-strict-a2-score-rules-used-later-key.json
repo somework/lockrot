@@ -1106,6 +1106,7 @@
    "not_found": 0,
    "branch_snapshot": 1,
    "shared_commit": 1,
+   "parent_split": 0,
    "undated": 0,
    "no_stable_release": 0,
    "undated_releases": 0

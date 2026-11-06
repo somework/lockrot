@@ -1075,6 +1075,7 @@
    "not_found": 0,
    "branch_snapshot": 1,
    "shared_commit": 0,
+   "parent_split": 0,
    "undated": 0,
    "no_stable_release": 0,
    "undated_releases": 0
@@ -1404,7 +1405,7 @@
       "reason": "branch_snapshot",
       "has_stable_release": true,
       "last_stable_release": null,
-      "last_stable_version": null,
+      "last_stable_version": "v8.1.5",
       "last_stable_dated_by": null,
       "snapshot_time": "2024-09-25T14:11:13+00:00",
       "tag_relation": null

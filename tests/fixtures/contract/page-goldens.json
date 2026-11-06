@@ -12,7 +12,7 @@
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
       "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
-      "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
+      "load_line": "180 points on 9 flagged packages · 172 (96 %) from high or worse · score model 1",
       "panel": [
         "How the score works · score model 1",
         "Bands: low 1 · medium 8 · high 16 · critical 32; from medium up, each band starts at 2 × the one below",
@@ -557,7 +557,9 @@
         "heading": null,
         "none": "Every measured package rounds to 0.0 libyears."
       },
-      "radius_lead": [],
+      "radius_lead": [
+        "Nothing is flagged."
+      ],
       "advisories_lead": {
         "figure": null,
         "unit": "no security advisory",
@@ -1571,7 +1573,9 @@
         "heading": "Furthest behind",
         "none": null
       },
-      "radius_lead": [],
+      "radius_lead": [
+        "Nothing is flagged."
+      ],
       "advisories_lead": {
         "figure": null,
         "unit": "the advisory check did not run",
@@ -1783,7 +1787,7 @@
       ],
       "grade_line": "Project grade: critical · 15 critical findings · 84 of 210 packages high or worse",
       "figure_line": "111 of 210 packages flagged · 80 ok · 19 finished",
-      "load_line": "1859 points on 111 flagged packages · 1666 (89 %) from high or worse · score model 1",
+      "load_line": "1859 points on 111 flagged packages · 1666 (90 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
@@ -3898,7 +3902,7 @@
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
       "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
-      "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
+      "load_line": "180 points on 9 flagged packages · 172 (96 %) from high or worse · score model 1",
       "panel": [
         "How the score works · score model 1",
         "Bands: low 1 · medium 8 · high 16 · critical 32; from medium up, each band starts at 2 × the one below",
@@ -4922,7 +4926,7 @@
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
       "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
-      "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
+      "load_line": "180 points on 9 flagged packages · 172 (96 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": null,
@@ -5547,7 +5551,7 @@
       ],
       "grade_line": "Project grade: critical · 2 critical findings · 12 of 55 packages high or worse",
       "figure_line": "14 of 55 packages flagged · 30 ok · 11 finished",
-      "load_line": "260 points on 14 flagged packages · 244 (93 %) from high or worse · score model 1",
+      "load_line": "260 points on 14 flagged packages · 244 (94 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
@@ -6915,7 +6919,9 @@
         "heading": null,
         "none": null
       },
-      "radius_lead": [],
+      "radius_lead": [
+        "Nothing is flagged."
+      ],
       "advisories_lead": {
         "figure": null,
         "unit": "no security advisory",
@@ -7330,7 +7336,7 @@
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
       "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
-      "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
+      "load_line": "180 points on 9 flagged packages · 172 (96 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
@@ -7780,7 +7786,7 @@
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
       "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
-      "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
+      "load_line": "180 points on 9 flagged packages · 172 (96 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
@@ -8222,7 +8228,7 @@
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
       "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
-      "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
+      "load_line": "180 points on 9 flagged packages · 172 (96 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
@@ -8673,7 +8679,7 @@
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
       "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
-      "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
+      "load_line": "180 points on 9 flagged packages · 172 (96 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
@@ -12783,7 +12789,9 @@
         "heading": null,
         "none": null
       },
-      "radius_lead": [],
+      "radius_lead": [
+        "Nothing is flagged."
+      ],
       "advisories_lead": {
         "figure": null,
         "unit": "no security advisory",
@@ -12891,7 +12899,9 @@
         "heading": "Furthest behind",
         "none": null
       },
-      "radius_lead": [],
+      "radius_lead": [
+        "Nothing is flagged."
+      ],
       "advisories_lead": {
         "figure": null,
         "unit": "no security advisory",
@@ -13001,7 +13011,9 @@
         "heading": "Furthest behind",
         "none": null
       },
-      "radius_lead": [],
+      "radius_lead": [
+        "Nothing is flagged."
+      ],
       "advisories_lead": {
         "figure": null,
         "unit": "no security advisory",
@@ -13040,7 +13052,7 @@
       ],
       "grade_line": "Project grade: critical · 16 critical findings · 83 of 210 packages high or worse",
       "figure_line": "110 of 210 packages flagged · 80 ok · 20 finished",
-      "load_line": "1863 points on 110 flagged packages · 1672 (89 %) from high or worse · score model 1",
+      "load_line": "1863 points on 110 flagged packages · 1672 (90 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
@@ -20133,7 +20145,7 @@
       ],
       "grade_line": "Project grade: critical · 4 critical findings · 6 of 9 packages high or worse",
       "figure_line": "9 of 9 packages flagged · 0 ok · 0 finished",
-      "load_line": "180 points on 9 flagged packages · 172 (95 %) from high or worse · score model 1",
+      "load_line": "180 points on 9 flagged packages · 172 (96 %) from high or worse · score model 1",
       "panel": null,
       "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
       "gate_link": "#view=findings&gate=fails",
@@ -20805,23 +20817,7 @@
       },
       "weighs_most": null,
       "flags_notes": [],
-      "exposure": {
-        "head": [
-          "Direct requirement",
-          "flagged, of 0"
-        ],
-        "rows": [
-          {
-            "package": "drupal/core",
-            "flagged": 3,
-            "link": "#view=radius&pkg=drupal%2Fcore"
-          }
-        ],
-        "count": null,
-        "overlap": null,
-        "more": null,
-        "shared": null
-      },
+      "exposure": null,
       "depth": {
         "rows": [],
         "sentence": null
@@ -20835,7 +20831,9 @@
         "heading": null,
         "none": null
       },
-      "radius_lead": [],
+      "radius_lead": [
+        "Nothing is flagged."
+      ],
       "advisories_lead": {
         "figure": null,
         "unit": "no security advisory",
@@ -24160,7 +24158,9 @@
         "sentence": null
       },
       "libyears": null,
-      "radius_lead": [],
+      "radius_lead": [
+        "No packages in this lock."
+      ],
       "advisories_lead": null,
       "findings_groups": [],
       "findings_rows": [],
@@ -24228,7 +24228,9 @@
         "sentence": null
       },
       "libyears": null,
-      "radius_lead": [],
+      "radius_lead": [
+        "No packages in this lock."
+      ],
       "advisories_lead": null,
       "findings_groups": [],
       "findings_rows": [],
