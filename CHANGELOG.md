@@ -100,6 +100,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** lockrot knows the PHP 8.6 GA date (2026-11-19). From that day, the PHP window
   and `capped` count PHP 8.6 as the newest minor. ([Capped](docs/verdicts.md#capped))
 
+- **All formats:** an installed stable version above the highest tag of its branch reads S8
+  `above_listed_releases` also when that tag has no date, and gets no S10 `release_dates` entry, so
+  `--fail-on=unchecked` does not fail on it. No date of that branch can measure such a version.
+  ([Left behind](docs/verdicts.md#left-behind))
+
 ### Security
 
 - **Breaking:** **CLI, PHAR, self-update:** a token goes only to the host that issued it.
@@ -166,6 +171,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** lockrot does not ask a repository for a package that its `only` or `exclude`
   keeps out. When no repository with a feed admits the package, it reads `no_feed`, not `answered`
   with 0 records.
+
+- **CLI:** the `-v` line for a withheld token prints no credentials from an issuer URL that does
+  not parse, for example one with a bad port. It printed the raw value.
+- **All formats:** under Composer's `cache-read-only` (`COMPOSER_CACHE_READ_ONLY`), lockrot writes
+  nothing to its repository-activity cache. It wrote there.
 
 ### Added
 
@@ -550,6 +560,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--dry-run`, a require-dev package stays a dev package, and a stale `composer.lock` on disk
   decides nothing.
   ([Under `--dry-run`](docs/install-time.md#a-note-on-the-dry-run-development-flag))
+
+- **All formats:** S6 `last_stable_version` is set whenever the package has a tag, also when the
+  newest date is a shared commit's. A pinned snapshot with a tag gets a `tag` move, never `no-tag`,
+  and an old-promise test move does not call the installed release the newest beside a higher tag.
+  ([What S6 carries](docs/verdicts.md#what-s6-carries))
+- **table, github, markdown, Install-time:** on the `update now:` line, the raise clause after the
+  platform sentence starts with a capital letter, as in the finding's `do:` line.
+- **json:** `run.php_window.*.lower_edge.php` is X.Y.Z when `config.platform.php` is `v8.4.100`,
+  `8.4.1-p1` or `8.4.1.2`. ([The PHP window](docs/verdicts.md#the-php-window))
+- **All formats:** the S9 summary names its first three advisories in the order of the rows
+  (critical, high, medium, unrated, low), so an unrated advisory comes before a low one.
+  ([Security advisories](docs/verdicts.md#security-advisories))
+- **All formats:** the move check asks a Composer repository for a name's `~dev` file only when the
+  name's stability admits dev, as Composer does. A repository with only that file no longer hides the
+  tagged releases of a later repository. ([Move](docs/verdicts.md#move))
+- **All formats:** the `abandoned_not_audited_by_composer` note names `COMPOSER_POLICY` when the
+  variable turns Composer's policy off, as the advisory notes do.
+  ([Abandoned not audited by Composer](docs/notes.md#abandoned_not_audited_by_composer))
+- **Config:** `ignore[].expires` refuses a value with a trailing newline, as
+  `accept-unchecked[].expires` does.
+- **sarif, gitlab:** a lock entry written as `"name" : "a/b"` gets its line number.
 
 ## [0.13.0] - 2026-10-01
 

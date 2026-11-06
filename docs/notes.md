@@ -277,7 +277,7 @@ marking (S1). An archived repository and the release and push dates still count.
 - Findings: each one carries `abandoned_ignored`.
 - `sets_network_failures`: no.
 
-### Abandoned not audited by Composer {#abandoned_not_audited_by_composer}
+### <a name="abandoned_not_audited_by_composer"></a>Abandoned not audited by Composer {#abandoned_not_audited_by_composer}
 
 A Composer setting stops `composer audit` from reporting abandoned packages, and some finding raised
 S1. The setting changes what `composer audit` prints, not the ignore list, so lockrot still counts
