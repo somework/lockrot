@@ -115,7 +115,9 @@ repository host becomes a [run note](notes.md), and the checks it blocked count 
 ([S10](verdicts.md#what-was-not-checked)). With `--strict-network`, a run note whose
 `sets_network_failures` is true makes the run exit `1`. That includes an `--offline` run where a
 locked package has no cached metadata. To fail on the missing checks themselves, use
-`--fail-on=unchecked`.
+`--fail-on=unchecked`. Known limit: when a metadata fetch fails and Composer serves its cached
+copy, lockrot writes no note, so `--strict-network` does not fail. Composer prints its "may be out
+of date" warning on stderr.
 
 **A vulnerable package exits `1` when its verdict reaches a grade value, or an advisory's severity
 reaches a `vulnerable` value.** An advisory adds its points to the score
