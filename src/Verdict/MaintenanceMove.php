@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+use Composer\Semver\Comparator;
+use Composer\Semver\VersionParser;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Security\Candidate;
 use Lockrot\Security\Fix;
@@ -159,13 +161,15 @@ final class MaintenanceMove
                 return self::require(FlagSet::OLD_PROMISE, $context, $row, '^'.ltrim($row->highest(), 'vV'));
             }
         }
-        // With no stable release read, the installed one is the newest that lockrot knows.
         $installedVersion = $context->subject()->version();
+        $newestVersion = $context->lastStableVersion();
+        if ($newestVersion !== null && self::isAboveVersion($newestVersion, $installedVersion)) {
+            return MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE)->withLatest(new Latest($newestVersion, $context->lastStableReleased(), false, null, null), null);
+        }
+        // No tag above the installed one, so the installed release is the newest, with the date that S5 judges.
         $s5 = $context->finding()->signalData(OldPromiseData::class);
-        $version = $context->lastStableVersion() ?? $installedVersion;
-        $released = $context->lastStableVersion() === null ? ($s5 === null ? null : $s5->released()) : $context->lastStableReleased();
 
-        return MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE)->withLatest(new Latest($version, $released, ltrim($version, 'vV') === ltrim($installedVersion, 'vV'), null, null), null);
+        return MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE)->withLatest(new Latest($installedVersion, $s5 === null ? null : $s5->released(), true, null, null), null);
     }
 
     /**
@@ -192,6 +196,17 @@ final class MaintenanceMove
         }
 
         return MoveDraft::of(Move::NO_MOVE, FlagSet::CAPPED)->withReason('no_release_admits');
+    }
+
+    /** A version that does not parse counts as above: the move then names it, as S6 does. */
+    private static function isAboveVersion(string $version, string $installed): bool
+    {
+        $parser = new VersionParser();
+        try {
+            return Comparator::greaterThan($parser->normalize($version), $parser->normalize($installed));
+        } catch (\UnexpectedValueException $e) {
+            return true;
+        }
     }
 
     private static function after(?\DateTimeImmutable $released, ?\DateTimeImmutable $ga): bool
