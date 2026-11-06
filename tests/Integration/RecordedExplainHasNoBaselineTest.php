@@ -16,15 +16,16 @@ final class RecordedExplainHasNoBaselineTest extends TestCase
 
     public function testEveryRecordedExplainDocumentHasANullFindingBaseline(): void
     {
-        $files = array_merge(
-            glob(self::FIXTURES.'contract/explain-2/*.json') ?: [],
-            glob(self::FIXTURES.'baselined/*/check/explain/*.json') ?: []
-        );
-        self::assertNotSame([], $files);
-        foreach ($files as $file) {
+        $contract = glob(self::FIXTURES.'contract/explain-2/*.json') ?: [];
+        $baselined = glob(self::FIXTURES.'baselined/*/check/explain/*.json') ?: [];
+        self::assertNotSame([], $contract);
+        self::assertNotSame([], $baselined);
+        foreach (array_merge($contract, $baselined) as $file) {
             $document = json_decode((string) file_get_contents($file), true, 512, \JSON_THROW_ON_ERROR);
             self::assertIsArray($document, $file);
-            self::assertNull(JsonPath::arrayAt($document, ['finding'])['baseline'] ?? null, $file);
+            $finding = JsonPath::arrayAt($document, ['finding']);
+            self::assertArrayHasKey('baseline', $finding, $file);
+            self::assertNull($finding['baseline'], $file);
         }
     }
 }
