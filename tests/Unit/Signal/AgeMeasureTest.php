@@ -191,7 +191,7 @@ final class AgeMeasureTest extends TestCase
         self::assertUnmeasured(AgeMeasure::ABOVE_LISTED_RELEASES, $measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.2.1']), $listed)));
         // The highest listed tag itself is not above anything.
         self::assertTrue($measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.2.0']), $listed))->isMeasured());
-        // Both refusals at once: no date of the row would measure a version above it, so that reason is the one given.
+        // Both refusals at once: no date of the row measures a version above it, so that reason is the one given.
         self::assertUnmeasured(AgeMeasure::ABOVE_LISTED_RELEASES, $measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.3.1']), $undatedHighest)));
     }
 

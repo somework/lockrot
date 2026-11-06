@@ -190,8 +190,8 @@ final class AdvisoryRule implements SignalRule
     }
 
     /**
-     * Severity display order (critical, high, medium, unrated, low), then the repository's own order (newest report first on Packagist),
-     * so the three names that the summary carries are the three that matter most.
+     * The Severity display order ({@see Severity::displayPosition()}), then the repository's own
+     * order (newest report first on Packagist).
      *
      * @param list<Advisory> $advisories
      *

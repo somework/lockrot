@@ -572,8 +572,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   platform sentence starts with a capital letter, as in the finding's `do:` line.
 - **json:** `run.php_window.*.lower_edge.php` is X.Y.Z when `config.platform.php` is `v8.4.100`,
   `8.4.1-p1` or `8.4.1.2`. ([The PHP window](docs/verdicts.md#the-php-window))
-- **All formats:** the S9 summary names its first three advisories in the order of the rows
-  (critical, high, medium, unrated, low), so an unrated advisory comes before a low one.
+- **All formats:** the S9 summary names its first three advisories in the display order of their
+  severities (critical, high, medium, unrated, low), so an unrated advisory comes before a low one.
   ([Security advisories](docs/verdicts.md#security-advisories))
 - **All formats:** the `abandoned_not_audited_by_composer` note names `COMPOSER_POLICY` when the
   variable turns Composer's policy off, as the advisory notes do.

@@ -195,7 +195,7 @@ final class RunFooter
         $step = $window === null ? '' : MoveText::platformStep($window->targetMinor(), $window->platformOverride());
         $words = $raise === null ? '' : MoveText::raiseWords($raise, $report->updateNowRaiseRemovesRequireDev());
 
-        // SPEC §5.6 L5: after the platform sentence the raise clause starts a sentence.
+        // After the platform sentence, the raise clause starts a sentence of its own.
         return $step.($step === '' ? $words : ucfirst($words));
     }
 

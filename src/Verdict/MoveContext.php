@@ -144,7 +144,7 @@ final class MoveContext
         return null;
     }
 
-    /** The newest stable release, null when lockrot read none. */
+    /** The S6 version ({@see PackageMetadata::lastStableVersion()}), null without metadata. */
     public function lastStableVersion(): ?string
     {
         return $this->metadata === null ? null : $this->metadata->lastStableVersion();
