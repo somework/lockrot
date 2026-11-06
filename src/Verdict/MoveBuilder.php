@@ -53,6 +53,9 @@ final class MoveBuilder
             // A blocked move names the PHP of the release that keeps it off the target, a tag the branch top, the others the release that the target installs.
             $php = $kind === Move::BLOCKED ? ($lower !== null ? $lower->php() : ($latest !== null ? $row->highestPhp() : $row->php())) : ($kind === Move::TAG ? $row->highestPhp() : $context->phpAtTarget($row, $lower, $newest));
             $phpCheck = PhpCheck::of($php, $context->floor());
+        } elseif ($row === null && $latest !== null && $draft->source() === FlagSet::PINNED) {
+            // With no branch row, the pinned move targets the S6 version: its php is that release's own.
+            $phpCheck = PhpCheck::of($context->lastStablePhp(), $context->floor());
         }
         $checks = $context->checks();
         $query = $checks === null ? null : self::query($kind, $subject, $constraint, $version, $phpCheck, $newest, $checks);

@@ -9,6 +9,7 @@ use Composer\Semver\VersionParser;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Security\Candidate;
 use Lockrot\Security\Fix;
+use Lockrot\Security\PhpCheck;
 use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\Data\AbandonedData;
 use Lockrot\Signal\Data\CappedData;
@@ -94,7 +95,10 @@ final class MaintenanceMove
             return self::tag($branch, self::highestTag($branch, $snapshotTime));
         }
 
-        return self::tag(null, new Latest($version, $s6->lastStableRelease(), false, $s6->tagRelation(), $snapshotTime));
+        $latest = new Latest($version, $s6->lastStableRelease(), false, $s6->tagRelation(), $snapshotTime);
+        $kind = PhpCheck::of($context->lastStablePhp(), $context->floor())->targetRuns() === false ? Move::BLOCKED : Move::TAG;
+
+        return MoveDraft::of($kind, FlagSet::PINNED)->withLatest($latest, null);
     }
 
     private static function highestTag(BranchRow $row, ?string $snapshotTime): Latest
@@ -105,9 +109,9 @@ final class MaintenanceMove
         return new Latest($row->highest(), $released === null ? null : $released->format(\DATE_ATOM), false, $relation, $snapshotTime);
     }
 
-    private static function tag(?BranchRow $row, Latest $latest): MoveDraft
+    private static function tag(BranchRow $row, Latest $latest): MoveDraft
     {
-        $kind = $row !== null && $row->highestAdmitsTargetPhp() === false ? Move::BLOCKED : Move::TAG;
+        $kind = $row->highestAdmitsTargetPhp() === false ? Move::BLOCKED : Move::TAG;
 
         return MoveDraft::of($kind, FlagSet::PINNED)->withLatest($latest, $row);
     }

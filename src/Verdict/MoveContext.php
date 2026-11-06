@@ -150,6 +150,12 @@ final class MoveContext
         return $this->metadata === null ? null : $this->metadata->lastStableVersion();
     }
 
+    /** The `require.php` of the S6 version, null without metadata or with no requirement. */
+    public function lastStablePhp(): ?string
+    {
+        return $this->metadata === null ? null : $this->metadata->lastStablePhp();
+    }
+
     public function lastStableReleased(): ?string
     {
         $at = $this->metadata === null ? null : $this->metadata->lastStableReleaseAt();

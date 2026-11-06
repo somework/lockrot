@@ -103,6 +103,7 @@ final class PackageMetadata
     private ?array $newestRequires = null;
     /** The highest stable release not dated after the run clock: the one {@see $newestRequires} reads. */
     private ?StableRelease $newestStable = null;
+    private ?string $lastStablePhp = null;
 
     /**
      * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string}> $latestStableByBranch
@@ -359,6 +360,11 @@ final class PackageMetadata
      */
     private function keepReleases(array $versions, array $stable, array $sharedCommit, \DateTimeImmutable $now, string $installedVersion): void
     {
+        foreach ($versions as $version) {
+            if ($version->getPrettyVersion() === $this->lastStableVersion) {
+                $this->lastStablePhp = self::phpOf($version);
+            }
+        }
         $newest = null;
         foreach ($stable as $normalized => [$version, $at]) {
             if (($at === null || $at <= $now) && ($newest === null || Comparator::greaterThan($normalized, $newest->getVersion()))) {
@@ -488,11 +494,13 @@ final class PackageMetadata
         $lastStableReleaseAt = $this->lastStableReleaseAt;
         $lastStableVersion = $this->lastStableVersion;
         $lastStableDatedBy = $this->lastStableDatedBy;
+        $lastStablePhp = $this->lastStablePhp;
         $highestBranch = self::highestBranch($byBranch);
         if (\in_array($highestBranch, $datedBranches, true)) {
             $lastStableReleaseAt = $byBranch[$highestBranch]['at'];
             $lastStableVersion = $byBranch[$highestBranch]['version'];
             $lastStableDatedBy = $parent->name;
+            $lastStablePhp = $byBranch[$highestBranch]['php'];
         }
 
         $dated = new self(
@@ -518,6 +526,7 @@ final class PackageMetadata
         $dated->installedRequires = $this->installedRequires;
         $dated->newestRequires = $this->newestRequires;
         $dated->newestStable = $this->newestStable;
+        $dated->lastStablePhp = $lastStablePhp;
         $dated->releasesAbove = $this->releasesAbove === null ? null : array_map(
             static fn (StableRelease $release): StableRelease => $release->sharedCommit() ? $release->withDate($parent->releaseDateOf($release->normalized())) : $release,
             $this->releasesAbove
@@ -674,6 +683,12 @@ final class PackageMetadata
     public function lastStableVersion(): ?string
     {
         return $this->lastStableVersion;
+    }
+
+    /** The `require.php` of {@see lastStableVersion()}, null when it requires none or when the release scan did not run. */
+    public function lastStablePhp(): ?string
+    {
+        return $this->lastStablePhp;
     }
 
     /** Whether a commit that other stable tags share dates the version that `lastStableReleaseAt()` reads. */
