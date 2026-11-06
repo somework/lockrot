@@ -465,9 +465,9 @@ maintainer.
 
 4. Squash merge the release pull request into `main` with CI green. GitHub refuses a rebase merge
    of more than 100 commits
-   ([repository limits](https://docs.github.com/en/repositories/creating-and-managing-repositories/repository-limits)),
-   and the ruleset of `main` requires a linear history, so a release branch of that size merges
-   only as a squash. The release branch keeps the commit history.
+   ([repository limits](https://docs.github.com/en/repositories/creating-and-managing-repositories/repository-limits)).
+   The ruleset of `main` requires a linear history, so a release branch of that size merges only
+   as a squash. The release branch keeps the commit history.
    Write the squash message as a release summary: the subject names the version, and the body
    lists the user-visible changes of the CHANGELOG section. Do not keep the default
    concatenation of every commit message. Remove `## Review notes` from the message. On a pull
@@ -481,7 +481,8 @@ maintainer.
    Approve the `schemas` environment of the lockrot.dev run, then check that each new schema URL
    answers (`curl -fsI https://lockrot.dev/schema/<document>-<number>.json`).
 6. When the `ci.yml` push run of the squash commit on `main` passes, tag the commit `vX.Y.Z` and
-   push the tag. `.github/workflows/phar.yml` refuses these tags:
+   push the tag. If the tag day changed after the merge, tag the commit of the date pull request
+   instead, when its `ci.yml` push run passes. `.github/workflows/phar.yml` refuses these tags:
 
     - a tag that is not on `main`, or whose `ci.yml` push run on `main` did not pass
     - a tag whose vendored renderer is not an attested release
@@ -511,9 +512,6 @@ maintainer.
 8. After the GitHub release of step 6, release [lockrot-action](https://github.com/somework/lockrot-action)
    when its `@v1` jobs need the new lockrot. For lockrot 0.14.0, the action release is v1.2.0 from
    the branch `feat/one-run-output`. Each merge and the release need the maintainer's approval.
-9. Start the next release branch from the squash commit on `main`. The old release branch holds
-   commits that `main` does not, so a second pull request from it shows them again and conflicts
-   where later commits change the same lines.
 
     1. Merge the branch of the action release into the action's `main`, with the release's
        `CHANGELOG.md` section.
@@ -528,6 +526,10 @@ maintainer.
     5. Check that `v1` names the release commit
        (`gh api repos/somework/lockrot-action/git/ref/tags/v1`), and that the `docker.yml` run
        published the image `ghcr.io/somework/lockrot:X.Y.Z`.
+
+9. Start the next release branch from the squash commit on `main`. The old release branch holds
+   commits that `main` does not, so a second pull request from it shows them again and conflicts
+   where later commits change the same lines.
 
 ## Related
 
