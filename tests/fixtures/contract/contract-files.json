@@ -4,7 +4,7 @@
         "resources/lockrot-config-2.schema.json": "c2b4b739ea94ff4781df9c82ae954173b56e85693b555fd8c54de1a86f85d96c",
         "resources/lockrot-explain-2.schema.json": "fb009a9a10d3078d2147522588dbc3b1310aee2d2f595f5fd5d29f2b23ad3c70",
         "resources/lockrot-report-2.schema.json": "c69418e4df3f6b7bf4832d18150a083cb4e6a9ea917dcf32b5b49e825bba9ca1",
-        "types/lockrot-report-2.d.ts": "5f3817a3d61fa64fa3249b37d7c20e358fbb0f3cb2a1f88b327b6816abefe5f0",
+        "types/lockrot-report-2.d.ts": "ca571e87cb488d775c4691df3bddbc1ce94833abb55a908fb2c01b90b8f6d616",
         "types/lockrot-report-2.known.d.ts": "3adbad65e70ec66d38d1f6f815e22e9a1f8a81eb84ef1b9d766a90391ca48c93"
     }
 }
