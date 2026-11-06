@@ -804,6 +804,51 @@ final class MoveTest extends TestCase
         self::assertSame(['version' => 'v1.9.3', 'released' => null, 'is_installed' => false, 'relation' => null, 'snapshot_time' => null], $move['latest']);
     }
 
+    /** Ruling R13-A (r12l.1, Q5): a newer-dated tag below the installed release leaves the installed release as the newest. */
+    public function testAnOldPromiseTestMoveKeepsTheInstalledReleaseAboveANewerDatedLowerTag(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse([
+            'lock' => [['version' => '2.0.0']],
+            'releases' => [self::release('2.0.0', '2019-01-01', '>=7.2'), ['shared_commit' => true] + self::release('v1.9.3', '2020-06-01', '>=7.2')],
+        ]), ['next_step']);
+
+        self::assertSame(['test', 'test it on PHP 8.4 — 2.0.0 is its newest release'], [$move['kind'], $move['text']]);
+        self::assertSame(['version' => '2.0.0', 'released' => '2019-01-01T00:00:00+00:00', 'is_installed' => true, 'relation' => null, 'snapshot_time' => null], $move['latest']);
+    }
+
+    /** Ruling R13-A (r12l.1, Q6): the installed release as the newest carries the date that S5 judges, also when its tag is undated. */
+    public function testAnOldPromiseTestMoveOnAnUndatedHighestInstalledTagCarriesTheLockTime(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse(['releases' => [self::release('1.0.0', null, '>=7.2')]]), ['next_step']);
+
+        self::assertSame(['test', 'test it on PHP 8.4 — 1.0.0 is its newest release'], [$move['kind'], $move['text']]);
+        self::assertSame(['version' => '1.0.0', 'released' => '2019-01-01T00:00:00+00:00', 'is_installed' => true, 'relation' => null, 'snapshot_time' => null], $move['latest']);
+    }
+
+    /** @return iterable<string, array{?string, ?string, string}> */
+    public static function preReleaseOnlySnapshots(): iterable
+    {
+        yield 'dated' => ['2025-06-01', 'newer', 'require a tag — the newest is v1.0.0-beta1 (2025-06-01)'];
+        yield 'undated' => [null, null, 'require a tag — the newest is v1.0.0-beta1'];
+    }
+
+    /**
+     * Ruling R13-A (r12l.1, Q4): with only pre-release tags no branch row exists, so the pinned
+     * move targets the S6 version, and I18b keeps it from `no-tag`.
+     *
+     * @dataProvider preReleaseOnlySnapshots
+     */
+    #[DataProvider('preReleaseOnlySnapshots')]
+    public function testASnapshotWithOnlyAPreReleaseTagRequiresThatTag(?string $date, ?string $relation, string $text): void
+    {
+        $finding = self::analyse(['lock' => [['version' => 'dev-master', 'time' => '2024-01-01T00:00:00+00:00']], 'releases' => [self::release('v1.0.0-beta1', $date, '>=7.2')]]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        self::assertSame(['tag', null, null], [$move['kind'], $move['to_branch'], $move['php_check']]);
+        self::assertSame(['version' => 'v1.0.0-beta1', 'released' => $date === null ? null : $date.'T00:00:00+00:00', 'is_installed' => false, 'relation' => $relation], array_diff_key(JsonPath::arrayAt($move, ['latest']), ['snapshot_time' => true]));
+        self::assertStringStartsWith($text, JsonPath::stringAt($move, ['text']));
+    }
+
     /**
      * @param array<mixed, mixed> $finding
      *
