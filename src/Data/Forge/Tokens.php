@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Forge;
 
-use Lockrot\Data\Repository\RepositoryUrl;
-
 /**
  * Only lockrot's own tokens: Composer's HTTP layer applies its own credentials ({@see ForgeAuth}).
  * `GITHUB_TOKEN` and `GITLAB_TOKEN` count only when each issuer environment variable of their
@@ -88,7 +86,7 @@ final class Tokens
             }
             $host = self::host($url);
             if ($host !== $publicHost) {
-                $withheld[$name] = $host ?? RepositoryUrl::shown(strpos($url, '://') === false ? 'https://'.$url : $url) ?? RepositoryUrl::inText($url);
+                $withheld[$name] = $host ?? self::withoutUserinfo($url);
 
                 return null;
             }
@@ -101,6 +99,18 @@ final class Tokens
      * Normalised as {@see RepoRef::host()} is, so the port stays. A value without a scheme is a
      * bare host. Null when the value does not parse.
      */
+    /** An issuer that does not parse is shown without what precedes its last `@`: userinfo can hold any character, a `/` included. */
+    private static function withoutUserinfo(string $url): string
+    {
+        $at = strrpos($url, '@');
+        if ($at === false) {
+            return $url;
+        }
+        $scheme = strpos($url, '://');
+
+        return ($scheme !== false && $scheme < $at ? substr($url, 0, $scheme + 3) : '').substr($url, $at + 1);
+    }
+
     private static function host(string $url): ?string
     {
         $parts = RepoLocator::hostAndPath(strpos($url, '://') === false ? 'https://'.$url : $url);

@@ -156,6 +156,25 @@ final class TokensTest extends TestCase
         self::assertStringNotContainsString('SECRETVALUE', $bare['GITHUB_TOKEN']);
     }
 
+    /** @return iterable<string, array{string, string}> */
+    public static function issuersWithASlashInThePassword(): iterable
+    {
+        yield 'with a scheme' => ['GITHUB_SERVER_URL', 'https://ci:SE/CRET@ghe.example:99999'];
+        yield 'without a scheme' => ['GH_HOST', 'ci:SE/CRET@ghe.example:99999'];
+    }
+
+    /**
+     * @dataProvider issuersWithASlashInThePassword
+     */
+    #[DataProvider('issuersWithASlashInThePassword')]
+    public function testAnUnparseableIssuerKeepsNoPasswordThatHoldsASlash(string $variable, string $issuer): void
+    {
+        $withheld = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', $variable => $issuer], null)->withheld();
+
+        self::assertStringNotContainsString('CRET', $withheld['GITHUB_TOKEN']);
+        self::assertStringContainsString('ghe.example:99999', $withheld['GITHUB_TOKEN']);
+    }
+
     public function testLockrotsOwnGitlabTokenHasNoIssuerCheck(): void
     {
         $tokens = Tokens::fromEnvironment(['LOCKROT_GITLAB_TOKEN' => 'a', 'GITLAB_TOKEN' => 'g', 'CI_SERVER_URL' => 'https://gitlab.example.com'], null);
