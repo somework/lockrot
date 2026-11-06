@@ -161,6 +161,23 @@ final class TokensTest extends TestCase
     {
         yield 'with a scheme' => ['GITHUB_SERVER_URL', 'https://ci:SE/CRET@ghe.example:99999'];
         yield 'without a scheme' => ['GH_HOST', 'ci:SE/CRET@ghe.example:99999'];
+        yield 'a scheme separator in the password' => ['GH_HOST', 'ci:CRET://x@ghe.example:99999'];
+        yield 'a password that parses as a port' => ['GITHUB_SERVER_URL', 'https://ci:12/CRET@ghe.example:99999'];
+    }
+
+    public function testAnUnparseableIssuerKeepsNoQueryOrPath(): void
+    {
+        $withheld = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => 'https://ghe.example:99999/x?private_token=SECRET#f'], null)->withheld();
+
+        self::assertSame(['GITHUB_TOKEN' => 'https://ghe.example:99999'], $withheld);
+    }
+
+    public function testAnIssuerWithUserinfoIsJudgedByItsHost(): void
+    {
+        $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => 'https://ci:12/CRET@ghe.example.com'], null);
+
+        self::assertNull($tokens->github());
+        self::assertSame(['GITHUB_TOKEN' => 'ghe.example.com'], $tokens->withheld());
     }
 
     /**
