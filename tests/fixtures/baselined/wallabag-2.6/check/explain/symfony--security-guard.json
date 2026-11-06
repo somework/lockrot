@@ -23,11 +23,7 @@
             {
                 "id": "abandoned",
                 "role": "lead",
-                "baseline": {
-                    "state": "known",
-                    "since": "2024-11-03",
-                    "covered_by": null
-                },
+                "baseline": null,
                 "signal_ids": [
                     "S1",
                     "S3"
@@ -49,11 +45,7 @@
             {
                 "id": "left-behind",
                 "role": "corroborating",
-                "baseline": {
-                    "state": "covered",
-                    "since": "2024-11-03",
-                    "covered_by": "abandoned"
-                },
+                "baseline": null,
                 "signal_ids": [
                     "S8"
                 ],
@@ -475,46 +467,24 @@
             },
             "push_unmeasured": null
         },
-        "baseline": {
-            "status": "known",
-            "recorded": {
-                "lead": "abandoned",
-                "flags": {
-                    "abandoned": {
-                        "known_since": "2024-11-03"
-                    }
-                },
-                "advisory_count": 0,
-                "first_seen": "2024-11-03",
-                "target_php": "8.4",
-                "fix_model": 1
-            },
-            "advisories_now": {
-                "known": 0,
-                "new": 0,
-                "re_rated": 0,
-                "fix_lost": 0
-            },
-            "worsened_by": []
-        },
+        "baseline": null,
         "gate": {
             "reaches_fail_on": true,
-            "fails": false,
-            "exempt_by": "baseline",
-            "by": [],
-            "basis": {
-                "score": 0,
-                "verdict": null,
-                "cap": 0,
-                "limited_by": "cap",
-                "new": {
-                    "total": 0,
-                    "exact": 0,
-                    "rounded_down": false,
-                    "terms": [],
-                    "modifiers": []
+            "fails": true,
+            "exempt_by": null,
+            "by": [
+                {
+                    "value": "high",
+                    "kind": "grade",
+                    "facts": [
+                        {
+                            "kind": "flag",
+                            "id": "abandoned"
+                        }
+                    ]
                 }
-            }
+            ],
+            "basis": null
         }
     },
     "lock": {

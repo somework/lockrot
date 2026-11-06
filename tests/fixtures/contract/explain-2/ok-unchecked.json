@@ -178,7 +178,7 @@
         "releases_listed": 6,
         "has_stable_release": true,
         "last_stable_release": null,
-        "last_stable_version": null,
+        "last_stable_version": "v8.6.1",
         "last_stable_dated_by": null,
         "installed_release": null,
         "installed_release_dated_by": null,

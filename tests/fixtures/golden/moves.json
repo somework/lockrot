@@ -3936,6 +3936,106 @@
         "move_in": "next_step",
         "partial": null
     },
+    "S5-parent-split\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "vulnerable",
+            "merged": [
+                "left-behind"
+            ],
+            "fix_kind": "upgrade",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "5.x",
+            "version": "v5.4.52",
+            "newest": "v5.4.52",
+            "constraint": "^5.4.52",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2.5",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "target": null,
+                    "constraint": "^2.6",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-4wjj-gy1p-ft3r",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "symfony/monolog-bridge:^5.4.52"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "symfony/monolog-bridge",
+                    "v5.4.52",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "v2.8.52",
+            "held_by": [],
+            "if_applied": null,
+            "check": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
     "S5-star\u2021": {
         "next_step": {
             "kind": "require",
@@ -4958,6 +5058,75 @@
         },
         "move_in": "next_step",
         "partial": null
+    },
+    "branch-above-undated\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "old-promise",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "5.x",
+            "version": "v5.0.0",
+            "newest": "v5.0.0",
+            "constraint": "^5.0.0",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "tubalmartin/cssmin:^5.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "tubalmartin/cssmin",
+                    "v5.0.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require tubalmartin/cssmin ^5.0.0 \u2014 clears old-promise; 5.x needs php >=7.2, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+        }
     },
     "cache-subscriber": {
         "next_step": {
@@ -14460,6 +14629,178 @@
     "ok-unchecked-entry\u2021": {
         "next_step": null
     },
+    "old-promise-higher-own-date\u2021": {
+        "next_step": {
+            "kind": "test",
+            "source": "old-promise",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v5.0.0",
+                "released": "2020-01-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": null,
+                "snapshot_time": null
+            },
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "test it on PHP 8.4"
+        }
+    },
+    "old-promise-highest-installed\u2021": {
+        "next_step": {
+            "kind": "test",
+            "source": "old-promise",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v4.1.1",
+                "released": "2018-01-15T15:26:51+00:00",
+                "is_installed": true,
+                "relation": null,
+                "snapshot_time": null
+            },
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "test it on PHP 8.4 \u2014 v4.1.1 is its newest release"
+        }
+    },
+    "old-promise-installed-undated\u2021": {
+        "next_step": {
+            "kind": "test",
+            "source": "old-promise",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v4.1.1",
+                "released": "2018-01-15T15:26:51+00:00",
+                "is_installed": true,
+                "relation": null,
+                "snapshot_time": null
+            },
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "test it on PHP 8.4 \u2014 v4.1.1 is its newest release"
+        }
+    },
+    "old-promise-newest-shared\u2021": {
+        "next_step": {
+            "kind": "test",
+            "source": "old-promise",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v4.1.3",
+                "released": null,
+                "is_installed": false,
+                "relation": null,
+                "snapshot_time": null
+            },
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "test it on PHP 8.4"
+        }
+    },
     "op-update": {
         "next_step": {
             "kind": "update",
@@ -15389,6 +15730,389 @@
             ],
             "also": [],
             "text": "move genealabs/laravel-pivot-events to ^12.0 through genealabs/laravel-model-caching \u2014 clears left-behind; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of genealabs/laravel-model-caching (13.1.11) no longer requires it"
+        }
+    },
+    "pinned-alpha-over-shared\u2021": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "3.x",
+            "version": "v3.3.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v3.3.0",
+                "released": null,
+                "is_installed": false,
+                "relation": null,
+                "snapshot_time": "2018-06-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "reason": "undated"
+                }
+            ],
+            "adds": [],
+            "leaves": [],
+            "clears_all": false,
+            "if_applied": {
+                "total": 16,
+                "verdict": "high",
+                "lead": "old-promise",
+                "deciding_advisory": null,
+                "at_most": true,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "friendsofsymfony/oauth-server-bundle:^3.3.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "friendsofsymfony/oauth-server-bundle",
+                    "v3.3.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest is v3.3.0; 3.x needs php >=7.2, which require.php allows; not checked: old-promise"
+        }
+    },
+    "pinned-highest-shared\u2021": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "10.x",
+            "version": "v10.49.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v10.49.0",
+                "released": null,
+                "is_installed": false,
+                "relation": null,
+                "snapshot_time": "2018-06-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "reason": "undated"
+                }
+            ],
+            "adds": [],
+            "leaves": [],
+            "clears_all": false,
+            "if_applied": {
+                "total": 16,
+                "verdict": "high",
+                "lead": "old-promise",
+                "deciding_advisory": null,
+                "at_most": true,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "friendsofsymfony/oauth-server-bundle:^10.49.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "friendsofsymfony/oauth-server-bundle",
+                    "v10.49.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest is v10.49.0; 10.x needs php >=7.2, which require.php allows; not checked: old-promise"
+        }
+    },
+    "pinned-newest-shared\u2021": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "v1.9.3",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v1.9.3",
+                "released": null,
+                "is_installed": false,
+                "relation": null,
+                "snapshot_time": "2018-06-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "reason": "undated"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "reason": "undated"
+                }
+            ],
+            "adds": [],
+            "leaves": [],
+            "clears_all": false,
+            "if_applied": {
+                "total": 20,
+                "verdict": "high",
+                "lead": "left-behind",
+                "deciding_advisory": null,
+                "at_most": true,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "friendsofsymfony/oauth-server-bundle:^1.9.3"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "friendsofsymfony/oauth-server-bundle",
+                    "v1.9.3",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest is v1.9.3; 1.x needs php >=7.2, which require.php allows; not checked: left-behind, old-promise"
+        }
+    },
+    "pinned-prerelease-newest\u2021": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "v4.0.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v4.0.0",
+                "released": "2025-01-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "newer",
+                "snapshot_time": "2018-06-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "friendsofsymfony/oauth-server-bundle:^4.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "friendsofsymfony/oauth-server-bundle",
+                    "v4.0.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest is v4.0.0 (2025-01-01); 4.x needs php >=7.2, which require.php allows"
+        }
+    },
+    "pinned-prerelease-no-row\u2021": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "v4.0.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v4.0.0",
+                "released": "2025-01-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "newer",
+                "snapshot_time": "2018-06-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "friendsofsymfony/oauth-server-bundle:^4.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "friendsofsymfony/oauth-server-bundle",
+                    "v4.0.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest is v4.0.0 (2025-01-01); 4.x needs php >=7.2, which require.php allows"
         }
     },
     "pinned-unread": {

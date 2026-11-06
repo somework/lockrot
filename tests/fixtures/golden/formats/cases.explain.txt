@@ -1502,6 +1502,46 @@ repository metadata
    * 2.x      v2.8.52       2019-11-13   >=5.3.9        0 of 1
 branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
+== case S5-parent-split‡
+symfony/monolog-bridge v2.6.13 — critical: left-behind · vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v2.6.13   not read (a split whose parent dates its newest release)
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
+          newest     v8.1.6    2026-08-30   0.1 years ago                 below release-warn-years 3; dated by symfony/symfony
+          last push            2026-09-23   less than three weeks ago     below push-warn-years 3
+          libyears not measured: a split whose parent dates its newest release
+repository GitHub github.com/symfony/monolog-bridge: last push 2026-09-23 · fetched 2026-09-14
+
+score     32 = left-behind 16 + vulnerable 16 [high advisory]     critical from 32
+  maintenance  left-behind 16 (lead)
+  security     vulnerable 16 (high advisory CVE-2026-45077)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require symfony/monolog-bridge ^5.4.52 — clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve
+          clears left-behind and PKSA-4wjj-gy1p-ft3r
+
+flags
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
+    high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
+               PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
+  feeds        packagist.org: 1 on record, 1 affects v2.6.13
+  accepted     none
+  not checked  S5 (undated releases)
+
+repository metadata
+     branch   highest tag   released     php            fixes
+     8.x      v8.1.6        2026-08-30   >=8.4.1        1 of 1 · php floor raise; held by composer.json; after it: 0, ok, if Composer resolves it
+     7.x      v7.4.18       2026-08-30   >=8.2          1 of 1 · php floor raise; held by composer.json; after it: 0, ok, if Composer resolves it
+     6.x      v6.4.45       2026-08-30   >=8.1          1 of 1 · php floor raise; held by composer.json; after it: 0, ok, if Composer resolves it
+     5.x      v5.4.52       2026-05-07   >=7.2.5        1 of 1 · upgrade (lowest fix); held by composer.json; after it: 0, ok, if Composer resolves it
+     4.x      v4.4.43       2022-06-16   >=7.1.3        0 of 1
+     3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
+   * 2.x      v2.8.52       2019-11-13   >=5.3.9        0 of 1
+branches 8.x and 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
+
 == case S5-star‡
 symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
   direct requirement (composer.json require)
@@ -2977,6 +3017,306 @@ flags
 repository metadata
      branch   highest tag   released     php        fixes
      1.x      1.6.2         2019-01-23   ^7.4
+
+== case pinned-newest-shared‡
+friendsofsymfony/oauth-server-bundle dev-master — high: pinned
+  direct requirement (composer.json require)
+
+age       installed  dev-masternot read (a branch snapshot has no release branch)
+          its branch           not read (a branch snapshot has no release branch)
+          newest               not read (undated releases)
+          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+          libyears not measured: a branch snapshot has no release branch
+repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
+
+score     16 = pinned 16     high from 16
+  maintenance  pinned 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require a tag — the newest is v1.9.3; 1.x needs php >=7.2, which require.php allows; not checked: left-behind, old-promise
+          clears pinned
+
+flags
+  pinned       S6 · pinned to branch snapshot dev-master
+  feeds        packagist.org: none on record
+  pulls in     pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)
+  accepted     none
+  not checked  S2 (undated releases) · S8 (a branch snapshot has no release branch)
+
+repository metadata
+     branch   highest tag   released          php        fixes
+     2.x      v2.0.0        2024-01-01        >=7.2
+     1.x      v1.9.3        commit 2025-06-01 >=7.2
+
+== case pinned-alpha-over-shared‡
+friendsofsymfony/oauth-server-bundle dev-master — high: pinned
+  direct requirement (composer.json require)
+
+age       installed  dev-masternot read (a branch snapshot has no release branch)
+          its branch           not read (a branch snapshot has no release branch)
+          newest               not read (undated releases)
+          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+          libyears not measured: a branch snapshot has no release branch
+repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
+
+score     16 = pinned 16     high from 16
+  maintenance  pinned 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require a tag — the newest is v3.3.0; 3.x needs php >=7.2, which require.php allows; not checked: old-promise
+          clears pinned
+
+flags
+  pinned       S6 · pinned to branch snapshot dev-master
+  feeds        packagist.org: none on record
+  pulls in     pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)
+  accepted     none
+  not checked  S2 (undated releases) · S8 (a branch snapshot has no release branch)
+
+repository metadata
+     branch   highest tag   released          php        fixes
+     3.x      v3.3.0        commit 2025-06-01 >=7.2
+
+== case pinned-prerelease-newest‡
+friendsofsymfony/oauth-server-bundle dev-master — high: pinned
+  direct requirement (composer.json require)
+
+age       installed  dev-masternot read (a branch snapshot has no release branch)
+          its branch           not read (a branch snapshot has no release branch)
+          newest     v4.1.0-beta12025-06-01   1.3 years ago                 below release-warn-years 3
+          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+          libyears not measured: a branch snapshot has no release branch
+repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
+
+score     16 = pinned 16     high from 16
+  maintenance  pinned 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require a tag — the newest is v4.0.0 (2025-01-01); 4.x needs php >=7.2, which require.php allows
+          clears pinned
+
+flags
+  pinned       S6 · pinned to branch snapshot dev-master
+  feeds        packagist.org: none on record
+  pulls in     pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)
+  accepted     none
+  not checked  S8 (a branch snapshot has no release branch)
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     4.x      v4.0.0        2025-01-01   >=7.2
+
+== case pinned-prerelease-no-row‡
+friendsofsymfony/oauth-server-bundle dev-master — high: pinned
+  direct requirement (composer.json require)
+
+age       installed  dev-masternot read (a branch snapshot has no release branch)
+          its branch           not read (a branch snapshot has no release branch)
+          newest     v5.0.0-beta12025-06-01   1.3 years ago                 below release-warn-years 3
+          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+          libyears not measured: a branch snapshot has no release branch
+repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
+
+score     16 = pinned 16     high from 16
+  maintenance  pinned 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require a tag — the newest is v4.0.0 (2025-01-01); 4.x needs php >=7.2, which require.php allows
+          clears pinned
+
+flags
+  pinned       S6 · pinned to branch snapshot dev-master
+  feeds        packagist.org: none on record
+  pulls in     pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)
+  accepted     none
+  not checked  S8 (a branch snapshot has no release branch)
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     4.x      v4.0.0        2025-01-01   >=7.2
+
+== case pinned-highest-shared‡
+friendsofsymfony/oauth-server-bundle dev-master — high: pinned
+  direct requirement (composer.json require)
+
+age       installed  dev-masternot read (a branch snapshot has no release branch)
+          its branch           not read (a branch snapshot has no release branch)
+          newest               not read (undated releases)
+          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+          libyears not measured: a branch snapshot has no release branch
+repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
+
+score     16 = pinned 16     high from 16
+  maintenance  pinned 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require a tag — the newest is v10.49.0; 10.x needs php >=7.2, which require.php allows; not checked: old-promise
+          clears pinned
+
+flags
+  pinned       S6 · pinned to branch snapshot dev-master
+  feeds        packagist.org: none on record
+  pulls in     pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)
+  accepted     none
+  not checked  S2 (undated releases) · S8 (a branch snapshot has no release branch)
+
+repository metadata
+     branch   highest tag   released          php        fixes
+     10.x     v10.49.0      commit 2023-06-05 >=7.2
+
+== case old-promise-newest-shared‡
+tubalmartin/cssmin v4.1.1 — high: old-promise
+  direct requirement (composer.json require)
+
+age       installed  v4.1.1    2018-01-15   8.7 years ago
+          4.x                  not read (undated releases)
+          newest               not read (undated releases)
+          last push            2023-12-22   2.8 years ago                 below push-warn-years 3
+          libyears at least 2.4 behind the newest stable release
+repository GitHub github.com/tubalmartin/YUI-CSS-compressor-PHP-port: last push 2023-12-22 · fetched 2026-09-14
+
+score     16 = old-promise 16     high from 16
+  maintenance  old-promise 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        test it on PHP 8.4
+
+flags
+  old-promise  S5 · released 2018-01-15 for PHP 5 (php ">=5.3.2"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  S2, S8 (undated releases)
+
+repository metadata
+     branch   highest tag   released          php        fixes
+     5.x      v5.0.0        2020-01-01        >=7.2
+   * 4.x      v4.1.3        commit 2020-06-01 >=7.2
+* the installed branch's highest tag has no release date — the repository leaves it undated, or dates it only by a commit other tags share (`commit …`: a subtree split, the day the directory last changed) — so S8 does not measure the branch
+
+== case old-promise-highest-installed‡
+tubalmartin/cssmin v4.1.1 — high: old-promise
+  direct requirement (composer.json require)
+
+age       installed  v4.1.1    2018-01-15   8.7 years ago
+          4.x        v4.1.1    2018-01-15   8.7 years ago                 past release-high-years 5
+          newest               not read (undated releases)
+          last push            2023-12-22   2.8 years ago                 below push-warn-years 3
+          libyears not measured: undated releases
+repository GitHub github.com/tubalmartin/YUI-CSS-compressor-PHP-port: last push 2023-12-22 · fetched 2026-09-14
+
+score     16 = old-promise 16     high from 16
+  maintenance  old-promise 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        test it on PHP 8.4 — v4.1.1 is its newest release
+
+flags
+  old-promise  S5 · released 2018-01-15 for PHP 5 (php ">=5.3.2"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  S2 (undated releases)
+
+repository metadata
+     branch   highest tag   released          php        fixes
+   * 4.x      v4.1.1        2018-01-15        >=5.3.2
+     3.x      v3.9.3        commit 2020-06-01 >=5.3.2
+
+== case old-promise-installed-undated‡
+tubalmartin/cssmin v4.1.1 — high: old-promise
+  direct requirement (composer.json require)
+
+age       installed  v4.1.1    2018-01-15   8.7 years ago
+          4.x                  not read (undated releases)
+          newest               not read (undated releases)
+          last push            2023-12-22   2.8 years ago                 below push-warn-years 3
+          libyears not measured: undated releases
+repository GitHub github.com/tubalmartin/YUI-CSS-compressor-PHP-port: last push 2023-12-22 · fetched 2026-09-14
+
+score     16 = old-promise 16     high from 16
+  maintenance  old-promise 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        test it on PHP 8.4 — v4.1.1 is its newest release
+
+flags
+  old-promise  S5 · released 2018-01-15 for PHP 5 (php ">=5.3.2"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  S2 (undated releases)
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 4.x      v4.1.1        undated      >=5.3.2
+* the installed branch's highest tag has no release date — the repository leaves it undated, or dates it only by a commit other tags share (`commit …`: a subtree split, the day the directory last changed) — so S8 does not measure the branch
+
+== case old-promise-higher-own-date‡
+tubalmartin/cssmin v4.1.1 — high: old-promise
+  direct requirement (composer.json require)
+
+age       installed  v4.1.1    2018-01-15   8.7 years ago
+          4.x        v4.1.1    2018-01-15   8.7 years ago                 past release-high-years 5
+          newest               not read (undated releases)
+          last push            2023-12-22   2.8 years ago                 below push-warn-years 3
+          libyears at least 2.0 behind the newest stable release
+repository GitHub github.com/tubalmartin/YUI-CSS-compressor-PHP-port: last push 2023-12-22 · fetched 2026-09-14
+
+score     16 = old-promise 16     high from 16
+  maintenance  old-promise 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        test it on PHP 8.4
+
+flags
+  old-promise  S5 · released 2018-01-15 for PHP 5 (php ">=5.3.2"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  S2 (undated releases)
+
+repository metadata
+     branch   highest tag   released          php        fixes
+     5.x      v5.0.0        2020-01-01        >=5.3.2
+   * 4.x      v4.1.1        2018-01-15        >=5.3.2
+     3.x      v3.9.3        commit 2020-06-01 >=5.3.2
+
+== case branch-above-undated‡
+tubalmartin/cssmin v4.1.1 — high: old-promise
+  direct requirement (composer.json require)
+
+age       installed  v4.1.1    2018-01-15   8.7 years ago
+          4.x                  not read (installed above every listed stable release)
+          newest     v5.0.0    2025-01-01   1.7 years ago                 below release-warn-years 3
+          last push            2023-12-22   2.8 years ago                 below push-warn-years 3
+          libyears 7.0 behind the newest stable release
+repository GitHub github.com/tubalmartin/YUI-CSS-compressor-PHP-port: last push 2023-12-22 · fetched 2026-09-14
+
+score     16 = old-promise 16     high from 16
+  maintenance  old-promise 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require tubalmartin/cssmin ^5.0.0 — clears old-promise; 5.x needs php >=7.2, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+          clears old-promise
+
+flags
+  old-promise  S5 · released 2018-01-15 for PHP 5 (php ">=5.3.2"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     5.x      v5.0.0        2025-01-01   >=7.2
+   * 4.x      v4.1.0        undated      >=7.2
+* the installed branch's highest tag has no release date — the repository leaves it undated, or dates it only by a commit other tags share (`commit …`: a subtree split, the day the directory last changed) — so S8 does not measure the branch
 
 == case B-offline‡
 symfony/monolog-bridge v2.6.13 — high: left-behind · old-promise
