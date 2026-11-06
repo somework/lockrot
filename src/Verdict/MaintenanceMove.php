@@ -166,6 +166,12 @@ final class MaintenanceMove
         if ($newestVersion !== null && self::isAboveVersion($newestVersion, $installedVersion)) {
             return MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE)->withLatest(new Latest($newestVersion, $context->lastStableReleased(), false, null, null), null);
         }
+        $highest = $context->rows()[0] ?? null;
+        if ($highest !== null && self::isAboveVersion($highest->highest(), $installedVersion)) {
+            $released = $highest->highestReleased();
+
+            return MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE)->withLatest(new Latest($highest->highest(), $released === null ? null : $released->format(\DATE_ATOM), false, null, null), null);
+        }
         // No tag above the installed one, so the installed release is the newest, with the date that S5 judges.
         $s5 = $context->finding()->signalData(OldPromiseData::class);
 
