@@ -753,6 +753,7 @@ final class MoveTest extends TestCase
 
         self::assertSame(['tag', $branch, ['version' => $target, 'released' => null, 'is_installed' => false, 'relation' => null]], [$move['kind'], $move['to_branch'], array_diff_key(JsonPath::arrayAt($move, ['latest']), ['snapshot_time' => true])]);
         self::assertSame($text, $move['text']);
+        self::assertSame(['requires' => '>=7.2', 'project_allows' => true, 'target_runs' => true, 'raise_to' => null, 'raise_size' => null], $move['php_check']);
         self::assertSame([$s6Version, null, null], self::s6Version($finding));
         self::assertSame([null, 'undated_releases'], [JsonPath::arrayAt($finding, ['age'])['release'], JsonPath::arrayAt($finding, ['age'])['release_unmeasured']]);
     }
@@ -763,7 +764,7 @@ final class MoveTest extends TestCase
         $finding = self::analyse(['lock' => [['version' => 'dev-master', 'time' => '2024-01-01T00:00:00+00:00']], 'releases' => [self::release('v4.0.0', '2025-01-01', '>=7.2'), self::release('v4.1.0-beta1', '2025-06-01', '>=8.5')]]);
         $move = JsonPath::arrayAt($finding, ['next_step']);
 
-        self::assertSame(['tag', '4.x', 'v4.0.0', '2025-01-01T00:00:00+00:00'], [$move['kind'], $move['to_branch'], JsonPath::stringAt($move, ['latest', 'version']), JsonPath::stringAt($move, ['latest', 'released'])]);
+        self::assertSame(['tag', '4.x', ['version' => 'v4.0.0', 'released' => '2025-01-01T00:00:00+00:00', 'is_installed' => false, 'relation' => 'newer']], [$move['kind'], $move['to_branch'], array_diff_key(JsonPath::arrayAt($move, ['latest']), ['snapshot_time' => true])]);
         self::assertSame('require a tag — the newest is v4.0.0 (2025-01-01); 4.x needs php >=7.2, which require.php allows', JsonPath::stringAt($move, ['text']));
         self::assertSame(['v4.1.0-beta1', '2025-06-01T00:00:00+00:00', 'newer'], self::s6Version($finding));
     }
