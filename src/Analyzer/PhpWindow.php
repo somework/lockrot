@@ -132,7 +132,8 @@ final class PhpWindow implements \JsonSerializable
             $knownMinors[] = $targetMinor;
         }
         $configuredPhp ??= $project->platformPhp();
-        $targetPoint = $solvePhp ?? MoveCheckers::platformPhp($targetMinor, $configuredPhp);
+        // The window reads a pin at its X.Y.Z release (SPEC R8-4, R9-2): `8.4.1-p1` meets no `>8.4.1`.
+        $targetPoint = self::releaseOf($solvePhp ?? MoveCheckers::platformPhp($targetMinor, $configuredPhp));
         $windows = [];
         foreach ($sets as $set => $links) {
             $windows[$set] = $links === null ? null : self::setWindow($links, $knownMinors, $targetMinor, $targetPoint);
@@ -145,7 +146,7 @@ final class PhpWindow implements \JsonSerializable
             'host_requires' => $hosts,
             'with_dev' => $windows['with_dev'],
             'without_dev' => $windows['without_dev'],
-            'target' => ['php' => self::releaseOf($targetPoint), 'inside' => $targetFailing === []],
+            'target' => ['php' => $targetPoint, 'inside' => $targetFailing === []],
             'target_fix' => null,
         ], $targetMinor, $knownMinors, $targetFailing, array_values(array_filter($targetFailing, static fn (array $req): bool => \in_array($req, $lockOnly, true))), $lock->skippedNames(), $configuredPhp);
     }
@@ -417,7 +418,7 @@ final class PhpWindow implements \JsonSerializable
         $patch = self::lowestPatch($links, $minor);
         if ($patch === null) {
             // Only the target point admits the minor: config.platform.php names a patch past the range.
-            return ['php' => self::releaseOf($point($minor)), 'set_by' => self::clean(self::failing($links, $minor.'.'.MoveCheckers::NEWEST_PATCH))];
+            return ['php' => $point($minor), 'set_by' => self::clean(self::failing($links, $minor.'.'.MoveCheckers::NEWEST_PATCH))];
         }
         $below = $patch > 0 ? $minor.'.'.($patch - 1) : (isset($minors[$first - 1]) ? $point($minors[$first - 1]) : null);
 
