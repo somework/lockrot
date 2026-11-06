@@ -303,7 +303,8 @@ def explain_metadata():
         rows['properties'][k].setdefault('description', {
             'abandoned': 'Whether the registry marks it abandoned.', 'replacement': 'The registry\'s replacement, as written; null when none.',
             'releases_listed': 'How many releases the registry lists.', 'has_stable_release': 'Whether it lists a tagged release.',
-            'last_stable_release': 'The newest dated stable release; null when none.', 'last_stable_version': 'Its version; null exactly when it is.',
+            'last_stable_release': 'The trusted date of `last_stable_version`, a pre-release included. Null when lockrot trusts none.',
+            'last_stable_version': 'The newest tagged release, a pre-release included. Null only when no tag exists.',
             'type': 'The package type the registry lists.', 'data_date': 'When this metadata was fetched or cached.'}[k])
     for k, v in row['properties'].items():
         v.setdefault('description', {'installed': 'Whether the installed version is on this branch.', 'newest_dated': 'The branch\'s newest dated stable release.',

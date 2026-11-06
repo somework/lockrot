@@ -394,6 +394,7 @@
             "not_found",
             "branch_snapshot",
             "shared_commit",
+            "parent_split",
             "undated",
             "no_stable_release",
             "undated_releases"
@@ -421,6 +422,11 @@
             },
             "shared_commit": {
               "description": "A commit that other tags share dates the installed tag, and no parent tag dates it (`age.installed_unmeasured` `shared_commit`).",
+              "type": "integer",
+              "minimum": 0
+            },
+            "parent_split": {
+              "description": "The installed tag has its own commit, and a parent dates the newest release of the split, so the lock time is not a release date (`age.installed_unmeasured` `parent_split`).",
               "type": "integer",
               "minimum": 0
             },
@@ -10734,7 +10740,7 @@
           ]
         },
         "last_stable_release": {
-          "description": "The newest dated tagged release; null when there is none lockrot trusts.",
+          "description": "The trusted date of `last_stable_version`. Null when lockrot trusts no date for it.",
           "oneOf": [
             {
               "$ref": "#/definitions/dateTime"
@@ -10745,7 +10751,7 @@
           ]
         },
         "last_stable_version": {
-          "description": "The version `last_stable_release` dates; null exactly when it is.",
+          "description": "The newest tagged release, a pre-release included. That is the highest tag when it has no trusted date, else the newest by date, a lower tag on a shared commit included. Null only when no tag exists or no metadata was loaded.",
           "type": [
             "string",
             "null"
@@ -10785,14 +10791,11 @@
       },
       "allOf": [
         {
-          "description": "`last_stable_version` is null exactly when `last_stable_release` is.",
+          "description": "`last_stable_release` is set only beside a `last_stable_version`: the version stays when its date is not trusted.",
           "anyOf": [
             {
               "properties": {
                 "last_stable_release": {
-                  "type": "null"
-                },
-                "last_stable_version": {
                   "type": "null"
                 }
               }
@@ -12002,12 +12005,13 @@
       ]
     },
     "installedUnmeasured": {
-      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.installed` is null: a dev pin (`branch_snapshot`), a tag dated only by a commit that other tags share (`shared_commit`), or a lock entry with no date (`undated`). An open set: read an unknown reason as another reason.",
+      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.installed` is null: a dev pin (`branch_snapshot`), a tag dated only by a commit that other tags share (`shared_commit`), a tag on its own commit in a split whose parent dates the newest release (`parent_split`), or a lock entry with no date (`undated`). An open set: read an unknown reason as another reason.",
       "type": "string",
       "pattern": "^[a-z][a-z0-9_]*$",
       "x-known-values": [
         "branch_snapshot",
         "shared_commit",
+        "parent_split",
         "undated"
       ]
     },
@@ -12066,6 +12070,7 @@
         "not_found",
         "branch_snapshot",
         "shared_commit",
+        "parent_split",
         "undated",
         "no_stable_release",
         "undated_releases"

@@ -896,8 +896,9 @@ defs['s6'] = sig_data('S6 (§2.1): pinned to a branch snapshot, or no tagged rel
     'version': d('The installed version.', {'type': 'string'}),
     'reason': open_set(['branch_snapshot', 'no_stable_release'], "Which of S6's cases fired. An open set (report-1)."),
     'has_stable_release': nul('Whether the repository lists any tagged version; null when no metadata was loaded.', {'type': 'boolean'}),
-    'last_stable_release': nul('The newest dated tagged release; null when there is none lockrot trusts.', ref('dateTime')),
-    'last_stable_version': nul('The version `last_stable_release` dates; null exactly when it is.', {'type': 'string'}),
+    'last_stable_release': nul('The trusted date of `last_stable_version`. Null when lockrot trusts no date for it.', ref('dateTime')),
+    'last_stable_version': nul(("The newest tagged release, a pre-release included. That is the highest tag when it has no trusted date, else the newest by date, "
+                                "a lower tag on a shared commit included. Null only when no tag exists or no metadata was loaded."), {'type': 'string'}),
     'last_stable_dated_by': ref('datedBy'),
     'snapshot_time': nul("For `branch_snapshot`, the lock's `time`; else null.", ref('dateTime')),
     'tag_relation': nul("How the newest tag relates to the snapshot (`older newer same`; revision 3), open (§8.2); null when there is no tag or no snapshot time.",
@@ -1059,15 +1060,15 @@ defs['activity']['allOf'] = [
      'anyOf': [{'properties': {'reason': {'not': {'enum': ['host_not_supported']}}}}, {'properties': {'host': {'type': 'string'}, 'forge': _N}}]},
 ]
 
-UNMEASURED = ['not_from_composer_repository', 'unavailable', 'not_found', 'branch_snapshot', 'unreached', 'no_composer_json', 'shared_commit', 'undated',
+UNMEASURED = ['not_from_composer_repository', 'unavailable', 'not_found', 'branch_snapshot', 'unreached', 'no_composer_json', 'shared_commit', 'parent_split', 'undated',
               'no_stable_release', 'undated_releases', 'no_branch_row', 'above_listed_releases', 'allowlisted', 'no_repository', 'offline', 'rate_limit',
               'fetch_failed', 'anonymous_budget', 'install_time_budget', 'no_token', 'repository_not_found', 'host_not_supported']
 _UN_INTRO = ("Each `*_unmeasured` key has its own known list (C77). An id means the same cause in every reason set, and one words table words them all. ")
 _UN_OPEN = " An open set: read an unknown reason as another reason."
 UNMEASURED_BY_KEY = {
-    'installedUnmeasured': (['branch_snapshot', 'shared_commit', 'undated'],
+    'installedUnmeasured': (['branch_snapshot', 'shared_commit', 'parent_split', 'undated'],
                             "Why `age.installed` is null: a dev pin (`branch_snapshot`), a tag dated only by a commit that other tags share (`shared_commit`), "
-                            "or a lock entry with no date (`undated`)."),
+                            "a tag on its own commit in a split whose parent dates the newest release (`parent_split`), or a lock entry with no date (`undated`)."),
     'releaseUnmeasured': (['not_from_composer_repository', 'unavailable', 'not_found', 'no_stable_release', 'undated_releases'],
                           ("Why `age.release` is null: the metadata was not read (the `metadata.status` value), no stable release (`no_stable_release`), or "
                            "the highest stable tag has no trusted date (`undated_releases`): it has no date, or its date is a commit that the split's "
@@ -1078,7 +1079,7 @@ UNMEASURED_BY_KEY = {
                                 "Or a stable installed version is above every listed stable release (`above_listed_releases`). An installed pre-release above "
                                 "the newest stable release of its branch is read against that release."),
     'pushUnmeasured': (ACT_REASONS + ['undated'], "Why `age.push` is null: `activity.reason` when the activity was not read, or `undated` when the answer carried no date."),
-    'libyearsUnmeasured': (['not_from_composer_repository', 'unavailable', 'not_found', 'branch_snapshot', 'shared_commit', 'undated', 'no_stable_release', 'undated_releases'],
+    'libyearsUnmeasured': (['not_from_composer_repository', 'unavailable', 'not_found', 'branch_snapshot', 'shared_commit', 'parent_split', 'undated', 'no_stable_release', 'undated_releases'],
                            "Why `libyears` is null. The metadata was not read (the `metadata.status` value). Or the installed end has no date that lockrot trusts "
                            "(the id of `age.installed_unmeasured`). Or the release end has none (the id of `age.release_unmeasured`)."),
     'depthUnmeasured': (['unreached', 'no_composer_json'], "Why `depth` is null: no path from the requirements that the run walked (`unreached`), or the run read no composer.json (`no_composer_json`)."),
@@ -1787,6 +1788,7 @@ LIBY['properties'] = {k: LIBY['properties'][k] for k in ('total', 'direct_requir
         'not_found': d('The Composer repository does not list the package (`metadata.status` `not_found`).', INT0),
         'branch_snapshot': d('A dev pin (`dev-main`, `2.x-dev`): a commit date, not a release date.', INT0),
         'shared_commit': d('A commit that other tags share dates the installed tag, and no parent tag dates it (`age.installed_unmeasured` `shared_commit`).', INT0),
+        'parent_split': d('The installed tag has its own commit, and a parent dates the newest release of the split, so the lock time is not a release date (`age.installed_unmeasured` `parent_split`).', INT0),
         'undated': d('The installed release has no date at all (`age.installed_unmeasured` `undated`).', INT0),
         'no_stable_release': d('No stable release to measure to (`age.release_unmeasured` `no_stable_release`).', INT0),
         'undated_releases': d('The newest end has no trusted date (`age.release_unmeasured` `undated_releases`: the highest stable tag has none).', INT0),
@@ -1984,8 +1986,8 @@ def add_relations_round4(defs):
            [P(flag_ids=dict(E(FLAGS), description='The eight flags, in flag order.'))],
            [P(signal_ids={'description': 'S1 to S11 first, in order.', 'items': [E(x) for x in BO.SIGNAL_IDS], 'minItems': len(BO.SIGNAL_IDS)})],
            [P(fail_on=E('none')), P(fail_on={'not': {'pattern': '(^|,)none(,|$)'}})])
-    relate(defs['s6'], '`last_stable_version` is null exactly when `last_stable_release` is.',
-           [P(last_stable_release=NULL, last_stable_version=NULL), P(last_stable_release=STR, last_stable_version=STR)])
+    relate(defs['s6'], '`last_stable_release` is set only beside a `last_stable_version`: the version stays when its date is not trusted.',
+           [P(last_stable_release=NULL), P(last_stable_release=STR, last_stable_version=STR)])
     blocks_live = lambda: P(blocks=CONTAINS(E('S2', 'S4')))
     relate(f, ['A degree\'s `liveness_complete` reads false only beside a `checks_skipped[]` or `checks_missing[]` entry that blocks S2 or S4.',
                'A degree\'s `liveness_complete` reads true only when no `checks_skipped[]` or `checks_missing[]` entry blocks S2 or S4.',
