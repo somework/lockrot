@@ -29,6 +29,7 @@ final class AgeMeasure
     public const BRANCH_SNAPSHOT = 'branch_snapshot';
     /** The lock's date for the installed tag is a commit other tags share, and no monorepo parent dates it. */
     public const SHARED_COMMIT = 'shared_commit';
+    public const PARENT_SPLIT = 'parent_split';
     /** The lock entry carries no date, or the repository answered with no push date. */
     public const UNDATED = 'undated';
     /** The package is not from a Composer repository: no metadata is asked for, no repository activity either. */
@@ -74,7 +75,7 @@ final class AgeMeasure
         $installed = InstalledRelease::of($facts->package(), $facts->metadata());
         $at = $installed->at();
         if ($at === null) {
-            return AgeReading::unmeasuredBecause($installed->kind() === InstalledRelease::SHARED_COMMIT ? self::SHARED_COMMIT : self::UNDATED);
+            return AgeReading::unmeasuredBecause(self::untrustedReason($installed));
         }
 
         return $this->reading($at, null, $installed->datedBy(), null, AgeReading::INSTALLED);
@@ -206,6 +207,12 @@ final class AgeMeasure
     private static function sharedCommitDates(PackageMetadata $metadata, array $branch): bool
     {
         return !isset($branch['dated_by']) && $metadata->sharesItsCommit($branch['version']);
+    }
+
+    /** The reason of an installed release that has no trusted date: libyears reads the same id. */
+    public static function untrustedReason(InstalledRelease $installed): string
+    {
+        return \in_array($installed->kind(), [InstalledRelease::SHARED_COMMIT, InstalledRelease::PARENT_SPLIT], true) ? $installed->kind() : self::UNDATED;
     }
 
     private static function metadataReason(PackageFacts $facts, ?string $metadataStatus): string

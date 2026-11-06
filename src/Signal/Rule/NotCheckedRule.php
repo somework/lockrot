@@ -73,6 +73,8 @@ final class NotCheckedRule implements SignalRule
 
     /** The causes of a `release_dates` entry ({@see Check::causes()}): the installed tag's lock date is a commit that other tags share. */
     public const CAUSE_INSTALLED_SHARED_COMMIT = 'installed_shared_commit';
+    /** The installed tag has its own commit, but a parent dates the split's newest release (ruling R13-31). */
+    public const CAUSE_INSTALLED_PARENT_SPLIT = 'installed_parent_split';
     /** The lock entry of the installed release has no `time`. */
     public const CAUSE_LOCK_UNDATED = 'lock_undated';
     /** A highest tag that the signal reads has no `time`. */
@@ -84,8 +86,15 @@ final class NotCheckedRule implements SignalRule
     private const DATE_CAUSES = [
         self::CAUSE_LOCK_UNDATED => 'the lock gives the installed release no date',
         self::CAUSE_INSTALLED_SHARED_COMMIT => 'the installed release has no release date (its tag shares a commit with other tags, and no parent dates it)',
+        self::CAUSE_INSTALLED_PARENT_SPLIT => 'the installed release has no release date (a parent dates the newest release of this split, so the lock time is not a release date)',
         self::CAUSE_SHARED_COMMIT => 'the age of the package was not read (a release it reads is dated by a commit its tags share)',
         self::CAUSE_TAG_UNDATED => 'the age of the package was not read (a release it reads carries no date)',
+    ];
+
+    /** The `release_dates` cause of each InstalledRelease kind with a lock date that lockrot does not trust. */
+    private const INSTALLED_CAUSES = [
+        InstalledRelease::SHARED_COMMIT => self::CAUSE_INSTALLED_SHARED_COMMIT,
+        InstalledRelease::PARENT_SPLIT => self::CAUSE_INSTALLED_PARENT_SPLIT,
     ];
 
     /** The S10 checks about the package's upkeep, which a raised S1 makes moot. */
@@ -143,8 +152,7 @@ final class NotCheckedRule implements SignalRule
             $blocked[] = [$metadata->lastStableSharesItsCommit() ? self::CAUSE_SHARED_COMMIT : self::CAUSE_TAG_UNDATED, Signal::S2];
         }
         if ($this->oldPromise !== null && $this->oldPromise->missesATrustedDate($facts)) {
-            $shared = InstalledRelease::of($facts->package(), $metadata)->kind() === InstalledRelease::SHARED_COMMIT;
-            $blocked[] = [$shared ? self::CAUSE_INSTALLED_SHARED_COMMIT : self::CAUSE_LOCK_UNDATED, Signal::S5];
+            $blocked[] = [self::INSTALLED_CAUSES[InstalledRelease::of($facts->package(), $metadata)->kind()] ?? self::CAUSE_LOCK_UNDATED, Signal::S5];
         }
         foreach (array_unique(array_map(static fn (string $tag): string => self::tagCause($metadata, $tag), $this->leftBehind->undatedReleases($facts))) as $cause) {
             $blocked[] = [$cause, Signal::S8];
@@ -297,7 +305,7 @@ final class NotCheckedRule implements SignalRule
                 throw new \LogicException('S10 has no cause for the release_dates entry.');
             }
 
-            return implode('; ', array_map(static fn (string $cause, array $blocks): string => self::DATE_CAUSES[$cause].', so '.ListWords::of($blocks).(\in_array($cause, [self::CAUSE_LOCK_UNDATED, self::CAUSE_INSTALLED_SHARED_COMMIT], true) ? ' could not judge it' : ' could not measure it'), array_keys($entry->causes()), $entry->causes()));
+            return implode('; ', array_map(static fn (string $cause, array $blocks): string => self::DATE_CAUSES[$cause].', so '.ListWords::of($blocks).(\in_array($cause, [self::CAUSE_LOCK_UNDATED, self::CAUSE_INSTALLED_SHARED_COMMIT, self::CAUSE_INSTALLED_PARENT_SPLIT], true) ? ' could not judge it' : ' could not measure it'), array_keys($entry->causes()), $entry->causes()));
         }
 
         throw new \LogicException('S10 has no words for the check '.$entry->check().'.');

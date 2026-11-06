@@ -35,6 +35,7 @@ final class CauseWords
         'accepted_by_config' => 'accepted by your accept-unchecked list',
         'no_versions' => 'no version left to read',
         'shared_commit' => 'dated only by a commit its tags share',
+        'parent_split' => 'a split whose parent dates its newest release',
         'undated' => 'no date',
         'no_stable_release' => 'no stable release',
         'no_branch_row' => 'no release on its branch',

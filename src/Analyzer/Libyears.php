@@ -26,6 +26,7 @@ final class Libyears
     public const NOT_FOUND = AgeMeasure::NOT_FOUND;
     public const BRANCH_SNAPSHOT = AgeMeasure::BRANCH_SNAPSHOT;
     public const SHARED_COMMIT = AgeMeasure::SHARED_COMMIT;
+    public const PARENT_SPLIT = AgeMeasure::PARENT_SPLIT;
     public const UNDATED = AgeMeasure::UNDATED;
     public const NO_STABLE_RELEASE = AgeMeasure::NO_STABLE_RELEASE;
     public const UNDATED_RELEASES = AgeMeasure::UNDATED_RELEASES;
@@ -34,7 +35,7 @@ final class Libyears
      * The block lists the reasons in this order. An unmeasured end takes the id of its age reading
      * ({@see AgeMeasure}), so one cause has one id.
      */
-    public const REASONS = [self::NOT_FROM_COMPOSER_REPOSITORY, self::UNAVAILABLE, self::NOT_FOUND, self::BRANCH_SNAPSHOT, self::SHARED_COMMIT, self::UNDATED, self::NO_STABLE_RELEASE, self::UNDATED_RELEASES];
+    public const REASONS = [self::NOT_FROM_COMPOSER_REPOSITORY, self::UNAVAILABLE, self::NOT_FOUND, self::BRANCH_SNAPSHOT, self::SHARED_COMMIT, self::PARENT_SPLIT, self::UNDATED, self::NO_STABLE_RELEASE, self::UNDATED_RELEASES];
 
     private float $total;
     private float $direct;
@@ -78,7 +79,7 @@ final class Libyears
         $release = InstalledRelease::of($package, $metadata);
         $installed = $release->at();
         if ($installed === null) {
-            return LibyearsMeasurement::unmeasured($release->kind() === InstalledRelease::SHARED_COMMIT ? self::SHARED_COMMIT : self::UNDATED);
+            return LibyearsMeasurement::unmeasured(AgeMeasure::untrustedReason($release));
         }
         if (!$metadata->hasStableRelease()) {
             return LibyearsMeasurement::unmeasured(self::NO_STABLE_RELEASE);
