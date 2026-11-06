@@ -270,8 +270,30 @@ final class PhpWindowTest extends TestCase
     public static function pinsPastTheRange(): iterable
     {
         yield 'v prefix' => ['v8.4.100', '>=8.4.100', '8.4.100'];
-        yield 'patch suffix' => ['8.4.1-p1', '>8.4.1 <8.4.2', '8.4.1'];
-        yield 'four segments' => ['8.4.1.2', '>=8.4.1.1 <8.4.2', '8.4.1'];
+        yield 'patch suffix' => ['8.4.1-p1', '>=8.4.1 <8.4.2', '8.4.1'];
+        yield 'four segments' => ['8.4.1.2', '>=8.4.1 <8.4.2', '8.4.1'];
+    }
+
+    /**
+     * The window solves a pin at its X.Y.Z release (SPEC R8-4, R9-2): a range that only the suffix
+     * or the fourth segment reaches keeps the minor out.
+     *
+     * @dataProvider pinsThatOnlyTheirSuffixAdmits
+     */
+    #[DataProvider('pinsThatOnlyTheirSuffixAdmits')]
+    public function testAPinIsSolvedAtItsXyzRelease(string $pin, string $require): void
+    {
+        $window = self::window(['packages' => [self::package('acme/a', ['php' => $require])], 'packages-dev' => []], ['config' => ['platform' => ['php' => $pin]]], '8.4');
+
+        self::assertNotContains('8.4', $window['without_dev']['minors']);
+        self::assertFalse($window['target']['inside']);
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function pinsThatOnlyTheirSuffixAdmits(): iterable
+    {
+        yield 'patch suffix' => ['8.4.1-p1', '>8.4.1 <8.4.2'];
+        yield 'four segments' => ['8.4.1.2', '>=8.4.1.1 <8.4.2'];
     }
 
     /** R3-6: config.platform.php 8.2.0 and a floor of 8.2.1. PHP 8.2.1 installs the lock, so 8.2 is in and is the lower edge. */
