@@ -84,9 +84,10 @@ final class Tokens
             if ($url === null) {
                 continue;
             }
-            $host = self::host($url);
+            $bare = self::withoutUserinfo($url);
+            $host = self::host($bare);
             if ($host !== $publicHost) {
-                $withheld[$name] = $host ?? self::withoutUserinfo($url);
+                $withheld[$name] = $host ?? self::authorityOf($bare);
 
                 return null;
             }
@@ -95,16 +96,27 @@ final class Tokens
         return $token;
     }
 
-    /** An issuer that does not parse is shown without what precedes its last `@`: userinfo can hold any character, a `/` included. */
+    /** Userinfo can hold any character, `/` and `://` included, so everything up to the last `@` goes. */
     private static function withoutUserinfo(string $url): string
     {
+        $scheme = self::schemeOf($url);
         $at = strrpos($url, '@');
-        if ($at === false) {
-            return $url;
-        }
-        $scheme = strpos($url, '://');
 
-        return ($scheme !== false && $scheme < $at ? substr($url, 0, $scheme + 3) : '').substr($url, $at + 1);
+        return $at === false || $at < \strlen($scheme) ? $url : $scheme.substr($url, $at + 1);
+    }
+
+    /** An issuer that does not parse is shown up to its path: a query or a fragment can hold a token. */
+    private static function authorityOf(string $url): string
+    {
+        $scheme = self::schemeOf($url);
+        $rest = substr($url, \strlen($scheme));
+
+        return $scheme.substr($rest, 0, strcspn($rest, '/?#'));
+    }
+
+    private static function schemeOf(string $url): string
+    {
+        return preg_match('~^[a-z][a-z0-9+.\-]*://~i', $url, $match) === 1 ? $match[0] : '';
     }
 
     /**
@@ -143,7 +155,7 @@ final class Tokens
 
     /**
      * The ambient tokens that {@see fromEnvironment()} withheld, by variable name: the issuer
-     * host, or the raw issuer value when it does not parse.
+     * host, or the scheme and authority of an issuer that does not parse, without userinfo.
      *
      * @return array<string, string>
      */
