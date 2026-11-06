@@ -1421,9 +1421,9 @@
             "newest": null,
             "constraint": null,
             "latest": {
-                "version": "1.0.0",
-                "released": "2019-01-01T00:00:00+00:00",
-                "is_installed": true,
+                "version": "1.5.0",
+                "released": null,
+                "is_installed": false,
                 "relation": null,
                 "snapshot_time": null
             },
@@ -1447,7 +1447,7 @@
             "commands": [],
             "through": [],
             "also": [],
-            "text": "test it on PHP 8.4 \u2014 1.0.0 is its newest release"
+            "text": "test it on PHP 8.4"
         }
     },
     "old-promise with a release on the ga day": {
