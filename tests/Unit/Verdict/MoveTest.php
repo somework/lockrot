@@ -840,7 +840,7 @@ final class MoveTest extends TestCase
         self::assertSame(['version' => '1.0.0', 'released' => '2019-01-01T00:00:00+00:00', 'is_installed' => true, 'relation' => null, 'snapshot_time' => null], $move['latest']);
     }
 
-    /** @return iterable<string, array{?string, ?string, ?string, array{requires: ?string, project_allows: ?bool, target_runs: ?bool, raise_to: ?string, raise_size: ?string}, string}> */
+    /** @return iterable<string, array{?string, ?string, ?string, array{requires: ?string, project_allows: ?bool, target_runs: ?bool, raise_to: ?string, raise_size: ?string}, non-empty-string}> */
     public static function preReleaseOnlySnapshots(): iterable
     {
         yield 'dated, with php' => ['2025-06-01', 'newer', '>=7.2', ['requires' => '>=7.2', 'project_allows' => true, 'target_runs' => true, 'raise_to' => null, 'raise_size' => null], 'require a tag — the newest is v1.0.0-beta1 (2025-06-01); v1.0.0-beta1 needs php >=7.2, which require.php allows'];
@@ -853,6 +853,7 @@ final class MoveTest extends TestCase
      * pre-release's own require.php.
      *
      * @param array{requires: ?string, project_allows: ?bool, target_runs: ?bool, raise_to: ?string, raise_size: ?string} $phpCheck
+     * @param non-empty-string                                                                                       $text
      *
      * @dataProvider preReleaseOnlySnapshots
      */

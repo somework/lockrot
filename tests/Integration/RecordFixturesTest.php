@@ -155,6 +155,9 @@ final class RecordFixturesTest extends TestCase
         self::assertSame([], RecorderNames::repository([], $locked), 'no metadata-url means no p2 answer to record');
     }
 
+    /**
+     * @dataProvider gitlabStatuses
+     */
     #[DataProvider('gitlabStatuses')]
     public function testAGitlabAnswerIsRecordedOnlyWithStatus200Or404(int $status, bool $recorded): void
     {

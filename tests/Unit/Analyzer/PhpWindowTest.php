@@ -288,6 +288,7 @@ final class PhpWindowTest extends TestCase
         self::assertContains('8.4', $window['without_dev']['minors']);
         self::assertTrue($window['target']['inside']);
         self::assertSame('8.4.1', $window['target']['php']);
+        self::assertNotNull($window['without_dev']['lower_edge']);
         self::assertSame('8.4.1', $window['without_dev']['lower_edge']['php']);
         self::assertNull($window['target_fix']);
     }
@@ -313,6 +314,7 @@ final class PhpWindowTest extends TestCase
         $window = self::window(['packages' => [self::package('acme/a', ['php' => '>8.4.1'])], 'packages-dev' => []], ['config' => ['platform' => ['php' => '8.4.1-p1']]], '8.4');
 
         self::assertTrue($window['target']['inside']);
+        self::assertNotNull($window['without_dev']['lower_edge']);
         self::assertSame('8.4.1', $window['without_dev']['lower_edge']['php']);
     }
 
