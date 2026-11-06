@@ -289,9 +289,9 @@ final class AgeMeasureTest extends TestCase
         self::assertUnmeasured(AgeMeasure::BRANCH_SNAPSHOT, $measure->installed(FactsBuilder::facts(FactsBuilder::package(['version' => 'dev-main', 'time' => self::ago(10)]))));
         self::assertUnmeasured(AgeMeasure::BRANCH_SNAPSHOT, $measure->installed(FactsBuilder::facts(FactsBuilder::package(['version' => 'dev-main']))));
         self::assertUnmeasured(AgeMeasure::UNDATED, $measure->installed(FactsBuilder::facts(FactsBuilder::package())));
-        // A split whose newest release a parent dated, while nothing dates the installed tag: the lock's date is a shared commit's.
+        // A split whose newest release a parent dated, while nothing dates the installed tag on its own commit (ruling R13-31).
         $split = $this->splitMetadata();
-        self::assertUnmeasured(AgeMeasure::SHARED_COMMIT, $measure->installed(FactsBuilder::facts(FactsBuilder::package(['version' => 'v0.9.0', 'time' => self::ago(10)]), $split)));
+        self::assertUnmeasured(AgeMeasure::PARENT_SPLIT, $measure->installed(FactsBuilder::facts(FactsBuilder::package(['version' => 'v0.9.0', 'time' => self::ago(10)]), $split)));
     }
 
     public function testAMeasuredReadingNeedsADateAndAnUnmeasuredOneAReason(): void

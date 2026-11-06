@@ -195,7 +195,7 @@ final class Report2RootTest extends TestCase
             'direct_requirements' => 4.72,
             'measured' => 2,
             'at_least_count' => 0,
-            'unmeasured' => ['not_from_composer_repository' => 0, 'unavailable' => 0, 'not_found' => 0, 'branch_snapshot' => 1, 'shared_commit' => 0, 'undated' => 0, 'no_stable_release' => 0, 'undated_releases' => 0],
+            'unmeasured' => ['not_from_composer_repository' => 0, 'unavailable' => 0, 'not_found' => 0, 'branch_snapshot' => 1, 'shared_commit' => 0, 'parent_split' => 0, 'undated' => 0, 'no_stable_release' => 0, 'undated_releases' => 0],
             'furthest_behind' => ['package' => 'smalot/pdfparser', 'version' => 'v1.1.0', 'libyears' => 4.72, 'at_least' => false],
             'packages' => 3,
         ], Report2Root::toLibyearsArray(Libyears::fromFindings($findings), $findings));

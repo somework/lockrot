@@ -131,6 +131,19 @@ final class InstalledReleaseTest extends TestCase
         self::assertNull($installed->datedBy());
     }
 
+    /** Ruling R13-31: the tag shares no commit, but a parent dates the split's newest release, so the lock time is no release date. */
+    public function testATagOnItsOwnCommitInASplitThatAParentDatesIsAParentSplit(): void
+    {
+        $installed = InstalledRelease::of(
+            F::package(['version' => 'v5.13.2', 'time' => self::LOCKED_AT]),
+            self::metadata('laravel/framework', ['5.13.3.0' => '2024-11-21T00:00:00+00:00'])
+        );
+
+        self::assertSame(InstalledRelease::PARENT_SPLIT, $installed->kind());
+        self::assertNull($installed->at());
+        self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), $installed->lockTime());
+    }
+
     /**
      * The repository marks the installed tag as dated by a commit that its neighbours share, while
      * it dates its own newest release.

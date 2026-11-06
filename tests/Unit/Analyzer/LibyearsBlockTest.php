@@ -44,8 +44,8 @@ final class LibyearsBlockTest extends TestCase
         $findings = self::findings();
         $block = Report2Root::toLibyearsArray(Libyears::fromFindings($findings), $findings);
 
-        self::assertSame(['not_from_composer_repository', 'unavailable', 'not_found', 'branch_snapshot', 'shared_commit', 'undated', 'no_stable_release', 'undated_releases'], array_keys($block['unmeasured']));
-        self::assertSame(['not_from_composer_repository' => 0, 'unavailable' => 0, 'not_found' => 0, 'branch_snapshot' => 1, 'shared_commit' => 1, 'undated' => 0, 'no_stable_release' => 1, 'undated_releases' => 0], $block['unmeasured']);
+        self::assertSame(['not_from_composer_repository', 'unavailable', 'not_found', 'branch_snapshot', 'shared_commit', 'parent_split', 'undated', 'no_stable_release', 'undated_releases'], array_keys($block['unmeasured']));
+        self::assertSame(['not_from_composer_repository' => 0, 'unavailable' => 0, 'not_found' => 0, 'branch_snapshot' => 1, 'shared_commit' => 1, 'parent_split' => 0, 'undated' => 0, 'no_stable_release' => 1, 'undated_releases' => 0], $block['unmeasured']);
     }
 
     public function testTheLowerBoundsAreCounted(): void
