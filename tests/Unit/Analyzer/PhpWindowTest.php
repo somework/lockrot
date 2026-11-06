@@ -270,23 +270,24 @@ final class PhpWindowTest extends TestCase
     public static function pinsPastTheRange(): iterable
     {
         yield 'v prefix' => ['v8.4.100', '>=8.4.100', '8.4.100'];
-        yield 'patch suffix' => ['8.4.1-p1', '>=8.4.1 <8.4.2', '8.4.1'];
-        yield 'four segments' => ['8.4.1.2', '>=8.4.1 <8.4.2', '8.4.1'];
+        yield 'patch suffix' => ['8.4.1-p1', '>8.4.1 <8.4.2', '8.4.1'];
+        yield 'four segments' => ['8.4.1.2', '>=8.4.1.1 <8.4.2', '8.4.1'];
     }
 
     /**
-     * The window solves a pin at its X.Y.Z release (SPEC R8-4, R9-2): a range that only the suffix
-     * or the fourth segment reaches keeps the minor out.
+     * The window reads a pin as Composer normalizes it, so a range that only the suffix or the
+     * fourth segment meets keeps the minor in, as `composer install` does.
      *
      * @dataProvider pinsThatOnlyTheirSuffixAdmits
      */
     #[DataProvider('pinsThatOnlyTheirSuffixAdmits')]
-    public function testAPinIsSolvedAtItsXyzRelease(string $pin, string $require): void
+    public function testAPinIsSolvedAsComposerNormalizesIt(string $pin, string $require): void
     {
         $window = self::window(['packages' => [self::package('acme/a', ['php' => $require])], 'packages-dev' => []], ['config' => ['platform' => ['php' => $pin]]], '8.4');
 
-        self::assertNotContains('8.4', $window['without_dev']['minors']);
-        self::assertFalse($window['target']['inside']);
+        self::assertContains('8.4', $window['without_dev']['minors']);
+        self::assertTrue($window['target']['inside']);
+        self::assertSame('8.4.1', $window['target']['php']);
     }
 
     /** @return iterable<string, array{string, string}> */
