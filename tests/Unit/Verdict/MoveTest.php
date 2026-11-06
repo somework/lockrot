@@ -816,6 +816,21 @@ final class MoveTest extends TestCase
         self::assertSame(['version' => '2.0.0', 'released' => '2019-01-01T00:00:00+00:00', 'is_installed' => true, 'relation' => null, 'snapshot_time' => null], $move['latest']);
     }
 
+    /**
+     * Ruling R13-A (r12l.1, Q7): with no RULE 1 version above the installed one, the test move
+     * names the highest stable tag above it, with its own date. A lower tag with a newer shared date does not win.
+     */
+    public function testAnOldPromiseTestMoveNamesAHigherTagOnItsOwnCommit(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse([
+            'lock' => [['version' => 'v4.1.1']],
+            'releases' => [self::release('v5.0.0', '2020-01-01', '>=7.2'), self::release('v4.1.1', '2018-01-01', '>=7.2'), ['shared_commit' => true] + self::release('v3.9.3', '2020-06-01', '>=7.2')],
+        ]), ['next_step']);
+
+        self::assertSame(['test', 'test it on PHP 8.4'], [$move['kind'], $move['text']]);
+        self::assertSame(['version' => 'v5.0.0', 'released' => '2020-01-01T00:00:00+00:00', 'is_installed' => false, 'relation' => null, 'snapshot_time' => null], $move['latest']);
+    }
+
     /** Ruling R13-A (r12l.1, Q6): the installed release as the newest carries the date that S5 judges, also when its tag is undated. */
     public function testAnOldPromiseTestMoveOnAnUndatedHighestInstalledTagCarriesTheLockTime(): void
     {
