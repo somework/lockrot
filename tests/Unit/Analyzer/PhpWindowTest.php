@@ -288,6 +288,8 @@ final class PhpWindowTest extends TestCase
         self::assertContains('8.4', $window['without_dev']['minors']);
         self::assertTrue($window['target']['inside']);
         self::assertSame('8.4.1', $window['target']['php']);
+        self::assertSame('8.4.1', $window['without_dev']['lower_edge']['php']);
+        self::assertNull($window['target_fix']);
     }
 
     /** @return iterable<string, array{string, string}> */
@@ -295,6 +297,23 @@ final class PhpWindowTest extends TestCase
     {
         yield 'patch suffix' => ['8.4.1-p1', '>8.4.1 <8.4.2'];
         yield 'four segments' => ['8.4.1.2', '>=8.4.1.1 <8.4.2'];
+    }
+
+    public function testAPinWithNoSuffixStaysOutsideARangeThatStartsAboveIt(): void
+    {
+        $window = self::window(['packages' => [self::package('acme/a', ['php' => '>8.4.1 <8.4.2'])], 'packages-dev' => []], ['config' => ['platform' => ['php' => '8.4.1']]], '8.4');
+
+        self::assertSame(['php' => '8.4.1', 'inside' => false], $window['target']);
+        self::assertNotContains('8.4', $window['without_dev']['minors']);
+    }
+
+    /** No X.Y.Z of the target minor below 8.4.2 installs the lock, but the pin does, so the pin is the lowest edge candidate. */
+    public function testThePinIsALowerEdgeCandidateBelowTheLowestPatchThatInstalls(): void
+    {
+        $window = self::window(['packages' => [self::package('acme/a', ['php' => '>8.4.1'])], 'packages-dev' => []], ['config' => ['platform' => ['php' => '8.4.1-p1']]], '8.4');
+
+        self::assertTrue($window['target']['inside']);
+        self::assertSame('8.4.1', $window['without_dev']['lower_edge']['php']);
     }
 
     /** R3-6: config.platform.php 8.2.0 and a floor of 8.2.1. PHP 8.2.1 installs the lock, so 8.2 is in and is the lower edge. */
