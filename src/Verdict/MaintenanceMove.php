@@ -87,7 +87,7 @@ final class MaintenanceMove
             return MoveDraft::of(Move::NO_TAG, FlagSet::PINNED);
         }
         $key = ReleaseBranch::of($version);
-        // A pre-release is never the target: a line with no stable tag gives way to the highest line.
+        // A line with no stable tag gives way to the highest line. Only with no stable tag at all is the target the pre-release that S6 names.
         $branch = ($key === null ? null : $context->row(ReleaseBranch::label($key))) ?? ($context->rows()[0] ?? null);
         if ($branch !== null) {
             // The newest dated tag can be a backport below its branch's highest tag: the move requires the highest tag.
