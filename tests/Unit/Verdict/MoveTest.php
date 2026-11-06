@@ -840,28 +840,43 @@ final class MoveTest extends TestCase
         self::assertSame(['version' => '1.0.0', 'released' => '2019-01-01T00:00:00+00:00', 'is_installed' => true, 'relation' => null, 'snapshot_time' => null], $move['latest']);
     }
 
-    /** @return iterable<string, array{?string, ?string, string}> */
+    /** @return iterable<string, array{?string, ?string, ?string, array{requires: ?string, project_allows: ?bool, target_runs: ?bool, raise_to: ?string, raise_size: ?string}, string}> */
     public static function preReleaseOnlySnapshots(): iterable
     {
-        yield 'dated' => ['2025-06-01', 'newer', 'require a tag — the newest is v1.0.0-beta1 (2025-06-01)'];
-        yield 'undated' => [null, null, 'require a tag — the newest is v1.0.0-beta1'];
+        yield 'dated, with php' => ['2025-06-01', 'newer', '>=7.2', ['requires' => '>=7.2', 'project_allows' => true, 'target_runs' => true, 'raise_to' => null, 'raise_size' => null], 'require a tag — the newest is v1.0.0-beta1 (2025-06-01); v1.0.0-beta1 needs php >=7.2, which require.php allows'];
+        yield 'undated, with no php' => [null, null, null, ['requires' => null, 'project_allows' => null, 'target_runs' => null, 'raise_to' => null, 'raise_size' => null], 'require a tag — the newest is v1.0.0-beta1'];
     }
 
     /**
      * Ruling R13-A (r12l.1, Q4): with only pre-release tags no branch row exists, so the pinned
-     * move targets the S6 version, and I18b keeps it from `no-tag`.
+     * move targets the S6 version, and I18b keeps it from `no-tag`. Its php_check reads that
+     * pre-release's own require.php.
+     *
+     * @param array{requires: ?string, project_allows: ?bool, target_runs: ?bool, raise_to: ?string, raise_size: ?string} $phpCheck
      *
      * @dataProvider preReleaseOnlySnapshots
      */
     #[DataProvider('preReleaseOnlySnapshots')]
-    public function testASnapshotWithOnlyAPreReleaseTagRequiresThatTag(?string $date, ?string $relation, string $text): void
+    public function testASnapshotWithOnlyAPreReleaseTagRequiresThatTag(?string $date, ?string $relation, ?string $php, array $phpCheck, string $text): void
     {
-        $finding = self::analyse(['lock' => [['version' => 'dev-master', 'time' => '2024-01-01T00:00:00+00:00']], 'releases' => [self::release('v1.0.0-beta1', $date, '>=7.2')]]);
+        $finding = self::analyse(['lock' => [['version' => 'dev-master', 'time' => '2024-01-01T00:00:00+00:00']], 'releases' => [self::release('v1.0.0-beta1', $date, $php)]]);
         $move = JsonPath::arrayAt($finding, ['next_step']);
 
-        self::assertSame(['tag', null, null], [$move['kind'], $move['to_branch'], $move['php_check']]);
+        self::assertSame(['tag', null, $phpCheck], [$move['kind'], $move['to_branch'], $move['php_check']]);
         self::assertSame(['version' => 'v1.0.0-beta1', 'released' => $date === null ? null : $date.'T00:00:00+00:00', 'is_installed' => false, 'relation' => $relation], array_diff_key(JsonPath::arrayAt($move, ['latest']), ['snapshot_time' => true]));
         self::assertStringStartsWith($text, JsonPath::stringAt($move, ['text']));
+    }
+
+    /** Ruling R13-A (r12l.1, no-row blocked): a pre-release that the target cannot run blocks the pinned move. */
+    public function testASnapshotWithOnlyAPreReleaseTagThatTheTargetCannotRunIsBlocked(): void
+    {
+        $finding = self::analyse(['lock' => [['version' => 'dev-master', 'time' => '2024-01-01T00:00:00+00:00']], 'releases' => [self::release('v1.0.0-beta1', '2025-06-01', '>=8.5')]]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        $phpCheck = JsonPath::arrayAt($move, ['php_check']);
+
+        self::assertSame(['blocked', null, '>=8.5', false], [$move['kind'], $move['to_branch'], $phpCheck['requires'], $phpCheck['target_runs']]);
+        self::assertSame('no move runs on the target: the newest tag, v1.0.0-beta1, needs php >=8.5 and the target php 8.4 does not run it; replace it', JsonPath::stringAt($move, ['text']));
     }
 
     /**
