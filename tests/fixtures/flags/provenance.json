@@ -1,7 +1,7 @@
 {
  "pr": "7d",
  "source": {
-  "cases.json": "29ed0b08f174465f5474b10ce28e6e0740f25211fbe3175ac1d54c0c05f3648c",
+  "cases.json": "225fdd7fd857aef3c47995ac64b75fdc2314cab731b5ca3e6dfc447a20b2ac46",
   "model_run_date": "2026-11-07"
  },
  "suite": "the model suite reports every step passed",
@@ -19,6 +19,9 @@
   "unknown-vuln‡",
   "ok-offline‡",
   "finished-offline‡",
+  "pinned-prerelease-only‡",
+  "pinned-prerelease-only-blocked‡",
+  "pinned-prerelease-only-undated‡",
   "no-tag‡",
   "B-accepted-unread‡",
   "host-unsupported",
