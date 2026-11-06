@@ -691,7 +691,16 @@ writes the move as `next_step`. Abridged from a recorded run on wallabag's lock:
   That php decides between `tag` and `blocked`, and the `old-promise` and `capped`
   facts of the move read it. The move adds `old-promise` only when that tag declares `require.php`.
   A `blocked` move to a tag names the php of the tag, and a `blocked` move with no tag names the
-  branch's `php`.
+  branch's `php`. With only pre-release tags, the move targets the pre-release that S6 names, with
+  `to_branch` null. Its `php_check` reads that pre-release's own `require.php`, and the line names
+  the release where a branch move names its branch.
+
+- **The release of a test.** `latest` of a `test` move is the first of these that applies:
+
+    1. S6's `last_stable_version`, when it is above the installed version.
+    2. The highest stable tag, with its own trusted date or null, when it is above the installed
+       version.
+    3. The installed release, with `is_installed` true and the date of `age.installed.at`.
 
 - **What it clears.** `next_step.clears[]` names only what lockrot checked for every version the
   constraint admits. `unverified[]` names what it could not check, and `leaves[]` what the move
