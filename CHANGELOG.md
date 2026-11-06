@@ -219,8 +219,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
   installs, with require-dev and without, and the links that set each edge. A target minor above
   the newest known minor counts as one more. `platform_override` is Composer's merged
-  `config.platform.php`, and `target.php` the `X.Y.Z` release that the move check solves at. The
-  text formats print a `php:` line. ([The PHP window](docs/verdicts.md#the-php-window))
+  `config.platform.php`. `target.php` and `lower_edge.php` are `X.Y.Z` releases, also for a pin
+  such as `8.4.1-p1`. The text formats print a `php:` line.
+  ([The PHP window](docs/verdicts.md#the-php-window))
 - **json, table, markdown, github:** `run.php_window.target_fix` names the packages that exclude
   the target PHP, and the answer of Composer's solver to their update at the target: the command,
   the holds of a refusal, or the root links that no update can change. The `php:` line prints it,
@@ -408,7 +409,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([Explaining one package](docs/configuration.md#explaining-one-package))
 - **json:** `libyears_unmeasured` and the keys of `libyears.unmeasured` follow `metadata.status`
   and `age`. `metadata_unavailable` is `unavailable` or `not_found`. `no_stable_release_date` is
-  `shared_commit` or `undated` when the installed release has no trusted date. It is
+  `shared_commit`, `parent_split` or `undated` when the installed release has no trusted date. It is
   `no_stable_release` or `undated_releases` when no dated stable release exists to measure to.
   Action: match the new ids in jq. ([Libyears](docs/verdicts.md#libyears))
 - **All formats:** the run note `not_from_composer_repository` says whether the run asked those
@@ -421,8 +422,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   advisory, and that each next step's score after the move assumes none on its versions.
   ([Run notes](docs/notes.md#advisories_not_checked))
 - **All formats:** an S10 `release_dates` entry names the cause for each signal that it blocks.
-  A cause is a lock entry with no date, an installed tag on a shared commit, a tag with no date, or
-  tags dated by a shared commit. ([What was not checked](docs/verdicts.md#what-was-not-checked))
+  A cause is a lock entry with no date, an installed tag on a shared commit, an installed tag of a
+  split whose newest release a parent dates, a tag with no date, or tags dated by a shared commit.
+  ([What was not checked](docs/verdicts.md#what-was-not-checked))
 - **json:** a `release_dates` gap that S1 or a whole-package allowlist entry drops from S10 shows in
   `checks_skipped[]` with the reason `undated_releases`, as the other dropped gaps do.
   ([What was not checked](docs/verdicts.md#what-was-not-checked))
@@ -570,14 +572,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([What S6 carries](docs/verdicts.md#what-s6-carries))
 - **table, github, markdown, Install-time:** on the `update now:` line, the raise clause after the
   platform sentence starts with a capital letter, as in the finding's `do:` line.
-- **All formats:** the PHP window reads a `config.platform.php` pin such as `v8.4.100`, `8.4.1-p1`
-  or `8.4.1.2` at its X.Y.Z release, and `run.php_window.*.lower_edge.php` is X.Y.Z. A range that
-  only the suffix meets, such as `>8.4.1` for `8.4.1-p1`, keeps the minor out of the window.
-  ([The PHP window](docs/verdicts.md#the-php-window))
-- **All formats:** an installed split tag on its own commit, whose newest release a parent dates,
-  reads `parent_split` in `age.installed_unmeasured` and `libyears_unmeasured`, and the root
-  `libyears.unmeasured` counts it. Its S10 `release_dates` clause no longer says that the tag
-  shares a commit. ([Dates from the monorepo](docs/verdicts.md#dates-from-the-monorepo))
 - **All formats:** the S9 summary names its first three advisories in the display order of their
   severities (critical, high, medium, unrated, low), so an unrated advisory comes before a low one.
   ([Security advisories](docs/verdicts.md#security-advisories))
