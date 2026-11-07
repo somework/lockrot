@@ -102,7 +102,7 @@ with `lockrot:`, any other failure with `lockrot failed:`. `-v` adds the stack t
   to a flag, an argument too many. lockrot checks it before it reads any file.
 - `--fail-on`, `--baseline` or `--target-php` given twice, also with the same value
   ([configuration.md](configuration.md#cli-options)).
-- A baseline lockrot cannot read, a baseline-1 file included
+- A baseline lockrot cannot read, a baseline-1 file included, and a baseline of another score model
   ([baseline.md](baseline.md#when-lockrot-cannot-read-the-file)).
 - An `--output` lockrot refuses before the analysis, such as an unknown format or `composer.lock`
   ([configuration.md](configuration.md#writing-reports-to-files)).
