@@ -63,7 +63,8 @@ final class ForgeAuth
             return true;
         }
         $headers = json_decode((string) $entry['username'], true);
-        // AuthHelper::addCustomHeaders() ignores the whole list when one element is no string, and
+        // A list with an element that is no string counts as no credential: Composer 2.11 sends none
+        // of it, and older Composer sends every element. Either way the anonymous cap holds. Composer
         // sends each header as written, so no trimming here.
         if (!\is_array($headers) || array_filter($headers, 'is_string') !== $headers) {
             return false;
