@@ -92,7 +92,7 @@ final class DrupalSiteTest extends TestCase
 
     public function testWithTheRecipeAndARecordedTokenAnswerEveryDrupalcodePackageIsNotArchived(): void
     {
-        $auth = new ForgeAuth(new Tokens('recorded', null), static fn (string $host): bool => $host === self::DRUPALCODE);
+        $auth = new ForgeAuth(new Tokens('recorded', null), static fn (string $host): bool => $host === self::DRUPALCODE, static fn (): bool => false);
         $findings = self::findingsOn($this->analyze(['gitlab.com', self::DRUPALCODE], $auth));
 
         self::assertNotSame([], $findings);

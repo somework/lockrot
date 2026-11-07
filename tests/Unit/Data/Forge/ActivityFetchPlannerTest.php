@@ -126,7 +126,7 @@ final class ActivityFetchPlannerTest extends TestCase
         self::assertSame(1, $plan->skippedNoToken(RepoRef::BITBUCKET));
         self::assertSame([RepoRef::BITBUCKET], $plan->cappedForges());
 
-        $withCredentials = new ForgeAuth(Tokens::none(), static fn (string $host): bool => $host === 'bitbucket.org');
+        $withCredentials = new ForgeAuth(Tokens::none(), static fn (string $host): bool => false, static fn (): bool => true);
         $plan = (new ActivityFetchPlanner($withCredentials, 1))->select($repos, $candidates);
         self::assertCount(3, $plan->repos());
         self::assertSame([], $plan->cappedForges());
@@ -139,7 +139,7 @@ final class ActivityFetchPlannerTest extends TestCase
         $config = new Config(false);
         $config->merge(['config' => ['client-certificate' => ['github.com' => ['local_cert' => '/c.pem']]]]);
         $io->loadConfiguration($config);
-        $auth = new ForgeAuth(Tokens::none(), ServiceFactory::composerCredentials($io));
+        $auth = new ForgeAuth(Tokens::none(), ServiceFactory::composerCredentials($io), ServiceFactory::bitbucketCredentials($io));
 
         $plan = (new ActivityFetchPlanner($auth, 1))->select(['a/a' => self::gh('o/a'), 'b/b' => self::gh('o/b')], ['a/a' => true, 'b/b' => true]);
 

@@ -818,7 +818,7 @@ final class CaseHydrator
         $credentials = ($activity['status'] ?? null) === 'read' && ($forge === RepoRef::BITBUCKET || ($forge === RepoRef::GITLAB && ($activity['archived'] ?? null) !== null));
         $host = $activity['host'] ?? null;
 
-        return new ForgeAuth(new Tokens($github, null), static fn (string $asked): bool => $credentials && $asked === $host);
+        return new ForgeAuth(new Tokens($github, null), static fn (string $asked): bool => $credentials && $asked === $host, static fn (): bool => $credentials && $forge === RepoRef::BITBUCKET);
     }
 
     /** @param list<array<mixed, mixed>|null> $activities a GitLab host other than gitlab.com is a configured `gitlab-domains` entry */

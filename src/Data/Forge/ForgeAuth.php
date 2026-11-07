@@ -22,16 +22,16 @@ final class ForgeAuth
     private Tokens $tokens;
     /** @var callable(string): bool */
     private $composerHasCredentials;
-    /** @var null|callable(): bool */
+    /** @var callable(): bool */
     private $authorizeBitbucket;
     private ?bool $bitbucketAuthorized = null;
 
     /**
      * @param callable(string): bool  $composerHasCredentials an `IOInterface` entry that {@see carriesCredential()} accepts
-     * @param null|callable(): bool   $authorizeBitbucket     turns Composer's Bitbucket credentials into
+     * @param callable(): bool        $authorizeBitbucket     turns Composer's Bitbucket credentials into
      *                                                        ones its HTTP layer can send, true on success
      */
-    public function __construct(Tokens $tokens, callable $composerHasCredentials, ?callable $authorizeBitbucket = null)
+    public function __construct(Tokens $tokens, callable $composerHasCredentials, callable $authorizeBitbucket)
     {
         $this->tokens = $tokens;
         $this->composerHasCredentials = $composerHasCredentials;
@@ -40,12 +40,12 @@ final class ForgeAuth
 
     public static function anonymous(): self
     {
-        return new self(Tokens::none(), static fn (string $host): bool => false);
+        return new self(Tokens::none(), static fn (string $host): bool => false, static fn (): bool => false);
     }
 
     public static function withTokens(Tokens $tokens): self
     {
-        return new self($tokens, static fn (string $host): bool => false);
+        return new self($tokens, static fn (string $host): bool => false, static fn (): bool => false);
     }
 
     /**
@@ -104,11 +104,7 @@ final class ForgeAuth
     private function bitbucketAuthorized(): bool
     {
         if ($this->bitbucketAuthorized === null) {
-            // Without an authorizer the callable cannot tell "no entry" from "entry without a
-            // credential", so it cannot apply the API-host-first rule of ServiceFactory::bitbucketCredentials().
-            $this->bitbucketAuthorized = $this->authorizeBitbucket !== null
-                ? ($this->authorizeBitbucket)()
-                : ($this->composerHasCredentials)('api.bitbucket.org') || ($this->composerHasCredentials)('bitbucket.org');
+            $this->bitbucketAuthorized = ($this->authorizeBitbucket)();
         }
 
         return $this->bitbucketAuthorized;

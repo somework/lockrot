@@ -48,7 +48,7 @@ final class ForgeAuthTest extends TestCase
             $asked[] = $host;
 
             return \in_array($host, ['git.example.com', 'github.com'], true);
-        });
+        }, static fn (): bool => false);
 
         self::assertTrue($auth->isAuthenticated(self::ref(self::GITLAB_SELF)));
         self::assertTrue($auth->isAuthenticated(self::ref(self::GITHUB)), 'http-basic for github.com is a credential Composer sends');
@@ -73,19 +73,17 @@ final class ForgeAuthTest extends TestCase
         self::assertSame(1, $calls);
     }
 
-    public function testWithoutAnAuthorizerBitbucketFallsBackToComposersCredentialLookup(): void
+    public function testBitbucketReadsOnlyTheAuthorizerAndNotTheHostLookup(): void
     {
-        $auth = new ForgeAuth(Tokens::none(), static fn (string $host): bool => $host === 'bitbucket.org');
-        self::assertTrue($auth->isAuthenticated(self::ref(self::BITBUCKET)));
-        $underApiHost = new ForgeAuth(Tokens::none(), static fn (string $host): bool => $host === 'api.bitbucket.org');
-        self::assertTrue($underApiHost->isAuthenticated(self::ref(self::BITBUCKET)), 'Composer finds credentials under the request host first');
+        $auth = new ForgeAuth(Tokens::none(), static fn (string $host): bool => true, static fn (): bool => false);
+        self::assertFalse($auth->isAuthenticated(self::ref(self::BITBUCKET)));
         self::assertFalse(ForgeAuth::anonymous()->isAuthenticated(self::ref(self::BITBUCKET)));
     }
 
     public function testTheGithubTokenNeverGoesToAnotherGithubHost(): void
     {
         $ghes = new RepoRef(RepoRef::GITHUB, 'ghes.example.com', 'a/b');
-        $auth = new ForgeAuth(new Tokens('gh', null), static fn (string $host): bool => $host === 'ghes.example.com');
+        $auth = new ForgeAuth(new Tokens('gh', null), static fn (string $host): bool => $host === 'ghes.example.com', static fn (): bool => false);
 
         self::assertNull($auth->tokenFor($ghes));
         self::assertTrue($auth->isAuthenticated($ghes), "Composer's credentials for the host still count");
