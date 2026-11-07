@@ -57,7 +57,7 @@ final class ExplainFormatter
             $this->header($finding, $explanation),
             [''],
             self::block('age', AgeText::block($finding, $explanation->thresholds())),
-            [self::escape(self::repositoryLabelled(self::repositoryLine($finding)))],
+            [self::escape(self::repositoryLabelled($finding))],
             [''],
             $this->score($finding),
             [''],
@@ -120,9 +120,13 @@ final class ExplainFormatter
     }
 
     /** A repository line that names its own subject keeps its words, any other gets the `repository` label. */
-    private static function repositoryLabelled(string $line): string
+    /** A not-read line for an unsupported host or with no repository path starts with its own words, so it takes no label. */
+    private static function repositoryLabelled(Finding $finding): string
     {
-        return preg_match('/^(lockrot cannot ask|repository activity) /', $line) === 1 ? $line : 'repository '.$line;
+        $lookup = $finding->details()->activity();
+        $unlabelled = $lookup->status() === ActivityLookup::NOT_READ && ($lookup->reason() === ActivityLookup::HOST_NOT_SUPPORTED || $lookup->where()->ref() === null);
+
+        return ($unlabelled ? '' : 'repository ').self::repositoryLine($finding);
     }
 
     /** The repository line, from `activity` and `age.push`. */
