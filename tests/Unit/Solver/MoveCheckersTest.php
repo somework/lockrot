@@ -157,6 +157,35 @@ final class MoveCheckersTest extends TestCase
         yield 'lock false and a refused platform' => [['lock' => false, 'platform' => ['php' => '^8.2']]];
     }
 
+    /**
+     * A run that checks no move still says whether the running Composer blocks the versions that
+     * an advisory affects, and which switch turned that off.
+     *
+     * @dataProvider uncheckedRunsAndTheirBlocking
+     *
+     * @param array<string, mixed> $settings
+     * @param array{bool, list<string>} $expected
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('uncheckedRunsAndTheirBlocking')]
+    public function testARunThatChecksNoMoveNamesTheAdvisoryBlockingOfItsConfig(array $settings, array $expected): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => $settings]);
+
+        $checker = MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]]), ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
+
+        self::assertSame(MoveCheck::NOT_CHECKED, $checker->baseline()->check()->result());
+        self::assertSame($expected, [$checker->blocksAdvisories(), $checker->blockingDisabledBy()]);
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, array{bool, list<string>}}> */
+    public static function uncheckedRunsAndTheirBlocking(): iterable
+    {
+        yield 'lock false' => [['lock' => false], [true, []]];
+        yield 'lock false, blocking off' => [['lock' => false, 'audit' => ['block-insecure' => false]], [false, ['config.audit.block-insecure']]];
+        yield 'a refused platform, blocking off' => [['platform' => ['php' => '^8.2'], 'audit' => ['block-insecure' => false]], [false, ['config.audit.block-insecure']]];
+    }
+
     public function testAConfigThatKeepsTheLockOnChecksTheMoves(): void
     {
         $config = new Config(false);

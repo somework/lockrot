@@ -22,6 +22,7 @@ use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
+use Lockrot\Solver\AdvisoryBlocking;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveQuery;
 use Lockrot\Solver\UncheckedMoves;
@@ -52,7 +53,7 @@ final class MoveBuilderTest extends TestCase
         $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
         $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
         $context = (new MoveContext($finding, new MoveSubject('a/b', '1.0.0', true, [], '8.4', null), null, [$row], null, new FixFinder(new PhpFloor('8.4'), LinkIndex::of($lock, ProjectConfig::empty())), new PhpFloor('8.4'), new \DateTimeImmutable(self::NOW), 2, null, [], [], true))
-            ->withChecks(MoveChecks::of(new UncheckedMoves(MoveCheck::OFFLINE)));
+            ->withChecks(MoveChecks::of(new UncheckedMoves(MoveCheck::OFFLINE, AdvisoryBlocking::everyAdvisory())));
 
         $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, null, '^2.0'), [], null, $context);
         $check = $move->check();
@@ -69,7 +70,7 @@ final class MoveBuilderTest extends TestCase
         $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
         $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
         $context = (new MoveContext($finding, new MoveSubject('a/b', '1.0.0', true, [], '8.4', null), null, [$row], null, new FixFinder(new PhpFloor('8.4'), LinkIndex::of($lock, ProjectConfig::empty())), new PhpFloor('8.4'), new \DateTimeImmutable(self::NOW), 2, null, [], [], true))
-            ->withChecks(MoveChecks::of(new UncheckedMoves(MoveCheck::LOCK_DISABLED)));
+            ->withChecks(MoveChecks::of(new UncheckedMoves(MoveCheck::LOCK_DISABLED, AdvisoryBlocking::everyAdvisory())));
 
         $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, null, '^2.0'), [], null, $context);
         $check = $move->check();

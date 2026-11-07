@@ -145,7 +145,7 @@ final class TargetFixTest extends TestCase
     /** K4: a lock-only run's move check gives no_composer_json. */
     public function testALockOnlyRunLeavesTheFixNotCheckedWithNoComposerJson(): void
     {
-        $fix = self::fix(['packages' => [self::CAPPED], 'packages-dev' => [], 'platform' => ['php' => '>=7.4']], null, new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON));
+        $fix = self::fix(['packages' => [self::CAPPED], 'packages-dev' => [], 'platform' => ['php' => '>=7.4']], null, new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON, AdvisoryBlocking::everyAdvisory()));
 
         self::assertSame(['not_checked', 'no_composer_json'], [$fix['check'], $fix['reason']]);
         self::assertSame(['acme/capped'], array_column($fix['packages'], 'name'));
@@ -176,7 +176,7 @@ final class TargetFixTest extends TestCase
     {
         $lock = ['packages' => [['name' => '--with-all-dependencies', 'version' => '1.0.0', 'require' => ['php' => '<8.4']]], 'packages-dev' => []];
 
-        $fix = self::fix($lock, [], new UncheckedMoves(MoveCheck::OFFLINE));
+        $fix = self::fix($lock, [], new UncheckedMoves(MoveCheck::OFFLINE, AdvisoryBlocking::everyAdvisory()));
 
         self::assertSame(['not_checked', 'offline'], [$fix['check'], $fix['reason']]);
     }
@@ -348,7 +348,7 @@ final class TargetFixTest extends TestCase
     /** On a lock-only run, every root link comes from the lock's platform, and it is the root ceiling. */
     public function testALockOnlyRunReadsTheLocksPlatformAsTheRootCeiling(): void
     {
-        $fix = self::fix(['packages' => [], 'packages-dev' => [], 'platform' => ['php' => '<8.1']], null, new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON));
+        $fix = self::fix(['packages' => [], 'packages-dev' => [], 'platform' => ['php' => '<8.1']], null, new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON, AdvisoryBlocking::everyAdvisory()));
 
         self::assertSame([[], 'refused'], [$fix['lock_platform'], $fix['check']]);
         self::assertSame([['root', 'require', 'php', '<8.1']], self::rootHolds($fix));

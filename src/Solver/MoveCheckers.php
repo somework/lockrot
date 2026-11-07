@@ -42,11 +42,11 @@ final class MoveCheckers
     {
         // Composer's Factory reads composer.lock only when `lock` is true, and its Installer refuses a partial update without a lock.
         if (!$config->get('lock')) {
-            return new UncheckedMoves(MoveCheck::LOCK_DISABLED, self::configuredPhp($config), self::configuredPhp64bit($config));
+            return new UncheckedMoves(MoveCheck::LOCK_DISABLED, AdvisoryBlocking::fromConfig($config), self::configuredPhp($config), self::configuredPhp64bit($config));
         }
         $overrides = self::platformOverrides($config->get('platform'));
         if ($overrides === null) {
-            return new UncheckedMoves(MoveCheck::PLATFORM_CONFIG_INVALID, self::configuredPhp($config), self::configuredPhp64bit($config));
+            return new UncheckedMoves(MoveCheck::PLATFORM_CONFIG_INVALID, AdvisoryBlocking::fromConfig($config), self::configuredPhp($config), self::configuredPhp64bit($config));
         }
         $platformNames = array_keys($overrides);
         $configured = self::configuredPhp($config);

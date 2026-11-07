@@ -20,6 +20,7 @@ use Lockrot\Output\Formatters;
 use Lockrot\Output\MarkdownFormatter;
 use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\Signal;
+use Lockrot\Solver\AdvisoryBlocking;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\BaselineEntries;
@@ -465,7 +466,7 @@ final class MarkdownFormatterTest extends TestCase
 
     public function testTheMovesLineNamesTheVariableThatTurnedTheBlockingOff(): void
     {
-        $checks = MoveChecks::of(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON));
+        $checks = MoveChecks::of(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON, AdvisoryBlocking::everyAdvisory()));
         $report = self::report()->withMoveChecks(new MoveCheckRun('2.9.5', false, ['COMPOSER_NO_SECURITY_BLOCKING'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
 
         self::assertStringContainsString('against the lock, with advisory blocking turned off by `COMPOSER_NO_SECURITY_BLOCKING`; ext-\\*, lib-\\*, php-debug, php-ipv6 and php-zts requirements not checked', self::formatter()->format($report));
