@@ -831,6 +831,18 @@ final class MoveTest extends TestCase
         self::assertSame(['version' => 'v5.0.0', 'released' => '2020-01-01T00:00:00+00:00', 'is_installed' => false, 'relation' => null, 'snapshot_time' => null], $move['latest']);
     }
 
+    /** Composer loads a lock version that does not parse when `version_normalized` is set. The move then names the newest tag. */
+    public function testAnOldPromiseTestMoveNamesTheNewestTagAboveAnInstalledVersionThatDoesNotParse(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse([
+            'lock' => [['version' => 'not a version', 'version_normalized' => '4.1.1.0']],
+            'releases' => [self::release('v5.0.0', '2020-01-01', '>=7.2'), self::release('v4.1.1', '2018-01-01', '>=7.2')],
+        ]), ['next_step']);
+
+        self::assertSame('test', $move['kind']);
+        self::assertSame(['version' => 'v5.0.0', 'released' => '2020-01-01T00:00:00+00:00', 'is_installed' => false, 'relation' => null, 'snapshot_time' => null], $move['latest']);
+    }
+
     /** Ruling R13-A (r12l.1, Q6): the installed release as the newest carries the date that S5 judges, also when its tag is undated. */
     public function testAnOldPromiseTestMoveOnAnUndatedHighestInstalledTagCarriesTheLockTime(): void
     {

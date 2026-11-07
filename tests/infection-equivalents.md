@@ -214,5 +214,4 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 
 - `src/Verdict/FindingDetails.php` CastString `$skipped[] = new Check('advisories', (string) $advisoryReason, [Signal::S9]);` — the `in_array()` guard admits two strings only.
 - `src/Verdict/FindingDetails.php` Coalesce `return ($check === null ? null : $check->installsBelow($version) ?? $check->installsAbove($version)) ?? $version;` — a release is below or above the version, never both, so at most one side is not null.
-- `src/Verdict/MaintenanceMove.php` NotCovered x1 `return true;` — in isAboveVersion(): unreachable code. `LockFile` refuses a lock version that does not normalize, and Composer's package loader normalizes each release version, so both arguments parse.
 - `src/Verdict/MoveText.php` Assignment `$text .= self::leaves($move).self::unverified($move);` — `$text` is the empty string before this line, so `=` writes the same text.
