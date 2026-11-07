@@ -516,6 +516,34 @@ final class MoveCheckersTest extends TestCase
             ['acme/new' => ['acme/deep' => '^1.0'], 'acme/deep' => ['acme/private' => '^1.0']],
             [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, null],
         ];
+        // 1.3.0 passes the one-level test, but its acme/other cannot install. The check must still reach 1.2.0.
+        yield 'a release that loses an unreached name beside a release whose requirement cannot install' => [
+            ['1.1.0' => [], '1.2.0' => ['acme/new' => '^1.0'], '1.3.0' => ['acme/other' => '^1.0']],
+            ['acme/new' => ['acme/private' => '^1.0'], 'acme/other' => ['php' => '>=9.0']],
+            [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, null],
+        ];
+    }
+
+    /** Only a release above the installed one counts, so a lower release of an installed requirement loses no name. */
+    public function testALowerReleaseOfAnInstalledRequirementLosesNoUnreachedName(): void
+    {
+        $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0'] + $packagist]]);
+        $loader = new ArrayLoader();
+        $remote = new RecordingComposerRepository([
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.1.0', 'require' => ['acme/dep' => '^1.0']]),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.2.0', 'require' => ['acme/dep' => '^1.0', 'acme/blocked' => '^1.0']]),
+            $loader->load(['name' => 'acme/dep', 'version' => '1.0.0', 'require' => ['acme/private' => '^1.0']]),
+            $loader->load(['name' => 'acme/dep', 'version' => '1.1.0']),
+            $loader->load(['name' => 'acme/blocked', 'version' => '1.0.0', 'require' => ['php' => '>=9.0']]),
+        ]);
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
+        $checker = MoveCheckers::forProject(self::root(['acme/lib' => '^1.0']), $lock, ProjectConfig::empty(), new Config(false), [$vcs, $remote], '8.4', false, Deadline::never());
+
+        $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
+
+        self::assertSame([MoveCheck::RESOLVES, null, '1.1.0'], [$check->result(), $check->reason(), $check->installs()]);
     }
 
     /** docs/verdicts.md, move-check limits: a solve that needs another release of a vcs-locked name proves nothing. */
