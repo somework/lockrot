@@ -296,7 +296,9 @@ def explain_metadata():
                                                                  'so the value is an upper bound on the age: the html bar reads "at most".')
     row['properties']['fixes'] = nullable(ref('branchFixes'), 'What the branch fixes of the counted advisories; null when the package has no counted advisory.')
     row['required'] = list(row['properties'])
-    rows['properties']['installed_branch'] = nullable({'type': 'string', 'minLength': 1}, 'The installed row\'s label (`finding.branch`); null for a snapshot.')
+    rows['properties']['installed_branch'] = nullable({'type': 'string', 'minLength': 1}, ('The label of the installed version\'s branch (`finding.branch`). '
+        'Null for a snapshot. It names a `branches[]` row only when that row has `installed` true. An installed pre-release on a line with no '
+        'stable tag has a label, and no row is installed.'))
     rows['required'] = list(rows['properties'])
     rows['description'] = 'What the Composer repository said about the package, with every branch row the explain text\'s table prints.'
     for k in ['abandoned', 'replacement', 'releases_listed', 'has_stable_release', 'last_stable_release', 'last_stable_version', 'type', 'data_date']:

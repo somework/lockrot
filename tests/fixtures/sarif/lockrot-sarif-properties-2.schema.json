@@ -1672,7 +1672,8 @@
                     "no_release_read",
                     "pass_cap",
                     "solver_error",
-                    "advisory_lookup_incomplete"
+                    "advisory_lookup_incomplete",
+                    "lock_disabled"
                   ]
                 },
                 {

@@ -359,7 +359,8 @@
    "no_release_read",
    "pass_cap",
    "solver_error",
-   "advisory_lookup_incomplete"
+   "advisory_lookup_incomplete",
+   "lock_disabled"
   ],
   "open": true,
   "integer": false
@@ -2993,7 +2994,8 @@
    "no_composer_json",
    "composer_json_invalid",
    "platform_config_invalid",
-   "solver_error"
+   "solver_error",
+   "lock_disabled"
   ],
   "open": true,
   "integer": false
@@ -3118,7 +3120,8 @@
    "no_release_read",
    "pass_cap",
    "solver_error",
-   "advisory_lookup_incomplete"
+   "advisory_lookup_incomplete",
+   "lock_disabled"
   ],
   "open": true,
   "integer": false
@@ -3184,7 +3187,8 @@
    "composer_json_invalid",
    "platform_config_invalid",
    "solver_error",
-   "advisory_lookup_incomplete"
+   "advisory_lookup_incomplete",
+   "lock_disabled"
   ],
   "open": true,
   "integer": false
@@ -3284,7 +3288,8 @@
    "update_now_refused",
    "update_now_not_checked",
    "move_check_failed",
-   "package_name_invalid"
+   "package_name_invalid",
+   "command_argument_unsafe"
   ],
   "open": true,
   "integer": false
@@ -3597,6 +3602,18 @@
   ],
   "values": [
    "package_name_invalid"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode27",
+  "pointer": "#/definitions/noteDetail/anyOf/26/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/26/properties/code"
+  ],
+  "values": [
+   "command_argument_unsafe"
   ],
   "open": false,
   "integer": false

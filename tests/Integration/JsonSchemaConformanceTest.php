@@ -943,6 +943,7 @@ final class JsonSchemaConformanceTest extends TestCase
             RunNote::updateNowRefused("Problem 1\n    - acme/a 2.1.0 conflicts with acme/b <3.0."),
             RunNote::updateNowNotChecked('install_time_budget', ['acme/a', 'acme/b']),
             RunNote::moveCheckFailed('Seld\\JsonLint\\ParsingException', 'does not contain valid JSON'),
+            RunNote::commandArgumentUnsafe([['package' => 'typo3/html-sanitizer', 'version' => 'v2.3.2+x|calc']]),
             // Last, so that the indexes of the vocabularies below stay those of the analyser's order.
             RunNote::packageNameInvalid(['--with-all-dependencies']),
         ];
