@@ -160,6 +160,9 @@ image `ghcr.io/somework/lockrot`. Its README says how to verify the image.
   writes PHP errors to stderr, uses the C locale and reads `COMPOSER_MEMORY_LIMIT`. To keep Xdebug,
   for example to step through lockrot, set `COMPOSER_ALLOW_XDEBUG=1`.
 
+- **Licences.** The archive carries lockrot's own `LICENSE` and the notice file of each bundled
+  package, as the MIT and BSD licences ask.
+
 - **`COMPOSER`.** Honoured as Composer honours it: `COMPOSER=alt.json php lockrot.phar` reads
   `alt.json` and `alt.lock` ([Environment overrides](configuration.md#environment-overrides)).
 

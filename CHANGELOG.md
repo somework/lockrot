@@ -506,7 +506,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **CLI, Config:** `--fail-on` and `LOCKROT_FAIL_ON` values are case-insensitive under any locale.
   ([CLI options](docs/configuration.md#cli-options))
-- **PHAR:** the archive ships the licence notices of its bundled libraries.
+- **PHAR:** the archive ships lockrot's own `LICENSE` and the notice file of every bundled package.
   ([What the PHAR does](docs/phar.md#what-the-phar-does-and-does-not-do))
 - **CLI:** the `--explain` repository line words match what lockrot read.
   ([Explaining one package](docs/configuration.md#explaining-one-package))
