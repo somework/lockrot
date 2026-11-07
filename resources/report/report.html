@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Skrm3OfVy2dXaZDrBaVae4LjqzQGkRPs/WTbTDwH6Dc='; style-src 'sha256-1u9G8Ll+yquXZIjZgB8x6k66Stf7zuARsdkitoCBpzI='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-WHmjUGsWOL+E2TtF1oMWAPiOw8iHNoS+h/lFaW3PMzA='; style-src 'sha256-pBfDlVSrUdrPv2TQUAjvDEqkz5MFnrALj1063H60alQ='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -251,6 +251,10 @@ code {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+.wbr::before {
+  content: "\200B";
+  content: "\200B" / "";
 }
 .eyebrow {
   font-family: var(--cond);
@@ -510,18 +514,16 @@ summary:focus-visible::after {
   align-items: baseline;
   min-width: 0;
 }
-.brand h1 {
+.brand-name {
   font-size: var(--text-xl);
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.3;
-}
-.brand h1 a {
   color: inherit;
   text-decoration: none;
   transition: color 0.12s ease;
 }
-.brand h1 a:hover {
+.brand-name:hover {
   color: var(--accent-ink);
 }
 .brand .dot {
@@ -8487,6 +8489,7 @@ a.ov-ex-row:hover {
 		not_found: "not in the repository",
 		not_from_composer_repository: "not from a Composer repository",
 		offline: "offline",
+		parent_split: "a split whose parent dates its newest release",
 		rate_limit: "rate limited",
 		releases_unknown: "releases not read",
 		repository_not_found: "repository not found",
@@ -9939,7 +9942,7 @@ a.ov-ex-row:hover {
 			text: installed
 		});
 		return {
-			head: php?.requires ? [`${move.to_branch ?? ""} needs php `, { code: phpConstraintWord(php.requires) }] : null,
+			head: php?.requires ? [`${move.to_branch ?? move.latest?.version ?? ""} needs php `, { code: phpConstraintWord(php.requires) }] : null,
 			lines
 		};
 	}
@@ -11326,6 +11329,14 @@ a.ov-ex-row:hover {
 			rows: shown
 		};
 	}
+	var EMPTY_WORDS = {
+		clean: "Nothing is flagged.",
+		emptyLock: "No packages in this lock."
+	};
+	function radiusEmpty(report) {
+		if (report.packages_checked === 0) return EMPTY_WORDS.emptyLock;
+		return report.packages_flagged === 0 ? EMPTY_WORDS.clean : null;
+	}
 	var HIDE_ACCEPTED = "hide";
 	function acceptedToggle(scope) {
 		return {
@@ -11910,6 +11921,9 @@ a.ov-ex-row:hover {
 			children: ROW_HINT
 		});
 	}
+	function headLabel(head, note) {
+		return note === null ? head : `${head}, ${note}`;
+	}
 	function toneClass(tone) {
 		return `tone-${tone}`;
 	}
@@ -11978,6 +11992,22 @@ a.ov-ex-row:hover {
 		return rows.filter((row) => row.value !== null && row.value !== void 0 && row.value !== "");
 	}
 	//#endregion
+	//#region src/ui/report/PkgName.tsx
+	var Wbr = () => u$1("span", { className: "wbr" });
+	function Breakable({ text, className = "nb" }) {
+		return u$1(S, { children: text.split(/(?<=[/:=])/).map((part, i) => u$1(S, { children: [i > 0 && u$1(Wbr, {}), u$1("span", {
+			className,
+			children: part
+		})] }, i)) });
+	}
+	var PkgName = ({ name }) => u$1(Breakable, { text: name });
+	function Words({ text }) {
+		return u$1(S, { children: text.split(" ").map((word, i) => u$1(S, { children: [i > 0 && " ", u$1("span", {
+			className: "nb",
+			children: word
+		})] }, i)) });
+	}
+	//#endregion
 	//#region src/ui/report/BranchTimeline.tsx
 	var at$1 = (name, x) => ({ [name]: `${x}%` });
 	var LONG_PHP = 14;
@@ -12025,6 +12055,7 @@ a.ov-ex-row:hover {
 				u$1("span", {
 					role: "rowheader",
 					className: "detail-timeline-branch",
+					"aria-label": `${lane.branch}${lane.newest ? TIMELINE_WORDS.newest : ""}${lane.installed ? ` ${TIMELINE_WORDS.yours}` : ""}${lane.move ? ` ${TIMELINE_WORDS.move}` : ""}`,
 					children: [
 						lane.branch,
 						lane.newest && u$1(Sr, { children: TIMELINE_WORDS.newest }),
@@ -12073,7 +12104,7 @@ a.ov-ex-row:hover {
 					children: [lane.php === null ? u$1(S, { children: [u$1("span", {
 						"aria-hidden": "true",
 						children: "—"
-					}), u$1(Sr, { children: TIMELINE_WORDS.noPhp })] }) : barParts(lane.php).map((part, i) => u$1(S, { children: [i > 0 && u$1("wbr", {}), part] }, i)), lane.phpWords !== null && u$1("span", {
+					}), u$1(Sr, { children: TIMELINE_WORDS.noPhp })] }) : barParts(lane.php).map((part, i) => u$1(S, { children: [i > 0 && u$1(Wbr, {}), part] }, i)), lane.phpWords !== null && u$1("span", {
 						className: "d3-tl-php-note",
 						children: lane.phpWords
 					})]
@@ -12159,11 +12190,13 @@ a.ov-ex-row:hover {
 					children: [
 						u$1("span", {
 							role: "columnheader",
+							"aria-label": TIMELINE_WORDS.branch,
 							children: TIMELINE_WORDS.branch
 						}),
 						u$1("span", {
 							role: "columnheader",
 							className: "detail-timeline-strip-head",
+							"aria-label": TIMELINE_WORDS.strip,
 							children: [u$1(Sr, { children: TIMELINE_WORDS.strip }), guides.map((guide) => u$1("span", {
 								className: `detail-timeline-guide-cap is-${guide.level} ${guide.level === "high" && guides.length > 1 ? "is-left" : "is-right"} ${toneClass(GUIDE_TONE[guide.level])}`,
 								style: at$1("--x", xOfYears(guide.years, span)),
@@ -12173,10 +12206,12 @@ a.ov-ex-row:hover {
 						}),
 						u$1("span", {
 							role: "columnheader",
+							"aria-label": TIMELINE_WORDS.latest,
 							children: TIMELINE_WORDS.latest
 						}),
 						u$1("span", {
 							role: "columnheader",
+							"aria-label": TIMELINE_WORDS.php,
 							children: TIMELINE_WORDS.php
 						})
 					]
@@ -12289,21 +12324,6 @@ a.ov-ex-row:hover {
 				pill.mark !== null && u$1(Mark, { mark: pill.mark })
 			]
 		})] }, pill.id)) });
-	}
-	//#endregion
-	//#region src/ui/report/PkgName.tsx
-	function Breakable({ text, className = "nb" }) {
-		return u$1(S, { children: text.split(/(?<=[/:=])/).map((part, i) => u$1(S, { children: [i > 0 && u$1("wbr", {}), u$1("span", {
-			className,
-			children: part
-		})] }, i)) });
-	}
-	var PkgName = ({ name }) => u$1(Breakable, { text: name });
-	function Words({ text }) {
-		return u$1(S, { children: text.split(" ").map((word, i) => u$1(S, { children: [i > 0 && " ", u$1("span", {
-			className: "nb",
-			children: word
-		})] }, i)) });
 	}
 	//#endregion
 	//#region src/ui/common/useCopy.ts
@@ -12560,7 +12580,10 @@ a.ov-ex-row:hover {
 	function Fact({ label, children, lines = false }) {
 		return u$1("div", {
 			className: "d3-mf",
-			children: [u$1("dt", { children: label }), u$1("dd", {
+			children: [u$1("dt", {
+				"aria-label": label,
+				children: label
+			}), u$1("dd", {
 				className: lines ? "d3-mf-lines" : void 0,
 				children
 			})]
@@ -12580,6 +12603,7 @@ a.ov-ex-row:hover {
 				u$1("h3", {
 					className: "eyebrow",
 					id,
+					"aria-label": card.heading,
 					children: card.heading
 				}),
 				u$1("p", {
@@ -12720,6 +12744,7 @@ a.ov-ex-row:hover {
 				u$1("h3", {
 					className: "eyebrow",
 					id,
+					"aria-label": `${DETAIL_WORDS.heldBy}${block.count > 1 ? ` · ${block.count}` : ""}${block.then ?? ""}`,
 					children: [
 						DETAIL_WORDS.heldBy,
 						block.count > 1 && u$1("span", {
@@ -13288,6 +13313,7 @@ a.ov-ex-row:hover {
 					className: "d2-why-head",
 					children: [u$1("h3", {
 						id: `${listId}-h`,
+						"aria-label": whyTitle(finding.verdict),
 						children: whyTitle(finding.verdict)
 					}), u$1("span", {
 						className: "d2-why-header",
@@ -13325,7 +13351,7 @@ a.ov-ex-row:hover {
 		className: `tag ${toneClass(gradeTone(advisoryBand(run, severity)))}`,
 		children: severity
 	});
-	var withBreaks = (parts) => parts.map((part, i) => u$1(S, { children: [i > 0 && u$1("wbr", {}), part] }, i));
+	var withBreaks = (parts) => parts.map((part, i) => u$1(S, { children: [i > 0 && u$1(Wbr, {}), part] }, i));
 	function Affects$1({ affects, advisory }) {
 		const [opened, setOpen] = d(false);
 		const printed = usePrinted();
@@ -13900,7 +13926,10 @@ a.ov-ex-row:hover {
 				] })]
 			].map((row) => row !== null && u$1("div", {
 				className: "d3-q",
-				children: [u$1("dt", { children: row[0] }), u$1("dd", { children: row[1] })]
+				children: [u$1("dt", {
+					"aria-label": row[0],
+					children: row[0]
+				}), u$1("dd", { children: row[1] })]
 			}, row[0]))
 		});
 	}
@@ -13978,6 +14007,7 @@ a.ov-ex-row:hover {
 			id,
 			children: [u$1("h3", {
 				className: "d2-row-label",
+				"aria-label": label,
 				children: label
 			}), u$1("div", {
 				className: "d2-row-value",
@@ -14070,7 +14100,10 @@ a.ov-ex-row:hover {
 			open: usePrinted() ? true : void 0,
 			children: [u$1("summary", {
 				className: "detail-reference-summary",
-				children: u$1("h3", { children: title })
+				children: u$1("h3", {
+					"aria-label": title,
+					children: title
+				})
 			}), u$1(KeyValue, { rows })]
 		});
 	}
@@ -14255,6 +14288,7 @@ a.ov-ex-row:hover {
 									u$1("h3", {
 										className: "d2-row-label",
 										id: `${branchesId}-head`,
+										"aria-label": DETAIL_WORDS.branches,
 										children: DETAIL_WORDS.branches
 									}),
 									u$1("p", {
@@ -14276,7 +14310,10 @@ a.ov-ex-row:hover {
 								wide: true,
 								children: [u$1("dl", {
 									className: "d3-kv",
-									children: age.flatMap(({ label, value }) => label === null ? [] : [u$1("div", { children: [u$1("dt", { children: label }), u$1("dd", { children: value })] }, label)])
+									children: age.flatMap(({ label, value }) => label === null ? [] : [u$1("div", { children: [u$1("dt", {
+										"aria-label": label,
+										children: label
+									}), u$1("dd", { children: value })] }, label)])
 								}), age.some(({ label }) => label === null) && u$1("ul", {
 									className: "d3-lines d2-row-note",
 									children: age.flatMap(({ label, value }) => label === null ? [u$1("li", { children: value }, value)] : [])
@@ -14415,6 +14452,10 @@ a.ov-ex-row:hover {
 	function waffleCaption(report) {
 		return report.packages_checked === 0 ? null : figureParts(report, true).join(" · ");
 	}
+	function sharePercent(part, whole) {
+		const pct = Math.round(100 * part / whole);
+		return part <= 0 || part >= whole ? pct : Math.min(Math.max(pct, 1), 99);
+	}
 	function loadLine(report) {
 		if (report.packages_checked === 0) return null;
 		const findings = graded(report);
@@ -14422,7 +14463,7 @@ a.ov-ex-row:hover {
 		const worse = highOrWorse(report);
 		const load = sum(findings.map(total));
 		const high = sum(findings.filter((f) => worse.includes(f.verdict)).map(total));
-		const share = load === 0 ? "" : ` (${String(Math.floor(100 * high / load))} %)`;
+		const share = load === 0 ? "" : ` (${String(sharePercent(high, load))} %)`;
 		const dev = findings.filter((f) => f.dev);
 		return [
 			`${plural(load, "point", "points")} on ${plural(report.packages_flagged, "flagged package", "flagged packages")}`,
@@ -14605,16 +14646,19 @@ a.ov-ex-row:hover {
 		filters
 	});
 	function exposureBars(report) {
-		const rows = report.exposure.slice(0, 8).map(({ package: name, flagged }) => ({
+		const none = report.packages_flagged === 0;
+		const exposure = none ? [] : report.exposure;
+		const rows = exposure.slice(0, 8).map(({ package: name, flagged }) => ({
 			package: name,
 			flagged
 		}));
-		const rest = report.exposure.length - rows.length;
+		const rest = exposure.length - rows.length;
 		const graded = report.run.graded_verdicts;
 		const flagged = new Set(report.findings.filter((f) => graded.includes(f.verdict)).map((f) => f.package));
-		const names = [...new Set(report.unattributed.map(({ package: name }) => name))].filter((name) => flagged.has(name));
+		const unattributed = none ? [] : report.unattributed;
+		const names = [...new Set(unattributed.map(({ package: name }) => name))].filter((name) => flagged.has(name));
 		const longest = Math.max(1, report.packages_flagged, ...rows.map(({ flagged: n }) => n));
-		const n = report.exposure.length;
+		const n = exposure.length;
 		return {
 			rows,
 			count: n < 2 ? null : `${plural(n, "direct requirement", "direct requirements")} pull in flagged packages.`,
@@ -14663,11 +14707,11 @@ a.ov-ex-row:hover {
 		const { dispatch } = useReport();
 		if (reason === "clean") return u$1("p", {
 			className: "empty",
-			children: "Nothing is flagged."
+			children: EMPTY_WORDS.clean
 		});
 		if (reason === "emptyLock") return u$1("p", {
 			className: "empty",
-			children: "No packages in this lock."
+			children: EMPTY_WORDS.emptyLock
 		});
 		return u$1("p", {
 			className: "empty",
@@ -14694,6 +14738,7 @@ a.ov-ex-row:hover {
 		return u$1("span", {
 			className: "fhead-age",
 			role: "columnheader",
+			"aria-label": caption,
 			title: `age axis${whose ? ` (${whose})` : ""}: years since the last release, 0 to ${axis.max} and more; warn at ${axis.warn} years, high at ${axis.high} years`,
 			children: [u$1("span", {
 				className: "vh",
@@ -14781,7 +14826,7 @@ a.ov-ex-row:hover {
 					className: "f2-unit",
 					children: name.slice(0, slash + 1)
 				}),
-				u$1("wbr", {}),
+				u$1(Wbr, {}),
 				u$1("span", {
 					className: "f2-unit",
 					children: name.slice(slash + 1)
@@ -14970,7 +15015,7 @@ a.ov-ex-row:hover {
 					children: [slash > 0 && u$1(S, { children: [u$1("span", {
 						className: "fc-vendor f2-unit",
 						children: finding.package.slice(0, slash + 1)
-					}), u$1("wbr", {})] }), u$1("span", {
+					}), u$1(Wbr, {})] }), u$1("span", {
 						className: "fc-name fc-unit f2-unit",
 						children: finding.package.slice(slash + 1)
 					})]
@@ -15098,6 +15143,7 @@ a.ov-ex-row:hover {
 				u$1("span", {
 					className: "fhead-col f2-head-score",
 					role: "columnheader",
+					"aria-label": FINDINGS_HEAD.score,
 					children: [u$1("span", {
 						className: "f2-head-label",
 						children: FINDINGS_HEAD.score
@@ -15117,11 +15163,13 @@ a.ov-ex-row:hover {
 				u$1("span", {
 					className: "fhead-col f2-head-pkg",
 					role: "columnheader",
+					"aria-label": FINDINGS_HEAD.pkg,
 					children: FINDINGS_HEAD.pkg
 				}),
 				u$1("span", {
 					className: "fhead-col f2-head-flags",
 					role: "columnheader",
+					"aria-label": FINDINGS_HEAD.flags,
 					children: FINDINGS_HEAD.flags
 				}),
 				axis ? u$1(AgeAxis, {
@@ -15130,6 +15178,7 @@ a.ov-ex-row:hover {
 				}) : u$1("span", {
 					className: "fhead-age",
 					role: "columnheader",
+					"aria-label": FINDINGS_HEAD.age,
 					children: u$1("span", {
 						className: "vh",
 						children: FINDINGS_HEAD.age
@@ -15138,17 +15187,19 @@ a.ov-ex-row:hover {
 				u$1("span", {
 					className: "fhead-col f2-head-reach",
 					role: "columnheader",
+					"aria-label": FINDINGS_HEAD.reach,
 					children: FINDINGS_HEAD.reach
 				}),
 				u$1("span", {
 					className: "fhead-col f2-head-next",
 					role: "columnheader",
+					"aria-label": FINDINGS_HEAD.next,
 					children: FINDINGS_HEAD.next
 				})
 			]
 		});
 	}
-	function SpanRow({ className, children }) {
+	function SpanRow({ className, label, children }) {
 		return u$1("div", {
 			className,
 			role: "row",
@@ -15156,6 +15207,7 @@ a.ov-ex-row:hover {
 				className: "f2-span-cell",
 				role: "cell",
 				"aria-colspan": 6,
+				"aria-label": label,
 				children
 			})
 		});
@@ -15180,8 +15232,17 @@ a.ov-ex-row:hover {
 			children: [
 				u$1(SpanRow, {
 					className: "fgroup-head",
+					label: [
+						verdict,
+						packagesCount(findings.length),
+						gateWords,
+						majors
+					].filter((part) => part !== null).join(", "),
 					children: [
-						u$1("h2", { children: verdict }),
+						u$1("h2", {
+							"aria-label": verdict,
+							children: verdict
+						}),
 						u$1("span", {
 							className: "fgroup-count",
 							children: packagesCount(findings.length)
@@ -15561,7 +15622,10 @@ a.ov-ex-row:hover {
 				u$1("section", {
 					className: "glossary-sect",
 					children: [
-						u$1("h3", { children: verdictsHeading(run) }),
+						u$1("h3", {
+							"aria-label": verdictsHeading(run),
+							children: verdictsHeading(run)
+						}),
 						u$1(Entries, {
 							entries: verdicts.filter(({ id }) => graded.includes(id)),
 							toned: true
@@ -15583,7 +15647,10 @@ a.ov-ex-row:hover {
 					className: "glossary-sect",
 					open: true,
 					children: [
-						u$1("summary", { children: u$1("h3", { children: flagsHeading(run) }) }),
+						u$1("summary", { children: u$1("h3", {
+							"aria-label": flagsHeading(run),
+							children: flagsHeading(run)
+						}) }),
 						u$1(Entries, {
 							entries: flagEntries(report),
 							toned: false
@@ -15603,7 +15670,10 @@ a.ov-ex-row:hover {
 				}),
 				u$1("details", {
 					className: "glossary-sect",
-					children: [u$1("summary", { children: u$1("h3", { children: "The signals" }) }), u$1("dl", {
+					children: [u$1("summary", { children: u$1("h3", {
+						"aria-label": "The signals",
+						children: "The signals"
+					}) }), u$1("dl", {
 						className: "deflist",
 						children: signalEntries(run).map(({ id, name, text }) => {
 							const doc = signalDocUrl(id);
@@ -15623,7 +15693,10 @@ a.ov-ex-row:hover {
 				}),
 				u$1("details", {
 					className: "glossary-sect",
-					children: [u$1("summary", { children: u$1("h3", { children: "One number for the lock: libyears" }) }), u$1("p", {
+					children: [u$1("summary", { children: u$1("h3", {
+						"aria-label": "One number for the lock: libyears",
+						children: "One number for the lock: libyears"
+					}) }), u$1("p", {
 						className: "prose",
 						children: GLOSSARY2_WORDS.libyears
 					})]
@@ -15632,7 +15705,10 @@ a.ov-ex-row:hover {
 					className: "glossary-sect glossary-keys",
 					open: keysOpen,
 					children: [
-						u$1("summary", { children: u$1("h3", { children: "Keys and search" }) }),
+						u$1("summary", { children: u$1("h3", {
+							"aria-label": "Keys and search",
+							children: "Keys and search"
+						}) }),
 						u$1("label", {
 							className: "prose",
 							children: [
@@ -15686,7 +15762,10 @@ a.ov-ex-row:hover {
 				}),
 				u$1("details", {
 					className: "glossary-sect",
-					children: [u$1("summary", { children: u$1("h3", { children: "For the lock's maintainers: accepting a package" }) }), u$1("p", {
+					children: [u$1("summary", { children: u$1("h3", {
+						"aria-label": "For the lock's maintainers: accepting a package",
+						children: "For the lock's maintainers: accepting a package"
+					}) }), u$1("p", {
 						className: "prose glossary-note",
 						children: GLOSSARY2_WORDS.accept
 					})]
@@ -16035,15 +16114,17 @@ a.ov-ex-row:hover {
 							className: "dot",
 							"aria-hidden": "true"
 						}),
-						u$1("h1", { children: u$1("a", {
+						u$1("a", {
+							className: "brand-name",
 							href: "https://lockrot.dev/",
 							target: "_blank",
 							rel: "noopener noreferrer",
 							"aria-label": newTab("lockrot"),
 							children: "lockrot"
-						}) }),
-						u$1("span", {
+						}),
+						u$1("h1", {
 							className: "eyebrow project",
+							"aria-label": project,
 							children: project
 						})
 					]
@@ -16914,6 +16995,7 @@ a.ov-ex-row:hover {
 		"not_found",
 		"branch_snapshot",
 		"shared_commit",
+		"parent_split",
 		"undated",
 		"no_stable_release",
 		"undated_releases"
@@ -17478,6 +17560,7 @@ a.ov-ex-row:hover {
 			children: [
 				u$1("h3", {
 					className: "eyebrow ledger-head",
+					"aria-label": headLabel(OVERVIEW_WORDS.flags, bars.length > 0 ? OVERVIEW_WORDS.flagsNote : null),
 					children: [
 						OVERVIEW_WORDS.flags,
 						" ",
@@ -17531,6 +17614,7 @@ a.ov-ex-row:hover {
 			children: [
 				linked ? u$1("h3", {
 					className: "eyebrow ledger-head",
+					"aria-label": OVERVIEW_WORDS.security,
 					children: OVERVIEW_WORDS.security
 				}) : u$1("span", {
 					className: "eyebrow ledger-head",
@@ -17668,6 +17752,7 @@ a.ov-ex-row:hover {
 				children: [
 					u$1("h3", {
 						className: "eyebrow ledger-head",
+						"aria-label": OVERVIEW_WORDS.libyears,
 						children: OVERVIEW_WORDS.libyears
 					}),
 					lead.figure !== null && u$1("p", {
@@ -17771,7 +17856,7 @@ a.ov-ex-row:hover {
 					children: affects.parts.map((part, i) => u$1(S, { children: [u$1("span", {
 						className: "ac2-r",
 						children: part
-					}), u$1("wbr", {})] }, i))
+					}), u$1(Wbr, {})] }, i))
 				})
 			]
 		});
@@ -17808,7 +17893,7 @@ a.ov-ex-row:hover {
 		const { state, dispatch, cursor } = useReport();
 		const { finding, row } = pair;
 		const fix = advisoryFixWords(row.fix, finding);
-		const countedAs = advisoryCountedAs(run, row.severity);
+		const countedAs = advisoryCountedAs(run, row.severity)?.replace(/^, /, "") ?? null;
 		const php = advisoryFixPhp(row.fix);
 		const held = heldByLine(row.fix.held_by, run, finding.package);
 		const inner = innerTabIndex(finding.package, cursor, first);
@@ -17824,6 +17909,7 @@ a.ov-ex-row:hover {
 				u$1("span", {
 					className: "ac-sev",
 					role: "cell",
+					"aria-label": countedAs === null ? row.severity : `${row.severity} ${countedAs}`,
 					children: [
 						u$1("span", {
 							className: "ac-lbl ac-sev-lbl",
@@ -17833,7 +17919,7 @@ a.ov-ex-row:hover {
 						row.severity,
 						countedAs !== null && u$1("span", {
 							className: "ac-counted",
-							children: countedAs.replace(/^, /, "")
+							children: countedAs
 						})
 					]
 				}),
@@ -17995,21 +18081,25 @@ a.ov-ex-row:hover {
 				u$1("span", {
 					className: "al-col al-col-sev",
 					role: "columnheader",
+					"aria-label": ADVISORY_HEAD.sev,
 					children: ADVISORY_HEAD.sev
 				}),
 				u$1("span", {
 					className: "al-col al-col-adv",
 					role: "columnheader",
+					"aria-label": ADVISORY_HEAD.adv,
 					children: ADVISORY_HEAD.adv
 				}),
 				u$1("span", {
 					className: "al-col al-col-aff",
 					role: "columnheader",
+					"aria-label": ADVISORY_HEAD.aff,
 					children: ADVISORY_HEAD.aff
 				}),
 				u$1("span", {
 					className: "al-col al-col-fix",
 					role: "columnheader",
+					"aria-label": ADVISORY_HEAD.fix,
 					children: ADVISORY_HEAD.fix
 				})
 			]
@@ -18140,6 +18230,7 @@ a.ov-ex-row:hover {
 			children: [
 				u$1("h3", {
 					className: "eyebrow ledger-head",
+					"aria-label": headLabel(WEIGHS_WORDS.head, WEIGHS_WORDS.note),
 					children: [
 						WEIGHS_WORDS.head,
 						" ",
@@ -18200,9 +18291,11 @@ a.ov-ex-row:hover {
 			children: [
 				exposure ? u$1("h4", {
 					className: "ov-subhead",
+					"aria-label": OVERVIEW_TAB_WORDS.depth,
 					children: OVERVIEW_TAB_WORDS.depth
 				}) : u$1("h3", {
 					className: "eyebrow ledger-head",
+					"aria-label": OVERVIEW_TAB_WORDS.depth,
 					children: OVERVIEW_TAB_WORDS.depth
 				}),
 				depth.length > 0 && u$1("ul", {
@@ -18238,6 +18331,7 @@ a.ov-ex-row:hover {
 				children: [
 					u$1("h3", {
 						className: "eyebrow ledger-head",
+						"aria-label": headLabel(OVERVIEW_TAB_WORDS.exposure, OVERVIEW_TAB_WORDS.exposureNote),
 						children: [
 							OVERVIEW_TAB_WORDS.exposure,
 							" ",
@@ -18324,23 +18418,30 @@ a.ov-ex-row:hover {
 		}) : null;
 		return u$1("table", {
 			className: "ov-ly",
+			"aria-label": libyearsCaption(rows.length),
 			children: [
 				u$1("caption", {
 					className: "eyebrow",
-					children: libyearsCaption(rows.length)
+					children: u$1("span", {
+						"aria-hidden": "true",
+						children: libyearsCaption(rows.length)
+					})
 				}),
 				u$1("thead", { children: u$1("tr", { children: [
 					u$1("th", {
 						scope: "col",
+						"aria-label": OVERVIEW_TAB_WORDS.package,
 						children: OVERVIEW_TAB_WORDS.package
 					}),
 					u$1("th", {
 						scope: "col",
 						className: "num",
+						"aria-label": OVERVIEW_TAB_WORDS.libyears,
 						children: OVERVIEW_TAB_WORDS.libyears
 					}),
 					u$1("th", {
 						scope: "col",
+						"aria-label": OVERVIEW_TAB_WORDS.release,
 						children: OVERVIEW_TAB_WORDS.release
 					})
 				] }) }),
@@ -18550,7 +18651,7 @@ a.ov-ex-row:hover {
 					className: "p2-unit",
 					children: name.slice(0, slash + 1)
 				}),
-				u$1("wbr", {}),
+				u$1(Wbr, {}),
 				u$1("span", {
 					className: "p2-unit",
 					children: name.slice(slash + 1)
@@ -18612,6 +18713,7 @@ a.ov-ex-row:hover {
 					className: "p2-verdict",
 					id: `${id}-verdict`,
 					"data-label": label("verdict"),
+					"aria-label": finding.verdict,
 					children: finding.verdict
 				}),
 				u$1("td", {
@@ -18734,6 +18836,7 @@ a.ov-ex-row:hover {
 										role: "columnheader",
 										id: column.key === "score" ? scoreHead : void 0,
 										className: `p2-h-${column.key}`,
+										"aria-label": column.label,
 										"aria-sort": active ? state.sortDesc ? "descending" : "ascending" : "none",
 										children: [printed ? u$1(S, { children: [column.label, u$1("span", {
 											"aria-hidden": "true",
@@ -18741,6 +18844,7 @@ a.ov-ex-row:hover {
 										})] }) : u$1("button", {
 											type: "button",
 											className: active ? "sort-btn active" : "sort-btn",
+											"aria-label": column.label,
 											onClick: () => {
 												dispatch({
 													type: "sort",
@@ -18796,19 +18900,27 @@ a.ov-ex-row:hover {
 			style: { "--depth": String(depth) },
 			"data-pkg": finding.package,
 			"aria-label": finding.package,
-			"aria-describedby": `${id}-score ${id}-grade`,
+			"aria-describedby": `${id}-said`,
 			"aria-current": state.pkg === finding.package ? "true" : void 0,
 			tabIndex: rowTabIndex(finding.package, cursor, first),
 			...openInteractions(finding.package, dispatch),
 			children: [
 				u$1("span", {
+					id: `${id}-said`,
+					hidden: true,
+					children: [
+						"score ",
+						finding.score.total,
+						" ",
+						finding.verdict
+					]
+				}),
+				u$1("span", {
 					className: "r2-grade",
-					id: `${id}-grade`,
 					children: finding.verdict
 				}),
 				u$1("span", {
 					className: "r2-score",
-					id: `${id}-score`,
 					children: [
 						u$1("span", {
 							className: "r2-lbl",
@@ -18881,11 +18993,14 @@ a.ov-ex-row:hover {
 							dev: row.dev,
 							pkg: row.package,
 							version: row.version
-						}), row.self !== null && u$1("span", {
+						}), row.self !== null && u$1(S, { children: [u$1("span", {
 							className: `r2-self ${toneClass(gradeTone(row.self.verdict))}`,
-							id: `${id}-self`,
 							children: RADIUS_WORDS.itself(row.self.verdict)
-						})]
+						}), u$1("span", {
+							id: `${id}-self`,
+							hidden: true,
+							children: RADIUS_WORDS.itself(row.self.verdict)
+						})] })]
 					}),
 					facts.count !== null && u$1("span", {
 						className: "r2-count",
@@ -18976,6 +19091,7 @@ a.ov-ex-row:hover {
 		const { report } = useReport2();
 		const narrow = useNarrow();
 		const printed = usePrinted();
+		const empty = radiusEmpty(report);
 		const depth = printed ? null : depthSentence(report);
 		const layout = radiusLayout2(report, applyFilters2(report, state, "radius"), population2(report, "radius"));
 		const answer = radiusAnswer2(report, layout);
@@ -18994,6 +19110,15 @@ a.ov-ex-row:hover {
 			report,
 			first
 		}, row.package));
+		if (empty !== null) return u$1("section", {
+			className: "radius2",
+			"data-surface": "radius",
+			"aria-label": "Blast radius",
+			children: u$1("p", {
+				className: "empty",
+				children: empty
+			})
+		});
 		return u$1("section", {
 			className: "radius2",
 			"data-surface": "radius",
@@ -19337,32 +19462,33 @@ a.ov-ex-row:hover {
 		});
 	}
 	function Table({ table, model }) {
-		const id = g();
 		const wrap = A(null);
 		return u$1("div", {
 			ref: wrap,
 			className: "run2-table-wrap",
 			...useOverflowX(wrap) ? {
 				role: "region",
-				"aria-labelledby": id,
+				"aria-label": table.caption,
 				tabIndex: 0
 			} : {},
 			children: u$1("table", {
 				className: "run2-table",
+				"aria-label": table.caption,
 				children: [
-					u$1("caption", {
-						id,
+					u$1("caption", { children: u$1("span", {
+						"aria-hidden": "true",
 						children: table.caption
-					}),
+					}) }),
 					u$1("thead", { children: u$1("tr", { children: table.head.map((cell, index) => u$1("th", {
 						scope: "col",
-						"aria-label": cell.name,
+						"aria-label": cell.name ?? cell.text,
 						children: cell.text
 					}, index)) }) }),
 					u$1("tbody", { children: table.rows.map((row) => u$1("tr", { children: row.map((cell, index) => index === 0 ? u$1("th", {
 						scope: "row",
 						children: cell.text
 					}, index) : u$1("td", {
+						"aria-label": cell.band === void 0 ? void 0 : cell.text,
 						className: cell.band === void 0 ? void 0 : `run2-band ${toneClass(verdictTone(model, cell.band))}`,
 						children: cell.text
 					}, index)) }, row[0]?.text)) })
@@ -19396,6 +19522,7 @@ a.ov-ex-row:hover {
 			children: [
 				u$1("h3", {
 					tabIndex: -1,
+					"aria-label": parts.title,
 					children: parts.title
 				}),
 				u$1(Ruler, { model: run.score_model }),
@@ -19462,7 +19589,10 @@ a.ov-ex-row:hover {
 		return u$1("section", {
 			className: "sect",
 			children: [
-				u$1("h3", { children: RUN_WORDS.lookup }),
+				u$1("h3", {
+					"aria-label": RUN_WORDS.lookup,
+					children: RUN_WORDS.lookup
+				}),
 				u$1("p", {
 					className: "run2-line",
 					children: lookup.scope
@@ -19487,7 +19617,10 @@ a.ov-ex-row:hover {
 		if (notes.length === 0) return null;
 		return u$1("section", {
 			className: "sect",
-			children: [u$1("h3", { children: RUN_WORDS.notes }), u$1("ul", {
+			children: [u$1("h3", {
+				"aria-label": RUN_WORDS.notes,
+				children: RUN_WORDS.notes
+			}), u$1("ul", {
 				className: "run2-rows",
 				children: notes.map((note, index) => u$1("li", { children: [note.text, note.docs !== null && u$1(S, { children: [" · ", u$1(OutLink, {
 					href: note.docs,
@@ -19502,7 +19635,10 @@ a.ov-ex-row:hover {
 		return u$1("section", {
 			className: "sect",
 			children: [
-				u$1("h3", { children: RUN_WORDS.acceptedUnchecked }),
+				u$1("h3", {
+					"aria-label": RUN_WORDS.acceptedUnchecked,
+					children: RUN_WORDS.acceptedUnchecked
+				}),
 				u$1("p", {
 					className: "run2-line",
 					children: accepted.head
@@ -19521,6 +19657,7 @@ a.ov-ex-row:hover {
 			id,
 			children: [u$1("h3", {
 				tabIndex: id === void 0 ? void 0 : -1,
+				"aria-label": head,
 				children: head
 			}), u$1("dl", {
 				className: `kv ${className}`.trim(),
@@ -19541,7 +19678,10 @@ a.ov-ex-row:hover {
 		return u$1("section", {
 			className: "sect run2-baseline",
 			children: [
-				u$1("h3", { children: RUN_WORDS.baseline }),
+				u$1("h3", {
+					"aria-label": RUN_WORDS.baseline,
+					children: RUN_WORDS.baseline
+				}),
 				u$1("p", {
 					className: "run2-line",
 					children: baseline.head
@@ -19590,7 +19730,10 @@ a.ov-ex-row:hover {
 				u$1(AcceptedUnchecked, { report }),
 				u$1("section", {
 					className: "sect",
-					children: [u$1("h3", { children: RUN_WORDS.gate }), u$1(GateLine, {
+					children: [u$1("h3", {
+						"aria-label": RUN_WORDS.gate,
+						children: RUN_WORDS.gate
+					}), u$1(GateLine, {
 						report,
 						className: "overview2-gate"
 					})]
@@ -20648,7 +20791,7 @@ a.ov-ex-row:hover {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.12";
+	var version = "0.14.0-rc.13";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");
