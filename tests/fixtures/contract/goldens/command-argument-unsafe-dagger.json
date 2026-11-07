@@ -1,0 +1,17 @@
+{
+    "score_text": "16 = pinned 16",
+    "next_step_text": "require a tag — the newest is v4.0.0+x|calc (2025-01-01); 4.x needs php >=7.2, which require.php allows; lockrot prints no command, because its release name holds |, < or >",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: newest release v4.0.0+x|calc 2025-01-01 (1.7 years ago); last push 2024-01-12 (2.7 years ago)",
+    "explain_age": [
+        "installed  dev-masternot read (a branch snapshot has no release branch)",
+        "its branch           not read (a branch snapshot has no release branch)",
+        "newest     v4.0.0+x|calc2025-01-01   1.7 years ago                 below release-warn-years 3",
+        "last push            2024-01-12   2.7 years ago                 below push-warn-years 3",
+        "libyears not measured: a branch snapshot has no release branch"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": []
+}

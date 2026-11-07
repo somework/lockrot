@@ -9,7 +9,7 @@
 flags: left-behind 1 · old-promise 1 · vulnerable 1 · 1 package carries more than one\
 depth: every flagged package is named in composer.json · direct 1\
 security: 1 vulnerable package · 14 advisories: 6 high, 8 medium\
-libyears: 6.9 behind across the one package · 6.9 from direct requirements · furthest behind `guzzlehttp/guzzle` 5.3.4 at 6.9\
+libyears: 6.8 behind across the one package · 6.8 from direct requirements · furthest behind `guzzlehttp/guzzle` 5.3.4 at 6.8\
 advisories: 1 package asked · packagist.org answered (15 on record for 1 package)\
 php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; the update of the package that excludes it is not checked (the run checked no move)
 

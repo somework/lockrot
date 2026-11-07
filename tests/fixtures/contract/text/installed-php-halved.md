@@ -8,7 +8,7 @@
 
 flags: abandoned 1 · left-behind 1 · 1 package carries more than one\
 depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 · deepest: `web-auth/metadata-service`, 1 hop (`web-auth/webauthn-lib` › `web-auth/metadata-service`)\
-libyears: 4.9 behind across the one package · 0.0 from direct requirements · furthest behind `web-auth/metadata-service` v2.1.7 at 4.9\
+libyears: 4.8 behind across the one package · 0.0 from direct requirements · furthest behind `web-auth/metadata-service` v2.1.7 at 4.8\
 pulled in by: `web-auth/webauthn-lib` 1\
 advisories: 1 package asked · packagist.org answered (3 on record for 1 package)\
 php: the lock installs on PHP 7.2 to 7.4; your target, 8.4, is excluded: require.php allows only ^7.2.5

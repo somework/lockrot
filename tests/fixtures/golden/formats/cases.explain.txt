@@ -694,11 +694,11 @@ do        composer update league/commonmark (gets 2.10.3) — clears 3 advisorie
 flags
   vulnerable   S9 high · 3 advisories: 2 high, 1 medium — all fixed on 2.x; worst: PKSA-m4t9-vsgq-8khn league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan · lookup complete
     high       PKSA-m4t9-vsgq-8khn  league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan
-               PKSA-m4t9-vsgq-8khn · reported 2026-09-30 · 16 points · fix: composer update to 2.x from 2.10.3
+               reported 2026-09-30 · 16 points · fix: composer update to 2.x from 2.10.3
     high       PKSA-zyf5-hrxv-hrd7  league/commonmark: Denial of service via distinctly-named attributes in the Attributes extension
-               PKSA-zyf5-hrxv-hrd7 · reported 2026-09-01 · 16 points · fix: composer update to 2.x from 2.10.0
+               reported 2026-09-01 · 16 points · fix: composer update to 2.x from 2.10.0
     medium     PKSA-m2dq-1fhr-29b1  league/commonmark: DisallowedRawHtml bypassed when a disallowed tag name ends the raw-HTML literal
-               PKSA-m2dq-1fhr-29b1 · reported 2026-09-30 · 8 points · fix: composer update to 2.x from 2.10.3
+               reported 2026-09-30 · 8 points · fix: composer update to 2.x from 2.10.3
   feeds        packagist.org: 18 on record, 3 affect 2.9.1
   accepted     none
   not checked  nothing
@@ -3169,6 +3169,37 @@ repository metadata
      branch   highest tag   released          php        fixes
      10.x     v10.49.0      commit 2023-06-05 >=7.2
 
+== case command-argument-unsafe‡
+friendsofsymfony/oauth-server-bundle dev-master — high: pinned
+  direct requirement (composer.json require)
+
+age       installed  dev-masternot read (a branch snapshot has no release branch)
+          its branch           not read (a branch snapshot has no release branch)
+          newest     v4.0.0+x|calc2025-01-01   1.7 years ago                 below release-warn-years 3
+          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+          libyears not measured: a branch snapshot has no release branch
+repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
+
+score     16 = pinned 16     high from 16
+  maintenance  pinned 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require a tag — the newest is v4.0.0+x|calc (2025-01-01); 4.x needs php >=7.2, which require.php allows; lockrot prints no command, because its release name holds |, < or >
+          clears pinned
+
+flags
+  pinned       S6 · pinned to branch snapshot dev-master
+  feeds        packagist.org: none on record
+  pulls in     pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)
+  accepted     none
+  not checked  S8 (a branch snapshot has no release branch)
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     4.x      v4.0.0+x|calc 2025-01-01   >=7.2
+note: lockrot prints no command for 1 move: a release name holds |, < or >, which cmd.exe and PowerShell run or redirect
+
 == case old-promise-newest-shared‡
 tubalmartin/cssmin v4.1.1 — high: old-promise
   direct requirement (composer.json require)
@@ -3551,11 +3582,11 @@ do        move league/commonmark to ^2.10.3 through laravel/framework, laravel/n
 flags
   vulnerable   S9 high · 3 advisories: 2 high, 1 medium — all fixed on 2.x (upgrade); worst: PKSA-m4t9-vsgq-8khn league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan · lookup complete
     high       PKSA-m4t9-vsgq-8khn  league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan
-               PKSA-m4t9-vsgq-8khn · reported 2026-09-30 · 16 points · fix: upgrade to 2.x from 2.10.3
+               reported 2026-09-30 · 16 points · fix: upgrade to 2.x from 2.10.3
     high       PKSA-zyf5-hrxv-hrd7  league/commonmark: Denial of service via distinctly-named attributes in the Attributes extension
-               PKSA-zyf5-hrxv-hrd7 · reported 2026-09-01 · 16 points · fix: composer update to 2.x from 2.10.0
+               reported 2026-09-01 · 16 points · fix: composer update to 2.x from 2.10.0
     medium     PKSA-m2dq-1fhr-29b1  league/commonmark: DisallowedRawHtml bypassed when a disallowed tag name ends the raw-HTML literal
-               PKSA-m2dq-1fhr-29b1 · reported 2026-09-30 · 8 points · fix: upgrade to 2.x from 2.10.3
+               reported 2026-09-30 · 8 points · fix: upgrade to 2.x from 2.10.3
   feeds        packagist.org: 18 on record, 3 affect 2.9.1
   accepted     none
   not checked  nothing
@@ -3661,13 +3692,13 @@ do        raise require.php to >=8.2, then require laravel/framework ^12.69.0 �
 flags
   vulnerable   S9 high · 6 advisories: 2 high, 2 medium, 1 unrated, 1 low — 1 of 6 fixed on 9.x; worst: PKSA-3r5d-mb8f-1qw9 Laravel Framework: CRLF injection in default email rule · lookup complete
     high       PKSA-3r5d-mb8f-1qw9  Laravel Framework: CRLF injection in default email rule
-               PKSA-3r5d-mb8f-1qw9 · reported 2026-06-17 · 16 points · fix: php floor raise to 12.x from v12.60.0
+               reported 2026-06-17 · 16 points · fix: php floor raise to 12.x from v12.60.0
     high       CVE-2024-52301  Laravel environment manipulation via query string
                PKSA-w7xr-vk7n-rstm · reported 2024-11-12 · 16 points · fix: composer update to 9.x from v9.52.17
     medium     CVE-2025-27515  Laravel has a File Validation Bypass
                PKSA-8qx3-n5y5-vvnd · reported 2025-03-05 · 8 points · fix: upgrade to 10.x from v10.48.29
     medium     PKSA-m5cs-t1y6-qpcs  Laravel Framework: Temporary Signed URL Path Confusion
-               PKSA-m5cs-t1y6-qpcs · reported 2026-06-17 · 8 points · fix: php floor raise to 12.x from v12.61.1
+               reported 2026-06-17 · 8 points · fix: php floor raise to 12.x from v12.61.1
     unrated    CVE-2026-48019  Laravel CRLF injection in default email rule
                PKSA-mdq4-51ck-6kdq · reported 2026-05-19 · 8 points · fix: php floor raise to 12.x from v12.60.0
     low        CVE-2026-102279  Laravel: XSS in Debug Page Information
@@ -3712,13 +3743,13 @@ do        raise require.php to >=8.2, then require laravel/framework ^12.69.0 �
 flags
   vulnerable   S9 high · 6 advisories: 2 high, 2 medium, 1 unrated, 1 low — 1 of 6 fixed on 9.x; worst: PKSA-3r5d-mb8f-1qw9 Laravel Framework: CRLF injection in default email rule · lookup partial
     high       PKSA-3r5d-mb8f-1qw9  Laravel Framework: CRLF injection in default email rule
-               PKSA-3r5d-mb8f-1qw9 · reported 2026-06-17 · 16 points · fix: php floor raise to 12.x from v12.60.0
+               reported 2026-06-17 · 16 points · fix: php floor raise to 12.x from v12.60.0
     high       CVE-2024-52301  Laravel environment manipulation via query string
                PKSA-w7xr-vk7n-rstm · reported 2024-11-12 · 16 points · fix: composer update to 9.x from v9.52.17
     medium     CVE-2025-27515  Laravel has a File Validation Bypass
                PKSA-8qx3-n5y5-vvnd · reported 2025-03-05 · 8 points · fix: upgrade to 10.x from v10.48.29
     medium     PKSA-m5cs-t1y6-qpcs  Laravel Framework: Temporary Signed URL Path Confusion
-               PKSA-m5cs-t1y6-qpcs · reported 2026-06-17 · 8 points · fix: php floor raise to 12.x from v12.61.1
+               reported 2026-06-17 · 8 points · fix: php floor raise to 12.x from v12.61.1
     unrated    CVE-2026-48019  Laravel CRLF injection in default email rule
                PKSA-mdq4-51ck-6kdq · reported 2026-05-19 · 8 points · fix: php floor raise to 12.x from v12.60.0
     low        CVE-2026-102279  Laravel: XSS in Debug Page Information
@@ -7478,6 +7509,68 @@ flags
 repository metadata
      branch   highest tag   released     php        fixes
    * 6.x      v6.4.41       2026-07-03   >=8.1      1 of 1 · composer update (lowest fix); after it: 0, ok; Composer's solver resolves it
+
+== case mc-unreached-vcs‡
+symfony/routing v6.4.28 — high: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v6.4.28   2025-10-31   0.9 years ago
+          6.x        v6.4.41   2026-07-01   0.3 years ago                 below release-warn-years 3
+          newest     v6.4.41   2026-07-01   0.3 years ago                 below release-warn-years 3
+          last push            2026-09-29   less than three weeks ago     below push-warn-years 3
+          libyears 0.7 behind the newest stable release
+repository GitHub github.com/symfony/routing: last push 2026-09-29 · fetched 2026-09-14
+
+score     16 = vulnerable 16 [high advisory]     high from 16
+  security     vulnerable 16 (high advisory CVE-2026-48784)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        composer update 'symfony/routing:^6.4.41' (gets v6.4.41) — clears the advisory; not checked with Composer's solver (a package it needs could not be loaded), so it holds only if Composer resolves it
+          clears PKSA-bf7t-jnpz-492k
+
+flags
+  vulnerable   S9 high · 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization · lookup complete
+    high       CVE-2026-48784  UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization
+               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 16 points · fix: composer update to 6.x from v6.4.41
+  feeds        packagist.org: 4 on record, 1 affects v6.4.28
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 6.x      v6.4.41       2026-07-01   >=8.1      1 of 1 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
+
+== case mc-lock-disabled‡
+symfony/routing v6.4.28 — high: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v6.4.28   2025-10-31   0.9 years ago
+          6.x        v6.4.41   2026-07-01   0.3 years ago                 below release-warn-years 3
+          newest     v6.4.41   2026-07-01   0.3 years ago                 below release-warn-years 3
+          last push            2026-09-29   less than three weeks ago     below push-warn-years 3
+          libyears 0.7 behind the newest stable release
+repository GitHub github.com/symfony/routing: last push 2026-09-29 · fetched 2026-09-14
+
+score     16 = vulnerable 16 [high advisory]     high from 16
+  security     vulnerable 16 (high advisory CVE-2026-48784)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        update it with Composer (gets v6.4.41) — clears the advisory; not checked with Composer's solver (config.lock is false, so Composer ignores composer.lock), so it holds only if Composer resolves it
+          clears PKSA-bf7t-jnpz-492k
+
+flags
+  vulnerable   S9 high · 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization · lookup complete
+    high       CVE-2026-48784  UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization
+               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 16 points · fix: composer update to 6.x from v6.4.41
+  feeds        packagist.org: 4 on record, 1 affects v6.4.28
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 6.x      v6.4.41       2026-07-01   >=8.1      1 of 1 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
 
 == case mc-root-version‡
 symfony/routing v6.4.28 — high: vulnerable

@@ -8,7 +8,7 @@
 
 flags: capped 1\
 depth: every flagged package is named in composer.json · direct 1 · 1 in packages-dev\
-libyears: 2.9 behind across the one package · 2.9 from direct requirements · furthest behind `laminas/laminas-code` 4.7.1 at 2.9\
+libyears: 3.0 behind across the one package · 3.0 from direct requirements · furthest behind `laminas/laminas-code` 4.7.1 at 3.0\
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)\
 php: without require-dev the lock installs on PHP 7.4 to 8.5, and with require-dev on PHP 7.4 to 8.1, so your target, 8.4, is excluded; the update of the package that excludes it is not checked (the run checked no move)
 

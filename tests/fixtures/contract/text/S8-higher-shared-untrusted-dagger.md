@@ -6,7 +6,7 @@
 |---|---|---|---|---|---|
 | ok | `pagerfanta/twig` | v3.8.0 | ok | `0`<br>pulls in 1 flagged package: pagerfanta/core (left-behind)<br>checks missing: S2, S8 (undated releases) | direct |
 
-libyears: at least 0.0 behind across the one package · 0.0 from direct requirements · furthest behind `pagerfanta/twig` v3.8.0 at 0.0 or more\
+libyears: at least 0.1 behind across the one package · 0.1 from direct requirements · furthest behind `pagerfanta/twig` v3.8.0 at 0.1 or more\
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)\
 php: the lock installs on PHP 7.4 to 8.5
 

@@ -21,7 +21,7 @@ flags: vulnerable 2
 depth: every flagged package is named in composer.json · direct 2
 security: 2 vulnerable packages · 2 advisories: 2 high · packages-dev not checked (pass --dev)
 fix, by package: composer update 2
-libyears: 2.7 behind across all 2 packages · 2.7 from direct requirements ·
+libyears: 2.8 behind across all 2 packages · 2.8 from direct requirements ·
 furthest behind typo3/html-sanitizer v2.2.0 at 2.0
 advisories: 2 packages asked · packagist.org answered (11 on record for 2 packages)
 moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by
