@@ -12,6 +12,7 @@ use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Baseline\RecordedAdvisory;
 use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Exception\ConfigException;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
@@ -100,16 +101,17 @@ final class BaselineComparisonTest extends TestCase
         self::assertSame('known', $fact === null ? null : $fact->state());
     }
 
-    /** Pins what the code does with a file from another score model: no note, compared as if it were this model. */
-    public function testABaselineUnderAnotherScoreModelGetsNoNoteAndIsComparedAsIfItWereThisModel(): void
+    /** Grades under two score models are not comparable, so the check run refuses the file. */
+    public function testABaselineUnderAnotherScoreModelIsRefused(): void
     {
         $entry = BaselineEntries::of('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15');
-        $baseline = Baseline::of([$entry], self::AT, PhpReleaseDates::minorOf(\PHP_VERSION), 'runtime', Version::STRING, ScoreModel::ID + 1);
+        $other = ScoreModel::ID + 1;
+        $baseline = Baseline::of([$entry], self::AT, PhpReleaseDates::minorOf(\PHP_VERSION), 'runtime', Version::STRING, $other);
 
-        $comparison = $this->compare($baseline, $this->report([['acme/abandoned', '1.0.0', Verdict::ABANDONED]]));
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage(self::PATH.' was written under score model '.$other.' and this lockrot uses score model '.ScoreModel::ID.'. Run --generate-baseline to write it again under this model, or run the lockrot that wrote it');
 
-        self::assertSame([], $comparison->notes());
-        self::assertSame(BaselineComparison::KNOWN, $comparison->statusOf('acme/abandoned'));
+        $this->compare($baseline, $this->report([['acme/abandoned', '1.0.0', Verdict::ABANDONED]]));
     }
 
     public function testAFindingAtTheBaselinedVerdictIsKnown(): void

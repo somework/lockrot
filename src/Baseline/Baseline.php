@@ -258,6 +258,11 @@ final class Baseline
         return $this->targetPhpSource;
     }
 
+    public function scoreModelId(): int
+    {
+        return $this->scoreModelId;
+    }
+
     public function fixModel(): int
     {
         return $this->fixModel;

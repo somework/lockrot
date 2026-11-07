@@ -8,9 +8,11 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Exception\ConfigException;
 use Lockrot\Score\Standing;
 use Lockrot\Score\Term;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\ScoreModel;
 
 /**
  * A run's findings compared with the committed baseline-2 file: docs/baseline.md, "Reading a
@@ -58,6 +60,15 @@ final class BaselineComparison
      */
     public static function compare(Baseline $baseline, Report $report, string $displayPath, array $presentPackages): self
     {
+        // Not in BaselineFile::read(): `--generate-baseline` reads the old file too and must still write its own model.
+        if ($baseline->scoreModelId() !== ScoreModel::ID) {
+            throw new ConfigException(\sprintf(
+                '%s was written under score model %d and this lockrot uses score model %d. Run --generate-baseline to write it again under this model, or run the lockrot that wrote it',
+                $displayPath,
+                $baseline->scoreModelId(),
+                ScoreModel::ID
+            ));
+        }
         $run = $report->run();
         $target = $run === null ? PhpReleaseDates::minorOf(\PHP_VERSION) : $run->targetPhp();
         $source = $run === null ? RunSettings::SOURCE_RUNTIME : $run->targetPhpSource();

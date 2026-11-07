@@ -99,8 +99,8 @@ final class BaselineTest extends TestCase
         self::assertSame(['abandoned' => '2026-09-14'], $entry->flags(), 'a flag the entry did not hold is known from today');
     }
 
-    /** Pins what the code does with a file from another score model: a regenerated file records this model without a word. */
-    public function testRegeneratingOverAnotherScoreModelRecordsThisModel(): void
+    /** --generate-baseline never refuses a file from another score model, it writes this one. */
+    public function testRegeneratingOverAnotherScoreModelRecordsThisModelAndDoesNotRefuse(): void
     {
         $previous = Baseline::of([], self::AT, '8.4', 'option', Version::STRING, ScoreModel::ID + 1);
 

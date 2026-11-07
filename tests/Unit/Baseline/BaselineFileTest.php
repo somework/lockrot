@@ -74,6 +74,15 @@ final class BaselineFileTest extends TestCase
         BaselineFile::resolve($dir, null, $release)->read();
     }
 
+    /** `--generate-baseline` reads the old file for its dates: only the comparison of a check run refuses another score model. */
+    public function testReadingAFileFromAnotherScoreModelDoesNotRefuseIt(): void
+    {
+        $dir = $this->tempDir();
+        file_put_contents($dir.'/lockrot-baseline.json', '{'.str_replace('"score_model_id": 1', '"score_model_id": 2', self::ROOT_2).', "findings": {}}');
+
+        self::assertSame(2, BaselineFile::resolve($dir, null, '0.14.0')->read()->toArray()['score_model_id']);
+    }
+
     /** @return iterable<string, array{string, ?int}> */
     public static function numbers(): iterable
     {
