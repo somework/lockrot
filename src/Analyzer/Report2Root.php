@@ -59,37 +59,17 @@ final class Report2Root
     }
 
     /**
-     * The sums add the written two-decimal values in whole hundredths, so the float error of a long
-     * sum stays out of the written number.
-     *
      * @param list<Finding> $findings
      *
      * @return array{total: ?float, direct_requirements: ?float, measured: int, at_least_count: int, unmeasured: array<string, int>, furthest_behind: ?array{package: string, version: string, libyears: ?float, at_least: bool}, packages: int}
      */
     public static function toLibyearsArray(Libyears $libyears, array $findings): array
     {
-        $total = null;
-        $direct = null;
-        foreach ($findings as $finding) {
-            $years = $finding->libyearsRounded();
-            if ($years === null) {
-                continue;
-            }
-            $hundredths = round($years * 100);
-            $total = ($total ?? 0) + $hundredths;
-            if ($finding->isDirect()) {
-                $direct = ($direct ?? 0) + $hundredths;
-            }
-        }
-        if ($total !== null) {
-            $direct ??= 0;
-        }
-
         $worst = $libyears->worst();
 
         return [
-            'total' => $total === null ? null : $total / 100.0,
-            'direct_requirements' => $direct === null ? null : $direct / 100.0,
+            'total' => $libyears->total(),
+            'direct_requirements' => $libyears->direct(),
             'measured' => $libyears->measured(),
             'at_least_count' => $libyears->atLeastCount(),
             'unmeasured' => $libyears->unmeasured(),

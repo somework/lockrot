@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
+use Lockrot\Analyzer\Report2Root;
 use Lockrot\Clock;
 use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\PackageMetadata;
@@ -389,11 +390,22 @@ final class LibyearsTest extends TestCase
         self::assertEqualsWithDelta(4.06, $behind, 0.005);
     }
 
-    public function testTheTotalsSumTheUnroundedValues(): void
+    public function testTheTotalsSumTheTwoDecimalValuesThatReportTwoWrites(): void
     {
         $block = Libyears::fromFindings([self::finding('a/a', LibyearsMeasurement::of(1.005)), self::finding('b/b', LibyearsMeasurement::of(1.005))]);
 
-        self::assertSame([2.01, 2.01], [$block->total(), $block->direct()]);
+        self::assertSame([2.02, 2.02], [$block->total(), $block->direct()]);
+    }
+
+    public function testTheFooterLinePrintsTheSumsThatTheJsonBlockWrites(): void
+    {
+        // 0.035 is written as 0.04 and 0.0149 as 0.01: the written sum 0.05 prints 0.1, the unrounded 0.0499 would print 0.0.
+        $findings = [self::finding('a/a', LibyearsMeasurement::of(0.035)), self::finding('b/b', LibyearsMeasurement::of(0.0149))];
+        $block = Libyears::fromFindings($findings);
+        $json = Report2Root::toLibyearsArray($block, $findings);
+
+        self::assertSame([0.05, 0.05], [$json['total'], $json['direct_requirements']]);
+        self::assertSame('libyears: 0.1 behind across all 2 packages · 0.1 from direct requirements · furthest behind a/a 1.0.0 at 0.0', $block->line());
     }
 
     public function testDirectCountsOnlyTheDirectRequirements(): void

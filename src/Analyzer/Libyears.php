@@ -145,8 +145,8 @@ final class Libyears
      */
     public static function fromFindings(array $findings): self
     {
-        $total = 0.0;
-        $direct = 0.0;
+        $total = 0;
+        $direct = 0;
         $measured = 0;
         $atLeast = 0;
         $unmeasured = array_fill_keys(self::REASONS, 0);
@@ -166,9 +166,10 @@ final class Libyears
             if ($finding->isLibyearsAtLeast()) {
                 ++$atLeast;
             }
-            $total += $behind;
+            $hundredths = (int) round(round($behind, 2) * 100);
+            $total += $hundredths;
             if ($finding->isDirect()) {
-                $direct += $behind;
+                $direct += $hundredths;
             }
             // Only a package that is behind can be the furthest behind. Package names are unique,
             // so strcmp on a tie never compares a name with itself.
@@ -177,22 +178,20 @@ final class Libyears
             }
         }
 
-        return new self($total, $direct, $measured, $atLeast, $unmeasured, $worst);
+        return new self($total / 100.0, $direct / 100.0, $measured, $atLeast, $unmeasured, $worst);
     }
 
     /**
-     * Unrounded sum over the measured packages. Null when none was measured, which is not zero:
-     * nothing could be read.
+     * Sum of the two-decimal values that report-2 writes per finding, added in whole hundredths so
+     * that the float error of a long sum stays out of it. Null when none was measured, which is not
+     * zero: nothing could be read.
      */
     public function total(): ?float
     {
         return $this->measured === 0 ? null : $this->total;
     }
 
-    /**
-     * Unrounded sum over the measured direct requirements. Null on the same terms as
-     * {@see total()}.
-     */
+    /** The same sum over the measured direct requirements. Null on the same terms as {@see total()}. */
     public function direct(): ?float
     {
         return $this->measured === 0 ? null : $this->direct;
@@ -247,6 +246,7 @@ final class Libyears
             return $head;
         }
         [$worst, $behind] = $this->worst;
+        $behind = round($behind, 2);
 
         return implode(' · ', [
             $head,
