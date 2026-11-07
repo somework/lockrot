@@ -506,9 +506,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   error that names the value. ([Testing hooks](docs/configuration.md#testing-hooks))
 - **All formats:** a lock URL with a long run of slashes does not stall the run.
 - **CLI:** a cached 404 from a run without a token does not hide a private repository from a later
-  run with a token. The activity cache keeps an answer per credential state. A run with lockrot's
-  credentials uses its own cache key, so it reads no answer that 0.13 cached without credentials.
-  After the upgrade, each run with a token fetches its GitHub answers once again.
+  run with a token. The activity cache keeps an answer per credential state, so no run reads an
+  answer that 0.13 cached. After the upgrade, each run fetches every activity answer once again,
+  anonymous runs too. Action: run `--offline` only after one online run on 0.14.
   ([Caching](docs/internals.md#caching))
 - **CLI:** the activity cache stores only a JSON answer or a 404, so a proxy page or a redirect
   does not replace a cached answer. A failed refetch of an expired 404 leaves the repository
