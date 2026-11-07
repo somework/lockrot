@@ -938,9 +938,10 @@ Limits of the check:
 - A package that no Composer repository lists, while a path, VCS or package repository can serve
   it, is not loaded either. A resolving solve is then not checked only when a release that the
   solve could install requires the package and no loaded package provides it. The solve could
-  install a release above the one that it installs, or any release of a package that it does not
-  install, when a loaded package meets each other requirement of the release. A provider counts
-  when a loaded package meets each of its own requirements.
+  install a release above the one that it installs, when a loaded package meets each other
+  requirement of the release. It could also install a package that it does not install, when such
+  a release requires it, directly or through another such package. A provider counts when a loaded
+  package meets each of its own requirements.
 - Composer blocks only the advisories that it reads. When the advisory lookup did not read a
   package that a resolving solve installs, the move is not checked (`check.reason`
   `advisory_lookup_incomplete`). An `--offline` run, a spent install-time budget and a failed
