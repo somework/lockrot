@@ -118,7 +118,7 @@ final class MoveBuilder
         }
         $s2 = $finding->signalData(NoReleaseData::class);
 
-        return (new Move(
+        $move = (new Move(
             $kind,
             $draft->source(),
             $merged,
@@ -143,6 +143,27 @@ final class MoveBuilder
             self::runnable(self::commands($kind, $subject, $constraint, $phpCheck, $latest, $version, $check, $checks, array_column($movesWith, 'package'))),
             $subject
         ))->withCheck($check)->withMovesWith($movesWith);
+        $unsafe = self::unsafeArgument($kind, $version, $constraint);
+
+        return $unsafe === null ? $move : $move->withUnsafeArgument($unsafe);
+    }
+
+    /**
+     * The version or branch that a step of the move would quote, when it holds a character that
+     * a Windows shell runs or redirects (SPEC §5.6). Only the four kinds that write a step quote one.
+     */
+    private static function unsafeArgument(string $kind, ?string $version, ?string $constraint): ?string
+    {
+        if (!\in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true)) {
+            return null;
+        }
+        foreach ([$version, $constraint === null ? null : ltrim($constraint, '^')] as $value) {
+            if ($value !== null && CommandArgument::holdsShellOperator($value)) {
+                return $value;
+            }
+        }
+
+        return null;
     }
 
     /**

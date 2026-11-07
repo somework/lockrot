@@ -74,6 +74,8 @@ final class Move implements \JsonSerializable
     /** @var list<list<string>> */
     private array $commands;
     private ?MoveCheck $check = null;
+    /** The version or branch that a step would quote and that {@see CommandArgument::holdsShellOperator()} refuses. */
+    private ?string $unsafeArgument = null;
     /** @var list<ThroughEntry>|null null on an `also[]` move */
     private ?array $through = null;
     /** @var list<self>|null null on an `also[]` move */
@@ -166,6 +168,22 @@ final class Move implements \JsonSerializable
         $clone->movesWith = $movesWith;
 
         return $clone;
+    }
+
+    /** The move keeps every field and writes no step: `commands` is empty and the text says why. */
+    public function withUnsafeArgument(string $value): self
+    {
+        $clone = clone $this;
+        $clone->unsafeArgument = $value;
+        $clone->commands = [];
+
+        return $clone;
+    }
+
+    /** The raw value, as the repository writes it, that kept the move from writing a step. */
+    public function unsafeArgument(): ?string
+    {
+        return $this->unsafeArgument;
     }
 
     /** @return list<array{package: string, installed_version: ?string, version: string}> */

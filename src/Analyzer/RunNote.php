@@ -44,6 +44,7 @@ final class RunNote
     public const BASELINE_FIX_MODEL_DIFFERS = 'baseline_fix_model_differs';
     public const IGNORE_DOES_NOT_COVER_ADVISORIES = 'ignore_does_not_cover_advisories';
     public const MOVES_NOT_CHECKED = 'moves_not_checked';
+    public const COMMAND_ARGUMENT_UNSAFE = 'command_argument_unsafe';
     public const UPDATE_NOW_REDUCED = 'update_now_reduced';
     public const UPDATE_NOW_REFUSED = 'update_now_refused';
     public const UPDATE_NOW_NOT_CHECKED = 'update_now_not_checked';
@@ -75,6 +76,7 @@ final class RunNote
         self::ABANDONED_NOT_AUDITED_BY_COMPOSER,
         self::ABANDONED_IGNORE_UNREADABLE,
         self::MOVES_NOT_CHECKED,
+        self::COMMAND_ARGUMENT_UNSAFE,
         self::UPDATE_NOW_REDUCED,
         self::UPDATE_NOW_REFUSED,
         self::UPDATE_NOW_NOT_CHECKED,
@@ -150,6 +152,21 @@ final class RunNote
         }
 
         return self::of(self::PACKAGE_NAME_INVALID, \sprintf('lock: lockrot skips %d %s whose name is no Composer package name', \count($names), \count($names) === 1 ? 'entry' : 'entries'), false, ['packages' => $names]);
+    }
+
+    /**
+     * The moves that write no step because a version or a branch name holds `|`, `<` or `>`. The
+     * text names none of the values: a release name from a repository can carry anything.
+     *
+     * @param list<array{package: string, version: string}> $moves the `next_step` of a finding before its `also[]`, in finding order
+     */
+    public static function commandArgumentUnsafe(array $moves): self
+    {
+        if ($moves === []) {
+            throw new \InvalidArgumentException('A note about unsafe command arguments names at least one move.');
+        }
+
+        return self::of(self::COMMAND_ARGUMENT_UNSAFE, \sprintf('lockrot prints no command for %d %s: a release name holds |, < or >, which cmd.exe and PowerShell run or redirect', \count($moves), \count($moves) === 1 ? 'move' : 'moves'), false, ['moves' => $moves]);
     }
 
     public static function offline(): self

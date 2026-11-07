@@ -32,6 +32,7 @@ do, what each gap does to findings, and what to do about it.
 | [`update_now_refused`](#update_now_refused) | Composer's solver refuses the members of `update now:` together | no | No `update now:` command | Update each member with its own move |
 | [`update_now_not_checked`](#update_now_not_checked) | Composer's solver did not check `update now:`, such as when the budget ran out | no | No `update now:` command, and `security.update_now` is empty | Update each candidate with its own move |
 | [`move_check_failed`](#move_check_failed) | Composer's solver failed on a request with an error other than a refusal | no | That move's `check.reason` reads `solver_error` | Read the note's `message`. Check the repository that it names |
+| [`command_argument_unsafe`](#command_argument_unsafe) | A release name that a move quotes holds `\|`, `<` or `>`, which cmd.exe and PowerShell run or redirect | no | That move's `commands` is empty, and its text says why | Update the package by hand, after you check the release name |
 | [`baseline_target_differs`](#baseline_target_differs) | The baseline was written for another target PHP | no | No advisory reads `fix_lost` | Regenerate the baseline at the run's target PHP, or run at the baseline's |
 | [`baseline_fix_model_differs`](#baseline_fix_model_differs) | The baseline was written under another fix model | no | No advisory reads `fix_lost` | Regenerate the baseline ([`--generate-baseline`](baseline.md)) |
 | [`ignore_does_not_cover_advisories`](#ignore_does_not_cover_advisories) | An `ignore[]` entry matches a package with a counted advisory | no | None: the advisories count | Accept the advisory in Composer's audit policy, if that is the decision ([accepting advisories](verdicts.md#accepting-advisories)) |
@@ -364,6 +365,21 @@ repository that does not parse. That move's `check.reason` reads `solver_error`,
 on. The note names the first such failure of the run.
 
 - `data`: `class` and `message` of the failure, Composer's own words.
+- `sets_network_failures`: no.
+
+### Command argument unsafe {#command_argument_unsafe}
+
+A move quotes a version or a branch name in its steps: the `^<version>` of an update, require or tag
+step, and the `<version>` of a why-not step. When that name holds `|`, `<` or `>`, a Windows shell
+that you paste the POSIX line into runs another program or redirects to a file. That move
+writes no step: `commands` is empty, and the text ends with "; lockrot prints no command, because its
+release name holds |, < or >". The move check still runs, and no other field of the move changes.
+The `update now:` line is not part of this rule. The note holds the move of a finding's
+`next_step` before its `also[]`, in finding order.
+
+- `data`: `moves`, one per move without a step: `package` and `version`, the name as the
+  repository writes it. The text names none of the names.
+- Findings: the moves have no step.
 - `sets_network_failures`: no.
 
 ## Gate and baseline
