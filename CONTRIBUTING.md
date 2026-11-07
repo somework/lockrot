@@ -134,7 +134,9 @@ The canonical list of what lockrot reads, writes and contacts is
 - `tools/report/record` records the rendering contract bundle into `tests/fixtures/contract/`, and
   `tools/report/record --all-baselined` records the real baselined projects
   (`tests/fixtures/baselined/README.md`). Both run twice and write only identical results. Review the
-  diff of a re-recording like a snapshot: lockrot-report pins `contract/bundle_sha256`.
+  diff of a re-recording like a snapshot: lockrot-report pins `contract/bundle_sha256`. After a
+  re-recording, run `node emit_bundle.js` in `tools/schema/node`: the `typescript` job of CI fails
+  on a stale `tests/fixtures/bundle.generated.ts`.
 - `bin/record-demo` records the README demo, `docs/assets/lockrot-demo.gif`, from a real run with
   asciinema and agg. Its header lists what to export. Re-record it when the table output changes
   shape.
@@ -162,10 +164,17 @@ To change a generated schema:
     python3 tools/schema/make_negatives_sarif.py
     ```
 
-3. Commit the builder and what it wrote in one commit.
+3. Rebuild the TypeScript unions and probes: `python3 tools/schema/ts/emit_dts.py`.
+4. Record the contract bundle with `tools/report/record`. It rewrites `tests/fixtures/contract/`,
+   including `contract-files.json`, which holds the sha256 of the published schemas and types.
+5. Write the bundle module, which reads that recording:
+   `cd tools/schema/node && node emit_bundle.js`.
+6. Commit the builder and what these steps wrote in one commit.
 
-The CI step "The generated schemas and negatives match tools/schema" runs the same commands and
-fails on a difference. `tests/Integration/SchemaRebuildTest.php` proves that the step catches a
+The CI step "The generated schemas and negatives match tools/schema" runs the commands of step 2
+and fails on a difference. The `typescript` job runs steps 3 and 5 and fails on a stale file of
+`types/`, `tools/schema/ts/` or `tests/fixtures/bundle.generated.ts`. `ContractBundleIsCurrentTest`
+fails on a stale recording (step 4). `tests/Integration/SchemaRebuildTest.php` proves that the step catches a
 hand edit.
 
 Under one schema number the files only widen: `tests/Integration/SchemaEvolutionTest.php` holds
