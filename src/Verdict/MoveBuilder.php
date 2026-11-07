@@ -118,6 +118,7 @@ final class MoveBuilder
         }
         $s2 = $finding->signalData(NoReleaseData::class);
 
+        $commands = self::runnable(self::commands($kind, $subject, $constraint, $phpCheck, $latest, $version, $check, $checks, array_column($movesWith, 'package')));
         $move = (new Move(
             $kind,
             $draft->source(),
@@ -140,26 +141,31 @@ final class MoveBuilder
             $leaves,
             $ifApplied,
             $because,
-            self::runnable(self::commands($kind, $subject, $constraint, $phpCheck, $latest, $version, $check, $checks, array_column($movesWith, 'package'))),
+            $commands,
             $subject
         ))->withCheck($check)->withMovesWith($movesWith);
-        $unsafe = self::unsafeArgument($kind, $version, $constraint);
+        $unsafe = self::unsafeArgument($commands, [$version, $constraint === null ? null : ltrim($constraint, '^'), $latest === null ? null : $latest->version()]);
 
         return $unsafe === null ? $move : $move->withUnsafeArgument($unsafe);
     }
 
     /**
-     * The version or branch that a step of the move would quote, when it holds a character that
-     * a Windows shell runs or redirects (SPEC §5.6). Only the four kinds that write a step quote one.
+     * The version, constraint or tag that a step quotes, when it holds a character that a Windows
+     * shell runs or redirects (SPEC §5.6). A value that no step quotes does not count.
+     *
+     * @param list<list<string>> $commands
+     * @param list<?string>      $values
      */
-    private static function unsafeArgument(string $kind, ?string $version, ?string $constraint): ?string
+    private static function unsafeArgument(array $commands, array $values): ?string
     {
-        if (!\in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true)) {
-            return null;
-        }
-        foreach ([$version, $constraint === null ? null : ltrim($constraint, '^')] as $value) {
-            if ($value !== null && CommandArgument::holdsShellOperator($value)) {
-                return $value;
+        foreach ($values as $value) {
+            if ($value === null || !CommandArgument::holdsShellOperator($value)) {
+                continue;
+            }
+            foreach (array_merge([], ...$commands) as $argument) {
+                if (strpos($argument, ltrim($value, '^vV')) !== false) {
+                    return $value;
+                }
             }
         }
 

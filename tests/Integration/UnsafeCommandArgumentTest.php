@@ -131,6 +131,26 @@ final class UnsafeCommandArgumentTest extends TestCase
     }
 
     /**
+     * Without the move check, the `why-not` step quotes the release name, so the move prints no
+     * command. `update now` names the package with no version, so the rule does not apply there.
+     */
+    public function testARunWithoutTheMoveCheckDropsTheMovesStepsAndKeepsUpdateNowByName(): void
+    {
+        $case = CaseHydrator::case('move-check‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        unset($inputs['checks']);
+        $inputs['releases'] = array_map(static fn ($release): array => \is_array($release) && ($release['version'] ?? null) === 'v2.3.2' ? ['version' => 'v2.3.2+x|calc'] + $release : (array) $release, array_values(JsonPath::arrayAt($inputs, ['releases'])));
+        $case['inputs'] = $inputs;
+
+        $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+
+        self::assertSame([], JsonPath::arrayAt(self::nextStep($document, self::PACKAGE), ['commands']));
+        self::assertSame([[self::PACKAGE], ['composer', 'update', self::PACKAGE]], [JsonPath::arrayAt($document, ['security', 'update_now']), JsonPath::arrayAt($document, ['security', 'update_now_command'])]);
+        $notes = array_values(array_filter(JsonPath::arrayAt($document, ['note_details']), static fn ($note): bool => \is_array($note) && $note['code'] === 'command_argument_unsafe'));
+        self::assertSame([['package' => self::PACKAGE, 'version' => 'v2.3.2+x|calc']], JsonPath::arrayAt($notes[0], ['data', 'moves']));
+    }
+
+    /**
      * @return array<mixed, mixed> the report-2 document, not held to its schema
      */
     private static function document(string $to, string $from, string $id): array
