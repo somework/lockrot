@@ -54,7 +54,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Analyzer/PhpWindow.php` CastInt `return $major.'.'.$minor.'.'.((int) $patch - 1);` — `releaseOf()` writes the patch as digits, and PHP subtracts from a digit string as from the integer it spells. The cast is for the type.
 - `src/Analyzer/RunNote.php` CastString `$host = (string) $where->host();` — every entry of the host note comes from `LocatedRepository::unsupported()`, which always names a host.
 - `src/Analyzer/UpdateNow.php` CastString `return self::resolved($kept, $findings, RunNote::updateNowReduced(self::inReportOrder(array_keys(array_diff_key($inline, $kept)), $findings), (string) $outcome->problem()));` — a refused combined outcome always carries its problem text.
-- `src/Analyzer/UpdateNow.php` LogicalAnd `if ($finding->securityStanding()->isVulnerable() && $move !== null && $move->kind() === Move::UPDATE && $move->clearedAdvisories() !== [] && $move->movesWith() === [] && $check !== null && $check->isResolved() && $check->form() === MoveCheck::INLINE) {` — S9 holds only counted advisories (`AdvisoryRule`), so a move that clears an advisory belongs to a vulnerable finding.
+- `src/Analyzer/UpdateNow.php` LogicalAnd `if ($finding->securityStanding()->isVulnerable() && $move !== null && $move->kind() === Move::UPDATE && $move->clearedAdvisories() !== [] && $move->movesWith() === [] && $move->unsafeArgument() === null && $check !== null && $check->isResolved() && $check->form() === MoveCheck::INLINE) {` — S9 holds only counted advisories (`AdvisoryRule`), so a move that clears an advisory belongs to a vulnerable finding.
 
 ## src/Baseline
 
