@@ -385,9 +385,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   its own step. ([Exit codes](docs/ci.md#exit-codes))
 - **Breaking:** **CLI, Config, Install-time:** `--target-php` and `LOCKROT_TARGET_PHP` take a
   major, a minor or a patch with nothing after it. lockrot keeps only the minor: `8.4.2` is `8.4`.
-  Another value, such as `8.4-fpm`, or a minor that is no PHP minor, exits 2 and names the
-  setting. At install time the check is skipped. 0.13 read the version at its start. Action: pass
-  a real PHP version alone.
+  Another value, such as `8.4-fpm`, or a minor that lockrot does not know and that lies below the
+  newest one it knows, exits 2 and names the setting. At install time the check is skipped. 0.13
+  read the version at its start. Action: pass a real PHP version alone.
   ([CLI options](docs/configuration.md#cli-options))
 - **Breaking:** **CLI:** a lock whose `packages`, `packages-dev`, `platform`, `platform-dev`,
   `platform-overrides` or `aliases` section Composer or lockrot cannot read, or that lists two
