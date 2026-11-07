@@ -208,7 +208,7 @@ final class TokensTest extends TestCase
         $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'SECRET', $variable => $issuer], null);
 
         self::assertNull($tokens->github());
-        self::assertArrayHasKey('GITHUB_TOKEN', $tokens->withheld());
+        self::assertSame(['GITHUB_TOKEN' => Tokens::READ_TWO_WAYS], $tokens->withheld());
     }
 
     public function testAnIssuerWithABackslashShowsNoUserinfoWhenWithheld(): void

@@ -16,6 +16,8 @@ namespace Lockrot\Data\Forge;
  */
 final class Tokens
 {
+    /** Fits "<variable> is for %s": the issuer names the public host only for one URL parser. */
+    public const READ_TWO_WAYS = 'an issuer that URL parsers read two ways';
     public const ENV_LOCKROT_GITHUB = 'LOCKROT_GITHUB_TOKEN';
     public const ENV_GITHUB = 'GITHUB_TOKEN';
     public const ENV_LOCKROT_GITLAB = 'LOCKROT_GITLAB_TOKEN';
@@ -90,7 +92,8 @@ final class Tokens
             // must be the public host too.
             // A backslash ends the authority for a WHATWG parser and not for parse_url(), so the two disagree on the host.
             if ($host !== $publicHost || self::host($url) !== $publicHost || self::hasBackslashInAuthority($url)) {
-                $withheld[$name] = $host ?? self::authorityOf($bare);
+                // The text before the `@` or the backslash can be userinfo, so it is not shown.
+                $withheld[$name] = $host === $publicHost ? self::READ_TWO_WAYS : ($host ?? self::authorityOf($bare));
 
                 return null;
             }
@@ -163,7 +166,8 @@ final class Tokens
 
     /**
      * The ambient tokens that {@see fromEnvironment()} withheld, by variable name: the issuer
-     * host, or the scheme and authority of an issuer that does not parse, without userinfo.
+     * host, the scheme and authority of an issuer that does not parse, without userinfo, or
+     * {@see READ_TWO_WAYS} for an issuer whose host the public host is in one reading only.
      *
      * @return array<string, string>
      */
