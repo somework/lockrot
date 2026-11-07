@@ -120,7 +120,7 @@ jobs:
         run: |
           sudo locale-gen tr_TR
           status=0
-          out=$(vendor/bin/phpunit -c phpunit9.xml.dist --colors=never --fail-on-skipped --filter 'testAnUpperCaseIParsesUnderTheTurkishLocale|testUpperCaseIsFoldedWithoutTheLocale|testLowerFoldsAnUpperCaseIUnderTheTurkishLocale|testAnUpperCaseIssuerHostNamesGithubComUnderTheTurkishLocale') || status=$?
+          out=$(vendor/bin/phpunit -c phpunit9.xml.dist --colors=never --fail-on-skipped --filter 'testAnUpperCaseIParsesUnderTheTurkishLocale|testUpperCaseIsFoldedWithoutTheLocale|testLowerFoldsAnUpperCaseIUnderTheTurkishLocale|testAnUpperCaseIssuerHostNamesGithubComUnderTheTurkishLocale|testExplainFindsAnUpperCaseNameUnderTheTurkishLocale') || status=$?
           echo "$out"
           [ "$status" -eq 0 ] && grep -q '^OK (' <<< "$out"
   # The tests rows exclude MoveCheckComposerOracleTest, or skip it on a composer/composer that

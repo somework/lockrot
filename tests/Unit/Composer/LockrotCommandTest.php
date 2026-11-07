@@ -559,6 +559,27 @@ final class LockrotCommandTest extends TestCase
         self::assertStringNotContainsString('packages checked', $display, 'the report itself is not printed');
     }
 
+    /** strtolower() follows LC_CTYPE before PHP 8.2: under tr_TR it folds `I` to the dotless `ı`. */
+    public function testExplainFindsAnUpperCaseNameUnderTheTurkishLocale(): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        $tester = $this->tester($this->loader());
+        $previous = setlocale(\LC_CTYPE, '0');
+        if (setlocale(\LC_CTYPE, 'tr_TR.ISO8859-9', 'tr_TR.ISO-8859-9', 'tr_TR', 'tr_TR.UTF-8') === false) {
+            self::markTestSkipped('No Turkish locale is installed.');
+        }
+
+        try {
+            $code = $tester->execute(['--explain' => 'DOCTRINE/ANNOTATIONS', '--target-php' => '8.4', '--fail-on' => 'stale']);
+        } finally {
+            setlocale(\LC_CTYPE, $previous === false ? 'C' : $previous);
+        }
+
+        $display = $tester->getDisplay();
+        self::assertSame(0, $code, $display);
+        self::assertStringStartsWith('doctrine/annotations ', $display);
+    }
+
     public function testExplainAsJsonCarriesTheFindingAndTheFacts(): void
     {
         chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');

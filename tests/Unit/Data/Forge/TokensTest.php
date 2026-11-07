@@ -87,7 +87,10 @@ final class TokensTest extends TestCase
     public function testAnUpperCaseIssuerHostNamesGithubComUnderTheTurkishLocale(): void
     {
         $previous = setlocale(\LC_CTYPE, '0');
-        setlocale(\LC_CTYPE, 'tr_TR.ISO8859-9', 'tr_TR.ISO-8859-9', 'tr_TR', 'tr_TR.UTF-8');
+        if (setlocale(\LC_CTYPE, 'tr_TR.ISO8859-9', 'tr_TR.ISO-8859-9', 'tr_TR', 'tr_TR.UTF-8') === false) {
+            self::markTestSkipped('No Turkish locale is installed.');
+        }
+
         try {
             $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GH_HOST' => 'GITHUB.COM', 'GITHUB_SERVER_URL' => 'https://GITHUB.COM'], null);
         } finally {
