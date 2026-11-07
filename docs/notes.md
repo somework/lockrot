@@ -37,6 +37,7 @@ do, what each gap does to findings, and what to do about it.
 | [`ignore_does_not_cover_advisories`](#ignore_does_not_cover_advisories) | An `ignore[]` entry matches a package with a counted advisory | no | None: the advisories count | Accept the advisory in Composer's audit policy, if that is the decision ([accepting advisories](verdicts.md#accepting-advisories)) |
 | [`not_from_composer_repository`](#not_from_composer_repository) | Some packages come from no Composer repository, and lockrot does not check them | no | `from_composer_repository` is false. S10 `not_from_composer_repository` on a vcs or unknown origin | Nothing on the project's side. A `type: composer` repository's operator can make it advertise a notify URL |
 | [`package_name_invalid`](#package_name_invalid) | Some lock entries carry a name that is no Composer package name | no | Those entries get no finding | Check the lock entries that the note's `packages` names |
+| [`command_argument_unsafe`](#command_argument_unsafe) | A release name that a command quotes holds a pipe, `<` or `>` | no | Those moves have no command. Every other field stays | Take the release from the move's `version`, and write the command for your shell yourself |
 
 ## <a name="reading-a-note"></a>Reading a note {#reading-a-note}
 
@@ -425,6 +426,20 @@ them.
 
 - `data`: `packages`, the names from the lock or the transaction, lowercased as Composer reads them.
 - Findings: the entries have none.
+- `sets_network_failures`: no.
+
+### Command argument unsafe {#command_argument_unsafe}
+
+A move quotes a version or a branch name in its command. When that name holds `|`, `<` or `>`,
+cmd.exe and PowerShell run or redirect it, so lockrot prints no command for the move. The move's
+`commands[]` is `[]`, and its text ends with "; lockrot prints no command, because its release name
+holds |, < or >". The move check still runs. The text of the note counts the moves.
+
+- `data`: `moves`, a list with at least one entry `{package, version}`, in finding order, with
+  `next_step` before `also[]`. `version` is the name that holds the character, as the repository
+  writes it.
+- Findings: the moves have no command. The `update now:` line and `run.php_window.target_fix.command`
+  quote package names only, so this note does not change them.
 - `sets_network_failures`: no.
 
 ## Related

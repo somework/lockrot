@@ -745,6 +745,14 @@ shows. The gitlab report
 carries no run notes, so read the `moves_not_checked` note that a move points at in another
 format.
 
+!!! warning
+    Do not paste a printed POSIX line into cmd.exe or PowerShell. These shells parse `|`, `<`, `>` and
+    `^` in a single-quoted argument of a `.bat` or `.cmd` target such as `composer.bat`, so a
+    pasted line can run another program or write a file. When an argument that comes from a
+    version or a branch name holds `|`, `<` or `>`, lockrot prints no command for that move. The
+    move's `commands[]` is `[]`, its text says why, and the run note
+    [`command_argument_unsafe`](notes.md#command_argument_unsafe) counts such moves.
+
 ### <a name="the-move-check"></a>The move check {#the-move-check}
 
 lockrot asks Composer's own solver about every move that runs a Composer request: the lead move,
