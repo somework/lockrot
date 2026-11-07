@@ -134,9 +134,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   sending the runner's token, when a setup step writes it into `github-oauth`. Action: if you put a github.com or gitlab.com token in
   `GITHUB_TOKEN` or `GITLAB_TOKEN` on such a runner, move it to `LOCKROT_GITHUB_TOKEN` or
   `LOCKROT_GITLAB_TOKEN`. ([Which credentials](docs/internals.md#which-credentials))
-- **CLI:** an issuer variable whose URL holds a backslash before `@` names no public host, so
-  lockrot withholds the ambient token from the public host. A browser and a URL parser read such a
-  URL as different hosts. ([Which credentials](docs/internals.md#which-credentials))
 - **Breaking:** **Baseline:** `--generate-baseline` refuses a baseline path named `composer.json`
   or `composer.lock`, a file that `COMPOSER` names, or a name with a colon or a trailing dot or
   space. It exits 2 on every OS, so it never writes over the project's Composer files. Action: if
@@ -147,6 +144,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   S10 and the run note `advisories_not_checked` name `composer_json_invalid`. `--fail-on=unchecked`
   then exits 1. Action: fix `composer.json` until `composer validate` passes.
   ([Run notes](docs/notes.md#advisories_not_checked))
+- **Config:** an issuer variable (`GITHUB_SERVER_URL`, `GH_HOST` and the others) whose URL holds a
+  backslash in the host part, or an `@` in the path, query or fragment, names no public host. A
+  browser and a URL parser read such a URL as different hosts, so lockrot withholds the ambient
+  token, and `-v` names "an issuer that URL parsers read two ways". Action: correct that variable.
+  ([Which credentials](docs/internals.md#which-credentials))
 - **All formats:** advisories are looked up by name for every package the run checks (packages-dev
   with `--dev`), so the names of packages from vcs, a path, an archive or an origin lockrot cannot
   tell now reach each Composer repository that publishes advisories. Action: set
