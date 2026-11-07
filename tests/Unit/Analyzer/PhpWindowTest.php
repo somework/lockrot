@@ -318,6 +318,26 @@ final class PhpWindowTest extends TestCase
         self::assertSame('8.4.1', $window['without_dev']['lower_edge']['php']);
     }
 
+    /** The pin 8.4.1-p1 is above 8.4.1, so the edge is read at 8.4.1: `>=8.4.1` holds there and is no `set_by`. */
+    public function testASuffixedPinEdgeIsReadAtItsOwnRelease(): void
+    {
+        $window = self::window(['packages' => [self::package('acme/a', ['php' => '>8.4.1']), self::package('acme/b', ['php' => '>=8.4.1'])], 'packages-dev' => []], ['config' => ['platform' => ['php' => '8.4.1-p1']]], '8.4');
+
+        self::assertNotNull($window['without_dev']['lower_edge']);
+        self::assertSame('8.4.1', $window['without_dev']['lower_edge']['php']);
+        self::assertSame(['>8.4.1'], array_column($window['without_dev']['lower_edge']['set_by'], 'constraint'));
+    }
+
+    /** No patch up to PhpFloor::NEWEST_PATCH installs, so the pin 8.4.101 is the edge, read at 8.4.100. */
+    public function testAPinAboveTheNewestPatchIsReadAtThePatchBelowIt(): void
+    {
+        $window = self::window(['packages' => [self::package('acme/a', ['php' => '>8.4.99']), self::package('acme/b', ['php' => '!=8.4.100'])], 'packages-dev' => []], ['config' => ['platform' => ['php' => '8.4.101']]], '8.4');
+
+        self::assertNotNull($window['without_dev']['lower_edge']);
+        self::assertSame('8.4.101', $window['without_dev']['lower_edge']['php']);
+        self::assertSame(['!=8.4.100'], array_column($window['without_dev']['lower_edge']['set_by'], 'constraint'));
+    }
+
     /** R3-6: config.platform.php 8.2.0 and a floor of 8.2.1. PHP 8.2.1 installs the lock, so 8.2 is in and is the lower edge. */
     public function testAPatchFloorInsideTheTargetMinorIsTheLowerEdge(): void
     {

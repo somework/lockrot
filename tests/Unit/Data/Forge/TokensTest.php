@@ -172,6 +172,23 @@ final class TokensTest extends TestCase
         self::assertSame(['GITHUB_TOKEN' => 'https://ghe.example:99999'], $withheld);
     }
 
+    /** @return iterable<string, array{string, string}> */
+    public static function unparseableIssuersWithUserinfo(): iterable
+    {
+        yield 'a user and a password' => ['https://ci:SECRETVALUE@ghe.example:99999', 'https://ghe.example:99999'];
+        yield 'an empty userinfo' => ['https://@ghe.example:99999', 'https://ghe.example:99999'];
+        yield 'a scheme in capitals' => ['HTTPS://ci:SECRETVALUE@ghe.example:99999', 'HTTPS://ghe.example:99999'];
+    }
+
+    /**
+     * @dataProvider unparseableIssuersWithUserinfo
+     */
+    #[DataProvider('unparseableIssuersWithUserinfo')]
+    public function testAnUnparseableIssuerIsWithheldAsItsSchemeAndAuthority(string $issuer, string $expected): void
+    {
+        self::assertSame(['GITHUB_TOKEN' => $expected], Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => $issuer], null)->withheld());
+    }
+
     public function testAnIssuerWithUserinfoIsJudgedByItsHost(): void
     {
         $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => 'https://ci:12/CRET@ghe.example.com'], null);
