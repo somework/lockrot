@@ -322,6 +322,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   two-decimal values. 0.13 rounded the sum of the unrounded values, so a total can move by up to
   0.05 on the upgrade with no data change. Action: reset a tracked baseline of `.libyears.total`
   at the first 0.14 run. ([Libyears](docs/schema.md#libyears))
+- **Baseline:** a check run refuses a baseline-2 file whose `score_model_id` is not this lockrot's
+  score model, and exits 2 with a configuration error that names both ids. Action: run
+  `--generate-baseline`, or run the lockrot that wrote the file. `--generate-baseline` over it
+  writes this lockrot's id. ([Baseline](docs/baseline.md#a-baseline-from-a-newer-lockrot))
 - **All formats:** when Composer's `config.lock` is false, the move check is `not_checked` with
   `lock_disabled`, and no move has a command. Composer refuses a partial update without a lock.
   ([The move check](docs/verdicts.md#the-move-check))
@@ -493,9 +497,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **CLI:** only a real credential lifts the anonymous activity cap: a `github-oauth` token, a
-  bearer token, or an `Authorization` value in `http-basic` or `custom-headers`. A client
-  certificate or `custom-headers` without `Authorization` is anonymous, so the cap and the cause
-  `no_token` stay. ([Which credentials](docs/internals.md#which-credentials))
+  bearer token, or an `Authorization` or `PRIVATE-TOKEN` value in `http-basic` or
+  `custom-headers`, also for Bitbucket. A client certificate or `custom-headers` without such a
+  value is anonymous, so the cap and the cause `no_token` stay.
+  ([Which credentials](docs/internals.md#which-credentials))
 - **CLI, Config:** `--fail-on` and `LOCKROT_FAIL_ON` values are case-insensitive under any locale.
   ([CLI options](docs/configuration.md#cli-options))
 - **PHAR:** the archive ships the licence notices of its bundled libraries.

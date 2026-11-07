@@ -261,6 +261,11 @@ A newer lockrot can write a baseline with a higher `lockrot.schema`
 refuses such a file and exits `2`. Upgrade lockrot to its newest release. Keep the file, because a
 new file starts every `first_seen` and `known_since` again on the day of the run.
 
+A check run also refuses a baseline whose `score_model_id` differs from the score model of this
+lockrot, and exits `2` with a configuration error that names both ids. Regenerate the file with
+`--generate-baseline`, or run the lockrot that wrote it. `--generate-baseline` over such a file
+writes the id of this lockrot.
+
 ## Install time
 
 `install-time-strict` uses the same comparison: a `known` finding does not stop a
