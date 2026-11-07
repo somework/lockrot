@@ -71,7 +71,7 @@ What each value fails the run on, and which to start with, is in [In CI](ci.md).
 |---|---|---|
 | `--format=<format>` | Output format for stdout. Values as for the `format` key | `format` |
 | `--fail-on=<values>` | The values that make this run exit `1`, comma-separated. Values as for the `fail-on` key | `LOCKROT_FAIL_ON`, `fail-on` |
-| `--target-php=<version>` | PHP version the project runs on: a major, a minor or a patch, such as `8.4`. lockrot keeps only the minor: `8.4.2` reads as `8.4`, and `8` reads as `8.0`. The move check solves at the PHP that [its limits](verdicts.md#the-move-check) name. A value with text after the version is exit `2` | `LOCKROT_TARGET_PHP`, `target-php` |
+| `--target-php=<version>` | PHP version the project runs on: a major, a minor or a patch, such as `8.4`. lockrot keeps only the minor: `8.4.2` reads as `8.4`, and `8` reads as `8.0`. The move check solves at the PHP that [its limits](verdicts.md#the-move-check) name. A value with text after the version is exit `2`. A minor that lockrot does not know and that lies below the newest minor it knows, such as `7.5` or `6`, is exit `2` too | `LOCKROT_TARGET_PHP`, `target-php` |
 | `--dev` | Also check `packages-dev` | `include-dev` |
 | `--all` | List every checked package, not only graded ones (in `table`, under a final `not flagged` group) | — |
 | `--offline` | Never reach the network: repository metadata comes from Composer's cache, activity from lockrot's. lockrot reports a package that is missing from the cache as unavailable ([Working offline](internals.md#working-offline)) | — |

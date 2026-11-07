@@ -29,7 +29,9 @@ final class LockrotConfig
     /** The refusal of a value that {@see isTargetPhpValue()} does not take: the setting, then the value. */
     private const TARGET_PHP_VALUE = '%s takes a major, a minor or a patch version, such as "8.4" or "8.4.2", with nothing before or after it; got "%s"';
     /** The refusal of a target minor that is no PHP minor: the setting, the minor, the known minors, the newest one, then the value. */
-    private const TARGET_PHP_MINOR = '%s names PHP %s, which does not exist; the known PHP minors are %s, and a minor above %s is accepted; got "%s"';
+    /** A day after every GA date of the release data: its clock lists every minor that the data dates. */
+    private const AFTER_EVERY_GA = '9999-12-31T00:00:00+00:00';
+    private const TARGET_PHP_MINOR = '%s names PHP %s, which is not a PHP minor that lockrot knows. The known minors are %s, and lockrot accepts a minor above %s. Got "%s"';
 
     private ?string $project;
     private FailOn $failOn;
@@ -255,7 +257,7 @@ final class LockrotConfig
             throw new ConfigException(\sprintf(self::TARGET_PHP_VALUE, 'LOCKROT_TARGET_PHP', $fromEnv));
         }
         if (\is_string($fromEnv) && $fromEnv !== '') {
-            self::refuseUnknownMinor('LOCKROT_TARGET_PHP', $fromEnv, $env);
+            self::refuseUnknownMinor('LOCKROT_TARGET_PHP', $fromEnv);
         }
         [$target, $source] = self::pickWithSource([
             RunSettings::SOURCE_OPTION => $cli['target-php'] ?? null,
@@ -271,24 +273,23 @@ final class LockrotConfig
         }
         $settings = [RunSettings::SOURCE_OPTION => '--target-php', RunSettings::SOURCE_CONFIG => 'extra.lockrot.target-php'];
         if (isset($settings[$source])) {
-            self::refuseUnknownMinor($settings[$source], $target, $env);
+            self::refuseUnknownMinor($settings[$source], $target);
         }
 
         return [PhpReleaseDates::minorOf($target), $source];
     }
 
     /**
-     * A minor below the newest known one that the release data does not list is no PHP, and no
-     * PHP window lists it. A minor above the newest known one can be a PHP that the data predates.
-     *
-     * @param array<string, mixed> $env
+     * No PHP window lists a minor that the release data does not list and that lies below its
+     * newest minor. A minor above the newest one can be a PHP that the data predates. The data, not
+     * the run's clock, sets the known minors, so a value is valid on every date.
      *
      * @throws ConfigException for a minor that is neither known nor above the newest known one
      */
-    private static function refuseUnknownMinor(string $setting, string $value, array $env): void
+    private static function refuseUnknownMinor(string $setting, string $value): void
     {
         $minor = PhpReleaseDates::minorOf($value);
-        $known = PhpReleaseDates::load()->minors(Clock::fromEnvironment($env));
+        $known = PhpReleaseDates::load()->minors(new Clock(new \DateTimeImmutable(self::AFTER_EVERY_GA)));
         $newest = $known === [] ? null : $known[\count($known) - 1];
         if ($newest === null || \in_array($minor, $known, true) || version_compare($minor, $newest, '>')) {
             return;

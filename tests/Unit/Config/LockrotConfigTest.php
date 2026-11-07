@@ -243,8 +243,9 @@ final class LockrotConfigTest extends TestCase
     }
 
     /**
-     * Ruling R14-2: a target minor that is no PHP minor and lies below the newest known one sits on
-     * no window minor. `6` reads as 6.0, and `7.5.3` as 7.5.
+     * Ruling R14-2: a target minor that the PHP release data does not list and that lies below its
+     * newest minor sits on no window minor. `6` reads as 6.0, and `7.5.3` as 7.5. The data, not the
+     * clock, sets the known minors, so the refusal holds on every date.
      *
      * @dataProvider targetPhpsThatAreNoPhpMinor
      *
@@ -256,8 +257,8 @@ final class LockrotConfigTest extends TestCase
     public function testATargetPhpThatIsNoKnownPhpMinorIsRefused(array $extra, array $env, array $cli, string $setting, string $minor, string $value): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage($setting.' names PHP '.$minor.', which does not exist; the known PHP minors are 5.3, 5.4, 5.5, 5.6, 7.0, 7.1, 7.2, 7.3, 7.4, 8.0, 8.1, 8.2, 8.3, 8.4 and 8.5, and a minor above 8.5 is accepted; got "'.$value.'"');
-        LockrotConfig::fromSources($extra, ['LOCKROT_TODAY' => '2026-09-14'] + $env, $cli, '8.5.10', null);
+        $this->expectExceptionMessage($setting.' names PHP '.$minor.', which is not a PHP minor that lockrot knows. The known minors are 5.3, 5.4, 5.5, 5.6, 7.0, 7.1, 7.2, 7.3, 7.4, 8.0, 8.1, 8.2, 8.3, 8.4, 8.5 and 8.6, and lockrot accepts a minor above 8.6. Got "'.$value.'"');
+        LockrotConfig::fromSources($extra, ['LOCKROT_TODAY' => '2019-06-01'] + $env, $cli, '8.5.10', null);
     }
 
     /** @return iterable<string, array{array<string, mixed>, array<string, mixed>, array<string, mixed>, string, string, string}> */
@@ -268,6 +269,8 @@ final class LockrotConfigTest extends TestCase
         yield 'the option at 6.0' => [[], [], ['target-php' => '6.0'], '--target-php', '6.0', '6.0'];
         yield 'the option at the major 6' => [[], [], ['target-php' => '6'], '--target-php', '6.0', '6'];
         yield 'the option below the first known minor' => [[], [], ['target-php' => '5.2'], '--target-php', '5.2', '5.2'];
+        yield 'the option at a PHP 4 minor' => [[], [], ['target-php' => '4.4'], '--target-php', '4.4', '4.4'];
+        yield 'the option at a minor above the newest one that the clock dates' => [[], [], ['target-php' => '7.9'], '--target-php', '7.9', '7.9'];
         yield 'the variable at 7.5' => [[], ['LOCKROT_TARGET_PHP' => '7.5'], [], 'LOCKROT_TARGET_PHP', '7.5', '7.5'];
         yield 'the variable under an option that wins' => [[], ['LOCKROT_TARGET_PHP' => '6.0'], ['target-php' => '8.4'], 'LOCKROT_TARGET_PHP', '6.0', '6.0'];
         yield 'the config key at 6.0' => [['target-php' => '6.0'], [], [], 'extra.lockrot.target-php', '6.0', '6.0'];
@@ -275,14 +278,14 @@ final class LockrotConfigTest extends TestCase
 
     /**
      * Ruling R12-4 keeps a minor above the newest known one: a PHP that the release data does not
-     * list yet.
+     * list yet. The check reads no clock, so a LOCKROT_TODAY that is no date does not stop it.
      *
      * @dataProvider targetPhpsThatAreKnownOrNewer
      */
     #[DataProvider('targetPhpsThatAreKnownOrNewer')]
     public function testATargetPhpThatIsAKnownOrANewerMinorIsAccepted(string $value, string $minor): void
     {
-        $env = ['LOCKROT_TODAY' => '2026-09-14'];
+        $env = ['LOCKROT_TODAY' => 'not a date'];
 
         self::assertSame(
             [$minor, $minor, $minor],
@@ -298,8 +301,8 @@ final class LockrotConfigTest extends TestCase
     public static function targetPhpsThatAreKnownOrNewer(): iterable
     {
         yield 'the first known minor' => ['5.3', '5.3'];
-        yield 'the newest known minor' => ['8.5.2', '8.5'];
-        yield 'a minor that the data dates after the clock' => ['8.6', '8.6'];
+        yield 'a patch of a known minor' => ['8.5.2', '8.5'];
+        yield 'the newest minor that the data lists, dated after the run' => ['8.6', '8.6'];
         yield 'a minor above the newest known one' => ['8.9', '8.9'];
         yield 'a major above the newest known minor' => ['9', '9.0'];
     }
