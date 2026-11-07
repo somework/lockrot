@@ -88,13 +88,17 @@ final class ServiceFactory
     public static function bitbucketAuthorizer(IOInterface $io, Config $config, Deadline $deadline, ?callable $downloaderFactory = null): callable
     {
         return static function () use ($io, $config, $deadline, $downloaderFactory): bool {
+            // AuthHelper takes the entry of the API host first, so a header-less one there is the one that counts.
             if ($io->hasAuthentication('api.bitbucket.org')) {
-                return true;
+                return ForgeAuth::carriesCredential($io->getAuthentication('api.bitbucket.org'));
             }
             if (!$io->hasAuthentication('bitbucket.org')) {
                 return false;
             }
             $auth = $io->getAuthentication('bitbucket.org');
+            if (!ForgeAuth::carriesCredential($auth)) {
+                return false;
+            }
             $consumers = $config->get('bitbucket-oauth');
             $consumer = \is_array($consumers) ? ($consumers['bitbucket.org'] ?? null) : null;
             $consumerKey = \is_array($consumer) ? ($consumer['consumer-key'] ?? null) : null;

@@ -247,6 +247,30 @@ final class ServiceFactoryTest extends TestCase
         self::assertTrue(ServiceFactory::bitbucketAuthorizer($io, $config, Deadline::never(), $never)(), 'credentials under the API host count too');
     }
 
+    /** A client certificate or credential-less custom headers add no header, so they authorize nothing. */
+    public function testTheBitbucketAuthorizerNeedsARealCredential(): void
+    {
+        $never = static function (): HttpDownloader {
+            self::fail('no exchange expected');
+        };
+        $entries = [
+            'client certificate' => ['client-certificate', 'x'],
+            'custom headers without a credential' => ['["X-Proxy-Tag: ci"]', 'custom-headers'],
+        ];
+        foreach (['api.bitbucket.org', 'bitbucket.org'] as $host) {
+            foreach ($entries as $name => [$username, $password]) {
+                $io = new NullIO();
+                $io->setAuthentication($host, $username, $password);
+
+                self::assertFalse(ServiceFactory::bitbucketAuthorizer($io, self::bitbucketConfig(), Deadline::never(), $never)(), $name.' under '.$host);
+            }
+        }
+
+        $io = new NullIO();
+        $io->setAuthentication('bitbucket.org', '["Authorization: Bearer t"]', 'custom-headers');
+        self::assertTrue(ServiceFactory::bitbucketAuthorizer($io, self::bitbucketConfig(), Deadline::never(), $never)(), 'custom Authorization header');
+    }
+
     /** The consumer pair becomes the bearer token AuthHelper sends, and nothing is written anywhere. */
     public function testTheBitbucketAuthorizerExchangesTheConsumerForABearerTokenInTheIo(): void
     {
