@@ -57,7 +57,7 @@ final class ExplainFormatter
             $this->header($finding, $explanation),
             [''],
             self::block('age', AgeText::block($finding, $explanation->thresholds())),
-            [self::escape('repository '.self::repositoryLine($finding))],
+            [self::escape(self::repositoryLabelled(self::repositoryLine($finding)))],
             [''],
             $this->score($finding),
             [''],
@@ -119,6 +119,12 @@ final class ExplainFormatter
         return $via.' from the nearest composer.json line'.($namedIn === [] ? '; no line of composer.json names it' : '');
     }
 
+    /** A repository line that names its own subject keeps its words, any other gets the `repository` label. */
+    private static function repositoryLabelled(string $line): string
+    {
+        return preg_match('/^(lockrot cannot ask|repository activity) /', $line) === 1 ? $line : 'repository '.$line;
+    }
+
     /** The repository line, from `activity` and `age.push`. */
     public static function repositoryLine(Finding $finding): string
     {
@@ -128,10 +134,10 @@ final class ExplainFormatter
         $reason = FindingBlock::checkWords($finding, (string) $lookup->reason());
         if ($lookup->status() === ActivityLookup::NOT_READ) {
             if ($lookup->reason() === ActivityLookup::HOST_NOT_SUPPORTED) {
-                return $where->host().': lockrot cannot ask this host about activity';
+                return 'lockrot cannot ask '.$where->host().' about repository activity';
             }
 
-            return $ref === null ? 'activity not asked ('.$reason.')' : $ref->host().'/'.$ref->path().': not asked ('.$reason.')';
+            return $ref === null ? 'repository activity not asked ('.$reason.')' : $ref->host().'/'.$ref->path().': not asked ('.$reason.')';
         }
         $name = $ref === null ? $where->host() : $ref->forgeLabel().' '.$ref->host().'/'.$ref->path();
         if ($lookup->status() === ActivityLookup::NOT_FOUND) {
