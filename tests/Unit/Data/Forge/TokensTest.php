@@ -189,6 +189,26 @@ final class TokensTest extends TestCase
         self::assertSame(['GITHUB_TOKEN' => $expected], Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => $issuer], null)->withheld());
     }
 
+    /** @return iterable<string, array{string, string}> */
+    public static function issuersWithThePublicHostAfterAnAt(): iterable
+    {
+        yield 'in the path' => ['GITHUB_SERVER_URL', 'https://ghe.corp/@github.com'];
+        yield 'in the query' => ['GITHUB_SERVER_URL', 'https://ghe.corp?x=@github.com'];
+        yield 'in the fragment of a bare host' => ['GH_HOST', 'ghe.corp#@github.com'];
+    }
+
+    /**
+     * @dataProvider issuersWithThePublicHostAfterAnAt
+     */
+    #[DataProvider('issuersWithThePublicHostAfterAnAt')]
+    public function testAnIssuerIsWithheldWhenItsHostIsNotPublicInEitherReadingOfItsAt(string $variable, string $issuer): void
+    {
+        $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'SECRET', $variable => $issuer], null);
+
+        self::assertNull($tokens->github());
+        self::assertArrayHasKey('GITHUB_TOKEN', $tokens->withheld());
+    }
+
     public function testAnIssuerWithUserinfoIsJudgedByItsHost(): void
     {
         $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => 'https://ci:12/CRET@ghe.example.com'], null);
