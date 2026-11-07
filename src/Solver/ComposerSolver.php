@@ -209,21 +209,37 @@ final class ComposerSolver
         foreach ($answer->getNewLockPackages(false) as $package) {
             $installed[$package->getName()] = $package->getVersion();
         }
-        $lost = [];
+        $queue = [];
         foreach ($pool->getPackages() as $package) {
-            $base = $package instanceof AliasPackage ? $package->getAliasOf() : $package;
-            $chosen = $installed[$base->getName()] ?? null;
-            if (($chosen !== null && Comparator::lessThanOrEqualTo($base->getVersion(), $chosen)) || !$this->isInstallable($package, $pool, $unreached)) {
+            $chosen = $installed[self::baseOf($package)->getName()] ?? null;
+            if ($chosen !== null && Comparator::greaterThan(self::baseOf($package)->getVersion(), $chosen)) {
+                $queue[] = $package;
+            }
+        }
+        // A package that the solve does not install counts only when a counted release requires it.
+        $counted = [];
+        $lost = [];
+        while (($package = array_pop($queue)) !== null) {
+            if (isset($counted[spl_object_id($package)]) || !$this->isInstallable($package, $pool, $unreached)) {
                 continue;
             }
+            $counted[spl_object_id($package)] = true;
             foreach ($package->getRequires() as $name => $link) {
-                if (\in_array($name, $unreached, true) && array_filter($pool->whatProvides($name, $link->getConstraint()), fn (BasePackage $provider): bool => $this->isInstallable($provider, $pool, $unreached)) === []) {
+                $providers = $pool->whatProvides($name, $link->getConstraint());
+                if (!\in_array($name, $unreached, true)) {
+                    $queue = array_merge($queue, array_filter($providers, static fn (BasePackage $provider): bool => !isset($installed[self::baseOf($provider)->getName()])));
+                } elseif (array_filter($providers, fn (BasePackage $provider): bool => $this->isInstallable($provider, $pool, $unreached)) === []) {
                     $lost[$name] = true;
                 }
             }
         }
 
         return array_filter($failures, static fn (string $failure, string $name): bool => $failure !== VersionSource::UNREACHED || isset($lost[$name]), \ARRAY_FILTER_USE_BOTH);
+    }
+
+    private static function baseOf(BasePackage $package): BasePackage
+    {
+        return $package instanceof AliasPackage ? $package->getAliasOf() : $package;
     }
 
     /**

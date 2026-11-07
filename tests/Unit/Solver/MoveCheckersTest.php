@@ -467,6 +467,57 @@ final class MoveCheckersTest extends TestCase
         yield 'an unreached name on a release below the one that the solve installs' => [['1.1.0' => ['acme/private' => '^1.0'], '1.2.0' => [], '1.3.0' => ['php' => '>=9.0']], '1.3.0', [MoveCheck::RESOLVES, null, '1.2.0']];
     }
 
+    /**
+     * A package that the solve does not install counts only when a release that the solve could
+     * install requires it, directly or through another such package.
+     *
+     * @dataProvider unreachedThroughAnotherPackage
+     *
+     * @param array<string, array<string, string>> $lib   the releases of acme/lib above 1.0.0, by version, with their requirements
+     * @param array<string, array<string, string>> $other the packages that the lock does not hold, by name, each at 1.0.0 with its requirements
+     * @param array{string, ?string, ?string}      $expected
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('unreachedThroughAnotherPackage')]
+    public function testAnUnreachedNameCountsOnlyThroughAReleaseThatTheSolveCouldInstall(array $lib, array $other, array $expected): void
+    {
+        $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0'] + $packagist]]);
+        $loader = new ArrayLoader();
+        $remote = [$loader->load(['name' => 'acme/lib', 'version' => '1.0.0'])];
+        foreach ($lib as $version => $require) {
+            $remote[] = $loader->load(['name' => 'acme/lib', 'version' => $version, 'require' => $require]);
+        }
+        foreach ($other as $name => $require) {
+            $remote[] = $loader->load(['name' => $name, 'version' => '1.0.0', 'require' => $require]);
+        }
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
+        $checker = MoveCheckers::forProject(self::root(['acme/lib' => '^1.0']), $lock, ProjectConfig::empty(), new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
+
+        $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
+
+        self::assertSame($expected, [$check->result(), $check->reason(), $check->installs()]);
+    }
+
+    /** @return iterable<string, array{array<string, array<string, string>>, array<string, array<string, string>>, array{string, ?string, ?string}}> */
+    public static function unreachedThroughAnotherPackage(): iterable
+    {
+        yield 'a package that only a release below the installed one requires' => [
+            ['1.1.0' => ['acme/old' => '^1.0'], '1.2.0' => []],
+            ['acme/old' => ['acme/private' => '^1.0']],
+            [MoveCheck::RESOLVES, null, '1.2.0'],
+        ];
+        yield 'a package that a release above the installed one requires' => [
+            ['1.1.0' => [], '1.2.0' => ['acme/new' => '^1.0']],
+            ['acme/new' => ['acme/private' => '^1.0']],
+            [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, null],
+        ];
+        yield 'a package two steps from a release above the installed one' => [
+            ['1.1.0' => [], '1.2.0' => ['acme/new' => '^1.0']],
+            ['acme/new' => ['acme/deep' => '^1.0'], 'acme/deep' => ['acme/private' => '^1.0']],
+            [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, null],
+        ];
+    }
+
     /** docs/verdicts.md, move-check limits: a solve that needs another release of a vcs-locked name proves nothing. */
     public function testAMoveThatNeedsAnotherReleaseOfAVcsLockedNameIsNotChecked(): void
     {
