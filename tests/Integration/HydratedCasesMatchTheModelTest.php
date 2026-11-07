@@ -442,6 +442,8 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         $report = JsonPath::decodeFile(self::CONTRACT.'report-2/'.$name.'.json');
         $explain = JsonPath::decodeFile(self::CONTRACT.'explain-2/'.$name.'.json');
         $lockrot = self::documentOf(self::findingOf($report, JsonPath::stringAt($case, ['finding', 'package'])), JsonPath::arrayAt($report, ['run']), self::branchesOf($explain));
+        $modelDocument = $model;
+        $lockrotDocument = $lockrot;
         $listed = [];
         foreach (self::DIFFERENCES[$id][$line] ?? [] as [$paths]) {
             foreach ($paths as $path) {
@@ -476,6 +478,45 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             if ($reason === self::IF_APPLIED) {
                 ModelBounds::assertWithinTheModelsBound(JsonPath::arrayAt($model, ['details', 'metadata', 'branches']), JsonPath::arrayAt($lockrot, ['details', 'metadata', 'branches']), $id.' '.$line);
             }
+            if ($reason === self::PHP_STAR) {
+                $moves = array_merge([JsonPath::arrayAt($lockrotDocument, ['next_step'])], array_map([JsonPath::class, 'decoded'], JsonPath::arrayAt($lockrotDocument, ['next_step', 'also'])));
+                ModelBounds::assertTheHoldersStepNamesItsNewestLine($moves, JsonPath::arrayAt(CaseHydrator::case($id), ['inputs', 'packages']), $id.' '.$line);
+            }
+            if ($reason === self::BITBUCKET) {
+                ModelBounds::assertNoArchivedReasonOnBitbucket($modelDocument, $lockrotDocument, $id.' '.$line);
+            }
+            if ($reason === self::TIE) {
+                self::assertTheTieRelations($paths, $modelDocument, $lockrotDocument, $id.' '.$line);
+            }
+            if ($reason === self::NO_SOLVER_WORLD) {
+                self::assertNull(JsonPath::arrayAt($case, ['inputs'])['solver_world'] ?? null, $id.' '.$line.': the case has solver inputs');
+                self::assertIsArray(JsonPath::arrayAt($modelDocument, ['run'])['move_check'] ?? null, $id.' '.$line.': the model writes a move check');
+                self::assertTrue(JsonPath::has($lockrotDocument, ['run', 'move_check']) && JsonPath::arrayAt($lockrotDocument, ['run'])['move_check'] === null, $id.' '.$line.': lockrot writes none');
+            }
+        }
+    }
+
+    /**
+     * @param list<string>        $paths
+     * @param array<mixed, mixed> $model
+     * @param array<mixed, mixed> $lockrot
+     */
+    private static function assertTheTieRelations(array $paths, array $model, array $lockrot, string $message): void
+    {
+        $starts = static fn (string $prefix): bool => array_filter($paths, static fn (string $path): bool => strpos($path, $prefix) === 0) !== [];
+        if (\in_array('signals[S5]', $paths, true)) {
+            self::assertArrayNotHasKey('S5', JsonPath::arrayAt($model, ['signals']), $message);
+            self::assertArrayHasKey('S5', JsonPath::arrayAt($lockrot, ['signals']), $message);
+        }
+        if (\in_array('flags[old-promise]', $paths, true)) {
+            self::assertArrayNotHasKey('old-promise', JsonPath::arrayAt($model, ['flags']), $message);
+            self::assertArrayHasKey('old-promise', JsonPath::arrayAt($lockrot, ['flags']), $message);
+        }
+        if ($starts('score.')) {
+            ModelBounds::assertTheScoreAddsTheOldPromiseTerm($model, $lockrot, $message);
+        }
+        if ($starts('next_step.unverified')) {
+            ModelBounds::assertTheMoveCountsOldPromise($model, $lockrot, $message);
         }
     }
 

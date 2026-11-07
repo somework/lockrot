@@ -431,6 +431,9 @@ final class MoveContractTest extends TestCase
             if ($reason === self::DATED) {
                 ModelBounds::assertWithinTheModelsBound($goldenRows, $lockrotRows, $id);
             }
+            if ($reason === self::TIE) {
+                ModelBounds::assertTheMoveCountsOldPromise($golden, $lockrot, $id);
+            }
         }
     }
 
