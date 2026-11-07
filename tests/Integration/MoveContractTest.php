@@ -589,7 +589,7 @@ final class MoveContractTest extends TestCase
         $commands = JsonPath::arrayAt($move, ['commands']);
         $quotes = \in_array($move['kind'], ['update', 'require', 'raise-php', 'tag'], true);
         // SPEC §5.6: a quoted release name with a shell operator, or a lock that Composer ignores, leaves the move no step.
-        if (($quotes && preg_match('{[|<>]}', ((string) $move['version']).((string) $move['constraint'])) === 1) || (\is_array($check) && $check['reason'] === 'lock_disabled')) {
+        if (($quotes && preg_match('{[|<>]}', (\is_string($move['version']) ? $move['version'] : '').(\is_string($move['constraint']) ? $move['constraint'] : '')) === 1) || (\is_array($check) && $check['reason'] === 'lock_disabled')) {
             self::assertSame([], $commands, JsonPath::stringAt($move, ['kind']).' has no step');
 
             return;
