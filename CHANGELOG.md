@@ -152,7 +152,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   step with a version, branch or name from the lock or a repository outside it is left out, so a
   hostile lock cannot inject into a pasted command. A release name that holds `|`, `<` or `>` leaves
   out the whole move's command, because cmd.exe and PowerShell run or redirect it. The run note
-  `command_argument_unsafe` counts such moves. This affects a reader who copies these commands. Action: if a step is missing,
+  `command_argument_unsafe` counts such moves. Such a move is no `security.update_now` member, and
+  the other members are solved without it. This affects a reader who copies these commands. Action: if a step is missing,
   check that lock entry before you write the command by hand. ([The move](docs/schema.md#the-move))
 - **CLI:** a repository host's redirect to another origin no longer receives lockrot's
   `Authorization` or `PRIVATE-TOKEN` header. lockrot asks the redirect target again without it. A
