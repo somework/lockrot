@@ -113,7 +113,10 @@ grows in minor releases. These are the ones that a reader meets most:
   `run.advisory_lookup.repositories[]`
 - in report-2, the `reason` of a move's `check`, of `run.move_check` and of
   `run.php_window.target_fix`
-- in report-2, the words of `run.score_model`
+- in report-2, the words of `run.score_model`, and the keys of `run.score_rules_used`: `counted`,
+  `lead-first`, `corroborating-share`, `advisory-points`, `no-reachable-fix-multiplier`,
+  `security-max`, `divide-reach`, `security-exempt-from-reach`, `sum`, `divide-dev`, `floor-once`,
+  `band-floors`, `zero-verdicts`, `sort`, `gate-bounded-new` and `baseline-cover`
 - in report-2, the integers `divisor` of a maintenance score term, `multiplier` of the security
   term and `divide_by` of a modifier
 - the configuration's `format`, and format names wherever lockrot writes one.
@@ -128,8 +131,12 @@ How the schemas write an open set:
   Every known value matches the `pattern`, and the list only grows under one number. An integer
   set has no `pattern`: it is an `integer` with a `minimum`, and its `x-known-values` are integers.
 
-- A draft-04 validator ignores `x-known-values`, so your copy accepts a value that a later release
-  adds.
+- An open map, such as `run.score_rules_used`, has `patternProperties` for its keys and
+  `x-known-keys`, the keys that this release writes. A later release can add a key that the
+  pattern admits.
+
+- A draft-04 validator ignores `x-known-values` and `x-known-keys`, so your copy accepts a value or
+  a key that a later release adds.
 
 - The pattern for signal ids, note codes, origin kinds and formats also admits `<vendor>:<name>`,
   the form [reserved](compatibility.md#names-reserved-for-extensions) for names that do not come
@@ -149,6 +156,11 @@ How to read one:
 
 - To hold a document to the values you know, read `x-known-values` as an `enum`. lockrot reads it
   as an `enum` when it validates `extra.lockrot`, so a mistyped `format` is a configuration error.
+
+- To hold a document to the keys you know, read `x-known-keys` as the only properties of the map,
+  each typed by the `patternProperties` entry that its name matches. Set `additionalProperties` to
+  `false` and drop `patternProperties`. Without that, your strict copy accepts any key that the
+  pattern admits.
 
 The [closed sets](compatibility.md#closed-sets-and-their-order) stay closed. A new value in a
 closed set needs a new schema number.
