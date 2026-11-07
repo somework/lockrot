@@ -75,6 +75,19 @@ final class UnsafeCommandArgumentTest extends TestCase
         }
     }
 
+    /** A raw `|` in a markdown table cell starts another cell, so each row keeps the header's six cells. */
+    public function testAMarkdownRowWithAPipeInItsReleaseNameKeepsItsCells(): void
+    {
+        $markdown = self::formatted('v2.3.2+x|calc', 'v2.3.2', 'move-check‡')['markdown'];
+        $rows = array_values(array_filter(explode("\n", $markdown), static fn (string $line): bool => strncmp($line, '| ', 2) === 0));
+
+        self::assertStringContainsString('v2.3.2+x\\|calc', $markdown);
+        self::assertNotSame([], $rows);
+        foreach ($rows as $row) {
+            self::assertCount(8, preg_split('{(?<!\\\\)\|}', $row) ?: [], $row);
+        }
+    }
+
     /**
      * @dataProvider unsafeVersions
      */
