@@ -240,7 +240,7 @@ final class Libyears
 
             return $packages === 1 ? 'libyears: the one package could not be measured' : \sprintf('libyears: none of the %d packages could be measured', $packages);
         }
-        $head = \sprintf('libyears: %s%.1F behind across %s', $this->atLeast > 0 ? 'at least ' : '', $this->total, $this->scope($packages));
+        $head = \sprintf('libyears: %s%s behind across %s', $this->atLeast > 0 ? 'at least ' : '', self::tenths($this->total), $this->scope($packages));
         if ($this->worst === null) {
             return $head;
         }
@@ -249,9 +249,15 @@ final class Libyears
 
         return implode(' · ', [
             $head,
-            \sprintf('%.1F from direct requirements', $this->direct),
-            \sprintf('furthest behind %s %s at %.1F%s', $name === null ? $worst->package() : $name($worst->package()), $worst->version(), $behind, $worst->isLibyearsAtLeast() ? ' or more' : ''),
+            self::tenths($this->direct).' from direct requirements',
+            \sprintf('furthest behind %s %s at %s%s', $name === null ? $worst->package() : $name($worst->package()), $worst->version(), self::tenths($behind), $worst->isLibyearsAtLeast() ? ' or more' : ''),
         ]);
+    }
+
+    /** Half up, as `--explain` prints a finding's libyears: the double nearest 1.45 lies below it, and `%.1F` prints it 1.4. */
+    private static function tenths(float $libyears): string
+    {
+        return number_format($libyears, 1, '.', '');
     }
 
     private function scope(int $packages): string

@@ -408,6 +408,27 @@ final class LibyearsTest extends TestCase
         self::assertSame('libyears: 0.1 behind across all 2 packages · 0.1 from direct requirements · furthest behind a/a 1.0.0 at 0.0', $block->line());
     }
 
+    /**
+     * The footer rounds a written value half up to one decimal, as `--explain` does. The doubles
+     * nearest 1.45 and 0.15 lie below them, so a plain `%.1F` prints 1.4 and 0.1.
+     *
+     * @dataProvider halfwayValues
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('halfwayValues')]
+    public function testTheFooterLineRoundsAWrittenHalfUp(float $libyears, string $printed): void
+    {
+        $block = Libyears::fromFindings([self::finding('a/a', LibyearsMeasurement::of($libyears))]);
+
+        self::assertSame(\sprintf('libyears: %1$s behind across the one package · %1$s from direct requirements · furthest behind a/a 1.0.0 at %1$s', $printed), $block->line());
+    }
+
+    /** @return iterable<string, array{float, string}> */
+    public static function halfwayValues(): iterable
+    {
+        yield '1.45' => [1.45, '1.5'];
+        yield '0.15' => [0.15, '0.2'];
+    }
+
     public function testDirectCountsOnlyTheDirectRequirements(): void
     {
         $block = Libyears::fromFindings([self::finding('a/a', LibyearsMeasurement::of(4.0)), self::finding('b/b', LibyearsMeasurement::of(2.5), false)]);
