@@ -108,8 +108,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   name's stability admits dev, as Composer does. A repository with only that file no longer hides
   the tagged releases of a later repository, so an advisory fix that the solver refused can read
   `update` or `upgrade` instead of `blocked`. ([Move](docs/verdicts.md#move))
-- **All formats:** a resolving solve that uses a name that lockrot did not load gives `not_checked`
-  with `unloaded_name`, not `resolves`, so a move that read as checked can read as not checked.
+- **All formats:** a resolving solve reads `not_checked` with `unloaded_name` when a release that
+  it could install requires a package that no Composer repository lists and no loaded package
+  provides. It read `resolves` before, so a move that read as checked can read as not checked.
   ([The move check](docs/verdicts.md#the-move-check))
 
 ### Security
