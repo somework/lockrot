@@ -28,9 +28,9 @@ final class LockrotConfig
 
     /** The refusal of a value that {@see isTargetPhpValue()} does not take: the setting, then the value. */
     private const TARGET_PHP_VALUE = '%s takes a major, a minor or a patch version, such as "8.4" or "8.4.2", with nothing before or after it; got "%s"';
-    /** The refusal of a target minor that is no PHP minor: the setting, the minor, the known minors, the newest one, then the value. */
     /** A day after every GA date of the release data: its clock lists every minor that the data dates. */
     private const AFTER_EVERY_GA = '9999-12-31T00:00:00+00:00';
+    /** The refusal of a target minor that is no PHP minor: the setting, the minor, the known minors, the newest one, then the value. */
     private const TARGET_PHP_MINOR = '%s names PHP %s, which is not a PHP minor that lockrot knows. The known minors are %s, and lockrot accepts a minor above %s. Got "%s"';
 
     private ?string $project;

@@ -182,9 +182,8 @@ final class Libyears
     }
 
     /**
-     * Sum of the two-decimal values that report-2 writes per finding, added in whole hundredths so
-     * that the float error of a long sum stays out of it. Null when none was measured, which is not
-     * zero: nothing could be read.
+     * Sum of the two-decimal values that report-2 writes per finding, in whole hundredths, so that a
+     * long sum gets no float error. Null when no finding has a measurement, which is not zero.
      */
     public function total(): ?float
     {

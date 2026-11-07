@@ -430,10 +430,12 @@ maintainer.
            check that the rc tag of step 4 starts does not count, because its branch is the tag.
            Then delete the branch.
 
-           If the full check of V is red, V cannot pass the gate, because no later run can turn a
-           red run of V green. A pull request mutates only its changed lines, and a pull request
-           that changes the contract bundle skips its mutation shards until the re-vendor. So the
-           full check of V can be the first whole-tree run that fails. Fix the cause on the
+           If the full check of V fails on a runner or network fault, re-run its failed jobs in the
+           same workflow run first. If the full check of V is red on a defect, V cannot pass the
+           gate, because no later run can turn a red run of V green. A pull request mutates only
+           its changed lines, and a pull request that changes the contract bundle skips its
+           mutation shards until the re-vendor. So the full check of V can be the first whole-tree
+           run that fails. Fix the cause on the
            release branch, and move V to the commit whose full check is green. If the fix changes
            the contract bundle, do steps 1 to 3 again first. Then do steps 4 and 5 again for the
            new V. Give each new rc tag the next unused rc number of X.Y.Z, so the rc tag and the

@@ -399,7 +399,7 @@ final class LibyearsTest extends TestCase
 
     public function testTheFooterLinePrintsTheSumsThatTheJsonBlockWrites(): void
     {
-        // 0.035 is written as 0.04 and 0.0149 as 0.01: the written sum 0.05 prints 0.1, the unrounded 0.0499 would print 0.0.
+        // 0.035 is written as 0.04 and 0.0149 as 0.01: the written sum 0.05 prints 0.1, and the unrounded sum 0.0499 prints 0.0.
         $findings = [self::finding('a/a', LibyearsMeasurement::of(0.035)), self::finding('b/b', LibyearsMeasurement::of(0.0149))];
         $block = Libyears::fromFindings($findings);
         $json = Report2Root::toLibyearsArray($block, $findings);
