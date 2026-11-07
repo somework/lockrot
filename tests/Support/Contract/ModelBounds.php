@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Support\Contract;
 
 use Composer\Semver\Comparator;
 use Composer\Semver\Semver;
+use Composer\Semver\VersionParser;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\ScoreModel;
 use PHPUnit\Framework\Assert;
@@ -70,7 +71,7 @@ final class ModelBounds
 
     /**
      * With no project lowest PHP, the step of a holder names the holder's newest line: the line of its
-     * highest release, and a constraint on that release's minor.
+     * highest stable release, and a constraint on that release's minor.
      *
      * @param array<mixed, mixed>       $moves    the lead move and its also[] moves
      * @param array<mixed, mixed>       $packages a case's `inputs.packages`
@@ -85,10 +86,13 @@ final class ModelBounds
                 if (!\is_array($step)) {
                     continue;
                 }
-                $versions = array_map(
-                    static fn ($release): string => JsonPath::stringAt(JsonPath::decoded($release), ['version']),
-                    JsonPath::arrayAt($packages, [JsonPath::stringAt($held, ['package']), 'releases'])
-                );
+                $versions = array_values(array_filter(
+                    array_map(
+                        static fn ($release): string => JsonPath::stringAt(JsonPath::decoded($release), ['version']),
+                        JsonPath::arrayAt($packages, [JsonPath::stringAt($held, ['package']), 'releases'])
+                    ),
+                    static fn (string $version): bool => VersionParser::parseStability($version) === 'stable'
+                ));
                 Assert::assertNotSame([], $versions, $message.': no releases of the holder');
                 Assert::assertSame(2, sscanf(ltrim(Semver::rsort($versions)[0], 'v'), '%d.%d', $major, $minor), $message);
                 Assert::assertSame($major.'.x', $step['to_branch'], $message.': the holder\'s step is not on its newest line');
@@ -130,7 +134,10 @@ final class ModelBounds
             $modelHeadline = JsonPath::arrayAt($modelFlag, ['headline'])['value'] ?? null;
             if ($modelHeadline === 'archived') {
                 ++$dropped;
-                Assert::assertContains($headline, JsonPath::arrayAt($flag, ['degree', 'reasons']), $message.': '.$id.' headline');
+                // The headline names `archived` before `marked` (Finding::headline).
+                $remaining = JsonPath::arrayAt($flag, ['degree', 'reasons']);
+                $first = array_values(array_filter(['archived', 'marked'], static fn (string $reason): bool => \in_array($reason, $remaining, true)))[0] ?? null;
+                Assert::assertSame($first, $headline, $message.': '.$id.' headline');
             } else {
                 Assert::assertSame($modelHeadline, $headline, $message.': '.$id.' headline');
             }
@@ -166,6 +173,29 @@ final class ModelBounds
         $expected = array_merge($removed(JsonPath::arrayAt($model, ['score'])), ['old-promise']);
         sort($expected);
         Assert::assertSame($expected, $removed(JsonPath::arrayAt($lockrot, ['score'])), $message.': without[]');
+
+        $rows = static function (array $document): array {
+            $byId = [];
+            foreach (JsonPath::arrayAt($document, ['score', 'without']) as $row) {
+                $row = JsonPath::decoded($row);
+                $byId[JsonPath::stringAt($row, ['remove', 'id'])] = $row;
+            }
+
+            return $byId;
+        };
+        $modelRows = $rows($model);
+        $lockrotRows = $rows($lockrot);
+        // Without old-promise, lockrot's finding is the model's finding.
+        Assert::assertSame(
+            [JsonPath::intAt($model, ['score', 'total']), $model['verdict'], $model['lead']],
+            [JsonPath::intAt($lockrotRows['old-promise'], ['total']), $lockrotRows['old-promise']['verdict'], $lockrotRows['old-promise']['lead']],
+            $message.': without[old-promise]'
+        );
+        foreach ($modelRows as $id => $modelRow) {
+            $total = JsonPath::intAt($lockrotRows[$id], ['total']);
+            Assert::assertGreaterThanOrEqual(JsonPath::intAt($modelRow, ['total']), $total, $message.': without['.$id.'] total');
+            Assert::assertSame(ScoreModel::band($total), $lockrotRows[$id]['verdict'], $message.': without['.$id.'] verdict');
+        }
     }
 
     /**
@@ -187,6 +217,22 @@ final class ModelBounds
         Assert::assertSame(JsonPath::arrayAt($modelStep, ['unverified']), $withoutOldPromise($unverified), $message.': the other unverified facts');
 
         $ifApplied = JsonPath::arrayAt($step, ['if_applied']);
+        // The move clears one flag, so its rerun is that flag's row of score.without[].
+        $cleared = array_values(array_filter(JsonPath::arrayAt($step, ['clears']), static fn ($fact): bool => JsonPath::decoded($fact)['kind'] === 'flag'));
+        Assert::assertCount(1, $cleared, $message.': the move clears one flag');
+        $row = null;
+        foreach (JsonPath::arrayAt($lockrot, ['score', 'without']) as $candidate) {
+            if (JsonPath::stringAt(JsonPath::decoded($candidate), ['remove', 'id']) === JsonPath::stringAt(JsonPath::decoded($cleared[0]), ['id'])) {
+                $row = JsonPath::decoded($candidate);
+            }
+        }
+        Assert::assertNotNull($row, $message.': no without[] row of the cleared flag');
+        Assert::assertSame(
+            [$row['total'], $row['verdict'], $row['lead']],
+            [$ifApplied['total'], $ifApplied['verdict'], $ifApplied['lead']],
+            $message.': if_applied is the cleared flag\'s row'
+        );
+        Assert::assertSame('old-promise', $ifApplied['lead'], $message.': old-promise leads the rerun');
         Assert::assertTrue(JsonPath::boolAt($ifApplied, ['at_most']), $message.': the score is an upper bound');
         Assert::assertGreaterThanOrEqual(JsonPath::intAt($modelStep, ['if_applied', 'total']), JsonPath::intAt($ifApplied, ['total']), $message);
         Assert::assertSame(ScoreModel::band(JsonPath::intAt($ifApplied, ['total'])), $ifApplied['verdict'], $message);
