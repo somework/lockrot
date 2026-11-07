@@ -387,7 +387,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'next_step.also[].held_by[].holder.next_step.to_branch' => self::ALSO_HELD,
         'next_step.also[].held_by[].holder.next_step.check' => self::ALSO_HELD,
         'next_step.also[].check.reason' => self::ALSO_CHECK,
-        'run.move_check.reason' => 'No case of the model has a baseline that the move check does not reach.',
         'next_step.also[].moves_with[].installed_version' => self::ALSO_CHECK,
         'next_step.also[].moves_with[].package' => self::ALSO_CHECK,
         'next_step.also[].moves_with[].version' => self::ALSO_CHECK,

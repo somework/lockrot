@@ -308,10 +308,36 @@ final class CaseHydrator
         $world = \is_array($inputs['solver_world'] ?? null) && \is_array($inputs['solver_world']['world'] ?? null) ? $inputs['solver_world']['world'] : null;
 
         // A case with a `solver_world` records every request, so another request fails the test. A world whose vcs
-        // repository serves a name of the lock records no request of a move: lockrot reads that move as unloaded_name.
-        $checker = new RecordedMoveChecker($checks, $run, $world !== null && !self::shadowsALockedName($world));
+        // repository serves a name of the lock, or a name that a release needs and no Composer repository lists, records
+        // no request of a move: lockrot reads that move as unloaded_name.
+        $checker = new RecordedMoveChecker($checks, $run, $world !== null && !self::shadowsALockedName($world) && !self::needsAnUnlistedName($world));
 
         return MoveChecks::of($locked === null ? $checker : $checker->withLocked($locked));
+    }
+
+    /** @param array<mixed, mixed> $world a case's `inputs.solver_world.world` */
+    private static function needsAnUnlistedName(array $world): bool
+    {
+        if (!\is_array($world['vcs_repos'] ?? null) || $world['vcs_repos'] === []) {
+            return false;
+        }
+        $repo = \is_array($world['repo'] ?? null) ? $world['repo'] : [];
+        $listed = array_keys($repo);
+        $lock = \is_array($world['lock'] ?? null) ? $world['lock'] : [];
+        foreach (\is_array($lock['packages'] ?? null) ? $lock['packages'] : [] as $entry) {
+            $listed[] = \is_array($entry) ? ($entry['name'] ?? null) : null;
+        }
+        foreach ($repo as $releases) {
+            foreach (\is_array($releases) ? $releases : [] as $release) {
+                foreach (array_keys(\is_array($release) && \is_array($release['require'] ?? null) ? $release['require'] : []) as $name) {
+                    if (strpos((string) $name, '/') !== false && !\in_array($name, $listed, true)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /** @param array<mixed, mixed> $world a case's `inputs.solver_world.world` */
