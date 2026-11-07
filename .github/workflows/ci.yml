@@ -104,6 +104,13 @@ jobs:
             if [ "$status" -ne 0 ]; then failed=1; fi
           done
           if [ "$failed" -ne 0 ]; then exit 1; fi
+      # ubuntu-latest generates no comma locale, so the comma-locale tests skip in the step above.
+      # One row on the newest PHP generates de_DE and fails when they skip.
+      - name: Run the comma-locale tests under a generated de_DE locale
+        if: matrix.php == '8.5' && matrix.composer == 'latest'
+        run: |
+          sudo locale-gen de_DE.UTF-8
+          vendor/bin/phpunit --fail-on-skipped --fail-on-empty-test-suite --filter 'YearsUnderACommaLocaleTest|testTheLibyearsFooterWritesAPointUnderACommaLocale'
   # The tests rows exclude MoveCheckComposerOracleTest, or skip it on a composer/composer that
   # neither recorded train 7d's answers nor gave the same answers (ComposerOracle::SAME_ANSWERS).
   # The latest rows follow each new Composer release. This job runs the oracle test once on each of

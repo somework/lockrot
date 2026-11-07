@@ -2570,6 +2570,32 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
+     * `bin/lockrot` pins LC_ALL to C, but `composer lockrot` runs in Composer's process, where a
+     * plugin can set a comma locale. The footer's libyears figures must still print a point.
+     */
+    public function testTheLibyearsFooterWritesAPointUnderACommaLocale(): void
+    {
+        $numeric = setlocale(\LC_NUMERIC, '0');
+        if (setlocale(\LC_NUMERIC, 'de_DE.UTF-8', 'de_DE', 'de_DE.utf8') === false) {
+            self::markTestSkipped('the machine has no de_DE locale, so no comma locale to set');
+        }
+
+        try {
+            self::assertSame('4,5', \sprintf('%.1f', 4.5), 'the locale writes a comma, or this test proves nothing');
+            chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+            $tester = $this->tester($this->loader());
+            $tester->execute(['--target-php' => '8.4']);
+            $display = $tester->getDisplay();
+        } finally {
+            setlocale(\LC_NUMERIC, $numeric === false ? 'C' : $numeric);
+        }
+
+        self::assertMatchesRegularExpression('/libyears: \d+\.\d behind/', $display);
+        self::assertMatchesRegularExpression('/furthest behind \S+ \S+ at \d+\.\d/', $display);
+        self::assertDoesNotMatchRegularExpression('/\d,\d (libyears|behind|from direct)|at \d+,\d/', $display);
+    }
+
+    /**
      * The report goes out exactly as the formatter produced it. Every format already ends in its own
      * newline, so a second one leaves a blank line under the table and a stray line in a JSON
      * document on its way into a parser.
