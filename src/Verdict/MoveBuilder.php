@@ -427,6 +427,9 @@ final class MoveBuilder
      */
     private static function commands(string $kind, MoveSubject $subject, ?string $constraint, ?PhpCheck $phpCheck, ?Latest $latest, ?string $version, ?MoveCheck $check, ?MoveChecks $checks, array $holders): array
     {
+        if ($check !== null && $check->reason() === MoveCheck::LOCK_DISABLED) {
+            return [];
+        }
         $whyNot = \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true) && $version !== null && ($check === null || !$check->isResolved())
             ? [['composer', 'why-not', $subject->package(), $version, '--locked']]
             : [];

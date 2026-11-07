@@ -77,6 +77,33 @@ final class MoveBuilderTest extends TestCase
         self::assertSame([['composer', 'why-not', 'a/b', '2.0.0', '--locked']], $move->commands());
     }
 
+    /**
+     * Under `config.lock` false, Composer ignores composer.lock, so a printed step or `why-not
+     * --locked` would act on a lock that Composer does not read.
+     *
+     * @dataProvider movesUnderALockThatComposerIgnores
+     */
+    #[DataProvider('movesUnderALockThatComposerIgnores')]
+    public function testAMoveUnderALockThatComposerIgnoresPrintsNoCommand(string $kind, ?string $constraint): void
+    {
+        [$row, $context] = self::checked(['*' => ['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::LOCK_DISABLED, 'holds' => []]], true, null, ['a/b' => '^1.0']);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of($kind, FlagSet::LEFT_BEHIND)->to($row, $lower, $constraint), [], null, $context);
+        $check = $move->check();
+
+        self::assertNotNull($check);
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED], [$check->result(), $check->reason()]);
+        self::assertSame([], $move->commands());
+    }
+
+    /** @return iterable<string, array{string, ?string}> the move kind and its constraint */
+    public static function movesUnderALockThatComposerIgnores(): iterable
+    {
+        yield 'an update' => [Move::UPDATE, null];
+        yield 'a require' => [Move::REQUIRE, '^2.0'];
+    }
+
     /** composer.json holds the release at ^1.0, and Composer's check of the move settles that hold. */
     public function testAResolvedMoveAssumesNoSolveAndItsStepCarriesTheFormOption(): void
     {
