@@ -52,6 +52,26 @@ final class BaselineComparison
     }
 
     /**
+     * A check run refuses a file of another score model: its grades are not comparable. A
+     * `--generate-baseline` run does not call it, so it rewrites the file under this model.
+     *
+     * @throws ConfigException when the file's score model is not this lockrot's
+     */
+    public static function refuseAnotherScoreModel(Baseline $baseline, string $displayPath): void
+    {
+        if ($baseline->scoreModelId() === ScoreModel::ID) {
+            return;
+        }
+
+        throw new ConfigException(\sprintf(
+            '%s was written under score model %d and this lockrot uses score model %d. Run --generate-baseline to write it again under this model, or run the lockrot that wrote it',
+            $displayPath,
+            $baseline->scoreModelId(),
+            ScoreModel::ID
+        ));
+    }
+
+    /**
      * The fix comparison runs only when the run's target PHP and fix model equal the file's, else a
      * note says why it did not.
      *
@@ -60,15 +80,6 @@ final class BaselineComparison
      */
     public static function compare(Baseline $baseline, Report $report, string $displayPath, array $presentPackages): self
     {
-        // Not in BaselineFile::read(): `--generate-baseline` reads the old file too and must still write its own model.
-        if ($baseline->scoreModelId() !== ScoreModel::ID) {
-            throw new ConfigException(\sprintf(
-                '%s was written under score model %d and this lockrot uses score model %d. Run --generate-baseline to write it again under this model, or run the lockrot that wrote it',
-                $displayPath,
-                $baseline->scoreModelId(),
-                ScoreModel::ID
-            ));
-        }
         $run = $report->run();
         $target = $run === null ? PhpReleaseDates::minorOf(\PHP_VERSION) : $run->targetPhp();
         $source = $run === null ? RunSettings::SOURCE_RUNTIME : $run->targetPhpSource();

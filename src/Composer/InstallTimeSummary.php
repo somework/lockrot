@@ -228,6 +228,9 @@ final class InstallTimeSummary
             $names[] = $package->name();
         }
 
-        return $report->withBaseline(BaselineComparison::compare($file->read(), $report, $file->reportedPath(), $names));
+        $baseline = $file->read();
+        BaselineComparison::refuseAnotherScoreModel($baseline, $file->displayPath());
+
+        return $report->withBaseline(BaselineComparison::compare($baseline, $report, $file->reportedPath(), $names));
     }
 }

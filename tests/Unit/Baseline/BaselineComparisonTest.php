@@ -111,7 +111,16 @@ final class BaselineComparisonTest extends TestCase
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(self::PATH.' was written under score model '.$other.' and this lockrot uses score model '.ScoreModel::ID.'. Run --generate-baseline to write it again under this model, or run the lockrot that wrote it');
 
-        $this->compare($baseline, $this->report([['acme/abandoned', '1.0.0', Verdict::ABANDONED]]));
+        BaselineComparison::refuseAnotherScoreModel($baseline, self::PATH);
+    }
+
+    public function testABaselineUnderThisScoreModelIsNotRefused(): void
+    {
+        $entry = BaselineEntries::of('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15');
+
+        BaselineComparison::refuseAnotherScoreModel(Baseline::of([$entry], self::AT, PhpReleaseDates::minorOf(\PHP_VERSION), 'runtime', Version::STRING, ScoreModel::ID), self::PATH);
+
+        $this->addToAssertionCount(1);
     }
 
     public function testAFindingAtTheBaselinedVerdictIsKnown(): void

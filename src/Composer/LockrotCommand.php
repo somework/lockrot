@@ -443,8 +443,12 @@ final class LockrotCommand extends BaseCommand
         if ($generate && $file->schemaNumber() === 1) {
             return null;
         }
+        $baseline = $file->read();
+        if (!$generate) {
+            BaselineComparison::refuseAnotherScoreModel($baseline, $file->displayPath());
+        }
 
-        return $file->read();
+        return $baseline;
     }
 
     /**

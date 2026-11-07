@@ -2420,6 +2420,37 @@ final class LockrotCommandTest extends TestCase
         self::assertSame($newer, file_get_contents($dir.'/lockrot-baseline.json'));
     }
 
+    public function testACheckRunOverABaselineFromAnotherScoreModelExitsTwoAndNamesBothIds(): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+        [$generated, , $generateErr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--target-php' => '8.4'], $this->loader());
+        self::assertSame(0, $generated, $generateErr);
+        $file = $this->readJsonFile($dir.'/lockrot-baseline.json');
+        $file['score_model_id'] = ScoreModel::ID + 1;
+        file_put_contents($dir.'/lockrot-baseline.json', json_encode($file));
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(2, $code, $stderr);
+        self::assertSame('', $stdout);
+        self::assertStringContainsString('lockrot-baseline.json was written under score model '.(ScoreModel::ID + 1).' and this lockrot uses score model '.ScoreModel::ID, $stderr);
+    }
+
+    public function testGenerateBaselineOverABaselineFromAnotherScoreModelWritesThisModel(): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+        [$generated, , $generateErr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--target-php' => '8.4'], $this->loader());
+        self::assertSame(0, $generated, $generateErr);
+        $file = $this->readJsonFile($dir.'/lockrot-baseline.json');
+        $file['score_model_id'] = ScoreModel::ID + 1;
+        file_put_contents($dir.'/lockrot-baseline.json', json_encode($file));
+
+        [$code, , $stderr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(0, $code, $stderr);
+        self::assertSame(ScoreModel::ID, JsonPath::intAt($this->readJsonFile($dir.'/lockrot-baseline.json'), ['score_model_id']));
+    }
+
     /** `--generate-baseline` over a baseline-1 file writes a fresh baseline-2 and carries nothing forward. */
     public function testGenerateBaselineOverABaseline1FileWritesBaseline2(): void
     {

@@ -74,7 +74,7 @@ final class BaselineFileTest extends TestCase
         BaselineFile::resolve($dir, null, $release)->read();
     }
 
-    /** `--generate-baseline` reads the old file for its dates: only the comparison of a check run refuses another score model. */
+    /** `--generate-baseline` reads the old file for its dates: only a check run refuses another score model. */
     public function testReadingAFileFromAnotherScoreModelDoesNotRefuseIt(): void
     {
         $dir = $this->tempDir();
