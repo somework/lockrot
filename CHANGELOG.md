@@ -504,7 +504,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **CLI, Config:** `--fail-on` and `LOCKROT_FAIL_ON` values are case-insensitive under any locale.
+- **CLI, Config:** `--fail-on`, `LOCKROT_FAIL_ON`, the `fail-on` key, the `--explain` value and the
+  issuer variables (`GH_HOST` and the others) ignore case under any locale. Under a Turkish locale
+  on PHP 7.4 to 8.1, an upper-case `I` in them lower-cased to a byte that is not `i`.
   ([CLI options](docs/configuration.md#cli-options))
 - **PHAR:** the archive ships lockrot's own `LICENSE` and the notice file of every bundled package.
   ([What the PHAR does](docs/phar.md#what-the-phar-does-and-does-not-do))
