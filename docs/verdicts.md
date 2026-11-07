@@ -962,7 +962,8 @@ Limits of the check:
   installs symfony/flex, a move that resolves in lockrot can fail in Composer, or install an older
   version.
 - When lockrot read no release of the move's row, or a requirement has no constraint, it tries no
-  move (`check.reason` `no_release_read`). The commands stay.
+  move (`check.reason` `no_release_read`). The commands stay, unless Composer's `config.lock` is
+  false.
 - It stops a chain of refusals after `Analyzer::CHECK_PASSES` passes. A new request after the
   last one is not checked (`check.reason` `pass_cap`).
 - When Composer's solver fails on a request, the move is not checked (`check.reason`
@@ -976,12 +977,13 @@ Limits of the check:
   is no package name. The advisory lookup of that run does not run either
   ([Security advisories](#security-advisories)).
 - A run whose Composer config sets `config.lock` to false, in composer.json or in the global
-  config, checks no move: `run.move_check.baseline` is `not_checked`, and each move's
-  `check.reason` is `lock_disabled`. The reason words are "config.lock is false, so Composer
-  ignores composer.lock". Composer refuses a partial update without a lock, so every move has no
-  command: `commands[]` is `[]`, and no `update now:` line or `moves_not_checked` note is written.
-  The findings still read composer.lock. `no_composer_json` and `composer_json_invalid` come
-  first, and `lock_disabled` comes before every other reason of the baseline.
+  config, checks no move: `run.move_check.baseline` is `not_checked` with the reason
+  `lock_disabled`. Each move's `check.reason` is `lock_disabled`, or `no_release_read` for a move
+  with no release read. The reason words are "config.lock is false, so Composer ignores
+  composer.lock". Composer refuses a partial update without a lock, so every move has no command:
+  `commands[]` is `[]`. lockrot writes no `update now:` line and no `moves_not_checked` note. The
+  findings still read composer.lock. `no_composer_json` and `composer_json_invalid` come first,
+  and `lock_disabled` comes before every other reason of the baseline.
 - A run whose `config.platform` holds a value that Composer refuses checks no move (`check.reason`
   `platform_config_invalid`). Each `composer update` then stops. The run still writes its report.
   These values give that reason:

@@ -112,6 +112,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   it could install requires a package that no Composer repository lists and no loaded package
   provides. It read `resolves` before, so a move that read as checked can read as not checked.
   ([The move check](docs/verdicts.md#the-move-check))
+- **All formats:** when Composer's `config.lock` is false, the move check is `not_checked` with
+  `lock_disabled`, and no move has a command. Composer refuses a partial update without a lock. A
+  move that the solver refused counted as no reachable fix, so a score and a verdict can move.
+  ([The move check](docs/verdicts.md#the-move-check))
 
 ### Security
 
@@ -403,9 +407,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   score model, and exits 2 with a configuration error that names both ids. Action: run
   `--generate-baseline`, or run the lockrot that wrote the file. `--generate-baseline` over it
   writes this lockrot's id. ([Baseline](docs/baseline.md#a-baseline-from-a-newer-lockrot))
-- **All formats:** when Composer's `config.lock` is false, the move check is `not_checked` with
-  `lock_disabled`, and no move has a command. Composer refuses a partial update without a lock.
-  ([The move check](docs/verdicts.md#the-move-check))
 - **Baseline:** when a `--generate-baseline` run reads a baseline-2 file, its reports compare
   with that file, as a check run does. They carry the root `baseline` and each finding's `baseline`.
   ([What --generate-baseline does](docs/baseline.md#what-generate-baseline-does))
