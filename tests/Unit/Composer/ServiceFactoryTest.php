@@ -287,6 +287,20 @@ final class ServiceFactoryTest extends TestCase
         self::assertTrue(ServiceFactory::composerCredentials($io)('bitbucket.org'));
     }
 
+    /** An offline run asks only whether Composer holds a credential that goes on the wire, under either Bitbucket host. */
+    public function testTheOfflineBitbucketCredentialsAreTrueOnlyForAStoredCredential(): void
+    {
+        self::assertFalse(ServiceFactory::bitbucketCredentials(new NullIO())(), 'nothing stored');
+
+        $web = new NullIO();
+        $web->setAuthentication('bitbucket.org', 'me@example.com', 'atlassian-api-token');
+        self::assertTrue(ServiceFactory::bitbucketCredentials($web)(), 'an entry of bitbucket.org');
+
+        $api = new NullIO();
+        $api->setAuthentication('api.bitbucket.org', 'me@example.com', 'atlassian-api-token');
+        self::assertTrue(ServiceFactory::bitbucketCredentials($api)(), 'an entry of api.bitbucket.org');
+    }
+
     /** The consumer pair becomes the bearer token AuthHelper sends, and nothing is written anywhere. */
     public function testTheBitbucketAuthorizerExchangesTheConsumerForABearerTokenInTheIo(): void
     {
