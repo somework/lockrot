@@ -475,6 +475,12 @@ final class RunNoteTest extends TestCase
         self::assertSame(['moves' => [['package' => 'a/b', 'version' => 'v1+x|y'], ['package' => 'c/d', 'version' => '2<3']]], $two->data());
     }
 
+    /** The note is about the steps lockrot prints, so it never marks the run as one that hit a network failure. */
+    public function testTheUnsafeCommandArgumentNoteSetsNoNetworkFailure(): void
+    {
+        self::assertFalse(RunNote::commandArgumentUnsafe([['package' => 'a/b', 'version' => 'v1+x|y']])->setsNetworkFailures());
+    }
+
     public function testTheUnsafeCommandArgumentNoteNamesAtLeastOneMove(): void
     {
         $this->expectException(\InvalidArgumentException::class);
