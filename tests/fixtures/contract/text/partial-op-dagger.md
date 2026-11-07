@@ -9,7 +9,7 @@
 flags: left-behind 1 · old-promise 1 · vulnerable 1 · 1 package carries more than one\
 depth: every flagged package is named in composer.json · direct 1\
 security: 1 vulnerable package · 2 advisories: 1 high, 1 medium\
-libyears: 9.4 behind across the one package · 9.4 from direct requirements · furthest behind `geoip2/geoip2` v2.4.5 at 9.4\
+libyears: 9.5 behind across the one package · 9.5 from direct requirements · furthest behind `geoip2/geoip2` v2.4.5 at 9.5\
 advisories: 1 package asked · packagist.org answered (2 on record for 1 package)\
 php: the lock installs on PHP 7.2 to 8.5
 
