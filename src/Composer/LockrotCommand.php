@@ -16,6 +16,7 @@ use Composer\Util\Platform;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
+use Lockrot\AsciiCase;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineFile;
@@ -381,7 +382,7 @@ final class LockrotCommand extends BaseCommand
         if ($format !== 'table' && $format !== 'json') {
             throw new ConfigException('--explain prints text or, with --format=json, JSON; --format='.$format.' has no explanation form');
         }
-        $name = strtolower(trim($name));
+        $name = AsciiCase::lower(trim($name));
         if ($name === '') {
             throw new ConfigException('--explain needs a package name, e.g. --explain=vendor/package');
         }

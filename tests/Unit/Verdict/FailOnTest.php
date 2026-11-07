@@ -142,7 +142,7 @@ final class FailOnTest extends TestCase
     public function testAnUpperCaseIParsesUnderTheTurkishLocale(): void
     {
         $previous = setlocale(\LC_CTYPE, '0');
-        if (setlocale(\LC_CTYPE, 'tr_TR.UTF-8', 'tr_TR', 'tr_TR.ISO8859-9') === false) {
+        if (setlocale(\LC_CTYPE, 'tr_TR.ISO8859-9', 'tr_TR.ISO-8859-9', 'tr_TR', 'tr_TR.UTF-8') === false) {
             self::markTestSkipped('No Turkish locale is installed.');
         }
 

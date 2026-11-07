@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Forge;
 
+use Lockrot\AsciiCase;
+
 /**
  * Only lockrot's own tokens: Composer's HTTP layer applies its own credentials ({@see ForgeAuth}).
  * `GITHUB_TOKEN` and `GITLAB_TOKEN` count only when each issuer environment variable of their
@@ -138,7 +140,7 @@ final class Tokens
     {
         $parts = RepoLocator::hostAndPath(strpos($url, '://') === false ? 'https://'.$url : $url);
 
-        return $parts === null ? null : strtolower($parts[0]);
+        return $parts === null ? null : AsciiCase::lower($parts[0]);
     }
 
     /** @param array<string, mixed> $env */
