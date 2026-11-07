@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Forge;
 
+use Lockrot\Data\Http\CachingHttpClient;
+
 /**
  * Whether a request to a repository is authenticated, and which of lockrot's own {@see Tokens} it
  * carries: docs/internals.md, "Which credentials".
@@ -25,7 +27,7 @@ final class ForgeAuth
     private ?bool $bitbucketAuthorized = null;
 
     /**
-     * @param callable(string): bool  $composerHasCredentials `IOInterface::hasAuthentication()`
+     * @param callable(string): bool  $composerHasCredentials an `IOInterface` entry that {@see carriesCredential()} accepts
      * @param null|callable(): bool   $authorizeBitbucket     turns Composer's Bitbucket credentials into
      *                                                        ones its HTTP layer can send, true on success
      */
@@ -44,6 +46,30 @@ final class ForgeAuth
     public static function withTokens(Tokens $tokens): self
     {
         return new self($tokens, static fn (string $host): bool => false);
+    }
+
+    /**
+     * Whether a Composer authentication entry puts a credential header on the wire: not an SSL
+     * client certificate, and not custom headers that hold no credential header.
+     *
+     * @param array{username: null|string, password: null|string} $entry `IOInterface::getAuthentication()`
+     */
+    public static function carriesCredential(array $entry): bool
+    {
+        if ($entry['username'] === 'client-certificate') {
+            return false;
+        }
+        if ($entry['password'] !== 'custom-headers') {
+            return true;
+        }
+        $headers = json_decode((string) $entry['username'], true);
+        foreach (\is_array($headers) ? $headers : [] as $header) {
+            if (\is_string($header) && CachingHttpClient::isCredentialHeader(ltrim($header))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function tokenFor(RepoRef $repo): ?string

@@ -50,7 +50,7 @@ final class ServiceFactory
         $http = self::createHttp($io, $config, $lockrot, $clock, $deadline);
         $auth = new ForgeAuth(
             $tokens,
-            static fn (string $host): bool => $io->hasAuthentication($host),
+            static fn (string $host): bool => $io->hasAuthentication($host) && ForgeAuth::carriesCredential($io->getAuthentication($host)),
             $lockrot->offline() ? null : self::bitbucketAuthorizer($io, $config, $deadline)
         );
 

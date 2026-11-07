@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Data\Forge;
 
+use Composer\Config;
+use Composer\IO\BufferIO;
 use Lockrot\Data\Forge\ForgeAuth;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\Tokens;
@@ -86,5 +88,52 @@ final class ForgeAuthTest extends TestCase
         self::assertNull($auth->tokenFor($ghes));
         self::assertTrue($auth->isAuthenticated($ghes), "Composer's credentials for the host still count");
         self::assertFalse(ForgeAuth::withTokens(new Tokens('gh', null))->isAuthenticated($ghes));
+    }
+
+    /**
+     * @param array<string, mixed> $settings Composer `config` keys, as in auth.json
+     */
+    private static function composerAuth(array $settings): ForgeAuth
+    {
+        $io = new BufferIO();
+        $config = new Config(false);
+        $config->merge(['config' => $settings]);
+        $io->loadConfiguration($config);
+
+        return new ForgeAuth(
+            Tokens::none(),
+            static fn (string $host): bool => $io->hasAuthentication($host) && ForgeAuth::carriesCredential($io->getAuthentication($host))
+        );
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, bool}>
+     */
+    public static function composerEntries(): iterable
+    {
+        yield 'github-oauth' => [['github-oauth' => ['github.com' => 'tok']], true];
+        yield 'bearer' => [['bearer' => ['github.com' => 'tok']], true];
+        yield 'http-basic' => [['http-basic' => ['github.com' => ['username' => 'u', 'password' => 'p']]], true];
+        yield 'custom Authorization header' => [['custom-headers' => ['github.com' => ['Authorization: token abc']]], true];
+        yield 'custom authorization header in lower case' => [['custom-headers' => ['github.com' => ['X-A: b', 'authorization: token abc']]], true];
+        yield 'custom header without Authorization' => [['custom-headers' => ['github.com' => ['X-Proxy-Tag: ci']]], false];
+        yield 'client certificate' => [['client-certificate' => ['github.com' => ['local_cert' => '/c.pem']]], false];
+    }
+
+    /**
+     * @param array<string, mixed> $settings
+     *
+     * @dataProvider composerEntries
+     */
+    public function testOnlyAComposerEntryThatCarriesACredentialAuthenticates(array $settings, bool $authenticated): void
+    {
+        self::assertSame($authenticated, self::composerAuth($settings)->isAuthenticated(self::ref(self::GITHUB)));
+    }
+
+    public function testACredentialLessBitbucketEntryDoesNotAuthenticateEither(): void
+    {
+        $auth = self::composerAuth(['client-certificate' => ['bitbucket.org' => ['local_cert' => '/c.pem']]]);
+
+        self::assertFalse($auth->isAuthenticated(self::ref(self::BITBUCKET)));
     }
 }
