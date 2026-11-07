@@ -227,6 +227,26 @@ final class UpdateNowTest extends TestCase
     }
 
     /**
+     * SPEC §5.6, "Update now": a lead update whose version holds `|`, `<` or `>` is no candidate,
+     * and the other candidates are solved together without it.
+     */
+    public function testALeadUpdateWithAnUnsafeVersionLeavesUpdateNowAndTheOtherCandidatesStay(): void
+    {
+        $case = CaseHydrator::case('commonmark');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['checks'] = ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]];
+        $inputs['releases'] = array_map(static fn ($release): array => \is_array($release) && ($release['version'] ?? null) === '2.10.3' ? ['version' => '2.10.3+x|calc'] + $release : (array) $release, array_values(JsonPath::arrayAt($inputs, ['releases'])));
+        $case['inputs'] = $inputs;
+
+        $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+
+        self::assertSame([self::LARAVEL], JsonPath::arrayAt($document, ['security', 'update_now']));
+        self::assertSame(['composer', 'update', self::LARAVEL.':^12.69.0'], JsonPath::arrayAt($document, ['security', 'update_now_command']));
+        self::assertSame([['package' => self::COMMONMARK, 'version' => '2.10.3+x|calc']], JsonPath::arrayAt(self::note($document, 'command_argument_unsafe'), ['data', 'moves']));
+        self::assertSame([], FindingRelations::violations($document), 'the root recount agrees');
+    }
+
+    /**
      * @param array<string, mixed>|null $combined
      *
      * @return array<mixed, mixed>

@@ -110,18 +110,24 @@ final class UnsafeCommandArgumentTest extends TestCase
         self::assertSame([], array_filter(JsonPath::arrayAt($document, ['note_details']), static fn ($note): bool => \is_array($note) && $note['code'] === 'command_argument_unsafe'));
     }
 
-    public function testTheUpdateNowCommandOmitsAMemberWhoseVersionIsUnsafe(): void
+    /**
+     * SPEC §5.6, "Update now": the unsafe update is the only candidate, so no `update now:` line
+     * prints, as with an empty candidate set.
+     */
+    public function testAnUnsafeUpdateThatIsTheOnlyCandidateLeavesNoUpdateNowLine(): void
     {
-        self::markTestIncomplete('finding 5: UpdateNow::of inlines the unsafe version, and src/Analyzer/UpdateNow.php is outside group G1');
-
         $case = CaseHydrator::case('move-check‡');
         $inputs = JsonPath::arrayAt($case, ['inputs']);
         $inputs['checks'] = ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]];
         $inputs['releases'] = array_map(static fn ($release): array => \is_array($release) && ($release['version'] ?? null) === 'v2.3.2' ? ['version' => 'v2.3.2+x|calc'] + $release : (array) $release, array_values(JsonPath::arrayAt($inputs, ['releases'])));
         $case['inputs'] = $inputs;
-        $command = CaseHydrator::report($case)->updateNowCommand();
+        $report = CaseHydrator::report($case);
 
-        self::assertTrue($command === null || strpos(implode(' ', $command), '|') === false);
+        $document = JsonPath::decoded($report->toArray());
+        self::assertSame([[], null], [JsonPath::arrayAt($document, ['security', 'update_now']), JsonPath::arrayAt($document, ['security'])['update_now_command']]);
+        foreach (CaseRecording::formatted($report, FailOn::none(), CaseHydrator::lockJson(['move-check‡'])) as $format => $output) {
+            self::assertStringNotContainsString('update now:', $output, $format);
+        }
     }
 
     /**
