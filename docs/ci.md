@@ -542,7 +542,8 @@ steps:
 Top to bottom, it holds:
 
 1. A heading: `### lockrot: <graded> of <checked> packages flagged — <grade counts>`, or on a clean
-   run `### lockrot: nothing flagged in <checked> packages`. A clean run has no table unless you
+   run `### lockrot: nothing flagged in <checked> packages`. A clean `--offline` run ends the
+   heading with ` — security advisories not checked (offline)`. A clean run has no table unless you
    pass `--all`, which lists every package under the heading.
 2. The [`gate:` line](#reading-the-gate-line), its first part in bold.
 3. A table of the graded findings (every finding with `--all`) in report order. The verdict is bold
