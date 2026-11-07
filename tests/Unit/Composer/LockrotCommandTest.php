@@ -1561,6 +1561,50 @@ final class LockrotCommandTest extends TestCase
         });
     }
 
+    /**
+     * Ruling R14-22: Composer reads `config.lock` from composer.json over the global config. When
+     * it is false, Composer ignores the composer.lock on disk, so lockrot checks no move.
+     *
+     * @dataProvider lockOffConfigs
+     *
+     * @param array<string, mixed>    $projectConfig
+     * @param array{string, ?string} $baseline
+     * @param array{string, ?string, ?list<string>} $targetFix
+     */
+    #[DataProvider('lockOffConfigs')]
+    public function testAConfigLockFalseLeavesEveryMoveUncheckedWithTheLockOnDisk(array $projectConfig, string $globalConfig, array $baseline, array $targetFix): void
+    {
+        $project = $this->tempDir('lockrot-lock-off-');
+        file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/lock-off-test', 'require' => ['acme/kept' => '1.0.0']] + ($projectConfig === [] ? [] : ['config' => $projectConfig])));
+        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0', 'require' => ['php' => '<8.0']]], 'packages-dev' => []]));
+        chdir($project);
+        $home = $this->tempDir('lockrot-lock-off-home-');
+        file_put_contents($home.'/config.json', $globalConfig);
+        $loader = $this->emptyLoader();
+        $command = fn (): LockrotCommand => $this->buildCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?\Closure $checks = null): Analyzer => self::withChecks(self::testAnalyzer($loader, $lockrot, $clock), $checks));
+
+        $this->withComposerEnv($this->tempDir('lockrot-lock-off-cache-'), $home, function () use ($command, $baseline, $targetFix): void {
+            [$code, $stdout, $stderr] = $this->runCommandWithSplitStreams($command(), ['--format' => 'json', '--target-php' => '8.4']);
+
+            self::assertSame(0, $code, $stderr);
+            $json = json_decode($stdout, true);
+            self::assertIsArray($json);
+            $moveCheck = JsonPath::arrayAt($json, ['run', 'move_check']);
+            self::assertSame($baseline, [$moveCheck['baseline'] ?? null, $moveCheck['reason'] ?? null]);
+            $fix = JsonPath::arrayAt($json, ['run', 'php_window', 'target_fix']);
+            self::assertSame($targetFix, [$fix['check'], $fix['reason'], $fix['command']]);
+            self::assertSame($baseline[0] === MoveCheck::REFUSED, \in_array(RunNote::MOVES_NOT_CHECKED, JsonPath::column($json, ['note_details'], 'code'), true));
+        });
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, string, array{string, ?string}, array{string, ?string, ?list<string>}}> the project config, the global config.json, the baseline with its reason, and the target fix's check, reason and command */
+    public static function lockOffConfigs(): iterable
+    {
+        yield 'composer.json sets lock false' => [['lock' => false], '{}', [MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED], [MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED, null]];
+        yield 'the global config sets lock false' => [[], '{"config": {"lock": false}}', [MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED], [MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED, null]];
+        yield 'composer.json sets lock true over a global false' => [['lock' => true], '{"config": {"lock": false}}', [MoveCheck::REFUSED, null], [MoveCheck::NOT_CHECKED, MoveCheck::NOT_FROM_COMPOSER_REPOSITORY, null]];
+    }
+
     /** @return iterable<string, array{array<string, mixed>}> */
     public static function platformsThatComposerRefuses(): iterable
     {

@@ -121,6 +121,49 @@ final class MoveCheckersTest extends TestCase
         self::assertSame($configuredPhp, $checker->configuredPhp());
     }
 
+    /**
+     * Ruling R14-22: with `config.lock` false, Composer ignores composer.lock and refuses a
+     * partial update, so no request is solved. The reason comes before a refused config.platform.
+     *
+     * @dataProvider configsWithTheLockOff
+     *
+     * @param array<string, mixed> $settings
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('configsWithTheLockOff')]
+    public function testAConfigThatTurnsTheLockOffChecksNoMoveAndSolvesNothing(array $settings): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => $settings]);
+        $repository = new RecordingComposerRepository([(new ArrayLoader())->load(['name' => 'acme/lib', 'version' => '1.1.0'])]);
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+
+        $checker = MoveCheckers::forProject(self::root(), $lock, ProjectConfig::empty(), $config, [$repository], '8.4', false, Deadline::never());
+
+        $unchecked = ['result' => MoveCheck::NOT_CHECKED, 'form' => null, 'reason' => MoveCheck::LOCK_DISABLED, 'installs' => null];
+        self::assertSame($unchecked, $checker->baseline()->check()->jsonSerialize(), 'baseline');
+        self::assertSame($unchecked, $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize(), 'move');
+        self::assertSame($unchecked, $checker->solveAt(['acme/lib'])->check()->jsonSerialize(), 'target fix');
+        self::assertSame($unchecked, $checker->combined(['acme/lib' => '^1.1'])->check()->jsonSerialize(), 'update now');
+        self::assertSame([], $repository->asked);
+    }
+
+    /** @return iterable<string, array{array<string, mixed>}> */
+    public static function configsWithTheLockOff(): iterable
+    {
+        yield 'lock false' => [['lock' => false]];
+        yield 'lock false and a refused platform' => [['lock' => false, 'platform' => ['php' => '^8.2']]];
+    }
+
+    public function testAConfigThatKeepsTheLockOnChecksTheMoves(): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['lock' => true]]);
+
+        $checker = MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]]), ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
+
+        self::assertSame(MoveCheck::RESOLVES, $checker->baseline()->check()->result());
+    }
+
     /** @return iterable<string, array{array<array-key, mixed>, ?string}> the platform and its configured php */
     public static function platformsThatComposerRefuses(): iterable
     {

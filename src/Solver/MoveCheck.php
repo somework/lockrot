@@ -41,12 +41,13 @@ final class MoveCheck implements \JsonSerializable
     public const PASS_CAP = 'pass_cap';
     public const SOLVER_ERROR = 'solver_error';
     public const ADVISORY_LOOKUP_INCOMPLETE = 'advisory_lookup_incomplete';
+    public const LOCK_DISABLED = 'lock_disabled';
 
     /** The reasons that lockrot writes, in the order that the schema lists them. */
-    public const REASONS = [self::BASELINE_REFUSED, self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NOT_FROM_COMPOSER_REPOSITORY, self::NO_COMPOSER_JSON, self::COMPOSER_JSON_INVALID, self::PLATFORM_CONFIG_INVALID, self::NO_RELEASE_READ, self::PASS_CAP, self::SOLVER_ERROR, self::ADVISORY_LOOKUP_INCOMPLETE];
+    public const REASONS = [self::BASELINE_REFUSED, self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NOT_FROM_COMPOSER_REPOSITORY, self::NO_COMPOSER_JSON, self::COMPOSER_JSON_INVALID, self::PLATFORM_CONFIG_INVALID, self::NO_RELEASE_READ, self::PASS_CAP, self::SOLVER_ERROR, self::ADVISORY_LOOKUP_INCOMPLETE, self::LOCK_DISABLED];
 
     /** The reasons that leave the baseline itself unchecked (`run.move_check.reason`), in the schema's order. */
-    public const BASELINE_REASONS = [self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NO_COMPOSER_JSON, self::COMPOSER_JSON_INVALID, self::PLATFORM_CONFIG_INVALID, self::SOLVER_ERROR];
+    public const BASELINE_REASONS = [self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NO_COMPOSER_JSON, self::COMPOSER_JSON_INVALID, self::PLATFORM_CONFIG_INVALID, self::SOLVER_ERROR, self::LOCK_DISABLED];
 
     /** Why lockrot did not ask Composer's solver about the move, by `check.reason`. */
     private const REASON_WORDS = [
@@ -62,6 +63,7 @@ final class MoveCheck implements \JsonSerializable
         self::PASS_CAP => 'Composer refused each move before it',
         self::SOLVER_ERROR => "Composer's solver failed on it",
         self::ADVISORY_LOOKUP_INCOMPLETE => 'the advisory lookup did not cover a package in the result',
+        self::LOCK_DISABLED => 'config.lock is false, so Composer ignores composer.lock',
     ];
 
     /** @var self::RESOLVES|self::REFUSED|self::NOT_CHECKED */
