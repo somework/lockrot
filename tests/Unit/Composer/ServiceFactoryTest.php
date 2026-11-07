@@ -435,6 +435,31 @@ final class ServiceFactoryTest extends TestCase
         self::assertSame([], glob($dir.'/lockrot/*') ?: []);
     }
 
+    /** A read-only cache is not a disabled one: a run with `cache-read-only` keeps the answers that an earlier run stored. */
+    public function testAReadOnlyComposerCacheStillServesAStoredAnswer(): void
+    {
+        $dir = $this->tempCacheDir();
+        $url = 'https://api.github.com/repos/vendor/name';
+        $writable = new Config(false, sys_get_temp_dir());
+        $writable->merge(['config' => ['cache-dir' => $dir, 'home' => sys_get_temp_dir()]]);
+        ServiceFactory::createCache(new NullIO(), $writable)->set($url, new HttpResult($url, 200, '{"stored":true}', new \DateTimeImmutable(self::NOW)));
+        $stored = glob($dir.'/lockrot/*') ?: [];
+        self::assertCount(1, $stored, 'the seeding run must write one envelope');
+
+        $readOnly = new Config(false, sys_get_temp_dir());
+        $readOnly->merge(['config' => ['cache-dir' => $dir, 'cache-read-only' => true, 'home' => sys_get_temp_dir()]]);
+        $cache = ServiceFactory::createCache(new NullIO(), $readOnly);
+        $served = $cache->get($url);
+
+        self::assertNotNull($served);
+        self::assertSame('{"stored":true}', $served->body());
+        $cache->set($url, new HttpResult($url, 200, '{"stored":false}', new \DateTimeImmutable(self::NOW)));
+        self::assertSame($stored, glob($dir.'/lockrot/*') ?: []);
+        $after = $cache->get($url);
+        self::assertNotNull($after);
+        self::assertSame('{"stored":true}', $after->body());
+    }
+
     public function testGithubTokenFromComposerConfig(): void
     {
         $config = new Config(false, sys_get_temp_dir());
