@@ -751,8 +751,8 @@ format.
     pasted line can run another program or write a file. When an argument that comes from a
     version or a branch name holds `|`, `<` or `>`, lockrot prints no command for that move. The
     move's `commands[]` is `[]`, its text says why, and the run note
-    [`command_argument_unsafe`](notes.md#command_argument_unsafe) counts such moves. Such an update
-    is not in `security.update_now`.
+    [`command_argument_unsafe`](notes.md#command_argument_unsafe) counts such moves. When the move check
+    runs, such an update is no `security.update_now` member.
 
 ### <a name="the-move-check"></a>The move check {#the-move-check}
 

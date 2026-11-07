@@ -368,12 +368,14 @@ on. The note names the first such failure of the run.
 
 ### Command argument unsafe {#command_argument_unsafe}
 
-A move quotes a version or a branch name in its steps: the `^<version>` of an update, require or tag
+A move quotes a release name in its steps: the `^<version>` of an update, require or tag
 step, and the `<version>` of a why-not step. When that name holds `|`, `<` or `>`, a Windows shell
 that you paste the POSIX line into runs another program or redirects to a file. That move
 writes no step: `commands` is empty, and the text ends with "; lockrot prints no command, because its
 release name holds |, < or >". The move check still runs, and no other field of the move changes.
-The `update now:` line is not part of this rule. The note holds the move of a finding's
+When the move check runs, such an update is no `security.update_now` member, and the other
+members are solved without it. A run without the move check names the package in `update now:`
+with no version. The note holds the move of a finding's
 `next_step` before its `also[]`, in finding order.
 
 - `data`: `moves`, one per move without a step: `package` and `version`, the name as the
