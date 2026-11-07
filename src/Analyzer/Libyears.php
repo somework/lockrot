@@ -166,7 +166,7 @@ final class Libyears
             if ($finding->isLibyearsAtLeast()) {
                 ++$atLeast;
             }
-            $hundredths = (int) round(round($behind, 2) * 100);
+            $hundredths = (int) round(((float) $finding->libyearsRounded()) * 100);
             $total += $hundredths;
             if ($finding->isDirect()) {
                 $direct += $hundredths;
@@ -245,8 +245,8 @@ final class Libyears
         if ($this->worst === null) {
             return $head;
         }
-        [$worst, $behind] = $this->worst;
-        $behind = round($behind, 2);
+        $worst = $this->worst[0];
+        $behind = (float) $worst->libyearsRounded();
 
         return implode(' · ', [
             $head,
