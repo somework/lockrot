@@ -247,6 +247,26 @@ final class UpdateNowTest extends TestCase
     }
 
     /**
+     * SPEC §5.6: the note names every move that writes no step, the `next_step` of a finding before
+     * its `also[]`.
+     */
+    public function testTheUnsafeArgumentNoteNamesTheLeadMoveAndThenTheAlsoMove(): void
+    {
+        $case = CaseHydrator::case('mc-update-now-maintenance‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['checks'] = ['baseline' => JsonPath::arrayAt($inputs, ['checks'])['baseline'], '*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]];
+        $inputs['releases'] = array_map(static fn ($release): array => \is_array($release) && \in_array($release['version'] ?? null, ['v6.4.41', 'v7.0.1'], true) ? ['version' => $release['version'].'+x|calc'] + $release : (array) $release, array_values(JsonPath::arrayAt($inputs, ['releases'])));
+        $case['inputs'] = $inputs;
+
+        $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+
+        self::assertSame(
+            [['package' => 'symfony/routing', 'version' => 'v6.4.41+x|calc'], ['package' => 'symfony/routing', 'version' => 'v7.0.1+x|calc']],
+            JsonPath::arrayAt(self::note($document, 'command_argument_unsafe'), ['data', 'moves'])
+        );
+    }
+
+    /**
      * @param array<string, mixed>|null $combined
      *
      * @return array<mixed, mixed>
