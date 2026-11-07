@@ -510,7 +510,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([CLI options](docs/configuration.md#cli-options))
 - **PHAR:** the archive ships lockrot's own `LICENSE` and the notice file of every bundled package.
   ([What the PHAR does](docs/phar.md#what-the-phar-does-and-does-not-do))
-- **CLI:** the `--explain` repository line words match what lockrot read.
+- **CLI:** for a host that lockrot cannot ask, or a package with no repository path, the
+  `--explain` repository line starts "lockrot cannot ask <host> about repository activity" or
+  "repository activity not asked (<reason>)", with no `repository` label.
   ([Explaining one package](docs/configuration.md#explaining-one-package))
 - **CLI:** `--explain` prints an advisory id once.
   ([Explaining one package](docs/configuration.md#explaining-one-package))
