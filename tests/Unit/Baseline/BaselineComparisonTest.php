@@ -100,6 +100,18 @@ final class BaselineComparisonTest extends TestCase
         self::assertSame('known', $fact === null ? null : $fact->state());
     }
 
+    /** Pins what the code does with a file from another score model: no note, compared as if it were this model. */
+    public function testABaselineUnderAnotherScoreModelGetsNoNoteAndIsComparedAsIfItWereThisModel(): void
+    {
+        $entry = BaselineEntries::of('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15');
+        $baseline = Baseline::of([$entry], self::AT, PhpReleaseDates::minorOf(\PHP_VERSION), 'runtime', Version::STRING, ScoreModel::ID + 1);
+
+        $comparison = $this->compare($baseline, $this->report([['acme/abandoned', '1.0.0', Verdict::ABANDONED]]));
+
+        self::assertSame([], $comparison->notes());
+        self::assertSame(BaselineComparison::KNOWN, $comparison->statusOf('acme/abandoned'));
+    }
+
     public function testAFindingAtTheBaselinedVerdictIsKnown(): void
     {
         $comparison = $this->compare(
