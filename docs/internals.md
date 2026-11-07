@@ -79,8 +79,9 @@ carries `User-Agent: lockrot`.
 ### Which credentials
 
 - A host counts as authenticated, with no cap, when lockrot has a token for it or Composer holds
-  credentials for it (in `auth.json`, `COMPOSER_AUTH`, or what a CI setup step writes there). On
-  GitLab, credentials also unlock the archived flag.
+  a real credential for it (in `auth.json`, `COMPOSER_AUTH`, or what a CI setup step writes there).
+  A real credential is a `github-oauth` token, a bearer token, or an `Authorization` value in
+  `http-basic` or `custom-headers`. On GitLab, credentials also unlock the archived flag.
 
 - When both exist, lockrot sends only Composer's header.
 
@@ -101,8 +102,10 @@ carries `User-Agent: lockrot`.
   runner's token into Composer's `github-oauth` for github.com makes Composer send it to
   api.github.com.
 
-- Exception: Composer's entry for the host can be a client certificate, or custom headers without a
-  credential header. Then Composer adds no credential header, and lockrot sends its own.
+- Exception: Composer's entry for the host can be a client certificate, or custom headers without
+  an `Authorization` value. Such an entry is no credential. The host counts as anonymous, so the cap
+  of 50 and the cause `no_token` stay. Composer adds no credential header, and lockrot sends its
+  own.
 
 - When a host redirects to another origin, lockrot asks that origin again without its own header.
   Where Composer cannot stop a redirect (without the curl extension), lockrot
