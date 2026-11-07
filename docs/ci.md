@@ -298,10 +298,11 @@ mark.
   unrated) and `20.0`. An advisory rule carries the `security-severity` that code scanning reads:
   `9.5`, `8.0`, `5.5` and `2.0`. An unrated advisory's rule has no `security-severity`.
 - **The run-level record.** When advisories were not checked, `github`, `sarif` and `gitlab` add
-  one record for the run: `lockrot/advisories-unchecked`. It is `error` (`major`) only when
-  `unchecked` is a failing value and a finding fails it on an advisory gap. Otherwise it is
-  `warning` (`minor`). Its message names each advisory repository that failed or that lockrot did
-  not ask, with the reason.
+  one record for the run. `sarif` and `gitlab` carry the id `lockrot/advisories-unchecked`.
+  `github` writes an annotation titled `lockrot` whose message starts `advisories not checked: `,
+  and has no id. The record is `error` (`major`) only when `unchecked` is a failing value and a
+  finding fails it on an advisory gap. Otherwise it is `warning` (`minor`). Its message names each
+  advisory repository that failed or that lockrot did not ask, with the reason.
 - **Text from the lock or a repository** in a `github`, `sarif` or `gitlab` message prints a
   control character, a line feed, a bidi control or another character that prints as nothing as an
   escape, such as `\x1B` or `\n`.
