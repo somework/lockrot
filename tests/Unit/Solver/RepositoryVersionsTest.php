@@ -227,6 +227,55 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([null, null, VersionSource::BUDGET], [$versions->failure('acme/lib'), $versions->failure('acme/other'), $versions->failure('acme/next')]);
     }
 
+    /** The budget runs out before the dev request of acme/dev, after the tags answered acme/lib. */
+    public function testANameThatAVcsRepositoryServesStaysShadowedWhenTheBudgetRunsOutBeforeTheDevRequestOfAnotherName(): void
+    {
+        $clock = new class () {
+            public float $now = 0.0;
+        };
+        $served = [self::package('acme/lib', '1.0.0'), self::package('acme/dev', '1.0.0'), self::package('acme/dev', 'dev-main')];
+        $advance = static function () use ($clock): void {
+            $clock->now = 10.0;
+        };
+        $repository = new class ($served, $advance) extends ComposerRepository {
+            /** @var list<BasePackage> */
+            private array $served;
+            private \Closure $advance;
+
+            /** @param list<BasePackage> $served */
+            public function __construct(array $served, \Closure $advance)
+            {
+                $this->served = $served;
+                $this->advance = $advance;
+            }
+
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
+            {
+                ($this->advance)();
+                $packages = array_values(array_filter($this->served, static fn (BasePackage $package): bool => \array_key_exists($package->getName(), $packageNameMap) && isset($acceptableStabilities[$package->getStability()])));
+
+                return ['namesFound' => array_map(static fn (BasePackage $package): string => $package->getName(), $packages), 'packages' => $packages];
+            }
+        };
+        $vcs = new ConfiguredRepository(['url' => 'https://github.com/acme/lib']);
+        $versions = new RepositoryVersions([$vcs, $repository], [], false, Deadline::inSeconds(5.0, static fn (): float => $clock->now), 'stable', ['acme/dev' => BasePackage::STABILITY_DEV], ['https://github.com/acme/lib' => ['acme/lib']]);
+
+        $loaded = $versions->versionsOf(['acme/lib', 'acme/dev']);
+
+        self::assertSame(['acme/lib' => ['1.0.0'], 'acme/dev' => []], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
+        self::assertSame([VersionSource::SHADOWED, VersionSource::BUDGET], [$versions->failure('acme/lib'), $versions->failure('acme/dev')]);
+    }
+
+    /** Offline, a root that refuses dev never reads the `~dev` file, so a missing one does not fail the tags. */
+    public function testOfflineATaggedNameUnderAStableRootKeepsItsTags(): void
+    {
+        $versions = new RepositoryVersions([self::repository(['acme/lib' => ['1.0.0', 'dev-main']])], [], true, Deadline::never(), 'stable', []);
+
+        $loaded = $versions->versionsOf(['acme/lib']);
+
+        self::assertSame([['1.0.0'], null], [self::pretty($loaded['acme/lib']), $versions->failure('acme/lib')]);
+    }
+
     /** G3: the first repository that lists the name wins, so a failed dev request there fails the name. */
     public function testAnAdmittedNameWhoseDevRequestFailsWhereItsTagsAreListedIsFailed(): void
     {
