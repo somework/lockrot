@@ -516,7 +516,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([Explaining one package](docs/configuration.md#explaining-one-package))
 - **CLI:** `--explain` prints an advisory id once.
   ([Explaining one package](docs/configuration.md#explaining-one-package))
-
 - **All formats:** on Composer 2.11, lockrot still counts the advisories of a `dev-*` version and
   refuses a partial advisory record, as on 2.10. `composer audit` 2.11 skips the first and reports
   the second. ([Which advisories count](docs/verdicts.md#which-advisories-count))
