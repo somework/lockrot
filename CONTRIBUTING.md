@@ -168,14 +168,15 @@ To change a generated schema:
 4. Record the contract bundle with `tools/report/record`. It rewrites `tests/fixtures/contract/`,
    including `contract-files.json`, which holds the sha256 of the published schemas and types.
 5. Write the bundle module, which reads that recording:
-   `cd tools/schema/node && node emit_bundle.js`.
+   `(cd tools/schema/node && node emit_bundle.js)`.
 6. Commit the builder and what these steps wrote in one commit.
 
 The CI step "The generated schemas and negatives match tools/schema" runs the commands of step 2
-and fails on a difference. The `typescript` job runs steps 3 and 5 and fails on a stale file of
-`types/`, `tools/schema/ts/` or `tests/fixtures/bundle.generated.ts`. `ContractBundleIsCurrentTest`
-fails on a stale recording (step 4). `tests/Integration/SchemaRebuildTest.php` proves that the step catches a
-hand edit.
+and fails on a difference. The `typescript` job runs steps 3 and 5 and fails on a stale
+`types/lockrot-report-2.known.d.ts`, `tools/schema/ts/known-map.json`,
+`tools/schema/ts/probes.generated.ts` or `tests/fixtures/bundle.generated.ts`.
+`ContractBundleIsCurrentTest` fails on a stale recording (step 4).
+`tests/Integration/SchemaRebuildTest.php` proves that the CI step catches a hand edit.
 
 Under one schema number the files only widen: `tests/Integration/SchemaEvolutionTest.php` holds
 them to every release's copy in `tests/fixtures/schema-evolution/schemas/<version>/`. It also holds
