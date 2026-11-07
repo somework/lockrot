@@ -63,8 +63,13 @@ final class ForgeAuth
             return true;
         }
         $headers = json_decode((string) $entry['username'], true);
-        foreach (\is_array($headers) ? $headers : [] as $header) {
-            if (\is_string($header) && CachingHttpClient::isCredentialHeader(ltrim($header))) {
+        // AuthHelper::addCustomHeaders() ignores the whole list when one element is no string, and
+        // sends each header as written, so no trimming here.
+        if (!\is_array($headers) || array_filter($headers, 'is_string') !== $headers) {
+            return false;
+        }
+        foreach ($headers as $header) {
+            if (CachingHttpClient::isCredentialHeader($header)) {
                 return true;
             }
         }
@@ -99,8 +104,8 @@ final class ForgeAuth
     private function bitbucketAuthorized(): bool
     {
         if ($this->bitbucketAuthorized === null) {
-            // Composer looks credentials up under the request's host, then under the site host
-            // (AuthHelper::findAuthOrigin()), so either host authenticates the API call.
+            // Without an authorizer the callable cannot tell "no entry" from "entry without a
+            // credential", so it cannot apply the API-host-first rule of ServiceFactory::bitbucketCredentials().
             $this->bitbucketAuthorized = $this->authorizeBitbucket !== null
                 ? ($this->authorizeBitbucket)()
                 : ($this->composerHasCredentials)('api.bitbucket.org') || ($this->composerHasCredentials)('bitbucket.org');

@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Data\Forge;
 
 use Composer\Config;
 use Composer\IO\BufferIO;
+use Lockrot\Composer\ServiceFactory;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
 use Lockrot\Data\Forge\RepoRef;
@@ -138,7 +139,7 @@ final class ActivityFetchPlannerTest extends TestCase
         $config = new Config(false);
         $config->merge(['config' => ['client-certificate' => ['github.com' => ['local_cert' => '/c.pem']]]]);
         $io->loadConfiguration($config);
-        $auth = new ForgeAuth(Tokens::none(), static fn (string $host): bool => $io->hasAuthentication($host) && ForgeAuth::carriesCredential($io->getAuthentication($host)));
+        $auth = new ForgeAuth(Tokens::none(), ServiceFactory::composerCredentials($io));
 
         $plan = (new ActivityFetchPlanner($auth, 1))->select(['a/a' => self::gh('o/a'), 'b/b' => self::gh('o/b')], ['a/a' => true, 'b/b' => true]);
 

@@ -14,6 +14,7 @@ use Composer\Util\Platform;
 use Composer\Util\RemoteFilesystem;
 use Composer\Util\Url;
 use Lockrot\Clock;
+use Lockrot\Data\Forge\ForgeAuth;
 use Lockrot\Data\Http\CachingHttpClient;
 use Lockrot\Data\Http\HttpClientInterface;
 use Lockrot\Data\Http\HttpResult;
@@ -114,14 +115,8 @@ final class ComposerHttpClient implements HttpClientInterface
         }
         // AuthHelper adds no credential header for an SSL client certificate, or for custom headers
         // that carry none, so lockrot's header stays.
-        if ($auth['username'] === 'client-certificate') {
+        if (!ForgeAuth::carriesCredential($auth)) {
             return $headers;
-        }
-        if ($auth['password'] === 'custom-headers') {
-            $custom = json_decode((string) $auth['username'], true);
-            if (!\is_array($custom) || !self::carriesCredentials($custom)) {
-                return $headers;
-            }
         }
 
         return self::withoutCredentials($headers);

@@ -50,8 +50,8 @@ final class ServiceFactory
         $http = self::createHttp($io, $config, $lockrot, $clock, $deadline);
         $auth = new ForgeAuth(
             $tokens,
-            static fn (string $host): bool => $io->hasAuthentication($host) && ForgeAuth::carriesCredential($io->getAuthentication($host)),
-            $lockrot->offline() ? null : self::bitbucketAuthorizer($io, $config, $deadline)
+            self::composerCredentials($io),
+            $lockrot->offline() ? self::bitbucketCredentials($io) : self::bitbucketAuthorizer($io, $config, $deadline)
         );
 
         $analyzer = new Analyzer(
@@ -71,6 +71,33 @@ final class ServiceFactory
         $analyzer = $analyzer->withDeadline($deadline);
 
         return $checks === null ? $analyzer : $analyzer->withMoveChecks($checks());
+    }
+
+    /**
+     * What {@see ForgeAuth} asks about a host: Composer holds an entry for it that puts a
+     * credential header on the wire ({@see ForgeAuth::carriesCredential()}).
+     *
+     * @return callable(string): bool
+     */
+    public static function composerCredentials(IOInterface $io): callable
+    {
+        return static fn (string $host): bool => $io->hasAuthentication($host) && ForgeAuth::carriesCredential($io->getAuthentication($host));
+    }
+
+    /**
+     * Bitbucket without the token exchange, for an offline run. AuthHelper::findAuthOrigin() takes
+     * the entry of `api.bitbucket.org` when there is one, else that of `bitbucket.org`, and only
+     * that entry counts.
+     *
+     * @return callable(): bool
+     */
+    public static function bitbucketCredentials(IOInterface $io): callable
+    {
+        return static function () use ($io): bool {
+            $host = $io->hasAuthentication('api.bitbucket.org') ? 'api.bitbucket.org' : 'bitbucket.org';
+
+            return $io->hasAuthentication($host) && ForgeAuth::carriesCredential($io->getAuthentication($host));
+        };
     }
 
     /**

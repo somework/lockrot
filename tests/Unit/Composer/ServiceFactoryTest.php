@@ -271,6 +271,22 @@ final class ServiceFactoryTest extends TestCase
         self::assertTrue(ServiceFactory::bitbucketAuthorizer($io, self::bitbucketConfig(), Deadline::never(), $never)(), 'custom Authorization header');
     }
 
+    /** A header-less entry for the API host hides the credentials of bitbucket.org, with or without the exchange. */
+    public function testAHeaderlessApiHostEntryDecidesAlone(): void
+    {
+        $never = static function (): HttpDownloader {
+            self::fail('no exchange expected');
+        };
+        $io = new NullIO();
+        $io->setAuthentication('api.bitbucket.org', 'client-certificate', '{"local_cert":"/c.pem"}');
+        $io->setAuthentication('bitbucket.org', 'me@example.com', 'atlassian-api-token');
+
+        self::assertFalse(ServiceFactory::bitbucketAuthorizer($io, self::bitbucketConfig(), Deadline::never(), $never)());
+        self::assertFalse(ServiceFactory::bitbucketCredentials($io)());
+        self::assertFalse(ServiceFactory::composerCredentials($io)('api.bitbucket.org'));
+        self::assertTrue(ServiceFactory::composerCredentials($io)('bitbucket.org'));
+    }
+
     /** The consumer pair becomes the bearer token AuthHelper sends, and nothing is written anywhere. */
     public function testTheBitbucketAuthorizerExchangesTheConsumerForABearerTokenInTheIo(): void
     {

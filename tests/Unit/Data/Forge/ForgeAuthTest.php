@@ -6,9 +6,11 @@ namespace Lockrot\Tests\Unit\Data\Forge;
 
 use Composer\Config;
 use Composer\IO\BufferIO;
+use Lockrot\Composer\ServiceFactory;
 use Lockrot\Data\Forge\ForgeAuth;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\Tokens;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class ForgeAuthTest extends TestCase
@@ -100,10 +102,7 @@ final class ForgeAuthTest extends TestCase
         $config->merge(['config' => $settings]);
         $io->loadConfiguration($config);
 
-        return new ForgeAuth(
-            Tokens::none(),
-            static fn (string $host): bool => $io->hasAuthentication($host) && ForgeAuth::carriesCredential($io->getAuthentication($host))
-        );
+        return new ForgeAuth(Tokens::none(), ServiceFactory::composerCredentials($io), ServiceFactory::bitbucketCredentials($io));
     }
 
     /**
@@ -117,6 +116,8 @@ final class ForgeAuthTest extends TestCase
         yield 'custom Authorization header' => [['custom-headers' => ['github.com' => ['Authorization: token abc']]], true];
         yield 'custom authorization header in lower case' => [['custom-headers' => ['github.com' => ['X-A: b', 'authorization: token abc']]], true];
         yield 'custom header without Authorization' => [['custom-headers' => ['github.com' => ['X-Proxy-Tag: ci']]], false];
+        yield 'custom list with a non-string element' => [['custom-headers' => ['github.com' => ['Authorization: token abc', 5]]], false];
+        yield 'custom header with a leading space' => [['custom-headers' => ['github.com' => [' Authorization: token abc']]], false];
         yield 'client certificate' => [['client-certificate' => ['github.com' => ['local_cert' => '/c.pem']]], false];
     }
 
@@ -125,6 +126,7 @@ final class ForgeAuthTest extends TestCase
      *
      * @dataProvider composerEntries
      */
+    #[DataProvider('composerEntries')]
     public function testOnlyAComposerEntryThatCarriesACredentialAuthenticates(array $settings, bool $authenticated): void
     {
         self::assertSame($authenticated, self::composerAuth($settings)->isAuthenticated(self::ref(self::GITHUB)));
@@ -133,6 +135,17 @@ final class ForgeAuthTest extends TestCase
     public function testACredentialLessBitbucketEntryDoesNotAuthenticateEither(): void
     {
         $auth = self::composerAuth(['client-certificate' => ['bitbucket.org' => ['local_cert' => '/c.pem']]]);
+
+        self::assertFalse($auth->isAuthenticated(self::ref(self::BITBUCKET)));
+    }
+
+    /** AuthHelper takes the entry of the API host first, so a header-less one there leaves the run anonymous, online or offline. */
+    public function testAHeaderlessApiHostEntryDecidesAloneOffline(): void
+    {
+        $auth = self::composerAuth([
+            'client-certificate' => ['api.bitbucket.org' => ['local_cert' => '/c.pem']],
+            'http-basic' => ['bitbucket.org' => ['username' => 'u', 'password' => 'p']],
+        ]);
 
         self::assertFalse($auth->isAuthenticated(self::ref(self::BITBUCKET)));
     }
