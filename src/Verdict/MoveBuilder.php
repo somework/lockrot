@@ -433,7 +433,8 @@ final class MoveBuilder
      */
     private static function commands(string $kind, MoveSubject $subject, ?string $constraint, ?PhpCheck $phpCheck, ?Latest $latest, ?string $version, ?MoveCheck $check, ?MoveChecks $checks, array $holders): array
     {
-        if ($check !== null && $check->reason() === MoveCheck::LOCK_DISABLED) {
+        // A move with no release read has its own reason, and Composer refuses its step under config.lock false all the same.
+        if (($check !== null && $check->reason() === MoveCheck::LOCK_DISABLED) || ($checks !== null && $checks->checker()->baseline()->check()->reason() === MoveCheck::LOCK_DISABLED)) {
             return [];
         }
         $whyNot = \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true) && $version !== null && ($check === null || !$check->isResolved())
