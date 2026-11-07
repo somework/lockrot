@@ -106,18 +106,23 @@ jobs:
           if [ "$failed" -ne 0 ]; then exit 1; fi
       # ubuntu-latest generates no comma locale, so the comma-locale tests skip in the step "Run tests
       # with the matrix Composer binary". The 8.5/latest row generates de_DE and fails when they skip.
+      # !cancelled(): a failed test step must not hide the locale tests.
       - name: Run the comma-locale tests under a generated de_DE locale
-        if: matrix.php == '8.5' && matrix.composer == 'latest'
+        if: ${{ !cancelled() && matrix.php == '8.5' && matrix.composer == 'latest' }}
         run: |
           sudo locale-gen de_DE.UTF-8
           vendor/bin/phpunit --fail-on-skipped --fail-on-empty-test-suite --filter 'YearsUnderACommaLocaleTest|testTheLibyearsFooterWritesAPointUnderACommaLocale'
       # strtolower() follows LC_CTYPE before PHP 8.2, so only a 7.4 row can show the Turkish `I`.
       # ubuntu-latest generates no tr_TR locale, and these tests skip without one.
+      # PHPUnit 9.6 has no --fail-on-empty-test-suite, so the step requires its OK line instead.
       - name: Run the Turkish-locale tests under a generated tr_TR locale
-        if: matrix.php == '7.4' && matrix.composer == 'latest'
+        if: ${{ !cancelled() && matrix.php == '7.4' && matrix.composer == 'latest' }}
         run: |
           sudo locale-gen tr_TR
-          vendor/bin/phpunit --fail-on-skipped --fail-on-empty-test-suite --filter 'testAnUpperCaseIParsesUnderTheTurkishLocale|testUpperCaseIsFoldedWithoutTheLocale|testLowerFoldsAnUpperCaseIUnderTheTurkishLocale|testAnUpperCaseIssuerHostNamesGithubComUnderTheTurkishLocale'
+          status=0
+          out=$(vendor/bin/phpunit -c phpunit9.xml.dist --colors=never --fail-on-skipped --filter 'testAnUpperCaseIParsesUnderTheTurkishLocale|testUpperCaseIsFoldedWithoutTheLocale|testLowerFoldsAnUpperCaseIUnderTheTurkishLocale|testAnUpperCaseIssuerHostNamesGithubComUnderTheTurkishLocale') || status=$?
+          echo "$out"
+          [ "$status" -eq 0 ] && grep -q '^OK (' <<< "$out"
   # The tests rows exclude MoveCheckComposerOracleTest, or skip it on a composer/composer that
   # neither recorded train 7d's answers nor gave the same answers (ComposerOracle::SAME_ANSWERS).
   # The latest rows follow each new Composer release. This job runs the oracle test once on each of
