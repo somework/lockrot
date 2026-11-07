@@ -1563,19 +1563,21 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * Ruling R14-22: Composer reads `config.lock` from composer.json over the global config. When
-     * it is false, Composer ignores the composer.lock on disk, so lockrot checks no move.
+     * it is false, Composer ignores the composer.lock on disk, so lockrot checks no move. A root
+     * `require.php` that excludes the target stays a refused target fix, because no update admits it.
      *
      * @dataProvider lockOffConfigs
      *
-     * @param array<string, mixed>    $projectConfig
-     * @param array{string, ?string} $baseline
-     * @param array{string, ?string, ?list<string>} $targetFix
+     * @param array<string, mixed>                          $projectConfig
+     * @param array<string, string>                         $rootRequire   the root requirements besides acme/kept
+     * @param array{string, ?string}                        $baseline
+     * @param array{string, ?string, ?list<string>, list<string>} $targetFix     check, reason, command and the sources of held_by
      */
     #[DataProvider('lockOffConfigs')]
-    public function testAConfigLockFalseLeavesEveryMoveUncheckedWithTheLockOnDisk(array $projectConfig, string $globalConfig, array $baseline, array $targetFix): void
+    public function testAConfigLockFalseLeavesEveryMoveUncheckedWithTheLockOnDisk(array $projectConfig, string $globalConfig, array $rootRequire, array $baseline, array $targetFix): void
     {
         $project = $this->tempDir('lockrot-lock-off-');
-        file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/lock-off-test', 'require' => ['acme/kept' => '1.0.0']] + ($projectConfig === [] ? [] : ['config' => $projectConfig])));
+        file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/lock-off-test', 'require' => ['acme/kept' => '1.0.0'] + $rootRequire] + ($projectConfig === [] ? [] : ['config' => $projectConfig])));
         file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0', 'require' => ['php' => '<8.0']]], 'packages-dev' => []]));
         chdir($project);
         $home = $this->tempDir('lockrot-lock-off-home-');
@@ -1592,17 +1594,20 @@ final class LockrotCommandTest extends TestCase
             $moveCheck = JsonPath::arrayAt($json, ['run', 'move_check']);
             self::assertSame($baseline, [$moveCheck['baseline'] ?? null, $moveCheck['reason'] ?? null]);
             $fix = JsonPath::arrayAt($json, ['run', 'php_window', 'target_fix']);
-            self::assertSame($targetFix, [$fix['check'], $fix['reason'], $fix['command']]);
+            self::assertIsArray($fix['held_by']);
+            self::assertSame($targetFix, [$fix['check'], $fix['reason'], $fix['command'], array_column($fix['held_by'], 'source')]);
             self::assertSame($baseline[0] === MoveCheck::REFUSED, \in_array(RunNote::MOVES_NOT_CHECKED, JsonPath::column($json, ['note_details'], 'code'), true));
         });
     }
 
-    /** @return iterable<string, array{array<string, mixed>, string, array{string, ?string}, array{string, ?string, ?list<string>}}> the project config, the global config.json, the baseline with its reason, and the target fix's check, reason and command */
+    /** @return iterable<string, array{array<string, mixed>, string, array<string, string>, array{string, ?string}, array{string, ?string, ?list<string>, list<string>}}> the project config, the global config.json, the root requirements, the baseline with its reason, and the target fix */
     public static function lockOffConfigs(): iterable
     {
-        yield 'composer.json sets lock false' => [['lock' => false], '{}', [MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED], [MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED, null]];
-        yield 'the global config sets lock false' => [[], '{"config": {"lock": false}}', [MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED], [MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED, null]];
-        yield 'composer.json sets lock true over a global false' => [['lock' => true], '{"config": {"lock": false}}', [MoveCheck::REFUSED, null], [MoveCheck::NOT_CHECKED, MoveCheck::NOT_FROM_COMPOSER_REPOSITORY, null]];
+        $unchecked = [MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED];
+        yield 'composer.json sets lock false' => [['lock' => false], '{}', [], $unchecked, [MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED, null, []]];
+        yield 'the global config sets lock false' => [[], '{"config": {"lock": false}}', [], $unchecked, [MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED, null, []]];
+        yield 'lock false with a root require.php that excludes the target' => [['lock' => false], '{}', ['php' => '<8.0'], $unchecked, [MoveCheck::REFUSED, null, null, ['root']]];
+        yield 'composer.json sets lock true over a global false' => [['lock' => true], '{"config": {"lock": false}}', [], [MoveCheck::REFUSED, null], [MoveCheck::NOT_CHECKED, MoveCheck::NOT_FROM_COMPOSER_REPOSITORY, null, []]];
     }
 
     /** @return iterable<string, array{array<string, mixed>}> */

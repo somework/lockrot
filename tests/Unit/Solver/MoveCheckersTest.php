@@ -144,6 +144,7 @@ final class MoveCheckersTest extends TestCase
         self::assertSame($unchecked, $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize(), 'move');
         self::assertSame($unchecked, $checker->solveAt(['acme/lib'])->check()->jsonSerialize(), 'target fix');
         self::assertSame($unchecked, $checker->combined(['acme/lib' => '^1.1'])->check()->jsonSerialize(), 'update now');
+        self::assertSame($unchecked, $checker->joint(MoveQuery::update('acme/lib', '^1.1', '1.1.0'), ['acme/other'])->check()->jsonSerialize(), 'joint');
         self::assertSame([], $repository->asked);
     }
 
