@@ -428,6 +428,26 @@ maintainer.
            renderer's `release.yml` gate accepts a full check only from such a branch. The full
            check that the rc tag of step 4 starts does not count, because its branch is the tag.
            Then delete the branch.
+
+           If the full check of V is red, V cannot pass the gate, because no later run can turn a
+           red run of V green. A change that touches `src/` skips its mutation shards on its pull
+           request, so this full check is the first whole-tree mutation run of that change. Fix
+           the cause on the release branch, and move V to the commit whose full check is green.
+           Then do steps 4 and 5 again for the new V, with the next rc number: its own rc tag, its
+           own `release/full-check-<sha of V>` branch and a new dry `repin`. Do not repin the
+           renderer to the old V.
+
+           Before you tag the renderer in step 7, check the gate that its `release.yml` runs on
+           the pin. The query must print `true`:
+
+           ```bash
+           gh run list --repo somework/lockrot --commit <V> --event push --status success \
+             --json workflowName,headBranch \
+             --jq 'any(.[]; .workflowName == "full-check" and (.headBranch | test("^release/full-check-[0-9a-f]+$")))'
+           ```
+
+           A renderer tag that the gate refuses has no release, and the renderer's tag ruleset
+           keeps it, so that renderer version is lost.
         6. In lockrot-report, run `node scripts/contract.mjs repin <V>`. Set the version in
            `CHANGELOG.md`. Run `npm version X.Y.Z --no-git-tag-version`, which sets `version` in
            `package.json` and both `version` fields of `package-lock.json` (the root and
