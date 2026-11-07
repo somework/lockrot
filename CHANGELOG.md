@@ -148,13 +148,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--offline`, or set `extra.lockrot.advisory-lookup` to `composer-repositories`.
   ([What lockrot contacts](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 - **All formats:** `next_step.commands`, `security.update_now_command`, the `update now:` line and
-  the command in the `do:` line hold only arguments from one set that every shell quotes safely. A
-  step with a version, branch or name from the lock or a repository outside it is left out, so a
-  hostile lock cannot inject into a pasted command. A release name that holds `|`, `<` or `>` leaves
-  out the whole move's command, because cmd.exe and PowerShell run or redirect it. The run note
-  `command_argument_unsafe` counts such moves. When the move check runs, such a move is no
-  `security.update_now` member, and the other members are solved without it. This affects a reader who copies these commands. Action: if a step is missing,
-  check that lock entry before you write the command by hand. ([The move](docs/schema.md#the-move))
+  the `do:` command hold only arguments that every shell quotes safely. A step with another
+  version, branch or name is left out, and a release name with `|`, `<` or `>` leaves out the whole
+  move's command. Action: if a step is missing, check that lock entry before you write the command
+  by hand. ([Command argument unsafe](docs/notes.md#command_argument_unsafe))
 - **CLI:** a repository host's redirect to another origin no longer receives lockrot's
   `Authorization` or `PRIVATE-TOKEN` header. lockrot asks the redirect target again without it. A
   redirect to a URL that is not http or https, or that has no host, is a failed request, so a
