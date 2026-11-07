@@ -165,8 +165,8 @@ final class ComposerSolver
         }
         $preferred = $this->preferredVersions($request);
         $policy = new DefaultPolicy($root->getPreferStable(), false, $preferred);
-        [$set, $composerRequest, $pool, $fixedRoot, $loaded, $feed] = $this->pool($root, $requires, $temporary, $request);
-        [$pool, $answer] = $this->answer($policy, $composerRequest, $pool, $fixedRoot, $preferred);
+        [$set, $composerRequest, $built, $fixedRoot, $loaded, $feed] = $this->pool($root, $requires, $temporary, $request);
+        [$pool, $answer] = $this->answer($policy, $composerRequest, $built, $fixedRoot, $preferred);
         if ($answer instanceof SolverProblemsException) {
             $locked = [];
             foreach ($this->locked->getPackages() as $package) {
@@ -181,11 +181,33 @@ final class ComposerSolver
         }
 
         // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
-        // A virtual name, which a package provides, is unreached too: only a refusal that wants an unreached name proves nothing.
         // Composer blocks a release by each name that it replaces too.
         $held = array_merge([], ...array_map(static fn (BasePackage $package): array => $package->getNames(false), $answer->getNewLockPackages(false)));
 
-        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), array_diff($this->failures($loaded->asked()), [VersionSource::UNREACHED]), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)));
+        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), self::withoutMetUnreached($this->failures($loaded->asked()), $built), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)));
+    }
+
+    /**
+     * $failures without each unreached name that no release in $pool loses: a virtual name, which
+     * no repository lists, is unreached too. A release loses a name that it requires and that no
+     * package in the pool provides at the required version, and a vcs repository can serve it.
+     *
+     * @param array<string, string> $failures name => {@see VersionSource} failure
+     *
+     * @return array<string, string>
+     */
+    private static function withoutMetUnreached(array $failures, Pool $pool): array
+    {
+        $lost = [];
+        foreach ($pool->getPackages() as $package) {
+            foreach ($package->getRequires() as $name => $link) {
+                if (($failures[$name] ?? null) === VersionSource::UNREACHED && $pool->whatProvides($name, $link->getConstraint()) === []) {
+                    $lost[$name] = true;
+                }
+            }
+        }
+
+        return array_filter($failures, static fn (string $failure, string $name): bool => $failure !== VersionSource::UNREACHED || isset($lost[$name]), \ARRAY_FILTER_USE_BOTH);
     }
 
     /**

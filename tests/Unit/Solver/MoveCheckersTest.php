@@ -416,6 +416,49 @@ final class MoveCheckersTest extends TestCase
         self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME], [$check->result(), $check->reason()]);
     }
 
+    /**
+     * Ruling R14-1: no Composer repository lists acme/private, which the vcs repository can serve.
+     * Without it, acme/lib 1.2.0 cannot install, so the solve resolves at 1.1.0 while Composer can
+     * install 1.2.0. A virtual name that a pool package provides keeps the solve resolving.
+     *
+     * @dataProvider unreachedRequirements
+     *
+     * @param array<string, string> $require the requirements of acme/lib 1.2.0
+     * @param array{string, ?string, ?string} $expected
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('unreachedRequirements')]
+    public function testAResolvingSolveThatLosesAReleaseToAnUnreachedNameIsNotChecked(array $require, array $expected): void
+    {
+        $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'acme/lib', 'version' => '1.0.0'] + $packagist,
+            ['name' => 'acme/logger', 'version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']] + $packagist,
+        ]]);
+        $loader = new ArrayLoader();
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
+        $repository = new RecordingComposerRepository([
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.1.0']),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.2.0', 'require' => $require]),
+            $loader->load(['name' => 'acme/logger', 'version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']]),
+        ]);
+        $checker = MoveCheckers::forProject(self::root(['acme/lib' => '^1.0', 'acme/logger' => '^1.0']), $lock, ProjectConfig::empty(), new Config(false), [$vcs, $repository], '8.4', false, Deadline::never());
+
+        $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
+
+        self::assertSame($expected, [$check->result(), $check->reason(), $check->installs()]);
+        self::assertSame(MoveCheck::RESOLVES, $checker->baseline()->check()->result());
+    }
+
+    /** @return iterable<string, array{array<string, string>, array{string, ?string, ?string}}> */
+    public static function unreachedRequirements(): iterable
+    {
+        yield 'a name that no pool package provides' => [['acme/private' => '^1.0'], [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, null]];
+        yield 'a version of a provided name that no pool package provides' => [['psr/log-implementation' => '^2.0'], [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, null]];
+        yield 'a virtual name that a pool package provides' => [['psr/log-implementation' => '^1.0'], [MoveCheck::RESOLVES, null, '1.2.0']];
+        yield 'a met virtual name on a release that the target php refuses' => [['psr/log-implementation' => '^1.0', 'php' => '>=9.0'], [MoveCheck::RESOLVES, null, '1.1.0']];
+    }
+
     /** docs/verdicts.md, move-check limits: a solve that needs another release of a vcs-locked name proves nothing. */
     public function testAMoveThatNeedsAnotherReleaseOfAVcsLockedNameIsNotChecked(): void
     {

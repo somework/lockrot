@@ -720,7 +720,23 @@ final class SolverCheckerTest extends TestCase
         yield 'the install-time budget ran out' => [VersionSource::BUDGET, MoveCheck::INSTALL_TIME_BUDGET];
     }
 
-    /** A resolving solve drops an unreached name from its unloaded names, so the update-now request reads each of its own. */
+    /**
+     * Ruling R14-1: a resolving solve keeps an unreached name that a pool release requires and
+     * that no pool package provides. Without acme/private, the solve installs 1.1.0, not 1.2.0.
+     */
+    public function testAnUpdateNowThatLosesAReleaseToAnUnreachedNameIsNotChecked(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0'], ['version' => '1.2.0', 'require' => ['acme/private' => '^1.0']]]],
+            ['acme/private' => VersionSource::UNREACHED]
+        );
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $checker->combined(['acme/lib' => '^1.1.0'])->check()->jsonSerialize());
+    }
+
+    /** The update-now request reads the failure of each name that it moves. */
     public function testAnUpdateNowOfANameNoComposerRepositoryListsIsNotChecked(): void
     {
         $checker = self::checker(
