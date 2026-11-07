@@ -242,6 +242,68 @@ final class LockrotConfigTest extends TestCase
         yield 'a trailing newline' => ["8.4\n"];
     }
 
+    /**
+     * Ruling R14-2: a target minor that is no PHP minor and lies below the newest known one sits on
+     * no window minor. `6` reads as 6.0, and `7.5.3` as 7.5.
+     *
+     * @dataProvider targetPhpsThatAreNoPhpMinor
+     *
+     * @param array<string, mixed> $extra
+     * @param array<string, mixed> $env
+     * @param array<string, mixed> $cli
+     */
+    #[DataProvider('targetPhpsThatAreNoPhpMinor')]
+    public function testATargetPhpThatIsNoKnownPhpMinorIsRefused(array $extra, array $env, array $cli, string $setting, string $minor, string $value): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage($setting.' names PHP '.$minor.', which does not exist; the known PHP minors are 5.3, 5.4, 5.5, 5.6, 7.0, 7.1, 7.2, 7.3, 7.4, 8.0, 8.1, 8.2, 8.3, 8.4 and 8.5, and a minor above 8.5 is accepted; got "'.$value.'"');
+        LockrotConfig::fromSources($extra, ['LOCKROT_TODAY' => '2026-09-14'] + $env, $cli, '8.5.10', null);
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, array<string, mixed>, array<string, mixed>, string, string, string}> */
+    public static function targetPhpsThatAreNoPhpMinor(): iterable
+    {
+        yield 'the option at 7.5' => [[], [], ['target-php' => '7.5'], '--target-php', '7.5', '7.5'];
+        yield 'the option at a 7.5 patch' => [[], [], ['target-php' => '7.5.3'], '--target-php', '7.5', '7.5.3'];
+        yield 'the option at 6.0' => [[], [], ['target-php' => '6.0'], '--target-php', '6.0', '6.0'];
+        yield 'the option at the major 6' => [[], [], ['target-php' => '6'], '--target-php', '6.0', '6'];
+        yield 'the option below the first known minor' => [[], [], ['target-php' => '5.2'], '--target-php', '5.2', '5.2'];
+        yield 'the variable at 7.5' => [[], ['LOCKROT_TARGET_PHP' => '7.5'], [], 'LOCKROT_TARGET_PHP', '7.5', '7.5'];
+        yield 'the variable under an option that wins' => [[], ['LOCKROT_TARGET_PHP' => '6.0'], ['target-php' => '8.4'], 'LOCKROT_TARGET_PHP', '6.0', '6.0'];
+        yield 'the config key at 6.0' => [['target-php' => '6.0'], [], [], 'extra.lockrot.target-php', '6.0', '6.0'];
+    }
+
+    /**
+     * Ruling R12-4 keeps a minor above the newest known one: a PHP that the release data does not
+     * list yet.
+     *
+     * @dataProvider targetPhpsThatAreKnownOrNewer
+     */
+    #[DataProvider('targetPhpsThatAreKnownOrNewer')]
+    public function testATargetPhpThatIsAKnownOrANewerMinorIsAccepted(string $value, string $minor): void
+    {
+        $env = ['LOCKROT_TODAY' => '2026-09-14'];
+
+        self::assertSame(
+            [$minor, $minor, $minor],
+            [
+                LockrotConfig::fromSources([], $env, ['target-php' => $value], '8.5.10', null)->targetPhp(),
+                LockrotConfig::fromSources([], $env + ['LOCKROT_TARGET_PHP' => $value], [], '8.5.10', null)->targetPhp(),
+                LockrotConfig::fromSources(['target-php' => $value], $env, [], '8.5.10', null)->targetPhp(),
+            ]
+        );
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function targetPhpsThatAreKnownOrNewer(): iterable
+    {
+        yield 'the first known minor' => ['5.3', '5.3'];
+        yield 'the newest known minor' => ['8.5.2', '8.5'];
+        yield 'a minor that the data dates after the clock' => ['8.6', '8.6'];
+        yield 'a minor above the newest known one' => ['8.9', '8.9'];
+        yield 'a major above the newest known minor' => ['9', '9.0'];
+    }
+
     public function testATargetPhpOptionOrVariableReadsTheMinorOfAMajorMinorOrPatch(): void
     {
         self::assertSame(
