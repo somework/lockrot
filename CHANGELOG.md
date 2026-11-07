@@ -116,6 +116,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `lock_disabled`, and no move has a command. Composer refuses a partial update without a lock. A
   move that the solver refused counted as no reachable fix, so a score and a verdict can move.
   ([The move check](docs/verdicts.md#the-move-check))
+- **CLI:** only a real credential lifts the anonymous activity cap. Every Composer credential for
+  the host counts, except a client certificate and `custom-headers` with no `Authorization` or
+  `PRIVATE-TOKEN` header, also for Bitbucket. Such a run is anonymous, so repositories past the cap
+  get no activity read and S10 `no_token` can follow. Action: if `--fail-on=unchecked` now fails
+  on it, set a token. ([Which credentials](docs/internals.md#which-credentials))
 
 ### Security
 
@@ -497,11 +502,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **CLI:** only a real credential lifts the anonymous activity cap: a `github-oauth` token, a
-  bearer token, or an `Authorization` or `PRIVATE-TOKEN` value in `http-basic` or
-  `custom-headers`, also for Bitbucket. A client certificate or `custom-headers` without such a
-  value is anonymous, so the cap and the cause `no_token` stay.
-  ([Which credentials](docs/internals.md#which-credentials))
 - **CLI, Config:** `--fail-on` and `LOCKROT_FAIL_ON` values are case-insensitive under any locale.
   ([CLI options](docs/configuration.md#cli-options))
 - **PHAR:** the archive ships the licence notices of its bundled libraries.
