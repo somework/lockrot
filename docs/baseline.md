@@ -24,7 +24,7 @@ Every later run (plugin or PHAR) reads `lockrot-baseline.json`, or the file `--b
 |---|---|---|
 | `new` | is graded and not in the baseline | When it reaches `--fail-on`, as without a baseline |
 | `worsened` | is in the baseline, and a fact is new: a flag that the entry does not cover, an advisory that it does not hold, an advisory rated higher, or a fix lost | When the new facts reach `--fail-on` ([the gate score](#the-gate-score)) |
-| no entry | is not graded (`ok`, `finished` or `unknown`) and has no baseline entry, because `--generate-baseline` writes an entry for a graded finding only | Only `--fail-on=unchecked`, when its S10 gap counts. The summary line counts it in no bucket |
+| no entry | is not graded (`ok`, `finished` or `unknown`) and has no baseline entry, because `--generate-baseline` writes no entry for an ungraded finding, except one that an incomplete lookup carries forward ([what it does](#what-generate-baseline-does)) | Only `--fail-on=unchecked`, when its S10 gap counts. The summary line counts it in no bucket |
 | `known` | is in the baseline, and every fact is covered | Never |
 | `stale` (not the `stale` flag) | is a baseline entry for a package that is not in `composer.lock` | Never. The output reports it as a note (in `json`: `baseline.stale`) |
 
