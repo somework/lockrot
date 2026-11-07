@@ -349,18 +349,19 @@ final class ExplainFormatterTest extends TestCase
         self::assertSame($plain, str_replace(["\033[1m", "\033[22m", "\033[31m", "\033[39m", "\033[33m", "\033[32m", "\033[36m"], '', ConsoleMarkup::render($markup, true)), 'nothing but lockrot\'s styles');
     }
 
-    /** @return iterable<string, array{?string}> */
+    /** @return iterable<string, array{?string, ?string, string}> the CVE, the reported date, the two lines */
     public static function advisoryCves(): iterable
     {
-        yield 'no CVE' => [null];
-        yield 'a CVE' => ['CVE-2026-0001'];
+        yield 'no CVE' => [null, '2026-01-02T00:00:00+00:00', '/\n +high +GHSA-aaaa-bbbb-cccc  [^\n]*\n +reported 2026-01-02 · /'];
+        yield 'a CVE' => ['CVE-2026-0001', '2026-01-02T00:00:00+00:00', '/\n +high +CVE-2026-0001  [^\n]*\n +GHSA-aaaa-bbbb-cccc · reported 2026-01-02 · /'];
+        yield 'no CVE and no reported date' => [null, null, '/\n +high +GHSA-aaaa-bbbb-cccc  [^\n]*\n +\d+ points · fix: /'];
     }
 
     /**
      * @dataProvider advisoryCves
      */
     #[DataProvider('advisoryCves')]
-    public function testAnAdvisoryPrintsItsIdOnceWhenItHasNoCve(?string $cve): void
+    public function testTheSecondAdvisoryLineNamesTheIdOnlyBesideACve(?string $cve, ?string $reportedAt, string $lines): void
     {
         $case = CaseHydrator::case('B');
         self::assertIsArray($case['inputs']);
@@ -368,6 +369,7 @@ final class ExplainFormatterTest extends TestCase
         self::assertIsArray($case['inputs']['advisories'][0]);
         $case['inputs']['advisories'][0]['id'] = 'GHSA-aaaa-bbbb-cccc';
         $case['inputs']['advisories'][0]['cve'] = $cve;
+        $case['inputs']['advisories'][0]['reported_at'] = $reportedAt;
         $analysis = CaseHydrator::analysisOf($case);
         $finding = $analysis->finding('symfony/monolog-bridge');
         $facts = $analysis->facts('symfony/monolog-bridge');
@@ -376,7 +378,7 @@ final class ExplainFormatterTest extends TestCase
 
         $plain = ConsoleMarkup::render((new ExplainFormatter())->text(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report())), false);
 
-        self::assertMatchesRegularExpression($cve === null ? '/\n +high +GHSA-aaaa-bbbb-cccc  [^\n]*\n +reported /' : '/\n +high +CVE-2026-0001  [^\n]*\n +GHSA-aaaa-bbbb-cccc · reported /', $plain);
+        self::assertMatchesRegularExpression($lines, $plain);
     }
 
     /** @return iterable<string, array{string}> */
