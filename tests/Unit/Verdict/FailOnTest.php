@@ -138,4 +138,29 @@ final class FailOnTest extends TestCase
 
         FailOn::parse('dead', 'extra.lockrot.fail-on');
     }
+
+    public function testAnUpperCaseIParsesUnderTheTurkishLocale(): void
+    {
+        $previous = setlocale(\LC_CTYPE, '0');
+        if (setlocale(\LC_CTYPE, 'tr_TR.UTF-8', 'tr_TR', 'tr_TR.ISO8859-9') === false) {
+            self::markTestSkipped('No Turkish locale is installed.');
+        }
+
+        try {
+            self::assertSame('unchecked', FailOn::parse('UNCHECKED')->value());
+            self::assertSame('high', FailOn::parse('HIGH')->value());
+        } finally {
+            setlocale(\LC_CTYPE, $previous === false ? 'C' : $previous);
+        }
+    }
+
+    public function testANonAsciiByteStaysAsItIsWhenLowerCasing(): void
+    {
+        try {
+            FailOn::parse("H\xC4\xB0GH\xDD");
+            self::fail('The value is not a known one.');
+        } catch (ConfigException $e) {
+            self::assertStringContainsString("\"h\xC4\xB0gh\xDD\"", $e->getMessage());
+        }
+    }
 }
