@@ -11,10 +11,12 @@ use Symfony\Component\Finder\Finder;
 /**
  * The MIT and BSD licences ask for their notice in every copy. The PHAR holds what the `finder` entries
  * of build/phar/box.json select, so each bundled package must keep one notice file there.
+ * The finders run over the dev vendor, as no Composer installs build/phar here, so a package that only
+ * the build lock holds is not checked. PharTest checks the built archive.
  */
 final class PharLicenceNoticesTest extends TestCase
 {
-    private const NOTICE_NAMES = ['LICENSE', 'LICENSE.md', 'LICENSE.txt', 'COPYING'];
+    public const NOTICE_NAME = '{^(LICEN[CS]E|COPYING)([.-][^/]*)?$}i';
 
     public function testTheBoxFindersKeepOneNoticeFileOfEveryNoticeDemandingPackage(): void
     {
@@ -25,7 +27,7 @@ final class PharLicenceNoticesTest extends TestCase
             if (!is_dir($root.'/vendor/'.$package)) {
                 continue;
             }
-            $found = array_intersect(array_map(static fn (string $name): string => $package.'/'.$name, self::NOTICE_NAMES), $selected);
+            $found = array_filter($selected, static fn (string $path): bool => \dirname($path) === $package && preg_match(self::NOTICE_NAME, basename($path)) === 1);
             if ($found === []) {
                 $missing[] = $package;
             }

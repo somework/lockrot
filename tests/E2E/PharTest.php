@@ -107,13 +107,14 @@ final class PharTest extends TestCase
         $base = 'phar://'.$this->phar().'/vendor/';
         $missing = [];
         foreach (PharLicenceNoticesTest::noticeDemandingPackages(\dirname(__DIR__, 2)) as $package) {
-            $notices = array_filter(['LICENSE', 'LICENSE.md', 'LICENSE.txt', 'COPYING'], static fn (string $name): bool => is_file($base.$package.'/'.$name));
+            $notices = is_dir($base.$package) ? preg_grep(PharLicenceNoticesTest::NOTICE_NAME, scandir($base.$package) ?: []) : [];
             if ($notices === []) {
                 $missing[] = $package;
             }
         }
 
         self::assertSame([], $missing);
+        self::assertFileExists($base.'somework/lockrot/LICENSE');
     }
 
     public function testPharRunsOnFixtureDirectory(): void
