@@ -13,6 +13,7 @@ use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SigningKeys;
 use Lockrot\Tests\Support\StaticFileServer;
 use Lockrot\Tests\Support\VersionMask;
+use Lockrot\Tests\Unit\Build\PharLicenceNoticesTest;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -98,6 +99,21 @@ final class PharTest extends TestCase
         $process->setTimeout(300)->run();
 
         return $process;
+    }
+
+    /** The MIT and BSD licences ask for their notice in every copy: each bundled package keeps one. */
+    public function testTheArchiveShipsTheLicenceNoticeOfEveryNoticeDemandingPackage(): void
+    {
+        $base = 'phar://'.$this->phar().'/vendor/';
+        $missing = [];
+        foreach (PharLicenceNoticesTest::noticeDemandingPackages(\dirname(__DIR__, 2)) as $package) {
+            $notices = array_filter(['LICENSE', 'LICENSE.md', 'LICENSE.txt', 'COPYING'], static fn (string $name): bool => is_file($base.$package.'/'.$name));
+            if ($notices === []) {
+                $missing[] = $package;
+            }
+        }
+
+        self::assertSame([], $missing);
     }
 
     public function testPharRunsOnFixtureDirectory(): void
