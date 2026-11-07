@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-WHmjUGsWOL+E2TtF1oMWAPiOw8iHNoS+h/lFaW3PMzA='; style-src 'sha256-pBfDlVSrUdrPv2TQUAjvDEqkz5MFnrALj1063H60alQ='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rQOMtmeYoBH03bFyyYsQ5l2Ak6hjOp5ORBDlyXOP9OM='; style-src 'sha256-PAtjzikmaZGAeGIP+cxuEenlJ3QYdzKxkEn9QoSHEnw='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -3979,6 +3979,11 @@ span.f2-unit {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.f2-ledger :is(.f2-pkg, .f2-reach) .pkg-word {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
 .f2-gate {
   flex: none;
   box-sizing: border-box;
@@ -5440,6 +5445,14 @@ span.f2-unit {
   grid-template-columns:
     max-content minmax(0, calc(var(--longest, 1) * var(--unit)))
     max-content minmax(min(10em, 22vw), 1fr) max-content;
+}
+@media (max-width: 479px) {
+  .overview2-flag-bars {
+    grid-template-columns:
+      max-content minmax(0, calc(var(--longest, 1) * var(--unit)))
+      max-content minmax(min-content, 1fr) max-content;
+    column-gap: 8px;
+  }
 }
 .overview2-split {
   font-size: var(--text-xs);
@@ -7608,7 +7621,34 @@ a.ov-ex-row:hover {
   }
 }
 </style>
-    <script>var LockrotReport = (function(exports) {
+    <script>/*! Third-party software in this file:
+
+preact 10.29.8 (MIT)
+
+The MIT License (MIT)
+
+Copyright (c) 2015-present Jason Miller
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+var LockrotReport = (function(exports) {
 	Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 	//#region node_modules/preact/dist/preact.module.js
 	var n;
@@ -8461,7 +8501,8 @@ a.ov-ex-row:hover {
 		["no_release_read", "no release of the row was read"],
 		["pass_cap", "Composer refused each move before it"],
 		["solver_error", "Composer's solver failed on it"],
-		["advisory_lookup_incomplete", "the advisory lookup did not cover a package in the result"]
+		["advisory_lookup_incomplete", "the advisory lookup did not cover a package in the result"],
+		["lock_disabled", "config.lock is false, so Composer ignores composer.lock"]
 	];
 	function checkReasonRich(reason) {
 		const words = CHECK_REASON_WORDS.find(([id]) => id === reason)?.[1];
@@ -10067,6 +10108,19 @@ a.ov-ex-row:hover {
 			then: then ? `, the move to ${move.constraint ?? move.to_branch ?? move.kind}` : null
 		};
 	}
+	var NO_COMMAND_WORDS = "lockrot prints no command: the release name holds |, < or >, which a Windows shell runs or redirects.";
+	var isUnsafeMove = (entry) => typeof entry === "object" && entry !== null && typeof entry["package"] === "string" && typeof entry["version"] === "string";
+	function unsafeMoves(notes) {
+		return notes.flatMap(({ code, data }) => {
+			if (code !== "command_argument_unsafe" || typeof data !== "object" || data === null) return [];
+			const moves = data["moves"];
+			return Array.isArray(moves) ? moves.filter(isUnsafeMove) : [];
+		});
+	}
+	function namedUnsafe(finding, move, unsafe) {
+		const release = move.kind === "tag" ? move.latest?.version ?? null : move.version;
+		return unsafe.some((u) => u.package === finding.package && u.version === release);
+	}
 	function stillRefused(run) {
 		if (run.move_check?.baseline !== "refused") return "";
 		return run.php_window?.target.inside === false ? " Composer still refuses the lock itself: the PHP line in the Overview names the packages." : " Composer still refuses the lock itself: the Run tab names the cause.";
@@ -10095,7 +10149,7 @@ a.ov-ex-row:hover {
 		if (move.moves_with.length === 0) return null;
 		return `It also updates ${joinAnd(move.moves_with.map((m) => `${m.package}${m.installed_version === null ? "" : ` from ${m.installed_version}`} to ${m.version}`))}`;
 	}
-	function moveCard(finding, move, run, then, noted) {
+	function moveCard(finding, move, run, then, noted, unsafe) {
 		const names = RELEASE_KINDS.includes(move.kind);
 		const actionable = names || move.commands.length > 0 || move.kind === "replace";
 		const leftFlags = move.leaves.filter((l) => l.kind === "flag").map((l) => l.id);
@@ -10116,16 +10170,17 @@ a.ov-ex-row:hover {
 			heldBy: heldBy(finding, move, run, then),
 			platformStep: move.commands.length > 0 ? platformStep(run) : null,
 			checkNote: move.commands.some((argv) => argv[1] === "why-not") && move.composer_moves_because.includes("holders") && commandLines(move.commands)[0] !== "This command holds characters the page does not print." ? "This shows which package holds the move." : null,
-			movesWith: movesWithLine(move)
+			movesWith: movesWithLine(move),
+			noCommand: move.commands.length === 0 && namedUnsafe(finding, move, unsafe) ? NO_COMMAND_WORDS : null
 		};
 	}
-	function moveCards(finding, run) {
+	function moveCards(finding, run, unsafe = []) {
 		const lead = finding.next_step;
 		if (lead === null) return [];
 		const cards = [];
 		const noted = [];
 		for (const [move, then] of [[lead, false], ...lead.also.map((also) => [also, true])]) {
-			cards.push(moveCard(finding, move, run, then, [...noted]));
+			cards.push(moveCard(finding, move, run, then, [...noted], unsafe));
 			noted.push(...move.composer_moves_because);
 		}
 		return cards;
@@ -11060,10 +11115,13 @@ a.ov-ex-row:hover {
 		const s7 = own?.signals.find(({ id }) => id === "S7");
 		return s7 === void 0 ? [] : s7.data.packages;
 	}
+	function shownExposure(report) {
+		return report.packages_flagged === 0 ? [] : report.exposure;
+	}
 	function radiusLayout2(report, visible, all) {
 		const byName = new Map(report.findings.map((f) => [f.package, f]));
 		return radiusLayout({ report: {
-			exposure: report.exposure.map((entry) => ({
+			exposure: shownExposure(report).map((entry) => ({
 				...entry,
 				members: members(byName.get(entry.package))
 			})),
@@ -11137,7 +11195,7 @@ a.ov-ex-row:hover {
 		list: "Direct requirements, in the order of lockrot's exposure list",
 		itself: (verdict) => `${verdict} itself`,
 		filtered: (n) => `${n} more ${pluralNoun(n, "does", "do")} not match the filter`,
-		show: (row) => `Show the ${plural(row.count, "package", "packages")} listed under ${row.package}`,
+		show: (row) => `The ${plural(row.count, "package", "packages")} listed under ${row.package}`,
 		listedUnder: (pkg) => `Listed under ${pkg}`,
 		via: (hops) => `via ${hops.join(" → ")}`,
 		singles: (n) => `${n} more pull in one flagged package each`,
@@ -11398,6 +11456,17 @@ a.ov-ex-row:hover {
 			flag: union(filters.flag, named),
 			gate
 		};
+	}
+	//#endregion
+	//#region src/domain/pageTitle.ts
+	var projectName = ({ project, lock_file }) => project ?? lock_file ?? "composer.lock";
+	function pageTitle(base, tab, project, pkg) {
+		return [
+			pkg,
+			tab,
+			project,
+			base.trim()
+		].filter((part) => part !== null && part !== "").join(" · ");
 	}
 	//#endregion
 	//#region src/domain/runState.ts
@@ -11842,7 +11911,6 @@ a.ov-ex-row:hover {
 		accepted: "Accepted",
 		gate: "Gate",
 		more: "{n} more",
-		showFewer: "show fewer",
 		clears: "Clears",
 		stays: "Stays",
 		notChecked: "Not checked",
@@ -12677,6 +12745,10 @@ a.ov-ex-row:hover {
 						})
 					]
 				}),
+				card.noCommand !== null && u$1("p", {
+					className: "d3-move-note",
+					children: card.noCommand
+				}),
 				card.composer.length > 0 && u$1("div", {
 					className: "d3-notes",
 					children: [u$1("p", {
@@ -13033,7 +13105,7 @@ a.ov-ex-row:hover {
 		facts: "This run",
 		baseline: "Baseline",
 		stale: "Entries for packages that left the lock",
-		scoreLink: "How the score works ›",
+		scoreLink: "How the score works",
 		rules: (n) => `The ${n} rules`,
 		fixes: "Fixes, easiest first",
 		lookup: "Advisory lookup",
@@ -13195,7 +13267,14 @@ a.ov-ex-row:hover {
 					section.focus({ preventScroll: true });
 				});
 			},
-			children: RUN_WORDS.scoreLink
+			children: [
+				RUN_WORDS.scoreLink,
+				" ",
+				u$1("span", {
+					"aria-hidden": "true",
+					children: "›"
+				})
+			]
 		});
 	}
 	//#endregion
@@ -13857,7 +13936,7 @@ a.ov-ex-row:hover {
 				children: u$1(Name$1, { name })
 			}, name))
 		}), rest > 0 && u$1(DisclosureButton, {
-			label: open ? DETAIL_WORDS.showFewer : DETAIL_WORDS.more.replace("{n}", String(rest)),
+			label: DETAIL_WORDS.more.replace("{n}", String(rest)),
 			open,
 			controls: listId,
 			onToggle: () => {
@@ -14154,7 +14233,7 @@ a.ov-ex-row:hover {
 		const lead = branchesLead(finding, metadata);
 		const age = ageRows(finding, metadata);
 		const baseline = baselineSuffix(finding, run);
-		const cards = moveCards(finding, run);
+		const cards = moveCards(finding, run, unsafeMoves(report.note_details));
 		const hasAdvisories = advisoryRows(finding).length > 0;
 		const jumps = {
 			...lead.length > 0 ? { branches: branchesId } : {},
@@ -14520,7 +14599,9 @@ a.ov-ex-row:hover {
 		kicker: "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
 		emptyLock: "No packages in this lock",
 		grades: "Grade",
+		stripGrades: "Grade, the same filter as under Filters",
 		perPackage: "One square per package",
+		picture: "Every package by verdict",
 		flags: "Flags",
 		flagsNote: "packages carrying each; a package counts once per flag",
 		security: "Security advisories",
@@ -14647,7 +14728,7 @@ a.ov-ex-row:hover {
 	});
 	function exposureBars(report) {
 		const none = report.packages_flagged === 0;
-		const exposure = none ? [] : report.exposure;
+		const exposure = shownExposure(report);
 		const rows = exposure.slice(0, 8).map(({ package: name, flagged }) => ({
 			package: name,
 			flagged
@@ -14664,6 +14745,7 @@ a.ov-ex-row:hover {
 			count: n < 2 ? null : `${plural(n, "direct requirement", "direct requirements")} pull in flagged packages.`,
 			longest,
 			scale: `flagged, of ${String(report.packages_flagged)}`,
+			name: `Direct requirements, each with the flagged packages it pulls in, of ${String(report.packages_flagged)} flagged`,
 			overlap: rows.length < 2 ? null : `A flagged package counts under each direct requirement it is reached from, up to ${String(report.exposure_rule.max_fan_in)}, so the rows overlap.`,
 			more: rest > 0 ? `${rest} more in Blast radius` : null,
 			shared: names.length > 0 ? `${RADIUS_WORDS.shared(names.length)}: ${names.join(", ")}.` : null,
@@ -15307,7 +15389,7 @@ a.ov-ex-row:hover {
 				u$1("div", {
 					className: "legend f2-strip-chips",
 					role: "group",
-					"aria-label": OVERVIEW_WORDS.grades,
+					"aria-label": OVERVIEW_WORDS.stripGrades,
 					children: gradeChips(report).map(({ grade, count }) => u$1(LegendButton, {
 						tone: verdictTone(report.run.score_model, grade),
 						dim: count === 0,
@@ -15582,7 +15664,7 @@ a.ov-ex-row:hover {
 	var GLOSSARY2_WORDS = {
 		docs: "The verdicts on lockrot.dev",
 		libyears: "For each package, the years between the release installed and its newest stable release, summed. It counts every drift, healthy patches included, so it says how far behind the lock is and nothing about why: no flag or gate reads it.",
-		score: "How the score adds the flags up is on the Run tab:",
+		score: "How the score adds the flags up is on the Run data tab:",
 		accept: "A package you consider finished can be accepted the way lockrot's built-in list accepts one: an extra.lockrot.ignore entry in composer.json, with a reason. Its accepted flags stay listed and weigh 0.",
 		listKeys: "On a tab with a list:",
 		everyKeys: "On every tab:",
@@ -16096,7 +16178,7 @@ a.ov-ex-row:hover {
 		const { run, lockrot, data_date } = model.report;
 		const ref = useMeasuredHeight("--topbar-h");
 		useGateFactFit(ref);
-		const project = run.project ?? run.lock_file ?? "composer.lock";
+		const project = projectName(run);
 		const label = themeButtonLabel(theme);
 		const decided = gateHeadline(model.report);
 		const gate = gateFact(model.report);
@@ -16503,7 +16585,7 @@ a.ov-ex-row:hover {
 			findings: String(population2(report, "findings").length),
 			advisories: String(report.findings.reduce((n, f) => n + advisoryRows(f).length, 0)),
 			packages: String(report.findings.length),
-			radius: String(report.exposure.length),
+			radius: String(shownExposure(report).length),
 			run: report.notes.length > 0 ? String(report.notes.length) : ""
 		};
 	}
@@ -17437,6 +17519,7 @@ a.ov-ex-row:hover {
 		const scope = leadScope(report);
 		return u$1("figure", {
 			className: "ov-picture",
+			"aria-label": OVERVIEW_WORDS.picture,
 			children: [
 				figure !== null && u$1("p", {
 					className: "ov-figure",
@@ -18351,7 +18434,7 @@ a.ov-ex-row:hover {
 						children: [u$1("span", { children: OVERVIEW_TAB_WORDS.requirement }), u$1("span", { children: bars.scale })]
 					}), u$1("ul", {
 						className: "ov-ex",
-						"aria-label": `${OVERVIEW_TAB_WORDS.exposureNote}, ${bars.scale}`,
+						"aria-label": bars.name,
 						children: bars.rows.map((row) => u$1("li", { children: u$1(TabLink, {
 							target: {
 								...bars.link,
@@ -19906,7 +19989,7 @@ a.ov-ex-row:hover {
 				mounted = true;
 				const { model } = latest.current;
 				const { run, lockrot, data_date } = model.report;
-				const project = run.project ?? run.lock_file ?? "composer.lock";
+				const project = projectName(run);
 				root.style.setProperty(RUNNING_HEAD, cssString(runningLine(project, dataDay(data_date), lockrot.version)));
 				R(k$1(PrintDocument, { base: latest.current }), node);
 			};
@@ -20435,7 +20518,7 @@ a.ov-ex-row:hover {
 			})] }), u$1(Rail, {})]
 		});
 	}
-	function App({ model }) {
+	function App({ model, title }) {
 		const wide = useWide();
 		const narrow = useNarrow();
 		const railRoom = useRailRoom();
@@ -20584,6 +20667,20 @@ a.ov-ex-row:hover {
 		h(() => {
 			detailScrollRef.current?.scrollTo(0, 0);
 		}, [state.pkg]);
+		h(() => {
+			if (title === void 0) return void 0;
+			const tab = TABS.find(({ view }) => view === state.view)?.label ?? state.view;
+			const held = model.report.findings.some(({ package: name }) => name === state.pkg);
+			document.title = pageTitle(title, tab, projectName(model.report.run), held ? state.pkg : null);
+			return () => {
+				document.title = title;
+			};
+		}, [
+			title,
+			model,
+			state.view,
+			state.pkg
+		]);
 		const now = T(() => new Date(model.report.generated_at), [model]);
 		const value = T(() => ({
 			model,
@@ -20695,9 +20792,12 @@ a.ov-ex-row:hover {
 	}
 	//#endregion
 	//#region src/ui/RenderGuard.tsx
-	function RenderGuard({ model }) {
+	function RenderGuard({ model, title }) {
 		const caught = b()[0];
-		if (caught === void 0) return u$1(App, { model });
+		if (caught === void 0) return u$1(App, {
+			model,
+			title
+		});
 		return u$1(ErrorScreen, { error: {
 			kind: "render-failed",
 			message: caught instanceof Error ? caught.message : "The page threw a value that is not an Error."
@@ -20774,8 +20874,11 @@ a.ov-ex-row:hover {
 	function screenFor(error) {
 		return error.kind === "report-1" ? k$1(Report1Screen, { version: error.version }) : k$1(ErrorScreen, { error });
 	}
-	function renderResult(target, result) {
-		R(result.ok ? k$1(RenderGuard, { model: result.model }) : screenFor(result.error), target);
+	function renderResult(target, result, title) {
+		R(result.ok ? k$1(RenderGuard, {
+			model: result.model,
+			title
+		}) : screenFor(result.error), target);
 	}
 	function mount(target, bundle) {
 		renderResult(target, normalize(bundle));
@@ -20791,14 +20894,14 @@ a.ov-ex-row:hover {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.13";
+	var version = "0.14.0-rc.14";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");
 		if (!dataEl || !appEl) return;
 		const text = dataEl.textContent;
 		if (text.trim() === "") return;
-		renderResult(appEl, parseBundle(text));
+		renderResult(appEl, parseBundle(text), document.title);
 	}
 	window.LockrotReport = {
 		version,
