@@ -147,6 +147,20 @@ final class MoveBuilderTest extends TestCase
         self::assertSame([[], '2.0.0+x|calc'], [$move->commands(), $move->unsafeArgument()]);
     }
 
+    /**
+     * A step quotes the constraint of a resolved require, so a constraint with an operator counts
+     * when the release name is clean, and the value that the move names has no leading caret.
+     */
+    public function testAResolvedRequireWhoseConstraintHoldsAnOperatorNamesTheConstraintWithoutItsCaret(): void
+    {
+        [$row, $context] = self::checkedOn(self::factsOf([['2.0.0', '2026-01-01', '>=7.4']]), ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]]);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0+x|calc'), [], null, $context);
+
+        self::assertSame([[], '2.0+x|calc'], [$move->commands(), $move->unsafeArgument()]);
+    }
+
     /** Under `config.lock` false the move has no command for that reason, so the unsafe clause does not apply. */
     public function testAMoveUnderALockThatComposerIgnoresGetsNoUnsafeArgument(): void
     {
