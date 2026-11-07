@@ -1081,4 +1081,16 @@ final class MoveTest extends TestCase
 
         self::assertSame([[], $movesWith], [$move->movesWith(), $copy->movesWith()]);
     }
+
+    public function testTheCopyWithAnUnsafeArgumentWritesNoStepAndLeavesTheMoveAsItWas(): void
+    {
+        $subject = new MoveSubject('acme/lib', '1.2.0', true, [], '8.4', null);
+        $steps = [['composer', 'update', 'acme/lib']];
+        $move = new Move(Move::UPDATE, FlagSet::VULNERABLE, [], null, null, null, null, '2.x', '2.0.0', '2.0.0', null, null, null, false, [], [], [], [], [], null, [], $steps, $subject);
+
+        $copy = $move->withUnsafeArgument('2.0.0+x|calc');
+
+        self::assertSame([null, $steps], [$move->unsafeArgument(), $move->commands()]);
+        self::assertSame(['2.0.0+x|calc', []], [$copy->unsafeArgument(), $copy->commands()]);
+    }
 }
