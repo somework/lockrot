@@ -119,7 +119,6 @@ final class ExplainFormatter
         return $via.' from the nearest composer.json line'.($namedIn === [] ? '; no line of composer.json names it' : '');
     }
 
-    /** A repository line that names its own subject keeps its words, any other gets the `repository` label. */
     /** A not-read line for an unsupported host or with no repository path starts with its own words, so it takes no label. */
     private static function repositoryLabelled(Finding $finding): string
     {
