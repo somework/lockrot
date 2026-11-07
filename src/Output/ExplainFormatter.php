@@ -268,7 +268,7 @@ final class ExplainFormatter
         return self::INDENT.self::escape(str_pad($label, self::FLAG - 1).' '.$text);
     }
 
-    /** @return list<string> one entry per counted advisory: severity, CVE and title, then the id, the date, the points and the fix */
+    /** @return list<string> one entry per counted advisory: severity, CVE (else id) and title, then the id (only with a CVE), the date, the points and the fix */
     private static function advisoryLines(Finding $finding): array
     {
         $s9 = $finding->signalData(AdvisoryData::class);
@@ -284,7 +284,7 @@ final class ExplainFormatter
     private static function advisoryFacts(AdvisoryRow $row): string
     {
         $fix = $row->fix();
-        $parts = [$row->id()];
+        $parts = $row->cve() === null ? [] : [$row->id()];
         $reported = $row->reportedAt();
         if ($reported !== null) {
             $parts[] = 'reported '.substr($reported, 0, 10);

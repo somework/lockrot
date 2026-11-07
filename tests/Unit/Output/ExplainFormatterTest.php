@@ -349,6 +349,36 @@ final class ExplainFormatterTest extends TestCase
         self::assertSame($plain, str_replace(["\033[1m", "\033[22m", "\033[31m", "\033[39m", "\033[33m", "\033[32m", "\033[36m"], '', ConsoleMarkup::render($markup, true)), 'nothing but lockrot\'s styles');
     }
 
+    /** @return iterable<string, array{?string}> */
+    public static function advisoryCves(): iterable
+    {
+        yield 'no CVE' => [null];
+        yield 'a CVE' => ['CVE-2026-0001'];
+    }
+
+    /**
+     * @dataProvider advisoryCves
+     */
+    #[DataProvider('advisoryCves')]
+    public function testAnAdvisoryPrintsItsIdOnceWhenItHasNoCve(?string $cve): void
+    {
+        $case = CaseHydrator::case('B');
+        self::assertIsArray($case['inputs']);
+        self::assertIsArray($case['inputs']['advisories']);
+        self::assertIsArray($case['inputs']['advisories'][0]);
+        $case['inputs']['advisories'][0]['id'] = 'GHSA-aaaa-bbbb-cccc';
+        $case['inputs']['advisories'][0]['cve'] = $cve;
+        $analysis = CaseHydrator::analysisOf($case);
+        $finding = $analysis->finding('symfony/monolog-bridge');
+        $facts = $analysis->facts('symfony/monolog-bridge');
+        self::assertNotNull($finding);
+        self::assertNotNull($facts);
+
+        $plain = ConsoleMarkup::render((new ExplainFormatter())->text(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report())), false);
+
+        self::assertMatchesRegularExpression($cve === null ? '/\n +high +GHSA-aaaa-bbbb-cccc  [^\n]*\n +reported /' : '/\n +high +CVE-2026-0001  [^\n]*\n +GHSA-aaaa-bbbb-cccc · reported /', $plain);
+    }
+
     /** @return iterable<string, array{string}> */
     public static function textsThatLookLikeMarkup(): iterable
     {
