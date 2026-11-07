@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Signal;
 
 use Lockrot\Clock;
+use Lockrot\Output\AgeText;
 use Lockrot\Signal\Rule\LeftBehindRule;
 use Lockrot\Signal\Rule\NoPushRule;
 use Lockrot\Signal\Rule\NoReleaseRule;
@@ -44,6 +45,11 @@ final class YearsUnderACommaLocaleTest extends TestCase
         self::assertNotNull($signal);
         self::assertSame('last release 2015-11-16 (10.8 years ago)', $signal->summary());
         self::assertSame('last release 2015-11-16 (10.8 years ago)', FlagSentence::maintenance(FlagSet::STALE, [$signal->data()]));
+    }
+
+    public function testTheAgeLineYearsWriteAPoint(): void
+    {
+        self::assertSame('10.8 years ago', AgeText::ago(10.84));
     }
 
     public function testTheS4SummaryWritesAPoint(): void
