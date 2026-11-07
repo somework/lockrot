@@ -61,7 +61,7 @@ interface MoveChecker
      */
     public function configuredPhp64bit();
 
-    /** The version of the Composer that solves, null when nothing solves. */
+    /** The version of the running Composer, which solves the moves or would solve them. */
     public function composerVersion(): ?string;
 
     /**

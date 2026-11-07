@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Solver;
 
+use Composer\Composer;
 use Composer\Config;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
@@ -145,6 +146,7 @@ final class MoveCheckersTest extends TestCase
         self::assertSame($unchecked, $checker->solveAt(['acme/lib'])->check()->jsonSerialize(), 'target fix');
         self::assertSame($unchecked, $checker->combined(['acme/lib' => '^1.1'])->check()->jsonSerialize(), 'update now');
         self::assertSame($unchecked, $checker->joint(MoveQuery::update('acme/lib', '^1.1', '1.1.0'), ['acme/other'])->check()->jsonSerialize(), 'joint');
+        self::assertSame(Composer::getVersion(), $checker->composerVersion(), 'the running Composer');
         self::assertSame([], $repository->asked);
     }
 

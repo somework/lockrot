@@ -1387,7 +1387,7 @@ final class LockrotCommandTest extends TestCase
             self::assertSame(0, $code, $stderr);
             $json = json_decode($stdout, true);
             self::assertIsArray($json);
-            self::assertSame(['not_checked', MoveCheck::COMPOSER_JSON_INVALID], [JsonPath::stringAt($json, ['run', 'move_check', 'baseline']), JsonPath::stringAt($json, ['run', 'move_check', 'reason'])]);
+            self::assertSame(['not_checked', MoveCheck::COMPOSER_JSON_INVALID, Composer::getVersion()], [JsonPath::stringAt($json, ['run', 'move_check', 'baseline']), JsonPath::stringAt($json, ['run', 'move_check', 'reason']), JsonPath::stringAt($json, ['run', 'move_check', 'composer'])]);
         });
     }
 

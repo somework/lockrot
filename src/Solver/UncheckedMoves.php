@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
+use Composer\Composer;
+
 /**
  * Checks no move, for one reason: a run with no composer.json, or a Composer that lacks the
  * solver's classes.
@@ -68,9 +70,9 @@ final class UncheckedMoves implements MoveChecker
         return $this->configuredPhp64bit;
     }
 
-    public function composerVersion(): ?string
+    public function composerVersion(): string
     {
-        return null;
+        return Composer::getVersion();
     }
 
     public function solverError(): ?array
