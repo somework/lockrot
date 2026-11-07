@@ -436,8 +436,8 @@ maintainer.
            full check of V can be the first whole-tree run that fails. Fix the cause on the
            release branch, and move V to the commit whose full check is green. If the fix changes
            the contract bundle, do steps 1 to 3 again first. Then do steps 4 and 5 again for the
-           new V, with the next rc number: its own rc tag and its own
-           `release/full-check-<sha of V>` branch. Run `node scripts/contract.mjs repin <V>` of
+           new V. Give each new rc tag the next unused rc number of X.Y.Z, so the rc tag and the
+           `release/full-check-<sha of V>` branch are new. Run `node scripts/contract.mjs repin <V>` of
            step 6 against the new V, and commit nothing. Do not repin the renderer to the old V.
 
            Before you tag the renderer in step 7, check the gate that its `release.yml` runs on

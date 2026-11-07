@@ -144,10 +144,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   S10 and the run note `advisories_not_checked` name `composer_json_invalid`. `--fail-on=unchecked`
   then exits 1. Action: fix `composer.json` until `composer validate` passes.
   ([Run notes](docs/notes.md#advisories_not_checked))
-- **Config:** an issuer variable (`GITHUB_SERVER_URL`, `GH_HOST` and the others) whose URL holds a
-  backslash in the host part, or an `@` in the path, query or fragment, names no public host. A
-  browser and a URL parser read such a URL as different hosts, so lockrot withholds the ambient
-  token, and `-v` names "an issuer that URL parsers read two ways". Action: correct that variable.
+- **Config:** an issuer variable (`GH_HOST` and the others) whose URL holds a backslash in its
+  authority, or an `@` in the path, query or fragment, names no public host. lockrot withholds the
+  ambient token. `-v` names the host after the last `@`, or "an issuer that URL parsers read two
+  ways" when that host is the public host. Action: correct that variable.
   ([Which credentials](docs/internals.md#which-credentials))
 - **All formats:** advisories are looked up by name for every package the run checks (packages-dev
   with `--dev`), so the names of packages from vcs, a path, an archive or an origin lockrot cannot
@@ -511,8 +511,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **PHAR:** the archive ships lockrot's own `LICENSE` and the notice file of every bundled package.
   ([What the PHAR does](docs/phar.md#what-the-phar-does-and-does-not-do))
 - **CLI:** for a host that lockrot cannot ask, or a package with no repository path, the
-  `--explain` repository line starts "lockrot cannot ask <host> about repository activity" or
-  "repository activity not asked (<reason>)", with no `repository` label.
+  `--explain` repository line starts `lockrot cannot ask <host> about repository activity` or
+  `repository activity not asked (<reason>)`, with no `repository` label.
   ([Explaining one package](docs/configuration.md#explaining-one-package))
 - **CLI:** `--explain` prints an advisory id once.
   ([Explaining one package](docs/configuration.md#explaining-one-package))

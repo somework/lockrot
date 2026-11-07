@@ -99,8 +99,9 @@ carries `User-Agent: lockrot`.
   variables. A host that only a `gh` or `glab` configuration file names is not seen. In that case,
   set the issuer variable of that host, or pass the token as `LOCKROT_GITHUB_TOKEN` or
   `LOCKROT_GITLAB_TOKEN`. An issuer URL that two URL parsers read as different hosts names no
-  public host: it holds a backslash in the host part, or an `@` in the path, query or fragment.
-  `-v` then names "an issuer that URL parsers read two ways", not a host.
+  public host: it holds a backslash in its authority, or an `@` in the path, query or fragment.
+  When the host after the last `@` is the public host, `-v` names "an issuer that URL parsers read
+  two ways". Else `-v` names that host.
 
 - lockrot cannot keep Composer's own credentials from a host. A setup step that writes the
   runner's token into Composer's `github-oauth` for github.com makes Composer send it to
