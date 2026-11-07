@@ -968,6 +968,13 @@ Limits of the check:
   `composer_json_invalid`). Composer refuses such a file, for example for a requirement name that
   is no package name. The advisory lookup of that run does not run either
   ([Security advisories](#security-advisories)).
+- A run whose Composer config sets `config.lock` to false, in composer.json or in the global
+  config, checks no move: `run.move_check.baseline` is `not_checked`, and each move's
+  `check.reason` is `lock_disabled`. The reason words are "config.lock is false, so Composer
+  ignores composer.lock". Composer refuses a partial update without a lock, so every move has no
+  command: `commands[]` is `[]`, and no `update now:` line or `moves_not_checked` note is written.
+  The findings still read composer.lock. `no_composer_json` and `composer_json_invalid` come
+  first, and `lock_disabled` comes before every other reason of the baseline.
 - A run whose `config.platform` holds a value that Composer refuses checks no move (`check.reason`
   `platform_config_invalid`). Each `composer update` then stops. The run still writes its report.
   These values give that reason:
