@@ -28,6 +28,7 @@ use Composer\Repository\LockArrayRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositorySet;
 use Composer\Repository\RootPackageRepository;
+use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Lockrot\Analyzer\PhpWindow;
@@ -184,30 +185,62 @@ final class ComposerSolver
         // Composer blocks a release by each name that it replaces too.
         $held = array_merge([], ...array_map(static fn (BasePackage $package): array => $package->getNames(false), $answer->getNewLockPackages(false)));
 
-        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), self::withoutMetUnreached($this->failures($loaded->asked()), $built), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)));
+        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), $this->withoutMetUnreached($this->failures($loaded->asked()), $built, $answer), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)));
     }
 
     /**
      * $failures without each unreached name that no release in $pool loses: a virtual name, which
-     * no repository lists, is unreached too. A release loses a name that it requires and that no
-     * package in the pool provides at the required version, and a vcs repository can serve it.
+     * no repository lists, is unreached too. A release that the solve could prefer loses a name
+     * that it requires when no installable pool package provides it at the required version. The
+     * solve could prefer a release above the one it installs whose other requirements each have a
+     * provider in the pool. A provider is installable by the same test, one level deep.
      *
      * @param array<string, string> $failures name => {@see VersionSource} failure
      *
      * @return array<string, string>
      */
-    private static function withoutMetUnreached(array $failures, Pool $pool): array
+    private function withoutMetUnreached(array $failures, Pool $pool, LockTransaction $answer): array
     {
+        $unreached = array_keys($failures, VersionSource::UNREACHED, true);
+        if ($unreached === []) {
+            return $failures;
+        }
+        $installed = [];
+        foreach ($answer->getNewLockPackages(false) as $package) {
+            $installed[$package->getName()] = $package->getVersion();
+        }
         $lost = [];
         foreach ($pool->getPackages() as $package) {
+            $base = $package instanceof AliasPackage ? $package->getAliasOf() : $package;
+            $chosen = $installed[$base->getName()] ?? null;
+            if (($chosen !== null && Comparator::lessThanOrEqualTo($base->getVersion(), $chosen)) || !$this->isInstallable($package, $pool, $unreached)) {
+                continue;
+            }
             foreach ($package->getRequires() as $name => $link) {
-                if (($failures[$name] ?? null) === VersionSource::UNREACHED && $pool->whatProvides($name, $link->getConstraint()) === []) {
+                if (\in_array($name, $unreached, true) && array_filter($pool->whatProvides($name, $link->getConstraint()), fn (BasePackage $provider): bool => $this->isInstallable($provider, $pool, $unreached)) === []) {
                     $lost[$name] = true;
                 }
             }
         }
 
         return array_filter($failures, static fn (string $failure, string $name): bool => $failure !== VersionSource::UNREACHED || isset($lost[$name]), \ARRAY_FILTER_USE_BOTH);
+    }
+
+    /**
+     * Whether each requirement of $package that is not on $unreached has a provider in $pool. The
+     * fixed platform is in the pool, and the solve ignores the requirements that its filter ignores.
+     *
+     * @param list<string> $unreached
+     */
+    private function isInstallable(BasePackage $package, Pool $pool, array $unreached): bool
+    {
+        foreach ($package->getRequires() as $name => $link) {
+            if (!\in_array($name, $unreached, true) && !$this->filter->isIgnored($name) && $pool->whatProvides($name, $link->getConstraint()) === []) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

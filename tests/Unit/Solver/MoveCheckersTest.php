@@ -419,16 +419,17 @@ final class MoveCheckersTest extends TestCase
 
     /**
      * Ruling R14-1: no Composer repository lists acme/private, which the vcs repository can serve.
-     * Without it, acme/lib 1.2.0 cannot install, so the solve resolves at 1.1.0 while Composer can
-     * install 1.2.0. A virtual name that a pool package provides keeps the solve resolving.
+     * A release that the solve could prefer and that needs it cannot install, so the solve can
+     * resolve below the release that Composer installs. A virtual name that an installable pool
+     * package provides keeps the solve resolving.
      *
      * @dataProvider unreachedRequirements
      *
-     * @param array<string, string> $require the requirements of acme/lib 1.2.0
-     * @param array{string, ?string, ?string} $expected
+     * @param array<string, array<string, string>> $releases the releases of acme/lib above 1.0.0, by version, with their requirements
+     * @param array{string, ?string, ?string}      $expected
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('unreachedRequirements')]
-    public function testAResolvingSolveThatLosesAReleaseToAnUnreachedNameIsNotChecked(array $require, array $expected): void
+    public function testAResolvingSolveThatLosesAReleaseToAnUnreachedNameIsNotChecked(array $releases, ?string $newest, array $expected): void
     {
         $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
         $lock = LockFile::fromArray(['packages' => [
@@ -437,27 +438,33 @@ final class MoveCheckersTest extends TestCase
         ]]);
         $loader = new ArrayLoader();
         $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
-        $repository = new RecordingComposerRepository([
+        $remote = [
             $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
-            $loader->load(['name' => 'acme/lib', 'version' => '1.1.0']),
-            $loader->load(['name' => 'acme/lib', 'version' => '1.2.0', 'require' => $require]),
             $loader->load(['name' => 'acme/logger', 'version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']]),
-        ]);
-        $checker = MoveCheckers::forProject(self::root(['acme/lib' => '^1.0', 'acme/logger' => '^1.0']), $lock, ProjectConfig::empty(), new Config(false), [$vcs, $repository], '8.4', false, Deadline::never());
+            $loader->load(['name' => 'acme/logger2', 'version' => '1.0.0', 'provide' => ['psr/log-implementation' => '2.0.0'], 'require' => ['php' => '>=9.0']]),
+        ];
+        foreach ($releases as $version => $require) {
+            $remote[] = $loader->load(['name' => 'acme/lib', 'version' => $version, 'require' => $require]);
+        }
+        $checker = MoveCheckers::forProject(self::root(['acme/lib' => '^1.0', 'acme/logger' => '^1.0']), $lock, ProjectConfig::empty(), new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
 
-        $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
+        $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0', null, $newest))->check();
 
         self::assertSame($expected, [$check->result(), $check->reason(), $check->installs()]);
         self::assertSame(MoveCheck::RESOLVES, $checker->baseline()->check()->result());
     }
 
-    /** @return iterable<string, array{array<string, string>, array{string, ?string, ?string}}> */
+    /** @return iterable<string, array{array<string, array<string, string>>, ?string, array{string, ?string, ?string}}> */
     public static function unreachedRequirements(): iterable
     {
-        yield 'a name that no pool package provides' => [['acme/private' => '^1.0'], [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, null]];
-        yield 'a version of a provided name that no pool package provides' => [['psr/log-implementation' => '^2.0'], [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, null]];
-        yield 'a virtual name that a pool package provides' => [['psr/log-implementation' => '^1.0'], [MoveCheck::RESOLVES, null, '1.2.0']];
-        yield 'a met virtual name on a release that the target php refuses' => [['psr/log-implementation' => '^1.0', 'php' => '>=9.0'], [MoveCheck::RESOLVES, null, '1.1.0']];
+        $unchecked = [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, null];
+        yield 'a name that no pool package provides' => [['1.1.0' => [], '1.2.0' => ['acme/private' => '^1.0']], null, $unchecked];
+        yield 'a version of a provided name that no pool package provides' => [['1.1.0' => [], '1.2.0' => ['psr/log-implementation' => '^3.0']], null, $unchecked];
+        yield 'a version of a provided name whose only provider cannot install' => [['1.1.0' => [], '1.2.0' => ['psr/log-implementation' => '^2.0', 'acme/logger2' => '^1.0']], null, $unchecked];
+        yield 'a virtual name that a pool package provides' => [['1.1.0' => [], '1.2.0' => ['psr/log-implementation' => '^1.0']], null, [MoveCheck::RESOLVES, null, '1.2.0']];
+        yield 'a met virtual name on a release that the target php refuses' => [['1.1.0' => [], '1.2.0' => ['psr/log-implementation' => '^1.0', 'php' => '>=9.0']], null, [MoveCheck::RESOLVES, null, '1.1.0']];
+        yield 'an unreached name on a release that the target php refuses' => [['1.1.0' => [], '1.2.0' => ['acme/private' => '^1.0', 'php' => '>=9.0']], null, [MoveCheck::RESOLVES, null, '1.1.0']];
+        yield 'an unreached name on a release below the one that the solve installs' => [['1.1.0' => ['acme/private' => '^1.0'], '1.2.0' => [], '1.3.0' => ['php' => '>=9.0']], '1.3.0', [MoveCheck::RESOLVES, null, '1.2.0']];
     }
 
     /** docs/verdicts.md, move-check limits: a solve that needs another release of a vcs-locked name proves nothing. */
