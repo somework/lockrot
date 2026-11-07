@@ -218,9 +218,11 @@ defs['factBaseline'] = nul("A fact's state against the baseline entry (§6.4 \"P
 
 # holders and php checks
 MOVE_CHECK_REASONS = ['baseline_refused', 'unloaded_name', 'offline', 'install_time_budget', 'not_from_composer_repository', 'no_composer_json',
-                      'composer_json_invalid', 'platform_config_invalid', 'no_release_read', 'pass_cap', 'solver_error', 'advisory_lookup_incomplete']
+                      'composer_json_invalid', 'platform_config_invalid', 'no_release_read', 'pass_cap', 'solver_error', 'advisory_lookup_incomplete',
+                      'lock_disabled']
 # The reasons that leave the baseline itself unchecked: the budget, a run that cannot solve at all, or a solve that Composer failed on.
-BASELINE_CHECK_REASONS = ['unloaded_name', 'offline', 'install_time_budget', 'no_composer_json', 'composer_json_invalid', 'platform_config_invalid', 'solver_error']
+BASELINE_CHECK_REASONS = ['unloaded_name', 'offline', 'install_time_budget', 'no_composer_json', 'composer_json_invalid', 'platform_config_invalid', 'solver_error',
+                          'lock_disabled']
 BLOCKING_SWITCHES = ['COMPOSER_NO_BLOCKING', 'COMPOSER_NO_SECURITY_BLOCKING', 'COMPOSER_POLICY', 'COMPOSER_POLICY_ADVISORIES_BLOCK', 'config.policy',
                      'config.policy.advisories', 'config.policy.advisories.block', 'config.audit.block-insecure']
 defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether the move's `composer update` or `composer require` installs from the lock. "
@@ -541,7 +543,7 @@ def move_props(with_also):
                          "An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. "
                          "A move that `check` resolves only with its dependencies ends its step with `--with-dependencies` or `--with-all-dependencies`, and a move that `check` refuses has no `update` or `require` step. "
                          "Only lockrot's own options start with `-`: `--no-update`, `--dev` and `--no-interaction` in a `require` step, `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step, and `--locked` in a `why-not` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. "
-                         "lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. "
+                         "lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. When a version, constraint or tag that a step quotes holds `|`, `<` or `>`, the move has no step at all, and the note `command_argument_unsafe` names it. `text` shows a command only as the POSIX rendering of a step here. "
                          "A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell."),
                         arr('One command as its argument list (`["composer", "require", "php:>=8.1", "--no-update"]`).', {'type': 'string', 'minLength': 1}, minItems=1)),
     }
@@ -1532,12 +1534,14 @@ NOTE_CODES = ['offline', 'metadata_unavailable', 'monorepo_parent_unavailable', 
               'repository_activity_not_found', 'not_from_composer_repository', 'baseline_target_differs',
               'baseline_fix_model_differs', 'ignore_does_not_cover_advisories', 'advisories_disabled_by_policy',
               'abandoned_markings_ignored', 'abandoned_not_audited_by_composer', 'abandoned_ignore_unreadable', 'repository_activity_host_not_supported',
-              'moves_not_checked', 'update_now_reduced', 'update_now_refused', 'update_now_not_checked', 'move_check_failed', 'package_name_invalid']
+              'moves_not_checked', 'update_now_reduced', 'update_now_refused', 'update_now_not_checked', 'move_check_failed', 'package_name_invalid',
+              'command_argument_unsafe']
 NOTE_DEFS = {c: 'note' + ''.join(w.capitalize() for w in c.split('_')) for c in NOTE_CODES}
 for c in NOTE_CODES:
     if c in ('advisories_disabled_by_policy', 'repository_activity_host_not_supported', 'abandoned_markings_ignored', 'abandoned_not_audited_by_composer',
              'abandoned_ignore_unreadable', 'baseline_target_differs', 'baseline_fix_model_differs', 'ignore_does_not_cover_advisories',
-             'moves_not_checked', 'update_now_reduced', 'update_now_refused', 'update_now_not_checked', 'move_check_failed', 'package_name_invalid'):
+             'moves_not_checked', 'update_now_reduced', 'update_now_refused', 'update_now_not_checked', 'move_check_failed', 'package_name_invalid',
+             'command_argument_unsafe'):
         continue
     defs[NOTE_DEFS[c]] = copy.deepcopy(R1['definitions'][NOTE_DEFS[c]])
 defs['noteMetadataUnavailable']['description'] = ("`metadata_unavailable`: metadata was asked for and did not come for `package_count` packages. `reasons` groups them by "
@@ -1666,7 +1670,7 @@ defs['targetFix'] = obj("`run.php_window.target_fix` (§5.9): one update that un
     'reason': nul(("Why the update was not checked, from the reasons of `next_step.check.reason`. Null on `resolves` and `refused`, and on `not_checked` "
                    "exactly when `run.move_check` is null (a run that checks no move)."), {'type': 'string', 'pattern': SNAKE,
                   'x-known-values': ['unloaded_name', 'offline', 'install_time_budget', 'not_from_composer_repository', 'no_composer_json', 'composer_json_invalid',
-                                     'platform_config_invalid', 'solver_error', 'advisory_lookup_incomplete']}),
+                                     'platform_config_invalid', 'solver_error', 'advisory_lookup_incomplete', 'lock_disabled']}),
     'held_by': arr(("On `refused`, the holds that the refusal names, as a move's `held_by[]`, less the `platform` holds on php of the listed "
                     "packages. `[]` when the refusal names no hold. At the root ceiling, which lockrot decides without a solve, the holds are "
                     "the root links that fail at `target.php`: `link` is the link's section, `require`, `require-dev` or `conflict`, and "
@@ -1692,6 +1696,15 @@ defs['noteMoveCheckFailed'] = obj(("`move_check_failed`: Composer's solver faile
 defs['notePackageNameInvalid'] = obj(("`package_name_invalid`: lock entries whose name is no Composer package name. lockrot skips them, so they have no finding "
                                       "and no command names them. The text names none of them."), {
     'packages': arr('The names as the lock writes them, in lock order. Foreign text, not contract.', {'type': 'string'}, minItems=1),
+})
+defs['noteCommandArgumentUnsafe'] = obj(("`command_argument_unsafe`: moves that write no step, because a release name that a step quotes holds `|`, `<` "
+                                         "or `>`. cmd.exe and PowerShell run or redirect at these characters in a pasted POSIX line. Each such move keeps "
+                                         "its kind, constraint and check, and its `commands[]` is empty. The text names no move."), {
+    'moves': arr('One entry per such move, in finding order, `next_step` before `also[]`.', obj('A move that writes no step.', {
+        'package': d("The finding's package.", ref('packageName')),
+        'version': d(("The release name that holds the character, as the repository writes it: the move's `version`, or `latest.version` on a "
+                      "`tag` move. Foreign text, not contract."), {'type': 'string', 'minLength': 1}),
+    }), minItems=1),
 })
 defs['noteCode'] = copy.deepcopy(R1['definitions']['noteCode'])
 defs['noteCode']['x-known-values'] = NOTE_CODES

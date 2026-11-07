@@ -25,6 +25,7 @@ use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
+use Lockrot\Solver\AdvisoryBlocking;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\BaselineEntries;
@@ -369,7 +370,7 @@ final class TableFormatterTest extends TestCase
     /** A critical, a medium and a low finding, and two score-0 ones that only `--all` shows. */
     public function testTheMovesLineNamesTheVariableThatTurnedTheBlockingOff(): void
     {
-        $checks = MoveChecks::of(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON));
+        $checks = MoveChecks::of(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON, AdvisoryBlocking::everyAdvisory()));
         $report = self::report()->withMoveChecks(new MoveCheckRun('2.9.5', false, ['COMPOSER_NO_SECURITY_BLOCKING'], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], $checks));
 
         self::assertStringContainsString('against the lock, with advisory blocking turned off by COMPOSER_NO_SECURITY_BLOCKING; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked', self::formatter(400)->format($report));
@@ -383,7 +384,7 @@ final class TableFormatterTest extends TestCase
         $window = PhpWindow::of(LockFile::fromArray($lock), ProjectConfig::fromArray([]), '8.5', PhpReleaseDates::load()->minors(new Clock($at)));
         self::assertNotNull($window);
         $report = self::report()
-            ->withMoveChecks(new MoveCheckRun('2.10.3', false, [], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], MoveChecks::of(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON))))
+            ->withMoveChecks(new MoveCheckRun('2.10.3', false, [], MoveCheck::resolves(MoveCheck::INLINE)), UpdateNow::of([], MoveChecks::of(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON, AdvisoryBlocking::everyAdvisory()))))
             ->withPhpWindow($window->withTargetFix(new RecordedMoveChecker(['target_fix' => ['result' => 'resolves', 'form' => 'with-all-dependencies']], [])));
         $moves = 'moves: checked with the solver of Composer 2.10.3 against the lock; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked';
         $command = 'composer update acme/a acme/tool --with-all-dependencies';

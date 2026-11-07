@@ -319,8 +319,8 @@ final class AcceptanceTest extends TestCase
                 'unmeasured' => $block->unmeasured(),
                 'furthest_behind' => $worst === null ? null : ['package' => $worst->package(), 'version' => $worst->version(), 'libyears' => $worst->libyearsRounded()],
             ];
-            // The block is the arithmetic over the printed findings, to within the rounding of each value.
-            self::assertEqualsWithDelta($rounded['total'], $sum, 0.005 * $measured, $dir);
+            // The block is the sum of the printed findings: only the float error of the addition remains.
+            self::assertEqualsWithDelta($sum, $rounded['total'] ?? 0.0, 1e-6, $dir);
             ksort($packages);
             $golden[$dir] = ['block' => $rounded, 'packages' => $packages];
         }

@@ -57,7 +57,7 @@ final class ExplainFormatter
             $this->header($finding, $explanation),
             [''],
             self::block('age', AgeText::block($finding, $explanation->thresholds())),
-            [self::escape('repository '.self::repositoryLine($finding))],
+            [self::escape(self::repositoryLabelled($finding))],
             [''],
             $this->score($finding),
             [''],
@@ -119,6 +119,15 @@ final class ExplainFormatter
         return $via.' from the nearest composer.json line'.($namedIn === [] ? '; no line of composer.json names it' : '');
     }
 
+    /** A not-read line for an unsupported host or with no repository path starts with its own words, so it takes no label. */
+    private static function repositoryLabelled(Finding $finding): string
+    {
+        $lookup = $finding->details()->activity();
+        $unlabelled = $lookup->status() === ActivityLookup::NOT_READ && ($lookup->reason() === ActivityLookup::HOST_NOT_SUPPORTED || $lookup->where()->ref() === null);
+
+        return ($unlabelled ? '' : 'repository ').self::repositoryLine($finding);
+    }
+
     /** The repository line, from `activity` and `age.push`. */
     public static function repositoryLine(Finding $finding): string
     {
@@ -128,10 +137,10 @@ final class ExplainFormatter
         $reason = FindingBlock::checkWords($finding, (string) $lookup->reason());
         if ($lookup->status() === ActivityLookup::NOT_READ) {
             if ($lookup->reason() === ActivityLookup::HOST_NOT_SUPPORTED) {
-                return $where->host().': lockrot cannot ask this host about activity';
+                return 'lockrot cannot ask '.$where->host().' about repository activity';
             }
 
-            return $ref === null ? 'activity not asked ('.$reason.')' : $ref->host().'/'.$ref->path().': not asked ('.$reason.')';
+            return $ref === null ? 'repository activity not asked ('.$reason.')' : $ref->host().'/'.$ref->path().': not asked ('.$reason.')';
         }
         $name = $ref === null ? $where->host() : $ref->forgeLabel().' '.$ref->host().'/'.$ref->path();
         if ($lookup->status() === ActivityLookup::NOT_FOUND) {
@@ -262,7 +271,7 @@ final class ExplainFormatter
         return self::INDENT.self::escape(str_pad($label, self::FLAG - 1).' '.$text);
     }
 
-    /** @return list<string> one entry per counted advisory: severity, CVE and title, then the id, the date, the points and the fix */
+    /** @return list<string> one entry per counted advisory: severity, CVE (else id) and title, then the id (only with a CVE), the date, the points and the fix */
     private static function advisoryLines(Finding $finding): array
     {
         $s9 = $finding->signalData(AdvisoryData::class);
@@ -278,7 +287,7 @@ final class ExplainFormatter
     private static function advisoryFacts(AdvisoryRow $row): string
     {
         $fix = $row->fix();
-        $parts = [$row->id()];
+        $parts = $row->cve() === null ? [] : [$row->id()];
         $reported = $row->reportedAt();
         if ($reported !== null) {
             $parts[] = 'reported '.substr($reported, 0, 10);

@@ -11,6 +11,21 @@ These scripts connect lockrot with its report renderer,
 | `check-vendored` | Fails unless `resources/report/` holds a plain release with the attestation that `update-renderer` checks, built from the commit in `renderer-commit`. The release pull request and the tag workflow run it |
 | `record` | Records the rendering contract bundle into `tests/fixtures/contract/` (`--all-baselined`: the real baselined projects too, `--engine-pages`: the page cases of real apps) |
 
+## After a re-record
+
+`record` rewrites `tests/fixtures/contract/`. `tests/fixtures/bundle.generated.ts` is built from
+`tests/fixtures/contract/report-2/`, so rebuild it after each re-record, from `tools/schema/node`
+(`npm ci --ignore-scripts` once):
+
+```sh
+node emit_bundle.js
+```
+
+After a schema change, run `python3 tools/schema/ts/emit_dts.py` before `record`, because
+`contract-files.json` holds the sha256 of `types/`. The `typescript` job of
+`.github/workflows/ci.yml` fails on a stale `bundle.generated.ts`, and `ContractBundleIsCurrentTest`
+fails on a stale recording. The full order is in `tools/schema/README.md`, "Commands".
+
 ## Which renderer a lockrot release vendors
 
 - A lockrot release vendors a plain `vX.Y.Z` of the renderer. Never tag lockrot with a pre-release

@@ -28,6 +28,7 @@ use Composer\Repository\LockArrayRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositorySet;
 use Composer\Repository\RootPackageRepository;
+use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Lockrot\Analyzer\PhpWindow;
@@ -165,8 +166,8 @@ final class ComposerSolver
         }
         $preferred = $this->preferredVersions($request);
         $policy = new DefaultPolicy($root->getPreferStable(), false, $preferred);
-        [$set, $composerRequest, $pool, $fixedRoot, $loaded, $feed] = $this->pool($root, $requires, $temporary, $request);
-        [$pool, $answer] = $this->answer($policy, $composerRequest, $pool, $fixedRoot, $preferred);
+        [$set, $composerRequest, $built, $fixedRoot, $loaded, $feed] = $this->pool($root, $requires, $temporary, $request);
+        [$pool, $answer] = $this->answer($policy, $composerRequest, $built, $fixedRoot, $preferred);
         if ($answer instanceof SolverProblemsException) {
             $locked = [];
             foreach ($this->locked->getPackages() as $package) {
@@ -181,11 +182,81 @@ final class ComposerSolver
         }
 
         // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
-        // A virtual name, which a package provides, is unreached too: only a refusal that wants an unreached name proves nothing.
         // Composer blocks a release by each name that it replaces too.
         $held = array_merge([], ...array_map(static fn (BasePackage $package): array => $package->getNames(false), $answer->getNewLockPackages(false)));
 
-        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), array_diff($this->failures($loaded->asked()), [VersionSource::UNREACHED]), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)));
+        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), $this->withoutMetUnreached($this->failures($loaded->asked()), $built, $answer), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)));
+    }
+
+    /**
+     * $failures without each unreached name that no release in $pool loses: a virtual name, which
+     * no repository lists, is unreached too. A release that the solve could prefer loses a name
+     * that it requires when no installable pool package provides it at the required version. The
+     * solve could prefer a release above the one it installs whose other requirements each have a
+     * provider in the pool. A provider is installable by the same test, one level deep.
+     *
+     * @param array<string, string> $failures name => {@see VersionSource} failure
+     *
+     * @return array<string, string>
+     */
+    private function withoutMetUnreached(array $failures, Pool $pool, LockTransaction $answer): array
+    {
+        $unreached = array_keys($failures, VersionSource::UNREACHED, true);
+        if ($unreached === []) {
+            return $failures;
+        }
+        $installed = [];
+        foreach ($answer->getNewLockPackages(false) as $package) {
+            $installed[$package->getName()] = $package->getVersion();
+        }
+        $queue = [];
+        foreach ($pool->getPackages() as $package) {
+            $chosen = $installed[self::baseOf($package)->getName()] ?? null;
+            if ($chosen !== null && Comparator::greaterThan(self::baseOf($package)->getVersion(), $chosen)) {
+                $queue[] = $package;
+            }
+        }
+        // A package that the solve does not install counts only when a counted release requires it.
+        $counted = [];
+        $lost = [];
+        while (($package = array_pop($queue)) !== null) {
+            if (isset($counted[spl_object_id($package)]) || !$this->isInstallable($package, $pool, $unreached)) {
+                continue;
+            }
+            $counted[spl_object_id($package)] = true;
+            foreach ($package->getRequires() as $name => $link) {
+                $providers = $pool->whatProvides($name, $link->getConstraint());
+                if (!\in_array($name, $unreached, true)) {
+                    $queue = array_merge($queue, array_filter($providers, static fn (BasePackage $provider): bool => !isset($installed[self::baseOf($provider)->getName()])));
+                } elseif (array_filter($providers, fn (BasePackage $provider): bool => $this->isInstallable($provider, $pool, $unreached)) === []) {
+                    $lost[$name] = true;
+                }
+            }
+        }
+
+        return array_filter($failures, static fn (string $failure, string $name): bool => $failure !== VersionSource::UNREACHED || isset($lost[$name]), \ARRAY_FILTER_USE_BOTH);
+    }
+
+    private static function baseOf(BasePackage $package): BasePackage
+    {
+        return $package instanceof AliasPackage ? $package->getAliasOf() : $package;
+    }
+
+    /**
+     * Whether each requirement of $package that is not on $unreached has a provider in $pool. The
+     * fixed platform is in the pool, and the solve ignores the requirements that its filter ignores.
+     *
+     * @param list<string> $unreached
+     */
+    private function isInstallable(BasePackage $package, Pool $pool, array $unreached): bool
+    {
+        foreach ($package->getRequires() as $name => $link) {
+            if (!\in_array($name, $unreached, true) && !$this->filter->isIgnored($name) && $pool->whatProvides($name, $link->getConstraint()) === []) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

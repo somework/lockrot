@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Data\Forge;
 
 use Composer\Config;
+use Lockrot\AsciiCase;
 
 /**
  * Places a clone URL, or a `support.source` that {@see SupportSource} reduced, on a host that
@@ -37,8 +38,8 @@ final class RepoLocator
     public function __construct(array $gitlabDomains = ['gitlab.com'], array $githubDomains = [], array $forgejoDomains = [])
     {
         $this->gitlabDomains = $gitlabDomains;
-        $this->githubDomains = array_map('strtolower', $githubDomains);
-        $this->forgejoDomains = array_map('strtolower', $forgejoDomains);
+        $this->githubDomains = array_map([AsciiCase::class, 'lower'], $githubDomains);
+        $this->forgejoDomains = array_map([AsciiCase::class, 'lower'], $forgejoDomains);
     }
 
     public static function fromConfig(Config $config): self
@@ -77,7 +78,7 @@ final class RepoLocator
             return LocatedRepository::none(null);
         }
         [$host, $path] = $parts;
-        $lowerHost = strtolower($host);
+        $lowerHost = AsciiCase::lower($host);
         if ($lowerHost === 'www.github.com') {
             // Composer's GitHubDriver reads the www. form as github.com, and so does lockrot.
             $lowerHost = 'github.com';
@@ -185,7 +186,7 @@ final class RepoLocator
     {
         $parts = explode('/', $domain, 2);
 
-        return [strtolower($parts[0]), isset($parts[1]) ? rtrim('/'.$parts[1], '/') : ''];
+        return [AsciiCase::lower($parts[0]), isset($parts[1]) ? rtrim('/'.$parts[1], '/') : ''];
     }
 
     /**

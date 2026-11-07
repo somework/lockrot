@@ -134,7 +134,9 @@ The canonical list of what lockrot reads, writes and contacts is
 - `tools/report/record` records the rendering contract bundle into `tests/fixtures/contract/`, and
   `tools/report/record --all-baselined` records the real baselined projects
   (`tests/fixtures/baselined/README.md`). Both run twice and write only identical results. Review the
-  diff of a re-recording like a snapshot: lockrot-report pins `contract/bundle_sha256`.
+  diff of a re-recording like a snapshot: lockrot-report pins `contract/bundle_sha256`. After a
+  re-recording, run `node emit_bundle.js` in `tools/schema/node`: the `typescript` job of CI fails
+  on a stale `tests/fixtures/bundle.generated.ts`.
 - `bin/record-demo` records the README demo, `docs/assets/lockrot-demo.gif`, from a real run with
   asciinema and agg. Its header lists what to export. Re-record it when the table output changes
   shape.
@@ -162,11 +164,19 @@ To change a generated schema:
     python3 tools/schema/make_negatives_sarif.py
     ```
 
-3. Commit the builder and what it wrote in one commit.
+3. Rebuild the TypeScript unions and probes: `python3 tools/schema/ts/emit_dts.py`.
+4. Record the contract bundle with `tools/report/record`. It rewrites `tests/fixtures/contract/`,
+   including `contract-files.json`, which holds the sha256 of the published schemas and types.
+5. Write the bundle module, which reads that recording:
+   `(cd tools/schema/node && node emit_bundle.js)`.
+6. Commit the builder and what these steps wrote in one commit.
 
-The CI step "The generated schemas and negatives match tools/schema" runs the same commands and
-fails on a difference. `tests/Integration/SchemaRebuildTest.php` proves that the step catches a
-hand edit.
+The CI step "The generated schemas and negatives match tools/schema" runs the commands of step 2
+and fails on a difference. The `typescript` job runs steps 3 and 5 and fails on a stale
+`types/lockrot-report-2.known.d.ts`, `tools/schema/ts/known-map.json`,
+`tools/schema/ts/probes.generated.ts` or `tests/fixtures/bundle.generated.ts`.
+`ContractBundleIsCurrentTest` fails on a stale recording (step 4).
+`tests/Integration/SchemaRebuildTest.php` proves that the CI step catches a hand edit.
 
 Under one schema number the files only widen: `tests/Integration/SchemaEvolutionTest.php` holds
 them to every release's copy in `tests/fixtures/schema-evolution/schemas/<version>/`. It also holds
@@ -419,6 +429,30 @@ maintainer.
            renderer's `release.yml` gate accepts a full check only from such a branch. The full
            check that the rc tag of step 4 starts does not count, because its branch is the tag.
            Then delete the branch.
+
+           If the full check of V fails on a runner or network fault, re-run its failed jobs in the
+           same workflow run first. If the full check of V is red on a defect, V cannot pass the
+           gate, because no later run can turn a red run of V green. A pull request mutates only
+           its changed lines, and a pull request that changes the contract bundle skips its
+           mutation shards until the re-vendor. So the full check of V can be the first whole-tree
+           run that fails. Fix the cause on the
+           release branch, and move V to the commit whose full check is green. If the fix changes
+           the contract bundle, do steps 1 to 3 again first. Then do steps 4 and 5 again for the
+           new V. Give each new rc tag the next unused rc number of X.Y.Z, so the rc tag and the
+           `release/full-check-<sha of V>` branch are new. Run `node scripts/contract.mjs repin <V>` of
+           step 6 against the new V, and commit nothing. Do not repin the renderer to the old V.
+
+           Before you tag the renderer in step 7, check the gate that its `release.yml` runs on
+           the pin. The query must print `true`:
+
+           ```bash
+           gh run list --repo somework/lockrot --commit <V> --event push --status success \
+             --json workflowName,headBranch \
+             --jq 'any(.[]; .workflowName == "full-check" and (.headBranch | test("^release/full-check-[0-9a-f]+$")))'
+           ```
+
+           A renderer tag that the gate refuses has no release, and the renderer's tag ruleset
+           keeps it, so that renderer version is lost.
         6. In lockrot-report, run `node scripts/contract.mjs repin <V>`. Set the version in
            `CHANGELOG.md`. Run `npm version X.Y.Z --no-git-tag-version`, which sets `version` in
            `package.json` and both `version` fields of `package-lock.json` (the root and

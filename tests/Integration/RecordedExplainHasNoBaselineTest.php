@@ -6,10 +6,18 @@ namespace Lockrot\Tests\Integration;
 
 use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/** `--explain` reads no baseline, so no recorded explain-2 document carries a baseline standing. */
+/**
+ * `--explain` reads no baseline, so no recorded explain-2 document carries a baseline standing.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
+ */
 #[CoversNothing]
+#[Group('covers-nothing')]
 final class RecordedExplainHasNoBaselineTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures/';

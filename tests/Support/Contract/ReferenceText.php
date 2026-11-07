@@ -59,6 +59,7 @@ final class ReferenceText
         'pass_cap' => 'Composer refused each move before it',
         'solver_error' => "Composer's solver failed on it",
         'advisory_lookup_incomplete' => 'the advisory lookup did not cover a package in the result',
+        'lock_disabled' => 'config.lock is false, so Composer ignores composer.lock',
     ];
     private const GRADES = ['critical', 'high', 'medium', 'low'];
 
@@ -102,7 +103,29 @@ final class ReferenceText
         // After the platform step a clause in words starts a sentence, and a command keeps its case.
         $text = $step === '' || strpos($text, 'composer ') === 0 ? $text : ucfirst($text);
 
-        return $step.$text.self::checked(Fields::nullableObject($move, 'check')).self::movesWith($move);
+        return $step.$text.self::checked(Fields::nullableObject($move, 'check')).self::movesWith($move).self::noCommand($move, $kind);
+    }
+
+    /**
+     * A move that quotes a release name with `|`, `<` or `>` writes no step (§5.6, ruling R14-5).
+     * Under `lock_disabled` every move writes no step for that reason instead.
+     *
+     * @param array<mixed, mixed> $move
+     */
+    private static function noCommand(array $move, string $kind): string
+    {
+        $check = Fields::nullableObject($move, 'check');
+        if (Fields::objects($move, 'commands') !== [] || !\in_array($kind, ['update', 'require', 'raise-php', 'tag'], true) || ($check['reason'] ?? null) === 'lock_disabled') {
+            return '';
+        }
+        $latest = Fields::nullableObject($move, 'latest');
+        foreach ([$move['version'] ?? null, $move['constraint'] ?? null, $latest['version'] ?? null] as $value) {
+            if (\is_string($value) && preg_match('{[|<>]}', $value) === 1) {
+                return '; lockrot prints no command, because its release name holds |, < or >';
+            }
+        }
+
+        return '';
     }
 
     /**

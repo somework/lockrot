@@ -24,6 +24,7 @@ Every later run (plugin or PHAR) reads `lockrot-baseline.json`, or the file `--b
 |---|---|---|
 | `new` | is graded and not in the baseline | When it reaches `--fail-on`, as without a baseline |
 | `worsened` | is in the baseline, and a fact is new: a flag that the entry does not cover, an advisory that it does not hold, an advisory rated higher, or a fix lost | When the new facts reach `--fail-on` ([the gate score](#the-gate-score)) |
+| no entry | is not graded (`ok`, `finished` or `unknown`) and has no baseline entry, because `--generate-baseline` writes no entry for an ungraded finding, except one that an incomplete lookup carries forward ([what it does](#what-generate-baseline-does)) | Only `--fail-on=unchecked`, when its S10 gap counts. The summary line counts it in no bucket |
 | `known` | is in the baseline, and every fact is covered | Never |
 | `stale` (not the `stale` flag) | is a baseline entry for a package that is not in `composer.lock` | Never. The output reports it as a note (in `json`: `baseline.stale`) |
 
@@ -150,7 +151,9 @@ Matching rules:
 - **Whichever value.** A `known` finding fails no `--fail-on` value, `unchecked` included. This
   is also true at score 0: an `ok`, `finished` or `unknown` finding with an entry that an
   incomplete lookup carried forward is `known`, and its [S10](verdicts.md#what-was-not-checked)
-  fails nothing. A `worsened` finding fails `unchecked` on whatever S10 it carries.
+  fails nothing. A `worsened` finding fails `unchecked` on whatever S10 it carries. An ungraded
+  finding with no entry can still fail `unchecked`, so a run of `--generate-baseline` followed by a
+  check with `--fail-on=unchecked` can exit 1 with `0 new · 0 worsened`.
 - **Stale entries stay.** A normal run never edits the file. Regenerate the file to drop them.
 
 ### The gate score
@@ -257,6 +260,11 @@ A newer lockrot can write a baseline with a higher `lockrot.schema`
 ([the rule for that number](schema.md#the-number-and-what-may-change-under-it)). An older lockrot
 refuses such a file and exits `2`. Upgrade lockrot to its newest release. Keep the file, because a
 new file starts every `first_seen` and `known_since` again on the day of the run.
+
+A check run also refuses a baseline whose `score_model_id` differs from the score model of this
+lockrot, and exits `2` with a configuration error that names both ids. Regenerate the file with
+`--generate-baseline`, or run the lockrot that wrote it. `--generate-baseline` over such a file
+writes the id of this lockrot.
 
 ## Install time
 

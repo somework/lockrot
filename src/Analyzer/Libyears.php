@@ -145,8 +145,8 @@ final class Libyears
      */
     public static function fromFindings(array $findings): self
     {
-        $total = 0.0;
-        $direct = 0.0;
+        $total = 0;
+        $direct = 0;
         $measured = 0;
         $atLeast = 0;
         $unmeasured = array_fill_keys(self::REASONS, 0);
@@ -166,9 +166,10 @@ final class Libyears
             if ($finding->isLibyearsAtLeast()) {
                 ++$atLeast;
             }
-            $total += $behind;
+            $hundredths = (int) round(((float) $finding->libyearsRounded()) * 100);
+            $total += $hundredths;
             if ($finding->isDirect()) {
-                $direct += $behind;
+                $direct += $hundredths;
             }
             // Only a package that is behind can be the furthest behind. Package names are unique,
             // so strcmp on a tie never compares a name with itself.
@@ -177,22 +178,19 @@ final class Libyears
             }
         }
 
-        return new self($total, $direct, $measured, $atLeast, $unmeasured, $worst);
+        return new self($total / 100.0, $direct / 100.0, $measured, $atLeast, $unmeasured, $worst);
     }
 
     /**
-     * Unrounded sum over the measured packages. Null when none was measured, which is not zero:
-     * nothing could be read.
+     * Sum of the two-decimal values that report-2 writes per finding, in whole hundredths, so that a
+     * long sum gets no float error. Null when no finding has a measurement, which is not zero.
      */
     public function total(): ?float
     {
         return $this->measured === 0 ? null : $this->total;
     }
 
-    /**
-     * Unrounded sum over the measured direct requirements. Null on the same terms as
-     * {@see total()}.
-     */
+    /** The same sum over the measured direct requirements. Null on the same terms as {@see total()}. */
     public function direct(): ?float
     {
         return $this->measured === 0 ? null : $this->direct;
@@ -242,17 +240,24 @@ final class Libyears
 
             return $packages === 1 ? 'libyears: the one package could not be measured' : \sprintf('libyears: none of the %d packages could be measured', $packages);
         }
-        $head = \sprintf('libyears: %s%.1F behind across %s', $this->atLeast > 0 ? 'at least ' : '', $this->total, $this->scope($packages));
+        $head = \sprintf('libyears: %s%s behind across %s', $this->atLeast > 0 ? 'at least ' : '', self::tenths($this->total), $this->scope($packages));
         if ($this->worst === null) {
             return $head;
         }
-        [$worst, $behind] = $this->worst;
+        $worst = $this->worst[0];
+        $behind = (float) $worst->libyearsRounded();
 
         return implode(' · ', [
             $head,
-            \sprintf('%.1F from direct requirements', $this->direct),
-            \sprintf('furthest behind %s %s at %.1F%s', $name === null ? $worst->package() : $name($worst->package()), $worst->version(), $behind, $worst->isLibyearsAtLeast() ? ' or more' : ''),
+            self::tenths($this->direct).' from direct requirements',
+            \sprintf('furthest behind %s %s at %s%s', $name === null ? $worst->package() : $name($worst->package()), $worst->version(), self::tenths($behind), $worst->isLibyearsAtLeast() ? ' or more' : ''),
         ]);
+    }
+
+    /** Half up, as `--explain` prints a finding's libyears: the double nearest 1.45 lies below it, and `%.1F` prints it 1.4. */
+    private static function tenths(float $libyears): string
+    {
+        return number_format($libyears, 1, '.', '');
     }
 
     private function scope(int $packages): string

@@ -108,6 +108,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   name's stability admits dev, as Composer does. A repository with only that file no longer hides
   the tagged releases of a later repository, so an advisory fix that the solver refused can read
   `update` or `upgrade` instead of `blocked`. ([Move](docs/verdicts.md#move))
+- **All formats:** a resolving solve reads `not_checked` with `unloaded_name` when a release that
+  it could install requires a package that no Composer repository lists and no loaded package
+  provides. It read `resolves` before, so a move that read as checked can read as not checked.
+  ([The move check](docs/verdicts.md#the-move-check))
+- **All formats:** when Composer's `config.lock` is false, the move check is `not_checked` with
+  `lock_disabled`, and no move has a command. Composer refuses a partial update without a lock. A
+  move that the solver refused counted as no reachable fix, so a score and a verdict can move.
+  ([The move check](docs/verdicts.md#the-move-check))
+- **CLI:** only a real credential lifts the anonymous activity cap. Every Composer credential for
+  the host counts, except a client certificate and `custom-headers` with no `Authorization` or
+  `PRIVATE-TOKEN` header, also for Bitbucket. Such a run is anonymous, so repositories past the cap
+  get no activity read and S10 `no_token` can follow. Action: if `--fail-on=unchecked` now fails
+  on it, set a token. ([Which credentials](docs/internals.md#which-credentials))
 
 ### Security
 
@@ -131,6 +144,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   S10 and the run note `advisories_not_checked` name `composer_json_invalid`. `--fail-on=unchecked`
   then exits 1. Action: fix `composer.json` until `composer validate` passes.
   ([Run notes](docs/notes.md#advisories_not_checked))
+- **Config:** an issuer variable (`GH_HOST` and the others) whose URL holds a backslash in its
+  authority, or an `@` in the path, query or fragment, names no public host. lockrot withholds the
+  ambient token. `-v` names the host after the last `@`, or "an issuer that URL parsers read two
+  ways" when that host is the public host. Action: correct that variable.
+  ([Which credentials](docs/internals.md#which-credentials))
 - **All formats:** advisories are looked up by name for every package the run checks (packages-dev
   with `--dev`), so the names of packages from vcs, a path, an archive or an origin lockrot cannot
   tell now reach each Composer repository that publishes advisories. Action: set
@@ -142,10 +160,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--offline`, or set `extra.lockrot.advisory-lookup` to `composer-repositories`.
   ([What lockrot contacts](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 - **All formats:** `next_step.commands`, `security.update_now_command`, the `update now:` line and
-  the command in the `do:` line hold only arguments from one set that every shell quotes safely. A
-  step with a version, branch or name from the lock or a repository outside it is left out, so a
-  hostile lock cannot inject into a pasted command. This affects a reader who copies these commands. Action: if a step is missing,
-  check that lock entry before you write the command by hand. ([The move](docs/schema.md#the-move))
+  the `do:` command hold only arguments that every shell quotes safely. A step with another
+  version, branch or name is left out, and a release name with `|`, `<` or `>` leaves out the whole
+  move's command. Action: if a step is missing, check that lock entry before you write the command
+  by hand. ([Command argument unsafe](docs/notes.md#command_argument_unsafe))
 - **CLI:** a repository host's redirect to another origin no longer receives lockrot's
   `Authorization` or `PRIVATE-TOKEN` header. lockrot asks the redirect target again without it. A
   redirect to a URL that is not http or https, or that has no host, is a failed request, so a
@@ -307,9 +325,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **PHAR:** the archive restarts without Xdebug, as `composer` does, so a run with Xdebug loaded
-  is no slower than one without it. PHP errors go to stderr, and the locale is C. Action: to keep
-  Xdebug, set `COMPOSER_ALLOW_XDEBUG=1`. ([What the PHAR does](docs/phar.md#what-the-phar-does-and-does-not-do))
+- **Breaking:** **json, table, markdown, github:** `libyears.total`, `libyears.direct_requirements`
+  and the `libyears:` footer sum the findings' two-decimal values. 0.13 rounded the sum of the
+  unrounded values, so a total can move by up to 0.05 on the upgrade with no data change. Action:
+  reset a tracked baseline of `.libyears.total` at the first 0.14 run.
+  ([Libyears](docs/schema.md#libyears))
 - **Breaking:** **gitlab, sarif:** one record per flag, plus one per advisory in SARIF. 0.13
   identities stay. SARIF `properties.verdict` is the grade, `signals` is `signal_ids`, `baseline` is
   `baseline_status`. A baseline-covered result carries `suppressions`. Action: guard on
@@ -365,8 +385,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   its own step. ([Exit codes](docs/ci.md#exit-codes))
 - **Breaking:** **CLI, Config, Install-time:** `--target-php` and `LOCKROT_TARGET_PHP` take a
   major, a minor or a patch with nothing after it. lockrot keeps only the minor: `8.4.2` is `8.4`.
-  Another value, such as `8.4-fpm`, exits 2 and names the setting. At install time the check is
-  skipped. 0.13 read the version at its start. Action: pass the version alone.
+  Another value, such as `8.4-fpm`, or a minor that lockrot does not know and that lies below the
+  newest one it knows, exits 2 and names the setting. At install time the check is skipped. 0.13
+  read the version at its start. Action: pass a real PHP version alone.
   ([CLI options](docs/configuration.md#cli-options))
 - **Breaking:** **CLI:** a lock whose `packages`, `packages-dev`, `platform`, `platform-dev`,
   `platform-overrides` or `aliases` section Composer or lockrot cannot read, or that lists two
@@ -386,6 +407,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   it off, the check skips each `packages-dev` package, even when Composer installs it and 0.13
   graded it. Action: generate the baseline with the `include-dev` setting that the install uses.
   ([Install-time summary](docs/install-time.md))
+- **PHAR:** the archive restarts without Xdebug, as `composer` does, so a run with Xdebug loaded
+  is no slower than one without it. PHP errors go to stderr, and the locale is C. Action: to keep
+  Xdebug, set `COMPOSER_ALLOW_XDEBUG=1`. ([What the PHAR does](docs/phar.md#what-the-phar-does-and-does-not-do))
+- **Baseline:** a check run refuses a baseline-2 file whose `score_model_id` is not this lockrot's
+  score model, and exits 2 with a configuration error that names both ids. Action: run
+  `--generate-baseline`, or run the lockrot that wrote the file. `--generate-baseline` over it
+  writes this lockrot's id. ([Baseline](docs/baseline.md#a-baseline-from-a-newer-lockrot))
 - **Baseline:** when a `--generate-baseline` run reads a baseline-2 file, its reports compare
   with that file, as a check run does. They carry the root `baseline` and each finding's `baseline`.
   ([What --generate-baseline does](docs/baseline.md#what-generate-baseline-does))
@@ -476,6 +504,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **CLI, Config:** `--fail-on`, `LOCKROT_FAIL_ON`, the `fail-on` key, the `--explain` value and the
+  issuer variables (`GH_HOST` and the others) ignore case under any locale. Under a Turkish locale
+  on PHP 7.4 to 8.1, an upper-case `I` in them lower-cased to a byte that is not `i`.
+  ([CLI options](docs/configuration.md#cli-options))
+- **PHAR:** the archive ships lockrot's own `LICENSE` and the notice file of every bundled package.
+  ([What the PHAR does](docs/phar.md#what-the-phar-does-and-does-not-do))
+- **CLI:** for a host that lockrot cannot ask, or a package with no repository path, the
+  `--explain` repository line starts `lockrot cannot ask <host> about repository activity` or
+  `repository activity not asked (<reason>)`, with no `repository` label.
+  ([Explaining one package](docs/configuration.md#explaining-one-package))
+- **CLI:** `--explain` prints an advisory id once.
+  ([Explaining one package](docs/configuration.md#explaining-one-package))
 - **All formats:** on Composer 2.11, lockrot still counts the advisories of a `dev-*` version and
   refuses a partial advisory record, as on 2.10. `composer audit` 2.11 skips the first and reports
   the second. ([Which advisories count](docs/verdicts.md#which-advisories-count))
@@ -506,10 +546,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   error that names the value. ([Testing hooks](docs/configuration.md#testing-hooks))
 - **All formats:** a lock URL with a long run of slashes does not stall the run.
 - **CLI:** a cached 404 from a run without a token does not hide a private repository from a later
-  run with a token. The activity cache keeps an answer per credential state. A run with lockrot's
-  credentials uses its own cache key, so it reads no answer that 0.13 cached without credentials.
-  After the upgrade, each run with a token fetches its GitHub answers once again.
-  ([Caching](docs/internals.md#caching))
+  run with a token. The activity cache keys an answer on whether lockrot's own credential header
+  went out, so no run reads an answer that 0.13 cached. The first online run on 0.14 fetches each
+  answer again, anonymous runs too. Action: run `--offline` only after one online run with the
+  same token state. ([Caching](docs/internals.md#caching))
 - **CLI:** the activity cache stores only a JSON answer or a 404, so a proxy page or a redirect
   does not replace a cached answer. A failed refetch of an expired 404 leaves the repository
   unchecked (S10 `fetch_failed`). A 404 from the cache carries its fetch time in

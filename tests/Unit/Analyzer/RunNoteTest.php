@@ -454,6 +454,7 @@ final class RunNoteTest extends TestCase
             'abandoned_not_audited_by_composer',
             'abandoned_ignore_unreadable',
             'moves_not_checked',
+            'command_argument_unsafe',
             'update_now_reduced',
             'update_now_refused',
             'update_now_not_checked',
@@ -461,6 +462,30 @@ final class RunNoteTest extends TestCase
         ], RunNote::CODES);
         self::assertSame(['offline', 'install_time_budget', 'composer_json_invalid'], RunNote::ADVISORIES_NOT_CHECKED_REASONS);
         self::assertSame(['install_time_budget'], RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS);
+    }
+
+    public function testTheUnsafeCommandArgumentNoteCountsItsMovesAndNamesNoVersion(): void
+    {
+        $one = RunNote::commandArgumentUnsafe([['package' => 'a/b', 'version' => 'v1+x|y']]);
+        $two = RunNote::commandArgumentUnsafe([['package' => 'a/b', 'version' => 'v1+x|y'], ['package' => 'c/d', 'version' => '2<3']]);
+
+        self::assertSame('lockrot prints no command for 1 move: a release name holds |, < or >, which cmd.exe and PowerShell run or redirect', $one->text());
+        self::assertStringStartsWith('lockrot prints no command for 2 moves:', $two->text());
+        self::assertStringNotContainsString('x|y', $two->text());
+        self::assertSame(['moves' => [['package' => 'a/b', 'version' => 'v1+x|y'], ['package' => 'c/d', 'version' => '2<3']]], $two->data());
+    }
+
+    /** The note is about the steps lockrot prints, so it never marks the run as one that hit a network failure. */
+    public function testTheUnsafeCommandArgumentNoteSetsNoNetworkFailure(): void
+    {
+        self::assertFalse(RunNote::commandArgumentUnsafe([['package' => 'a/b', 'version' => 'v1+x|y']])->setsNetworkFailures());
+    }
+
+    public function testTheUnsafeCommandArgumentNoteNamesAtLeastOneMove(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        RunNote::commandArgumentUnsafe([]);
     }
 
     private const CONFLICT = "Problem 1\n    - acme/a 2.1.0 conflicts with acme/b <3.0.";

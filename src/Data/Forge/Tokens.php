@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Forge;
 
+use Lockrot\AsciiCase;
+
 /**
  * Only lockrot's own tokens: Composer's HTTP layer applies its own credentials ({@see ForgeAuth}).
  * `GITHUB_TOKEN` and `GITLAB_TOKEN` count only when each issuer environment variable of their
@@ -16,6 +18,8 @@ namespace Lockrot\Data\Forge;
  */
 final class Tokens
 {
+    /** Fits "<variable> is for %s": the issuer names the public host only for one URL parser. */
+    public const READ_TWO_WAYS = 'an issuer that URL parsers read two ways';
     public const ENV_LOCKROT_GITHUB = 'LOCKROT_GITHUB_TOKEN';
     public const ENV_GITHUB = 'GITHUB_TOKEN';
     public const ENV_LOCKROT_GITLAB = 'LOCKROT_GITLAB_TOKEN';
@@ -88,8 +92,10 @@ final class Tokens
             $host = self::host($bare);
             // $bare also cuts at an `@` in a path, a query or a fragment, so the host of $url
             // must be the public host too.
-            if ($host !== $publicHost || self::host($url) !== $publicHost) {
-                $withheld[$name] = $host ?? self::authorityOf($bare);
+            // A backslash ends the authority for a WHATWG parser and not for parse_url(), so the two disagree on the host.
+            if ($host !== $publicHost || self::host($url) !== $publicHost || self::hasBackslashInAuthority($url)) {
+                // The text before the `@` or the backslash can be userinfo, so it is not shown.
+                $withheld[$name] = $host === $publicHost ? self::READ_TWO_WAYS : ($host ?? self::authorityOf($bare));
 
                 return null;
             }
@@ -105,6 +111,11 @@ final class Tokens
         $at = strrpos($url, '@');
 
         return $at === false || $at < \strlen($scheme) ? $url : $scheme.substr($url, $at + 1);
+    }
+
+    private static function hasBackslashInAuthority(string $url): bool
+    {
+        return strpos(self::authorityOf($url), '\\') !== false;
     }
 
     /** An issuer that does not parse is shown up to its path: a query or a fragment can hold a token. */
@@ -129,7 +140,7 @@ final class Tokens
     {
         $parts = RepoLocator::hostAndPath(strpos($url, '://') === false ? 'https://'.$url : $url);
 
-        return $parts === null ? null : strtolower($parts[0]);
+        return $parts === null ? null : AsciiCase::lower($parts[0]);
     }
 
     /** @param array<string, mixed> $env */
@@ -157,7 +168,8 @@ final class Tokens
 
     /**
      * The ambient tokens that {@see fromEnvironment()} withheld, by variable name: the issuer
-     * host, or the scheme and authority of an issuer that does not parse, without userinfo.
+     * host, the scheme and authority of an issuer that does not parse, without userinfo, or
+     * {@see READ_TWO_WAYS} for an issuer whose host the public host is in one reading only.
      *
      * @return array<string, string>
      */

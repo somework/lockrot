@@ -86,6 +86,10 @@ final class MoveCheckComposerOracleTest extends TestCase
         // A case that the hydrator cannot rebuild keeps its world: the oracle needs no other input.
         foreach (JsonPath::arrayAt(JsonPath::decodeFile(CaseHydrator::CASES), ['cases']) as $case) {
             if (\is_array($case) && \is_array($case['solver_world'] ?? null)) {
+                // Under config.lock false lockrot asks Composer nothing (ruling R14-22), so the world records no answer.
+                if (JsonPath::has($case, ['solver_world', 'world', 'config', 'lock']) && JsonPath::boolAt($case, ['solver_world', 'world', 'config', 'lock']) === false) {
+                    continue;
+                }
                 yield JsonPath::stringAt($case, ['id']) => [$case['solver_world'], JsonPath::stringAt($case, ['run', 'move_check', 'composer'])];
             }
         }

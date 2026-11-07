@@ -559,6 +559,27 @@ final class LockrotCommandTest extends TestCase
         self::assertStringNotContainsString('packages checked', $display, 'the report itself is not printed');
     }
 
+    /** strtolower() follows LC_CTYPE before PHP 8.2: under tr_TR it folds `I` to the dotless `ı`. */
+    public function testExplainFindsAnUpperCaseNameUnderTheTurkishLocale(): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        $tester = $this->tester($this->loader());
+        $previous = setlocale(\LC_CTYPE, '0');
+        if (setlocale(\LC_CTYPE, 'tr_TR.ISO8859-9', 'tr_TR.ISO-8859-9', 'tr_TR', 'tr_TR.UTF-8') === false) {
+            self::markTestSkipped('No Turkish locale is installed.');
+        }
+
+        try {
+            $code = $tester->execute(['--explain' => 'DOCTRINE/ANNOTATIONS', '--target-php' => '8.4', '--fail-on' => 'stale']);
+        } finally {
+            setlocale(\LC_CTYPE, $previous === false ? 'C' : $previous);
+        }
+
+        $display = $tester->getDisplay();
+        self::assertSame(0, $code, $display);
+        self::assertStringStartsWith('doctrine/annotations ', $display);
+    }
+
     public function testExplainAsJsonCarriesTheFindingAndTheFacts(): void
     {
         chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
@@ -1387,7 +1408,7 @@ final class LockrotCommandTest extends TestCase
             self::assertSame(0, $code, $stderr);
             $json = json_decode($stdout, true);
             self::assertIsArray($json);
-            self::assertSame(['not_checked', MoveCheck::COMPOSER_JSON_INVALID], [JsonPath::stringAt($json, ['run', 'move_check', 'baseline']), JsonPath::stringAt($json, ['run', 'move_check', 'reason'])]);
+            self::assertSame(['not_checked', MoveCheck::COMPOSER_JSON_INVALID, Composer::getVersion()], [JsonPath::stringAt($json, ['run', 'move_check', 'baseline']), JsonPath::stringAt($json, ['run', 'move_check', 'reason']), JsonPath::stringAt($json, ['run', 'move_check', 'composer'])]);
         });
     }
 
@@ -1559,6 +1580,55 @@ final class LockrotCommandTest extends TestCase
             self::assertSame(['not_checked', MoveCheck::PLATFORM_CONFIG_INVALID], [JsonPath::stringAt($json, ['run', 'move_check', 'baseline']), JsonPath::stringAt($json, ['run', 'move_check', 'reason'])]);
             self::assertStringContainsString('moves: not checked (', $text);
         });
+    }
+
+    /**
+     * Ruling R14-22: Composer reads `config.lock` from composer.json over the global config. When
+     * it is false, Composer ignores the composer.lock on disk, so lockrot checks no move. A root
+     * `require.php` that excludes the target stays a refused target fix, because no update admits it.
+     *
+     * @dataProvider lockOffConfigs
+     *
+     * @param array<string, mixed>                          $projectConfig
+     * @param array<string, string>                         $rootRequire   the root requirements besides acme/kept
+     * @param array{string, ?string}                        $baseline
+     * @param array{string, ?string, ?list<string>, list<string>} $targetFix     check, reason, command and the sources of held_by
+     */
+    #[DataProvider('lockOffConfigs')]
+    public function testAConfigLockFalseLeavesEveryMoveUncheckedWithTheLockOnDisk(array $projectConfig, string $globalConfig, array $rootRequire, array $baseline, array $targetFix): void
+    {
+        $project = $this->tempDir('lockrot-lock-off-');
+        file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/lock-off-test', 'require' => ['acme/kept' => '1.0.0'] + $rootRequire] + ($projectConfig === [] ? [] : ['config' => $projectConfig])));
+        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0', 'require' => ['php' => '<8.0']]], 'packages-dev' => []]));
+        chdir($project);
+        $home = $this->tempDir('lockrot-lock-off-home-');
+        file_put_contents($home.'/config.json', $globalConfig);
+        $loader = $this->emptyLoader();
+        $command = fn (): LockrotCommand => $this->buildCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?\Closure $checks = null): Analyzer => self::withChecks(self::testAnalyzer($loader, $lockrot, $clock), $checks));
+
+        $this->withComposerEnv($this->tempDir('lockrot-lock-off-cache-'), $home, function () use ($command, $baseline, $targetFix): void {
+            [$code, $stdout, $stderr] = $this->runCommandWithSplitStreams($command(), ['--format' => 'json', '--target-php' => '8.4']);
+
+            self::assertSame(0, $code, $stderr);
+            $json = json_decode($stdout, true);
+            self::assertIsArray($json);
+            $moveCheck = JsonPath::arrayAt($json, ['run', 'move_check']);
+            self::assertSame($baseline, [$moveCheck['baseline'] ?? null, $moveCheck['reason'] ?? null]);
+            $fix = JsonPath::arrayAt($json, ['run', 'php_window', 'target_fix']);
+            self::assertIsArray($fix['held_by']);
+            self::assertSame($targetFix, [$fix['check'], $fix['reason'], $fix['command'], array_column($fix['held_by'], 'source')]);
+            self::assertSame($baseline[0] === MoveCheck::REFUSED, \in_array(RunNote::MOVES_NOT_CHECKED, JsonPath::column($json, ['note_details'], 'code'), true));
+        });
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, string, array<string, string>, array{string, ?string}, array{string, ?string, ?list<string>, list<string>}}> the project config, the global config.json, the root requirements, the baseline with its reason, and the target fix */
+    public static function lockOffConfigs(): iterable
+    {
+        $unchecked = [MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED];
+        yield 'composer.json sets lock false' => [['lock' => false], '{}', [], $unchecked, [MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED, null, []]];
+        yield 'the global config sets lock false' => [[], '{"config": {"lock": false}}', [], $unchecked, [MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED, null, []]];
+        yield 'lock false with a root require.php that excludes the target' => [['lock' => false], '{}', ['php' => '<8.0'], $unchecked, [MoveCheck::REFUSED, null, null, ['root']]];
+        yield 'composer.json sets lock true over a global false' => [['lock' => true], '{"config": {"lock": false}}', [], [MoveCheck::REFUSED, null], [MoveCheck::NOT_CHECKED, MoveCheck::NOT_FROM_COMPOSER_REPOSITORY, null, []]];
     }
 
     /** @return iterable<string, array{array<string, mixed>}> */
@@ -2376,6 +2446,37 @@ final class LockrotCommandTest extends TestCase
         self::assertSame($newer, file_get_contents($dir.'/lockrot-baseline.json'));
     }
 
+    public function testACheckRunOverABaselineFromAnotherScoreModelExitsTwoAndNamesBothIds(): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+        [$generated, , $generateErr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--target-php' => '8.4'], $this->loader());
+        self::assertSame(0, $generated, $generateErr);
+        $file = $this->readJsonFile($dir.'/lockrot-baseline.json');
+        $file['score_model_id'] = ScoreModel::ID + 1;
+        file_put_contents($dir.'/lockrot-baseline.json', json_encode($file));
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(2, $code, $stderr);
+        self::assertSame('', $stdout);
+        self::assertStringContainsString('lockrot-baseline.json was written under score model '.(ScoreModel::ID + 1).' and this lockrot uses score model '.ScoreModel::ID, $stderr);
+    }
+
+    public function testGenerateBaselineOverABaselineFromAnotherScoreModelWritesThisModel(): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+        [$generated, , $generateErr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--target-php' => '8.4'], $this->loader());
+        self::assertSame(0, $generated, $generateErr);
+        $file = $this->readJsonFile($dir.'/lockrot-baseline.json');
+        $file['score_model_id'] = ScoreModel::ID + 1;
+        file_put_contents($dir.'/lockrot-baseline.json', json_encode($file));
+
+        [$code, , $stderr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(0, $code, $stderr);
+        self::assertSame(ScoreModel::ID, JsonPath::intAt($this->readJsonFile($dir.'/lockrot-baseline.json'), ['score_model_id']));
+    }
+
     /** `--generate-baseline` over a baseline-1 file writes a fresh baseline-2 and carries nothing forward. */
     public function testGenerateBaselineOverABaseline1FileWritesBaseline2(): void
     {
@@ -2567,6 +2668,32 @@ final class LockrotCommandTest extends TestCase
         self::assertStringNotContainsString('brick/math', substr($display, 0, $summaryAt), 'brick/math has nothing to flag');
         self::assertStringContainsString('furthest behind brick/math 0.18.0', $display, 'but it is the one furthest behind');
         self::assertStringContainsString('brick/math', $everything->getDisplay());
+    }
+
+    /**
+     * `bin/lockrot` pins LC_ALL to C, but `composer lockrot` runs in Composer's process, where a
+     * plugin can set a comma locale. The footer's libyears figures must still print a point.
+     */
+    public function testTheLibyearsFooterWritesAPointUnderACommaLocale(): void
+    {
+        $numeric = setlocale(\LC_NUMERIC, '0');
+        if (setlocale(\LC_NUMERIC, 'de_DE.UTF-8', 'de_DE', 'de_DE.utf8') === false) {
+            self::markTestSkipped('the machine has no de_DE locale, so no comma locale to set');
+        }
+
+        try {
+            self::assertSame('4,5', \sprintf('%.1f', 4.5), 'the locale writes a comma, or this test proves nothing');
+            chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+            $tester = $this->tester($this->loader());
+            $tester->execute(['--target-php' => '8.4']);
+            $display = $tester->getDisplay();
+        } finally {
+            setlocale(\LC_NUMERIC, $numeric === false ? 'C' : $numeric);
+        }
+
+        self::assertMatchesRegularExpression('/libyears: \d+\.\d behind/', $display);
+        self::assertMatchesRegularExpression('/furthest behind \S+ \S+ at \d+\.\d/', $display);
+        self::assertDoesNotMatchRegularExpression('/\d,\d (libyears|behind|from direct)|at \d+,\d/', $display);
     }
 
     /**

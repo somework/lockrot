@@ -195,6 +195,14 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame(self::HEADERS, self::strip($io, self::GITHUB, self::HEADERS));
 
         $io = new BufferIO();
+        $io->setAuthentication('github.com', '["Authorization: Bearer theirs", 5]', 'custom-headers');
+        self::assertSame(self::HEADERS, self::strip($io, self::GITHUB, self::HEADERS), 'AuthHelper drops a list with a non-string element whole');
+
+        $io = new BufferIO();
+        $io->setAuthentication('github.com', '[" Authorization: Bearer theirs"]', 'custom-headers');
+        self::assertSame(self::HEADERS, self::strip($io, self::GITHUB, self::HEADERS), 'AuthHelper sends a header as written, and a leading space is no header name');
+
+        $io = new BufferIO();
         $io->setAuthentication('github.com', '["X-Api-Key: k", "Authorization: Bearer theirs"]', 'custom-headers');
         self::assertSame(self::WITHOUT_AUTHORIZATION, self::strip($io, self::GITHUB, self::HEADERS), 'custom headers that do carry a credential replace lockrot\'s');
     }

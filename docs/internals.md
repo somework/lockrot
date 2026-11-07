@@ -79,8 +79,11 @@ carries `User-Agent: lockrot`.
 ### Which credentials
 
 - A host counts as authenticated, with no cap, when lockrot has a token for it or Composer holds
-  credentials for it (in `auth.json`, `COMPOSER_AUTH`, or what a CI setup step writes there). On
-  GitLab, credentials also unlock the archived flag.
+  a real credential for it (in `auth.json`, `COMPOSER_AUTH`, or what a CI setup step writes there).
+  Every Composer credential counts, except a client certificate (`client-certificate`) and a
+  `custom-headers` entry with no `Authorization` or `PRIVATE-TOKEN` header. For Bitbucket, the
+  entry of api.bitbucket.org counts first, else the entry of bitbucket.org. On GitLab, credentials
+  also unlock the archived flag.
 
 - When both exist, lockrot sends only Composer's header.
 
@@ -95,14 +98,20 @@ carries `User-Agent: lockrot`.
   `LOCKROT_GITLAB_TOKEN` always count, because they name the public host. lockrot reads only these
   variables. A host that only a `gh` or `glab` configuration file names is not seen. In that case,
   set the issuer variable of that host, or pass the token as `LOCKROT_GITHUB_TOKEN` or
-  `LOCKROT_GITLAB_TOKEN`.
+  `LOCKROT_GITLAB_TOKEN`. An issuer URL that two URL parsers read as different hosts names no
+  public host: it holds a backslash in its authority, or an `@` in the path, query or fragment.
+  When the host after the last `@` is the public host, `-v` names "an issuer that URL parsers read
+  two ways". Else `-v` names that host.
 
 - lockrot cannot keep Composer's own credentials from a host. A setup step that writes the
   runner's token into Composer's `github-oauth` for github.com makes Composer send it to
   api.github.com.
 
-- Exception: Composer's entry for the host can be a client certificate, or custom headers without a
-  credential header. Then Composer adds no credential header, and lockrot sends its own.
+- Exception: Composer's entry for the host can be a client certificate, or custom headers without
+  an `Authorization` or `PRIVATE-TOKEN` header. A custom-headers list that holds a value which is
+  not a string counts as no header. Such an entry is no credential. The host counts as anonymous,
+  so the cap of 50 and the cause `no_token` stay. Composer adds no credential header, and lockrot
+  sends its own.
 
 - When a host redirects to another origin, lockrot asks that origin again without its own header.
   Where Composer cannot stop a redirect (without the curl extension), lockrot

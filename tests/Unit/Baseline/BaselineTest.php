@@ -10,6 +10,7 @@ use Lockrot\Exception\ConfigException;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -96,6 +97,16 @@ final class BaselineTest extends TestCase
         self::assertSame('2.0.0', $entry->version());
         self::assertSame(Verdict::ABANDONED, $entry->recordedLead());
         self::assertSame(['abandoned' => '2026-09-14'], $entry->flags(), 'a flag the entry did not hold is known from today');
+    }
+
+    /** A regenerated file records this lockrot's score model, whatever the previous file holds. */
+    public function testRegeneratingOverAnotherScoreModelRecordsThisModelAndDoesNotRefuse(): void
+    {
+        $previous = Baseline::of([], self::AT, '8.4', 'option', Version::STRING, ScoreModel::ID + 1);
+
+        $regenerated = Baseline::fromReport($this->report([['acme/abandoned', '1.0.0', Verdict::ABANDONED]]), $previous);
+
+        self::assertSame(ScoreModel::ID, $regenerated->toArray()['score_model_id']);
     }
 
     public function testToArrayShape(): void

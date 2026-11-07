@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Verdict\CommandArgument;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /** The command argument rule of SPEC-0.14.md §5.6: the one set that every argv lockrot writes passes. */
@@ -154,5 +155,25 @@ final class CommandArgumentTest extends TestCase
         self::assertTrue(CommandArgument::allPass(['composer', 'require', 'php:>=8.1', '--no-update']));
         self::assertFalse(CommandArgument::allPass(['composer', 'why-not', 'a/b', '--working-dir=x']));
         self::assertFalse(CommandArgument::allPass(['composer', 'update', "a/b\n"]));
+    }
+
+    /** @return iterable<string, array{string, bool}> */
+    public static function versions(): iterable
+    {
+        yield 'a pipe' => ['v2.3.2+x|calc|x', true];
+        yield 'a less-than sign' => ['1.0<2', true];
+        yield 'a greater-than sign' => ['1.0>2', true];
+        yield 'a plain tag' => ['v2.3.2', false];
+        yield 'build metadata' => ['v2.3.2+build.5', false];
+        yield 'a dev branch' => ['dev-feature/x', false];
+    }
+
+    /**
+     * @dataProvider versions
+     */
+    #[DataProvider('versions')]
+    public function testAVersionOrBranchHoldsAShellOperatorOnlyWithAPipeOrAnAngleBracket(string $value, bool $expected): void
+    {
+        self::assertSame($expected, CommandArgument::holdsShellOperator($value));
     }
 }

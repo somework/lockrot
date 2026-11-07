@@ -431,6 +431,9 @@ final class MoveContractTest extends TestCase
             if ($reason === self::DATED) {
                 ModelBounds::assertWithinTheModelsBound($goldenRows, $lockrotRows, $id);
             }
+            if ($reason === self::TIE) {
+                ModelBounds::assertTheMoveCountsOldPromise($golden, $lockrot, $id);
+            }
         }
     }
 
@@ -583,9 +586,15 @@ final class MoveContractTest extends TestCase
     private static function assertWhyNot(array $finding, array $move): void
     {
         $check = $move['check'];
-        $asks = \in_array($move['kind'], ['update', 'require', 'raise-php', 'tag'], true) && \is_string($move['version'])
-            && (!\is_array($check) || $check['result'] !== 'resolves');
         $commands = JsonPath::arrayAt($move, ['commands']);
+        $quotes = \in_array($move['kind'], ['update', 'require', 'raise-php', 'tag'], true);
+        // SPEC §5.6: a quoted release name with a shell operator, or a lock that Composer ignores, leaves the move no step.
+        if (($quotes && preg_match('{[|<>]}', (\is_string($move['version']) ? $move['version'] : '').(\is_string($move['constraint']) ? $move['constraint'] : '')) === 1) || (\is_array($check) && $check['reason'] === 'lock_disabled')) {
+            self::assertSame([], $commands, JsonPath::stringAt($move, ['kind']).' has no step');
+
+            return;
+        }
+        $asks = $quotes && \is_string($move['version']) && (!\is_array($check) || $check['result'] !== 'resolves');
         $whyNot = array_values(array_filter($commands, static fn ($argv): bool => \is_array($argv) && ($argv[1] ?? null) === 'why-not'));
         $step = ['composer', 'why-not', $finding['package'], $move['version'], '--locked'];
         self::assertSame($asks ? [$step] : [], $whyNot, JsonPath::stringAt($move, ['kind']).' why-not');

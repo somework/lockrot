@@ -8,9 +8,11 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Exception\ConfigException;
 use Lockrot\Score\Standing;
 use Lockrot\Score\Term;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\ScoreModel;
 
 /**
  * A run's findings compared with the committed baseline-2 file: docs/baseline.md, "Reading a
@@ -47,6 +49,26 @@ final class BaselineComparison
         $this->standings = $standings;
         $this->stale = $stale;
         $this->notes = $notes;
+    }
+
+    /**
+     * A check run refuses a file of another score model: its grades are not comparable. A
+     * `--generate-baseline` run does not call it, so it rewrites the file under this model.
+     *
+     * @throws ConfigException when the file's score model is not this lockrot's
+     */
+    public static function refuseAnotherScoreModel(Baseline $baseline, string $displayPath): void
+    {
+        if ($baseline->scoreModelId() === ScoreModel::ID) {
+            return;
+        }
+
+        throw new ConfigException(\sprintf(
+            '%s was written under score model %d and this lockrot uses score model %d. Run --generate-baseline to write it again under this model, or run the lockrot that wrote it',
+            $displayPath,
+            $baseline->scoreModelId(),
+            ScoreModel::ID
+        ));
     }
 
     /**

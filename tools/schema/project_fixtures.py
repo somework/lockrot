@@ -551,6 +551,10 @@ def inputs_of(case):
         # Composer's answer to every request that the model asked, the baseline and the combined update included:
         # the hydrator serves only these, and the real-solver test serves the world itself.
         checks = {k: dict(a, reason=None) for k, a in world['answers'].items()}
+        if (world['world'].get('config') or {}).get('lock') is False:
+            # Under config.lock false lockrot asks Composer nothing, so the model records no answer: each check reads lock_disabled.
+            unchecked = dict(result='not_checked', form=None, installs=None, holds=[], problem=None, reason='lock_disabled')
+            checks = {'baseline': unchecked, '*': unchecked}
         inputs['solver_world'] = world
         inputs['lock'] = world_lock(inputs['lock'], world['world']['lock'])
         own = world['world']['repo'].get(f['package'])

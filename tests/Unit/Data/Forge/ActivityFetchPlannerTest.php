@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Data\Forge;
 
+use Composer\Config;
+use Composer\IO\BufferIO;
+use Lockrot\Composer\ServiceFactory;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
 use Lockrot\Data\Forge\RepoRef;
@@ -123,10 +126,26 @@ final class ActivityFetchPlannerTest extends TestCase
         self::assertSame(1, $plan->skippedNoToken(RepoRef::BITBUCKET));
         self::assertSame([RepoRef::BITBUCKET], $plan->cappedForges());
 
-        $withCredentials = new ForgeAuth(Tokens::none(), static fn (string $host): bool => $host === 'bitbucket.org');
+        $withCredentials = new ForgeAuth(Tokens::none(), static fn (string $host): bool => false, static fn (): bool => true);
         $plan = (new ActivityFetchPlanner($withCredentials, 1))->select($repos, $candidates);
         self::assertCount(3, $plan->repos());
         self::assertSame([], $plan->cappedForges());
+    }
+
+    /** A client certificate adds no request header, so the run is anonymous and GitHub stays capped. */
+    public function testAClientCertificateEntryLeavesGithubCapped(): void
+    {
+        $io = new BufferIO();
+        $config = new Config(false);
+        $config->merge(['config' => ['client-certificate' => ['github.com' => ['local_cert' => '/c.pem']]]]);
+        $io->loadConfiguration($config);
+        $auth = new ForgeAuth(Tokens::none(), ServiceFactory::composerCredentials($io), ServiceFactory::bitbucketCredentials($io));
+
+        $plan = (new ActivityFetchPlanner($auth, 1))->select(['a/a' => self::gh('o/a'), 'b/b' => self::gh('o/b')], ['a/a' => true, 'b/b' => true]);
+
+        self::assertSame(['github.com/o/a'], self::keys($plan->repos()));
+        self::assertSame(1, $plan->skippedBudget(RepoRef::GITHUB));
+        self::assertSame([RepoRef::GITHUB], $plan->cappedForges());
     }
 
     /** The capped list follows the `RepoRef::FORGES` order. */

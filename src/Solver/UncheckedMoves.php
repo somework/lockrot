@@ -4,26 +4,31 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
+use Composer\Composer;
+
 /**
- * Checks no move, for one reason: a run with no composer.json, or a Composer that lacks the
- * solver's classes.
+ * Checks no move, for one reason that leaves Composer nothing to solve. The run still names the
+ * running Composer and the advisory blocking of its config.
  *
  * @internal
  */
 final class UncheckedMoves implements MoveChecker
 {
     private string $reason;
+    private AdvisoryBlocking $blocking;
     private ?string $configuredPhp;
     /** @var string|false|null */
     private $configuredPhp64bit;
 
     /**
+     * @param AdvisoryBlocking  $blocking           the advisory blocking of the running Composer's config
      * @param ?string           $configuredPhp      `config.platform.php` of Composer's merged config, as {@see MoveCheckers::configuredPhp()} reads it
      * @param string|false|null $configuredPhp64bit as {@see MoveCheckers::configuredPhp64bit()} reads it
      */
-    public function __construct(string $reason, ?string $configuredPhp = null, $configuredPhp64bit = null)
+    public function __construct(string $reason, AdvisoryBlocking $blocking, ?string $configuredPhp = null, $configuredPhp64bit = null)
     {
         $this->reason = $reason;
+        $this->blocking = $blocking;
         $this->configuredPhp = $configuredPhp;
         $this->configuredPhp64bit = $configuredPhp64bit;
     }
@@ -68,9 +73,9 @@ final class UncheckedMoves implements MoveChecker
         return $this->configuredPhp64bit;
     }
 
-    public function composerVersion(): ?string
+    public function composerVersion(): string
     {
-        return null;
+        return Composer::getVersion();
     }
 
     public function solverError(): ?array
@@ -80,12 +85,12 @@ final class UncheckedMoves implements MoveChecker
 
     public function blocksAdvisories(): bool
     {
-        return false;
+        return $this->blocking->blocks();
     }
 
     public function blockingDisabledBy(): array
     {
-        return [];
+        return $this->blocking->disabledBy();
     }
 
     public function withAdvisories(array $records, array $covered): MoveChecker

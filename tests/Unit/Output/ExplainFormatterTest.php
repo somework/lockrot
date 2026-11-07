@@ -181,9 +181,18 @@ final class ExplainFormatterTest extends TestCase
         yield 'read, archived, no push' => [ActivityLookup::read($archived), $none, 'GitHub github.com/a/b: no push reported, archived · fetched 2026-10-01'];
         yield 'not found' => [ActivityLookup::notFound(new RepoRef(RepoRef::GITHUB, 'github.com', 'hoaproject/Consistency')), $none, 'GitHub github.com/hoaproject/Consistency: the host answered 404 (private, renamed or removed)'];
         yield 'not found, from the cache' => [ActivityLookup::notFound(new RepoRef(RepoRef::GITHUB, 'github.com', 'hoaproject/Consistency'), new \DateTimeImmutable('2026-09-13T02:00:00+00:00')), $none, 'GitHub github.com/hoaproject/Consistency: the host answered 404 (private, renamed or removed) (cached 2026-09-13)'];
-        yield 'host not supported' => [ActivityLookup::notRead(ActivityLookup::HOST_NOT_SUPPORTED, LocatedRepository::unsupported('codeberg.org', null)), $none, 'codeberg.org: lockrot cannot ask this host about activity'];
+        yield 'host not supported' => [ActivityLookup::notRead(ActivityLookup::HOST_NOT_SUPPORTED, LocatedRepository::unsupported('codeberg.org', null)), $none, 'lockrot cannot ask codeberg.org about repository activity'];
         yield 'not asked, with a repository' => [ActivityLookup::notRead(ActivityLookup::ALLOWLISTED, LocatedRepository::located(new RepoRef(RepoRef::GITHUB, 'github.com', 'symfony/polyfill-intl-idn'))), $none, 'github.com/symfony/polyfill-intl-idn: not asked (allowlisted)'];
-        yield 'not asked, no repository' => [ActivityLookup::notRead(ActivityLookup::NO_REPOSITORY, LocatedRepository::none(null)), $none, 'activity not asked (no repository found)'];
+        yield 'not asked, no repository' => [ActivityLookup::notRead(ActivityLookup::NO_REPOSITORY, LocatedRepository::none(null)), $none, 'repository activity not asked (no repository found)'];
+    }
+
+    public function testTheTextPrintsAnUnsupportedHostWithoutARepositoryLabel(): void
+    {
+        $finding = self::withAge((new FindingBuilder())->build(), ActivityLookup::notRead(ActivityLookup::HOST_NOT_SUPPORTED, LocatedRepository::unsupported('codeberg.org', null)), AgeReading::unmeasuredBecause(AgeMeasure::UNDATED));
+        $text = self::plain(self::explain($finding));
+
+        self::assertStringContainsString("\nlockrot cannot ask codeberg.org about repository activity\n", $text);
+        self::assertStringNotContainsString('repository lockrot', $text);
     }
 
     /** @dataProvider notFromAComposerRepository */
@@ -338,6 +347,38 @@ final class ExplainFormatterTest extends TestCase
         self::assertMatchesRegularExpression('/\n  security     vulnerable \d+ \(high advisory '.preg_quote('CVE-'.$text, '/').'\)\n/', $plain);
         self::assertStringContainsString('CVE-'.$text.'  title '.$text."\n", $plain);
         self::assertSame($plain, str_replace(["\033[1m", "\033[22m", "\033[31m", "\033[39m", "\033[33m", "\033[32m", "\033[36m"], '', ConsoleMarkup::render($markup, true)), 'nothing but lockrot\'s styles');
+    }
+
+    /** @return iterable<string, array{?string, ?string, string}> the CVE, the reported date, the two lines */
+    public static function advisoryCves(): iterable
+    {
+        yield 'no CVE' => [null, '2026-01-02T00:00:00+00:00', '/\n +high +GHSA-aaaa-bbbb-cccc  [^\n]*\n +reported 2026-01-02 · /'];
+        yield 'a CVE' => ['CVE-2026-0001', '2026-01-02T00:00:00+00:00', '/\n +high +CVE-2026-0001  [^\n]*\n +GHSA-aaaa-bbbb-cccc · reported 2026-01-02 · /'];
+        yield 'no CVE and no reported date' => [null, null, '/\n +high +GHSA-aaaa-bbbb-cccc  [^\n]*\n +\d+ points · fix: /'];
+    }
+
+    /**
+     * @dataProvider advisoryCves
+     */
+    #[DataProvider('advisoryCves')]
+    public function testTheSecondAdvisoryLineNamesTheIdOnlyBesideACve(?string $cve, ?string $reportedAt, string $lines): void
+    {
+        $case = CaseHydrator::case('B');
+        self::assertIsArray($case['inputs']);
+        self::assertIsArray($case['inputs']['advisories']);
+        self::assertIsArray($case['inputs']['advisories'][0]);
+        $case['inputs']['advisories'][0]['id'] = 'GHSA-aaaa-bbbb-cccc';
+        $case['inputs']['advisories'][0]['cve'] = $cve;
+        $case['inputs']['advisories'][0]['reported_at'] = $reportedAt;
+        $analysis = CaseHydrator::analysisOf($case);
+        $finding = $analysis->finding('symfony/monolog-bridge');
+        $facts = $analysis->facts('symfony/monolog-bridge');
+        self::assertNotNull($finding);
+        self::assertNotNull($facts);
+
+        $plain = ConsoleMarkup::render((new ExplainFormatter())->text(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report())), false);
+
+        self::assertMatchesRegularExpression($lines, $plain);
     }
 
     /** @return iterable<string, array{string}> */

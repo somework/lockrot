@@ -22,7 +22,19 @@ python3 tools/schema/make_negatives_other.py baseline-2
 python3 tools/schema/make_negatives_other.py config-2
 python3 tools/schema/build_sarif_properties_schema.py
 python3 tools/schema/make_negatives_sarif.py
+python3 tools/schema/ts/emit_dts.py
+tools/report/record
+(cd tools/schema/node && npm ci --ignore-scripts && node emit_bundle.js)
 ```
+
+The last three commands rebuild what the schemas and the types feed. `ts/emit_dts.py` writes
+`types/lockrot-report-2.known.d.ts`, `tools/schema/ts/known-map.json` and
+`tools/schema/ts/probes.generated.ts`. `tools/report/record` rewrites `tests/fixtures/contract/`,
+including `contract-files.json`, which holds the sha256 of the schemas and the types, so run it
+after `emit_dts.py`. `node emit_bundle.js` reads the recorded `tests/fixtures/contract/report-2/` and
+writes `tests/fixtures/bundle.generated.ts`, so run it after `tools/report/record`. The `typescript`
+job of `.github/workflows/ci.yml` runs `emit_dts.py` and `emit_bundle.js` and fails on a diff, and
+`ContractBundleIsCurrentTest` fails on a stale `contract-files.json`.
 
 | Script | Reads | Writes |
 |---|---|---|
@@ -34,7 +46,8 @@ python3 tools/schema/make_negatives_sarif.py
 | `make_negatives_other.py config-2` | none: each fixture is written whole | `tests/fixtures/schema/negative/config-2/` |
 | `build_sarif_properties_schema.py` | `resources/lockrot-report-2.schema.json` | `tests/fixtures/sarif/lockrot-sarif-properties-2.schema.json` |
 | `make_negatives_sarif.py` | `tests/fixtures/sarif/documents/B.sarif.json` | `tests/fixtures/sarif/negative/` |
-| `ts/emit_dts.py` | `resources/lockrot-report-2.schema.json` | `types/` |
+| `ts/emit_dts.py` | `resources/lockrot-report-2.schema.json` | `types/lockrot-report-2.known.d.ts`, `ts/known-map.json`, `ts/probes.generated.ts` |
+| `node/emit_bundle.js` | `tests/fixtures/contract/report-2/` | `tests/fixtures/bundle.generated.ts` |
 | `project_fixtures.py` | the reference model's `cases.json`, `docs/` and `page-goldens.json` | `tests/fixtures/flags/`, `tests/fixtures/schema/documents/`, `tests/fixtures/contract/page-goldens.json` |
 
 `ship_text.py` is the shipping pass that the builders apply to every description: it removes the

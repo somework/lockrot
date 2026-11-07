@@ -15,6 +15,7 @@ use Lockrot\Security\LinkIndex;
 use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
+use Lockrot\Solver\AdvisoryBlocking;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\FindingBuilder;
@@ -41,7 +42,7 @@ final class MoveContextTest extends TestCase
     {
         $context = self::context();
 
-        $checked = $context->withChecks(MoveChecks::of(new UncheckedMoves(MoveCheck::OFFLINE)));
+        $checked = $context->withChecks(MoveChecks::of(new UncheckedMoves(MoveCheck::OFFLINE, AdvisoryBlocking::everyAdvisory())));
 
         self::assertNull($context->checks());
         self::assertNotNull($checked->checks());

@@ -102,7 +102,7 @@ with `lockrot:`, any other failure with `lockrot failed:`. `-v` adds the stack t
   to a flag, an argument too many. lockrot checks it before it reads any file.
 - `--fail-on`, `--baseline` or `--target-php` given twice, also with the same value
   ([configuration.md](configuration.md#cli-options)).
-- A baseline lockrot cannot read, a baseline-1 file included
+- A baseline lockrot cannot read, a baseline-1 file included, and a baseline of another score model
   ([baseline.md](baseline.md#when-lockrot-cannot-read-the-file)).
 - An `--output` lockrot refuses before the analysis, such as an unknown format or `composer.lock`
   ([configuration.md](configuration.md#writing-reports-to-files)).
@@ -298,10 +298,11 @@ mark.
   unrated) and `20.0`. An advisory rule carries the `security-severity` that code scanning reads:
   `9.5`, `8.0`, `5.5` and `2.0`. An unrated advisory's rule has no `security-severity`.
 - **The run-level record.** When advisories were not checked, `github`, `sarif` and `gitlab` add
-  one record for the run: `lockrot/advisories-unchecked`. It is `error` (`major`) only when
-  `unchecked` is a failing value and a finding fails it on an advisory gap. Otherwise it is
-  `warning` (`minor`). Its message names each advisory repository that failed or that lockrot did
-  not ask, with the reason.
+  one record for the run. `sarif` and `gitlab` carry the id `lockrot/advisories-unchecked`.
+  `github` writes an annotation titled `lockrot` whose message starts `advisories not checked: `,
+  and has no id. The record is `error` (`major`) only when `unchecked` is a failing value and a
+  finding fails it on an advisory gap. Otherwise it is `warning` (`minor`). Its message names each
+  advisory repository that failed or that lockrot did not ask, with the reason.
 - **Text from the lock or a repository** in a `github`, `sarif` or `gitlab` message prints a
   control character, a line feed, a bidi control or another character that prints as nothing as an
   escape, such as `\x1B` or `\n`.
@@ -442,7 +443,7 @@ steps:
 | `locations` | The package's line in the analysed lock |
 | `partialFingerprints` | `lockrot/package`: the package name, so a result keeps its identity when its line moves. An advisory result adds `lockrot/advisory` |
 | `suppressions` | On a result whose fact the baseline covers |
-| `properties` | `package`, `version`, `verdict` (the grade), `priority`, `lead`, `score_total`, `score_text`, `score_model_id`, `flag_ids`, `direct`, `dev`, `data_date`, `baseline_status` (`known`, `new`, `worsened` or null), `error_by` (the failing values), `chain`, `depth`, `direct_dependents`, `signal_ids` and `age`. An advisory result adds the advisory's `fix` |
+| `properties` | `package`, `version`, `verdict` (the grade), `priority`, `lead`, `score_total`, `score_text`, `score_model_id`, `flag_ids`, `direct`, `dev`, `data_date`, `baseline_status` (`known`, `new`, `worsened` or null), `error_by` (the failing values). The first result of a finding also holds `chain`, `depth`, `direct_dependents`, `signal_ids` and `age`. A maintenance result adds `term`, a copy of the flag's `score.terms[]` entry. An advisory result adds `advisory` (its id), `cve` (null when it has none), `severity`, `fix` (the object of the S9 row), `points` (the severity points times the multiplier, before halving) and `deciding` (true on the advisory that the security term names). The deciding advisory result also adds `term`, the security term |
 | `runs[0].properties` | `lockrot_schema`, `text_grammar`, `score_text_grammar`, `score_model_id`, `fix_model` and `advisory_lookup` |
 | `invocations[].toolExecutionNotifications` | The report's notes, a warning per advisory repository that failed, and a note per advisory repository that lockrot did not ask |
 
@@ -541,7 +542,8 @@ steps:
 Top to bottom, it holds:
 
 1. A heading: `### lockrot: <graded> of <checked> packages flagged — <grade counts>`, or on a clean
-   run `### lockrot: nothing flagged in <checked> packages`. A clean run has no table unless you
+   run `### lockrot: nothing flagged in <checked> packages`. A clean `--offline` run ends the
+   heading with ` — security advisories not checked (offline)`. A clean run has no table unless you
    pass `--all`, which lists every package under the heading.
 2. The [`gate:` line](#reading-the-gate-line), its first part in bold.
 3. A table of the graded findings (every finding with `--all`) in report order. The verdict is bold

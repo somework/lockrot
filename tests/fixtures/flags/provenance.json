@@ -1,10 +1,10 @@
 {
  "pr": "7d",
  "source": {
-  "cases.json": "b4eafb65260fcc9503be81845a51ad13edfebbf1d5228b8ae738762bdc6336a1",
+  "cases.json": "689f950ef40a6cac63d0bfeb2bcb2d9df24556b68089ff0c4eb6f9a294ba60fe",
   "model_run_date": "2026-11-07"
  },
- "suite": "the model suite reports every step passed",
+ "suite": "the targeted model run passes every step except the counts warning that validation.out is older than cases.json",
  "page_goldens": {
   "sha256": "504f84a370c55ed72b061e82a2d0825a995da3991028302bfd4a96dc8fdbe302",
   "rendered": "the model's goldens"

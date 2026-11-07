@@ -50,6 +50,7 @@ use Lockrot\Tests\Support\HermeticComposerConfig;
 use Lockrot\Tests\Support\MarkupRefusingFormatter;
 use Lockrot\Tests\Support\RecordingIO;
 use Lockrot\Verdict\FailOn;
+use Lockrot\Verdict\ScoreModel;
 use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
@@ -695,8 +696,24 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringContainsString('lockrot: install-time check skipped: lockrot '.$major.'.'.$minor.' reads baseline-2 only, and lockrot-baseline.json is a baseline-1 file.', $io->getOutput());
     }
 
+    /**
+     * A file written under another score model has grades that this lockrot cannot compare, so the
+     * install-time check skips with the refusal and the strict gate never blocks on it.
+     */
+    public function testABaselineOfAnotherScoreModelSkipsTheCheckAndNeverBlocksAStrictInstall(): void
+    {
+        $dir = $this->project(['install-time-strict' => true, 'fail-on' => 'old-promise']);
+        $this->writeBaseline($dir.'/lockrot-baseline.json', ['phpzip/phpzip' => 'stale'], '8.4', ScoreModel::ID + 1);
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        self::assertStringContainsString('lockrot: install-time check skipped: lockrot-baseline.json was written under score model '.(ScoreModel::ID + 1).' and this lockrot uses score model '.ScoreModel::ID.'.', $io->getOutput());
+    }
+
     /** @param array<string, string> $verdicts package => verdict */
-    private function writeBaseline(string $path, array $verdicts, string $targetPhp = '8.4'): void
+    private function writeBaseline(string $path, array $verdicts, string $targetPhp = '8.4', int $scoreModelId = ScoreModel::ID): void
     {
         $findings = [];
         foreach ($verdicts as $package => $verdict) {
@@ -708,7 +725,7 @@ final class InstallTimeSummaryTest extends TestCase
             'generated_at' => self::FIXED_NOW,
             'target_php' => $targetPhp,
             'target_php_source' => 'option',
-            'score_model_id' => 1,
+            'score_model_id' => $scoreModelId,
             'fix_model' => 1,
             'findings' => $findings,
         ], \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)."\n");

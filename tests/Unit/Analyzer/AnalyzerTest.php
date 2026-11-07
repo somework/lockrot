@@ -43,6 +43,7 @@ use Lockrot\Signal\Data\LeftBehindData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Solver\AdvisoryBlocking;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\CaseHydrator;
@@ -843,8 +844,8 @@ final class AnalyzerTest extends TestCase
             return $window->toArray()['target']['inside'];
         };
 
-        self::assertFalse($inside($analyzer->withMoveChecks(MoveChecks::of(new UncheckedMoves(MoveCheck::BASELINE_REFUSED, null, '7.4.0')))));
-        self::assertTrue($inside($analyzer->withMoveChecks(MoveChecks::of(new UncheckedMoves(MoveCheck::BASELINE_REFUSED)))), 'the control: php-64bit follows php');
+        self::assertFalse($inside($analyzer->withMoveChecks(MoveChecks::of(new UncheckedMoves(MoveCheck::BASELINE_REFUSED, AdvisoryBlocking::everyAdvisory(), null, '7.4.0')))));
+        self::assertTrue($inside($analyzer->withMoveChecks(MoveChecks::of(new UncheckedMoves(MoveCheck::BASELINE_REFUSED, AdvisoryBlocking::everyAdvisory())))), 'the control: php-64bit follows php');
     }
 
     public function testWithMoveChecksReturnsAClonedInstanceLeavingOriginalWithoutChecks(): void

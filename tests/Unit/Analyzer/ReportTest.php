@@ -22,6 +22,7 @@ use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\RunFooter;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Solver\AdvisoryBlocking;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\BaselineEntries;
@@ -380,7 +381,7 @@ final class ReportTest extends TestCase
     public function testWithMoveChecksAndWithNoteLeaveTheOriginalReportUntouched(): void
     {
         $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0);
-        $checks = MoveChecks::of(new UncheckedMoves(MoveCheck::OFFLINE));
+        $checks = MoveChecks::of(new UncheckedMoves(MoveCheck::OFFLINE, AdvisoryBlocking::everyAdvisory()));
 
         $checked = $report->withMoveChecks(new MoveCheckRun(null, false, [], MoveCheck::notChecked(MoveCheck::OFFLINE)), UpdateNow::of([], $checks));
         $noted = $report->withNote(RunNote::offline());

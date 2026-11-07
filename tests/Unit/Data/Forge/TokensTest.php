@@ -83,6 +83,23 @@ final class TokensTest extends TestCase
         self::assertSame($withheld, $tokens->withheld());
     }
 
+    /** Under a Turkish locale, PHP 7.4 to 8.1 lower `I` in `GITHUB.COM` to a byte that is not `i`. */
+    public function testAnUpperCaseIssuerHostNamesGithubComUnderTheTurkishLocale(): void
+    {
+        $previous = setlocale(\LC_CTYPE, '0');
+        if (setlocale(\LC_CTYPE, 'tr_TR.ISO8859-9', 'tr_TR.ISO-8859-9', 'tr_TR', 'tr_TR.UTF-8') === false) {
+            self::markTestSkipped('No Turkish locale is installed.');
+        }
+
+        try {
+            $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GH_HOST' => 'GITHUB.COM', 'GITHUB_SERVER_URL' => 'https://GITHUB.COM'], null);
+        } finally {
+            setlocale(\LC_CTYPE, (string) $previous);
+        }
+
+        self::assertSame(['b', []], [$tokens->github(), $tokens->withheld()]);
+    }
+
     /** @return iterable<string, array{array<string, string>, ?string, array<string, string>}> */
     public static function ghHosts(): iterable
     {
@@ -195,6 +212,8 @@ final class TokensTest extends TestCase
         yield 'in the path' => ['GITHUB_SERVER_URL', 'https://ghe.corp/@github.com'];
         yield 'in the query' => ['GITHUB_SERVER_URL', 'https://ghe.corp?x=@github.com'];
         yield 'in the fragment of a bare host' => ['GH_HOST', 'ghe.corp#@github.com'];
+        yield 'after a backslash' => ['GITHUB_SERVER_URL', 'https://ghe.corp\\@github.com'];
+        yield 'after a backslash in a bare host' => ['GH_HOST', 'ghe.corp\\@github.com'];
     }
 
     /**
@@ -206,7 +225,15 @@ final class TokensTest extends TestCase
         $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'SECRET', $variable => $issuer], null);
 
         self::assertNull($tokens->github());
-        self::assertArrayHasKey('GITHUB_TOKEN', $tokens->withheld());
+        self::assertSame(['GITHUB_TOKEN' => Tokens::READ_TWO_WAYS], $tokens->withheld());
+    }
+
+    public function testAnIssuerWithABackslashShowsNoUserinfoWhenWithheld(): void
+    {
+        $withheld = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => 'https://ci:SECRETVALUE\\@github.com'], null)->withheld();
+
+        self::assertArrayHasKey('GITHUB_TOKEN', $withheld);
+        self::assertStringNotContainsString('SECRET', $withheld['GITHUB_TOKEN']);
     }
 
     public function testAnIssuerWithUserinfoIsJudgedByItsHost(): void

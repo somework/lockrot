@@ -22,6 +22,7 @@ use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
+use Lockrot\Solver\AdvisoryBlocking;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveQuery;
 use Lockrot\Solver\UncheckedMoves;
@@ -52,7 +53,7 @@ final class MoveBuilderTest extends TestCase
         $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
         $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
         $context = (new MoveContext($finding, new MoveSubject('a/b', '1.0.0', true, [], '8.4', null), null, [$row], null, new FixFinder(new PhpFloor('8.4'), LinkIndex::of($lock, ProjectConfig::empty())), new PhpFloor('8.4'), new \DateTimeImmutable(self::NOW), 2, null, [], [], true))
-            ->withChecks(MoveChecks::of(new UncheckedMoves(MoveCheck::OFFLINE)));
+            ->withChecks(MoveChecks::of(new UncheckedMoves(MoveCheck::OFFLINE, AdvisoryBlocking::everyAdvisory())));
 
         $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, null, '^2.0'), [], null, $context);
         $check = $move->check();
@@ -60,6 +61,23 @@ final class MoveBuilderTest extends TestCase
         self::assertNull($move->version());
         self::assertNotNull($check);
         self::assertSame(['result' => MoveCheck::NOT_CHECKED, 'form' => null, 'reason' => MoveCheck::NO_RELEASE_READ, 'installs' => null], $check->jsonSerialize());
+    }
+
+    /** A move with no release read reads `no_release_read`, and under `config.lock` false it still prints no command. */
+    public function testAMoveWithNoReleaseReadPrintsNoCommandUnderALockThatComposerIgnores(): void
+    {
+        $row = self::row();
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0']]]);
+        $context = (new MoveContext($finding, new MoveSubject('a/b', '1.0.0', true, [], '8.4', null), null, [$row], null, new FixFinder(new PhpFloor('8.4'), LinkIndex::of($lock, ProjectConfig::empty())), new PhpFloor('8.4'), new \DateTimeImmutable(self::NOW), 2, null, [], [], true))
+            ->withChecks(MoveChecks::of(new UncheckedMoves(MoveCheck::LOCK_DISABLED, AdvisoryBlocking::everyAdvisory())));
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, null, '^2.0'), [], null, $context);
+        $check = $move->check();
+
+        self::assertNotNull($check);
+        self::assertSame(MoveCheck::NO_RELEASE_READ, $check->reason());
+        self::assertSame([], $move->commands());
     }
 
     public function testARefusedMoveKeepsTheHoldsOfItsReleaseAddsTheRefusalsAndPrintsNoStep(): void
@@ -75,6 +93,84 @@ final class MoveBuilderTest extends TestCase
             array_map(static fn (Holder $holder): array => $holder->jsonSerialize(), $move->heldBy())
         );
         self::assertSame([['composer', 'why-not', 'a/b', '2.0.0', '--locked']], $move->commands());
+    }
+
+    /**
+     * Under `config.lock` false, Composer ignores composer.lock, so a printed step or `why-not
+     * --locked` would act on a lock that Composer does not read.
+     *
+     * @dataProvider movesUnderALockThatComposerIgnores
+     */
+    #[DataProvider('movesUnderALockThatComposerIgnores')]
+    public function testAMoveUnderALockThatComposerIgnoresPrintsNoCommand(string $kind, ?string $constraint): void
+    {
+        [$row, $context] = self::checked(['*' => ['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::LOCK_DISABLED, 'holds' => []]], true, null, ['a/b' => '^1.0']);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of($kind, FlagSet::LEFT_BEHIND)->to($row, $lower, $constraint), [], null, $context);
+        $check = $move->check();
+
+        self::assertNotNull($check);
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::LOCK_DISABLED], [$check->result(), $check->reason()]);
+        self::assertSame([], $move->commands());
+    }
+
+    /** @return iterable<string, array{string, ?string}> the move kind and its constraint */
+    public static function movesUnderALockThatComposerIgnores(): iterable
+    {
+        yield 'an update' => [Move::UPDATE, null];
+        yield 'a require' => [Move::REQUIRE, '^2.0'];
+    }
+
+    /**
+     * A resolved require quotes only its constraint, so a release name with a pipe that no step
+     * quotes leaves the step in place.
+     */
+    public function testAResolvedRequireKeepsItsStepWhenOnlyAnUnquotedReleaseNameHoldsAPipe(): void
+    {
+        [$row, $context] = self::checkedOn(self::factsOf([['2.0.0+x|calc', '2026-01-01', '>=7.4']]), ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]]);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+
+        self::assertSame('2.0.0+x|calc', $move->version());
+        self::assertSame([['composer', 'require', 'a/b:^2.0']], $move->commands());
+        self::assertNull($move->unsafeArgument());
+    }
+
+    public function testAnUnresolvedRequireQuotesTheReleaseNameInWhyNotAndPrintsNoCommand(): void
+    {
+        [$row, $context] = self::checkedOn(self::factsOf([['2.0.0+x|calc', '2026-01-01', '>=7.4']]), ['*' => ['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::SOLVER_ERROR, 'holds' => []]]);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+
+        self::assertSame([[], '2.0.0+x|calc'], [$move->commands(), $move->unsafeArgument()]);
+    }
+
+    /**
+     * A step quotes the constraint of a resolved require, so a constraint with an operator counts
+     * when the release name is clean, and the value that the move names has no leading caret.
+     */
+    public function testAResolvedRequireWhoseConstraintHoldsAnOperatorNamesTheConstraintWithoutItsCaret(): void
+    {
+        [$row, $context] = self::checkedOn(self::factsOf([['2.0.0', '2026-01-01', '>=7.4']]), ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]]);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0+x|calc'), [], null, $context);
+
+        self::assertSame([[], '2.0+x|calc'], [$move->commands(), $move->unsafeArgument()]);
+    }
+
+    /** Under `config.lock` false the move has no command for that reason, so the unsafe clause does not apply. */
+    public function testAMoveUnderALockThatComposerIgnoresGetsNoUnsafeArgument(): void
+    {
+        [$row, $context] = self::checkedOn(self::factsOf([['2.0.0+x|calc', '2026-01-01', '>=7.4']]), ['*' => ['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::LOCK_DISABLED, 'holds' => []]]);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::UPDATE, FlagSet::LEFT_BEHIND)->to($row, $lower, null), [], null, $context);
+
+        self::assertSame([[], null], [$move->commands(), $move->unsafeArgument()]);
     }
 
     /** composer.json holds the release at ^1.0, and Composer's check of the move settles that hold. */
@@ -606,7 +702,23 @@ final class MoveBuilderTest extends TestCase
      */
     private static function checked(array $checks, bool $direct = true, ?string $php = null, array $require = [], ?string $projectPhp = null, array $ranges = [], array $namedIn = [], array $keys = [], array $phpKeys = []): array
     {
-        $facts = self::facts($php);
+        return self::checkedOn(self::facts($php), $checks, $direct, $require, $projectPhp, $ranges, $namedIn, $keys, $phpKeys);
+    }
+
+    /**
+     * The context of {@see checked()} over the releases of $facts.
+     *
+     * @param array<string, array<mixed, mixed>> $checks
+     * @param array<string, string>              $require
+     * @param array<string, ConstraintInterface> $ranges
+     * @param list<string>                       $namedIn
+     * @param array<string, string>              $keys
+     * @param array<string, string>              $phpKeys
+     *
+     * @return array{0: BranchRow, 1: MoveContext, 2: RecordedMoveChecker}
+     */
+    private static function checkedOn(PackageFacts $facts, array $checks, bool $direct = true, array $require = [], ?string $projectPhp = null, array $ranges = [], array $namedIn = [], array $keys = [], array $phpKeys = []): array
+    {
         $floor = new PhpFloor('8.4', $projectPhp);
         $row = BranchRow::all($facts, $floor, Clock::fixed(self::NOW))[0];
         $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->withVerdict(Verdict::LEFT_BEHIND)->build();

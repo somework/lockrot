@@ -292,6 +292,10 @@ final class Analyzer
         $report = (new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($lookups), $includeDev, $advisories->coverage()))
             ->withPhpWindow($window === null ? null : $window->withTargetFix($checks === null ? null : $checks->checker()))
             ->withSolvePhp($solvePhp);
+        $unsafe = self::movesWithoutStep($report->sorted());
+        if ($unsafe !== []) {
+            $report = $report->withNote(RunNote::commandArgumentUnsafe($unsafe));
+        }
         if ($checks !== null) {
             $report = $report->withMoveChecks(new MoveCheckRun($checks->checker()->composerVersion(), $checks->checker()->blocksAdvisories(), $checks->checker()->blockingDisabledBy(), $checks->checker()->baseline()->check()), UpdateNow::of($report->sorted(), $checks));
             $error = $checks->checker()->solverError();
@@ -301,6 +305,26 @@ final class Analyzer
         }
 
         return new Analysis($report, $factsByPackage);
+    }
+
+    /**
+     * @param list<Finding> $findings in report order
+     *
+     * @return list<array{package: string, version: string}> the moves that write no step, `next_step` before `also[]`
+     */
+    private static function movesWithoutStep(array $findings): array
+    {
+        $moves = [];
+        foreach ($findings as $finding) {
+            $next = $finding->nextStep();
+            foreach ($next === null ? [] : array_merge([$next], $next->also()) as $move) {
+                if ($move->unsafeArgument() !== null) {
+                    $moves[] = ['package' => $finding->package(), 'version' => $move->unsafeArgument()];
+                }
+            }
+        }
+
+        return $moves;
     }
 
     /**

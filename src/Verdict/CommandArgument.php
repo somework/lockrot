@@ -28,6 +28,16 @@ final class CommandArgument
         return preg_match(self::SET, $argument) === 1;
     }
 
+    /**
+     * Whether a version or a branch name, which a step quotes in `package:^X` or as the version of
+     * `composer why-not`, holds a character that cmd.exe or PowerShell runs or redirects. The
+     * check reads the value, so the `>=` of a `php:>=8.1` step does not count.
+     */
+    public static function holdsShellOperator(string $value): bool
+    {
+        return strpbrk($value, '|<>') !== false;
+    }
+
     /** @param list<string> $argv `composer`, its subcommand, then the arguments */
     public static function allPass(array $argv): bool
     {

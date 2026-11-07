@@ -745,6 +745,15 @@ shows. The gitlab report
 carries no run notes, so read the `moves_not_checked` note that a move points at in another
 format.
 
+!!! warning
+    Do not paste a printed POSIX line into cmd.exe or PowerShell. These shells parse `|`, `<`, `>` and
+    `^` in a single-quoted argument of a `.bat` or `.cmd` target such as `composer.bat`, so a
+    pasted line can run another program or write a file. When an argument that comes from a
+    version or a branch name holds `|`, `<` or `>`, lockrot prints no command for that move. The
+    move's `commands[]` is `[]`, its text says why, and the run note
+    [`command_argument_unsafe`](notes.md#command_argument_unsafe) counts such moves. When the move check
+    runs, such an update is no `security.update_now` member.
+
 ### <a name="the-move-check"></a>The move check {#the-move-check}
 
 lockrot asks Composer's own solver about every move that runs a Composer request: the lead move,
@@ -926,6 +935,13 @@ Limits of the check:
   lower release than Composer installs. The move is then not checked, with the load reason
   (`unloaded_name`, `offline` or `install_time_budget`). A refusal that needs such a package reads
   the same.
+- A package that no Composer repository lists, while a path, VCS or package repository can serve
+  it, is not loaded either. A resolving solve is then not checked only when a release that the
+  solve could install requires the package and no loaded package provides it. The solve could
+  install a release above the one that it installs, when a loaded package meets each other
+  requirement of the release. It could also install a package that it does not install, when such
+  a release requires it, directly or through another such package. A provider counts when a loaded
+  package meets each of its own requirements.
 - Composer blocks only the advisories that it reads. When the advisory lookup did not read a
   package that a resolving solve installs, the move is not checked (`check.reason`
   `advisory_lookup_incomplete`). An `--offline` run, a spent install-time budget and a failed
@@ -947,7 +963,8 @@ Limits of the check:
   installs symfony/flex, a move that resolves in lockrot can fail in Composer, or install an older
   version.
 - When lockrot read no release of the move's row, or a requirement has no constraint, it tries no
-  move (`check.reason` `no_release_read`). The commands stay.
+  move (`check.reason` `no_release_read`). The commands stay, unless Composer's `config.lock` is
+  false.
 - It stops a chain of refusals after `Analyzer::CHECK_PASSES` passes. A new request after the
   last one is not checked (`check.reason` `pass_cap`).
 - When Composer's solver fails on a request, the move is not checked (`check.reason`
@@ -960,6 +977,14 @@ Limits of the check:
   `composer_json_invalid`). Composer refuses such a file, for example for a requirement name that
   is no package name. The advisory lookup of that run does not run either
   ([Security advisories](#security-advisories)).
+- A run whose Composer config sets `config.lock` to false, in composer.json or in the global
+  config, checks no move: `run.move_check.baseline` is `not_checked` with the reason
+  `lock_disabled`. Each move's `check.reason` is `lock_disabled`, or `no_release_read` for a move
+  with no release read. The reason words are "config.lock is false, so Composer ignores
+  composer.lock". Composer refuses a partial update without a lock, so every move has no command:
+  `commands[]` is `[]`. lockrot writes no `update now:` line and no `moves_not_checked` note. The
+  findings still read composer.lock. `no_composer_json` and `composer_json_invalid` come first,
+  and `lock_disabled` comes before every other reason of the baseline.
 - A run whose `config.platform` holds a value that Composer refuses checks no move (`check.reason`
   `platform_config_invalid`). Each `composer update` then stops. The run still writes its report.
   These values give that reason:

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+use Lockrot\AsciiCase;
 use Lockrot\Exception\ConfigException;
 
 /**
@@ -65,7 +66,7 @@ final class FailOn
         $byKind = [];
         $seen = [];
         foreach ($words as $word) {
-            $value = strtolower(preg_replace(self::SURROUNDING_WHITESPACE, '', $word) ?? $word);
+            $value = AsciiCase::lower(preg_replace(self::SURROUNDING_WHITESPACE, '', $word) ?? $word);
             if ($value === 'vulnerable-low') {
                 throw new ConfigException($source.': vulnerable-low is not a value: use "vulnerable": every counted advisory is at least low');
             }

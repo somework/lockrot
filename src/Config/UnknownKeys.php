@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Config;
 
+use Lockrot\AsciiCase;
 use Lockrot\Output\TerminalText;
 
 /**
@@ -142,9 +143,7 @@ final class UnknownKeys
         if (\strlen($key) > self::LONGEST_KEY) {
             return null;
         }
-        // Not strtolower(): on PHP 7.4 it follows LC_CTYPE, and under a Turkish locale `I` does not
-        // become `i`. The PHAR never calls setlocale(), but a plugin's host process can call it.
-        $needle = strtr($key, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz');
+        $needle = AsciiCase::lower($key);
         $nearest = null;
         $fewest = \PHP_INT_MAX;
         foreach ($known as $candidate) {

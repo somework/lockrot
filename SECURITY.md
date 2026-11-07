@@ -55,6 +55,12 @@ How lockrot writes a report or a baseline:
   over the target. lockrot creates the temporary file exclusively, so it never follows a file or
   symlink that is already at that name. lockrot needs write access to that directory.
 
+- lockrot calls `fsync` on the temporary file before the rename only on PHP 8.1 and later, because
+  the function exists from 8.1. On PHP 7.4 and 8.0, a power loss after the rename and before the
+  data reaches the disk can leave an empty target on a file system that does not protect a replace
+  by rename. No directory sync follows the rename on any PHP version. A target that no run
+  replaced stays whole.
+
 - A run that stops during a write can leave a `*.tmp` file beside the target. `self-update` stages
   the new archive beside the PHAR ([Keeping it updated](docs/phar.md#keeping-it-updated)).
 

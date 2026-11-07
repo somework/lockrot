@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/pinned",
+        "description": "friendsofsymfony/oauth-server-bundle dev-master \u2014 finding high (16 = pinned 16) \u2014 pinned: pinned to branch snapshot dev-master. Do: require a tag \u2014 the newest is v4.0.0+x|calc (2025-01-01); 4.x needs php >=7.2, which require.php allows; lockrot prints no command, because its release name holds |, < or >.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "5c76bac52e93c068b6abb03ecd5e1dca10eb7582ab62abea9af66e6c2e944c3c",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

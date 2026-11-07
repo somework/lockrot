@@ -113,7 +113,8 @@ grows in minor releases. These are the ones that a reader meets most:
   `run.advisory_lookup.repositories[]`
 - in report-2, the `reason` of a move's `check`, of `run.move_check` and of
   `run.php_window.target_fix`
-- in report-2, the words of `run.score_model`
+- in report-2, the words of `run.score_model`, and the keys of `run.score_rules_used`, the rule ids
+  of the score model ([The score](verdicts.md#score))
 - in report-2, the integers `divisor` of a maintenance score term, `multiplier` of the security
   term and `divide_by` of a modifier
 - the configuration's `format`, and format names wherever lockrot writes one.
@@ -128,8 +129,12 @@ How the schemas write an open set:
   Every known value matches the `pattern`, and the list only grows under one number. An integer
   set has no `pattern`: it is an `integer` with a `minimum`, and its `x-known-values` are integers.
 
-- A draft-04 validator ignores `x-known-values`, so your copy accepts a value that a later release
-  adds.
+- An open map, such as `run.score_rules_used`, has `patternProperties` for its keys and
+  `x-known-keys`, the keys that this release writes. A later release can add a key that the
+  pattern admits.
+
+- A draft-04 validator ignores `x-known-values` and `x-known-keys`, so your copy accepts a value or
+  a key that a later release adds.
 
 - The pattern for signal ids, note codes, origin kinds and formats also admits `<vendor>:<name>`,
   the form [reserved](compatibility.md#names-reserved-for-extensions) for names that do not come
@@ -149,6 +154,11 @@ How to read one:
 
 - To hold a document to the values you know, read `x-known-values` as an `enum`. lockrot reads it
   as an `enum` when it validates `extra.lockrot`, so a mistyped `format` is a configuration error.
+
+- To hold a document to the keys you know, read `x-known-keys` as the only properties of the map,
+  each typed by the `patternProperties` entry that its name matches. Set `additionalProperties` to
+  `false` and drop `patternProperties`. Without that, your strict copy accepts any key that the
+  pattern admits.
 
 The [closed sets](compatibility.md#closed-sets-and-their-order) stay closed. A new value in a
 closed set needs a new schema number.
@@ -183,7 +193,7 @@ names what to read for each report-1 field that report-2 removes or redefines.
 | `.evidence` (every fact) | `.evidence` holds the summaries of the counted flags only. Read `[.flags[].summary]` for every flag that fired, accepted ones included, and `[.signals[].summary]` for the rest |
 | `.priority_basis` | `.score`: its `terms`, its `modifiers` and its `text` |
 | `.no_fix_expected`, S9's `fixed_by` and `fixed_on_branch` | `.security` and the `fix` of each S9 row |
-| `.libyears.total` | the same key. It is the rounded sum of the findings' `libyears` |
+| `.libyears.total` | the same key. It is the sum of the findings' two-decimal `libyears`. 0.13 rounded the sum of the unrounded values, so a total can move by up to 0.05 with no data change. `.libyears.direct_requirements` follows the same rule |
 | `.libyears_unmeasured == "metadata_unavailable"` | `.libyears_unmeasured == "unavailable" or .libyears_unmeasured == "not_found"` |
 | `.libyears_unmeasured == "no_stable_release_date"` | `shared_commit`, `parent_split`, `undated`, `no_stable_release` or `undated_releases`, the ids that `age` uses for the same cause |
 | S9's `.severity == null` | `.severity == "unrated"`. `moderate` reads `medium`, and `.severity_published` keeps Composer's word |
@@ -317,7 +327,7 @@ shapes leave out the parts that do not apply. A score of 0 carries only `model`,
 | `score_model` | object | The whole score model: weights, severities, fix kinds, bands, sort and rules ([Score model 1](verdicts/model-1.md)) |
 | `score_rules_used` | object | Rule id → the number of findings on which the rule changed or decided a number. Null for `sort` |
 | `advisory_lookup` | object | `scope` and `scope_source`, the packages asked and not asked, and each Composer repository that can publish advisories, with its `outcome` ([Which advisories count](verdicts.md#which-advisories-count)) |
-| `move_check` | object or null | Which Composer checked the moves (`composer`), and whether it blocked the versions that an advisory affects. `blocking_disabled_by` lists the switches that turned that blocking off, environment variables and composer.json `config` keys, `[]` when none did. `baseline` says whether Composer's solver resolves or refuses the lock itself, with `reason` when lockrot did not check it. `ignored_platform` lists the platform patterns whose requirements the solve ignores, except a name that `config.platform` sets. `composer lockrot` always writes `move_check`. A run that checks no move says why in `baseline` and `reason` ([The move check](verdicts.md#the-move-check)). Null means a report built without the move check, such as a contract fixture |
+| `move_check` | object or null | The version of the running Composer, which solves the moves or would solve them (`composer`), and whether it blocked the versions that an advisory affects. `blocking_disabled_by` lists the switches that turned that blocking off, environment variables and composer.json `config` keys, `[]` when none did. `baseline` says whether Composer's solver resolves or refuses the lock itself, with `reason` when lockrot did not check it. `ignored_platform` lists the platform patterns whose requirements the solve ignores, except a name that `config.platform` sets. `composer lockrot` always writes `move_check`. A run that checks no move says why in `baseline` and `reason` ([The move check](verdicts.md#the-move-check)). Null means a report built without the move check, such as a contract fixture |
 | `php_window` | object or null | The PHP minors on which the lock installs, with require-dev (`with_dev`) and without (`without_dev`), and the links that set each edge. It also holds `config.platform.php` from Composer's merged config (`platform_override`) and the host features that a requirement names. `target` says whether the window admits the target PHP. `target_fix` names the update of the packages that exclude the target, and the answer of Composer's solver to it. Its `platform_step` says whether to set `config.platform.php` to your release of the target PHP first. Its `lock_platform` lists the root `require` links that exclude the target and that only the lock's `platform` or `platform-dev` holds. Null when the window is unknowable ([The PHP window](verdicts.md#the-php-window)) |
 
 ### The gate
@@ -410,7 +420,9 @@ Every other option comes after the package arguments. The first argument is `com
 second is `update`, `require` or `why-not`.
 
 An argument comes from the lock or a repository, so lockrot leaves out a step that breaks this
-rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the
+rule. The move keeps its `constraint`, `text` and other steps. When a version, constraint or tag
+that a step quotes holds `|`, `<` or `>`, the move has no step at all
+([`command_argument_unsafe`](notes.md#command_argument_unsafe)). `text` shows a command only as the
 POSIX rendering of a step in `commands`. Render each argv with one of these renderings:
 
 | Shell | Rendering | Example |
@@ -459,7 +471,7 @@ lockrot derives the root `libyears` block from the findings' `libyears`:
 
 | Key | Type | Holds |
 |---|---|---|
-| `total` | number or null | The findings' `libyears`, summed and rounded to two decimals. Null when `measured` is 0 |
+| `total` | number or null | The sum of the findings' two-decimal `libyears`. Null when `measured` is 0 |
 | `direct_requirements` | number or null | The same sum over `direct: true`. Null when `measured` is 0 |
 | `measured` | integer | Findings whose `libyears` is a number |
 | `at_least_count` | integer | Findings whose `libyears` is a lower bound. When it is above 0, `total` is a lower bound |

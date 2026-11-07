@@ -347,7 +347,10 @@ final class UnknownKeysTest extends TestCase
     public function testUpperCaseIsFoldedWithoutTheLocale(): void
     {
         $previous = setlocale(\LC_CTYPE, '0');
-        setlocale(\LC_CTYPE, 'tr_TR.ISO8859-9', 'tr_TR.ISO-8859-9', 'tr_TR', 'tr_TR.UTF-8');
+        if (setlocale(\LC_CTYPE, 'tr_TR.ISO8859-9', 'tr_TR.ISO-8859-9', 'tr_TR', 'tr_TR.UTF-8') === false) {
+            self::markTestSkipped('No Turkish locale is installed.');
+        }
+
         try {
             $warnings = UnknownKeys::warnings(['INSTALL' => 'off']);
         } finally {

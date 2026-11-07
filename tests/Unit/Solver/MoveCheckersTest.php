@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Solver;
 
+use Composer\Composer;
 use Composer\Config;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
@@ -119,6 +120,80 @@ final class MoveCheckersTest extends TestCase
         self::assertSame($unchecked, $checker->baseline()->check()->jsonSerialize(), 'baseline');
         self::assertSame($unchecked, $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize(), 'move');
         self::assertSame($configuredPhp, $checker->configuredPhp());
+    }
+
+    /**
+     * Ruling R14-22: with `config.lock` false, Composer ignores composer.lock and refuses a
+     * partial update, so no request is solved. The reason comes before a refused config.platform.
+     *
+     * @dataProvider configsWithTheLockOff
+     *
+     * @param array<string, mixed> $settings
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('configsWithTheLockOff')]
+    public function testAConfigThatTurnsTheLockOffChecksNoMoveAndSolvesNothing(array $settings): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => $settings]);
+        $repository = new RecordingComposerRepository([(new ArrayLoader())->load(['name' => 'acme/lib', 'version' => '1.1.0'])]);
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+
+        $checker = MoveCheckers::forProject(self::root(), $lock, ProjectConfig::empty(), $config, [$repository], '8.4', false, Deadline::never());
+
+        $unchecked = ['result' => MoveCheck::NOT_CHECKED, 'form' => null, 'reason' => MoveCheck::LOCK_DISABLED, 'installs' => null];
+        self::assertSame($unchecked, $checker->baseline()->check()->jsonSerialize(), 'baseline');
+        self::assertSame($unchecked, $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->jsonSerialize(), 'move');
+        self::assertSame($unchecked, $checker->solveAt(['acme/lib'])->check()->jsonSerialize(), 'target fix');
+        self::assertSame($unchecked, $checker->combined(['acme/lib' => '^1.1'])->check()->jsonSerialize(), 'update now');
+        self::assertSame($unchecked, $checker->joint(MoveQuery::update('acme/lib', '^1.1', '1.1.0'), ['acme/other'])->check()->jsonSerialize(), 'joint');
+        self::assertSame(Composer::getVersion(), $checker->composerVersion(), 'the running Composer');
+        self::assertSame([], $repository->asked);
+    }
+
+    /** @return iterable<string, array{array<string, mixed>}> */
+    public static function configsWithTheLockOff(): iterable
+    {
+        yield 'lock false' => [['lock' => false]];
+        yield 'lock false and a refused platform' => [['lock' => false, 'platform' => ['php' => '^8.2']]];
+    }
+
+    /**
+     * A run that checks no move still says whether the running Composer blocks the versions that
+     * an advisory affects, and which switch turned that off.
+     *
+     * @dataProvider uncheckedRunsAndTheirBlocking
+     *
+     * @param array<string, mixed> $settings
+     * @param array{bool, list<string>} $expected
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('uncheckedRunsAndTheirBlocking')]
+    public function testARunThatChecksNoMoveNamesTheAdvisoryBlockingOfItsConfig(array $settings, array $expected): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => $settings]);
+
+        $checker = MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]]), ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
+
+        self::assertSame(MoveCheck::NOT_CHECKED, $checker->baseline()->check()->result());
+        self::assertSame($expected, [$checker->blocksAdvisories(), $checker->blockingDisabledBy()]);
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, array{bool, list<string>}}> */
+    public static function uncheckedRunsAndTheirBlocking(): iterable
+    {
+        yield 'lock false' => [['lock' => false], [true, []]];
+        yield 'lock false, blocking off' => [['lock' => false, 'audit' => ['block-insecure' => false]], [false, ['config.audit.block-insecure']]];
+        yield 'a refused platform, blocking off' => [['platform' => ['php' => '^8.2'], 'audit' => ['block-insecure' => false]], [false, ['config.audit.block-insecure']]];
+    }
+
+    public function testAConfigThatKeepsTheLockOnChecksTheMoves(): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['lock' => true]]);
+
+        $checker = MoveCheckers::forProject(self::root(), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]]), ProjectConfig::empty(), $config, [], '8.4', false, Deadline::never());
+
+        self::assertSame(MoveCheck::RESOLVES, $checker->baseline()->check()->result());
     }
 
     /** @return iterable<string, array{array<array-key, mixed>, ?string}> the platform and its configured php */
@@ -371,6 +446,135 @@ final class MoveCheckersTest extends TestCase
         $check = MoveCheckers::forProject(self::root(), $lock, ProjectConfig::empty(), new Config(false), [$vcs, $repository], '8.4', false, Deadline::never())->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
 
         self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME], [$check->result(), $check->reason()]);
+    }
+
+    /**
+     * Ruling R14-1: no Composer repository lists acme/private, which the vcs repository can serve.
+     * A release that the solve could prefer and that needs it cannot install, so the solve can
+     * resolve below the release that Composer installs. A virtual name that an installable pool
+     * package provides keeps the solve resolving.
+     *
+     * @dataProvider unreachedRequirements
+     *
+     * @param array<string, array<string, string>> $releases the releases of acme/lib above 1.0.0, by version, with their requirements
+     * @param array{string, ?string, ?string}      $expected
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('unreachedRequirements')]
+    public function testAResolvingSolveThatLosesAReleaseToAnUnreachedNameIsNotChecked(array $releases, ?string $newest, array $expected): void
+    {
+        $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'acme/lib', 'version' => '1.0.0'] + $packagist,
+            ['name' => 'acme/logger', 'version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']] + $packagist,
+        ]]);
+        $loader = new ArrayLoader();
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
+        $remote = [
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/logger', 'version' => '1.0.0', 'provide' => ['psr/log-implementation' => '1.0.0']]),
+            $loader->load(['name' => 'acme/logger2', 'version' => '1.0.0', 'provide' => ['psr/log-implementation' => '2.0.0'], 'require' => ['php' => '>=9.0']]),
+        ];
+        foreach ($releases as $version => $require) {
+            $remote[] = $loader->load(['name' => 'acme/lib', 'version' => $version, 'require' => $require]);
+        }
+        $checker = MoveCheckers::forProject(self::root(['acme/lib' => '^1.0', 'acme/logger' => '^1.0']), $lock, ProjectConfig::empty(), new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
+
+        $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0', null, $newest))->check();
+
+        self::assertSame($expected, [$check->result(), $check->reason(), $check->installs()]);
+        self::assertSame(MoveCheck::RESOLVES, $checker->baseline()->check()->result());
+    }
+
+    /** @return iterable<string, array{array<string, array<string, string>>, ?string, array{string, ?string, ?string}}> */
+    public static function unreachedRequirements(): iterable
+    {
+        $unchecked = [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, null];
+        yield 'a name that no pool package provides' => [['1.1.0' => [], '1.2.0' => ['acme/private' => '^1.0']], null, $unchecked];
+        yield 'a version of a provided name that no pool package provides' => [['1.1.0' => [], '1.2.0' => ['psr/log-implementation' => '^3.0']], null, $unchecked];
+        yield 'a version of a provided name whose only provider cannot install' => [['1.1.0' => [], '1.2.0' => ['psr/log-implementation' => '^2.0', 'acme/logger2' => '^1.0']], null, $unchecked];
+        yield 'a virtual name that a pool package provides' => [['1.1.0' => [], '1.2.0' => ['psr/log-implementation' => '^1.0']], null, [MoveCheck::RESOLVES, null, '1.2.0']];
+        yield 'a met virtual name on a release that the target php refuses' => [['1.1.0' => [], '1.2.0' => ['psr/log-implementation' => '^1.0', 'php' => '>=9.0']], null, [MoveCheck::RESOLVES, null, '1.1.0']];
+        yield 'an unreached name on a release that the target php refuses' => [['1.1.0' => [], '1.2.0' => ['acme/private' => '^1.0', 'php' => '>=9.0']], null, [MoveCheck::RESOLVES, null, '1.1.0']];
+        yield 'an unreached name on a release below the one that the solve installs' => [['1.1.0' => ['acme/private' => '^1.0'], '1.2.0' => [], '1.3.0' => ['php' => '>=9.0']], '1.3.0', [MoveCheck::RESOLVES, null, '1.2.0']];
+    }
+
+    /**
+     * A package that the solve does not install counts only when a release that the solve could
+     * install requires it, directly or through another such package.
+     *
+     * @dataProvider unreachedThroughAnotherPackage
+     *
+     * @param array<string, array<string, string>> $lib   the releases of acme/lib above 1.0.0, by version, with their requirements
+     * @param array<string, array<string, string>> $other the packages that the lock does not hold, by name, each at 1.0.0 with its requirements
+     * @param array{string, ?string, ?string}      $expected
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('unreachedThroughAnotherPackage')]
+    public function testAnUnreachedNameCountsOnlyThroughAReleaseThatTheSolveCouldInstall(array $lib, array $other, array $expected): void
+    {
+        $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0'] + $packagist]]);
+        $loader = new ArrayLoader();
+        $remote = [$loader->load(['name' => 'acme/lib', 'version' => '1.0.0'])];
+        foreach ($lib as $version => $require) {
+            $remote[] = $loader->load(['name' => 'acme/lib', 'version' => $version, 'require' => $require]);
+        }
+        foreach ($other as $name => $require) {
+            $remote[] = $loader->load(['name' => $name, 'version' => '1.0.0', 'require' => $require]);
+        }
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
+        $checker = MoveCheckers::forProject(self::root(['acme/lib' => '^1.0']), $lock, ProjectConfig::empty(), new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
+
+        $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
+
+        self::assertSame($expected, [$check->result(), $check->reason(), $check->installs()]);
+    }
+
+    /** @return iterable<string, array{array<string, array<string, string>>, array<string, array<string, string>>, array{string, ?string, ?string}}> */
+    public static function unreachedThroughAnotherPackage(): iterable
+    {
+        yield 'a package that only a release below the installed one requires' => [
+            ['1.1.0' => ['acme/old' => '^1.0'], '1.2.0' => []],
+            ['acme/old' => ['acme/private' => '^1.0']],
+            [MoveCheck::RESOLVES, null, '1.2.0'],
+        ];
+        yield 'a package that a release above the installed one requires' => [
+            ['1.1.0' => [], '1.2.0' => ['acme/new' => '^1.0']],
+            ['acme/new' => ['acme/private' => '^1.0']],
+            [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, null],
+        ];
+        yield 'a package two steps from a release above the installed one' => [
+            ['1.1.0' => [], '1.2.0' => ['acme/new' => '^1.0']],
+            ['acme/new' => ['acme/deep' => '^1.0'], 'acme/deep' => ['acme/private' => '^1.0']],
+            [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, null],
+        ];
+        // 1.3.0 passes the one-level test, but its acme/other cannot install. The check must still reach 1.2.0.
+        yield 'a release that loses an unreached name beside a release whose requirement cannot install' => [
+            ['1.1.0' => [], '1.2.0' => ['acme/new' => '^1.0'], '1.3.0' => ['acme/other' => '^1.0']],
+            ['acme/new' => ['acme/private' => '^1.0'], 'acme/other' => ['php' => '>=9.0']],
+            [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, null],
+        ];
+    }
+
+    /** Only a release above the installed one counts, so a lower release of an installed requirement loses no name. */
+    public function testALowerReleaseOfAnInstalledRequirementLosesNoUnreachedName(): void
+    {
+        $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0'] + $packagist]]);
+        $loader = new ArrayLoader();
+        $remote = new RecordingComposerRepository([
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.1.0', 'require' => ['acme/dep' => '^1.0']]),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.2.0', 'require' => ['acme/dep' => '^1.0', 'acme/blocked' => '^1.0']]),
+            $loader->load(['name' => 'acme/dep', 'version' => '1.0.0', 'require' => ['acme/private' => '^1.0']]),
+            $loader->load(['name' => 'acme/dep', 'version' => '1.1.0']),
+            $loader->load(['name' => 'acme/blocked', 'version' => '1.0.0', 'require' => ['php' => '>=9.0']]),
+        ]);
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
+        $checker = MoveCheckers::forProject(self::root(['acme/lib' => '^1.0']), $lock, ProjectConfig::empty(), new Config(false), [$vcs, $remote], '8.4', false, Deadline::never());
+
+        $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
+
+        self::assertSame([MoveCheck::RESOLVES, null, '1.1.0'], [$check->result(), $check->reason(), $check->installs()]);
     }
 
     /** docs/verdicts.md, move-check limits: a solve that needs another release of a vcs-locked name proves nothing. */

@@ -12,6 +12,7 @@ use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Baseline\RecordedAdvisory;
 use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Exception\ConfigException;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
@@ -98,6 +99,28 @@ final class BaselineComparisonTest extends TestCase
             array_map(static fn (RunNote $note): array => [$note->code(), $note->text()], $comparison->notes())
         );
         self::assertSame('known', $fact === null ? null : $fact->state());
+    }
+
+    /** Grades under two score models are not comparable, so the check run refuses the file. */
+    public function testABaselineUnderAnotherScoreModelIsRefused(): void
+    {
+        $entry = BaselineEntries::of('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15');
+        $other = ScoreModel::ID + 1;
+        $baseline = Baseline::of([$entry], self::AT, PhpReleaseDates::minorOf(\PHP_VERSION), 'runtime', Version::STRING, $other);
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage(self::PATH.' was written under score model '.$other.' and this lockrot uses score model '.ScoreModel::ID.'. Run --generate-baseline to write it again under this model, or run the lockrot that wrote it');
+
+        BaselineComparison::refuseAnotherScoreModel($baseline, self::PATH);
+    }
+
+    public function testABaselineUnderThisScoreModelIsNotRefused(): void
+    {
+        $entry = BaselineEntries::of('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15');
+
+        BaselineComparison::refuseAnotherScoreModel(Baseline::of([$entry], self::AT, PhpReleaseDates::minorOf(\PHP_VERSION), 'runtime', Version::STRING, ScoreModel::ID), self::PATH);
+
+        $this->addToAssertionCount(1);
     }
 
     public function testAFindingAtTheBaselinedVerdictIsKnown(): void

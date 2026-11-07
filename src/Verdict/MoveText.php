@@ -43,6 +43,9 @@ final class MoveText
         MoveFact::STOPS_BELOW_NEWEST_PHP => 'it stops below the newest PHP',
     ];
 
+    /** The end of the text of a move that writes no step because a version holds a shell operator. */
+    private const NO_COMMAND = '; lockrot prints no command, because its release name holds |, < or >';
+
     public static function render(Move $move): string
     {
         return implode('', array_column(self::parts($move), 0));
@@ -77,7 +80,7 @@ final class MoveText
         if ($through !== '' && \in_array(Move::TRANSITIVE, $move->composerMovesBecause(), true)) {
             $text .= '; '.$through;
         }
-        $parts[] = [$text.self::checked($move->check()).self::movesWith($move), false];
+        $parts[] = [$text.self::checked($move->check()).self::movesWith($move).($move->unsafeArgument() === null ? '' : self::NO_COMMAND), false];
         $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride(), $subject->isBaselineRefused());
 
         return self::joined(array_merge([[$step, false]], $step === '' ? $parts : self::sentenceStart($parts)));

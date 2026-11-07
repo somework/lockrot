@@ -1643,7 +1643,7 @@
                     "uniqueItems": true
                 },
                 "commands": {
-                    "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell). The kinds without a command have `[]`. A transitive `require`, `raise-php` or `tag` move has no step for its package unless `check` resolves it. Then the step is `composer update vendor/pkg:<constraint>` with the form's option, on a Composer that takes an inline constraint there. A `raise-php` move starts with its php step (`composer require php:>=8.1 --no-update`). An `update`, `require`, `raise-php` or `tag` move whose `check` does not resolve it ends with `composer why-not vendor/pkg <version> --locked`. A move with `moves_with` entries runs the joint request: `composer update vendor/pkg:<constraint>` followed by the holders. A root requirement writes it in two steps: `composer require vendor/pkg:<constraint> --no-update`, then `composer update vendor/pkg` followed by the holders. A `require` step on a package that composer.json lists only in `require-dev` adds `--dev`. A `require` step on a name that both `require` and `require-dev` list adds `--no-interaction` and spells the name as the `require-dev` key does: Composer then writes `require` and removes the `require-dev` line. The php step does the same when `require-dev` lists php. The command argument rule: each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. A move that `check` resolves only with its dependencies ends its step with `--with-dependencies` or `--with-all-dependencies`, and a move that `check` refuses has no `update` or `require` step. Only lockrot's own options start with `-`: `--no-update`, `--dev` and `--no-interaction` in a `require` step, `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step, and `--locked` in a `why-not` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell.",
+                    "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell). The kinds without a command have `[]`. A transitive `require`, `raise-php` or `tag` move has no step for its package unless `check` resolves it. Then the step is `composer update vendor/pkg:<constraint>` with the form's option, on a Composer that takes an inline constraint there. A `raise-php` move starts with its php step (`composer require php:>=8.1 --no-update`). An `update`, `require`, `raise-php` or `tag` move whose `check` does not resolve it ends with `composer why-not vendor/pkg <version> --locked`. A move with `moves_with` entries runs the joint request: `composer update vendor/pkg:<constraint>` followed by the holders. A root requirement writes it in two steps: `composer require vendor/pkg:<constraint> --no-update`, then `composer update vendor/pkg` followed by the holders. A `require` step on a package that composer.json lists only in `require-dev` adds `--dev`. A `require` step on a name that both `require` and `require-dev` list adds `--no-interaction` and spells the name as the `require-dev` key does: Composer then writes `require` and removes the `require-dev` line. The php step does the same when `require-dev` lists php. The command argument rule: each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. A move that `check` resolves only with its dependencies ends its step with `--with-dependencies` or `--with-all-dependencies`, and a move that `check` refuses has no `update` or `require` step. Only lockrot's own options start with `-`: `--no-update`, `--dev` and `--no-interaction` in a `require` step, `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step, and `--locked` in a `why-not` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. When a version, constraint or tag that a step quotes holds `|`, `<` or `>`, the move has no step at all, and the note `command_argument_unsafe` names it. `text` shows a command only as the POSIX rendering of a step here. A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell.",
                     "type": "array",
                     "items": {
                         "description": "One command as its argument list (`[\"composer\", \"require\", \"php:>=8.1\", \"--no-update\"]`).",
@@ -3521,7 +3521,8 @@
                                                 "no_composer_json",
                                                 "composer_json_invalid",
                                                 "platform_config_invalid",
-                                                "solver_error"
+                                                "solver_error",
+                                                "lock_disabled"
                                             ]
                                         },
                                         {
@@ -14008,7 +14009,7 @@
                     "uniqueItems": true
                 },
                 "commands": {
-                    "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell). The kinds without a command have `[]`. A transitive `require`, `raise-php` or `tag` move has no step for its package unless `check` resolves it. Then the step is `composer update vendor/pkg:<constraint>` with the form's option, on a Composer that takes an inline constraint there. A `raise-php` move starts with its php step (`composer require php:>=8.1 --no-update`). An `update`, `require`, `raise-php` or `tag` move whose `check` does not resolve it ends with `composer why-not vendor/pkg <version> --locked`. A move with `moves_with` entries runs the joint request: `composer update vendor/pkg:<constraint>` followed by the holders. A root requirement writes it in two steps: `composer require vendor/pkg:<constraint> --no-update`, then `composer update vendor/pkg` followed by the holders. A `require` step on a package that composer.json lists only in `require-dev` adds `--dev`. A `require` step on a name that both `require` and `require-dev` list adds `--no-interaction` and spells the name as the `require-dev` key does: Composer then writes `require` and removes the `require-dev` line. The php step does the same when `require-dev` lists php. The command argument rule: each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. A move that `check` resolves only with its dependencies ends its step with `--with-dependencies` or `--with-all-dependencies`, and a move that `check` refuses has no `update` or `require` step. Only lockrot's own options start with `-`: `--no-update`, `--dev` and `--no-interaction` in a `require` step, `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step, and `--locked` in a `why-not` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell.",
+                    "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell). The kinds without a command have `[]`. A transitive `require`, `raise-php` or `tag` move has no step for its package unless `check` resolves it. Then the step is `composer update vendor/pkg:<constraint>` with the form's option, on a Composer that takes an inline constraint there. A `raise-php` move starts with its php step (`composer require php:>=8.1 --no-update`). An `update`, `require`, `raise-php` or `tag` move whose `check` does not resolve it ends with `composer why-not vendor/pkg <version> --locked`. A move with `moves_with` entries runs the joint request: `composer update vendor/pkg:<constraint>` followed by the holders. A root requirement writes it in two steps: `composer require vendor/pkg:<constraint> --no-update`, then `composer update vendor/pkg` followed by the holders. A `require` step on a package that composer.json lists only in `require-dev` adds `--dev`. A `require` step on a name that both `require` and `require-dev` list adds `--no-interaction` and spells the name as the `require-dev` key does: Composer then writes `require` and removes the `require-dev` line. The php step does the same when `require-dev` lists php. The command argument rule: each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. A move that `check` resolves only with its dependencies ends its step with `--with-dependencies` or `--with-all-dependencies`, and a move that `check` refuses has no `update` or `require` step. Only lockrot's own options start with `-`: `--no-update`, `--dev` and `--no-interaction` in a `require` step, `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step, and `--locked` in a `why-not` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. When a version, constraint or tag that a step quotes holds `|`, `<` or `>`, the move has no step at all, and the note `command_argument_unsafe` names it. `text` shows a command only as the POSIX rendering of a step here. A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell.",
                     "type": "array",
                     "items": {
                         "description": "One command as its argument list (`[\"composer\", \"require\", \"php:>=8.1\", \"--no-update\"]`).",
@@ -15066,7 +15067,8 @@
                                         "no_release_read",
                                         "pass_cap",
                                         "solver_error",
-                                        "advisory_lookup_incomplete"
+                                        "advisory_lookup_incomplete",
+                                        "lock_disabled"
                                     ]
                                 },
                                 {
@@ -15413,8 +15415,42 @@
                 "update_now_refused",
                 "update_now_not_checked",
                 "move_check_failed",
-                "package_name_invalid"
+                "package_name_invalid",
+                "command_argument_unsafe"
             ]
+        },
+        "noteCommandArgumentUnsafe": {
+            "description": "`command_argument_unsafe`: moves that write no step, because a release name that a step quotes holds `|`, `<` or `>`. cmd.exe and PowerShell run or redirect at these characters in a pasted POSIX line. Each such move keeps its kind, constraint and check, and its `commands[]` is empty. The text names no move.",
+            "type": "object",
+            "required": [
+                "moves"
+            ],
+            "properties": {
+                "moves": {
+                    "description": "One entry per such move, in finding order, `next_step` before `also[]`.",
+                    "type": "array",
+                    "items": {
+                        "description": "A move that writes no step.",
+                        "type": "object",
+                        "required": [
+                            "package",
+                            "version"
+                        ],
+                        "properties": {
+                            "package": {
+                                "description": "The finding's package.",
+                                "$ref": "#/definitions/packageName"
+                            },
+                            "version": {
+                                "description": "The release name that holds the character, as the repository writes it: the move's `version`, or `latest.version` on a `tag` move. Foreign text, not contract.",
+                                "type": "string",
+                                "minLength": 1
+                            }
+                        }
+                    },
+                    "minItems": 1
+                }
+            }
         },
         "noteDetail": {
             "description": "One thing the run could not see or changed (report-1's typed notes): `code`, `data` typed per code, `text` the sentence every format prints. Every note's `text` is prose rendered from its `data` (NoteSentence).",
@@ -15767,6 +15803,18 @@
                     }
                 },
                 {
+                    "properties": {
+                        "code": {
+                            "enum": [
+                                "command_argument_unsafe"
+                            ]
+                        },
+                        "data": {
+                            "$ref": "#/definitions/noteCommandArgumentUnsafe"
+                        }
+                    }
+                },
+                {
                     "description": "A note whose code this schema does not list, from a later release or not from lockrot: its data is any object.",
                     "not": {
                         "properties": {
@@ -15797,7 +15845,8 @@
                                     "update_now_refused",
                                     "update_now_not_checked",
                                     "move_check_failed",
-                                    "package_name_invalid"
+                                    "package_name_invalid",
+                                    "command_argument_unsafe"
                                 ]
                             }
                         }
@@ -16176,7 +16225,8 @@
                         "no_release_read",
                         "pass_cap",
                         "solver_error",
-                        "advisory_lookup_incomplete"
+                        "advisory_lookup_incomplete",
+                        "lock_disabled"
                     ]
                 },
                 "packages": {
@@ -17111,7 +17161,7 @@
                     }
                 },
                 "installed_branch": {
-                    "description": "The installed row's label (`finding.branch`); null for a snapshot.",
+                    "description": "The label of the installed version's branch (`finding.branch`). Null for a snapshot. It names a `branches[]` row only when that row has `installed` true. An installed pre-release on a line with no stable tag has a label, and no row is installed.",
                     "oneOf": [
                         {
                             "type": "string",

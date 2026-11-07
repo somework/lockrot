@@ -118,7 +118,8 @@ final class MoveBuilder
         }
         $s2 = $finding->signalData(NoReleaseData::class);
 
-        return (new Move(
+        $commands = self::runnable(self::commands($kind, $subject, $constraint, $phpCheck, $latest, $version, $check, $checks, array_column($movesWith, 'package')));
+        $move = (new Move(
             $kind,
             $draft->source(),
             $merged,
@@ -140,9 +141,35 @@ final class MoveBuilder
             $leaves,
             $ifApplied,
             $because,
-            self::runnable(self::commands($kind, $subject, $constraint, $phpCheck, $latest, $version, $check, $checks, array_column($movesWith, 'package'))),
+            $commands,
             $subject
         ))->withCheck($check)->withMovesWith($movesWith);
+        $unsafe = self::unsafeArgument($commands, [$version, $constraint === null ? null : ltrim($constraint, '^'), $latest === null ? null : $latest->version()]);
+
+        return $unsafe === null ? $move : $move->withUnsafeArgument($unsafe);
+    }
+
+    /**
+     * The version, constraint or tag that a step quotes, when it holds a character that a Windows
+     * shell runs or redirects (SPEC §5.6). A value that no step quotes does not count.
+     *
+     * @param list<list<string>> $commands
+     * @param list<?string>      $values
+     */
+    private static function unsafeArgument(array $commands, array $values): ?string
+    {
+        foreach ($values as $value) {
+            if ($value === null || !CommandArgument::holdsShellOperator($value)) {
+                continue;
+            }
+            foreach (array_merge([], ...$commands) as $argument) {
+                if (strpos($argument, ltrim($value, '^vV')) !== false) {
+                    return $value;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -406,6 +433,10 @@ final class MoveBuilder
      */
     private static function commands(string $kind, MoveSubject $subject, ?string $constraint, ?PhpCheck $phpCheck, ?Latest $latest, ?string $version, ?MoveCheck $check, ?MoveChecks $checks, array $holders): array
     {
+        // A move with no release read has its own reason, and Composer refuses its step under config.lock false all the same.
+        if (($check !== null && $check->reason() === MoveCheck::LOCK_DISABLED) || ($checks !== null && $checks->checker()->baseline()->check()->reason() === MoveCheck::LOCK_DISABLED)) {
+            return [];
+        }
         $whyNot = \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true) && $version !== null && ($check === null || !$check->isResolved())
             ? [['composer', 'why-not', $subject->package(), $version, '--locked']]
             : [];

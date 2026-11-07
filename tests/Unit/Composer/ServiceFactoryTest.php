@@ -247,6 +247,60 @@ final class ServiceFactoryTest extends TestCase
         self::assertTrue(ServiceFactory::bitbucketAuthorizer($io, $config, Deadline::never(), $never)(), 'credentials under the API host count too');
     }
 
+    /** A client certificate or credential-less custom headers add no header, so they authorize nothing. */
+    public function testTheBitbucketAuthorizerNeedsARealCredential(): void
+    {
+        $never = static function (): HttpDownloader {
+            self::fail('no exchange expected');
+        };
+        $entries = [
+            'client certificate' => ['client-certificate', 'x'],
+            'custom headers without a credential' => ['["X-Proxy-Tag: ci"]', 'custom-headers'],
+        ];
+        foreach (['api.bitbucket.org', 'bitbucket.org'] as $host) {
+            foreach ($entries as $name => [$username, $password]) {
+                $io = new NullIO();
+                $io->setAuthentication($host, $username, $password);
+
+                self::assertFalse(ServiceFactory::bitbucketAuthorizer($io, self::bitbucketConfig(), Deadline::never(), $never)(), $name.' under '.$host);
+            }
+        }
+
+        $io = new NullIO();
+        $io->setAuthentication('bitbucket.org', '["Authorization: Bearer t"]', 'custom-headers');
+        self::assertTrue(ServiceFactory::bitbucketAuthorizer($io, self::bitbucketConfig(), Deadline::never(), $never)(), 'custom Authorization header');
+    }
+
+    /** A header-less entry for the API host hides the credentials of bitbucket.org, with or without the exchange. */
+    public function testAHeaderlessApiHostEntryDecidesAlone(): void
+    {
+        $never = static function (): HttpDownloader {
+            self::fail('no exchange expected');
+        };
+        $io = new NullIO();
+        $io->setAuthentication('api.bitbucket.org', 'client-certificate', '{"local_cert":"/c.pem"}');
+        $io->setAuthentication('bitbucket.org', 'me@example.com', 'atlassian-api-token');
+
+        self::assertFalse(ServiceFactory::bitbucketAuthorizer($io, self::bitbucketConfig(), Deadline::never(), $never)());
+        self::assertFalse(ServiceFactory::bitbucketCredentials($io)());
+        self::assertFalse(ServiceFactory::composerCredentials($io)('api.bitbucket.org'));
+        self::assertTrue(ServiceFactory::composerCredentials($io)('bitbucket.org'));
+    }
+
+    /** An offline run asks only whether Composer holds a credential that goes on the wire, under either Bitbucket host. */
+    public function testTheOfflineBitbucketCredentialsAreTrueOnlyForAStoredCredential(): void
+    {
+        self::assertFalse(ServiceFactory::bitbucketCredentials(new NullIO())(), 'nothing stored');
+
+        $web = new NullIO();
+        $web->setAuthentication('bitbucket.org', 'me@example.com', 'atlassian-api-token');
+        self::assertTrue(ServiceFactory::bitbucketCredentials($web)(), 'an entry of bitbucket.org');
+
+        $api = new NullIO();
+        $api->setAuthentication('api.bitbucket.org', 'me@example.com', 'atlassian-api-token');
+        self::assertTrue(ServiceFactory::bitbucketCredentials($api)(), 'an entry of api.bitbucket.org');
+    }
+
     /** The consumer pair becomes the bearer token AuthHelper sends, and nothing is written anywhere. */
     public function testTheBitbucketAuthorizerExchangesTheConsumerForABearerTokenInTheIo(): void
     {
@@ -433,6 +487,31 @@ final class ServiceFactoryTest extends TestCase
         $cache->set('https://api.github.com/repos/vendor/name', new HttpResult('https://api.github.com/repos/vendor/name', 200, '{}', new \DateTimeImmutable(self::NOW)));
 
         self::assertSame([], glob($dir.'/lockrot/*') ?: []);
+    }
+
+    /** A read-only cache is not a disabled one: a run with `cache-read-only` keeps the answers that an earlier run stored. */
+    public function testAReadOnlyComposerCacheStillServesAStoredAnswer(): void
+    {
+        $dir = $this->tempCacheDir();
+        $url = 'https://api.github.com/repos/vendor/name';
+        $writable = new Config(false, sys_get_temp_dir());
+        $writable->merge(['config' => ['cache-dir' => $dir, 'home' => sys_get_temp_dir()]]);
+        ServiceFactory::createCache(new NullIO(), $writable)->set($url, new HttpResult($url, 200, '{"stored":true}', new \DateTimeImmutable(self::NOW)));
+        $stored = glob($dir.'/lockrot/*') ?: [];
+        self::assertCount(1, $stored, 'the seeding run must write one envelope');
+
+        $readOnly = new Config(false, sys_get_temp_dir());
+        $readOnly->merge(['config' => ['cache-dir' => $dir, 'cache-read-only' => true, 'home' => sys_get_temp_dir()]]);
+        $cache = ServiceFactory::createCache(new NullIO(), $readOnly);
+        $served = $cache->get($url);
+
+        self::assertNotNull($served);
+        self::assertSame('{"stored":true}', $served->body());
+        $cache->set($url, new HttpResult($url, 200, '{"stored":false}', new \DateTimeImmutable(self::NOW)));
+        self::assertSame($stored, glob($dir.'/lockrot/*') ?: []);
+        $after = $cache->get($url);
+        self::assertNotNull($after);
+        self::assertSame('{"stored":true}', $after->body());
     }
 
     public function testGithubTokenFromComposerConfig(): void

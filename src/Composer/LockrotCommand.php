@@ -16,6 +16,7 @@ use Composer\Util\Platform;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
+use Lockrot\AsciiCase;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineFile;
@@ -43,6 +44,7 @@ use Lockrot\Output\ReportTargets;
 use Lockrot\Output\RunGateText;
 use Lockrot\Output\TerminalText;
 use Lockrot\Output\TerminalWidth;
+use Lockrot\Solver\AdvisoryBlocking;
 use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveCheckers;
 use Lockrot\Solver\UncheckedMoves;
@@ -263,7 +265,7 @@ final class LockrotCommand extends BaseCommand
             $targets = ReportTargets::resolve($specs, $cwd, $specs === [] ? [] : self::protectedFiles($cwd, $composerFile, $lockPath, $baselineFile, $project));
             $markdownMaxBytes = self::markdownMaxBytes($input);
             // No time budget, unlike the install-time summary (docs/install-time.md#time-budget).
-            $checks = static fn (): MoveChecks => MoveChecks::of($root === null ? new UncheckedMoves($hasComposerJson ? MoveCheck::COMPOSER_JSON_INVALID : MoveCheck::NO_COMPOSER_JSON, $platformPhp, MoveCheckers::configuredPhp64bit($config)) : MoveCheckers::forProject($root, $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), Deadline::never(), $lockrot->advisoryLookup()));
+            $checks = static fn (): MoveChecks => MoveChecks::of($root === null ? new UncheckedMoves($hasComposerJson ? MoveCheck::COMPOSER_JSON_INVALID : MoveCheck::NO_COMPOSER_JSON, AdvisoryBlocking::fromConfig($config), $platformPhp, MoveCheckers::configuredPhp64bit($config)) : MoveCheckers::forProject($root, $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), Deadline::never(), $lockrot->advisoryLookup()));
             $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never(), $checks, $lock->platform()['php'] ?? null);
             if ($root === null && $hasComposerJson) {
                 // Fail closed: the global config holds neither the project's repositories nor its
@@ -381,7 +383,7 @@ final class LockrotCommand extends BaseCommand
         if ($format !== 'table' && $format !== 'json') {
             throw new ConfigException('--explain prints text or, with --format=json, JSON; --format='.$format.' has no explanation form');
         }
-        $name = strtolower(trim($name));
+        $name = AsciiCase::lower(trim($name));
         if ($name === '') {
             throw new ConfigException('--explain needs a package name, e.g. --explain=vendor/package');
         }
@@ -443,8 +445,12 @@ final class LockrotCommand extends BaseCommand
         if ($generate && $file->schemaNumber() === 1) {
             return null;
         }
+        $baseline = $file->read();
+        if (!$generate) {
+            BaselineComparison::refuseAnotherScoreModel($baseline, $file->displayPath());
+        }
 
-        return $file->read();
+        return $baseline;
     }
 
     /**

@@ -61,7 +61,7 @@ final class CoverageTest extends TestCase
                 $this->record($name, $schema, $schema, '#', json_decode((string) file_get_contents(substr($path, -3) === '.gz' ? 'compress.zlib://'.$path : $path)));
             }
         }
-        self::assertSame([Schemas::REPORT => 424, Schemas::EXPLAIN => 341, Schemas::BASELINE => 142, Schemas::CONFIG => 79], $counts, 'tests/fixtures/schema/documents/provenance.json');
+        self::assertSame([Schemas::REPORT => 430, Schemas::EXPLAIN => 348, Schemas::BASELINE => 142, Schemas::CONFIG => 79], $counts, 'tests/fixtures/schema/documents/provenance.json');
 
         $shared = [];
         foreach ((array) $schemas[Schemas::EXPLAIN]->definitions as $definition => $node) {
@@ -319,6 +319,8 @@ final class CoverageTest extends TestCase
                 "the open set lists a move's known values: NextStep::partial() assumes clears_hold, and no_new_advisories on an incomplete lookup, as its description says. next_step.if_applied.assumes carries the value"],
             [self::D.'noteUpdateNowNotChecked/properties/reason', ['baseline_refused', 'unloaded_name', 'offline', 'not_from_composer_repository', 'no_composer_json', 'composer_json_invalid', 'no_release_read', 'pass_cap', 'solver_error', 'advisory_lookup_incomplete', 'platform_config_invalid'],
                 "the note's reason is a value of check.reason, which the move-check documents carry each. A document carries install_time_budget"],
+            [self::D.'noteUpdateNowNotChecked/properties/reason', ['lock_disabled'],
+                'under config.lock false no update-now candidate exists, so the note never names lock_disabled (ruling R14-22)'],
             [self::D.'noteAbandonedNotAuditedByComposer/properties/policy_key', ['COMPOSER_POLICY'],
                 self::NOT_REACHED.' (a run with COMPOSER_POLICY=0 and an abandoned-marked package)'],
             [self::D.'noteRepositoryActivityHostNotSupported/properties/hosts/items/properties/listed_in/oneOf/0', ['forgejo-domains'],

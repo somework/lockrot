@@ -1,8 +1,8 @@
 {
     "apps/wallabag_wallabag": {
         "block": {
-            "total": 163.69,
-            "direct_requirements": 108.31,
+            "total": 163.67,
+            "direct_requirements": 108.28,
             "measured": 194,
             "unmeasured": {
                 "not_from_composer_repository": 0,
@@ -226,7 +226,7 @@
     },
     "apps/nextcloud_3rdparty": {
         "block": {
-            "total": 47.47,
+            "total": 47.48,
             "direct_requirements": 13.3,
             "measured": 94,
             "unmeasured": {
