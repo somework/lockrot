@@ -88,7 +88,8 @@ final class Tokens
             $host = self::host($bare);
             // $bare also cuts at an `@` in a path, a query or a fragment, so the host of $url
             // must be the public host too.
-            if ($host !== $publicHost || self::host($url) !== $publicHost) {
+            // A backslash ends the authority for a WHATWG parser and not for parse_url(), so the two disagree on the host.
+            if ($host !== $publicHost || self::host($url) !== $publicHost || self::hasBackslashInAuthority($url)) {
                 $withheld[$name] = $host ?? self::authorityOf($bare);
 
                 return null;
@@ -105,6 +106,11 @@ final class Tokens
         $at = strrpos($url, '@');
 
         return $at === false || $at < \strlen($scheme) ? $url : $scheme.substr($url, $at + 1);
+    }
+
+    private static function hasBackslashInAuthority(string $url): bool
+    {
+        return strpos(self::authorityOf($url), '\\') !== false;
     }
 
     /** An issuer that does not parse is shown up to its path: a query or a fragment can hold a token. */

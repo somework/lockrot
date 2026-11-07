@@ -195,6 +195,8 @@ final class TokensTest extends TestCase
         yield 'in the path' => ['GITHUB_SERVER_URL', 'https://ghe.corp/@github.com'];
         yield 'in the query' => ['GITHUB_SERVER_URL', 'https://ghe.corp?x=@github.com'];
         yield 'in the fragment of a bare host' => ['GH_HOST', 'ghe.corp#@github.com'];
+        yield 'after a backslash' => ['GITHUB_SERVER_URL', 'https://ghe.corp\\@github.com'];
+        yield 'after a backslash in a bare host' => ['GH_HOST', 'ghe.corp\\@github.com'];
     }
 
     /**
@@ -207,6 +209,14 @@ final class TokensTest extends TestCase
 
         self::assertNull($tokens->github());
         self::assertArrayHasKey('GITHUB_TOKEN', $tokens->withheld());
+    }
+
+    public function testAnIssuerWithABackslashShowsNoUserinfoWhenWithheld(): void
+    {
+        $withheld = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => 'https://ci:SECRETVALUE\\@github.com'], null)->withheld();
+
+        self::assertArrayHasKey('GITHUB_TOKEN', $withheld);
+        self::assertStringNotContainsString('SECRET', $withheld['GITHUB_TOKEN']);
     }
 
     public function testAnIssuerWithUserinfoIsJudgedByItsHost(): void
