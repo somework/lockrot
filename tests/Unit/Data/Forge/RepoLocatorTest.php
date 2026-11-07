@@ -137,6 +137,25 @@ final class RepoLocatorTest extends TestCase
         self::assertSame('gitlab.example.com', $ref->host(), 'lowercased, as Composer lowercases its origin');
     }
 
+    /** strtolower() follows LC_CTYPE before PHP 8.2: under tr_TR it folds `I` to the dotless `ı`. */
+    public function testAnUpperCaseHostAndDomainAreLocatedUnderTheTurkishLocale(): void
+    {
+        $previous = setlocale(\LC_CTYPE, '0');
+        if (setlocale(\LC_CTYPE, 'tr_TR.ISO8859-9', 'tr_TR.ISO-8859-9', 'tr_TR', 'tr_TR.UTF-8') === false) {
+            self::markTestSkipped('No Turkish locale is installed.');
+        }
+
+        try {
+            $github = (new RepoLocator())->locate('https://GITHUB.COM/acme/lib');
+            $gitlab = (new RepoLocator(['GITLAB.EXAMPLE.COM']))->locate('https://gitlab.example.com/group/project.git');
+        } finally {
+            setlocale(\LC_CTYPE, $previous === false ? 'C' : $previous);
+        }
+
+        self::assertSame([RepoRef::GITHUB, 'github.com'], $github === null ? null : [$github->forge(), $github->host()]);
+        self::assertSame([RepoRef::GITLAB, 'gitlab.example.com'], $gitlab === null ? null : [$gitlab->forge(), $gitlab->host()]);
+    }
+
     public function testFromConfigReadsGitlabDomainsAndIgnoresWhatIsNotAHost(): void
     {
         $config = new Config(false);
