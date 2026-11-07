@@ -568,8 +568,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** S6 `last_stable_version` is set whenever the package has a tag, also when the
   newest date is a shared commit's. A pinned snapshot with a tag gets a `tag` move, never `no-tag`,
   and it targets a stable tag, or the pre-release and its `require.php` when no stable tag exists.
-  An old-promise `test` move names a higher tag, else the installed release with its lock date.
-  ([Move](docs/verdicts.md#move))
+  An old-promise `test` move names a higher tag, else the installed release with the date that S5
+  reads. ([Move](docs/verdicts.md#move))
 - **table, github, markdown, Install-time:** on the `update now:` line, the raise clause after the
   platform sentence starts with a capital letter, as in the finding's `do:` line.
 - **All formats:** the S9 summary names its first three advisories in the display order of their

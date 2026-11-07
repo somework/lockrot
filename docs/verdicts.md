@@ -700,7 +700,8 @@ writes the move as `next_step`. Abridged from a recorded run on wallabag's lock:
     1. S6's `last_stable_version`, when it is above the installed version.
     2. The highest stable tag, with its own trusted date or null, when it is above the installed
        version.
-    3. The installed release, with `is_installed` true and the date of `age.installed.at`.
+    3. The installed release, with `is_installed` true and the date that [S5](#old-promise) reads
+       for it.
 
 - **What it clears.** `next_step.clears[]` names only what lockrot checked for every version the
   constraint admits. `unverified[]` names what it could not check, and `leaves[]` what the move
