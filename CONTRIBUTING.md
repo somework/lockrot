@@ -527,9 +527,10 @@ maintainer.
        (`gh api repos/somework/lockrot-action/git/ref/tags/v1`), and that the `docker.yml` run
        published the image `ghcr.io/somework/lockrot:X.Y.Z`.
 
-9. Start the next release branch from the squash commit on `main`. The old release branch holds
-   commits that `main` does not, so a second pull request from it shows them again and conflicts
-   where later commits change the same lines.
+9. Start the next release branch from the newest commit on `main`, after every pull request of this
+   release merges. The squash commit can precede the date pull request of step 6. The old release
+   branch holds commits that `main` does not, so a second pull request from it shows them again and
+   conflicts where later commits change the same lines.
 
 ## Related
 
