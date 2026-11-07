@@ -76,7 +76,7 @@ final class LockLineIndex
             if (
                 $depth === self::ENTRY_DEPTH
                 && \in_array($section, self::PACKAGE_SECTIONS, true)
-                && preg_match('/^\s*"name":\s*"([^"]+)"\s*,?\s*$/', $line, $match) === 1
+                && preg_match('/^\s*"name"\s*:\s*"([^"]+)"\s*,?\s*$/', $line, $match) === 1
             ) {
                 $name = json_decode('"'.$match[1].'"');
                 if (\is_string($name)) {

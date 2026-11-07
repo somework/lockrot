@@ -127,6 +127,18 @@ final class AbandonedIgnoreTest extends TestCase
         }
     }
 
+    public function testComposerPolicyZeroWinsOverAPolicyFalseInTheConfig(): void
+    {
+        Platform::putEnv('COMPOSER_POLICY', '0');
+        try {
+            $off = self::read(['policy' => false])->notAuditedBy();
+            self::assertNotNull($off);
+            self::assertSame(['COMPOSER_POLICY', false], [$off->policyKey(), $off->value()]);
+        } finally {
+            Platform::clearEnv('COMPOSER_POLICY');
+        }
+    }
+
     /** Composer's PolicyConfig returns early on `policy: false`, before it reads the audit variable. */
     public function testThePolicyOffWinsOverTheAuditVariable(): void
     {

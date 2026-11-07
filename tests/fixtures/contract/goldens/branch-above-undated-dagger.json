@@ -1,0 +1,23 @@
+{
+    "score_text": "16 = old-promise 16",
+    "next_step_text": "require tubalmartin/cssmin ^5.0.0 — clears old-promise; 5.x needs php >=7.2, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v4.1.1 released 2018-01-15 (8.7 years ago); newest release v5.0.0 2025-01-01 (1.7 years ago); last push 2023-12-22 (2.8 years ago)",
+    "explain_age": [
+        "installed  v4.1.1    2018-01-15   8.7 years ago",
+        "4.x                  not read (installed above every listed stable release)",
+        "newest     v5.0.0    2025-01-01   1.7 years ago                 below release-warn-years 3",
+        "last push            2023-12-22   2.8 years ago                 below push-warn-years 3",
+        "libyears 7.0 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer require 'tubalmartin/cssmin:^5.0.0'",
+        "composer why-not tubalmartin/cssmin v5.0.0 --locked"
+    ],
+    "commands_cmd": [
+        "composer require \"tubalmartin/cssmin:^5.0.0\"",
+        "composer why-not tubalmartin/cssmin v5.0.0 --locked"
+    ]
+}

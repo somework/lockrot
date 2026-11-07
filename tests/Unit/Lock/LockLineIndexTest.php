@@ -34,6 +34,13 @@ final class LockLineIndexTest extends TestCase
         self::assertSame('"name": "'.$package.'",', trim($lines[$line - 1]));
     }
 
+    public function testANameMemberWithASpaceBeforeTheColonHasALine(): void
+    {
+        $json = "{\n  \"packages\": [\n    {\n      \"name\" : \"a/b\",\n      \"version\": \"1.0.0\"\n    }\n  ],\n  \"packages-dev\": []\n}\n";
+
+        self::assertSame(4, LockLineIndex::fromString($json)->lineOf('a/b'));
+    }
+
     public function testUnknownPackageHasNoLine(): void
     {
         self::assertNull(LockLineIndex::fromFile(self::LARAVEL_LOCK)->lineOf('acme/not-in-this-lock'));

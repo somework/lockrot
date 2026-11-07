@@ -23,11 +23,7 @@
             {
                 "id": "left-behind",
                 "role": "lead",
-                "baseline": {
-                    "state": "new",
-                    "since": null,
-                    "covered_by": null
-                },
+                "baseline": null,
                 "signal_ids": [
                     "S8"
                 ],
@@ -440,11 +436,7 @@
                                 ],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         },
                         {
                             "id": "PKSA-b35n-565h-rs4q",
@@ -480,11 +472,7 @@
                                 ],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         }
                     ],
                     "releases_read": true,
@@ -526,45 +514,7 @@
             },
             "push_unmeasured": null
         },
-        "baseline": {
-            "status": "new",
-            "recorded": null,
-            "advisories_now": {
-                "known": 0,
-                "new": 2,
-                "re_rated": 0,
-                "fix_lost": 0
-            },
-            "worsened_by": [
-                {
-                    "kind": "flag",
-                    "id": "left-behind",
-                    "why": "new",
-                    "recorded": null,
-                    "now": null
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-365x-2zjk-pt47",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "high",
-                        "fix_kind": "upgrade"
-                    }
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-b35n-565h-rs4q",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "low",
-                        "fix_kind": "upgrade"
-                    }
-                }
-            ]
-        },
+        "baseline": null,
         "gate": {
             "reaches_fail_on": true,
             "fails": true,

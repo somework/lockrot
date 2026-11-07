@@ -102,7 +102,7 @@ final class CauseVocabularyTest extends TestCase
             }
             $libyears = $finding['libyears_unmeasured'] ?? null;
             $age = JsonPath::arrayAt($finding, ['age']);
-            if (\in_array($libyears, ['shared_commit', 'undated'], true)) {
+            if (\in_array($libyears, ['shared_commit', 'parent_split', 'undated'], true)) {
                 self::assertSame($libyears, $age['installed_unmeasured'], JsonPath::stringAt($case, ['id']));
                 ++$checked;
             }

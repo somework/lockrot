@@ -1412,6 +1412,7 @@
             "not_found": 0,
             "branch_snapshot": 0,
             "shared_commit": 4,
+            "parent_split": 0,
             "undated": 11,
             "no_stable_release": 0,
             "undated_releases": 0
@@ -26119,7 +26120,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "4 security advisories affect v4.4.34 (CVE-2026-45304, CVE-2026-45305, CVE-2026-45133 and 1 more); 3 fixed in v5.4.52, 1 fixed in v5.4.54",
+                    "summary": "4 security advisories affect v4.4.34 (CVE-2026-109413, CVE-2026-45304, CVE-2026-45305 and 1 more); 1 fixed in v5.4.54, 3 fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {

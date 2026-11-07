@@ -84,6 +84,9 @@ lockrot asked for the metadata of `package_count` packages, and it did not arriv
 - Findings: each such package has `libyears_unmeasured` `unavailable`. Its verdict comes from what
   lockrot could still read, so a counted advisory still grades it.
 - `sets_network_failures`: yes, whatever the reasons, `offline` and `install_time_budget` included.
+- Known limit: when a fetch fails and Composer serves its cached copy of the package, lockrot
+  writes no note, and `--strict-network` does not fail. Composer prints its "may be out of date"
+  warning on stderr ([exit codes](ci.md#exit-codes)).
 
 | `reason` | Cause | What to do |
 |---|---|---|
@@ -274,7 +277,7 @@ marking (S1). An archived repository and the release and push dates still count.
 - Findings: each one carries `abandoned_ignored`.
 - `sets_network_failures`: no.
 
-### Abandoned not audited by Composer {#abandoned_not_audited_by_composer}
+### <a name="abandoned_not_audited_by_composer"></a>Abandoned not audited by Composer {#abandoned_not_audited_by_composer}
 
 A Composer setting stops `composer audit` from reporting abandoned packages, and some finding raised
 S1. The setting changes what `composer audit` prints, not the ignore list, so lockrot still counts

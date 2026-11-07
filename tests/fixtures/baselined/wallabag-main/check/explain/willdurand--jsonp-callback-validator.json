@@ -23,11 +23,7 @@
             {
                 "id": "stale",
                 "role": "lead",
-                "baseline": {
-                    "state": "covered",
-                    "since": "2024-05-17",
-                    "covered_by": "left-behind"
-                },
+                "baseline": null,
                 "signal_ids": [
                     "S2",
                     "S4"
@@ -286,49 +282,13 @@
             },
             "push_unmeasured": null
         },
-        "baseline": {
-            "status": "known",
-            "recorded": {
-                "lead": "left-behind",
-                "flags": {
-                    "left-behind": {
-                        "known_since": "2024-05-17"
-                    },
-                    "old-promise": {
-                        "known_since": "2024-05-17"
-                    }
-                },
-                "advisory_count": 0,
-                "first_seen": "2024-05-17",
-                "target_php": "8.4",
-                "fix_model": 1
-            },
-            "advisories_now": {
-                "known": 0,
-                "new": 0,
-                "re_rated": 0,
-                "fix_lost": 0
-            },
-            "worsened_by": []
-        },
+        "baseline": null,
         "gate": {
             "reaches_fail_on": false,
             "fails": false,
             "exempt_by": null,
             "by": [],
-            "basis": {
-                "score": 0,
-                "verdict": null,
-                "cap": 0,
-                "limited_by": "cap",
-                "new": {
-                    "total": 0,
-                    "exact": 0,
-                    "rounded_down": false,
-                    "terms": [],
-                    "modifiers": []
-                }
-            }
+            "basis": null
         }
     },
     "lock": {

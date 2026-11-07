@@ -6,8 +6,10 @@ namespace Lockrot\Tests\Integration;
 
 use Lockrot\Clock;
 use Lockrot\Lock\LockFile;
+use Lockrot\Tests\Support\RecordedStatus;
 use Lockrot\Tests\Support\RecorderHttp;
 use Lockrot\Tests\Support\RecorderNames;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -151,6 +153,27 @@ final class RecordFixturesTest extends TestCase
         self::assertSame($locked, RecorderNames::repository(['metadata-url' => '/p2/%package%.json', 'available-package-patterns' => []], $locked), 'Composer reads an empty list as no list');
         self::assertSame($locked, RecorderNames::repository(['metadata-url' => '/p2/%package%.json', 'available-packages' => [], 'available-package-patterns' => []], $locked));
         self::assertSame([], RecorderNames::repository([], $locked), 'no metadata-url means no p2 answer to record');
+    }
+
+    /**
+     * @dataProvider gitlabStatuses
+     */
+    #[DataProvider('gitlabStatuses')]
+    public function testAGitlabAnswerIsRecordedOnlyWithStatus200Or404(int $status, bool $recorded): void
+    {
+        self::assertSame($recorded, RecordedStatus::keepsGitlab($status));
+    }
+
+    /** @return iterable<string, array{int, bool}> */
+    public static function gitlabStatuses(): iterable
+    {
+        yield 'found' => [200, true];
+        yield 'missing' => [404, true];
+        yield 'timeout' => [0, false];
+        yield 'bad token' => [401, false];
+        yield 'forbidden' => [403, false];
+        yield 'rate limited' => [429, false];
+        yield 'server error' => [503, false];
     }
 
     /**

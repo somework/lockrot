@@ -192,9 +192,11 @@ final class RunFooter
     {
         $window = $report->phpWindow();
         $raise = $report->updateNowRaise();
+        $step = $window === null ? '' : MoveText::platformStep($window->targetMinor(), $window->platformOverride());
+        $words = $raise === null ? '' : MoveText::raiseWords($raise, $report->updateNowRaiseRemovesRequireDev());
 
-        return ($window === null ? '' : MoveText::platformStep($window->targetMinor(), $window->platformOverride()))
-            .($raise === null ? '' : MoveText::raiseWords($raise, $report->updateNowRaiseRemovesRequireDev()));
+        // After the platform sentence, the raise clause starts a sentence of its own.
+        return $step.($step === '' ? $words : ucfirst($words));
     }
 
     /**

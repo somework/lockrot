@@ -476,11 +476,7 @@
                                 "held_by": [],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         },
                         {
                             "id": "PKSA-8zx5-v2nz-58pb",
@@ -506,11 +502,7 @@
                                 "held_by": [],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         },
                         {
                             "id": "PKSA-dpx1-78wg-1kqs",
@@ -536,11 +528,7 @@
                                 "held_by": [],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         },
                         {
                             "id": "PKSA-gw7n-z4yx-7xjt",
@@ -566,11 +554,7 @@
                                 "held_by": [],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         },
                         {
                             "id": "PKSA-1tmc-rt7x-12w6",
@@ -596,11 +580,7 @@
                                 "held_by": [],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         },
                         {
                             "id": "PKSA-21g2-dzjv-sky5",
@@ -626,11 +606,7 @@
                                 "held_by": [],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         },
                         {
                             "id": "PKSA-3mcc-k66d-pydb",
@@ -656,11 +632,7 @@
                                 "held_by": [],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         },
                         {
                             "id": "PKSA-fbvq-z33h-r2np",
@@ -686,11 +658,7 @@
                                 "held_by": [],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         },
                         {
                             "id": "PKSA-xx6c-6d96-db2w",
@@ -716,11 +684,7 @@
                                 "held_by": [],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         },
                         {
                             "id": "PKSA-kvv6-36cr-fkzb",
@@ -746,11 +710,7 @@
                                 "held_by": [],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         },
                         {
                             "id": "PKSA-yd6k-t2gh-1m43",
@@ -776,11 +736,7 @@
                                 "held_by": [],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         },
                         {
                             "id": "PKSA-g9zw-qxh8-pq8w",
@@ -806,11 +762,7 @@
                                 "held_by": [],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         },
                         {
                             "id": "PKSA-n14z-jjjg-g8vd",
@@ -836,11 +788,7 @@
                                 "held_by": [],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         },
                         {
                             "id": "PKSA-sjvz-tbbr-vwth",
@@ -866,11 +814,7 @@
                                 "held_by": [],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         },
                         {
                             "id": "PKSA-wwb1-81rc-pd65",
@@ -896,11 +840,7 @@
                                 "held_by": [],
                                 "reason": null
                             },
-                            "baseline": {
-                                "state": "new",
-                                "since": null,
-                                "covered_by": null
-                            }
+                            "baseline": null
                         }
                     ],
                     "releases_read": true,
@@ -942,175 +882,7 @@
             },
             "push_unmeasured": null
         },
-        "baseline": {
-            "status": "worsened",
-            "recorded": {
-                "lead": null,
-                "flags": null,
-                "advisory_count": 1,
-                "first_seen": "2024-11-03",
-                "target_php": "8.4",
-                "fix_model": 1
-            },
-            "advisories_now": {
-                "known": 0,
-                "new": 15,
-                "re_rated": 0,
-                "fix_lost": 0
-            },
-            "worsened_by": [
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-h8hf-ytnd-5t9q",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "critical",
-                        "fix_kind": "raise-php"
-                    }
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-8zx5-v2nz-58pb",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "high",
-                        "fix_kind": "raise-php"
-                    }
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-dpx1-78wg-1kqs",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "high",
-                        "fix_kind": "raise-php"
-                    }
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-gw7n-z4yx-7xjt",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "high",
-                        "fix_kind": "raise-php"
-                    }
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-1tmc-rt7x-12w6",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "medium",
-                        "fix_kind": "raise-php"
-                    }
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-21g2-dzjv-sky5",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "medium",
-                        "fix_kind": "raise-php"
-                    }
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-3mcc-k66d-pydb",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "medium",
-                        "fix_kind": "raise-php"
-                    }
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-fbvq-z33h-r2np",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "medium",
-                        "fix_kind": "raise-php"
-                    }
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-xx6c-6d96-db2w",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "medium",
-                        "fix_kind": "raise-php"
-                    }
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-kvv6-36cr-fkzb",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "unrated",
-                        "fix_kind": "raise-php"
-                    }
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-yd6k-t2gh-1m43",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "unrated",
-                        "fix_kind": "raise-php"
-                    }
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-g9zw-qxh8-pq8w",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "low",
-                        "fix_kind": "raise-php"
-                    }
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-n14z-jjjg-g8vd",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "low",
-                        "fix_kind": "raise-php"
-                    }
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-sjvz-tbbr-vwth",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "low",
-                        "fix_kind": "raise-php"
-                    }
-                },
-                {
-                    "kind": "advisory",
-                    "id": "PKSA-wwb1-81rc-pd65",
-                    "why": "new",
-                    "recorded": null,
-                    "now": {
-                        "severity": "low",
-                        "fix_kind": "raise-php"
-                    }
-                }
-            ]
-        },
+        "baseline": null,
         "gate": {
             "reaches_fail_on": true,
             "fails": true,
@@ -1127,32 +899,7 @@
                     ]
                 }
             ],
-            "basis": {
-                "score": 32,
-                "verdict": "critical",
-                "cap": 64,
-                "limited_by": "score",
-                "new": {
-                    "total": 32,
-                    "exact": 32,
-                    "rounded_down": false,
-                    "terms": [
-                        {
-                            "part": "security",
-                            "flag": "vulnerable",
-                            "role": "security",
-                            "advisory": "PKSA-h8hf-ytnd-5t9q",
-                            "severity": "critical",
-                            "fix_kind": "raise-php",
-                            "weight": 32,
-                            "multiplier": 1,
-                            "points": 32,
-                            "contribution": 32
-                        }
-                    ],
-                    "modifiers": []
-                }
-            }
+            "basis": null
         }
     },
     "lock": {

@@ -29,6 +29,7 @@ final class AgeMeasure
     public const BRANCH_SNAPSHOT = 'branch_snapshot';
     /** The lock's date for the installed tag is a commit other tags share, and no monorepo parent dates it. */
     public const SHARED_COMMIT = 'shared_commit';
+    public const PARENT_SPLIT = 'parent_split';
     /** The lock entry carries no date, or the repository answered with no push date. */
     public const UNDATED = 'undated';
     /** The package is not from a Composer repository: no metadata is asked for, no repository activity either. */
@@ -74,7 +75,7 @@ final class AgeMeasure
         $installed = InstalledRelease::of($facts->package(), $facts->metadata());
         $at = $installed->at();
         if ($at === null) {
-            return AgeReading::unmeasuredBecause($installed->kind() === InstalledRelease::SHARED_COMMIT ? self::SHARED_COMMIT : self::UNDATED);
+            return AgeReading::unmeasuredBecause(self::untrustedReason($installed));
         }
 
         return $this->reading($at, null, $installed->datedBy(), null, AgeReading::INSTALLED);
@@ -126,13 +127,14 @@ final class AgeMeasure
         if ($own === null) {
             return AgeReading::unmeasuredBecause(self::NO_BRANCH_ROW);
         }
-        $at = $own['at'];
-        if ($at === null || $own['highest']['at'] === null || self::sharedCommitDates($metadata, $own)) {
-            return AgeReading::unmeasuredBecause(self::UNDATED_RELEASES);
-        }
+        // Before the date test: no date of the row closes this gap, so it is no S10 release_dates gap.
         // A pre-release above the branch's newest stable release is still on that branch: S8 judges that release.
         if ($aliasLine === null && VersionParser::parseStability($version) === 'stable' && $this->isAhead($version, $own['highest']['normalized'])) {
             return AgeReading::unmeasuredBecause(self::ABOVE_LISTED_RELEASES);
+        }
+        $at = $own['at'];
+        if ($at === null || $own['highest']['at'] === null || self::sharedCommitDates($metadata, $own)) {
+            return AgeReading::unmeasuredBecause(self::UNDATED_RELEASES);
         }
 
         return $this->reading($at, $own['version'], $own['dated_by'] ?? null, [$this->thresholds->releaseWarnYears(), $this->thresholds->releaseHighYears()], AgeReading::RELEASE);
@@ -205,6 +207,12 @@ final class AgeMeasure
     private static function sharedCommitDates(PackageMetadata $metadata, array $branch): bool
     {
         return !isset($branch['dated_by']) && $metadata->sharesItsCommit($branch['version']);
+    }
+
+    /** The reason of an installed release that has no trusted date: libyears reads the same id. */
+    public static function untrustedReason(InstalledRelease $installed): string
+    {
+        return \in_array($installed->kind(), [InstalledRelease::SHARED_COMMIT, InstalledRelease::PARENT_SPLIT], true) ? $installed->kind() : self::UNDATED;
     }
 
     private static function metadataReason(PackageFacts $facts, ?string $metadataStatus): string

@@ -714,6 +714,203 @@ final class MoveTest extends TestCase
     }
 
     /**
+     * Ruling R13-A: a snapshot of a package with a stable tag never gets `no-tag`. S6 names the tag
+     * whose date S2 does not trust, with no date, and the move targets the highest tag of its row.
+     *
+     * @return iterable<string, array{0: list<array<string, mixed>>, 1: string, 2: string, 3: string, 4: string}>
+     */
+    public static function untrustedNewestTags(): iterable
+    {
+        yield 'a dated highest tag beside a newer-dated lower tag on a shared commit' => [
+            [self::release('v2.0.0', '2024-01-01', '>=7.2'), ['shared_commit' => true] + self::release('v1.9.3', '2025-06-01', '>=7.2')],
+            'v1.9.3', '1.x', 'v1.9.3', 'require a tag — the newest is v1.9.3; 1.x needs php >=7.2, which require.php allows; old-promise stays; not checked: left-behind',
+        ];
+        yield 'an older dated alpha above stable tags on a shared commit' => [
+            array_merge([self::release('v4.0.0-alpha1', '2020-01-01', '>=7.2')], array_map(static fn (string $version): array => ['shared_commit' => true] + self::release($version, '2021-01-01', '>=7.2'), ['v3.1.0', 'v3.2.0', 'v3.3.0'])),
+            'v3.3.0', '3.x', 'v3.3.0', 'require a tag — the newest is v3.3.0; 3.x needs php >=7.2, which require.php allows; old-promise stays',
+        ];
+        yield 'a highest tag on a shared commit' => [
+            array_map(static fn (string $version): array => ['shared_commit' => true] + self::release($version, '2023-06-05', '>=7.2'), ['v10.13.1', 'v10.20.0', 'v10.49.0']),
+            'v10.49.0', '10.x', 'v10.49.0', 'require a tag — the newest is v10.49.0; 10.x needs php >=7.2, which require.php allows; old-promise stays',
+        ];
+        yield 'a highest tag on a shared commit above a tag on its own commit' => [
+            array_merge([self::release('v1.0.0', '2019-01-01', '>=7.2')], array_map(static fn (string $version): array => ['shared_commit' => true] + self::release($version, '2023-06-05', '>=7.2'), ['v2.0.0', 'v2.0.1', 'v2.0.2'])),
+            'v2.0.2', '2.x', 'v2.0.2', 'require a tag — the newest is v2.0.2; 2.x needs php >=7.2, which require.php allows; old-promise stays',
+        ];
+    }
+
+    /**
+     * @dataProvider untrustedNewestTags
+     *
+     * @param list<array<string, mixed>> $releases
+     */
+    #[DataProvider('untrustedNewestTags')]
+    public function testASnapshotWhoseNewestTagHasNoTrustedDateRequiresATagWithNoDate(array $releases, string $s6Version, string $branch, string $target, string $text): void
+    {
+        $run = ['target_php' => '8.4', 'project_php' => '>=7.2', 'fail_on' => 'high', 'include_dev' => false];
+        $finding = self::analyse(['lock' => [['version' => 'dev-master']], 'root' => ['require' => ['php' => '>=7.2']], 'run' => $run, 'releases' => $releases]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        self::assertSame(['tag', $branch, ['version' => $target, 'released' => null, 'is_installed' => false, 'relation' => null]], [$move['kind'], $move['to_branch'], array_diff_key(JsonPath::arrayAt($move, ['latest']), ['snapshot_time' => true])]);
+        self::assertSame($text, $move['text']);
+        self::assertSame(['requires' => '>=7.2', 'project_allows' => true, 'target_runs' => true, 'raise_to' => null, 'raise_size' => null], $move['php_check']);
+        self::assertSame([$s6Version, null, null], self::s6Version($finding));
+        self::assertSame([null, 'undated_releases'], [JsonPath::arrayAt($finding, ['age'])['release'], JsonPath::arrayAt($finding, ['age'])['release_unmeasured']]);
+    }
+
+    /** Ruling R13-46: a pinned move targets a stable tag, never the pre-release that S6 names as the newest. */
+    public function testASnapshotWhoseNewestTagIsAPreReleaseRequiresTheHighestStableTagOfItsLine(): void
+    {
+        $finding = self::analyse(['lock' => [['version' => 'dev-master', 'time' => '2024-01-01T00:00:00+00:00']], 'releases' => [self::release('v4.0.0', '2025-01-01', '>=7.2'), self::release('v4.1.0-beta1', '2025-06-01', '>=8.5')]]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        self::assertSame(['tag', '4.x', ['version' => 'v4.0.0', 'released' => '2025-01-01T00:00:00+00:00', 'is_installed' => false, 'relation' => 'newer']], [$move['kind'], $move['to_branch'], array_diff_key(JsonPath::arrayAt($move, ['latest']), ['snapshot_time' => true])]);
+        self::assertSame('require a tag — the newest is v4.0.0 (2025-01-01); 4.x needs php >=7.2, which require.php allows', JsonPath::stringAt($move, ['text']));
+        self::assertSame(['v4.1.0-beta1', '2025-06-01T00:00:00+00:00', 'newer'], self::s6Version($finding));
+    }
+
+    /** @return iterable<string, array{list<array{version: string, time: ?string, php: ?string}>, string}> */
+    public static function preReleasesOnAMajorWithNoStableTag(): iterable
+    {
+        yield 'a dated pre-release' => [[self::release('v3.3.0', '2021-01-01', '>=7.2'), self::release('v4.0.0-beta1', '2022-01-01', '>=8.5')], 'v4.0.0-beta1'];
+        yield 'an undated pre-release' => [[self::release('v3.3.0', '2021-01-01', '>=7.2'), self::release('v4.0.0-beta1', null, '>=8.5')], 'v4.0.0-beta1'];
+    }
+
+    /**
+     * Ruling R13-A, R13-46: when the line of S6's tag has no stable tag, the move targets the
+     * highest tag of the highest line.
+     *
+     * @dataProvider preReleasesOnAMajorWithNoStableTag
+     *
+     * @param list<array{version: string, time: ?string, php: ?string}> $releases
+     */
+    #[DataProvider('preReleasesOnAMajorWithNoStableTag')]
+    public function testASnapshotWhosePreReleaseHasNoLineRequiresTheHighestStableTag(array $releases, string $s6Version): void
+    {
+        $finding = self::analyse(['lock' => [['version' => 'dev-master']], 'releases' => $releases]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        self::assertSame(['tag', '3.x', 'v3.3.0', '2021-01-01T00:00:00+00:00'], [$move['kind'], $move['to_branch'], JsonPath::stringAt($move, ['latest', 'version']), JsonPath::stringAt($move, ['latest', 'released'])]);
+        self::assertStringStartsWith('require a tag — the newest is v3.3.0 (2021-01-01); 3.x needs php >=7.2, which require.php allows', JsonPath::stringAt($move, ['text']));
+        self::assertSame($s6Version, self::s6Version($finding)[0]);
+    }
+
+    /** Ruling R13-A: the test move names the newest tag that S6 reads, not the installed release, when a higher one exists. */
+    public function testAnOldPromiseTestMoveNamesTheNewestTagWhoseDateIsNotTrusted(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse(['releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('v2.0.0', '2020-01-01', '>=7.2'), ['shared_commit' => true] + self::release('v1.9.3', '2020-06-01', '>=7.2')]]), ['next_step']);
+
+        self::assertSame(['test', 'test it on PHP 8.4'], [$move['kind'], $move['text']]);
+        self::assertSame(['version' => 'v1.9.3', 'released' => null, 'is_installed' => false, 'relation' => null, 'snapshot_time' => null], $move['latest']);
+    }
+
+    /** Ruling R13-A (r12l.1, Q5): a newer-dated tag below the installed release leaves the installed release as the newest. */
+    public function testAnOldPromiseTestMoveKeepsTheInstalledReleaseAboveANewerDatedLowerTag(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse([
+            'lock' => [['version' => '2.0.0']],
+            'releases' => [self::release('2.0.0', '2019-01-01', '>=7.2'), ['shared_commit' => true] + self::release('v1.9.3', '2020-06-01', '>=7.2')],
+        ]), ['next_step']);
+
+        self::assertSame(['test', 'test it on PHP 8.4 — 2.0.0 is its newest release'], [$move['kind'], $move['text']]);
+        self::assertSame(['version' => '2.0.0', 'released' => '2019-01-01T00:00:00+00:00', 'is_installed' => true, 'relation' => null, 'snapshot_time' => null], $move['latest']);
+    }
+
+    /**
+     * Ruling R13-A (r12l.1, Q7): with no RULE 1 version above the installed one, the test move
+     * names the highest stable tag above it, with its own date. A lower tag with a newer shared date does not win.
+     */
+    public function testAnOldPromiseTestMoveNamesAHigherTagOnItsOwnCommit(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse([
+            'lock' => [['version' => 'v4.1.1']],
+            'releases' => [self::release('v5.0.0', '2020-01-01', '>=7.2'), self::release('v4.1.1', '2018-01-01', '>=7.2'), ['shared_commit' => true] + self::release('v3.9.3', '2020-06-01', '>=7.2')],
+        ]), ['next_step']);
+
+        self::assertSame(['test', 'test it on PHP 8.4'], [$move['kind'], $move['text']]);
+        self::assertSame(['version' => 'v5.0.0', 'released' => '2020-01-01T00:00:00+00:00', 'is_installed' => false, 'relation' => null, 'snapshot_time' => null], $move['latest']);
+    }
+
+    /** Composer loads a lock version that does not parse when `version_normalized` is set. The move then names the newest tag. */
+    public function testAnOldPromiseTestMoveNamesTheNewestTagAboveAnInstalledVersionThatDoesNotParse(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse([
+            'lock' => [['version' => 'not a version', 'version_normalized' => '4.1.1.0']],
+            'releases' => [self::release('v5.0.0', '2020-01-01', '>=7.2'), self::release('v4.1.1', '2018-01-01', '>=7.2')],
+        ]), ['next_step']);
+
+        self::assertSame('test', $move['kind']);
+        self::assertSame(['version' => 'v5.0.0', 'released' => '2020-01-01T00:00:00+00:00', 'is_installed' => false, 'relation' => null, 'snapshot_time' => null], $move['latest']);
+    }
+
+    /** Ruling R13-A (r12l.1, Q6): the installed release as the newest carries the date that S5 judges, also when its tag is undated. */
+    public function testAnOldPromiseTestMoveOnAnUndatedHighestInstalledTagCarriesTheLockTime(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse(['releases' => [self::release('1.0.0', null, '>=7.2')]]), ['next_step']);
+
+        self::assertSame(['test', 'test it on PHP 8.4 — 1.0.0 is its newest release'], [$move['kind'], $move['text']]);
+        self::assertSame(['version' => '1.0.0', 'released' => '2019-01-01T00:00:00+00:00', 'is_installed' => true, 'relation' => null, 'snapshot_time' => null], $move['latest']);
+    }
+
+    /** @return iterable<string, array{?string, ?string, ?string, array{requires: ?string, project_allows: ?bool, target_runs: ?bool, raise_to: ?string, raise_size: ?string}, non-empty-string}> */
+    public static function preReleaseOnlySnapshots(): iterable
+    {
+        yield 'dated, with php' => ['2025-06-01', 'newer', '>=7.2', ['requires' => '>=7.2', 'project_allows' => true, 'target_runs' => true, 'raise_to' => null, 'raise_size' => null], 'require a tag — the newest is v1.0.0-beta1 (2025-06-01); v1.0.0-beta1 needs php >=7.2, which require.php allows'];
+        yield 'undated, with no php' => [null, null, null, ['requires' => null, 'project_allows' => null, 'target_runs' => null, 'raise_to' => null, 'raise_size' => null], 'require a tag — the newest is v1.0.0-beta1'];
+    }
+
+    /**
+     * Ruling R13-A (r12l.1, Q4): with only pre-release tags no branch row exists, so the pinned
+     * move targets the S6 version, and I18b keeps it from `no-tag`. Its php_check reads that
+     * pre-release's own require.php.
+     *
+     * @param array{requires: ?string, project_allows: ?bool, target_runs: ?bool, raise_to: ?string, raise_size: ?string} $phpCheck
+     * @param non-empty-string                                                                                       $text
+     *
+     * @dataProvider preReleaseOnlySnapshots
+     */
+    #[DataProvider('preReleaseOnlySnapshots')]
+    public function testASnapshotWithOnlyAPreReleaseTagRequiresThatTag(?string $date, ?string $relation, ?string $php, array $phpCheck, string $text): void
+    {
+        $finding = self::analyse(['lock' => [['version' => 'dev-master', 'time' => '2024-01-01T00:00:00+00:00']], 'releases' => [self::release('v1.0.0-beta1', $date, $php)]]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        self::assertSame(['tag', null, $phpCheck], [$move['kind'], $move['to_branch'], $move['php_check']]);
+        self::assertSame(['version' => 'v1.0.0-beta1', 'released' => $date === null ? null : $date.'T00:00:00+00:00', 'is_installed' => false, 'relation' => $relation], array_diff_key(JsonPath::arrayAt($move, ['latest']), ['snapshot_time' => true]));
+        self::assertStringStartsWith($text, JsonPath::stringAt($move, ['text']));
+    }
+
+    /** Ruling R13-A (r12l.1, no-row blocked): a pre-release that the target cannot run blocks the pinned move. */
+    public function testASnapshotWithOnlyAPreReleaseTagThatTheTargetCannotRunIsBlocked(): void
+    {
+        $finding = self::analyse(['lock' => [['version' => 'dev-master', 'time' => '2024-01-01T00:00:00+00:00']], 'releases' => [self::release('v1.0.0-beta1', '2025-06-01', '>=8.5')]]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        $phpCheck = JsonPath::arrayAt($move, ['php_check']);
+
+        self::assertSame(['blocked', null, '>=8.5', false], [$move['kind'], $move['to_branch'], $phpCheck['requires'], $phpCheck['target_runs']]);
+        self::assertSame('no move runs on the target: the newest tag, v1.0.0-beta1, needs php >=8.5 and the target php 8.4 does not run it; replace it', JsonPath::stringAt($move, ['text']));
+    }
+
+    /**
+     * @param array<mixed, mixed> $finding
+     *
+     * @return array{mixed, mixed, mixed} S6's `last_stable_version`, `last_stable_release` and `tag_relation`
+     */
+    private static function s6Version(array $finding): array
+    {
+        foreach (JsonPath::arrayAt($finding, ['signals']) as $signal) {
+            self::assertIsArray($signal);
+            if ($signal['id'] === 'S6') {
+                $data = JsonPath::arrayAt($signal, ['data']);
+
+                return [$data['last_stable_version'], $data['last_stable_release'], $data['tag_relation']];
+            }
+        }
+        self::fail('no S6');
+    }
+
+    /**
      * @param array<mixed, mixed> $case
      *
      * @return array<mixed, mixed> the case package's finding as report-2 writes it

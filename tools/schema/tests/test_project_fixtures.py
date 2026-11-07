@@ -183,6 +183,27 @@ class APackageThatIsNotFoundHasNoReleases(unittest.TestCase):
         self.assertEqual([{'version': 'v4.4.41', 'time': None, 'php': None}], facts['releases'])
 
 
+class AnInstalledVersionAboveTheListedReleasesIsNotListed(unittest.TestCase):
+    """S8's `above_listed_releases` says that the installed version is above every listed release of its branch."""
+    ROW = {'branch': '4.x', 'installed': True, 'highest': 'v4.1.0', 'highest_released': None, 'highest_commit_date': None,
+           'newest_dated': 'v4.1.0', 'newest_dated_released': None, 'dated_by': None, 'php': '>=7.2', 'highest_php': '>=7.2', 'fixes': None}
+    FINDING = {'package': 'tubalmartin/cssmin', 'version': 'v4.1.1', 'dev': False, 'origin': {'kind': 'packagist'},
+               'installed_php': {'requires': '>=5.3.2'}, 'signals': [], 'security': {'records': 0, 'ignored': []}, 'activity': {},
+               'metadata': {'status': 'read'}, 'age': {'installed': {'at': '2018-01-15T15:26:51+00:00'}}}
+
+    def test_the_installed_version_stays_out_of_the_releases(self):
+        finding = dict(self.FINDING, age=dict(self.FINDING['age'], branch_release_unmeasured='above_listed_releases'))
+
+        facts = project_fixtures.package_facts(finding, [self.ROW])
+
+        self.assertEqual(['v4.1.0'], [r['version'] for r in facts['releases']])
+
+    def test_an_installed_version_with_no_such_reading_is_listed(self):
+        facts = project_fixtures.package_facts(self.FINDING, [self.ROW])
+
+        self.assertEqual(['v4.1.0', 'v4.1.1'], [r['version'] for r in facts['releases']])
+
+
 class AnUndatedSharedCommitTagTakesTheLockTimeOfTheRunInputs(unittest.TestCase):
     """The installed tag shares its commit, and no case document dates it: the model's `run_inputs._lock_time` does."""
     LOCK_TIME = '2024-09-10T14:38:51+00:00'

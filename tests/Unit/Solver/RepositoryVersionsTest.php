@@ -99,9 +99,27 @@ final class RepositoryVersionsTest extends TestCase
 
     public function testANameWithNoTaggedReleaseLoadsItsDevVersions(): void
     {
-        $versions = new RepositoryVersions([self::repository(['acme/lib' => ['dev-main']])], [], false, Deadline::never());
+        $versions = new RepositoryVersions([self::repository(['acme/lib' => ['dev-main']])], [], false, Deadline::never(), 'dev', []);
 
         self::assertSame(['dev-main'], self::pretty($versions->versions('acme/lib')));
+    }
+
+    /** Composer asks no `~dev` file of a root that refuses dev, so a repository that has only that file does not claim the name. */
+    public function testARepositoryWithOnlyADevFileDoesNotClaimTheNameUnderAStableRoot(): void
+    {
+        $devOnly = self::recording(['acme/x' => ['dev-main']]);
+        $versions = new RepositoryVersions([$devOnly, self::repository(['acme/x' => ['1.0.0']])], [], false, Deadline::never(), 'stable', []);
+
+        self::assertSame(['1.0.0'], self::pretty($versions->versions('acme/x')));
+        self::assertNull($versions->failure('acme/x'));
+        self::assertSame([[['acme/x'], 'stable']], $devOnly->asked);
+    }
+
+    public function testARepositoryWithOnlyADevFileDoesNotClaimTheNameWhenTheNameLoadsAlone(): void
+    {
+        $versions = new RepositoryVersions([self::recording(['acme/x' => ['dev-main']], ['acme/bad']), self::repository(['acme/x' => ['1.0.0']])], [], false, Deadline::never(), 'stable', []);
+
+        self::assertSame(['1.0.0'], self::pretty($versions->versionsOf(['acme/x', 'acme/bad'])['acme/x']));
     }
 
     public function testATaggedNameLoadsNoDevVersionsUnderARootThatAdmitsOnlyStable(): void
@@ -244,7 +262,7 @@ final class RepositoryVersionsTest extends TestCase
         $loaded = $versions->versionsOf(['acme/tagged', 'acme/branch', 'acme/bad']);
 
         self::assertSame(['1.0.0'], self::pretty($loaded['acme/tagged']));
-        self::assertSame(['dev-main'], self::pretty($loaded['acme/branch']));
+        self::assertSame([], $loaded['acme/branch']);
     }
 
     public function testANameThatLoadsAloneAfterAFailedRequestLoadsItsDevVersionsWhenTheRootAdmitsThem(): void
@@ -377,9 +395,9 @@ final class RepositoryVersionsTest extends TestCase
 
         $loaded = $versions->versionsOf(['acme/tagged', 'acme/branch', 'acme/elsewhere', 'acme/none']);
 
-        self::assertSame(['acme/tagged' => ['1.0.0'], 'acme/branch' => ['dev-main'], 'acme/elsewhere' => ['2.0.0'], 'acme/none' => []], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
-        self::assertSame([[['acme/tagged', 'acme/branch', 'acme/elsewhere', 'acme/none'], 'stable'], [['acme/branch', 'acme/elsewhere', 'acme/none'], 'dev']], $first->asked);
-        self::assertSame([[['acme/elsewhere', 'acme/none'], 'stable'], [['acme/none'], 'dev']], $second->asked);
+        self::assertSame(['acme/tagged' => ['1.0.0'], 'acme/branch' => [], 'acme/elsewhere' => ['2.0.0'], 'acme/none' => []], array_map(static fn (array $packages): array => self::pretty($packages), $loaded));
+        self::assertSame([[['acme/tagged', 'acme/branch', 'acme/elsewhere', 'acme/none'], 'stable']], $first->asked);
+        self::assertSame([[['acme/branch', 'acme/elsewhere', 'acme/none'], 'stable']], $second->asked);
         self::assertNull($versions->failure('acme/none'));
     }
 
@@ -508,7 +526,7 @@ final class RepositoryVersionsTest extends TestCase
         $first = self::recording([]);
         $second = self::recording(['acme/lib' => ['1.0.0']]);
         $now = static fn (): float => 3.0 * (\count($first->asked) + \count($second->asked));
-        $versions = new RepositoryVersions([$first, $second], [], false, Deadline::inSeconds(5.0, $now));
+        $versions = new RepositoryVersions([$first, $second], [], false, Deadline::inSeconds(5.0, $now), 'dev', []);
 
         self::assertSame(['acme/lib' => []], $versions->versionsOf(['acme/lib']));
         self::assertSame(VersionSource::BUDGET, $versions->failure('acme/lib'));
@@ -544,14 +562,13 @@ final class RepositoryVersionsTest extends TestCase
     public function testANameThatItsTagsAnsweredBeforeTheBudgetEndedStaysShadowed(): void
     {
         $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://github.com/acme/lib']);
-        $repository = self::recording(['acme/lib' => ['1.0.0'], 'acme/dev-only' => ['dev-main']]);
+        $repository = self::recording(['acme/lib' => ['1.0.0']]);
         $now = static fn (): float => 6.0 * \count($repository->asked);
         $versions = new RepositoryVersions([$vcs, $repository], [], false, Deadline::inSeconds(5.0, $now), 'stable', [], [RepositoryVersions::urlKey('https://github.com/acme/lib') => ['acme/lib']]);
 
-        $versions->versionsOf(['acme/lib', 'acme/dev-only']);
+        $versions->versionsOf(['acme/lib']);
 
         self::assertSame([['1.0.0'], VersionSource::SHADOWED], [self::pretty($versions->versions('acme/lib')), $versions->failure('acme/lib')]);
-        self::assertSame([[], VersionSource::BUDGET], [$versions->versions('acme/dev-only'), $versions->failure('acme/dev-only')]);
     }
 
     /** A name that loads alone after a failed request sends its dev request only while the budget lasts. */
@@ -559,7 +576,7 @@ final class RepositoryVersionsTest extends TestCase
     {
         $repository = self::recording(['acme/dev-only' => ['dev-main']], ['acme/bad']);
         $now = static fn (): float => 2.5 * \count($repository->asked);
-        $versions = new RepositoryVersions([$repository], [], false, Deadline::inSeconds(5.0, $now));
+        $versions = new RepositoryVersions([$repository], [], false, Deadline::inSeconds(5.0, $now), 'dev', []);
 
         self::assertSame(['acme/dev-only' => [], 'acme/bad' => []], $versions->versionsOf(['acme/dev-only', 'acme/bad']));
         self::assertSame([VersionSource::BUDGET, VersionSource::BUDGET], [$versions->failure('acme/dev-only'), $versions->failure('acme/bad')]);
@@ -665,7 +682,7 @@ final class RepositoryVersionsTest extends TestCase
 
     public function testANameThatLoadsAloneWithOnlyDevVersionsInACanonicalRepositoryHidesTheNamesakeOfTheNextRepository(): void
     {
-        $versions = new RepositoryVersions([self::recording(['acme/lib' => ['dev-main']], ['acme/bad']), self::repository(['acme/lib' => ['9.0.0']])], [], false, Deadline::never());
+        $versions = new RepositoryVersions([self::recording(['acme/lib' => ['dev-main']], ['acme/bad']), self::repository(['acme/lib' => ['9.0.0']])], [], false, Deadline::never(), 'dev', []);
 
         self::assertSame(['dev-main'], self::pretty($versions->versionsOf(['acme/lib', 'acme/bad'])['acme/lib']));
     }

@@ -17,8 +17,8 @@ For a missing or wrong date, start at
 | Source | What lockrot asks | Credentials | Without credentials | Cache |
 |---|---|---|---|---|
 | Composer repositories: Packagist, Private Packagist, Satis, mirrors | Metadata: abandoned flag, versions, release dates (S1, S2, S5, S6, S8). The releases S9 looks in for a fix. Advisories on the installed version (S9) | Composer's own, from `auth.json` or `COMPOSER_AUTH` | What the repository serves anonymously | Composer's |
-| GitHub, `api.github.com` | Archived flag (S3), last push to any branch (S4) | `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN` when github.com issued it, else Composer's `github-oauth`. Any other Composer credential for github.com counts too | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
-| GitLab: gitlab.com and every host in Composer's `gitlab-domains` | Newest commit on any branch (S4). Archived flag (S3) with credentials only | `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN` when gitlab.com issued it, for gitlab.com only. Any Composer credential for the host, such as `gitlab-token` | Every package, but the archived flag is hidden, so S3 cannot fire | lockrot's, 24 h |
+| GitHub, `api.github.com` | Archived flag (S3), last push to any branch (S4) | `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN` when no issuer variable names another host, else Composer's `github-oauth`. Any other Composer credential for github.com counts too | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
+| GitLab: gitlab.com and every host in Composer's `gitlab-domains` | Newest commit on any branch (S4). Archived flag (S3) with credentials only | `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN` when no issuer variable names another host, for gitlab.com only. Any Composer credential for the host, such as `gitlab-token` | Every package, but the archived flag is hidden, so S3 cannot fire | lockrot's, 24 h |
 | Bitbucket Cloud, `api.bitbucket.org` | Newest commit on any branch (S4). Bitbucket has no archived state | Composer's `http-basic` (an Atlassian API token), `bearer` or `bitbucket-oauth` | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
 
 - A candidate has [S2](verdicts.md#the-signals) and no S1. A package with no dated release is
@@ -84,7 +84,7 @@ carries `User-Agent: lockrot`.
 
 - When both exist, lockrot sends only Composer's header.
 
-- A token goes only to the host that issued it. `GITHUB_TOKEN` counts only when each of
+- lockrot withholds an ambient token from the public host when an issuer variable names another host. `GITHUB_TOKEN` counts only when each of
   `GITHUB_SERVER_URL` and `GH_HOST` is unset, empty or names github.com. `GITLAB_TOKEN` counts only
   when each of `CI_SERVER_URL`, `GITLAB_HOST`, `GL_HOST` and `GITLAB_URI` is unset, empty or names
   gitlab.com. A value can be a URL or a bare host, and a port counts as part of the host. So on
@@ -92,7 +92,10 @@ carries `User-Agent: lockrot`.
   does not send the runner's token to the public host. The same holds for a token that `gh` or
   `glab` reads for the host that `GH_HOST`, `GL_HOST` or `GITLAB_URI` names. It goes on to the next
   source, and `-v` prints one line for each token that it does not send. `LOCKROT_GITHUB_TOKEN` and
-  `LOCKROT_GITLAB_TOKEN` always count, because they name the public host.
+  `LOCKROT_GITLAB_TOKEN` always count, because they name the public host. lockrot reads only these
+  variables. A host that only a `gh` or `glab` configuration file names is not seen. In that case,
+  set the issuer variable of that host, or pass the token as `LOCKROT_GITHUB_TOKEN` or
+  `LOCKROT_GITLAB_TOKEN`.
 
 - lockrot cannot keep Composer's own credentials from a host. A setup step that writes the
   runner's token into Composer's `github-oauth` for github.com makes Composer send it to

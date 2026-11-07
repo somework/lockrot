@@ -79,7 +79,7 @@ final class AbandonedIgnore
     {
         $policy = $config->get('policy');
         if ($policy === false) {
-            return ($config->raw()['config']['policy'] ?? null) === false ? new AbandonedAuditOff('policy', false) : new AbandonedAuditOff('COMPOSER_POLICY', false);
+            return new AbandonedAuditOff(\in_array(Platform::getEnv('COMPOSER_POLICY'), [false, ''], true) ? 'policy' : 'COMPOSER_POLICY', false);
         }
         $env = Platform::getEnv('COMPOSER_AUDIT_ABANDONED');
         if (\is_string($env) && $env !== '') {

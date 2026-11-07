@@ -32,6 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   so a left-behind package with only medium or low advisories can drop a grade. Action: if you gate
   at `critical` or `high`, run once without the gate and compare each finding's verdict.
   ([The score](docs/verdicts.md#score))
+- **Breaking:** **Config:** the default target PHP reads `config.platform.php` from Composer's
+  merged config, the global `config.json` included, and reads a `v`-prefixed value as Composer
+  does. 0.13 ignored the global file, so a grade or the gate can change on an unchanged lock.
+  Action: pin `--target-php` (or `LOCKROT_TARGET_PHP`, or `extra.lockrot.target-php`) to keep the
+  old target. ([Configuration](docs/configuration.md))
 - **Breaking:** **CLI:** `--fail-on=unchecked` also fails when advisories or an advisory's release
   data were not read, when a repository host cannot be asked, and on a package from vcs or an
   unknown origin. A path package and a package outside the `composer-repositories` scope are skips.
@@ -94,6 +99,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([Within reach](docs/verdicts.md#within-reach))
 - **All formats:** lockrot knows the PHP 8.6 GA date (2026-11-19). From that day, the PHP window
   and `capped` count PHP 8.6 as the newest minor. ([Capped](docs/verdicts.md#capped))
+- **All formats:** an installed stable version above the highest tag of its branch reads S8
+  `above_listed_releases` also when that tag has no date that lockrot trusts, and gets no S10
+  `release_dates` entry, so
+  `--fail-on=unchecked` does not fail on it. No date of that branch can measure such a version.
+  ([Left behind](docs/verdicts.md#left-behind))
+- **All formats:** the move check asks a Composer repository for a name's `~dev` file only when the
+  name's stability admits dev, as Composer does. A repository with only that file no longer hides
+  the tagged releases of a later repository, so an advisory fix that the solver refused can read
+  `update` or `upgrade` instead of `blocked`. ([Move](docs/verdicts.md#move))
 
 ### Security
 
@@ -161,6 +175,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** lockrot does not ask a repository for a package that its `only` or `exclude`
   keeps out. When no repository with a feed admits the package, it reads `no_feed`, not `answered`
   with 0 records.
+- **CLI:** the `-v` line for a withheld token prints no credentials from an issuer URL that does
+  not parse, for example one with a bad port. It printed the raw value.
+- **All formats:** under Composer's `cache-read-only` (`COMPOSER_CACHE_READ_ONLY`), lockrot writes
+  nothing to its repository-activity cache. It wrote there.
 
 ### Added
 
@@ -201,8 +219,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
   installs, with require-dev and without, and the links that set each edge. A target minor above
   the newest known minor counts as one more. `platform_override` is Composer's merged
-  `config.platform.php`, and `target.php` the `X.Y.Z` release that the move check solves at. The
-  text formats print a `php:` line. ([The PHP window](docs/verdicts.md#the-php-window))
+  `config.platform.php`. `target.php` and `lower_edge.php` are `X.Y.Z` releases, also for a pin
+  such as `8.4.1-p1`. The text formats print a `php:` line.
+  ([The PHP window](docs/verdicts.md#the-php-window))
 - **json, table, markdown, github:** `run.php_window.target_fix` names the packages that exclude
   the target PHP, and the answer of Composer's solver to their update at the target: the command,
   the holds of a refusal, or the root links that no update can change. The `php:` line prints it,
@@ -390,7 +409,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([Explaining one package](docs/configuration.md#explaining-one-package))
 - **json:** `libyears_unmeasured` and the keys of `libyears.unmeasured` follow `metadata.status`
   and `age`. `metadata_unavailable` is `unavailable` or `not_found`. `no_stable_release_date` is
-  `shared_commit` or `undated` when the installed release has no trusted date. It is
+  `shared_commit`, `parent_split` or `undated` when the installed release has no trusted date. It is
   `no_stable_release` or `undated_releases` when no dated stable release exists to measure to.
   Action: match the new ids in jq. ([Libyears](docs/verdicts.md#libyears))
 - **All formats:** the run note `not_from_composer_repository` says whether the run asked those
@@ -403,8 +422,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   advisory, and that each next step's score after the move assumes none on its versions.
   ([Run notes](docs/notes.md#advisories_not_checked))
 - **All formats:** an S10 `release_dates` entry names the cause for each signal that it blocks.
-  A cause is a lock entry with no date, an installed tag on a shared commit, a tag with no date, or
-  tags dated by a shared commit. ([What was not checked](docs/verdicts.md#what-was-not-checked))
+  A cause is a lock entry with no date, an installed tag on a shared commit, an installed tag of a
+  split whose newest release a parent dates, a tag with no date, or tags dated by a shared commit.
+  ([What was not checked](docs/verdicts.md#what-was-not-checked))
 - **json:** a `release_dates` gap that S1 or a whole-package allowlist entry drops from S10 shows in
   `checks_skipped[]` with the reason `undated_releases`, as the other dropped gaps do.
   ([What was not checked](docs/verdicts.md#what-was-not-checked))
@@ -500,9 +520,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   repeated `packages` key.
 - **CLI:** the `--explain` branch table keeps its columns in place when a tag holds a control or
   zero-width character. ([Explaining one package](docs/configuration.md#explaining-one-package))
-- **Config:** the default target PHP reads `config.platform.php` from Composer's merged config, the
-  global `config.json` included, and reads a `v`-prefixed value as Composer does.
-  ([Configuration](docs/configuration.md))
 - **All formats:** a GitHub secondary rate limit that answers 403 without rate-limit headers gives
   the reason `rate_limit` and the note `repository_activity_rate_limited`.
 - **Install-time:** without ext-curl, the install-time check stops repository activity requests at
@@ -548,6 +565,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--dry-run`, a require-dev package stays a dev package, and a stale `composer.lock` on disk
   decides nothing.
   ([Under `--dry-run`](docs/install-time.md#a-note-on-the-dry-run-development-flag))
+- **All formats:** S6 `last_stable_version` is set whenever the package has a tag, also when the
+  newest date is a shared commit's. A pinned snapshot with a tag gets a `tag` move, never `no-tag`,
+  and it targets a stable tag, or the pre-release and its `require.php` when no stable tag exists.
+  An old-promise `test` move names a higher tag, else the installed release with the date that S5
+  reads. ([Move](docs/verdicts.md#move))
+- **table, github, markdown, Install-time:** on the `update now:` line, the raise clause after the
+  platform sentence starts with a capital letter, as in the finding's `do:` line.
+- **All formats:** the S9 summary names its first three advisories in the display order of their
+  severities (critical, high, medium, unrated, low), so an unrated advisory comes before a low one.
+  ([Security advisories](docs/verdicts.md#security-advisories))
+- **All formats:** the `abandoned_not_audited_by_composer` note names `COMPOSER_POLICY` when the
+  variable turns Composer's policy off, as the advisory notes do.
+  ([Abandoned not audited by Composer](docs/notes.md#abandoned_not_audited_by_composer))
+- **Config:** `ignore[].expires` refuses a value with a trailing newline, as
+  `accept-unchecked[].expires` does.
+- **sarif, gitlab:** a lock entry written as `"name" : "a/b"` gets its line number.
 
 ## [0.13.0] - 2026-10-01
 

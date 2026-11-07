@@ -362,7 +362,8 @@ maintainer.
       planned tag day. If the final tag falls on another day, add a commit to the release pull
       request that changes only that date and `docs/example-run.md`. That commit changes no file
       of the contract bundle. If the day changes after the merge, open a pull request into `main`
-      that changes only that date and `docs/example-run.md`. Then tag its merge commit.
+      that changes only that date and `docs/example-run.md`. Then tag the commit that its merge
+      writes on `main`.
 
     - Check `resources/php-ga-dates.json` against the PHP release schedule on php.net: the
       schedule page of the next minor (`https://wiki.php.net/todo/php<major><minor>`) and
@@ -396,8 +397,8 @@ maintainer.
 
     - Vendor a renderer release ([The HTML report page](#the-html-report-page)) in this order. Each
       build of [lockrot-report](https://github.com/somework/lockrot-report) fetches its pinned
-      lockrot commit by its sha. The rebase merge into `main` leaves the release branch's commits
-      unreachable from `main`, so a tag must keep the pinned commit reachable.
+      lockrot commit by its sha. The squash merge into `main` writes a new commit and leaves the release
+      branch's commits unreachable from `main`, so a tag must keep the pinned commit reachable.
 
         1. When the contract bundle changes, run `tools/report/record`. Commit it with the version,
            the dated CHANGELOG heading, the schema copies and the golden pins of this step.
@@ -411,7 +412,7 @@ maintainer.
            `check-vendored` step refuses a pre-release, so it passes only after step 8.
         4. Let V be the commit of step 3. Tag V `vX.Y.Z-rc.<N+1>` and push the tag. The
            renderer's `node scripts/contract.mjs reachable` accepts a commit on `main` or on a
-           lockrot tag, and the rebase merge never puts V on `main`.
+           lockrot tag, and the squash merge never puts V on `main`.
         5. Push V unchanged to `release/full-check-<sha of V>`:
            `git push origin <V>:refs/heads/release/full-check-<V>`, with the full hex sha of V in
            both places. Wait for a green full check of the whole tree on that branch. The
@@ -443,11 +444,15 @@ maintainer.
 
     - List the required checks of main's ruleset, and compare them with `.github/workflows/ci.yml`.
       Run `gh api repos/somework/lockrot/rulesets`, then
-      `gh api repos/somework/lockrot/rulesets/<id>` for the ruleset of `main`, and read the
-      `context` of each `required_status_checks` entry. Each job of `ci.yml` needs one entry, named
-      as its `name:` key reads, or by its job id when it has none. A matrix job needs one entry for
-      each row. A ruleset requires a check by its name, so a red job outside the list does not
-      stop the merge. Add each missing entry to the ruleset before the merge.
+      `gh api repos/somework/lockrot/rulesets/<id> --jq '.rules[] |
+      select(.type=="required_status_checks") | .parameters.required_status_checks[].context'`
+      for the ruleset of `main`. Each job of `ci.yml` needs one entry, named as its `name:` key
+      reads, or by its job id when it has none. A matrix job needs one entry for each row. A ruleset
+      requires a check by its name, so a red job outside the list does not stop the merge. Add each
+      missing entry to the ruleset before the merge. Read the matrix rows that a pull request into
+      `main` runs. Remove each required context that no job or such row of `ci.yml` produces: no
+      run reports it, so the pull request waits for it with no way to bypass. A context of a
+      removed matrix row is stale.
     - When the release changes the flag set, a schema number or the score model, the lockrot.dev
       change that reads it is merged. The lockrot.dev build stops on a set that it does not know.
     - Before the first final renderer tag, list the renderer's rulesets with
@@ -458,7 +463,15 @@ maintainer.
       with lockrot's tag ruleset as the model. A moved tag gets a second attestation, and
       `update-renderer` then cannot name one source commit for the release.
 
-4. Merge the release pull request into `main` with CI green. On a pull request into `main`, the
+4. Squash merge the release pull request into `main` with CI green. GitHub refuses a rebase merge
+   of more than 100 commits
+   ([repository limits](https://docs.github.com/en/repositories/creating-and-managing-repositories/repository-limits)).
+   The ruleset of `main` requires a linear history, so a release branch of that size merges only
+   as a squash. The release branch keeps the commit history.
+   Write the squash message as a release summary: the subject names the version, and the body
+   lists the user-visible changes of the CHANGELOG section. Do not keep the default
+   concatenation of every commit message. Remove `## Review notes` from the message. On a pull
+   request into `main`, the
    `quality` job also runs `tools/report/check-vendored`, the renderer check of the tag. It also
    runs `tools/release/version_bump.py`. When the pull request changes a file that the release
    ships (`src/`, `resources/`, `bin/lockrot`, `composer.json`), that check fails unless
@@ -467,8 +480,9 @@ maintainer.
 5. When a schema file changes, `.github/workflows/schemas.yml` asks lockrot.dev to publish it.
    Approve the `schemas` environment of the lockrot.dev run, then check that each new schema URL
    answers (`curl -fsI https://lockrot.dev/schema/<document>-<number>.json`).
-6. When the `ci.yml` push run of the merge commit on `main` passes, tag the commit `vX.Y.Z` and
-   push the tag. `.github/workflows/phar.yml` refuses these tags:
+6. When the `ci.yml` push run of the squash commit on `main` passes, tag the commit `vX.Y.Z` and
+   push the tag. If the tag day changed after the merge, tag the commit of the date pull request
+   instead, when its `ci.yml` push run passes. `.github/workflows/phar.yml` refuses these tags:
 
     - a tag that is not on `main`, or whose `ci.yml` push run on `main` did not pass
     - a tag whose vendored renderer is not an attested release
@@ -512,6 +526,11 @@ maintainer.
     5. Check that `v1` names the release commit
        (`gh api repos/somework/lockrot-action/git/ref/tags/v1`), and that the `docker.yml` run
        published the image `ghcr.io/somework/lockrot:X.Y.Z`.
+
+9. Start the next release branch from the newest commit on `main`, after every pull request of this
+   release merges. The squash commit can precede the date pull request of step 6. The old release
+   branch holds commits that `main` does not, so a second pull request from it shows them again and
+   conflicts where later commits change the same lines.
 
 ## Related
 

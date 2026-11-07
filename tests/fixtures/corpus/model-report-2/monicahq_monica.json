@@ -1186,6 +1186,7 @@
       "not_found": 0,
       "branch_snapshot": 0,
       "shared_commit": 5,
+      "parent_split": 0,
       "undated": 0,
       "no_stable_release": 0,
       "undated_releases": 0
@@ -2418,7 +2419,7 @@
         {
           "id": "S9",
           "level": "high",
-          "summary": "4 security advisories affect v12.22.1 (PKSA-3r5d-mb8f-1qw9, PKSA-m5cs-t1y6-qpcs, CVE-2026-102279 and 1 more); 2 fixed in v12.60.0, 1 fixed in v12.61.1, 1 fixed in v12.69.0",
+          "summary": "4 security advisories affect v12.22.1 (PKSA-3r5d-mb8f-1qw9, PKSA-m5cs-t1y6-qpcs, CVE-2026-48019 and 1 more); 2 fixed in v12.60.0, 1 fixed in v12.61.1, 1 fixed in v12.69.0",
           "data": {
             "advisories": [
               {

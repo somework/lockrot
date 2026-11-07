@@ -423,6 +423,18 @@ final class ServiceFactoryTest extends TestCase
         self::assertSame([], glob($dir.'/*.json') ?: [], 'and not directly in the configured cache directory');
     }
 
+    public function testAReadOnlyComposerCacheWritesNothingUnderTheActivityDirectory(): void
+    {
+        $dir = $this->tempCacheDir();
+        $config = new Config(false, sys_get_temp_dir());
+        $config->merge(['config' => ['cache-dir' => $dir, 'cache-read-only' => true, 'home' => sys_get_temp_dir()]]);
+
+        $cache = ServiceFactory::createCache(new NullIO(), $config);
+        $cache->set('https://api.github.com/repos/vendor/name', new HttpResult('https://api.github.com/repos/vendor/name', 200, '{}', new \DateTimeImmutable(self::NOW)));
+
+        self::assertSame([], glob($dir.'/lockrot/*') ?: []);
+    }
+
     public function testGithubTokenFromComposerConfig(): void
     {
         $config = new Config(false, sys_get_temp_dir());

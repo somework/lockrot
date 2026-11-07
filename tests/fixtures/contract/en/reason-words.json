@@ -21,6 +21,7 @@
         "not_found": "not in the repository",
         "not_from_composer_repository": "not from a Composer repository",
         "offline": "offline",
+        "parent_split": "a split whose parent dates its newest release",
         "rate_limit": "rate limited",
         "releases_unknown": "releases not read",
         "repository_not_found": "repository not found",

@@ -107,6 +107,8 @@ timeout, and Composer can retry a failed transfer. With curl, the timeout of one
 An advisory that a repository publishes in its metadata takes that timeout too. A request to a
 repository's advisory API times out after 10 seconds
 ([Composer 2.10.0](https://github.com/composer/composer/blob/2.10.0/src/Composer/Repository/ComposerRepository.php)).
+A move-check solve that has started runs to its end, past the budget. The budget stops only a solve
+that has not started.
 With a warm cache, Composer sends fewer requests. `composer lockrot` has no budget.
 
 ```json

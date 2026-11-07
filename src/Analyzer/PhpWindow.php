@@ -403,11 +403,12 @@ final class PhpWindow implements \JsonSerializable
 
     /**
      * The lowest X.Y.Z of the first admitted minor, Z from 0 to {@see MoveCheckers::NEWEST_PATCH},
-     * and the links that fail at the point just below it: the patch before, or the minor before.
+     * or the pin when it installs below that X.Y.Z. The links that fail at the point just below it:
+     * the release or the patch before, or the minor before.
      *
      * @param list<PhpLink>            $links
      * @param list<string>             $minors
-     * @param callable(string): string $point  the point at which a minor is read
+     * @param callable(string): string $point  the point at which a minor is read: the pin in the target minor
      *
      * @return array{php: string, set_by: list<Req>}
      */
@@ -415,13 +416,25 @@ final class PhpWindow implements \JsonSerializable
     {
         $minor = $minors[$first];
         $patch = self::lowestPatch($links, $minor);
-        if ($patch === null) {
-            // Only the target point admits the minor: config.platform.php names a patch past the range.
-            return ['php' => $point($minor), 'set_by' => self::clean(self::failing($links, $minor.'.'.MoveCheckers::NEWEST_PATCH))];
+        $pin = $point($minor);
+        if ($patch === null || (self::failing($links, $pin) === [] && Comparator::lessThan(self::normalized($pin), self::normalized($minor.'.'.$patch)))) {
+            return ['php' => self::releaseOf($pin), 'set_by' => self::clean(self::failing($links, self::below($pin)))];
         }
         $below = $patch > 0 ? $minor.'.'.($patch - 1) : (isset($minors[$first - 1]) ? $point($minors[$first - 1]) : null);
 
         return ['php' => $minor.'.'.$patch, 'set_by' => $below === null ? [] : self::clean(self::failing($links, $below))];
+    }
+
+    /** The X.Y.Z just below a pin: its own release when a suffix or a fourth segment lifts the pin above it. */
+    private static function below(string $pin): string
+    {
+        $release = self::releaseOf($pin);
+        if (Comparator::lessThan(self::normalized($release), self::normalized($pin))) {
+            return $release;
+        }
+        [$major, $minor, $patch] = explode('.', $release);
+
+        return $major.'.'.$minor.'.'.((int) $patch - 1);
     }
 
     /**

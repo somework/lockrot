@@ -200,7 +200,7 @@
         "releases_listed": 5,
         "has_stable_release": true,
         "last_stable_release": null,
-        "last_stable_version": null,
+        "last_stable_version": "v4.9.0",
         "last_stable_dated_by": null,
         "installed_release": "2023-04-15T16:39:14+00:00",
         "installed_release_dated_by": null,

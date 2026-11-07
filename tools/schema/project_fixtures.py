@@ -367,7 +367,9 @@ def package_facts(f, rows, lock_time=None):
     s6 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S6'), None) or {}
     # A snapshot has no release date: its lock time is the snapshot's commit time.
     installed_at = (age.get('installed') or {}).get('at') or s6.get('snapshot_time')
-    release(f['version'], installed_at, f['installed_php']['requires'])
+    if age.get('branch_release_unmeasured') != 'above_listed_releases':
+        # That reading says that the installed version is above every listed release of its branch.
+        release(f['version'], installed_at, f['installed_php']['requires'])
     # The newest release that S2 measures can be a pre-release, which no branch row names.
     newest = age.get('release') or {}
     release(newest.get('version'), newest.get('at'), None)

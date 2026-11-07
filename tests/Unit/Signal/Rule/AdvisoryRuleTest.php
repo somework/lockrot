@@ -43,6 +43,20 @@ final class AdvisoryRuleTest extends TestCase
         self::assertSame('6 security advisories affect 1.0.0 (C-1, H-1, H-2 and 3 more)', $signal->summary());
     }
 
+    /** The summary reads the bucket, so an unrated, `moderate` or upper-case word ranks as the rows do. */
+    public function testTheSummaryNamesAdvisoriesInTheDisplayOrderOfTheirBuckets(): void
+    {
+        $facts = new PackageFacts(F::package(), null, null, [
+            $this->advisory('L-1', null, 'low'), $this->advisory('N-1', null, null),
+            $this->advisory('MO-1', null, 'moderate'), $this->advisory('UP-1', null, 'HIGH'),
+        ]);
+
+        $signal = (new AdvisoryRule())->evaluate($facts);
+
+        self::assertNotNull($signal);
+        self::assertSame('4 security advisories affect 1.0.0 (UP-1, MO-1, N-1 and 1 more)', $signal->summary());
+    }
+
     /** A row writes the report date as ISO 8601 and the affected range as the repository wrote it. */
     public function testARowWritesTheReportDateAndTheRange(): void
     {

@@ -89,6 +89,46 @@
             "argv": [
                 "composer",
                 "require",
+                "friendsofsymfony/oauth-server-bundle:^1.9.3"
+            ],
+            "posix": "composer require 'friendsofsymfony/oauth-server-bundle:^1.9.3'",
+            "cmd": "composer require \"friendsofsymfony/oauth-server-bundle:^1.9.3\"",
+            "powershell": "composer --% require \"friendsofsymfony/oauth-server-bundle:^1.9.3\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "friendsofsymfony/oauth-server-bundle:^10.49.0"
+            ],
+            "posix": "composer require 'friendsofsymfony/oauth-server-bundle:^10.49.0'",
+            "cmd": "composer require \"friendsofsymfony/oauth-server-bundle:^10.49.0\"",
+            "powershell": "composer --% require \"friendsofsymfony/oauth-server-bundle:^10.49.0\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "friendsofsymfony/oauth-server-bundle:^3.3.0"
+            ],
+            "posix": "composer require 'friendsofsymfony/oauth-server-bundle:^3.3.0'",
+            "cmd": "composer require \"friendsofsymfony/oauth-server-bundle:^3.3.0\"",
+            "powershell": "composer --% require \"friendsofsymfony/oauth-server-bundle:^3.3.0\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "friendsofsymfony/oauth-server-bundle:^4.0.0"
+            ],
+            "posix": "composer require 'friendsofsymfony/oauth-server-bundle:^4.0.0'",
+            "cmd": "composer require \"friendsofsymfony/oauth-server-bundle:^4.0.0\"",
+            "powershell": "composer --% require \"friendsofsymfony/oauth-server-bundle:^4.0.0\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
                 "geoip2/geoip2:^3.4"
             ],
             "posix": "composer require 'geoip2/geoip2:^3.4'",
@@ -425,6 +465,16 @@
             "posix": "composer require 'symfony/yaml:^6.4.40'",
             "cmd": "composer require \"symfony/yaml:^6.4.40\"",
             "powershell": "composer --% require \"symfony/yaml:^6.4.40\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "tubalmartin/cssmin:^5.0.0"
+            ],
+            "posix": "composer require 'tubalmartin/cssmin:^5.0.0'",
+            "cmd": "composer require \"tubalmartin/cssmin:^5.0.0\"",
+            "powershell": "composer --% require \"tubalmartin/cssmin:^5.0.0\""
         },
         {
             "argv": [
@@ -890,6 +940,54 @@
             "posix": "composer why-not friendsofsymfony/oauth-server-bundle 1.6.2 --locked",
             "cmd": "composer why-not friendsofsymfony/oauth-server-bundle 1.6.2 --locked",
             "powershell": "composer --% why-not friendsofsymfony/oauth-server-bundle 1.6.2 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "friendsofsymfony/oauth-server-bundle",
+                "v1.9.3",
+                "--locked"
+            ],
+            "posix": "composer why-not friendsofsymfony/oauth-server-bundle v1.9.3 --locked",
+            "cmd": "composer why-not friendsofsymfony/oauth-server-bundle v1.9.3 --locked",
+            "powershell": "composer --% why-not friendsofsymfony/oauth-server-bundle v1.9.3 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "friendsofsymfony/oauth-server-bundle",
+                "v10.49.0",
+                "--locked"
+            ],
+            "posix": "composer why-not friendsofsymfony/oauth-server-bundle v10.49.0 --locked",
+            "cmd": "composer why-not friendsofsymfony/oauth-server-bundle v10.49.0 --locked",
+            "powershell": "composer --% why-not friendsofsymfony/oauth-server-bundle v10.49.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "friendsofsymfony/oauth-server-bundle",
+                "v3.3.0",
+                "--locked"
+            ],
+            "posix": "composer why-not friendsofsymfony/oauth-server-bundle v3.3.0 --locked",
+            "cmd": "composer why-not friendsofsymfony/oauth-server-bundle v3.3.0 --locked",
+            "powershell": "composer --% why-not friendsofsymfony/oauth-server-bundle v3.3.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "friendsofsymfony/oauth-server-bundle",
+                "v4.0.0",
+                "--locked"
+            ],
+            "posix": "composer why-not friendsofsymfony/oauth-server-bundle v4.0.0 --locked",
+            "cmd": "composer why-not friendsofsymfony/oauth-server-bundle v4.0.0 --locked",
+            "powershell": "composer --% why-not friendsofsymfony/oauth-server-bundle v4.0.0 --locked"
         },
         {
             "argv": [
@@ -1382,6 +1480,18 @@
             "posix": "composer why-not symfony/yaml v5.4.52 --locked",
             "cmd": "composer why-not symfony/yaml v5.4.52 --locked",
             "powershell": "composer --% why-not symfony/yaml v5.4.52 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "tubalmartin/cssmin",
+                "v5.0.0",
+                "--locked"
+            ],
+            "posix": "composer why-not tubalmartin/cssmin v5.0.0 --locked",
+            "cmd": "composer why-not tubalmartin/cssmin v5.0.0 --locked",
+            "powershell": "composer --% why-not tubalmartin/cssmin v5.0.0 --locked"
         },
         {
             "argv": [

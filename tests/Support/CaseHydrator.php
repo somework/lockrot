@@ -592,7 +592,7 @@ final class CaseHydrator
             if (\is_string($entry['php'] ?? null)) {
                 $require = ['php' => $entry['php']] + $require;
             }
-            $locked = ['name' => $entry['name'], 'version' => $entry['version'], 'require' => $require] + array_intersect_key($entry, ['conflict' => true, 'provide' => true, 'replace' => true]);
+            $locked = ['name' => $entry['name'], 'version' => $entry['version'], 'require' => $require] + array_intersect_key($entry, ['version_normalized' => true, 'conflict' => true, 'provide' => true, 'replace' => true]);
             $marking = $packages[$name]['abandoned'] ?? null;
             if ($marking !== null && ($marking['by'] ?? null) === 'lock') {
                 $locked['abandoned'] = $marking['replacement'] ?? true;

@@ -358,7 +358,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'score.accepted[].if_counted.modifiers[].before' => self::ONLY_PSR_LOG,
         'score.accepted[].if_counted.modifiers[].divide_by' => self::ONLY_PSR_LOG,
         'score.accepted[].if_counted.modifiers[].reason' => self::ONLY_PSR_LOG,
-        'age.release.dated_by' => 'No case of the model dates its newest release by a monorepo parent.',
         'security.partial.unverified' => self::PARTIAL_UNVERIFIED,
         'security.partial.if_applied.at_most=true' => self::PARTIAL_UNVERIFIED,
         'score.accepted[].if_counted.at_least=true' => 'No case of the model accepts a `stale` that S4 did not decide.',

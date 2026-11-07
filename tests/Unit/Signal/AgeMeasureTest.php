@@ -191,8 +191,8 @@ final class AgeMeasureTest extends TestCase
         self::assertUnmeasured(AgeMeasure::ABOVE_LISTED_RELEASES, $measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.2.1']), $listed)));
         // The highest listed tag itself is not above anything.
         self::assertTrue($measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.2.0']), $listed))->isMeasured());
-        // Both refusals at once: the undated reason is the one given.
-        self::assertUnmeasured(AgeMeasure::UNDATED_RELEASES, $measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.3.1']), $undatedHighest)));
+        // Both refusals at once: no date of the row measures a version above it, so that reason is the one given.
+        self::assertUnmeasured(AgeMeasure::ABOVE_LISTED_RELEASES, $measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.3.1']), $undatedHighest)));
     }
 
     /** A shared commit dates a tag before its release, so the branch would read older than it is, and S8 would fire early. */
@@ -289,9 +289,9 @@ final class AgeMeasureTest extends TestCase
         self::assertUnmeasured(AgeMeasure::BRANCH_SNAPSHOT, $measure->installed(FactsBuilder::facts(FactsBuilder::package(['version' => 'dev-main', 'time' => self::ago(10)]))));
         self::assertUnmeasured(AgeMeasure::BRANCH_SNAPSHOT, $measure->installed(FactsBuilder::facts(FactsBuilder::package(['version' => 'dev-main']))));
         self::assertUnmeasured(AgeMeasure::UNDATED, $measure->installed(FactsBuilder::facts(FactsBuilder::package())));
-        // A split whose newest release a parent dated, while nothing dates the installed tag: the lock's date is a shared commit's.
+        // A split whose newest release a parent dated, while nothing dates the installed tag on its own commit (ruling R13-31).
         $split = $this->splitMetadata();
-        self::assertUnmeasured(AgeMeasure::SHARED_COMMIT, $measure->installed(FactsBuilder::facts(FactsBuilder::package(['version' => 'v0.9.0', 'time' => self::ago(10)]), $split)));
+        self::assertUnmeasured(AgeMeasure::PARENT_SPLIT, $measure->installed(FactsBuilder::facts(FactsBuilder::package(['version' => 'v0.9.0', 'time' => self::ago(10)]), $split)));
     }
 
     public function testAMeasuredReadingNeedsADateAndAnUnmeasuredOneAReason(): void

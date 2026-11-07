@@ -23,6 +23,7 @@ use Lockrot\Solver\MoveChecker;
 use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\RecordedMoveChecker;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
@@ -322,6 +323,26 @@ final class RunFooterTest extends TestCase
         $text = Formatters::for($format, FormatContext::create(null, 'high'))->format($report);
 
         self::assertStringContainsString($line, $format === 'table' ? (string) preg_replace('/\n +/', ' ', ConsoleMarkup::render($text, false)) : $text);
+    }
+
+    /**
+     * Ruling R12-9 and its Q1 correction: after the platform sentence the raise clause starts a
+     * sentence, and the `composer update` command keeps its own case.
+     */
+    public function testAfterThePlatformSentenceTheRaiseClauseOfTheUpdateNowLineStartsWithACapital(): void
+    {
+        $case = CaseHydrator::case('move-check‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['checks'] = ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]];
+        $inputs['releases'] = array_merge(JsonPath::arrayAt($inputs, ['releases']), [['version' => 'v2.3.5', 'time' => '2026-07-01T00:00:00+00:00', 'php' => '>=8.2']]);
+        $case['inputs'] = $inputs;
+        $window = PhpWindow::of(LockFile::fromArray(['packages' => [], 'packages-dev' => []]), ProjectConfig::fromArray(['config' => ['platform' => ['php' => '7.4.29']]]), '8.4', PhpReleaseDates::load()->minors(new Clock(new \DateTimeImmutable(self::AT))));
+        $report = CaseHydrator::report($case)->withPhpWindow($window);
+
+        $text = (string) preg_replace('/\n +/', ' ', ConsoleMarkup::render(Formatters::for('table', FormatContext::create(null, 'high'))->format($report), false));
+
+        self::assertSame('First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29. Raise require.php to >=8.2, then ', RunFooter::platformStep($report));
+        self::assertStringContainsString('update now: First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 7.4.29. Raise require.php to >=8.2, then composer update \'typo3/html-sanitizer:^2.3.2\'', $text);
     }
 
     public function testThePhpLineOfARefusalWithNoHoldEndsAfterThePackageThatExcludesTheTarget(): void

@@ -16,6 +16,12 @@ final class RecordedStatus
         return $status !== 0 && $status !== 429 && $status < 500 && !($github && \in_array($status, [401, 403], true));
     }
 
+    /** GitLab answers only for a project that exists or does not: any other status describes the moment, so the recording stays incomplete. */
+    public static function keepsGitlab(int $status): bool
+    {
+        return \in_array($status, [200, 404], true);
+    }
+
     /** Whether $path holds an envelope whose status the recorder keeps. */
     public static function isRecorded(string $path, bool $github): bool
     {

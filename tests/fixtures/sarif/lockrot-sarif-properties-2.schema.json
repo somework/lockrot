@@ -1458,12 +1458,13 @@
       ]
     },
     "installedUnmeasured": {
-      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.installed` is null: a dev pin (`branch_snapshot`), a tag dated only by a commit that other tags share (`shared_commit`), or a lock entry with no date (`undated`). An open set: read an unknown reason as another reason.",
+      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.installed` is null: a dev pin (`branch_snapshot`), a tag dated only by a commit that other tags share (`shared_commit`), a tag on its own commit in a split whose parent dates the newest release (`parent_split`), or a lock entry with no date (`undated`). An open set: read an unknown reason as another reason.",
       "type": "string",
       "pattern": "^[a-z][a-z0-9_]*$",
       "x-known-values": [
         "branch_snapshot",
         "shared_commit",
+        "parent_split",
         "undated"
       ]
     },

@@ -27,9 +27,6 @@ final class AdvisoryRule implements SignalRule
     /** Advisories named in the summary before the rest are counted. */
     public const NAMED = 3;
 
-    /** Packagist's severity scale, worst first. An advisory without one sorts last. */
-    private const SEVERITY_RANK = ['critical' => 0, 'high' => 1, 'medium' => 2, 'low' => 3];
-
     public function evaluate(PackageFacts $facts): ?Signal
     {
         $advisories = $facts->advisories();
@@ -193,8 +190,8 @@ final class AdvisoryRule implements SignalRule
     }
 
     /**
-     * Worst severity first, then the repository's own order (newest report first on Packagist),
-     * so the three names that the summary carries are the three that matter most.
+     * The Severity display order ({@see Severity::displayPosition()}), then the repository's own
+     * order (newest report first on Packagist).
      *
      * @param list<Advisory> $advisories
      *
@@ -204,8 +201,8 @@ final class AdvisoryRule implements SignalRule
     {
         $order = array_keys($advisories);
         usort($order, static function (int $a, int $b) use ($advisories): int {
-            $rankA = self::SEVERITY_RANK[$advisories[$a]->severity() ?? ''] ?? \count(self::SEVERITY_RANK);
-            $rankB = self::SEVERITY_RANK[$advisories[$b]->severity() ?? ''] ?? \count(self::SEVERITY_RANK);
+            $rankA = Severity::fromComposer($advisories[$a]->severity())->displayPosition();
+            $rankB = Severity::fromComposer($advisories[$b]->severity())->displayPosition();
 
             return $rankA <=> $rankB ?: $a <=> $b;
         });

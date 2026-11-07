@@ -1272,6 +1272,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
             "not_found": 0,
             "branch_snapshot": 4,
             "shared_commit": 2,
+            "parent_split": 0,
             "undated": 0,
             "no_stable_release": 0,
             "undated_releases": 0

@@ -564,16 +564,6 @@ final class NotCheckedRuleTest extends TestCase
         self::assertSame([NotCheckedRule::CAUSE_INSTALLED_SHARED_COMMIT => [Signal::S5]], self::releaseDatesCauses($rule->evaluate($facts)));
     }
 
-    /** A parent dated the newest release, so the package is a split, and its installed tag's lock date is a shared commit's. */
-    public function testAnInstalledTagOfASplitThatAParentDatesIsTheCauseOfAnS5Gap(): void
-    {
-        $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
-        $metadata = new PackageMetadata('vendor/pkg', false, null, true, new \DateTimeImmutable('2021-08-30T00:00:00+00:00'), 'v4.4.31', 3, null, 'library', new \DateTimeImmutable(self::NOW), [], [], 'acme/parent');
-        $facts = new PackageFacts(F::package(['version' => 'v4.4.30', 'time' => '2020-10-01T00:00:00+00:00', 'php' => '>=7.1.3']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []);
-
-        self::assertSame([NotCheckedRule::CAUSE_INSTALLED_SHARED_COMMIT => [Signal::S5]], self::releaseDatesCauses($rule->evaluate($facts)));
-    }
-
     public function testALockEntryWithNoTimeIsTheCauseOfAnS5Gap(): void
     {
         $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
@@ -607,6 +597,30 @@ final class NotCheckedRuleTest extends TestCase
         $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.3.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
 
         self::assertSame([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S8]], self::releaseDatesCauses($signal));
+    }
+
+    /** An installed stable version above its row's highest tag leaves S8 unmeasured whether that tag is dated or not, so no date closes a gap. */
+    public function testAnInstalledVersionAboveAnUndatedHighestTagHasNoReleaseDatesGap(): void
+    {
+        $metadata = F::metadata([['v3.0.0', '2026-01-01T00:00:00+00:00'], ['v2.5.0', null]]);
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v2.5.1']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertNull($signal);
+    }
+
+    /** A parent dates the newest release and the installed tag sits on its own commit: no shared commit causes the gap. */
+    public function testAnInstalledTagOnItsOwnCommitIsNotBlamedOnASharedCommit(): void
+    {
+        $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
+        $metadata = new PackageMetadata('vendor/pkg', false, null, true, new \DateTimeImmutable('2021-08-30T00:00:00+00:00'), 'v4.4.31', 3, null, 'library', new \DateTimeImmutable(self::NOW), [], [], 'acme/parent');
+        $facts = new PackageFacts(F::package(['version' => 'v4.4.30', 'time' => '2020-10-01T00:00:00+00:00', 'php' => '>=7.1.3']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []);
+
+        self::assertFalse($metadata->sharesItsCommit('v4.4.30'));
+        $signal = $rule->evaluate($facts);
+        self::assertNotNull($signal);
+        self::assertSame([NotCheckedRule::CAUSE_INSTALLED_PARENT_SPLIT => [Signal::S5]], self::releaseDatesCauses($signal));
+        self::assertStringContainsString('the installed release has no release date (a parent dates the newest release of this split, so the lock time is not a release date), so S5 could not judge it', $signal->summary());
     }
 
     /** One entry, one cause per kind of missing date, in the order of the signals that each blocks. */

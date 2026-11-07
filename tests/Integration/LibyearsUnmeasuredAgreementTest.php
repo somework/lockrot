@@ -167,7 +167,7 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
         $release = InstalledRelease::of($package, $metadata);
         $installed = $release->at();
         if ($installed === null) {
-            return [$release->kind() === InstalledRelease::SHARED_COMMIT ? Libyears::SHARED_COMMIT : Libyears::UNDATED, null];
+            return [\in_array($release->kind(), [InstalledRelease::SHARED_COMMIT, InstalledRelease::PARENT_SPLIT], true) ? $release->kind() : Libyears::UNDATED, null];
         }
         if (!$metadata->hasStableRelease()) {
             return [Libyears::NO_STABLE_RELEASE, null];
@@ -217,7 +217,7 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
         }
         self::assertIsString($row['version']);
 
-        return VersionParser::parseStability($row['version']) === 'dev' ? [Libyears::BRANCH_SNAPSHOT] : [Libyears::SHARED_COMMIT, Libyears::UNDATED, Libyears::NO_STABLE_RELEASE, Libyears::UNDATED_RELEASES];
+        return VersionParser::parseStability($row['version']) === 'dev' ? [Libyears::BRANCH_SNAPSHOT] : [Libyears::SHARED_COMMIT, Libyears::PARENT_SPLIT, Libyears::UNDATED, Libyears::NO_STABLE_RELEASE, Libyears::UNDATED_RELEASES];
     }
 
     private function analysis(MetadataLoaderInterface $loader, string $dir): Analysis

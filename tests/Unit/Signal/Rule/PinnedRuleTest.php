@@ -175,7 +175,7 @@ final class PinnedRuleTest extends TestCase
     /**
      * A subtree split, as the repository really lists one: its tags are cut on a commit they share,
      * so the date they carry is the commit's and no release date is trusted. It has released, and
-     * when is left unsaid.
+     * S6 names its highest tag with no date.
      */
     public function testBranchSnapshotOfASplitWhoseTagsShareACommit(): void
     {
@@ -193,7 +193,7 @@ final class PinnedRuleTest extends TestCase
             'reason' => PinnedRule::REASON_BRANCH_SNAPSHOT,
             'has_stable_release' => true,
             'last_stable_release' => null,
-            'last_stable_version' => null,
+            'last_stable_version' => '10.49.0',
             'last_stable_dated_by' => null,
             'snapshot_time' => '2024-01-01T00:00:00+00:00',
             'tag_relation' => null,

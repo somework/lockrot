@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+use Composer\Semver\Comparator;
+use Composer\Semver\VersionParser;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Security\Candidate;
 use Lockrot\Security\Fix;
+use Lockrot\Security\PhpCheck;
 use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\Data\AbandonedData;
 use Lockrot\Signal\Data\CappedData;
@@ -85,13 +88,17 @@ final class MaintenanceMove
             return MoveDraft::of(Move::NO_TAG, FlagSet::PINNED);
         }
         $key = ReleaseBranch::of($version);
-        $branch = $key === null ? null : $context->row(ReleaseBranch::label($key));
+        // A line with no stable tag gives way to the highest line. Only with no stable tag at all is the target the pre-release that S6 names.
+        $branch = ($key === null ? null : $context->row(ReleaseBranch::label($key))) ?? ($context->rows()[0] ?? null);
         if ($branch !== null) {
             // The newest dated tag can be a backport below its branch's highest tag: the move requires the highest tag.
             return self::tag($branch, self::highestTag($branch, $snapshotTime));
         }
 
-        return self::tag(null, new Latest($version, $s6->lastStableRelease(), false, $s6->tagRelation(), $snapshotTime));
+        $latest = new Latest($version, $s6->lastStableRelease(), false, $s6->tagRelation(), $snapshotTime);
+        $kind = PhpCheck::of($context->lastStablePhp(), $context->floor())->targetRuns() === false ? Move::BLOCKED : Move::TAG;
+
+        return MoveDraft::of($kind, FlagSet::PINNED)->withLatest($latest, null);
     }
 
     private static function highestTag(BranchRow $row, ?string $snapshotTime): Latest
@@ -102,9 +109,9 @@ final class MaintenanceMove
         return new Latest($row->highest(), $released === null ? null : $released->format(\DATE_ATOM), false, $relation, $snapshotTime);
     }
 
-    private static function tag(?BranchRow $row, Latest $latest): MoveDraft
+    private static function tag(BranchRow $row, Latest $latest): MoveDraft
     {
-        $kind = $row !== null && $row->highestAdmitsTargetPhp() === false ? Move::BLOCKED : Move::TAG;
+        $kind = $row->highestAdmitsTargetPhp() === false ? Move::BLOCKED : Move::TAG;
 
         return MoveDraft::of($kind, FlagSet::PINNED)->withLatest($latest, $row);
     }
@@ -158,13 +165,21 @@ final class MaintenanceMove
                 return self::require(FlagSet::OLD_PROMISE, $context, $row, '^'.ltrim($row->highest(), 'vV'));
             }
         }
-        // With no stable release read, the installed one is the newest that lockrot knows.
         $installedVersion = $context->subject()->version();
-        $s5 = $context->finding()->signalData(OldPromiseData::class);
-        $version = $context->lastStableVersion() ?? $installedVersion;
-        $released = $context->lastStableVersion() === null ? ($s5 === null ? null : $s5->released()) : $context->lastStableReleased();
+        $newestVersion = $context->lastStableVersion();
+        if ($newestVersion !== null && self::isAboveVersion($newestVersion, $installedVersion)) {
+            return MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE)->withLatest(new Latest($newestVersion, $context->lastStableReleased(), false, null, null), null);
+        }
+        $highest = $context->rows()[0] ?? null;
+        if ($highest !== null && self::isAboveVersion($highest->highest(), $installedVersion)) {
+            $released = $highest->highestReleased();
 
-        return MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE)->withLatest(new Latest($version, $released, ltrim($version, 'vV') === ltrim($installedVersion, 'vV'), null, null), null);
+            return MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE)->withLatest(new Latest($highest->highest(), $released === null ? null : $released->format(\DATE_ATOM), false, null, null), null);
+        }
+        // No tag above the installed one, so the installed release is the newest, with the date that S5 judges.
+        $s5 = $context->finding()->signalData(OldPromiseData::class);
+
+        return MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE)->withLatest(new Latest($installedVersion, $s5 === null ? null : $s5->released(), true, null, null), null);
     }
 
     /**
@@ -191,6 +206,17 @@ final class MaintenanceMove
         }
 
         return MoveDraft::of(Move::NO_MOVE, FlagSet::CAPPED)->withReason('no_release_admits');
+    }
+
+    /** A version that does not parse counts as above: the move then names it, as S6 does. */
+    private static function isAboveVersion(string $version, string $installed): bool
+    {
+        $parser = new VersionParser();
+        try {
+            return Comparator::greaterThan($parser->normalize($version), $parser->normalize($installed));
+        } catch (\UnexpectedValueException $e) {
+            return true;
+        }
     }
 
     private static function after(?\DateTimeImmutable $released, ?\DateTimeImmutable $ga): bool

@@ -185,7 +185,7 @@ names what to read for each report-1 field that report-2 removes or redefines.
 | `.no_fix_expected`, S9's `fixed_by` and `fixed_on_branch` | `.security` and the `fix` of each S9 row |
 | `.libyears.total` | the same key. It is the rounded sum of the findings' `libyears` |
 | `.libyears_unmeasured == "metadata_unavailable"` | `.libyears_unmeasured == "unavailable" or .libyears_unmeasured == "not_found"` |
-| `.libyears_unmeasured == "no_stable_release_date"` | `shared_commit`, `undated`, `no_stable_release` or `undated_releases`, the ids that `age` uses for the same cause |
+| `.libyears_unmeasured == "no_stable_release_date"` | `shared_commit`, `parent_split`, `undated`, `no_stable_release` or `undated_releases`, the ids that `age` uses for the same cause |
 | S9's `.severity == null` | `.severity == "unrated"`. `moderate` reads `medium`, and `.severity_published` keeps Composer's word |
 | S4's `.data` (`last_push`, `repo`, `host`, `years`) | the same keys, plus `forge` and `event` (`push` or `commit`) |
 | explain-1's `.activity`, `.target_php`, `.project_php`, `.thresholds` | explain-2's `.finding.activity`, `.run.target_php`, `.run.project_php`, `.run.thresholds`. `.finding.activity` is an object on every finding: read its `status` where explain-1's `.activity` was null |
@@ -334,7 +334,7 @@ findings, by what `run` says.
 | `standing` | object | `{known, new, worsened, none}`: the findings that reach a value, by their `baseline.status`. `none` counts a null `baseline`. The four counts add up to `reaching` |
 | `failing_packages` | array | The `package` of each finding whose `gate.fails` is true, in `findings` order. It holds as many package names as `failing` counts, so it is empty in a `generate_baseline` run |
 | `failing_by` | array | `{value, failing}` per value of `run.gates`, zero counts included |
-| `not_applied` | array | `{check, packages, reason}` per gap that a grade or `vulnerable` value could not read: advisories that lockrot did not check |
+| `not_applied` | array | `{check, packages, reason}` per gap of packages whose advisories lockrot did not check (`unchecked`). A vulnerable finding whose lookup was partial has no entry: it shows as `security.check` `partial` |
 | `text` | string | The [`gate:` line](ci.md#reading-the-gate-line): prose, not contract |
 
 Each finding's `gate`:

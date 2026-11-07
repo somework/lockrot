@@ -49,14 +49,19 @@ final class CaseRecording
     private Report $report;
     private Analysis $analysis;
     private Finding $finding;
+    /** The report and finding before the baseline: `--explain` reads no baseline. */
+    private Report $unbaselined;
+    private Finding $unbaselinedFinding;
 
     /** @param array<mixed, mixed> $case */
-    private function __construct(array $case, Report $report, Analysis $analysis, Finding $finding)
+    private function __construct(array $case, Report $report, Analysis $analysis, Finding $finding, Report $unbaselined, Finding $unbaselinedFinding)
     {
         $this->case = $case;
         $this->report = $report;
         $this->analysis = $analysis;
         $this->finding = $finding;
+        $this->unbaselined = $unbaselined;
+        $this->unbaselinedFinding = $unbaselinedFinding;
     }
 
     /**
@@ -99,13 +104,20 @@ final class CaseRecording
         if ($checks !== null && $moveCheck !== null) {
             $report = $report->withMoveChecks($moveCheck, UpdateNow::of($report->sorted(), $checks));
         }
+        $unbaselined = $report;
         $baseline = self::baselineOf(JsonPath::stringAt($case, ['id']));
         if ($baseline !== null) {
             $report = $report->withBaseline(BaselineComparison::compare($baseline, $report, self::BASELINE_PATH, [$package]));
         }
+
+        return new self($case, $report, $analysis, self::findingOf($report, $package), $unbaselined, self::findingOf($unbaselined, $package));
+    }
+
+    private static function findingOf(Report $report, string $package): Finding
+    {
         foreach ($report->findings() as $written) {
             if ($written->package() === $package) {
-                return new self($case, $report, $analysis, $written);
+                return $written;
             }
         }
         throw new \LogicException('the report lost the finding of '.$package);
@@ -163,7 +175,7 @@ final class CaseRecording
         if ($facts === null || $run === null) {
             throw new \LogicException('no facts or run for '.$this->finding->package());
         }
-        $explanation = new Explanation($this->finding, $facts, $this->thresholds(), $run->targetPhp(), $this->report, $this->projectPhp());
+        $explanation = new Explanation($this->unbaselinedFinding, $facts, $this->thresholds(), $run->targetPhp(), $this->unbaselined, $this->projectPhp());
 
         return (new ExplainFormatter())->json($explanation);
     }

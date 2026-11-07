@@ -254,7 +254,7 @@ export type ActivityReason2 = "repository_not_found";
 /** closed set at #/definitions/activity/anyOf/2/properties/status */
 export type ActivityStatus4 = "not_read";
 /** open set at #/definitions/installedUnmeasured */
-export type InstalledUnmeasured = "branch_snapshot" | "shared_commit" | "undated" | (string & {});
+export type InstalledUnmeasured = "branch_snapshot" | "shared_commit" | "parent_split" | "undated" | (string & {});
 /** open set at #/definitions/releaseUnmeasured */
 export type ReleaseUnmeasured = "not_from_composer_repository" | "unavailable" | "not_found" | "no_stable_release" | "undated_releases" | (string & {});
 /** open set at #/definitions/branchReleaseUnmeasured */
@@ -262,7 +262,7 @@ export type BranchReleaseUnmeasured = "not_from_composer_repository" | "unavaila
 /** open set at #/definitions/pushUnmeasured */
 export type PushUnmeasured = "allowlisted" | "not_from_composer_repository" | "no_repository" | "host_not_supported" | "repository_not_found" | "offline" | "install_time_budget" | "no_token" | "anonymous_budget" | "rate_limit" | "fetch_failed" | "undated" | (string & {});
 /** open set at #/definitions/libyearsUnmeasured */
-export type LibyearsUnmeasured = "not_from_composer_repository" | "unavailable" | "not_found" | "branch_snapshot" | "shared_commit" | "undated" | "no_stable_release" | "undated_releases" | (string & {});
+export type LibyearsUnmeasured = "not_from_composer_repository" | "unavailable" | "not_found" | "branch_snapshot" | "shared_commit" | "parent_split" | "undated" | "no_stable_release" | "undated_releases" | (string & {});
 /** open set at #/definitions/depthUnmeasured */
 export type DepthUnmeasured = "unreached" | "no_composer_json" | (string & {});
 /** closed set at #/definitions/ageLevel/oneOf/0 */

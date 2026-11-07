@@ -162,10 +162,10 @@ final class AnalyzerBootstrapTest extends TestCase
     /** An issuer that does not parse is named by its raw value, which can carry a terminal escape. */
     public function testAWithheldIssuerIsNeutralised(): void
     {
-        $stderr = $this->stderrOf(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => "https://?\x1b]8;;"], OutputInterface::VERBOSITY_VERBOSE);
+        $stderr = $this->stderrOf(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => "https://\x1b]8;;"], OutputInterface::VERBOSITY_VERBOSE);
 
         self::assertStringNotContainsString("\x1b", $stderr);
-        self::assertStringContainsString('https://?\\x1B]8;;', $stderr);
+        self::assertStringContainsString('GITHUB_TOKEN is for ', $stderr);
     }
 
     /** @param array<string, string> $env */

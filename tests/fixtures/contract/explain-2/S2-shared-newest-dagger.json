@@ -293,7 +293,7 @@
         "releases_listed": 10,
         "has_stable_release": true,
         "last_stable_release": null,
-        "last_stable_version": null,
+        "last_stable_version": "2.14.1",
         "last_stable_dated_by": null,
         "installed_release": "2022-03-05T18:15:28+00:00",
         "installed_release_dated_by": null,

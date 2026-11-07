@@ -1378,49 +1378,6 @@
             "newest": null,
             "constraint": null,
             "latest": {
-                "version": "0.9.0",
-                "released": "2025-03-01T00:00:00+00:00",
-                "is_installed": false,
-                "relation": null,
-                "snapshot_time": null
-            },
-            "php_check": null,
-            "crosses_major": null,
-            "held_by": [],
-            "clears": [],
-            "unverified": [],
-            "adds": [],
-            "leaves": [
-                {
-                    "kind": "flag",
-                    "id": "old-promise"
-                }
-            ],
-            "clears_all": false,
-            "if_applied": null,
-            "check": null,
-            "moves_with": [],
-            "composer_moves_because": [],
-            "commands": [],
-            "through": [],
-            "also": [],
-            "text": "test it on PHP 8.4"
-        }
-    },
-    "old-promise with an undated release": {
-        "next_step": {
-            "kind": "test",
-            "source": "old-promise",
-            "merged": [],
-            "fix_kind": null,
-            "reason": null,
-            "replacement": null,
-            "quiet_years": null,
-            "to_branch": null,
-            "version": null,
-            "newest": null,
-            "constraint": null,
-            "latest": {
                 "version": "1.0.0",
                 "released": "2019-01-01T00:00:00+00:00",
                 "is_installed": true,
@@ -1448,6 +1405,49 @@
             "through": [],
             "also": [],
             "text": "test it on PHP 8.4 \u2014 1.0.0 is its newest release"
+        }
+    },
+    "old-promise with an undated release": {
+        "next_step": {
+            "kind": "test",
+            "source": "old-promise",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "1.5.0",
+                "released": null,
+                "is_installed": false,
+                "relation": null,
+                "snapshot_time": null
+            },
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "test it on PHP 8.4"
         }
     },
     "old-promise with a release on the ga day": {

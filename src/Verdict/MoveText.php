@@ -375,7 +375,8 @@ final class MoveText
         if ($check === null || $requires === null) {
             return '';
         }
-        $text = '; '.$move->toBranch().' needs php '.$requires;
+        $latest = $move->latest();
+        $text = '; '.($move->toBranch() ?? ($latest === null ? '' : $latest->version())).' needs php '.$requires;
         if ($check->projectAllows() === true) {
             $text .= ', which require.php allows';
         } elseif ($check->raiseSize() !== null) {

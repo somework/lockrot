@@ -164,7 +164,7 @@ S6's evidence reads the same whether or not the package ever released. Its `data
 | `version` | The installed version, as the lock writes it |
 | `reason` | `branch_snapshot` when the installed version is a branch (checked first), `no_stable_release` when it is not and the repository lists no tagged version. An [open set](schema.md#open-sets) |
 | `has_stable_release` | Whether the repository lists any tagged version. A pre-release counts, a branch does not. Null when lockrot loaded no repository metadata for the package (a `vcs` or `path` entry, a package the repository does not list, metadata that did not load) |
-| `last_stable_release`, `last_stable_version` | The newest *dated* tagged release, which is not always the highest tag. Null with no tagged release, with no metadata, or when the highest tag has no date lockrot trusts and no [monorepo parent](#dates-from-the-monorepo) dates it |
+| `last_stable_release`, `last_stable_version` | The newest *dated* tagged release, a pre-release included, which is not always the highest tag. Both are null with no tagged release or with no metadata. `last_stable_release` is null, and `last_stable_version` set, in two cases that no [monorepo parent](#dates-from-the-monorepo) dates. When the highest tag has no date that lockrot trusts, the version is that tag. When the newest date is a shared commit's on a lower tag, the version is that lower tag. A set `last_stable_release` implies a set `last_stable_version` |
 | `last_stable_dated_by` | The monorepo parent that dated that release, else null |
 | `snapshot_time` | For a snapshot, the lock's `time`: the date of the commit the branch pointed at, not a release. Null for `no_stable_release`, and when the lock entry has no `time` |
 | `tag_relation` | How the newest tag compares with the snapshot: `older`, `newer` or `same`, else null. An [open set](schema.md#open-sets) |
@@ -435,7 +435,9 @@ request on it.
   the lock's shared-commit `time` for [libyears](#libyears), `age.installed` and
   [S5](#old-promise). `--explain` prints
   it as `installed release` (`installed_release_dated_by` in JSON). Where it does not, the
-  package is unmeasured.
+  package is unmeasured. The reason is `shared_commit` when the installed tag shares its commit.
+  Else it is `parent_split`: a parent dates the newest release of the split, so the lock time of
+  the installed tag is not a release date.
 
 - A branch the parent does not have, or does not date either, stays unmeasured, as does every
   branch in an install-time run that has spent its [budget](install-time.md#time-budget).
@@ -689,7 +691,17 @@ writes the move as `next_step`. Abridged from a recorded run on wallabag's lock:
   That php decides between `tag` and `blocked`, and the `old-promise` and `capped`
   facts of the move read it. The move adds `old-promise` only when that tag declares `require.php`.
   A `blocked` move to a tag names the php of the tag, and a `blocked` move with no tag names the
-  branch's `php`.
+  branch's `php`. With only pre-release tags, the move targets the pre-release that S6 names, with
+  `to_branch` null. Its `php_check` reads that pre-release's own `require.php`, and the line names
+  the release where a branch move names its branch.
+
+- **The release of a test.** `latest` of a `test` move is the first of these that applies:
+
+    1. S6's `last_stable_version`, when it is above the installed version.
+    2. The highest stable tag, with its own trusted date or null, when it is above the installed
+       version.
+    3. The installed release, with `is_installed` true and the date that [S5](#old-promise) reads
+       for it.
 
 - **What it clears.** `next_step.clears[]` names only what lockrot checked for every version the
   constraint admits. `unverified[]` names what it could not check, and `leaves[]` what the move
@@ -720,13 +732,16 @@ writes the move as `next_step`. Abridged from a recorded run on wallabag's lock:
   still refuses the lock itself: the moves_not_checked note names the first cause." The run note
   [`moves_not_checked`](notes.md#moves_not_checked) names the cause of Composer's first problem.
 
-The `update now:` footer line lists every package whose `update` move Composer's solver resolves
-with the constraint inline, with one command for all of them.
+The `update now:` footer line lists the Update now candidates of
+[The move check](#the-move-check) whose `update` move Composer's solver resolves with the constraint
+inline. It gives one command for all of them.
 
 The table, markdown, github, gitlab and sarif formats, `--explain` and the install-time block print
 each command in its POSIX form, for a POSIX shell. `commands[]` carries the argv of each command for
-other shells. For cmd.exe or PowerShell, render `commands[]` as
-[The move](schema.md#the-move) shows, or use the copy menu of the html page. The gitlab report
+other shells. A Windows shell user takes the command from the copy menu of the html page, or quotes
+it for that shell. A pasted POSIX line can lose the caret of `package:^X` and pin the exact version
+with no error. For cmd.exe or PowerShell, render `commands[]` as [The move](schema.md#the-move)
+shows. The gitlab report
 carries no run notes, so read the `moves_not_checked` note that a move points at in another
 format.
 
@@ -998,7 +1013,9 @@ How lockrot reads the window:
 - A known minor is a PHP minor whose GA date is on or before the run's date. A known minor is in
   `minors` when every requirement admits its newest patch (`8.4.99`) and no conflict matches it.
 - lockrot reads the target's minor at the PHP that [the move check](#the-move-check) solves at
-  instead, and `target.php` holds that PHP. lockrot reads `config.platform.php` from Composer's
+  instead, and `target.php` holds that PHP. `target.php` and `lower_edge.php` show the X.Y.Z
+  release of a pin such as `v8.4.1`, `8.4.1-p1` or `8.4.1.2`. In the target's minor, that pin
+  is the lower edge when no X.Y.Z below it installs the lock. lockrot reads `config.platform.php` from Composer's
   config, the global `config.json` included, also in a run that checks no move. A cap inside a minor, such as `<8.4.5`, leaves that minor out.
 - When the set does not admit that PHP, the target's minor stays in the window if the set admits
   a later patch of that minor. So with `config.platform.php` 8.4.0, a patch floor such as
@@ -1297,7 +1314,7 @@ formats print only under `--all`, keeps its verdict and adds the same `checks mi
 | `repository_activity` | `host_not_supported` | The repository is on a host that lockrot cannot ask ([host note](notes.md#repository_activity_host_not_supported)) | S3, S4 |
 | `repository_activity` | `not_from_composer_repository` | The package comes from vcs, or from an origin that lockrot cannot tell: lockrot asks no host for it | S3, S4 |
 | `release_metadata` | `not_from_composer_repository` | The same origins: no Composer repository serves its releases | S2, S8. S11 too when S11 fires: a [capped](#capped) package then has `admits_newest` unread |
-| `release_dates` | `undated_releases` | A release that S2, S5 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it. The summary gives one clause per cause. A cause is an undated lock entry, an installed tag on a shared commit, or a release that S2 or S8 reads with no date or with the date of a commit that its tags share. That release is the newest stable release, the installed branch's newest release, a higher branch's highest tag, or its newest release on a shared commit | S2 when the newest stable release has no trusted date (an undated highest tag, or a shared-commit date). S5 when the installed release is undated, its lock date is before the GA of the target's major or absent, and the other two [S5 conditions](#old-promise) hold. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch is untrusted, the installed branch has no release for `release-warn-years`, and S8 did not fire. A higher branch is untrusted when its release is undated, or when only a shared commit past `release-warn-years` dates it. Never S8 on a branch snapshot, which has no release branch |
+| `release_dates` | `undated_releases` | A release that S2, S5 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it. The summary gives one clause per cause. One cause is an undated lock entry. Another is an installed tag on a shared commit, or an installed tag of a split whose newest release a parent dates. A release that S2 or S8 reads is a cause when it has no date or the date of a commit that its tags share. That release is the newest stable release, the installed branch's newest release, a higher branch's highest tag, or its newest release on a shared commit | S2 when the newest stable release has no trusted date (an undated highest tag, or a shared-commit date). S5 when the installed release is undated, its lock date is before the GA of the target's major or absent, and the other two [S5 conditions](#old-promise) hold. S8 when the installed branch's release is undated and a higher branch exists. The exception is an installed version above every listed stable release of its branch. S8 also when a higher branch is untrusted and the installed branch has no release for `release-warn-years`, if S8 did not fire. A higher branch is untrusted when its release is undated, or when only a shared commit past `release-warn-years` dates it. Never S8 on a branch snapshot, which has no release branch |
 | `advisories` | `offline`, `install_time_budget`, `lookup_failed`, `no_feed`, `composer_json_invalid` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
 | `releases` | `releases_unknown` | A counted advisory's fix is unknown because the package's release data did not come | S9 |
 
@@ -1350,8 +1367,9 @@ The skips of `checks_skipped[]`:
   `not_found` or `not_read`, the `reason` when it did not read, the host and the repository, and
   whether the host marks the repository archived.
 
-- `--fail-on=unchecked` fails the run on any finding that carries S10. It catches a workflow that
-  does not pass `GITHUB_TOKEN` to lockrot ([ci.md](ci.md#what-unchecked-fails-on)).
+- `--fail-on=unchecked` fails the run on a finding that carries S10 and that the baseline does not
+  exempt. It catches a workflow that does not pass `GITHUB_TOKEN` to lockrot
+  ([ci.md](ci.md#what-unchecked-fails-on)).
 
 ## Libyears
 
@@ -1385,7 +1403,7 @@ applies:
 | `not_from_composer_repository` | lockrot asked for no metadata: a `path`, `vcs`, `artifact` or inline `package` entry, or a `type: composer` repository that advertises no notify URL. The finding's `from_composer_repository` is false |
 | `unavailable`, `not_found` | lockrot asked for metadata and did not get it, or the repository does not list the package. Equal to `metadata.status` |
 | `branch_snapshot` | The installed version is a branch (`dev-main`, `2.x-dev`): it has a commit date, not a release date, and `pinned` already says what there is to say |
-| `shared_commit`, `undated` | The installed release has no date lockrot trusts: its commit carries other tags, or the lock entry has no `time`. The same ids as `age.installed_unmeasured` |
+| `shared_commit`, `parent_split`, `undated` | The installed release has no date lockrot trusts: its commit carries other tags, a parent dates the newest release of its split, or the lock entry has no `time`. The same ids as `age.installed_unmeasured` |
 | `no_stable_release` | The package has no tagged release |
 | `undated_releases` | The package has tagged releases, and no release above the installed one has a trusted date. `age.release_unmeasured` uses the same id when the highest stable tag has no trusted date, also when older tags have one |
 

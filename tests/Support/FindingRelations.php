@@ -176,8 +176,8 @@ final class FindingRelations
             $out[] = 'score.model is run.score_model.id';
         }
         $cause = self::stringOrNull($f, ['libyears_unmeasured']);
-        if (\in_array($cause, ['shared_commit', 'undated'], true) && self::stringOrNull($f, ['age', 'installed_unmeasured']) !== $cause) {
-            $out[] = 'a libyears_unmeasured of shared_commit or undated is age.installed_unmeasured';
+        if (\in_array($cause, ['shared_commit', 'parent_split', 'undated'], true) && self::stringOrNull($f, ['age', 'installed_unmeasured']) !== $cause) {
+            $out[] = 'a libyears_unmeasured of shared_commit, parent_split or undated is age.installed_unmeasured';
         }
         $flagIds = JsonPath::column($f, ['flags'], 'id');
         if (\count($flagIds) !== \count(array_unique($flagIds, \SORT_REGULAR))) {

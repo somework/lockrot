@@ -123,8 +123,8 @@ report-3 and lockrot 2.0. [verdicts.md](verdicts.md#the-nine-verdicts) says what
 
 The order decides:
 
-- `--fail-on`: a finding fails the run at or above a grade, at or above a flag in flag order, or
-  with an advisory at or above a severity ([ci.md](ci.md)).
+- `--fail-on`: a finding that the baseline does not exempt fails the run at or above a grade, at or
+  above a flag in flag order, or with an advisory at or above a severity ([ci.md](ci.md)).
 - The baseline: a finding is `worsened` when a flag above the recorded ones fires, an advisory is
   new, or a known one is rated higher or loses its fix ([baseline.md](baseline.md)).
 - The report's order: verdict, then the security part of the score, then the score, then direct

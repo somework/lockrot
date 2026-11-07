@@ -29,7 +29,7 @@ When lockrot runs in a container, pass `-e GITHUB_SERVER_URL` with `-e GITHUB_TO
 ([Which credentials](internals.md#which-credentials)).
 
 `--fail-on` takes a comma-separated list, at most one value of each kind. A finding fails the run
-when it reaches any value of the list:
+when it reaches a value of the list and the baseline does not exempt it:
 
 | Fail the build on | Value | Kind |
 |---|---|---|
@@ -115,7 +115,9 @@ repository host becomes a [run note](notes.md), and the checks it blocked count 
 ([S10](verdicts.md#what-was-not-checked)). With `--strict-network`, a run note whose
 `sets_network_failures` is true makes the run exit `1`. That includes an `--offline` run where a
 locked package has no cached metadata. To fail on the missing checks themselves, use
-`--fail-on=unchecked`.
+`--fail-on=unchecked`. Known limit: when a metadata fetch fails and Composer serves its cached
+copy, lockrot writes no note, so `--strict-network` does not fail. Composer prints its "may be out
+of date" warning on stderr.
 
 **A vulnerable package exits `1` when its verdict reaches a grade value, or an advisory's severity
 reaches a `vulnerable` value.** An advisory adds its points to the score
@@ -159,9 +161,11 @@ gate: fails · --fail-on=high · 42 findings fail it · target php 8.4 (--target
   `1 finding fails it (left-behind 1, vulnerable-high 1)`. Findings that the baseline exempts are
   counted apart: `1 reaches it and the baseline exempts it`.
 - `--strict-network: a lookup failed` when `--strict-network` tripped.
-- One clause per gap that the gate could not read: `advisories not applied to 6 packages: not
-  checked (offline)`. A grade or `vulnerable` value cannot fail on advisories that lockrot did not
-  check, and the clause says so.
+- One clause per gap of packages whose advisories lockrot did not check (`unchecked`):
+  `advisories not applied to 6 packages: not checked (offline)`. A grade or `vulnerable` value
+  cannot fail on those advisories, and the clause says so. A vulnerable finding whose lookup was
+  partial gets no clause: it shows as `security.check` `partial` with its run note. That note
+  sets whether `--strict-network` fails ([Run notes](notes.md)).
 - Last, the target PHP and its source. `(the running PHP)` says that nothing pinned it.
 
 The JSON report writes the line as `gate.text` and the gate data as fields: `gate.failing_by`

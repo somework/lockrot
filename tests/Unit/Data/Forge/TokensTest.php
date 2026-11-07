@@ -145,6 +145,90 @@ final class TokensTest extends TestCase
         self::assertSame(['GITHUB_TOKEN' => 'https://'], Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => 'https://'], null)->withheld());
     }
 
+    public function testAnUnparseableIssuerWithCredentialsIsWithheldWithoutThem(): void
+    {
+        $withheld = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => 'https://ci:SECRETVALUE@ghe.example:99999'], null)->withheld();
+
+        self::assertArrayHasKey('GITHUB_TOKEN', $withheld);
+        self::assertStringNotContainsString('SECRETVALUE', $withheld['GITHUB_TOKEN']);
+
+        $bare = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GH_HOST' => 'ci:SECRETVALUE@ghe.example:99999'], null)->withheld();
+        self::assertStringNotContainsString('SECRETVALUE', $bare['GITHUB_TOKEN']);
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function issuersWithASlashInThePassword(): iterable
+    {
+        yield 'with a scheme' => ['GITHUB_SERVER_URL', 'https://ci:SE/CRET@ghe.example:99999'];
+        yield 'without a scheme' => ['GH_HOST', 'ci:SE/CRET@ghe.example:99999'];
+        yield 'a scheme separator in the password' => ['GH_HOST', 'ci:CRET://x@ghe.example:99999'];
+        yield 'a password that parses as a port' => ['GITHUB_SERVER_URL', 'https://ci:12/CRET@ghe.example:99999'];
+    }
+
+    public function testAnUnparseableIssuerKeepsNoQueryOrPath(): void
+    {
+        $withheld = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => 'https://ghe.example:99999/x?private_token=SECRET#f'], null)->withheld();
+
+        self::assertSame(['GITHUB_TOKEN' => 'https://ghe.example:99999'], $withheld);
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function unparseableIssuersWithUserinfo(): iterable
+    {
+        yield 'a user and a password' => ['https://ci:SECRETVALUE@ghe.example:99999', 'https://ghe.example:99999'];
+        yield 'an empty userinfo' => ['https://@ghe.example:99999', 'https://ghe.example:99999'];
+        yield 'a scheme in capitals' => ['HTTPS://ci:SECRETVALUE@ghe.example:99999', 'HTTPS://ghe.example:99999'];
+    }
+
+    /**
+     * @dataProvider unparseableIssuersWithUserinfo
+     */
+    #[DataProvider('unparseableIssuersWithUserinfo')]
+    public function testAnUnparseableIssuerIsWithheldAsItsSchemeAndAuthority(string $issuer, string $expected): void
+    {
+        self::assertSame(['GITHUB_TOKEN' => $expected], Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => $issuer], null)->withheld());
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function issuersWithThePublicHostAfterAnAt(): iterable
+    {
+        yield 'in the path' => ['GITHUB_SERVER_URL', 'https://ghe.corp/@github.com'];
+        yield 'in the query' => ['GITHUB_SERVER_URL', 'https://ghe.corp?x=@github.com'];
+        yield 'in the fragment of a bare host' => ['GH_HOST', 'ghe.corp#@github.com'];
+    }
+
+    /**
+     * @dataProvider issuersWithThePublicHostAfterAnAt
+     */
+    #[DataProvider('issuersWithThePublicHostAfterAnAt')]
+    public function testAnIssuerIsWithheldWhenItsHostIsNotPublicInEitherReadingOfItsAt(string $variable, string $issuer): void
+    {
+        $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'SECRET', $variable => $issuer], null);
+
+        self::assertNull($tokens->github());
+        self::assertArrayHasKey('GITHUB_TOKEN', $tokens->withheld());
+    }
+
+    public function testAnIssuerWithUserinfoIsJudgedByItsHost(): void
+    {
+        $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => 'https://ci:12/CRET@ghe.example.com'], null);
+
+        self::assertNull($tokens->github());
+        self::assertSame(['GITHUB_TOKEN' => 'ghe.example.com'], $tokens->withheld());
+    }
+
+    /**
+     * @dataProvider issuersWithASlashInThePassword
+     */
+    #[DataProvider('issuersWithASlashInThePassword')]
+    public function testAnUnparseableIssuerKeepsNoPasswordThatHoldsASlash(string $variable, string $issuer): void
+    {
+        $withheld = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', $variable => $issuer], null)->withheld();
+
+        self::assertStringNotContainsString('CRET', $withheld['GITHUB_TOKEN']);
+        self::assertStringContainsString('ghe.example:99999', $withheld['GITHUB_TOKEN']);
+    }
+
     public function testLockrotsOwnGitlabTokenHasNoIssuerCheck(): void
     {
         $tokens = Tokens::fromEnvironment(['LOCKROT_GITLAB_TOKEN' => 'a', 'GITLAB_TOKEN' => 'g', 'CI_SERVER_URL' => 'https://gitlab.example.com'], null);

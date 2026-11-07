@@ -59,6 +59,7 @@ final class LibyearsTest extends TestCase
         yield 'a branch with metadata' => [self::package('dev-main'), $latest, null, null, Libyears::BRANCH_SNAPSHOT, false];
         yield 'a branch the lock does not date' => [self::package('2.x-dev', null), $latest, null, null, Libyears::BRANCH_SNAPSHOT, false];
         yield 'the installed tag on a shared commit' => [self::package(), self::splitPackage([], null), null, null, Libyears::SHARED_COMMIT, false];
+        yield 'the installed tag on its own commit in a split that a parent dates' => [self::package(), self::splitPackage([], 'laravel/framework', []), null, null, Libyears::PARENT_SPLIT, false];
         yield 'a lock entry without a time' => [self::package('v5.13.2', null), $latest, null, null, Libyears::UNDATED, false];
         yield 'stable releases, none dated, and nothing dated above' => [self::package(), self::metadata(null), null, null, Libyears::UNDATED_RELEASES, false];
         yield 'only pre-releases, installed at a dated one' => [self::package('1.0.0-beta3'), self::preReleasesOnly(), null, null, Libyears::NO_STABLE_RELEASE, false];
@@ -104,7 +105,7 @@ final class LibyearsTest extends TestCase
         $installed = $age->installed($facts)->unmeasured();
         $release = $age->release($facts, $whyNoMetadata)->unmeasured();
 
-        if (\in_array($reason, [Libyears::BRANCH_SNAPSHOT, Libyears::SHARED_COMMIT, Libyears::UNDATED], true)) {
+        if (\in_array($reason, [Libyears::BRANCH_SNAPSHOT, Libyears::SHARED_COMMIT, Libyears::PARENT_SPLIT, Libyears::UNDATED], true)) {
             self::assertSame($installed, $reason, 'the installed end');
         }
         if (\in_array($reason, [Libyears::NO_STABLE_RELEASE, Libyears::UNDATED_RELEASES, Libyears::NOT_FROM_COMPOSER_REPOSITORY, Libyears::UNAVAILABLE, Libyears::NOT_FOUND], true)) {
@@ -170,7 +171,7 @@ final class LibyearsTest extends TestCase
         $block = Libyears::fromFindings($findings);
 
         self::assertSame(array_merge(array_fill_keys(Libyears::REASONS, 0), array_count_values($reasons)), $block->unmeasured());
-        self::assertSame(['not_from_composer_repository' => 0, 'unavailable' => 0, 'not_found' => 1, 'branch_snapshot' => 2, 'shared_commit' => 0, 'undated' => 0, 'no_stable_release' => 0, 'undated_releases' => 0], $block->unmeasured());
+        self::assertSame(['not_from_composer_repository' => 0, 'unavailable' => 0, 'not_found' => 1, 'branch_snapshot' => 2, 'shared_commit' => 0, 'parent_split' => 0, 'undated' => 0, 'no_stable_release' => 0, 'undated_releases' => 0], $block->unmeasured());
         self::assertSame(2, $block->measured());
     }
 
@@ -426,6 +427,7 @@ final class LibyearsTest extends TestCase
             Libyears::NOT_FOUND => 1,
             Libyears::BRANCH_SNAPSHOT => 2,
             Libyears::SHARED_COMMIT => 1,
+            Libyears::PARENT_SPLIT => 0,
             Libyears::UNDATED => 1,
             Libyears::NO_STABLE_RELEASE => 1,
             Libyears::UNDATED_RELEASES => 1,

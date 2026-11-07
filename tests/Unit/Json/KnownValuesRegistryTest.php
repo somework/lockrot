@@ -92,7 +92,7 @@ final class KnownValuesRegistryTest extends TestCase
             '#/definitions/s8/properties/floor_source/oneOf/0' => [$floors, 'PhpFloor'],
             '#/definitions/s9fix/properties/reason/oneOf/0' => [$fixReasons, 'Fix'],
             '#/definitions/libyearsUnmeasured' => [Libyears::REASONS, 'Libyears'],
-            '#/definitions/installedUnmeasured' => [[AgeMeasure::BRANCH_SNAPSHOT, AgeMeasure::SHARED_COMMIT, AgeMeasure::UNDATED], 'AgeMeasure'],
+            '#/definitions/installedUnmeasured' => [[AgeMeasure::BRANCH_SNAPSHOT, AgeMeasure::SHARED_COMMIT, AgeMeasure::PARENT_SPLIT, AgeMeasure::UNDATED], 'AgeMeasure'],
             '#/definitions/releaseUnmeasured' => [[AgeMeasure::NOT_FROM_COMPOSER_REPOSITORY, AgeMeasure::UNAVAILABLE, AgeMeasure::NOT_FOUND, AgeMeasure::NO_STABLE_RELEASE, AgeMeasure::UNDATED_RELEASES], 'AgeMeasure'],
             '#/definitions/branchReleaseUnmeasured' => [[AgeMeasure::NOT_FROM_COMPOSER_REPOSITORY, AgeMeasure::UNAVAILABLE, AgeMeasure::NOT_FOUND, AgeMeasure::BRANCH_SNAPSHOT, AgeMeasure::NO_BRANCH_ROW, AgeMeasure::UNDATED_RELEASES, AgeMeasure::ABOVE_LISTED_RELEASES], 'AgeMeasure'],
             '#/definitions/pushUnmeasured' => [[ActivityLookup::ALLOWLISTED, ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, ActivityLookup::NO_REPOSITORY, ActivityLookup::HOST_NOT_SUPPORTED, ActivityLookup::REPOSITORY_NOT_FOUND, NotCheckedRule::OFFLINE, NotCheckedRule::BUDGET, NotCheckedRule::NO_TOKEN, NotCheckedRule::RATE_BUDGET, NotCheckedRule::RATE_LIMIT, NotCheckedRule::FETCH_FAILED, AgeMeasure::UNDATED], 'AgeMeasure'],
