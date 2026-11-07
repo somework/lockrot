@@ -113,10 +113,8 @@ grows in minor releases. These are the ones that a reader meets most:
   `run.advisory_lookup.repositories[]`
 - in report-2, the `reason` of a move's `check`, of `run.move_check` and of
   `run.php_window.target_fix`
-- in report-2, the words of `run.score_model`, and the keys of `run.score_rules_used`: `counted`,
-  `lead-first`, `corroborating-share`, `advisory-points`, `no-reachable-fix-multiplier`,
-  `security-max`, `divide-reach`, `security-exempt-from-reach`, `sum`, `divide-dev`, `floor-once`,
-  `band-floors`, `zero-verdicts`, `sort`, `gate-bounded-new` and `baseline-cover`
+- in report-2, the words of `run.score_model`, and the keys of `run.score_rules_used`, the rule ids
+  of the score model ([The score](verdicts.md#score))
 - in report-2, the integers `divisor` of a maintenance score term, `multiplier` of the security
   term and `divide_by` of a modifier
 - the configuration's `format`, and format names wherever lockrot writes one.
