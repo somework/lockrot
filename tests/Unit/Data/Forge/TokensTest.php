@@ -83,6 +83,20 @@ final class TokensTest extends TestCase
         self::assertSame($withheld, $tokens->withheld());
     }
 
+    /** Under a Turkish locale, PHP 7.4 to 8.1 lower `I` in `GITHUB.COM` to a byte that is not `i`. */
+    public function testAnUpperCaseIssuerHostNamesGithubComUnderTheTurkishLocale(): void
+    {
+        $previous = setlocale(\LC_CTYPE, '0');
+        setlocale(\LC_CTYPE, 'tr_TR.ISO8859-9', 'tr_TR.ISO-8859-9', 'tr_TR', 'tr_TR.UTF-8');
+        try {
+            $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GH_HOST' => 'GITHUB.COM', 'GITHUB_SERVER_URL' => 'https://GITHUB.COM'], null);
+        } finally {
+            setlocale(\LC_CTYPE, (string) $previous);
+        }
+
+        self::assertSame(['b', []], [$tokens->github(), $tokens->withheld()]);
+    }
+
     /** @return iterable<string, array{array<string, string>, ?string, array<string, string>}> */
     public static function ghHosts(): iterable
     {

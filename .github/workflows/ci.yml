@@ -117,7 +117,7 @@ jobs:
         if: matrix.php == '7.4' && matrix.composer == 'latest'
         run: |
           sudo locale-gen tr_TR
-          vendor/bin/phpunit --fail-on-skipped --fail-on-empty-test-suite --filter 'testAnUpperCaseIParsesUnderTheTurkishLocale|testUpperCaseIsFoldedWithoutTheLocale|testLowerFoldsAnUpperCaseIUnderTheTurkishLocale'
+          vendor/bin/phpunit --fail-on-skipped --fail-on-empty-test-suite --filter 'testAnUpperCaseIParsesUnderTheTurkishLocale|testUpperCaseIsFoldedWithoutTheLocale|testLowerFoldsAnUpperCaseIUnderTheTurkishLocale|testAnUpperCaseIssuerHostNamesGithubComUnderTheTurkishLocale'
   # The tests rows exclude MoveCheckComposerOracleTest, or skip it on a composer/composer that
   # neither recorded train 7d's answers nor gave the same answers (ComposerOracle::SAME_ANSWERS).
   # The latest rows follow each new Composer release. This job runs the oracle test once on each of
