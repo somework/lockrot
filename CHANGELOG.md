@@ -316,20 +316,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **PHAR:** the archive restarts without Xdebug, as `composer` does, so a run with Xdebug loaded
-  is no slower than one without it. PHP errors go to stderr, and the locale is C. Action: to keep
-  Xdebug, set `COMPOSER_ALLOW_XDEBUG=1`. ([What the PHAR does](docs/phar.md#what-the-phar-does-and-does-not-do))
-- **Breaking:** **json:** `libyears.total` and `libyears.direct_requirements` sum the findings'
-  two-decimal values. 0.13 rounded the sum of the unrounded values, so a total can move by up to
-  0.05 on the upgrade with no data change. Action: reset a tracked baseline of `.libyears.total`
-  at the first 0.14 run. ([Libyears](docs/schema.md#libyears))
-- **Baseline:** a check run refuses a baseline-2 file whose `score_model_id` is not this lockrot's
-  score model, and exits 2 with a configuration error that names both ids. Action: run
-  `--generate-baseline`, or run the lockrot that wrote the file. `--generate-baseline` over it
-  writes this lockrot's id. ([Baseline](docs/baseline.md#a-baseline-from-a-newer-lockrot))
-- **All formats:** when Composer's `config.lock` is false, the move check is `not_checked` with
-  `lock_disabled`, and no move has a command. Composer refuses a partial update without a lock.
-  ([The move check](docs/verdicts.md#the-move-check))
+- **Breaking:** **json, table, markdown, github:** `libyears.total`, `libyears.direct_requirements`
+  and the `libyears:` footer sum the findings' two-decimal values. 0.13 rounded the sum of the
+  unrounded values, so a total can move by up to 0.05 on the upgrade with no data change. Action:
+  reset a tracked baseline of `.libyears.total` at the first 0.14 run.
+  ([Libyears](docs/schema.md#libyears))
 - **Breaking:** **gitlab, sarif:** one record per flag, plus one per advisory in SARIF. 0.13
   identities stay. SARIF `properties.verdict` is the grade, `signals` is `signal_ids`, `baseline` is
   `baseline_status`. A baseline-covered result carries `suppressions`. Action: guard on
@@ -407,6 +398,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   it off, the check skips each `packages-dev` package, even when Composer installs it and 0.13
   graded it. Action: generate the baseline with the `include-dev` setting that the install uses.
   ([Install-time summary](docs/install-time.md))
+- **PHAR:** the archive restarts without Xdebug, as `composer` does, so a run with Xdebug loaded
+  is no slower than one without it. PHP errors go to stderr, and the locale is C. Action: to keep
+  Xdebug, set `COMPOSER_ALLOW_XDEBUG=1`. ([What the PHAR does](docs/phar.md#what-the-phar-does-and-does-not-do))
+- **Baseline:** a check run refuses a baseline-2 file whose `score_model_id` is not this lockrot's
+  score model, and exits 2 with a configuration error that names both ids. Action: run
+  `--generate-baseline`, or run the lockrot that wrote the file. `--generate-baseline` over it
+  writes this lockrot's id. ([Baseline](docs/baseline.md#a-baseline-from-a-newer-lockrot))
+- **All formats:** when Composer's `config.lock` is false, the move check is `not_checked` with
+  `lock_disabled`, and no move has a command. Composer refuses a partial update without a lock.
+  ([The move check](docs/verdicts.md#the-move-check))
 - **Baseline:** when a `--generate-baseline` run reads a baseline-2 file, its reports compare
   with that file, as a check run does. They carry the root `baseline` and each finding's `baseline`.
   ([What --generate-baseline does](docs/baseline.md#what-generate-baseline-does))
