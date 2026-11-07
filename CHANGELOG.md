@@ -108,6 +108,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   name's stability admits dev, as Composer does. A repository with only that file no longer hides
   the tagged releases of a later repository, so an advisory fix that the solver refused can read
   `update` or `upgrade` instead of `blocked`. ([Move](docs/verdicts.md#move))
+- **All formats:** a resolving solve that uses a name that lockrot did not load gives `not_checked`
+  with `unloaded_name`, not `resolves`, so a move that read as checked can read as not checked.
+  ([The move check](docs/verdicts.md#the-move-check))
 
 ### Security
 
@@ -121,6 +124,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   sending the runner's token, when a setup step writes it into `github-oauth`. Action: if you put a github.com or gitlab.com token in
   `GITHUB_TOKEN` or `GITLAB_TOKEN` on such a runner, move it to `LOCKROT_GITHUB_TOKEN` or
   `LOCKROT_GITLAB_TOKEN`. ([Which credentials](docs/internals.md#which-credentials))
+- **CLI:** an issuer variable whose URL holds a backslash before `@` names no public host, so
+  lockrot withholds the ambient token from the public host. A browser and a URL parser read such a
+  URL as different hosts. ([Which credentials](docs/internals.md#which-credentials))
 - **Breaking:** **Baseline:** `--generate-baseline` refuses a baseline path named `composer.json`
   or `composer.lock`, a file that `COMPOSER` names, or a name with a colon or a trailing dot or
   space. It exits 2 on every OS, so it never writes over the project's Composer files. Action: if
@@ -144,7 +150,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** `next_step.commands`, `security.update_now_command`, the `update now:` line and
   the command in the `do:` line hold only arguments from one set that every shell quotes safely. A
   step with a version, branch or name from the lock or a repository outside it is left out, so a
-  hostile lock cannot inject into a pasted command. This affects a reader who copies these commands. Action: if a step is missing,
+  hostile lock cannot inject into a pasted command. A release name that holds `|`, `<` or `>` leaves
+  out the whole move's command, because cmd.exe and PowerShell run or redirect it. The run note
+  `command_argument_unsafe` counts such moves. This affects a reader who copies these commands. Action: if a step is missing,
   check that lock entry before you write the command by hand. ([The move](docs/schema.md#the-move))
 - **CLI:** a repository host's redirect to another origin no longer receives lockrot's
   `Authorization` or `PRIVATE-TOKEN` header. lockrot asks the redirect target again without it. A
@@ -314,6 +322,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   two-decimal values. 0.13 rounded the sum of the unrounded values, so a total can move by up to
   0.05 on the upgrade with no data change. Action: reset a tracked baseline of `.libyears.total`
   at the first 0.14 run. ([Libyears](docs/schema.md#libyears))
+- **All formats:** when Composer's `config.lock` is false, the move check is `not_checked` with
+  `lock_disabled`, and no move has a command. Composer refuses a partial update without a lock.
+  ([The move check](docs/verdicts.md#the-move-check))
 - **Breaking:** **gitlab, sarif:** one record per flag, plus one per advisory in SARIF. 0.13
   identities stay. SARIF `properties.verdict` is the grade, `signals` is `signal_ids`, `baseline` is
   `baseline_status`. A baseline-covered result carries `suppressions`. Action: guard on
@@ -369,8 +380,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   its own step. ([Exit codes](docs/ci.md#exit-codes))
 - **Breaking:** **CLI, Config, Install-time:** `--target-php` and `LOCKROT_TARGET_PHP` take a
   major, a minor or a patch with nothing after it. lockrot keeps only the minor: `8.4.2` is `8.4`.
-  Another value, such as `8.4-fpm`, exits 2 and names the setting. At install time the check is
-  skipped. 0.13 read the version at its start. Action: pass the version alone.
+  Another value, such as `8.4-fpm`, or a minor that is no PHP minor, exits 2 and names the
+  setting. At install time the check is skipped. 0.13 read the version at its start. Action: pass
+  a real PHP version alone.
   ([CLI options](docs/configuration.md#cli-options))
 - **Breaking:** **CLI:** a lock whose `packages`, `packages-dev`, `platform`, `platform-dev`,
   `platform-overrides` or `aliases` section Composer or lockrot cannot read, or that lists two
@@ -479,6 +491,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   as `cached_at` not null. ([Migrating](docs/schema.md#migrating-from-report-1))
 
 ### Fixed
+
+- **CLI:** only a real credential lifts the anonymous activity cap: a `github-oauth` token, a
+  bearer token, or an `Authorization` value in `http-basic` or `custom-headers`. A client
+  certificate or `custom-headers` without `Authorization` is anonymous, so the cap and the cause
+  `no_token` stay. ([Which credentials](docs/internals.md#which-credentials))
+- **CLI, Config:** `--fail-on` and `LOCKROT_FAIL_ON` values are case-insensitive under any locale.
+  ([CLI options](docs/configuration.md#cli-options))
+- **PHAR:** the archive ships the licence notices of its bundled libraries.
+  ([What the PHAR does](docs/phar.md#what-the-phar-does-and-does-not-do))
+- **CLI:** the `--explain` repository line words match what lockrot read.
+  ([Explaining one package](docs/configuration.md#explaining-one-package))
+- **CLI:** `--explain` prints an advisory id once.
+  ([Explaining one package](docs/configuration.md#explaining-one-package))
 
 - **All formats:** on Composer 2.11, lockrot still counts the advisories of a `dev-*` version and
   refuses a partial advisory record, as on 2.10. `composer audit` 2.11 skips the first and reports
