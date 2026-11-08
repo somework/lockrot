@@ -176,6 +176,21 @@ final class ComposerHttpClientTest extends TestCase
     }
 
     /**
+     * Composer before 2.11.1 adds every element of a custom-headers list, a non-string one included,
+     * so its Authorization header goes out and lockrot's own must go, or the request carries two.
+     */
+    public function testAnOlderComposerSendsACredentialFromAListWithANonStringElement(): void
+    {
+        $io = new BufferIO();
+        $io->setAuthentication('github.com', '["Authorization: Bearer theirs", 5]', 'custom-headers');
+        self::assertSame(self::WITHOUT_AUTHORIZATION, ComposerHttpClient::withoutRedundantAuthorization($io, self::config(), self::GITHUB, self::HEADERS, false));
+
+        $io = new BufferIO();
+        $io->setAuthentication('github.com', '["X-Api-Key: k", 5]', 'custom-headers');
+        self::assertSame(self::HEADERS, ComposerHttpClient::withoutRedundantAuthorization($io, self::config(), self::GITHUB, self::HEADERS, false), 'no credential header in the list');
+    }
+
+    /**
      * Two credential shapes make AuthHelper add no credential header — an SSL client certificate,
      * and custom headers without one — so lockrot's own token must stay, or the request goes out
      * anonymous while the cap is lifted.
@@ -196,7 +211,7 @@ final class ComposerHttpClientTest extends TestCase
 
         $io = new BufferIO();
         $io->setAuthentication('github.com', '["Authorization: Bearer theirs", 5]', 'custom-headers');
-        self::assertSame(self::HEADERS, self::strip($io, self::GITHUB, self::HEADERS), 'AuthHelper drops a list with a non-string element whole');
+        self::assertSame(self::HEADERS, ComposerHttpClient::withoutRedundantAuthorization($io, self::config(), self::GITHUB, self::HEADERS, true), 'Composer 2.11.1 and newer drop a list with a non-string element whole');
 
         $io = new BufferIO();
         $io->setAuthentication('github.com', '[" Authorization: Bearer theirs"]', 'custom-headers');
