@@ -41,6 +41,7 @@ final class PageGoldensTest extends TestCase
         'pagerfanta' => 'the hydrated lock holds pagerfanta/twig and the packages that its finding names, and the model\'s case document counts its one finding',
         'guzzle-mixed' => 'the hydrated lock holds guzzlehttp/guzzle and the packages that hold its moves, and the model\'s case document counts its one finding',
         'ok-unchecked' => 'the hydrated lock holds scheb/2fa-google-authenticator and the packages that its finding names, and the model\'s case document counts its one finding',
+        'platform-minor-excluded‡' => 'the hydrated lock holds scheb/2fa-bundle and the five scheb/2fa-* packages that its root requires, and the model\'s case document counts its one finding',
         'rounded-dev‡' => 'the hydrated lock holds jfcherng/php-color-output and the packages that its finding names, and the model\'s case document counts its one finding',
     ];
 

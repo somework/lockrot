@@ -588,7 +588,7 @@ deepest: hoa/ustring and hoa/zformat, 4 hops (wallabag/rulerz › hoa/ruler › 
 security: 2 vulnerable packages · 3 advisories: 1 high, 2 medium
 fix, by package: composer update 1 · upgrade 1
 update now: composer update 'phpseclib/phpseclib:^3.0.57'
-libyears: at least 264.2 behind across 265 of 271 packages · 132.7 from direct requirements ·
+libyears: at least 262.6 behind across 265 of 271 packages · 132.4 from direct requirements ·
 furthest behind sebastian/version 3.0.2 at 6.0
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · phpunit/phpunit 13 · wallabag/phpepub 5 ·
 friendsofphp/php-cs-fixer 3 · … and 27 more

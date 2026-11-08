@@ -1108,7 +1108,7 @@ deepest: hoa/ustring and hoa/zformat, 4 hops (kphoen/rulerz › hoa/ruler › ho
 security: 20 vulnerable packages · 64 advisories: 1 critical, 17 high, 30 medium, 3 unrated, 13 low ·
 packages-dev not checked (pass --dev)
 fix, by package: composer update 8 · upgrade 9 · php floor raise 2 · no fix 1
-libyears: at least 388.8 behind across 204 of 210 packages · 220.4 from direct requirements ·
+libyears: at least 387.2 behind across 204 of 210 packages · 220.2 from direct requirements ·
 furthest behind willdurand/jsonp-callback-validator v1.1.0 at 8.0
 pulled in by: kphoen/rulerz-bundle 15 · kphoen/rulerz 14 · wallabag/phpepub 5 · nelmio/api-doc-bundle 3 ·
 pagerfanta/doctrine-orm-adapter 3 · … and 31 more

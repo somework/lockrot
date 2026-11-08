@@ -1308,8 +1308,8 @@
         ]
     },
     "libyears": {
-        "total": 264.21,
-        "direct_requirements": 132.69,
+        "total": 262.56,
+        "direct_requirements": 132.41,
         "measured": 265,
         "at_least_count": 3,
         "unmeasured": {
@@ -8680,7 +8680,7 @@
             "evidence": "left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-06-08)",
             "allowlist_reason": null,
             "data_date": "2026-10-14T00:00:00+00:00",
-            "libyears": 4.43,
+            "libyears": 4.41,
             "age": {
                 "installed": {
                     "at": "2022-01-03T10:21:24+00:00",
@@ -30131,7 +30131,7 @@
             "evidence": "",
             "allowlist_reason": null,
             "data_date": "2026-10-14T00:00:00+00:00",
-            "libyears": 0.64,
+            "libyears": 0.51,
             "age": {
                 "installed": {
                     "at": "2025-10-21T15:21:39+00:00",
@@ -42881,7 +42881,7 @@
             "evidence": "",
             "allowlist_reason": null,
             "data_date": "2026-10-14T00:00:00+00:00",
-            "libyears": 1.82,
+            "libyears": 1.69,
             "age": {
                 "installed": {
                     "at": "2024-09-25T14:11:13+00:00",
@@ -48759,7 +48759,7 @@
             "evidence": "",
             "allowlist_reason": "intentionally empty package: PHP 7+ has random_bytes() built in",
             "data_date": "2026-10-14T00:00:00+00:00",
-            "libyears": 1.34,
+            "libyears": 0,
             "age": {
                 "installed": {
                     "at": "2020-10-15T08:29:30+00:00",
@@ -53053,7 +53053,7 @@
             "evidence": "",
             "allowlist_reason": null,
             "data_date": "2026-10-14T00:00:00+00:00",
-            "libyears": 0.88,
+            "libyears": 0.87,
             "age": {
                 "installed": {
                     "at": "2025-09-24T06:03:27+00:00",
@@ -53448,7 +53448,7 @@
             "evidence": "",
             "allowlist_reason": null,
             "data_date": "2026-10-14T00:00:00+00:00",
-            "libyears": 1,
+            "libyears": 0.98,
             "age": {
                 "installed": {
                     "at": "2025-08-10T06:57:39+00:00",

@@ -1,8 +1,8 @@
 {
     "apps/wallabag_wallabag": {
         "block": {
-            "total": 163.67,
-            "direct_requirements": 108.28,
+            "total": 162.05,
+            "direct_requirements": 108.0,
             "measured": 194,
             "unmeasured": {
                 "not_from_composer_repository": 0,
@@ -42,7 +42,7 @@
             "doctrine/lexer": 0.0,
             "doctrine/migrations": 0.0,
             "doctrine/orm": 0.79,
-            "doctrine/persistence": 0.64,
+            "doctrine/persistence": 0.51,
             "doctrine/sql-formatter": 0.29,
             "egulias/email-validator": 0.0,
             "enshrined/svg-sanitize": 1.05,
@@ -103,7 +103,7 @@
             "pagerfanta/doctrine-orm-adapter": 0.63,
             "pagerfanta/twig": null,
             "paragonie/constant_time_encoding": 0.0,
-            "paragonie/random_compat": 1.34,
+            "paragonie/random_compat": 0.0,
             "php-amqplib/php-amqplib": 0.0,
             "php-amqplib/rabbitmq-bundle": 0.45,
             "php-http/client-common": 0.0,
@@ -132,7 +132,7 @@
             "ralouphie/getallheaders": 0.0,
             "scheb/2fa-backup-code": 4.06,
             "scheb/2fa-bundle": 4.23,
-            "scheb/2fa-email": 4.43,
+            "scheb/2fa-email": 4.41,
             "scheb/2fa-google-authenticator": 4.06,
             "scheb/2fa-trusted-device": 4.06,
             "scssphp/scssphp": 0.0,
@@ -201,7 +201,7 @@
             "symfony/translation": 1.52,
             "symfony/translation-contracts": 1.69,
             "symfony/twig-bridge": 1.75,
-            "symfony/twig-bundle": 1.82,
+            "symfony/twig-bundle": 1.69,
             "symfony/validator": 1.75,
             "symfony/var-dumper": 1.81,
             "symfony/var-exporter": 0.36,

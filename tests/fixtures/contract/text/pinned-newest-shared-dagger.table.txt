@@ -1,8 +1,7 @@
 <options=bold><fg=red>high (1)</fg=red></options=bold>
   friendsofsymfony/oauth-server-bundle dev-master  direct  ·  pinned
       16 = pinned 16
-      do: require a tag — the newest is v1.9.3; 1.x needs php \>=7.2, which require.php allows; not checked:
-          left-behind, old-promise
+      do: require a tag — the newest is v2.0.0 (2024-01-01); 2.x needs php \>=7.2, which require.php allows
       pinned       pinned to branch snapshot dev-master
       age: last push 2024-01-12 (2.7 years ago)
       pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)

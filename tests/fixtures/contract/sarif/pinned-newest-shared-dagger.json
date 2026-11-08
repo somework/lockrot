@@ -44,7 +44,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "friendsofsymfony/oauth-server-bundle dev-master \u2014 finding high, 16 = pinned 16 \u2014 pinned: pinned to branch snapshot dev-master. Do: require a tag \u2014 the newest is v1.9.3; 1.x needs php >=7.2, which require.php allows; not checked: left-behind, old-promise."
+                        "text": "friendsofsymfony/oauth-server-bundle dev-master \u2014 finding high, 16 = pinned 16 \u2014 pinned: pinned to branch snapshot dev-master. Do: require a tag \u2014 the newest is v2.0.0 (2024-01-01); 2.x needs php >=7.2, which require.php allows."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "friendsofsymfony/oauth-server-bundle"

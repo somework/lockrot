@@ -1508,7 +1508,7 @@ symfony/monolog-bridge v2.6.13 — critical: left-behind · vulnerable
 
 age       installed  v2.6.13   not read (a split whose parent dates its newest release)
           2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
-          newest     v8.1.6    2026-08-30   0.1 years ago                 below release-warn-years 3; dated by symfony/symfony
+          newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
           last push            2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears not measured: a split whose parent dates its newest release
 repository GitHub github.com/symfony/monolog-bridge: last push 2026-09-23 · fetched 2026-09-14
@@ -1687,6 +1687,95 @@ repository metadata
      0.2.x    0.2.0         2013-03-27        >=5.3.3
      0.1.x    0.1.0         2013-03-23        >=5.3.3
 * the installed branch's highest tag has no release date — the repository leaves it undated, or dates it only by a commit other tags share (`commit …`: a subtree split, the day the directory last changed) — so S8 does not measure the branch
+
+== case S8-installed-lower-dated‡
+pagerfanta/twig v3.8.0 — ok
+  direct requirement (composer.json require)
+
+age       installed  v3.8.0    2023-04-15   3.5 years ago
+          3.x        v3.8.0    2025-06-01   1.3 years ago                 below release-warn-years 3
+          newest               not read (undated releases)
+          last push            2026-09-08   0.1 years ago                 below push-warn-years 3
+          libyears at least 1.9 behind the newest stable release
+repository GitHub github.com/Pagerfanta/twig: last push 2026-09-08 · fetched 2026-09-14
+
+score     0
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        nothing to do: nothing counts
+
+flags
+  feeds        packagist.org: none on record
+  pulls in     pulls in 1 flagged package: pagerfanta/core (left-behind)
+  accepted     none
+  not checked  S2 (undated releases)
+
+repository metadata
+     branch   highest tag   released          php          fixes
+     4.x      v4.9.0        commit 2025-03-08 ^8.1
+   * 3.x      v3.8.1        undated           ^7.4 || ^8.0
+     2.x      v2.7.3        2021-07-25        ^7.2 || ^8.0
+* the installed branch's highest tag has no release date — the repository leaves it undated, or dates it only by a commit other tags share (`commit …`: a subtree split, the day the directory last changed) — so S8 does not measure the branch
+
+== case S2-parent-shared-lower‡
+akaunting/laravel-debugbar-collector 2.1.1 — medium: stale
+  direct requirement (composer.json require)
+
+age       installed  2.1.1     2023-06-02   3.3 years ago
+          2.x        2.1.1     2023-06-02   3.3 years ago                 past release-warn-years 3
+          newest     1.0.2     2026-09-01   0.1 years ago                 below release-warn-years 3; dated by akaunting/monorepo
+          last push            2023-06-02   3.3 years ago                 past push-warn-years 3
+          libyears 0.0 behind the newest stable release
+repository GitHub github.com/akaunting/laravel-debugbar-collector: last push 2023-06-02 · fetched 2026-09-14
+
+score     8 = stale 8     medium from 8
+  maintenance  stale 8 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        —
+
+flags
+  stale        S4 · last push 2023-06-02 (3.3 years ago)
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 2.x      2.1.1         2023-06-02   >=8.0
+     1.x      1.0.2         2026-09-01   >=7.3
+branch 1.x dated by akaunting/monorepo, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
+
+== case S2-shared-unresolved‡
+akaunting/laravel-debugbar-collector 2.1.1 — medium: stale
+  direct requirement (composer.json require)
+
+age       installed  2.1.1     2023-06-02   3.3 years ago
+          2.x        2.1.1     2023-06-02   3.3 years ago                 past release-warn-years 3
+          newest               not read (undated releases)
+          last push            2023-06-02   3.3 years ago                 past push-warn-years 3
+          libyears 0.0 behind the newest stable release
+repository GitHub github.com/akaunting/laravel-debugbar-collector: last push 2023-06-02 · fetched 2026-09-14
+
+score     8 = stale 8     medium from 8
+  maintenance  stale 8 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        —
+
+flags
+  stale        S4 · last push 2023-06-02 (3.3 years ago)
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  S2 (undated releases)
+
+repository metadata
+     branch   highest tag   released          php        fixes
+   * 2.x      2.1.1         2023-06-02        >=8.0
+     1.x      1.0.2         commit 2024-03-01 >=7.3
 
 == case S8-higher-shared-alive‡
 pagerfanta/twig v3.8.0 — high: left-behind
@@ -3034,7 +3123,7 @@ score     16 = pinned 16     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require a tag — the newest is v1.9.3; 1.x needs php >=7.2, which require.php allows; not checked: left-behind, old-promise
+do        require a tag — the newest is v2.0.0 (2024-01-01); 2.x needs php >=7.2, which require.php allows
           clears pinned
 
 flags
@@ -3048,6 +3137,37 @@ repository metadata
      branch   highest tag   released          php        fixes
      2.x      v2.0.0        2024-01-01        >=7.2
      1.x      v1.9.3        commit 2025-06-01 >=7.2
+
+== case S6-snapshot-backport-newer‡
+friendsofsymfony/oauth-server-bundle dev-master — high: pinned
+  direct requirement (composer.json require)
+
+age       installed  dev-masternot read (a branch snapshot has no release branch)
+          its branch           not read (a branch snapshot has no release branch)
+          newest     v12.70.0  2026-03-12   0.6 years ago                 below release-warn-years 3
+          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+          libyears not measured: a branch snapshot has no release branch
+repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
+
+score     16 = pinned 16     high from 16
+  maintenance  pinned 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require a tag — the newest is v13.0.0 (2026-01-11), older than your snapshot (2026-02-01); review, or replace; 13.x needs php >=7.2, which require.php allows
+          clears pinned
+
+flags
+  pinned       S6 · pinned to branch snapshot dev-master
+  feeds        packagist.org: none on record
+  pulls in     pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)
+  accepted     none
+  not checked  S8 (a branch snapshot has no release branch)
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     13.x     v13.0.0       2026-01-11   >=7.2
+     12.x     v12.70.0      2026-03-12   >=7.2
 
 == case pinned-alpha-over-shared‡
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned
@@ -3208,7 +3328,7 @@ age       installed  v4.1.1    2018-01-15   8.7 years ago
           4.x                  not read (undated releases)
           newest               not read (undated releases)
           last push            2023-12-22   2.8 years ago                 below push-warn-years 3
-          libyears at least 2.4 behind the newest stable release
+          libyears 2.0 behind the newest stable release
 repository GitHub github.com/tubalmartin/YUI-CSS-compressor-PHP-port: last push 2023-12-22 · fetched 2026-09-14
 
 score     16 = old-promise 16     high from 16
@@ -3238,7 +3358,7 @@ age       installed  v4.1.1    2018-01-15   8.7 years ago
           4.x        v4.1.1    2018-01-15   8.7 years ago                 past release-high-years 5
           newest               not read (undated releases)
           last push            2023-12-22   2.8 years ago                 below push-warn-years 3
-          libyears not measured: undated releases
+          libyears 0.0 behind the newest stable release
 repository GitHub github.com/tubalmartin/YUI-CSS-compressor-PHP-port: last push 2023-12-22 · fetched 2026-09-14
 
 score     16 = old-promise 16     high from 16
@@ -3296,7 +3416,7 @@ age       installed  v4.1.1    2018-01-15   8.7 years ago
           4.x        v4.1.1    2018-01-15   8.7 years ago                 past release-high-years 5
           newest               not read (undated releases)
           last push            2023-12-22   2.8 years ago                 below push-warn-years 3
-          libyears at least 2.0 behind the newest stable release
+          libyears 2.0 behind the newest stable release
 repository GitHub github.com/tubalmartin/YUI-CSS-compressor-PHP-port: last push 2023-12-22 · fetched 2026-09-14
 
 score     16 = old-promise 16     high from 16
@@ -5859,6 +5979,99 @@ do        require scheb/2fa-bundle ^6.13 — clears left-behind; it stops below 
 
 flags
   left-behind  S8 · branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=8.1; 6.x released v6.13.1 (2024-11-29)
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php                                            fixes
+     8.x      v8.6.1        2026-07-10   ~8.4.0 || ~8.5.0
+     7.x      v7.14.0       2026-06-12   ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0
+     6.x      v6.13.1       2024-11-29   ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0
+   * 5.x      v5.13.2       2022-04-16   >=7.2.5
+
+== case platform-minor-unlisted‡
+scheb/2fa-bundle v5.13.2 — high: left-behind
+  direct requirement (composer.json require)
+
+age       installed  v5.13.2   2022-04-16   4.5 years ago
+          5.x        v5.13.2   2022-04-16   4.5 years ago                 past release-warn-years 3
+          newest     v8.6.1    2026-07-10   0.2 years ago                 below release-warn-years 3
+          last push            2026-07-10   0.2 years ago                 below push-warn-years 3
+          libyears 4.2 behind the newest stable release
+repository GitHub github.com/scheb/2fa-bundle: last push 2026-07-10 · fetched 2026-09-14
+
+score     16 = left-behind 16     high from 16
+  maintenance  left-behind 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        no move runs on the target: 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and the target php 7.5 does not run it
+
+flags
+  left-behind  S8 · branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php                                            fixes
+     8.x      v8.6.1        2026-07-10   ~8.4.0 || ~8.5.0
+     7.x      v7.14.0       2026-06-12   ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0
+     6.x      v6.13.1       2024-11-29   ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0
+   * 5.x      v5.13.2       2022-04-16   >=7.2.5
+
+== case platform-minor-below-known‡
+scheb/2fa-bundle v5.13.2 — high: left-behind
+  direct requirement (composer.json require)
+
+age       installed  v5.13.2   2022-04-16   4.5 years ago
+          5.x        v5.13.2   2022-04-16   4.5 years ago                 past release-warn-years 3
+          newest     v8.6.1    2026-07-10   0.2 years ago                 below release-warn-years 3
+          last push            2026-07-10   0.2 years ago                 below push-warn-years 3
+          libyears 4.2 behind the newest stable release
+repository GitHub github.com/scheb/2fa-bundle: last push 2026-07-10 · fetched 2026-09-14
+
+score     16 = left-behind 16     high from 16
+  maintenance  left-behind 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        no move runs on the target: 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and the target php 5.2 does not run it
+
+flags
+  left-behind  S8 · branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=5.2; no releasing branch within reach
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php                                            fixes
+     8.x      v8.6.1        2026-07-10   ~8.4.0 || ~8.5.0
+     7.x      v7.14.0       2026-06-12   ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0
+     6.x      v6.13.1       2024-11-29   ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0
+   * 5.x      v5.13.2       2022-04-16   >=7.2.5
+
+== case platform-minor-excluded‡
+scheb/2fa-bundle v5.13.2 — high: left-behind
+  direct requirement (composer.json require)
+
+age       installed  v5.13.2   2022-04-16   4.5 years ago
+          5.x        v5.13.2   2022-04-16   4.5 years ago                 past release-warn-years 3
+          newest     v8.6.1    2026-07-10   0.2 years ago                 below release-warn-years 3
+          last push            2026-07-10   0.2 years ago                 below push-warn-years 3
+          libyears 4.2 behind the newest stable release
+repository GitHub github.com/scheb/2fa-bundle: last push 2026-07-10 · fetched 2026-09-14
+
+score     16 = left-behind 16     high from 16
+  maintenance  left-behind 16 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        no move runs on the target: 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and the target php 7.5 does not run it
+
+flags
+  left-behind  S8 · branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach
   feeds        packagist.org: none on record
   accepted     none
   not checked  nothing

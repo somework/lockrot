@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **high** | `friendsofsymfony/oauth-server-bundle` | dev-master | pinned | `16 = pinned 16`<br>**Do:** require a tag — the newest is v1.9.3; 1.x needs php \>=7.2, which require.php allows; not checked: left-behind, old-promise<br>*pinned:* pinned to branch snapshot dev-master<br>*age:* last push 2024-01-12 (2.7 years ago)<br>pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)<br>checks missing: S2 (undated releases) | direct |
+| **high** | `friendsofsymfony/oauth-server-bundle` | dev-master | pinned | `16 = pinned 16`<br>**Do:** require a tag — the newest is v2.0.0 (2024-01-01); 2.x needs php \>=7.2, which require.php allows<br>*pinned:* pinned to branch snapshot dev-master<br>*age:* last push 2024-01-12 (2.7 years ago)<br>pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)<br>checks missing: S2 (undated releases) | direct |
 
 flags: pinned 1\
 depth: every flagged package is named in composer.json · direct 1\

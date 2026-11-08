@@ -435,11 +435,11 @@
             "installed": null,
             "installed_unmeasured": "parent_split",
             "release": {
-                "version": "v8.1.6",
-                "at": "2026-08-30T01:03:44+00:00",
+                "version": "v6.4.45",
+                "at": "2026-08-30T01:18:12+00:00",
                 "years": 0.1,
                 "level": null,
-                "dated_by": "symfony/symfony"
+                "dated_by": null
             },
             "release_unmeasured": null,
             "branch_release": {
