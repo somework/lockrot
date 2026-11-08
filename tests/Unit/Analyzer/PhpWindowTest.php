@@ -229,6 +229,85 @@ final class PhpWindowTest extends TestCase
     }
 
     /**
+     * SPEC I38: `target.inside` true comes with a minors list that holds the target minor, also
+     * when GA data lists no such minor (below the lowest one, or between two).
+     *
+     * @dataProvider unlistedPlatformMinors
+     *
+     * @param list<string> $expectedMinors
+     */
+    #[DataProvider('unlistedPlatformMinors')]
+    public function testAnUnlistedPlatformMinorIsInsertedInVersionOrder(string $pin, string $target, array $expectedMinors, string $lowerEdge): void
+    {
+        $window = self::window(
+            ['packages' => [self::package('acme/a', ['php' => '>=5.2.1'])], 'packages-dev' => []],
+            ['require' => ['php' => '>=5.2'], 'config' => ['platform' => ['php' => $pin]]],
+            $target,
+        );
+
+        $set = $window['without_dev'];
+        self::assertTrue($window['target']['inside']);
+        self::assertSame($pin, $window['target']['php']);
+        self::assertSame($expectedMinors, $set['minors']);
+        self::assertContains($target, $set['minors'], 'I38');
+        self::assertNotNull($set['lower_edge']);
+        self::assertSame($lowerEdge, $set['lower_edge']['php']);
+    }
+
+    /** @return iterable<string, array{string, string, list<string>, string}> */
+    public static function unlistedPlatformMinors(): iterable
+    {
+        yield 'below the lowest known minor' => ['5.2.17', '5.2', array_merge(['5.2'], self::EVERY_MINOR), '5.2.1'];
+        yield 'between two known minors' => ['7.5.0', '7.5', ['5.3', '5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '7.5', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5'], '5.3.0'];
+    }
+
+    public function testTheLowerEdgeOfAnInsertedMinorNamesTheLinksBelowIt(): void
+    {
+        $lock = ['packages' => [self::package('acme/a', ['php' => '>=5.2.1'])], 'packages-dev' => []];
+        $below = self::window($lock, ['require' => ['php' => '>=5.2'], 'config' => ['platform' => ['php' => '5.2.17']]], '5.2');
+        $between = self::window($lock, ['require' => ['php' => '>=5.2'], 'config' => ['platform' => ['php' => '7.5.0']]], '7.5');
+
+        self::assertNotNull($below['without_dev']['lower_edge']);
+        self::assertNotNull($between['without_dev']['lower_edge']);
+        self::assertSame(['acme/a'], array_column($below['without_dev']['lower_edge']['set_by'], 'name'));
+        self::assertSame([], $between['without_dev']['lower_edge']['set_by']);
+    }
+
+    public function testAnInsertedMinorThatASetExcludesIsAGapAndAnUpperEdge(): void
+    {
+        $platform = ['config' => ['platform' => ['php' => '7.5.0']]];
+        $gap = self::window(['packages' => [self::package('acme/a', ['php' => '~7.4.0 || ^8.0'])], 'packages-dev' => []], $platform, '7.5');
+        $cap = self::window(['packages' => [self::package('acme/a', ['php' => '~7.4.0'])], 'packages-dev' => []], $platform, '7.5');
+
+        self::assertFalse($gap['target']['inside']);
+        self::assertSame(['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5'], $gap['without_dev']['minors']);
+        self::assertTrue($gap['without_dev']['gaps']);
+        self::assertSame(['excludes' => '7.5', 'links' => ['require']], self::upper($cap['without_dev']));
+    }
+
+    public function testTheInsertedMinorIsInTheKnownMinorsThatTheWordsRead(): void
+    {
+        $window = PhpWindow::of(LockFile::fromArray(['packages' => [], 'packages-dev' => []]), ProjectConfig::empty(), '7.5', self::minors());
+
+        self::assertNotNull($window);
+        self::assertSame(['5.3', '5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '7.5', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5'], $window->knownMinors());
+    }
+
+    public function testAListedTargetMinorIsNotInsertedTwice(): void
+    {
+        $window = self::window(['packages' => [], 'packages-dev' => []], ['config' => ['platform' => ['php' => '7.4.33']]], '7.4');
+
+        self::assertSame(self::EVERY_MINOR, $window['without_dev']['minors']);
+    }
+
+    public function testATargetMinorAboveTheNewestKnownMinorIsAppendedOnce(): void
+    {
+        $window = self::window(['packages' => [], 'packages-dev' => []], ['config' => ['platform' => ['php' => '9.0.0']]], '9.0');
+
+        self::assertSame(array_merge(self::EVERY_MINOR, ['9.0']), $window['without_dev']['minors']);
+    }
+
+    /**
      * Composer accepts each of these as a stable 8.4.1 platform php. report-2 and explain-2 set
      * `target.php` to the pattern of the assertion.
      *
@@ -632,7 +711,7 @@ final class PhpWindowTest extends TestCase
         self::assertSame('acme/a', $capped['upper_edge']['set_by'][0]['name'] ?? null);
 
         $empty = LockFile::fromArray(['packages' => [], 'packages-dev' => []]);
-        self::assertSame(self::EVERY_MINOR, self::window(['packages' => [], 'packages-dev' => []], [], '7.5')['without_dev']['minors'], 'a target between known minors adds none');
+        self::assertSame(['5.3', '5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '7.5', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5'], self::window(['packages' => [], 'packages-dev' => []], [], '7.5')['without_dev']['minors'], 'a target between known minors is inserted in version order');
         $newest = PhpWindow::of($empty, ProjectConfig::empty(), '8.5', self::minors());
         $noneKnown = PhpWindow::of($empty, ProjectConfig::empty(), '8.4', []);
         self::assertNotNull($newest);

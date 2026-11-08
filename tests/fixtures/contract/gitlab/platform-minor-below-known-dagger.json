@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "scheb/2fa-bundle v5.13.2 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=5.2; no releasing branch within reach. Do: no move runs on the target: 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and the target php 5.2 does not run it.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "973cabbee1ddf065f4b966c480cd322018c714e8d6bbb25b9c9c4f14d17d552e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 12
+            }
+        }
+    }
+]

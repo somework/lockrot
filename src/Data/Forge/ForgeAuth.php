@@ -63,8 +63,8 @@ final class ForgeAuth
             return true;
         }
         $headers = json_decode((string) $entry['username'], true);
-        // A list with an element that is no string counts as no credential: Composer 2.11 sends none
-        // of it, and older Composer sends every element. Either way the anonymous cap holds. Composer
+        // A list with an element that is no string counts as no credential: Composer 2.11.1 and newer
+        // send none of it, and older Composer sends every element. Either way the anonymous cap holds. Composer
         // sends each header as written, so no trimming here.
         if (!\is_array($headers) || array_filter($headers, 'is_string') !== $headers) {
             return false;

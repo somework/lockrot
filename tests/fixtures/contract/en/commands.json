@@ -89,21 +89,31 @@
             "argv": [
                 "composer",
                 "require",
-                "friendsofsymfony/oauth-server-bundle:^1.9.3"
-            ],
-            "posix": "composer require 'friendsofsymfony/oauth-server-bundle:^1.9.3'",
-            "cmd": "composer require \"friendsofsymfony/oauth-server-bundle:^1.9.3\"",
-            "powershell": "composer --% require \"friendsofsymfony/oauth-server-bundle:^1.9.3\""
-        },
-        {
-            "argv": [
-                "composer",
-                "require",
                 "friendsofsymfony/oauth-server-bundle:^10.49.0"
             ],
             "posix": "composer require 'friendsofsymfony/oauth-server-bundle:^10.49.0'",
             "cmd": "composer require \"friendsofsymfony/oauth-server-bundle:^10.49.0\"",
             "powershell": "composer --% require \"friendsofsymfony/oauth-server-bundle:^10.49.0\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "friendsofsymfony/oauth-server-bundle:^13.0.0"
+            ],
+            "posix": "composer require 'friendsofsymfony/oauth-server-bundle:^13.0.0'",
+            "cmd": "composer require \"friendsofsymfony/oauth-server-bundle:^13.0.0\"",
+            "powershell": "composer --% require \"friendsofsymfony/oauth-server-bundle:^13.0.0\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "friendsofsymfony/oauth-server-bundle:^2.0.0"
+            ],
+            "posix": "composer require 'friendsofsymfony/oauth-server-bundle:^2.0.0'",
+            "cmd": "composer require \"friendsofsymfony/oauth-server-bundle:^2.0.0\"",
+            "powershell": "composer --% require \"friendsofsymfony/oauth-server-bundle:^2.0.0\""
         },
         {
             "argv": [
@@ -946,24 +956,36 @@
                 "composer",
                 "why-not",
                 "friendsofsymfony/oauth-server-bundle",
-                "v1.9.3",
-                "--locked"
-            ],
-            "posix": "composer why-not friendsofsymfony/oauth-server-bundle v1.9.3 --locked",
-            "cmd": "composer why-not friendsofsymfony/oauth-server-bundle v1.9.3 --locked",
-            "powershell": "composer --% why-not friendsofsymfony/oauth-server-bundle v1.9.3 --locked"
-        },
-        {
-            "argv": [
-                "composer",
-                "why-not",
-                "friendsofsymfony/oauth-server-bundle",
                 "v10.49.0",
                 "--locked"
             ],
             "posix": "composer why-not friendsofsymfony/oauth-server-bundle v10.49.0 --locked",
             "cmd": "composer why-not friendsofsymfony/oauth-server-bundle v10.49.0 --locked",
             "powershell": "composer --% why-not friendsofsymfony/oauth-server-bundle v10.49.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "friendsofsymfony/oauth-server-bundle",
+                "v13.0.0",
+                "--locked"
+            ],
+            "posix": "composer why-not friendsofsymfony/oauth-server-bundle v13.0.0 --locked",
+            "cmd": "composer why-not friendsofsymfony/oauth-server-bundle v13.0.0 --locked",
+            "powershell": "composer --% why-not friendsofsymfony/oauth-server-bundle v13.0.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "friendsofsymfony/oauth-server-bundle",
+                "v2.0.0",
+                "--locked"
+            ],
+            "posix": "composer why-not friendsofsymfony/oauth-server-bundle v2.0.0 --locked",
+            "cmd": "composer why-not friendsofsymfony/oauth-server-bundle v2.0.0 --locked",
+            "powershell": "composer --% why-not friendsofsymfony/oauth-server-bundle v2.0.0 --locked"
         },
         {
             "argv": [

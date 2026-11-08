@@ -7,6 +7,7 @@ namespace Lockrot\Composer;
 use Composer\Config;
 use Composer\Downloader\TransportException;
 use Composer\IO\IOInterface;
+use Composer\Util\AuthHelper;
 use Composer\Util\Http\Response;
 use Composer\Util\HttpDownloader;
 use Composer\Util\Loop;
@@ -90,10 +91,11 @@ final class ComposerHttpClient implements HttpClientInterface
      * resolved still lifts the repository-activity cap. See docs/internals.md#which-credentials.
      *
      * @param list<string> $headers
+     * @param ?bool        $dropsInvalidCustomHeaders whether Composer drops a custom-headers list with a non-string element whole (2.11.1 and newer), null for the running Composer
      *
      * @return list<string>
      */
-    public static function withoutRedundantAuthorization(IOInterface $io, Config $config, string $url, array $headers): array
+    public static function withoutRedundantAuthorization(IOInterface $io, Config $config, string $url, array $headers, ?bool $dropsInvalidCustomHeaders = null): array
     {
         if ($url === '') {
             return $headers;
@@ -115,11 +117,29 @@ final class ComposerHttpClient implements HttpClientInterface
         }
         // AuthHelper adds no credential header for an SSL client certificate, or for custom headers
         // that carry none, so lockrot's header stays.
-        if (!ForgeAuth::carriesCredential($auth)) {
+        // AuthHelper::addCustomHeaders() validates the list, so its presence marks a Composer that drops a list with a non-string element.
+        if (!self::composerSendsCredential($auth, $dropsInvalidCustomHeaders ?? (new \ReflectionClass(AuthHelper::class))->hasMethod('addCustomHeaders'))) {
             return $headers;
         }
 
         return self::withoutCredentials($headers);
+    }
+
+    /**
+     * ForgeAuth::carriesCredential() reads a list with a non-string element as no credential, which
+     * keeps the anonymous cap. Composer before 2.11.1 still adds every element of such a list.
+     *
+     * @param array{username: null|string, password: null|string} $auth
+     */
+    private static function composerSendsCredential(array $auth, bool $dropsInvalidCustomHeaders): bool
+    {
+        if ($auth['password'] === 'custom-headers' && !$dropsInvalidCustomHeaders) {
+            $list = json_decode((string) $auth['username'], true);
+
+            return \is_array($list) && self::carriesCredentials($list);
+        }
+
+        return ForgeAuth::carriesCredential($auth);
     }
 
     /**

@@ -1,4 +1,4 @@
-::error file=composer.lock,line=4,title=lockrot%3A high — pinned::friendsofsymfony/oauth-server-bundle dev-master: 16 = pinned 16. Do: require a tag — the newest is v1.9.3; 1.x needs php >=7.2, which require.php allows; not checked: left-behind, old-promise. pinned: pinned to branch snapshot dev-master. checks missing: S2 (undated releases).
+::error file=composer.lock,line=4,title=lockrot%3A high — pinned::friendsofsymfony/oauth-server-bundle dev-master: 16 = pinned 16. Do: require a tag — the newest is v2.0.0 (2024-01-01); 2.x needs php >=7.2, which require.php allows. pinned: pinned to branch snapshot dev-master. checks missing: S2 (undated releases).
 flags: pinned 1
 depth: every flagged package is named in composer.json · direct 1
 php: the lock installs on PHP 7.4 to 8.5

@@ -106,6 +106,59 @@ final class AtomicWriterTest extends TestCase
         self::assertSame(['r.json'], self::entries($dir), 'the temporary file must be cleaned up');
     }
 
+    /**
+     * The temporary file takes the target's read-only mode, then the move fails. On Unix unlink()
+     * needs the directory's permission and not the file's, so this test passes without the chmod
+     * before unlink. It pins the cleanup after the mode copy.
+     * {@see testAFailedReplaceOfAReadOnlyFileOnWindowsLeavesNoTemporaryFile()} holds the Windows case.
+     */
+    public function testAFailedMoveOntoAReadOnlyTargetLeavesNoTemporaryFile(): void
+    {
+        if (\DIRECTORY_SEPARATOR === '\\') {
+            self::markTestSkipped('Windows has no Unix permission bits on a directory');
+        }
+        $dir = $this->tempDir();
+        mkdir($dir.'/r.json');
+        file_put_contents($dir.'/r.json/occupied', 'x');
+        chmod($dir.'/r.json', 0555);
+
+        try {
+            AtomicWriter::write($dir.'/r.json', 'report', 'out/r.json');
+            self::fail('The move onto a directory must fail.');
+        } catch (ConfigException $e) {
+            self::assertStringStartsWith('Cannot write out/r.json: ', $e->getMessage());
+        } finally {
+            chmod($dir.'/r.json', 0755);
+        }
+
+        self::assertSame(['r.json'], self::entries($dir), 'the temporary file must be cleaned up');
+    }
+
+    /**
+     * MoveFileEx refuses a read-only target, and unlink() refuses the read-only temporary file that
+     * took its mode. Windows CI: https://github.com/somework/lockrot/issues/180
+     */
+    public function testAFailedReplaceOfAReadOnlyFileOnWindowsLeavesNoTemporaryFile(): void
+    {
+        if (\DIRECTORY_SEPARATOR !== '\\') {
+            self::markTestSkipped('Unix replaces a read-only file');
+        }
+        $dir = $this->tempDir();
+        file_put_contents($dir.'/r.json', 'old');
+        chmod($dir.'/r.json', 0444);
+
+        try {
+            AtomicWriter::write($dir.'/r.json', 'report', 'out/r.json');
+            self::fail('The replace of a read-only file must fail on Windows.');
+        } catch (ConfigException $e) {
+            self::assertStringStartsWith('Cannot write out/r.json: ', $e->getMessage());
+        } finally {
+            chmod($dir.'/r.json', 0644);
+        }
+
+        self::assertSame(['r.json'], self::entries($dir), 'the temporary file must be cleaned up');
+    }
+
     /** With no directory to write into, the reason is the write's own, not the cleanup's. */
     public function testAMissingDirectoryReportsTheFailedWrite(): void
     {

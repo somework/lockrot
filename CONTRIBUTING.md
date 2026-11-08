@@ -383,8 +383,8 @@ maintainer.
       an X.0 release before its day, so add an X.0 date only after that release. Check the file
       before you record `docs/example-run.md`.
 
-    - Re-record `docs/example-run.md` with a PHAR that you build from the release branch
-      ([The PHAR](#the-phar)):
+    - Re-record `docs/example-run.md` after the version bump. Build the PHAR from the release
+      branch, so that it prints the new version ([The PHAR](#the-phar)):
       `GITHUB_TOKEN=<token> python3 tools/release/example_run.py build/lockrot.phar <planned tag day>`.
       The script runs the page's command on the two snapshots that the page links, with
       `LOCKROT_TODAY` set to that day. It refuses a run with a run note and a clean run that flags a
@@ -443,12 +443,16 @@ maintainer.
            step 6 against the new V, and commit nothing. Do not repin the renderer to the old V.
 
            Before you tag the renderer in step 7, check the gate that its `release.yml` runs on
-           the pin. The query must print `true`:
+           the pin. The gate needs a green CI run of V, and a green full check on a
+           `release/full-check-<sha>` branch or a green CI run on `main`. The query tests the same
+           condition and must print `true`:
 
            ```bash
            gh run list --repo somework/lockrot --commit <V> --event push --status success \
              --json workflowName,headBranch \
-             --jq 'any(.[]; .workflowName == "full-check" and (.headBranch | test("^release/full-check-[0-9a-f]+$")))'
+             --jq 'any(.[]; .workflowName == "CI") and
+               (any(.[]; .workflowName == "full-check" and (.headBranch | test("^release/full-check-[0-9a-f]+$")))
+                or any(.[]; .workflowName == "CI" and .headBranch == "main"))'
            ```
 
            A renderer tag that the gate refuses has no release, and the renderer's tag ruleset
@@ -468,7 +472,10 @@ maintainer.
            commit must not change the contract bundle.
         9. If `Version::STRING` still names the previous release, add one commit for the bump. It
            holds the version, the dated CHANGELOG heading, the schema copies with their
-           `RELEASED_SCHEMAS` row and the golden pins of step 1. The contract bundle masks the tool
+           `RELEASED_SCHEMAS` row and the golden pins of step 1. When a schema differs from the
+           previous release's, it also holds the `RECORDING_PENDING` entry. Then re-record
+           `docs/example-run.md` (`tools/release/example_run.py`) from a PHAR that prints the new
+           version. Push the recording with the bump commit. The contract bundle masks the tool
            version, so this commit changes no file of the bundle. Without it, the release pull
            request fails (step 4).
 

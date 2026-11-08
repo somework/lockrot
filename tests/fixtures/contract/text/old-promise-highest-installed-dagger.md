@@ -8,7 +8,7 @@
 
 flags: old-promise 1\
 depth: every flagged package is named in composer.json · direct 1\
-libyears: the one package could not be measured\
+libyears: 0.0 behind across the one package\
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)\
 php: the lock installs on PHP 8.3 to 8.5
 

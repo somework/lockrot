@@ -15470,11 +15470,11 @@
         },
         "installed_unmeasured": null,
         "release": {
-          "version": "v13.36.0",
-          "at": "2026-10-11T20:46:11+00:00",
+          "version": "v12.70.0",
+          "at": "2026-10-13T13:24:10+00:00",
           "years": 0,
           "level": null,
-          "dated_by": null
+          "dated_by": "laravel/framework"
         },
         "release_unmeasured": null,
         "branch_release": {
@@ -15602,11 +15602,11 @@
         },
         "installed_unmeasured": null,
         "release": {
-          "version": "v13.36.0",
-          "at": "2026-10-06T02:42:44+00:00",
+          "version": "v12.70.0",
+          "at": "2026-10-13T13:24:10+00:00",
           "years": 0,
           "level": null,
-          "dated_by": null
+          "dated_by": "laravel/framework"
         },
         "release_unmeasured": null,
         "branch_release": {
@@ -15734,11 +15734,11 @@
         },
         "installed_unmeasured": null,
         "release": {
-          "version": "v13.36.0",
-          "at": "2026-10-08T22:29:36+00:00",
+          "version": "v12.70.0",
+          "at": "2026-10-13T13:24:10+00:00",
           "years": 0,
           "level": null,
-          "dated_by": null
+          "dated_by": "laravel/framework"
         },
         "release_unmeasured": null,
         "branch_release": {
@@ -15866,11 +15866,11 @@
         },
         "installed_unmeasured": null,
         "release": {
-          "version": "v13.36.0",
-          "at": "2026-10-06T02:42:44+00:00",
+          "version": "v12.70.0",
+          "at": "2026-10-13T13:24:10+00:00",
           "years": 0,
           "level": null,
-          "dated_by": null
+          "dated_by": "laravel/framework"
         },
         "release_unmeasured": null,
         "branch_release": {

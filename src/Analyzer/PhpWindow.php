@@ -127,9 +127,10 @@ final class PhpWindow implements \JsonSerializable
         $hosts = array_unique($hosts);
         sort($hosts);
 
-        // A set that admits the target must list the target's minor, also before that minor's GA.
-        if ($knownMinors === [] || version_compare($targetMinor, $knownMinors[\count($knownMinors) - 1], '>')) {
+        // A set that admits the target must list the target's minor, also one that the GA data does not list.
+        if (!\in_array($targetMinor, $knownMinors, true)) {
             $knownMinors[] = $targetMinor;
+            usort($knownMinors, 'version_compare');
         }
         $configuredPhp ??= $project->platformPhp();
         $targetPoint = $solvePhp ?? MoveCheckers::platformPhp($targetMinor, $configuredPhp);
@@ -361,7 +362,7 @@ final class PhpWindow implements \JsonSerializable
 
     /**
      * The edges are read on the known minors, never on raw intervals: PHP 6 and PHP 7.5 to 7.9 do
-     * not exist, so `~7.4.0 || ~8.0.0` has no gap.
+     * not exist, so `~7.4.0 || ~8.0.0` has no gap, unless the target's minor is one of them.
      *
      * @param list<PhpLink> $links
      * @param list<string> $minors

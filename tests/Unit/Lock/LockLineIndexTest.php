@@ -41,6 +41,32 @@ final class LockLineIndexTest extends TestCase
         self::assertSame(4, LockLineIndex::fromString($json)->lineOf('a/b'));
     }
 
+    /**
+     * A lock saved with CRLF, with a lone CR, or with a byte-order mark names the same lines as the
+     * LF form.
+     *
+     * @dataProvider lineEnds
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('lineEnds')]
+    public function testEveryLineEndNumbersTheSameLines(string $prefix, string $end): void
+    {
+        $lines = ['{', '  "packages": [', '    {', '      "name": "a/b",', '      "version": "1.0.0"', '    },', '    {', '      "name": "c/d"', '    }', '  ],', '  "packages-dev": []', '}'];
+
+        $index = LockLineIndex::fromString($prefix.implode($end, $lines).$end);
+
+        self::assertSame(4, $index->lineOf('a/b'));
+        self::assertSame(8, $index->lineOf('c/d'));
+    }
+
+    /** @return iterable<string, array{string, string}> the text before the first line, the line end */
+    public static function lineEnds(): iterable
+    {
+        yield 'LF' => ['', "\n"];
+        yield 'CRLF' => ['', "\r\n"];
+        yield 'a lone CR' => ['', "\r"];
+        yield 'a byte-order mark' => ["\xEF\xBB\xBF", "\n"];
+    }
+
     public function testUnknownPackageHasNoLine(): void
     {
         self::assertNull(LockLineIndex::fromFile(self::LARAVEL_LOCK)->lineOf('acme/not-in-this-lock'));

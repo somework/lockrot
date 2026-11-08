@@ -183,7 +183,7 @@
   "replacement_url": null,
   "note": null,
   "libyears_unmeasured": null,
-  "libyears_at_least": true,
+  "libyears_at_least": false,
   "direct": true,
   "dev": false,
   "reach": "direct",

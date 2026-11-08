@@ -346,7 +346,7 @@ depth: 34 of 52 flagged packages are named by no line of composer.json · direct
 3 hops 5 · 4 hops 2 ·
 deepest: hoa/ustring and hoa/zformat, 4 hops (wallabag/rulerz › hoa/ruler › hoa/compiler › hoa/regex › hoa/ustring)
 security: no vulnerable package · advisories not checked · packages-dev not checked (pass --dev)
-libyears: at least 163.7 behind across 194 of 200 packages · 108.3 from direct requirements ·
+libyears: at least 162.1 behind across 194 of 200 packages · 108.0 from direct requirements ·
 furthest behind smalot/pdfparser v1.1.0 at 4.7
 pulled in by: wallabag/rulerz-bundle 15 · wallabag/rulerz 14 · wallabag/phpepub 5 ·
 scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · … and 21 more

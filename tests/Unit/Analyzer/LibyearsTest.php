@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Analyzer;
 
+use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report2Root;
@@ -365,6 +366,25 @@ final class LibyearsTest extends TestCase
 
         self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), InstalledRelease::of(self::package(), $metadata)->at());
         self::assertEqualsWithDelta(4.06, Libyears::measure(self::package(), $metadata)->years() ?? 0.0, 0.005);
+    }
+
+    /** A lower branch that only the parent dates can be S2's newest release by date, but the newest end of libyears stays the highest branch's. */
+    public function testAParentDateOfALowerBranchIsNotTheNewestEnd(): void
+    {
+        $tag = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => ['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace];
+        $loader = new ArrayLoader();
+        $now = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
+        $child = PackageMetadata::fromPackages('illuminate/collections', array_map(static fn (array $release) => $loader->load($release), [
+            $tag('illuminate/collections', 'v13.0.0', 'c13-own', self::LOCKED_AT),
+            $tag('illuminate/collections', 'v12.70.0', 'c12-shared', '2021-01-04T00:00:00+00:00'),
+            $tag('illuminate/collections', 'v12.69.0', 'c12-shared', '2021-01-04T00:00:00+00:00'),
+            $tag('illuminate/collections', 'v12.68.0', 'c12-shared', '2021-01-04T00:00:00+00:00'),
+        ]), $now);
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $loader->load($tag('laravel/framework', 'v12.70.0', 'f12-70', '2026-09-01T00:00:00+00:00', ['illuminate/collections' => 'self.version'])),
+        ], $now);
+
+        self::assertSame(0.0, Libyears::measure(self::package('v13.0.0'), $child->datedBy($parent))->years());
     }
 
     public function testAVersionComposerCannotNormalizeIsMeasuredFromTheLocksDate(): void

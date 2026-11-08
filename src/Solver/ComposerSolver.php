@@ -155,6 +155,9 @@ final class ComposerSolver
     private function solveOrThrow(SolveRequest $request): Solution
     {
         $root = $this->rootWith($request->rootChanges(), $request->devChanges());
+        // `update name:constraint` adds the stability flag of the constraint to the root's own:
+        // https://github.com/composer/composer/blob/2.10.3/src/Composer/Command/UpdateCommand.php
+        $root->setStabilityFlags(RootPackageLoader::extractStabilityFlags($request->inline(), $root->getMinimumStability(), $root->getStabilityFlags()));
         $requires = [];
         foreach (self::rootLinks($root) as $name => $link) {
             $requires[$name] = $link->getConstraint();

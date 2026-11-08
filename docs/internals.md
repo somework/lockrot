@@ -17,7 +17,7 @@ For a missing or wrong date, start at
 | Source | What lockrot asks | Credentials | Without credentials | Cache |
 |---|---|---|---|---|
 | Composer repositories: Packagist, Private Packagist, Satis, mirrors | Metadata: abandoned flag, versions, release dates (S1, S2, S5, S6, S8). The releases S9 looks in for a fix. Advisories on the installed version (S9) | Composer's own, from `auth.json` or `COMPOSER_AUTH` | What the repository serves anonymously | Composer's |
-| GitHub, `api.github.com` | Archived flag (S3), last push to any branch (S4) | `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN` when no issuer variable names another host, else Composer's `github-oauth`. Any other Composer credential for github.com counts too | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
+| GitHub, `api.github.com` | Archived flag (S3), last push to any branch (S4) | Composer's `github-oauth`, or any other Composer credential for github.com, when present: lockrot then sends only Composer's header. Else `LOCKROT_GITHUB_TOKEN`, else `GITHUB_TOKEN` when no issuer variable names another host | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
 | GitLab: gitlab.com and every host in Composer's `gitlab-domains` | Newest commit on any branch (S4). Archived flag (S3) with credentials only | `LOCKROT_GITLAB_TOKEN`, else `GITLAB_TOKEN` when no issuer variable names another host, for gitlab.com only. Any Composer credential for the host, such as `gitlab-token` | Every package, but the archived flag is hidden, so S3 cannot fire | lockrot's, 24 h |
 | Bitbucket Cloud, `api.bitbucket.org` | Newest commit on any branch (S4). Bitbucket has no archived state | Composer's `http-basic` (an Atlassian API token), `bearer` or `bitbucket-oauth` | Candidates only, at most 50 repositories a run | lockrot's, 24 h |
 
@@ -85,33 +85,38 @@ carries `User-Agent: lockrot`.
   entry of api.bitbucket.org counts first, else the entry of bitbucket.org. On GitLab, credentials
   also unlock the archived flag.
 
-- When both exist, lockrot sends only Composer's header.
+- When both exist, lockrot sends only Composer's credential, and drops its own `Authorization` or
+  `PRIVATE-TOKEN` header whenever Composer sends a credential for the host.
 
-- lockrot withholds an ambient token from the public host when an issuer variable names another host. `GITHUB_TOKEN` counts only when each of
-  `GITHUB_SERVER_URL` and `GH_HOST` is unset, empty or names github.com. `GITLAB_TOKEN` counts only
-  when each of `CI_SERVER_URL`, `GITLAB_HOST`, `GL_HOST` and `GITLAB_URI` is unset, empty or names
-  gitlab.com. A value can be a URL or a bare host, and a port counts as part of the host. So on
-  GitHub Enterprise Server, GHE.com, Gitea or Forgejo Actions, or self-managed GitLab CI, lockrot
-  does not send the runner's token to the public host. The same holds for a token that `gh` or
-  `glab` reads for the host that `GH_HOST`, `GL_HOST` or `GITLAB_URI` names. It goes on to the next
-  source, and `-v` prints one line for each token that it does not send. `LOCKROT_GITHUB_TOKEN` and
-  `LOCKROT_GITLAB_TOKEN` always count, because they name the public host. lockrot reads only these
-  variables. A host that only a `gh` or `glab` configuration file names is not seen. In that case,
-  set the issuer variable of that host, or pass the token as `LOCKROT_GITHUB_TOKEN` or
-  `LOCKROT_GITLAB_TOKEN`. An issuer URL that two URL parsers read as different hosts names no
-  public host: it holds a backslash in its authority, or an `@` in the path, query or fragment.
-  When the host after the last `@` is the public host, `-v` names "an issuer that URL parsers read
-  two ways". Else `-v` names that host.
+- lockrot withholds an ambient token from the public host when an issuer variable names another
+  host. `GITHUB_TOKEN` counts only when each of `GITHUB_SERVER_URL` and `GH_HOST` is unset, empty or
+  names github.com. `GITLAB_TOKEN` counts only when each of `CI_SERVER_URL`, `GITLAB_HOST`,
+  `GL_HOST` and `GITLAB_URI` is unset, empty or names gitlab.com. A value can be a URL or a bare
+  host, and a port counts as part of the host. So on GitHub Enterprise Server, GHE.com, Gitea or
+  Forgejo Actions, or self-managed GitLab CI, lockrot does not send the runner's token to the public
+  host. The same holds for a token that `gh` or `glab` reads for the host that `GH_HOST`, `GL_HOST`
+  or `GITLAB_URI` names. It goes on to the next source, and `-v` prints one line for each token that
+  it does not send. `LOCKROT_GITHUB_TOKEN` and `LOCKROT_GITLAB_TOKEN` always count, because they
+  name the public host. lockrot reads only these variables. A host that only a `gh` or `glab`
+  configuration file names is not seen. In that case, set the issuer variable of that host, or pass
+  the token as `LOCKROT_GITHUB_TOKEN` or `LOCKROT_GITLAB_TOKEN`. An issuer URL that two URL parsers
+  read as different hosts names no public host: it holds a backslash in its authority, or an `@` in
+  the path, query or fragment. When the host after the last `@` is the public host, `-v` names "an
+  issuer that URL parsers read two ways". Else `-v` names that host.
 
 - lockrot cannot keep Composer's own credentials from a host. A setup step that writes the
   runner's token into Composer's `github-oauth` for github.com makes Composer send it to
   api.github.com.
 
 - Exception: Composer's entry for the host can be a client certificate, or custom headers without
-  an `Authorization` or `PRIVATE-TOKEN` header. A custom-headers list that holds a value which is
-  not a string counts as no header. Such an entry is no credential. The host counts as anonymous,
-  so the cap of 50 and the cause `no_token` stay. Composer adds no credential header, and lockrot
-  sends its own.
+  an `Authorization` or `PRIVATE-TOKEN` header. Such an entry is no credential. A `custom-headers`
+  list that holds a value which is not a string is no credential either. The host counts as
+  anonymous, so the cap of 50 and the cause `no_token` stay. Composer then adds no credential
+  header, and lockrot sends its own. The one difference is such a list on Composer before 2.11.1:
+  that Composer sends every element of the list. When an element is an `Authorization` or
+  `PRIVATE-TOKEN` header, lockrot sends no credential header of its own.
+  [Composer 2.11.1](https://github.com/composer/composer/releases/tag/2.11.1) and newer send none
+  of such a list.
 
 - When a host redirects to another origin, lockrot asks that origin again without its own header.
   Where Composer cannot stop a redirect (without the curl extension), lockrot
@@ -231,8 +236,9 @@ public Drupal site locks showed both.
   a 4xx other than 404 (401 and 429 included), a 3xx, or a 2xx that is not JSON, such as a proxy
   login page. When an older answer for the URL is cached, lockrot uses it, and the footer shows its
   age. A cached 404 counts in that age too, and its finding carries the fetch time as
-  `activity.cached_at`. When the refetch of an expired 404 fails, lockrot does not use that 404, because the
-  repository can exist at the time of the refetch. The repository is then unchecked (S10).
+  `activity.cached_at`. When the refetch of an expired 404 fails, lockrot does not use that 404,
+  because the repository can exist at the time of the refetch. The repository is then unchecked
+  (S10).
 
 - lockrot keys each answer on its URL and on whether the request carried lockrot's own credential
   header. So a run with a token asks again for a repository that answered 404 to a run without a

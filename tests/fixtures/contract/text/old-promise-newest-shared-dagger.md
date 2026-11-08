@@ -8,7 +8,7 @@
 
 flags: old-promise 1\
 depth: every flagged package is named in composer.json · direct 1\
-libyears: at least 2.4 behind across the one package · 2.4 from direct requirements · furthest behind `tubalmartin/cssmin` v4.1.1 at 2.4 or more\
+libyears: 2.0 behind across the one package · 2.0 from direct requirements · furthest behind `tubalmartin/cssmin` v4.1.1 at 2.0\
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)\
 php: the lock installs on PHP 8.3 to 8.5
 

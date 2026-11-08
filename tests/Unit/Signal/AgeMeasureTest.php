@@ -11,6 +11,7 @@ use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\AgeReading;
 use Lockrot\Signal\PackageFacts;
+use Lockrot\Signal\Rule\NoReleaseRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
@@ -211,6 +212,44 @@ final class AgeMeasureTest extends TestCase
         self::assertUnmeasured(AgeMeasure::UNDATED_RELEASES, $this->measure()->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.3.0']), $metadata)));
     }
 
+    /** An undated highest tag is newer than the branch's dated release, so a dated release inside `release-warn-years` decides S8. */
+    public function testADatedReleaseInsideTheWarnYearsDecidesTheBranchUnderAnUndatedHighestTag(): void
+    {
+        $metadata = FactsBuilder::metadata([['v3.0.0', self::ago(86400)], ['v2.5.1', null], ['v2.5.0', self::ago(Clock::SECONDS_PER_YEAR)]]);
+
+        $reading = $this->measure()->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => 'v2.5.0']), $metadata));
+
+        self::assertTrue($reading->isMeasured(), (string) $reading->unmeasured());
+        self::assertSame('v2.5.0', $reading->version());
+        self::assertSame(1.0, $reading->years());
+        self::assertNull($reading->level());
+        self::assertNull($reading->datedBy());
+    }
+
+    public function testADatedReleaseAtTheWarnYearsDecidesNothingUnderAnUndatedHighestTag(): void
+    {
+        $warnYears = (new Thresholds())->releaseWarnYears();
+        $metadata = FactsBuilder::metadata([['v3.0.0', self::ago(86400)], ['v2.5.1', null], ['v2.5.0', self::ago($warnYears * Clock::SECONDS_PER_YEAR)]]);
+
+        self::assertUnmeasured(AgeMeasure::UNDATED_RELEASES, $this->measure()->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => 'v2.5.0']), $metadata)));
+    }
+
+    /** A shared commit dates a tag before its release, so its date inside `release-warn-years` decides nothing under an undated highest tag. */
+    public function testASharedCommitDateInsideTheWarnYearsDoesNotDecideTheBranchUnderAnUndatedHighestTag(): void
+    {
+        $on = static fn (string $version, string $commit, ?string $time): array => ['name' => 'vendor/pkg', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => $commit]];
+        $loader = new ArrayLoader();
+        $metadata = PackageMetadata::fromPackages('vendor/pkg', array_map(static fn (array $release) => $loader->load($release), [
+            $on('3.0.0', 'three', self::ago(86400)),
+            $on('2.5.3', 'top', null),
+            $on('2.5.2', 'split', self::ago(Clock::SECONDS_PER_YEAR)),
+            $on('2.5.1', 'split', self::ago(Clock::SECONDS_PER_YEAR)),
+            $on('2.5.0', 'split', self::ago(Clock::SECONDS_PER_YEAR)),
+        ]), new \DateTimeImmutable(self::NOW));
+
+        self::assertUnmeasured(AgeMeasure::UNDATED_RELEASES, $this->measure()->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '2.5.0']), $metadata)));
+    }
+
     /** A pre-release above the branch's newest stable release is not above the branch: S8 reads that stable release. */
     public function testAnInstalledPreReleaseAboveTheNewestStableReadsTheNewestStable(): void
     {
@@ -321,6 +360,162 @@ final class AgeMeasureTest extends TestCase
     {
         self::assertUnmeasured(AgeMeasure::UNDATED, $this->measure()->pushOf(FactsBuilder::activity(false, null)));
         self::assertSame(1.0, $this->measure()->pushOf(FactsBuilder::activity(false, self::ago(Clock::SECONDS_PER_YEAR)))->years());
+    }
+
+    /**
+     * SPEC §8.4.1: `release` is the newest tag by date. The split's highest branch keeps an old date
+     * of its own, and its lower branch is on a shared commit that only the parent dates.
+     */
+    public function testTheReleaseReadingIsTheNewestTagByDateWhenTheParentDatesALowerBranch(): void
+    {
+        $facts = FactsBuilder::facts(FactsBuilder::package(['name' => 'illuminate/collections', 'version' => 'v12.70.0']), self::lowerBranchDatedSplit(self::ago(4 * Clock::SECONDS_PER_YEAR)));
+
+        $reading = $this->measure()->release($facts);
+
+        self::assertSame('v12.70.0', $reading->version());
+        self::assertSame(self::ago(30 * 86400), $reading->at() !== null ? $reading->at()->format(\DATE_ATOM) : null);
+        self::assertSame('laravel/framework', $reading->datedBy());
+        self::assertNull($reading->level());
+        self::assertNull((new NoReleaseRule(Clock::fixed(self::NOW), new Thresholds()))->evaluate($facts));
+    }
+
+    /**
+     * Only S2 and age.release take the lower branch's parent date. The newest release that the
+     * moves, the metadata fields and libyears read stays the highest branch's: a move to the newer
+     * date would be a downgrade.
+     */
+    public function testAParentDateOfALowerBranchLeavesTheNewestReleaseOnTheHighestBranch(): void
+    {
+        $highestAt = self::ago(4 * Clock::SECONDS_PER_YEAR);
+        $metadata = self::lowerBranchDatedSplit($highestAt);
+
+        self::assertSame('v13.0.0', $metadata->lastStableVersion());
+        self::assertSame($highestAt, $metadata->lastStableReleaseAt() !== null ? $metadata->lastStableReleaseAt()->format(\DATE_ATOM) : null);
+        self::assertNull($metadata->lastStableDatedBy());
+        self::assertSame('v12.70.0', $metadata->releaseReadingVersion());
+        self::assertSame('laravel/framework', $metadata->releaseReadingDatedBy());
+    }
+
+    /**
+     * The parent dates the split's highest branch, whose tags share one commit. A backport on a
+     * lower branch has a newer date of its own commit, so S2 reads the backport.
+     */
+    public function testAnOwnDateOfALowerBranchBeatsTheParentDateOfTheHighestBranch(): void
+    {
+        $tag = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => ['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace];
+        $loader = new ArrayLoader();
+        $child = PackageMetadata::fromPackages('illuminate/collections', array_map(static fn (array $release) => $loader->load($release), [
+            $tag('illuminate/collections', 'v13.2.0', 'c13-shared', self::ago(90 * 86400)),
+            $tag('illuminate/collections', 'v13.1.0', 'c13-shared', self::ago(90 * 86400)),
+            $tag('illuminate/collections', 'v13.0.0', 'c13-shared', self::ago(90 * 86400)),
+            $tag('illuminate/collections', 'v12.9.0', 'c12-own', self::ago(10 * 86400)),
+        ]), new \DateTimeImmutable(self::NOW));
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $loader->load($tag('laravel/framework', 'v13.2.0', 'f13-2', self::ago(60 * 86400), ['illuminate/collections' => 'self.version'])),
+        ], new \DateTimeImmutable(self::NOW));
+        $metadata = $child->datedBy($parent);
+
+        $reading = $this->measure()->release(FactsBuilder::facts(FactsBuilder::package(['name' => 'illuminate/collections', 'version' => 'v12.9.0']), $metadata));
+
+        self::assertSame('v12.9.0', $reading->version());
+        self::assertNull($reading->datedBy());
+        self::assertSame('v13.2.0', $metadata->lastStableVersion());
+        self::assertSame('laravel/framework', $metadata->lastStableDatedBy());
+    }
+
+    /**
+     * The highest tag has its own date, and the newest date is a shared commit's on 12.x, which
+     * alone leaves S2 unknown. The parent dates that branch, so S2 reads the parent's release.
+     */
+    public function testAParentDateOfTheSharedNewestBranchGivesTheReleaseReading(): void
+    {
+        $metadata = self::splitWithASharedNewestBranch(true);
+
+        $reading = $this->measure()->release(FactsBuilder::facts(FactsBuilder::package(['name' => 'illuminate/collections', 'version' => 'v13.0.0']), $metadata));
+
+        self::assertSame('v12.70.0', $reading->version());
+        self::assertSame('laravel/framework', $reading->datedBy());
+    }
+
+    public function testASharedNewestBranchThatTheParentDoesNotDateLeavesTheReleaseUnmeasured(): void
+    {
+        $metadata = self::splitWithASharedNewestBranch(false);
+
+        self::assertUnmeasured(AgeMeasure::UNDATED_RELEASES, $this->measure()->release(FactsBuilder::facts(FactsBuilder::package(['name' => 'illuminate/collections', 'version' => 'v13.0.0']), $metadata)));
+    }
+
+    /** Ruling R15-28e: a newest date on a lower line leaves S6 and the moves on the highest line, with its own date. */
+    public function testTheS6VersionOfASplitWithASharedNewestBranchIsTheHighestLinesTag(): void
+    {
+        $own = self::splitWithASharedNewestBranch(false);
+
+        self::assertSame(['v13.0.0', 'v13.0.0'], [self::splitWithASharedNewestBranch(true)->lastStableVersion(), $own->lastStableVersion()]);
+        self::assertSame(self::ago(270 * 86400), $own->lastStableReleaseAt() === null ? null : $own->lastStableReleaseAt()->format(\DATE_ATOM));
+    }
+
+    /** v13.0.0 on its own commit 270 days ago, the 12.x tags on one commit 210 days ago, and a parent that dates 12.x or only 11.x. */
+    private static function splitWithASharedNewestBranch(bool $parentDatesTheSharedBranch): PackageMetadata
+    {
+        $tag = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => ['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace];
+        $loader = new ArrayLoader();
+        $child = PackageMetadata::fromPackages('illuminate/collections', array_map(static fn (array $release) => $loader->load($release), [
+            $tag('illuminate/collections', 'v13.0.0', 'c13-own', self::ago(270 * 86400)),
+            $tag('illuminate/collections', 'v12.70.0', 'c12-shared', self::ago(210 * 86400)),
+            $tag('illuminate/collections', 'v12.69.0', 'c12-shared', self::ago(210 * 86400)),
+            $tag('illuminate/collections', 'v12.68.0', 'c12-shared', self::ago(210 * 86400)),
+            $tag('illuminate/collections', 'v11.9.0', 'c11-shared', self::ago(400 * 86400)),
+            $tag('illuminate/collections', 'v11.8.0', 'c11-shared', self::ago(400 * 86400)),
+            $tag('illuminate/collections', 'v11.7.0', 'c11-shared', self::ago(400 * 86400)),
+        ]), new \DateTimeImmutable(self::NOW));
+        $dated = $parentDatesTheSharedBranch ? ['v12.70.0', 30] : ['v11.9.0', 300];
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $loader->load($tag('laravel/framework', $dated[0], 'f-'.$dated[0], self::ago($dated[1] * 86400), ['illuminate/collections' => 'self.version'])),
+        ], new \DateTimeImmutable(self::NOW));
+
+        return $child->datedBy($parent);
+    }
+
+    public function testOnTheSameDateTheReleaseReadingKeepsTheHigherVersion(): void
+    {
+        $facts = FactsBuilder::facts(FactsBuilder::package(['name' => 'illuminate/collections', 'version' => 'v13.0.0']), self::lowerBranchDatedSplit(self::ago(30 * 86400)));
+
+        $reading = $this->measure()->release($facts);
+
+        self::assertSame('v13.0.0', $reading->version());
+        self::assertNull($reading->datedBy());
+    }
+
+    /** The parent dates no release of the split's highest branch, so the lock time of a tag on its own commit stays a release date. */
+    public function testAParentDateOfALowerBranchLeavesTheInstalledReleaseOnItsOwnCommitDated(): void
+    {
+        $installedAt = self::ago(4 * Clock::SECONDS_PER_YEAR);
+        $facts = FactsBuilder::facts(FactsBuilder::package(['name' => 'illuminate/collections', 'version' => 'v13.0.0', 'time' => $installedAt]), self::lowerBranchDatedSplit($installedAt));
+
+        $reading = $this->measure()->installed($facts);
+
+        self::assertSame($installedAt, $reading->at() !== null ? $reading->at()->format(\DATE_ATOM) : null);
+        self::assertNull($reading->datedBy());
+    }
+
+    /**
+     * illuminate/collections: v13.0.0 on its own commit at $highestAt, the 12.x tags on one
+     * commit, and laravel/framework's v12.70.0 released 30 days ago.
+     */
+    private static function lowerBranchDatedSplit(string $highestAt): PackageMetadata
+    {
+        $tag = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => ['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace];
+        $loader = new ArrayLoader();
+        $child = PackageMetadata::fromPackages('illuminate/collections', array_map(static fn (array $release) => $loader->load($release), [
+            $tag('illuminate/collections', 'v13.0.0', 'c13-own', $highestAt),
+            $tag('illuminate/collections', 'v12.70.0', 'c12-shared', self::ago(5 * Clock::SECONDS_PER_YEAR)),
+            $tag('illuminate/collections', 'v12.69.0', 'c12-shared', self::ago(5 * Clock::SECONDS_PER_YEAR)),
+            $tag('illuminate/collections', 'v12.68.0', 'c12-shared', self::ago(5 * Clock::SECONDS_PER_YEAR)),
+        ]), new \DateTimeImmutable(self::NOW));
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $loader->load($tag('laravel/framework', 'v12.70.0', 'f12-70', self::ago(30 * 86400), ['illuminate/collections' => 'self.version'])),
+        ], new \DateTimeImmutable(self::NOW));
+
+        return $child->datedBy($parent);
     }
 
     /**

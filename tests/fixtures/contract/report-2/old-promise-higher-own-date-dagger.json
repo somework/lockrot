@@ -1044,7 +1044,7 @@
         "total": 1.96,
         "direct_requirements": 1.96,
         "measured": 1,
-        "at_least_count": 1,
+        "at_least_count": 0,
         "unmeasured": {
             "not_from_composer_repository": 0,
             "unavailable": 0,
@@ -1060,7 +1060,7 @@
             "package": "tubalmartin/cssmin",
             "version": "v4.1.1",
             "libyears": 1.96,
-            "at_least": true
+            "at_least": false
         },
         "packages": 1
     },
@@ -1306,7 +1306,7 @@
             "replacement_url": null,
             "note": null,
             "libyears_unmeasured": null,
-            "libyears_at_least": true,
+            "libyears_at_least": false,
             "direct": true,
             "dev": false,
             "reach": "direct",

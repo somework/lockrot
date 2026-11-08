@@ -3785,6 +3785,43 @@
     "S10-tag-undated\u2021": {
         "next_step": null
     },
+    "S2-parent-shared-lower\u2021": {
+        "next_step": {
+            "kind": "no-move",
+            "source": "stale",
+            "merged": [],
+            "fix_kind": null,
+            "reason": "package_quiet",
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "\u2014"
+        }
+    },
     "S2-shared-newest\u2021": {
         "next_step": {
             "kind": "no-move",
@@ -3834,6 +3871,43 @@
             ],
             "also": [],
             "text": "no move: no release above 2.2.4 admits PHP 8.5"
+        }
+    },
+    "S2-shared-unresolved\u2021": {
+        "next_step": {
+            "kind": "no-move",
+            "source": "stale",
+            "merged": [],
+            "fix_kind": null,
+            "reason": "package_quiet",
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "\u2014"
         }
     },
     "S5-parent-after-ga\u2021": {
@@ -4241,6 +4315,78 @@
         "move_in": "next_step",
         "partial": null
     },
+    "S6-snapshot-backport-newer\u2021": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "13.x",
+            "version": "v13.0.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v13.0.0",
+                "released": "2026-01-11T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "older",
+                "snapshot_time": "2026-02-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "friendsofsymfony/oauth-server-bundle:^13.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "friendsofsymfony/oauth-server-bundle",
+                    "v13.0.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest is v13.0.0 (2026-01-11), older than your snapshot (2026-02-01); review, or replace; 13.x needs php >=7.2, which require.php allows"
+        }
+    },
     "S8-higher-shared-alive\u2021": {
         "next_step": {
             "kind": "raise-php",
@@ -4320,6 +4466,9 @@
         "next_step": null
     },
     "S8-higher-undated-stale\u2021": {
+        "next_step": null
+    },
+    "S8-installed-lower-dated\u2021": {
         "next_step": null
     },
     "S8-prerelease-installed\u2021": {
@@ -15012,8 +15161,8 @@
             "newest": null,
             "constraint": null,
             "latest": {
-                "version": "v4.1.3",
-                "released": null,
+                "version": "v5.0.0",
+                "released": "2020-01-01T00:00:00+00:00",
                 "is_installed": false,
                 "relation": null,
                 "snapshot_time": null
@@ -16137,15 +16286,15 @@
             "reason": null,
             "replacement": null,
             "quiet_years": null,
-            "to_branch": "1.x",
-            "version": "v1.9.3",
+            "to_branch": "2.x",
+            "version": "v2.0.0",
             "newest": null,
             "constraint": null,
             "latest": {
-                "version": "v1.9.3",
-                "released": null,
+                "version": "v2.0.0",
+                "released": "2024-01-01T00:00:00+00:00",
                 "is_installed": false,
-                "relation": null,
+                "relation": "newer",
                 "snapshot_time": "2018-06-01T00:00:00+00:00"
             },
             "php_check": {
@@ -16164,27 +16313,16 @@
                     "basis": "tags_only"
                 }
             ],
-            "unverified": [
-                {
-                    "kind": "flag",
-                    "id": "left-behind",
-                    "reason": "undated"
-                },
-                {
-                    "kind": "flag",
-                    "id": "old-promise",
-                    "reason": "undated"
-                }
-            ],
+            "unverified": [],
             "adds": [],
             "leaves": [],
-            "clears_all": false,
+            "clears_all": true,
             "if_applied": {
-                "total": 20,
-                "verdict": "high",
-                "lead": "left-behind",
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
                 "deciding_advisory": null,
-                "at_most": true,
+                "at_most": false,
                 "assumes": [
                     "clears_hold"
                 ]
@@ -16196,19 +16334,19 @@
                 [
                     "composer",
                     "require",
-                    "friendsofsymfony/oauth-server-bundle:^1.9.3"
+                    "friendsofsymfony/oauth-server-bundle:^2.0.0"
                 ],
                 [
                     "composer",
                     "why-not",
                     "friendsofsymfony/oauth-server-bundle",
-                    "v1.9.3",
+                    "v2.0.0",
                     "--locked"
                 ]
             ],
             "through": [],
             "also": [],
-            "text": "require a tag \u2014 the newest is v1.9.3; 1.x needs php >=7.2, which require.php allows; not checked: left-behind, old-promise"
+            "text": "require a tag \u2014 the newest is v2.0.0 (2024-01-01); 2.x needs php >=7.2, which require.php allows"
         }
     },
     "pinned-prerelease-newest\u2021": {
@@ -16390,6 +16528,135 @@
             "through": [],
             "also": [],
             "text": "no move: lockrot did not read its releases, so it names none; review the snapshot"
+        }
+    },
+    "platform-minor-below-known\u2021": {
+        "next_step": {
+            "kind": "blocked",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "6.x",
+            "version": null,
+            "newest": "v6.13.1",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+                "project_allows": false,
+                "target_runs": false,
+                "raise_to": ">=8.0",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "no move runs on the target: 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and the target php 5.2 does not run it"
+        }
+    },
+    "platform-minor-excluded\u2021": {
+        "next_step": {
+            "kind": "blocked",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "6.x",
+            "version": null,
+            "newest": "v6.13.1",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+                "project_allows": false,
+                "target_runs": false,
+                "raise_to": ">=8.0",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "no move runs on the target: 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and the target php 7.5 does not run it"
+        }
+    },
+    "platform-minor-unlisted\u2021": {
+        "next_step": {
+            "kind": "blocked",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "6.x",
+            "version": null,
+            "newest": "v6.13.1",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+                "project_allows": false,
+                "target_runs": false,
+                "raise_to": ">=8.0",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "no move runs on the target: 6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 and the target php 7.5 does not run it"
         }
     },
     "platform-step-inside\u2021": {

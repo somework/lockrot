@@ -6,9 +6,11 @@ namespace Lockrot\Tests\Unit\Solver;
 
 use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Config;
+use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
+use Composer\Repository\ComposerRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Semver\VersionParser;
 use Composer\Util\Platform;
@@ -21,6 +23,7 @@ use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveChecker;
 use Lockrot\Solver\MoveQuery;
 use Lockrot\Solver\PoolAdvisories;
+use Lockrot\Solver\RepositoryVersions;
 use Lockrot\Solver\SolverChecker;
 use Lockrot\Solver\VersionSource;
 use Lockrot\Tests\Support\ArrayVersionSource;
@@ -1248,6 +1251,48 @@ final class SolverCheckerTest extends TestCase
 
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::SOLVER_ERROR, 'installs' => null], $outcome->check()->jsonSerialize());
         self::assertSame(['class' => \Error::class, 'message' => 'Call to undefined method Composer\\DependencyResolver\\Pool::removed()'], $checker->solverError());
+    }
+
+    /** Ruling R14-1: after an error in a repository's answer stops one solve, a later solve that needs that name reads it as not loaded. */
+    public function testALaterSolveThatNeedsANameWhoseLoadRaisedAnErrorIsNotCheckedWithAnUnloadedName(): void
+    {
+        $served = [];
+        foreach (['acme/lib', 'acme/other'] as $name) {
+            foreach (['1.0.0', '1.1.0'] as $version) {
+                $served[] = (new ArrayLoader())->load(['name' => $name, 'version' => $version, 'require' => $version === '1.1.0' ? ['acme/broken' => '^1.0'] : []]);
+            }
+        }
+        $repository = new class ($served) extends ComposerRepository {
+            /** @var array<BasePackage> */
+            private array $served;
+
+            /** @param array<BasePackage> $served */
+            public function __construct(array $served)
+            {
+                $this->served = $served;
+            }
+
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
+            {
+                if (\array_key_exists('acme/broken', $packageNameMap)) {
+                    throw new \TypeError('Composer\MetadataMinifier\MetadataMinifier::expand(): Argument #1 ($versions) must be of type array, string given');
+                }
+                $packages = array_values(array_filter($this->served, static fn (BasePackage $package): bool => \array_key_exists($package->getName(), $packageNameMap) && isset($acceptableStabilities[$package->getStability()])));
+
+                return ['namesFound' => array_map(static fn (BasePackage $package): string => $package->getName(), $packages), 'packages' => $packages];
+            }
+        };
+        $checker = self::checkerWith(
+            ['acme/lib' => '^1.0', 'acme/other' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/other', 'version' => '1.0.0']],
+            new RepositoryVersions([$repository], [], false, Deadline::never())
+        );
+
+        $first = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+        $later = $checker->check(MoveQuery::update('acme/other', '^1.1.0', '1.1.0'));
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::SOLVER_ERROR, 'installs' => null], $first->check()->jsonSerialize());
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null], $later->check()->jsonSerialize());
     }
 
     /** The solver stops at its first failing chain: the scan of the target release names the other holds. */

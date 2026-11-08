@@ -262,6 +262,14 @@ final class NotCheckedRuleTest extends TestCase
         self::assertStringContainsString('so S8 could not measure it', $signal->summary());
     }
 
+    /** The installed branch released inside `release-warn-years`, so its undated highest tag cannot raise S8: S8 lost nothing. */
+    public function testAnUndatedHighestTagAboveADatedReleaseInsideTheWarnYearsDoesNotBlockS8(): void
+    {
+        $metadata = F::metadata([['v3.0.0', '2026-06-01T00:00:00+00:00'], ['v2.5.1', null], ['v2.5.0', '2025-06-01T00:00:00+00:00']]);
+
+        self::assertNull($this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v2.5.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), [])));
+    }
+
     /** S8 compares with a higher branch, so an undated installed branch with none above takes nothing from S8. */
     public function testAnUndatedInstalledBranchWithNoHigherBranchDoesNotBlockS8(): void
     {

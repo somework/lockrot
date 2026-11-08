@@ -164,7 +164,7 @@ S6's evidence reads the same whether or not the package ever released. Its `data
 | `version` | The installed version, as the lock writes it |
 | `reason` | `branch_snapshot` when the installed version is a branch (checked first), `no_stable_release` when it is not and the repository lists no tagged version. An [open set](schema.md#open-sets) |
 | `has_stable_release` | Whether the repository lists any tagged version. A pre-release counts, a branch does not. Null when lockrot loaded no repository metadata for the package (a `vcs` or `path` entry, a package the repository does not list, metadata that did not load) |
-| `last_stable_release`, `last_stable_version` | The newest *dated* tagged release, a pre-release included, which is not always the highest tag. Both are null with no tagged release or with no metadata. `last_stable_release` is null, and `last_stable_version` set, in two cases that no [monorepo parent](#dates-from-the-monorepo) dates. When the highest tag has no date that lockrot trusts, the version is that tag. When the newest date is a shared commit's on a lower tag, the version is that lower tag. A set `last_stable_release` implies a set `last_stable_version` |
+| `last_stable_release`, `last_stable_version` | The newest *dated* tagged release, a pre-release included, which is not always the highest tag. A newest date on a line below the highest stable line gives way to the newest dated release of that line. Both are null with no tagged release or with no metadata. `last_stable_release` is null, and `last_stable_version` set, in two cases that no [monorepo parent](#dates-from-the-monorepo) dates. When the highest tag has no date that lockrot trusts, the version is that tag. When the newest date is a shared commit's on a lower tag of the highest line, the version is that lower tag. A set `last_stable_release` implies a set `last_stable_version` |
 | `last_stable_dated_by` | The monorepo parent that dated that release, else null |
 | `snapshot_time` | For a snapshot, the lock's `time`: the date of the commit the branch pointed at, not a release. Null for `no_stable_release`, and when the lock entry has no `time` |
 | `tag_relation` | How the newest tag compares with the snapshot: `older`, `newer` or `same`, else null. An [open set](schema.md#open-sets) |
@@ -233,7 +233,8 @@ S8 is not measured for:
   private fork, or a lock written against a tag since deleted. An installed pre-release above that
   tag is still on the branch, and S8 judges the branch's newest stable release.
 
-- A branch whose highest tag has no [trusted date](#dates-from-the-monorepo).
+- A branch whose highest tag has no [trusted date](#dates-from-the-monorepo), unless the branch's
+  newest release with a trusted date is inside `release-warn-years`.
 
 - An installed branch whose newest dated release is a lower tag that only a commit shared with other
   tags dates. `age.branch_release` is then null with `undated_releases`.
@@ -434,15 +435,22 @@ request on it.
 - The parent dates the installed version too. Where it lists the same version, its date replaces
   the lock's shared-commit `time` for [libyears](#libyears), `age.installed` and
   [S5](#old-promise). `--explain` prints
-  it as `installed release` (`installed_release_dated_by` in JSON). Where it does not, the
-  package is unmeasured. The reason is `shared_commit` when the installed tag shares its commit.
-  Else it is `parent_split`: a parent dates the newest release of the split, so the lock time of
-  the installed tag is not a release date.
+  it as `installed release` (`installed_release_dated_by` in JSON).
+
+- Where the parent does not list the installed version, the installed tag decides. A tag that
+  shares its commit is unmeasured with the reason `shared_commit`. A tag on its own commit is
+  unmeasured with the reason `parent_split` when a parent dates the split's highest branch. The
+  lock time of that tag is then not a release date. If no parent dates the highest branch,
+  lockrot trusts the lock time of a tag on its own commit.
 
 - A branch the parent does not have, or does not date either, stays unmeasured, as does every
   branch in an install-time run that has spent its [budget](install-time.md#time-budget).
 
 - S2 and S8 carry the parent as `dated_by`, and `--explain` marks the branch rows it supplied.
+
+- When the highest tag has a trusted date or a parent date, S2 reads the newest trusted date over
+  every branch row.
+  A lower branch that the parent dates counts, and so does a dated pre-release.
 
 - S8 can quote a branch's highest tag, or a lower tag, that only a commit shared with other tags
   dates. A release is never older than its commit, so that date is a lower bound. The summary then says "on or after"
@@ -1046,13 +1054,14 @@ How lockrot reads the window:
   a later patch of that minor. So with `config.platform.php` 8.4.0, a patch floor such as
   `>=8.4.2` keeps 8.4 in the window, and `lower_edge.php` reads 8.4.2. A cap below that PHP leaves
   the minor out.
-- A target minor above the newest known minor, such as 8.6 before its GA, counts as one more known
-  minor of the window. A set that admits it lists it in `minors`. A cap that excludes it gives
+- A target minor that the release data does not list counts as one more known minor of the
+  window, in version order. Examples are 8.6 before its GA, and 7.5 or 5.2 from
+  `config.platform.php`. A set that admits it lists it in `minors`. A cap that excludes it gives
   `upper_edge` with `excludes` set to that minor, and `set_by` lists the links of the cap. The
   edges, `gaps` and the `php:` line read this minor too. [`capped`](#capped) does not: its R and
   `stops_at`, and the `capped` test of a move, read the known minors without it.
 - lockrot reads the edges and `gaps` on the known minors. PHP 6 and PHP 7.5 to 7.9 do not exist, so
-  `~7.4.0 || ~8.0.0` has no gap.
+  `~7.4.0 || ~8.0.0` has no gap, unless the target's minor is one of them.
 - `lower_edge.php` is the lowest PHP of the first minor in the window. `lower_edge.set_by` lists the
   links that exclude the PHP just below it.
 - `upper_edge.excludes` is the known minor after the window, and `upper_edge.set_by` lists the links
@@ -1127,10 +1136,11 @@ moves: checked with the solver of Composer 2.10.3 against the lock; ext-*, lib-*
 php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
 ```
 
-wallabag 2.6.14 at the target PHP 8.4, whose composer.json requires `php-http/guzzle5-adapter ^2.0`:
+wallabag 2.6.14 at the target PHP 8.4, where three requirements of composer.json and one
+requirement of a package hold the update:
 
 ```text
-php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer's solver at PHP 8.4 refuses the update of the 3 packages that exclude it: composer.json requires php-http/guzzle5-adapter ^2.0
+php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer's solver at PHP 8.4 refuses the update of the 3 packages that exclude it: composer.json requires bdunogier/guzzle-site-authenticator ^1.1.0, composer.json requires guzzlehttp/guzzle ^5.3.4, composer.json requires php-http/guzzle5-adapter ^2.0 and bdunogier/guzzle-site-authenticator 1.1.0 requires guzzlehttp/guzzle ^5.3.1
 ```
 
 ## <a name="score"></a>The score {#score}
@@ -1406,8 +1416,9 @@ libyears: at least 189.8 behind across 194 of 200 packages · 120.2 from direct 
 furthest behind phpdocumentor/reflection-common 2.2.0 at 5.4
 ```
 
-For each package, lockrot takes the years from the installed version's release to the package's
-newest release (the date S2 reads). It counts years of 365.25 days, never below zero, and sums them
+For each package, lockrot takes the years from the installed version's release to the newest
+release on the package's highest line. A newer release on a lower line does not count, so this date
+is not always the one that S2 reads. It counts years of 365.25 days, never below zero, and sums them
 over the packages the run analysed. The installed version's date is the lock's `time`, or its
 [monorepo parent's](#dates-from-the-monorepo). The number does not read the clock. The package
 furthest behind is the one with the highest value. A tie goes to the package whose name sorts first

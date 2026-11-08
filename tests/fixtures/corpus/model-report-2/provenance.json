@@ -1,7 +1,7 @@
 {
     "written_by": "security-axis/spec_flags_r3_docs.py reports <dir> <out> --cache tests/fixtures/corpus/cache --php-fit <file>, in the private model folder, then tools/corpus/differential.php --adopt-model",
     "model": {
-        "spec_flags_r3.py": "c6181ccfb86b39d7afcf6235acb772cd070a0ba381690e21c07a4c545caf1c34",
+        "spec_flags_r3.py": "2ce2e1bfde24ec601e9285c6d541deafdce8152583222b7fb94da0996e958e84",
         "spec_flags_r3_docs.py": "10de59875e2f289e568d5ffd6731b2e14c228d9259aab9775c9c632ed65234fd"
     },
     "model_inputs": {
@@ -1425,7 +1425,7 @@
         "koel_koel.json": "6eb242c8ba627b31516813027a76b2e67e465ffb202fdeb73aacb52684cd20e1",
         "magento_magento2.json": "c56b7e62e69526376d93d302649bc68397e20c5bdba19fb9e39d093f467e4da1",
         "matomo-org_matomo.json": "32b222e5baef7bd9b378400c0834b49ce330fd6002e3d762672795f43e7a6303",
-        "mautic_mautic.json": "c72a857d46e253066e769d2d9fcf6c419cf607eebb4bb9c0e4e355ba2189a8ef",
+        "mautic_mautic.json": "613886a94bf6f80c7df7661a3a79dd488851349e7d3f07fe4cda2c2aed04b6a9",
         "monicahq_monica.json": "1d93dd422779e36cdc098aa48d53a458f5c32f68457ddad15a94ce4bda244104",
         "nextcloud_3rdparty.json": "f9534740dad2e0d829492a20d09548ad852f92ef9d1ceaa669cd983daab906ed",
         "wallabag_wallabag.json": "be63423f0b7fbd743b578e8c0b4f037e509d28c3ba266f8e6c532f993afa94e1"
