@@ -585,30 +585,51 @@ final class PackageMetadataDatedByTest extends TestCase
         ], new \DateTimeImmutable(self::NOW));
     }
 
+    /** A parent that dates the split's undated v2.1.0, so datedBy() replaces the split's own reading. */
+    private function parentOfUndatedV21(string $at): PackageMetadata
+    {
+        return PackageMetadata::fromPackages('acme/monorepo', [
+            $this->load(self::tag('acme/monorepo', 'v2.1.0', 'm21', $at, ['acme/split' => 'self.version'])),
+        ], new \DateTimeImmutable(self::NOW));
+    }
+
     public function testTheNewestPreReleaseIsTheNewestByDateAndThenByVersion(): void
     {
         $child = $this->split([
             ['v3.0.0-beta1', 'c-b1', '2025-09-01T00:00:00+00:00'],
             ['v3.0.0-beta3', 'c-b3', '2025-10-01T00:00:00+00:00'],
             ['v3.0.0-beta2', 'c-b2', '2025-10-01T00:00:00+00:00'],
-            ['v2.0.0', 'c20', '2024-01-01T00:00:00+00:00'],
+            ['v2.1.0', 'c21', null],
         ]);
 
-        $dated = $child->datedBy($this->parentOfV2());
+        $dated = $child->datedBy($this->parentOfUndatedV21('2024-01-01T00:00:00+00:00'));
 
         self::assertSame('v3.0.0-beta3', $dated->releaseReadingVersion(), 'beta3 and beta2 share the newest date, and beta3 is the higher version');
     }
 
-    public function testAPreReleaseOnTheReadingsDateWinsByVersion(): void
+    public function testAPreReleaseOnTheParentDatesDayWinsByVersion(): void
     {
         $child = $this->split([
             ['v3.0.0-beta1', 'c-b1', '2024-01-01T00:00:00+00:00'],
-            ['v2.0.0', 'c20', '2024-01-01T00:00:00+00:00'],
+            ['v2.1.0', 'c21', null],
         ]);
 
-        $dated = $child->datedBy($this->parentOfV2());
+        $dated = $child->datedBy($this->parentOfUndatedV21('2024-01-01T00:00:00+00:00'));
 
         self::assertSame('v3.0.0-beta1', $dated->releaseReadingVersion());
+    }
+
+    public function testAnUndatedMiddleLineDoesNotEndTheWalkOverTheRows(): void
+    {
+        $child = $this->split([
+            ['v2.1.0', 'c21', null],
+            ['v1.0.0', 'c10', null],
+            ['v0.9.0', 'c09', '2025-01-01T00:00:00+00:00'],
+        ]);
+
+        $dated = $child->datedBy($this->parentOfUndatedV21('2024-01-01T00:00:00+00:00'));
+
+        self::assertSame('v0.9.0', $dated->releaseReadingVersion(), 'v0.9.0 on 2025-01-01 is newer than the parent date of v2.1.0');
     }
 
     public function testAnUndatedHighestTagKeepsItsOwnReadingBesideANewerLowerLine(): void
