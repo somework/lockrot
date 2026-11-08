@@ -62,8 +62,9 @@ How lockrot writes a report or a baseline:
   replaced stays whole.
 
 - A run that stops during a write can leave a `*.tmp` file beside the target. When lockrot cannot
-  write a file, it removes its own `*.tmp` file and exits `2`. `self-update` stages the new archive
-  beside the PHAR ([Keeping it updated](docs/phar.md#keeping-it-updated)).
+  write a file, it tries to remove its own `*.tmp` file and exits `2` ([Exit codes](docs/ci.md#exit-codes)).
+  If the removal fails, the `*.tmp` file stays. `self-update` stages the new archive beside the PHAR
+  ([Keeping it updated](docs/phar.md#keeping-it-updated)).
 
 - lockrot writes an absolute path where it points, inside the project or not.
 
