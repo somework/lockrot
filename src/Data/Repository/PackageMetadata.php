@@ -107,6 +107,8 @@ final class PackageMetadata
     private ?\DateTimeImmutable $releaseReadingAt;
     private ?string $releaseReadingVersion;
     private ?string $releaseReadingDatedBy;
+    /** @var array{0: \DateTimeImmutable, 1: string}|null the newest dated pre-release: its date and its pretty version */
+    private ?array $newestPreRelease = null;
 
     /**
      * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string}> $latestStableByBranch
@@ -194,6 +196,7 @@ final class PackageMetadata
         $commitByVersion = [];
         // Dated or not, unlike $commitByVersion: the shared-commit tags are read from it.
         $commitOfTag = [];
+        $newestPreRelease = null;
         /** @var array<string, array{0: BasePackage, 1: ?\DateTimeImmutable, 2: ?string}> $stable by normalized version: the release, its date, its php */
         $stable = [];
 
@@ -220,6 +223,9 @@ final class PackageMetadata
                 $releaseDate = $version->getReleaseDate();
                 if ($releaseDate !== null) {
                     $releaseDate = self::toImmutable($releaseDate);
+                    if (VersionParser::parseStability($version->getVersion()) !== 'stable' && ($newestPreRelease === null || $releaseDate > $newestPreRelease[0])) {
+                        $newestPreRelease = [$releaseDate, $version->getPrettyVersion()];
+                    }
                     if (self::newer($releaseDate, $version->getVersion(), $lastStableReleaseAt, $lastStableNormalized)) {
                         $lastStableReleaseAt = $releaseDate;
                         $lastStableVersion = $version->getPrettyVersion();
@@ -363,6 +369,7 @@ final class PackageMetadata
             $lastStableShared
         );
         [$metadata->releaseReadingAt, $metadata->releaseReadingVersion] = $releaseReading;
+        $metadata->newestPreRelease = $newestPreRelease;
         if ($installedVersion !== null) {
             $metadata->keepReleases($versions, $stable, $sharedCommitVersions, $dataDate, $installedVersion);
         }
@@ -558,6 +565,11 @@ final class PackageMetadata
                     $releaseReadingDatedBy = $datedByParent ? $parent->name : null;
                 }
             }
+            // The branch rows hold stable tags only. S2 counts a dated pre-release too (SPEC §8.4.1).
+            if ($this->newestPreRelease !== null && self::newerTag($this->newestPreRelease[0], $this->newestPreRelease[1], $releaseReadingAt, $releaseReadingVersion)) {
+                [$releaseReadingAt, $releaseReadingVersion] = $this->newestPreRelease;
+                $releaseReadingDatedBy = null;
+            }
             if ($unresolved !== null && $unresolved > $releaseReadingAt) {
                 $releaseReadingAt = null;
                 $releaseReadingVersion = $lastStableVersion;
@@ -593,6 +605,7 @@ final class PackageMetadata
         $dated->releaseReadingAt = $releaseReadingAt;
         $dated->releaseReadingVersion = $releaseReadingVersion;
         $dated->releaseReadingDatedBy = $releaseReadingDatedBy;
+        $dated->newestPreRelease = $this->newestPreRelease;
         $dated->releasesAbove = $this->releasesAbove === null ? null : array_map(
             static fn (StableRelease $release): StableRelease => $release->sharedCommit() ? $release->withDate($parent->releaseDateOf($release->normalized())) : $release,
             $this->releasesAbove

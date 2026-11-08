@@ -517,4 +517,45 @@ final class PackageMetadataDatedByTest extends TestCase
         self::assertNull($dated->releaseReadingAt(), 'the shared 1.x date 2026-01-01 is newer than the parent date 2025-01-01');
         self::assertTrue($dated->lastStableSharesItsCommit(), 'S10 names the shared commit, not an undated tag');
     }
+
+    /** SPEC §8.4.1: `age.release` reads the newest tag by date, pre-releases counted, also after a parent date. */
+    public function testADatedPreReleaseNewerThanTheParentDatedLowerLineStaysTheReading(): void
+    {
+        $child = PackageMetadata::fromPackages('acme/split', [
+            $this->load(self::tag('acme/split', 'v3.0.0-beta1', 'c3-beta', '2025-09-01T00:00:00+00:00')),
+            $this->load(self::tag('acme/split', 'v2.0.0', 'c20-own', '2024-01-01T00:00:00+00:00')),
+            $this->load(self::tag('acme/split', 'v1.9.2', 'c1-shared', '2026-01-01T00:00:00+00:00')),
+            $this->load(self::tag('acme/split', 'v1.9.1', 'c1-shared', '2026-01-01T00:00:00+00:00')),
+            $this->load(self::tag('acme/split', 'v1.9.0', 'c1-shared', '2026-01-01T00:00:00+00:00')),
+        ], new \DateTimeImmutable(self::NOW));
+        $parent = PackageMetadata::fromPackages('acme/monorepo', [
+            $this->load(self::tag('acme/monorepo', 'v1.9.2', 'm192', '2025-06-01T00:00:00+00:00', ['acme/split' => 'self.version'])),
+        ], new \DateTimeImmutable(self::NOW));
+
+        $dated = $child->datedBy($parent);
+
+        self::assertSame('v3.0.0-beta1', $dated->releaseReadingVersion(), 'the beta 2025-09-01 is newer than the parent\'s 1.x date 2025-06-01');
+        self::assertEquals(new \DateTimeImmutable('2025-09-01T00:00:00+00:00'), $dated->releaseReadingAt());
+        self::assertNull($dated->releaseReadingDatedBy());
+    }
+
+    public function testADatedPreReleaseStaysTheReadingWhenTheParentDatesTheUndatedHighestLine(): void
+    {
+        $undated = self::tag('acme/split', 'v2.1.0', 'c21-own', '2000-01-01T00:00:00+00:00');
+        unset($undated['time']);
+        $child = PackageMetadata::fromPackages('acme/split', [
+            $this->load(self::tag('acme/split', 'v3.0.0-beta1', 'c3-beta', '2026-06-01T00:00:00+00:00')),
+            $this->load($undated),
+        ], new \DateTimeImmutable(self::NOW));
+        $parent = PackageMetadata::fromPackages('acme/monorepo', [
+            $this->load(self::tag('acme/monorepo', 'v2.1.0', 'm21', '2022-01-01T00:00:00+00:00', ['acme/split' => 'self.version'])),
+        ], new \DateTimeImmutable(self::NOW));
+        self::assertSame('v3.0.0-beta1', $child->releaseReadingVersion());
+
+        $dated = $child->datedBy($parent);
+
+        self::assertSame('v3.0.0-beta1', $dated->releaseReadingVersion(), 'the parent date 2022-01-01 of 2.x is older than the beta 2026-06-01');
+        self::assertEquals(new \DateTimeImmutable('2026-06-01T00:00:00+00:00'), $dated->releaseReadingAt());
+        self::assertSame('v2.1.0', $dated->lastStableVersion(), 'the metadata keep the highest stable line');
+    }
 }
