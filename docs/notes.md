@@ -369,10 +369,10 @@ on. The note names the first such failure of the run.
 ### <a name="command_argument_unsafe"></a>Command argument unsafe {#command_argument_unsafe}
 
 A move quotes a release name in its steps: its `version`, its `constraint` without the caret, or
-`latest.version` on a tag move. The `>=` of the php step `php:>=8.1` is no release name. When that
-name holds `|`, `<` or `>`, a Windows shell
-that you paste the POSIX line into runs another program or redirects to a file. That move
-writes no step: `commands` is empty, and the text ends with the clause `lockrot prints no command, because its
+`latest.version` on a tag move. The `>=` of the php step `php:>=8.1` is no release name. If a
+release name holds `|`, `<` or `>`, a Windows shell runs another program or redirects to a file.
+This happens when you paste the POSIX line into that shell. Such a move writes no step:
+`commands` is empty, and the text ends with the clause `lockrot prints no command, because its
 release name holds |, < or >`. The move check still runs, and no other field of the move changes.
 When the move check runs, such an update is no `security.update_now` member, and the other
 members are solved without it. A run without the move check names the package in `update now:`
