@@ -127,6 +127,46 @@ final class PageGoldensTest extends TestCase
     }
 
     /**
+     * SPEC-0.14.md §7.9.4 "Libyears" and §7.9.15 line 3: the block prints `libyears.total` and
+     * `libyears.direct_requirements` with two decimals, and "at least" when `libyears.at_least_count` is
+     * above 0. The copy summary prints the total with one decimal, half up as `number_format` rounds
+     * (§7.9.9).
+     *
+     * @dataProvider provideEveryGolden
+     */
+    #[DataProvider('provideEveryGolden')]
+    public function testTheLibyearsBlockAndTheCopySummaryReadTheDocumentLibyears(string $id): void
+    {
+        $golden = JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens', $id]);
+        $document = self::modelDocument(JsonPath::stringAt($golden, ['document']));
+        $lines = array_values(array_filter(JsonPath::arrayAt($golden, ['copy_summary']), 'is_string'));
+        $clauses = preg_grep('/libyears behind\.$/', explode(' · ', $lines[2] ?? '')) ?: [];
+        self::assertArrayHasKey('libyears', $golden, $id.': re-record page-goldens.json from the model');
+        $block = \is_array($golden['libyears']) ? $golden['libyears'] : [];
+        $stated = ['figure' => $block['figure'] ?? null, 'bound' => $block['bound'] ?? null, 'sub' => $block['sub'] ?? null, 'copy_summary' => array_values($clauses)];
+
+        if (JsonPath::intAt($document, ['packages_checked']) === 0) {
+            self::assertNull($golden['libyears'], $id.': an empty lock prints no libyears block');
+            self::assertSame([], $stated['copy_summary'], $id.': an empty lock prints no libyears clause');
+
+            return;
+        }
+        $libyears = JsonPath::arrayAt($document, ['libyears']);
+        $measured = JsonPath::intAt($libyears, ['measured']);
+        $atLeast = JsonPath::intAt($libyears, ['at_least_count']) > 0 ? 'at least ' : '';
+        $expected = $measured === 0
+            ? ['figure' => null, 'bound' => '', 'sub' => 'no package measured', 'copy_summary' => []]
+            : [
+                'figure' => number_format(self::floatAt($libyears, 'total'), 2, '.', ''),
+                'bound' => rtrim($atLeast),
+                'sub' => 'over '.$measured.($measured === 1 ? ' package' : ' packages').' · '.number_format(self::floatAt($libyears, 'direct_requirements'), 2, '.', '').' from direct requirements',
+                'copy_summary' => [$atLeast.number_format(self::floatAt($libyears, 'total'), 1, '.', '').' libyears behind.'],
+            ];
+
+        self::assertSame($expected, $stated, $id.': re-record page-goldens.json from the model');
+    }
+
+    /**
      * SPEC-0.14.md §7.9.7: the gate partition is null when no finding fails the gate, and its three
      * counts sum to the root `gate.failing`.
      *
@@ -566,6 +606,15 @@ final class PageGoldensTest extends TestCase
         }
 
         return \is_string($data) ? $data : null;
+    }
+
+    /** @param array<mixed, mixed> $libyears */
+    private static function floatAt(array $libyears, string $key): float
+    {
+        $value = $libyears[$key] ?? null;
+        self::assertTrue(\is_int($value) || \is_float($value), 'libyears.'.$key.' is a number');
+
+        return (float) $value;
     }
 
     /** @return array<mixed, mixed> */
