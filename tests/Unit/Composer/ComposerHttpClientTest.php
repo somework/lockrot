@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Composer;
 
+use Composer\Composer;
 use Composer\Config;
 use Composer\Downloader\TransportException;
 use Composer\IO\BufferIO;
@@ -188,6 +189,29 @@ final class ComposerHttpClientTest extends TestCase
         $io = new BufferIO();
         $io->setAuthentication('github.com', '["X-Api-Key: k", 5]', 'custom-headers');
         self::assertSame(self::HEADERS, ComposerHttpClient::withoutRedundantAuthorization($io, self::config(), self::GITHUB, self::HEADERS, false), 'no credential header in the list');
+    }
+
+    /** The running Composer decides through its AuthHelper. The CI rows on Composer 2.10 and on the newest Composer run one each. */
+    public function testTheRunningComposerBefore2111SendsTheCredentialOfAListWithANonStringElement(): void
+    {
+        if (version_compare(Composer::VERSION, '2.11.1', '>=')) {
+            self::markTestSkipped('Composer '.Composer::VERSION.' drops such a list whole');
+        }
+        $io = new BufferIO();
+        $io->setAuthentication('github.com', '["Authorization: Bearer theirs", 5]', 'custom-headers');
+
+        self::assertSame(self::WITHOUT_AUTHORIZATION, ComposerHttpClient::withoutRedundantAuthorization($io, self::config(), self::GITHUB, self::HEADERS));
+    }
+
+    public function testTheRunningComposerFrom2111DropsAListWithANonStringElementSoLockrotsTokenStays(): void
+    {
+        if (version_compare(Composer::VERSION, '2.11.1', '<')) {
+            self::markTestSkipped('Composer '.Composer::VERSION.' sends every element of such a list');
+        }
+        $io = new BufferIO();
+        $io->setAuthentication('github.com', '["Authorization: Bearer theirs", 5]', 'custom-headers');
+
+        self::assertSame(self::HEADERS, ComposerHttpClient::withoutRedundantAuthorization($io, self::config(), self::GITHUB, self::HEADERS));
     }
 
     /**

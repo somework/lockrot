@@ -117,7 +117,7 @@ final class ComposerHttpClient implements HttpClientInterface
         }
         // AuthHelper adds no credential header for an SSL client certificate, or for custom headers
         // that carry none, so lockrot's header stays.
-        // AuthHelper::addCustomHeaders() is the method that validates the list, so its presence tells the Composer.
+        // AuthHelper::addCustomHeaders() validates the list, so its presence marks a Composer that drops a list with a non-string element.
         if (!self::composerSendsCredential($auth, $dropsInvalidCustomHeaders ?? (new \ReflectionClass(AuthHelper::class))->hasMethod('addCustomHeaders'))) {
             return $headers;
         }

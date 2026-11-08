@@ -108,11 +108,12 @@ carries `User-Agent: lockrot`.
   api.github.com.
 
 - Exception: Composer's entry for the host can be a client certificate, or custom headers without
-  an `Authorization` or `PRIVATE-TOKEN` header. Composer before 2.11.1 sends every element of a
-  `custom-headers` list, and 2.11.1 and newer drop a list that holds a value which is not a string
-  whole. Such a list counts as no header. Such an entry is no credential. The host counts as anonymous,
-  so the cap of 50 and the cause `no_token` stay. Composer adds no credential header, and lockrot
-  sends its own.
+  an `Authorization` or `PRIVATE-TOKEN` header. Such an entry is no credential. A `custom-headers`
+  list that holds a value which is not a string is no credential either. The host counts as
+  anonymous, so the cap of 50 and the cause `no_token` stay. Composer then adds no credential
+  header, and lockrot sends its own. The one difference is such a list on Composer before 2.11.1:
+  that Composer sends every element of the list. When an element is an `Authorization` header,
+  lockrot sends none of its own. Composer 2.11.1 and newer send none of such a list.
 
 - When a host redirects to another origin, lockrot asks that origin again without its own header.
   Where Composer cannot stop a redirect (without the curl extension), lockrot

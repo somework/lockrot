@@ -107,11 +107,9 @@ final class AtomicWriterTest extends TestCase
     }
 
     /**
-     * The temporary file takes the target's read-only mode, then the move fails. On Unix the cleanup
-     * works either way, because unlink() needs the directory's permission and not the file's. The
-     * read-only file target that makes MoveFileEx refuse on Windows has no Unix reproduction, so this
-     * test pins the cleanup for a failed move after the mode was copied, and only Windows CI would
-     * fail without the chmod before unlink.
+     * The temporary file takes the target's read-only mode, then the move fails. On Unix unlink()
+     * needs the directory's permission and not the file's, so this test passes without the chmod
+     * before unlink. It pins the cleanup after the mode copy. The Windows case is the next test.
      */
     public function testAFailedMoveOntoAReadOnlyTargetLeavesNoTemporaryFile(): void
     {
@@ -130,6 +128,31 @@ final class AtomicWriterTest extends TestCase
             self::assertStringStartsWith('Cannot write out/r.json: ', $e->getMessage());
         } finally {
             chmod($dir.'/r.json', 0755);
+        }
+
+        self::assertSame(['r.json'], self::entries($dir), 'the temporary file must be cleaned up');
+    }
+
+    /**
+     * MoveFileEx refuses a read-only target, and unlink() refuses the read-only temporary file that
+     * took its mode. Windows CI: https://github.com/somework/lockrot/issues/180
+     */
+    public function testAFailedReplaceOfAReadOnlyFileOnWindowsLeavesNoTemporaryFile(): void
+    {
+        if (\DIRECTORY_SEPARATOR !== '\\') {
+            self::markTestSkipped('Unix replaces a read-only file');
+        }
+        $dir = $this->tempDir();
+        file_put_contents($dir.'/r.json', 'old');
+        chmod($dir.'/r.json', 0444);
+
+        try {
+            AtomicWriter::write($dir.'/r.json', 'report', 'out/r.json');
+            self::fail('The replace of a read-only file must fail on Windows.');
+        } catch (ConfigException $e) {
+            self::assertStringStartsWith('Cannot write out/r.json: ', $e->getMessage());
+        } finally {
+            chmod($dir.'/r.json', 0644);
         }
 
         self::assertSame(['r.json'], self::entries($dir), 'the temporary file must be cleaned up');

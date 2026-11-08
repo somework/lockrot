@@ -43,7 +43,7 @@ final class LockLineIndexTest extends TestCase
 
     /**
      * A lock saved with CRLF, with a lone CR, or with a byte-order mark names the same lines as the
-     * LF form: SARIF `startLine` and GitLab `lines.begin` depend on it.
+     * LF form.
      *
      * @dataProvider lineEnds
      */
