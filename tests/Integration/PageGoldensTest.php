@@ -130,7 +130,7 @@ final class PageGoldensTest extends TestCase
      * SPEC-0.14.md §7.9.4 "Libyears" and §7.9.15 line 3: the block prints `libyears.total` and
      * `libyears.direct_requirements` with two decimals, and "at least" when `libyears.at_least_count` is
      * above 0. The copy summary prints the total with one decimal, half up as `number_format` rounds
-     * (ruling R15-18).
+     * (§7.9.9).
      *
      * @dataProvider provideEveryGolden
      */
@@ -141,11 +141,13 @@ final class PageGoldensTest extends TestCase
         $document = self::modelDocument(JsonPath::stringAt($golden, ['document']));
         $lines = array_values(array_filter(JsonPath::arrayAt($golden, ['copy_summary']), 'is_string'));
         $clauses = preg_grep('/libyears behind\.$/', explode(' · ', $lines[2] ?? '')) ?: [];
-        $block = \is_array($golden['libyears'] ?? null) ? $golden['libyears'] : [];
+        self::assertArrayHasKey('libyears', $golden, $id.': re-record page-goldens.json from the model');
+        $block = \is_array($golden['libyears']) ? $golden['libyears'] : [];
         $stated = ['figure' => $block['figure'] ?? null, 'bound' => $block['bound'] ?? null, 'sub' => $block['sub'] ?? null, 'copy_summary' => array_values($clauses)];
 
         if (JsonPath::intAt($document, ['packages_checked']) === 0) {
-            self::assertSame(['figure' => null, 'bound' => null, 'sub' => null, 'copy_summary' => []], $stated, $id.': an empty lock prints no libyears');
+            self::assertNull($golden['libyears'], $id.': an empty lock prints no libyears block');
+            self::assertSame([], $stated['copy_summary'], $id.': an empty lock prints no libyears clause');
 
             return;
         }
