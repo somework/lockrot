@@ -371,6 +371,23 @@ final class AgeMeasureTest extends TestCase
         self::assertNull((new NoReleaseRule(Clock::fixed(self::NOW), new Thresholds()))->evaluate($facts));
     }
 
+    /**
+     * Only S2 and age.release take the lower branch's parent date. The newest release that the
+     * moves, the metadata fields and libyears read stays the highest branch's: a move to the newer
+     * date would be a downgrade.
+     */
+    public function testAParentDateOfALowerBranchLeavesTheNewestReleaseOnTheHighestBranch(): void
+    {
+        $highestAt = self::ago(4 * Clock::SECONDS_PER_YEAR);
+        $metadata = self::lowerBranchDatedSplit($highestAt);
+
+        self::assertSame('v13.0.0', $metadata->lastStableVersion());
+        self::assertSame($highestAt, $metadata->lastStableReleaseAt() !== null ? $metadata->lastStableReleaseAt()->format(\DATE_ATOM) : null);
+        self::assertNull($metadata->lastStableDatedBy());
+        self::assertSame('v12.70.0', $metadata->releaseReadingVersion());
+        self::assertSame('laravel/framework', $metadata->releaseReadingDatedBy());
+    }
+
     public function testOnTheSameDateTheReleaseReadingKeepsTheHigherVersion(): void
     {
         $facts = FactsBuilder::facts(FactsBuilder::package(['name' => 'illuminate/collections', 'version' => 'v13.0.0']), self::lowerBranchDatedSplit(self::ago(30 * 86400)));

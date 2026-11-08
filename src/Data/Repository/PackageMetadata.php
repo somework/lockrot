@@ -104,8 +104,9 @@ final class PackageMetadata
     /** The highest stable release not dated after the run clock: the one {@see $newestRequires} reads. */
     private ?StableRelease $newestStable = null;
     private ?string $lastStablePhp = null;
-    private ?\DateTimeImmutable $libyearsNewestAt;
-    private ?string $highestBranchDatedBy;
+    private ?\DateTimeImmutable $releaseReadingAt;
+    private ?string $releaseReadingVersion;
+    private ?string $releaseReadingDatedBy;
 
     /**
      * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string}> $latestStableByBranch
@@ -151,8 +152,9 @@ final class PackageMetadata
         $this->sharedCommitVersions = $sharedCommitVersions;
         $this->abandonedBy = $abandonedBy;
         $this->lastStableSharesItsCommit = $lastStableSharesItsCommit;
-        $this->libyearsNewestAt = $lastStableReleaseAt;
-        $this->highestBranchDatedBy = $lastStableDatedBy;
+        $this->releaseReadingAt = $lastStableReleaseAt;
+        $this->releaseReadingVersion = $lastStableVersion;
+        $this->releaseReadingDatedBy = $lastStableDatedBy;
     }
 
     /**
@@ -493,33 +495,31 @@ final class PackageMetadata
             return $this;
         }
 
-        // The highest branch is in $datedBranches only when the package could not date its own
-        // highest tag. Then the package's age is unknown without the parent's date of that branch.
+        // The package's newest release is its highest branch's. That branch is in $datedBranches
+        // only when the package could not date its own highest tag.
         $lastStableReleaseAt = $this->lastStableReleaseAt;
         $lastStableVersion = $this->lastStableVersion;
         $lastStableDatedBy = $this->lastStableDatedBy;
         $lastStablePhp = $this->lastStablePhp;
-        $highestBranchDatedBy = $this->highestBranchDatedBy;
-        $libyearsNewestAt = $this->libyearsNewestAt;
         $highestBranch = self::highestBranch($byBranch);
         if (\in_array($highestBranch, $datedBranches, true)) {
             $lastStableReleaseAt = $byBranch[$highestBranch]['at'];
             $lastStableVersion = $byBranch[$highestBranch]['version'];
             $lastStableDatedBy = $parent->name;
             $lastStablePhp = $byBranch[$highestBranch]['php'];
-            $highestBranchDatedBy = $parent->name;
-            $libyearsNewestAt = $lastStableReleaseAt;
         }
         // SPEC §8.4.1: S2 reads the newest tag by date, so a lower branch that the parent dates
         // counts too. With no trusted date of the package's highest tag, its age stays unknown.
-        if ($lastStableReleaseAt !== null) {
+        $releaseReadingAt = $lastStableReleaseAt;
+        $releaseReadingVersion = $lastStableVersion;
+        $releaseReadingDatedBy = $lastStableDatedBy;
+        if ($releaseReadingAt !== null) {
             foreach ($datedBranches as $key) {
                 $row = $byBranch[$key];
-                if ($row['at'] !== null && self::newerTag($row['at'], $row['version'], $lastStableReleaseAt, $lastStableVersion)) {
-                    $lastStableReleaseAt = $row['at'];
-                    $lastStableVersion = $row['version'];
-                    $lastStableDatedBy = $parent->name;
-                    $lastStablePhp = $row['php'];
+                if ($row['at'] !== null && self::newerTag($row['at'], $row['version'], $releaseReadingAt, $releaseReadingVersion)) {
+                    $releaseReadingAt = $row['at'];
+                    $releaseReadingVersion = $row['version'];
+                    $releaseReadingDatedBy = $parent->name;
                 }
             }
         }
@@ -548,8 +548,9 @@ final class PackageMetadata
         $dated->newestRequires = $this->newestRequires;
         $dated->newestStable = $this->newestStable;
         $dated->lastStablePhp = $lastStablePhp;
-        $dated->libyearsNewestAt = $libyearsNewestAt;
-        $dated->highestBranchDatedBy = $highestBranchDatedBy;
+        $dated->releaseReadingAt = $releaseReadingAt;
+        $dated->releaseReadingVersion = $releaseReadingVersion;
+        $dated->releaseReadingDatedBy = $releaseReadingDatedBy;
         $dated->releasesAbove = $this->releasesAbove === null ? null : array_map(
             static fn (StableRelease $release): StableRelease => $release->sharedCommit() ? $release->withDate($parent->releaseDateOf($release->normalized())) : $release,
             $this->releasesAbove
@@ -704,9 +705,9 @@ final class PackageMetadata
     }
 
     /**
-     * The newest release date of a non-dev version, pre-releases included. A branch that a monorepo
-     * parent dates ({@see datedBy()}) counts with the parent's date. Null when the highest tag has
-     * no trusted date, or when the newest date is that of a commit its tags share.
+     * The newest release date of a non-dev version, pre-releases included, or the parent's date of
+     * the highest branch ({@see datedBy()}). Null when the highest tag has no trusted date, or when
+     * the newest date is that of a commit its tags share.
      */
     public function lastStableReleaseAt(): ?\DateTimeImmutable
     {
@@ -714,18 +715,24 @@ final class PackageMetadata
     }
 
     /**
-     * The newest end of libyears: {@see lastStableReleaseAt()}, except that a parent's date of a
-     * branch below the highest one does not count.
+     * The date of the release that S2 judges: {@see lastStableReleaseAt()}, or a later parent date
+     * of a lower branch (SPEC §8.4.1 `age.release`). A tie goes to the higher version.
      */
-    public function libyearsNewestAt(): ?\DateTimeImmutable
+    public function releaseReadingAt(): ?\DateTimeImmutable
     {
-        return $this->libyearsNewestAt;
+        return $this->releaseReadingAt;
     }
 
-    /** The monorepo parent that dated the package's highest branch ({@see datedBy()}), null when none did. */
-    public function highestBranchDatedBy(): ?string
+    /** The tag that {@see releaseReadingAt()} dates. */
+    public function releaseReadingVersion(): ?string
     {
-        return $this->highestBranchDatedBy;
+        return $this->releaseReadingVersion;
+    }
+
+    /** The monorepo parent that dated {@see releaseReadingAt()}, null when the date is the package's own. */
+    public function releaseReadingDatedBy(): ?string
+    {
+        return $this->releaseReadingDatedBy;
     }
 
     /**

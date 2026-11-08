@@ -94,12 +94,12 @@ final class AgeMeasure
         if (!$metadata->hasStableRelease()) {
             return AgeReading::unmeasuredBecause(self::NO_STABLE_RELEASE);
         }
-        $at = $metadata->lastStableReleaseAt();
+        $at = $metadata->releaseReadingAt();
         if ($at === null) {
             return AgeReading::unmeasuredBecause(self::UNDATED_RELEASES);
         }
 
-        return $this->reading($at, $metadata->lastStableVersion(), $metadata->lastStableDatedBy(), [$this->thresholds->releaseWarnYears(), $this->thresholds->releaseHighYears()], AgeReading::RELEASE);
+        return $this->reading($at, $metadata->releaseReadingVersion(), $metadata->releaseReadingDatedBy(), [$this->thresholds->releaseWarnYears(), $this->thresholds->releaseHighYears()], AgeReading::RELEASE);
     }
 
     /**

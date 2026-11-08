@@ -76,7 +76,7 @@ final class InstalledRelease
         if ($metadata->sharesItsCommit($package->version())) {
             return new self(self::SHARED_COMMIT, null, $time, null);
         }
-        if ($metadata->highestBranchDatedBy() !== null) {
+        if ($metadata->lastStableDatedBy() !== null) {
             return new self(self::PARENT_SPLIT, null, $time, null);
         }
 

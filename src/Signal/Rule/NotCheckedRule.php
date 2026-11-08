@@ -148,7 +148,7 @@ final class NotCheckedRule implements SignalRule
     private function releaseDates(PackageFacts $facts, PackageMetadata $metadata): ?Check
     {
         $blocked = [];
-        if ($metadata->hasStableRelease() && $metadata->lastStableReleaseAt() === null) {
+        if ($metadata->hasStableRelease() && $metadata->releaseReadingAt() === null) {
             $blocked[] = [$metadata->lastStableSharesItsCommit() ? self::CAUSE_SHARED_COMMIT : self::CAUSE_TAG_UNDATED, Signal::S2];
         }
         if ($this->oldPromise !== null && $this->oldPromise->missesATrustedDate($facts)) {
