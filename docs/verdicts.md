@@ -448,6 +448,9 @@ request on it.
 
 - S2 and S8 carry the parent as `dated_by`, and `--explain` marks the branch rows it supplied.
 
+- S2 reads the newest trusted date over every branch row, a lower branch that the parent dates
+  included. A dated pre-release counts too.
+
 - S8 can quote a branch's highest tag, or a lower tag, that only a commit shared with other tags
   dates. A release is never older than its commit, so that date is a lower bound. The summary then says "on or after"
   the date. `newest_release_at_least` or `reachable_release_at_least` is true. `newest_years` or

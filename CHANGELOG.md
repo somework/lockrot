@@ -157,7 +157,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Authorization` or `PRIVATE-TOKEN` line makes lockrot send no credential header of its own,
   because Composer sends the list's. ([Which credentials](docs/internals.md#which-credentials))
 - **Baseline, CLI:** when lockrot cannot replace a baseline or an `--output` file, it tries to remove
-  its own `*.tmp` file beside the target, also on Windows when the target is read-only.
+  its own `*.tmp` file beside the target.
   ([What lockrot does](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 - **Config:** an issuer variable (`GH_HOST` and the others) whose URL holds a backslash in its
   authority, or an `@` in the path, query or fragment, names no public host. lockrot withholds the
