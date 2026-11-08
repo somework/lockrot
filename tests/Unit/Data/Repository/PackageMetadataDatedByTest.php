@@ -647,6 +647,19 @@ final class PackageMetadataDatedByTest extends TestCase
         self::assertSame('v3.0.0-beta1', $dated->releaseReadingVersion());
     }
 
+    public function testAPreReleaseWhosePrettyVersionDoesNotParseWinsOnlyByALaterDate(): void
+    {
+        $preRelease = self::tag('acme/split', 'release-3-beta', 'c-b1', '2024-01-01T00:00:00+00:00');
+        $preRelease['version_normalized'] = '3.0.0.0-beta1';
+        $undated = self::tag('acme/split', 'v2.1.0', 'c21', '2000-01-01T00:00:00+00:00');
+        unset($undated['time']);
+        $child = PackageMetadata::fromPackages('acme/split', [$this->load($preRelease), $this->load($undated)], new \DateTimeImmutable(self::NOW));
+
+        $dated = $child->datedBy($this->parentOfUndatedV21('2024-01-01T00:00:00+00:00'));
+
+        self::assertSame('v2.1.0', $dated->releaseReadingVersion(), 'release-3-beta does not parse, and its date equals the parent date of v2.1.0');
+    }
+
     public function testAnUndatedMiddleLineDoesNotEndTheWalkOverTheRows(): void
     {
         $child = $this->split([
