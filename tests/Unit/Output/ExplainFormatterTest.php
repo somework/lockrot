@@ -355,6 +355,8 @@ final class ExplainFormatterTest extends TestCase
         yield 'no CVE' => [null, '2026-01-02T00:00:00+00:00', '/\n +high +GHSA-aaaa-bbbb-cccc  [^\n]*\n +reported 2026-01-02 · /'];
         yield 'a CVE' => ['CVE-2026-0001', '2026-01-02T00:00:00+00:00', '/\n +high +CVE-2026-0001  [^\n]*\n +GHSA-aaaa-bbbb-cccc · reported 2026-01-02 · /'];
         yield 'a CVE that equals the id' => ['GHSA-aaaa-bbbb-cccc', '2026-01-02T00:00:00+00:00', '/\n +high +GHSA-aaaa-bbbb-cccc  [^\n]*\n +reported 2026-01-02 · /'];
+        yield 'a CVE that equals the id and no reported date' => ['GHSA-aaaa-bbbb-cccc', null, '/\n +high +GHSA-aaaa-bbbb-cccc  [^\n]*\n +\d+ points · fix: /'];
+        yield 'a CVE and no reported date' => ['CVE-2026-0001', null, '/\n +high +CVE-2026-0001  [^\n]*\n +GHSA-aaaa-bbbb-cccc · \d+ points · fix: /'];
         yield 'no CVE and no reported date' => [null, null, '/\n +high +GHSA-aaaa-bbbb-cccc  [^\n]*\n +\d+ points · fix: /'];
     }
 
