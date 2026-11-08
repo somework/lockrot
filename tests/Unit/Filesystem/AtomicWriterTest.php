@@ -109,7 +109,8 @@ final class AtomicWriterTest extends TestCase
     /**
      * The temporary file takes the target's read-only mode, then the move fails. On Unix unlink()
      * needs the directory's permission and not the file's, so this test passes without the chmod
-     * before unlink. It pins the cleanup after the mode copy. The Windows case is the next test.
+     * before unlink. It pins the cleanup after the mode copy.
+     * {@see testAFailedReplaceOfAReadOnlyFileOnWindowsLeavesNoTemporaryFile()} holds the Windows case.
      */
     public function testAFailedMoveOntoAReadOnlyTargetLeavesNoTemporaryFile(): void
     {

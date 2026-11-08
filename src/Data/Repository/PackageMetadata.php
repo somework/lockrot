@@ -325,7 +325,7 @@ final class PackageMetadata
                 $sharedCommitVersions[$normalized] = true;
             }
         }
-        // Ruling R15-28e: only S2 reads a newest date on a line below the highest stable line. S6, the
+        // Only S2 reads a newest date on a line below the highest stable line. S6, the
         // moves, libyears and the metadata fields read the highest line's row, so a branch snapshot
         // never moves down a line. A highest tag with no trusted date keeps its own reading.
         $highestUndated = $highestStable !== null && ($highestStable->getReleaseDate() === null || $highestShared);
@@ -440,7 +440,7 @@ final class PackageMetadata
     /**
      * Whether a monorepo parent could fill a missing date. It can when:
      * - the package's last release is undated
-     * - a shared commit's date that no parent resolves keeps the S2 reading unknown (ruling R15-28d)
+     * - a shared commit's date that no parent resolves keeps the S2 reading unknown
      * - the installed branch's highest tag is undated
      * - the installed version's tag shares its commit and no parent has dated it
      * Other branches do not count: every split package has old branches with undated tags.
@@ -530,6 +530,7 @@ final class PackageMetadata
         $releaseReadingAt = $this->releaseReadingAt;
         $releaseReadingVersion = $this->releaseReadingVersion;
         $releaseReadingDatedBy = $this->releaseReadingDatedBy;
+        $readingSharesItsCommit = $this->lastStableSharesItsCommit;
         if (\in_array($highestBranch, $datedBranches, true)) {
             $releaseReadingAt = $lastStableReleaseAt;
             $releaseReadingVersion = $lastStableVersion;
@@ -561,6 +562,7 @@ final class PackageMetadata
                 $releaseReadingAt = null;
                 $releaseReadingVersion = $lastStableVersion;
                 $releaseReadingDatedBy = null;
+                $readingSharesItsCommit = true;
             }
         }
 
@@ -582,7 +584,7 @@ final class PackageMetadata
             $parent->name,
             $this->sharedCommitVersions,
             $this->abandonedBy,
-            $this->lastStableSharesItsCommit
+            $readingSharesItsCommit
         );
         $dated->installedRequires = $this->installedRequires;
         $dated->newestRequires = $this->newestRequires;

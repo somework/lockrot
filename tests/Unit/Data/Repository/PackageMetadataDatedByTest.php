@@ -467,7 +467,7 @@ final class PackageMetadataDatedByTest extends TestCase
         ], new \DateTimeImmutable(self::NOW));
     }
 
-    /** Ruling R15-28d: a parent date resolves a shared-commit date that blocks the S2 reading. */
+    /** A parent date resolves a shared-commit date that blocks the S2 reading. */
     public function testASharedLowerLineNewerThanTheReadingAsksTheParentAndTakesItsDate(): void
     {
         $child = $this->splitWithASharedLowerLine('2024-03-01T00:00:00+00:00');
@@ -494,5 +494,27 @@ final class PackageMetadataDatedByTest extends TestCase
 
         self::assertEquals(new \DateTimeImmutable('2023-06-02T07:22:01+00:00'), $child->releaseReadingAt());
         self::assertFalse($child->needsParentDates('2', '2.1.1'));
+    }
+
+    /** The parent dates the undated highest tag, and a newer shared lower-line date still blocks S2. */
+    public function testASharedLowerLineThatBlocksTheReadingAfterTheParentNamesTheSharedCommit(): void
+    {
+        $undated = self::tag('acme/split', 'v2.1.0', 'c21-own', '2000-01-01T00:00:00+00:00');
+        unset($undated['time']);
+        $child = PackageMetadata::fromPackages('acme/split', [
+            $this->load($undated),
+            $this->load(self::tag('acme/split', 'v2.0.0', 'c20-own', '2023-01-01T00:00:00+00:00')),
+            $this->load(self::tag('acme/split', 'v1.9.2', 'c1-shared', '2026-01-01T00:00:00+00:00')),
+            $this->load(self::tag('acme/split', 'v1.9.1', 'c1-shared', '2026-01-01T00:00:00+00:00')),
+            $this->load(self::tag('acme/split', 'v1.9.0', 'c1-shared', '2026-01-01T00:00:00+00:00')),
+        ], new \DateTimeImmutable(self::NOW));
+        $parent = PackageMetadata::fromPackages('acme/monorepo', [
+            $this->load(self::tag('acme/monorepo', 'v2.1.0', 'm21', '2025-01-01T00:00:00+00:00', ['acme/split' => 'self.version'])),
+        ], new \DateTimeImmutable(self::NOW));
+
+        $dated = $child->datedBy($parent);
+
+        self::assertNull($dated->releaseReadingAt(), 'the shared 1.x date 2026-01-01 is newer than the parent date 2025-01-01');
+        self::assertTrue($dated->lastStableSharesItsCommit(), 'S10 names the shared commit, not an undated tag');
     }
 }

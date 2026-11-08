@@ -113,8 +113,8 @@ carries `User-Agent: lockrot`.
   list that holds a value which is not a string is no credential either. The host counts as
   anonymous, so the cap of 50 and the cause `no_token` stay. Composer then adds no credential
   header, and lockrot sends its own. The one difference is such a list on Composer before 2.11.1:
-  that Composer sends every element of the list. When an element is an `Authorization` header,
-  lockrot sends none of its own.
+  that Composer sends every element of the list. When an element is an `Authorization` or
+  `PRIVATE-TOKEN` header, lockrot sends no credential header of its own.
   [Composer 2.11.1](https://github.com/composer/composer/releases/tag/2.11.1) and newer send none
   of such a list.
 
