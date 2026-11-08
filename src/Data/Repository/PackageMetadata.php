@@ -509,15 +509,25 @@ final class PackageMetadata
             $lastStablePhp = $byBranch[$highestBranch]['php'];
         }
         // SPEC §8.4.1: S2 reads the newest tag by trusted date over every branch row, so a lower
-        // branch that the parent dates counts too. A row dated by a commit that its tags share is
-        // not trusted. Without a trusted date of the newest release, the age stays unknown.
+        // branch that the parent dates counts too. A shared commit's date is only a lower bound of
+        // its release: a newer one that the parent does not date leaves the age unknown.
         $releaseReadingAt = $lastStableReleaseAt;
         $releaseReadingVersion = $lastStableVersion;
         $releaseReadingDatedBy = $lastStableDatedBy;
+        $highest = $byBranch[$highestBranch] ?? null;
+        if ($releaseReadingAt === null && $highest !== null && !isset($highest['dated_by']) && $highest['highest']['at'] !== null) {
+            $releaseReadingAt = $highest['highest']['at'];
+            $releaseReadingVersion = $highest['highest']['pretty'];
+        }
         if ($releaseReadingAt !== null) {
+            $unresolved = null;
             foreach ($byBranch as $row) {
                 $datedByParent = isset($row['dated_by']);
-                if ($row['at'] === null || (!$datedByParent && $this->sharesItsCommit($row['version']))) {
+                if ($row['at'] === null) {
+                    continue;
+                }
+                if (!$datedByParent && $this->sharesItsCommit($row['version'])) {
+                    $unresolved = $unresolved === null || $row['at'] > $unresolved ? $row['at'] : $unresolved;
                     continue;
                 }
                 if (self::newerTag($row['at'], $row['version'], $releaseReadingAt, $releaseReadingVersion)) {
@@ -525,6 +535,11 @@ final class PackageMetadata
                     $releaseReadingVersion = $row['version'];
                     $releaseReadingDatedBy = $datedByParent ? $parent->name : null;
                 }
+            }
+            if ($unresolved !== null && $unresolved > $releaseReadingAt) {
+                $releaseReadingAt = null;
+                $releaseReadingVersion = $lastStableVersion;
+                $releaseReadingDatedBy = null;
             }
         }
 
