@@ -99,7 +99,7 @@ final class AgeText
             }
             $lines[] = rtrim($head.$reading->measuredAt()->format('Y-m-d').'   '.str_pad(self::ago((float) $reading->years()), 30).implode('; ', $words));
         }
-        // The published two-decimal value, rounded half up: a reader of the JSON renders the same line.
+        // Half up on the published two-decimal value, as number_format does: the double nearest 1.45 lies below it, and `%.1F` prints 1.4.
         $libyears = $finding->libyearsRounded();
         $unmeasured = $finding->libyearsUnmeasured();
         $lines[] = $libyears === null

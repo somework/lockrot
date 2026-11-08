@@ -43,6 +43,29 @@ final class AgeTextTest extends TestCase
         self::assertSame('libyears at least 2.0 behind the newest stable release', $atLeast[\count($atLeast) - 1]);
     }
 
+    /**
+     * Half up on the published two-decimal value. The doubles nearest 1.15 and 1.45 lie below them.
+     *
+     * @dataProvider halfwayLibyears
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('halfwayLibyears')]
+    public function testTheExplainLibyearsLineRoundsAPublishedValueHalfUp(float $libyears, string $printed): void
+    {
+        $lines = AgeText::block((new FindingBuilder())->withLibyears(LibyearsMeasurement::of($libyears))->build(), new Thresholds());
+
+        self::assertSame('libyears '.$printed.' behind the newest stable release', $lines[\count($lines) - 1]);
+    }
+
+    /** @return iterable<string, array{float, string}> */
+    public static function halfwayLibyears(): iterable
+    {
+        yield '1.45' => [1.45, '1.5'];
+        yield '6.85' => [6.85, '6.9'];
+        yield '4.05' => [4.05, '4.1'];
+        yield '1.15' => [1.15, '1.2'];
+        yield '1.25' => [1.25, '1.3'];
+    }
+
     public function testTheBranchIsTheReleaseBranchOrTheAliasLineOrItsBranch(): void
     {
         self::assertSame('2.x', AgeText::branchOf('v2.16.1'));
