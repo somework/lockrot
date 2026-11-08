@@ -185,6 +185,28 @@ final class LockrotConfigTest extends TestCase
     }
 
     /**
+     * Ruling R15-3: only the option, the variable and the config key refuse an unknown minor. A
+     * `config.platform.php` is Composer's own setting, so the run takes its minor and PhpWindow lists it.
+     *
+     * @dataProvider platformPhpsInAnUnlistedMinor
+     */
+    #[DataProvider('platformPhpsInAnUnlistedMinor')]
+    public function testAPlatformPhpInAnUnlistedMinorSetsTheTargetWithoutARefusal(string $platformPhp, string $minor): void
+    {
+        $config = LockrotConfig::fromSources([], ['LOCKROT_TODAY' => '2019-06-01'], [], '8.5.10', $platformPhp);
+
+        self::assertSame($minor, $config->targetPhp());
+        self::assertSame(RunSettings::SOURCE_PLATFORM, $config->targetPhpSource());
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function platformPhpsInAnUnlistedMinor(): iterable
+    {
+        yield 'below the first known minor' => ['5.2.17', '5.2'];
+        yield 'between two known minors' => ['7.5.0', '7.5'];
+    }
+
+    /**
      * Ruling R8-37: Composer refuses such a `config.platform.php`, so the run continues at the
      * running PHP and the move check reads `platform_config_invalid`.
      *

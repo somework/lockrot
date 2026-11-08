@@ -128,8 +128,9 @@ final class PhpWindow implements \JsonSerializable
         sort($hosts);
 
         // A set that admits the target must list the target's minor, also before that minor's GA.
-        if ($knownMinors === [] || version_compare($targetMinor, $knownMinors[\count($knownMinors) - 1], '>')) {
+        if (!\in_array($targetMinor, $knownMinors, true)) {
             $knownMinors[] = $targetMinor;
+            usort($knownMinors, 'version_compare');
         }
         $configuredPhp ??= $project->platformPhp();
         $targetPoint = $solvePhp ?? MoveCheckers::platformPhp($targetMinor, $configuredPhp);
