@@ -129,6 +129,32 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([], $versions->versions('acme/c'));
     }
 
+    /** A name that an earlier repository lists in full keeps its versions when a later repository raises an error. */
+    public function testAnErrorInALaterRepositoryLeavesANameThatAnEarlierRepositoryCompleted(): void
+    {
+        $broken = new class () extends ComposerRepository {
+            public function __construct()
+            {
+            }
+
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
+            {
+                throw new \TypeError('Composer\MetadataMinifier\MetadataMinifier::expand(): Argument #1 ($versions) must be of type array, string given');
+            }
+        };
+        $versions = new RepositoryVersions([self::repository(['acme/a' => ['1.0.0']]), $broken], [], false, Deadline::never());
+
+        try {
+            $versions->versionsOf(['acme/a', 'acme/b']);
+            self::fail('the error reaches the caller');
+        } catch (\TypeError $e) {
+        }
+
+        self::assertSame(['1.0.0'], self::pretty($versions->versions('acme/a')));
+        self::assertNull($versions->failure('acme/a'));
+        self::assertSame(VersionSource::FAILED, $versions->failure('acme/b'));
+    }
+
     public function testTheFirstComposerRepositoryThatListsATaggedReleaseOfTheNameWins(): void
     {
         $versions = new RepositoryVersions([self::repository(['acme/other' => ['1.0.0']]), self::repository(['acme/lib' => ['1.0.0', 'dev-main']]), self::repository(['acme/lib' => ['2.0.0']]), new ArrayRepository([self::package('acme/lib', '9.0.0')])], [], false, Deadline::never());

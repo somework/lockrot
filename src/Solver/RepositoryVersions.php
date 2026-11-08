@@ -105,6 +105,7 @@ final class RepositoryVersions implements VersionSource
     /**
      * Asks each repository for the names together, so Composer sends the requests side by side.
      * One failed request fails them all: the names that it leaves are loaded one by one.
+     * An \Error fails every name that it leaves, also a name with good metadata in the same batch.
      *
      * @param array<string> $names
      */
