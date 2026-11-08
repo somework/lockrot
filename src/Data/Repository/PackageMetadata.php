@@ -544,8 +544,8 @@ final class PackageMetadata
             $releaseReadingDatedBy = $lastStableDatedBy;
         }
         $highest = $byBranch[$highestBranch] ?? null;
-        // Only a shared commit leaves the own reading unknown beside a dated highest row (R15-28d). An
-        // undated highest tag, a pre-release included, keeps the age unknown.
+        // Read the highest row's own date only when a shared commit hid it. An undated highest tag, a
+        // pre-release included, keeps the reading unknown.
         if ($releaseReadingAt === null && $this->lastStableSharesItsCommit && $highest !== null && !isset($highest['dated_by']) && $highest['highest']['at'] !== null) {
             $releaseReadingAt = $highest['highest']['at'];
             $releaseReadingVersion = $highest['highest']['pretty'];
