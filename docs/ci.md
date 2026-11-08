@@ -94,7 +94,10 @@ with `lockrot:`, any other failure with `lockrot failed:`. `-v` adds the stack t
     - Each `name` is a string, and no name is listed twice, case ignored.
 
 - `vendor/somework/lockrot/bin/lockrot` when the composer/composer package that it loads is older
-  than 2.10, or on a non-CLI PHP SAPI with `register_argc_argv=On`. It runs nothing.
+  than 2.10 or is missing, or on a non-CLI PHP SAPI with `register_argc_argv=On`. It runs
+  nothing. For the first case, the message names three ways out: run the [PHAR](phar.md), upgrade
+  Composer to 2.10 or newer and run `composer lockrot`, or require composer/composer 2.10 or newer
+  in the project.
 - A value the configuration rejects: in `extra.lockrot`, in an environment variable, or on the
   command line ([configuration.md](configuration.md#extralockrot-keys)). That includes two values
   of one kind in `--fail-on`, `none` beside another value, and `vulnerable-low`.
