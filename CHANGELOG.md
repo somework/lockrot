@@ -325,6 +325,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking:** **Config:** `ignore[].expires` with a trailing newline, such as `"2027-01-01\n"`,
+  exits 2, as `accept-unchecked[].expires` does. 0.13 accepted it. Action: write the date as
+  `YYYY-MM-DD` with nothing after it.
+  ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 - **Breaking:** **json, table, markdown, github:** `libyears.total`, `libyears.direct_requirements`
   and the `libyears:` footer sum the findings' two-decimal values. 0.13 rounded the sum of the
   unrounded values, so a total can move on the upgrade with no data change. The move grows with
@@ -384,11 +388,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with `--generate-baseline`, exits 2 before Composer starts. 0.13 took the last value, and ran
   the explanation with no baseline written. Action: give each option once, and run `--explain` in
   its own step. ([Exit codes](docs/ci.md#exit-codes))
-- **Breaking:** **CLI, Config, Install-time:** `--target-php` and `LOCKROT_TARGET_PHP` take a
-  major, a minor or a patch with nothing after it. lockrot keeps only the minor: `8.4.2` is `8.4`.
-  Another value, such as `8.4-fpm`, or a minor that lockrot does not know and that lies below the
-  newest one it knows, exits 2 and names the setting. At install time the check is skipped. 0.13
-  read the version at its start. Action: pass a real PHP version alone.
+- **Breaking:** **CLI, Config, Install-time:** `--target-php`, `LOCKROT_TARGET_PHP` and
+  `extra.lockrot.target-php` take a major, a minor or a patch: `8.4.2` is `8.4`. Text after the
+  version, or a minor that lockrot does not know below the newest one it knows, exits 2.
+  Install time skips the check. Action: pass a real PHP version.
   ([CLI options](docs/configuration.md#cli-options))
 - **Breaking:** **CLI:** a lock whose `packages`, `packages-dev`, `platform`, `platform-dev`,
   `platform-overrides` or `aliases` section Composer or lockrot cannot read, or that lists two
@@ -619,8 +622,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** the `abandoned_not_audited_by_composer` note names `COMPOSER_POLICY` when the
   variable turns Composer's policy off, as the advisory notes do.
   ([Abandoned not audited by Composer](docs/notes.md#abandoned_not_audited_by_composer))
-- **Config:** `ignore[].expires` refuses a value with a trailing newline, as
-  `accept-unchecked[].expires` does.
 - **sarif, gitlab:** a lock entry written as `"name" : "a/b"` gets its line number.
 
 ## [0.13.0] - 2026-10-01
