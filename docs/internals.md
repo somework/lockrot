@@ -85,7 +85,7 @@ carries `User-Agent: lockrot`.
   entry of api.bitbucket.org counts first, else the entry of bitbucket.org. On GitLab, credentials
   also unlock the archived flag.
 
-- When both exist, lockrot sends only Composer's header.
+- When both exist, lockrot sends only Composer's header. It drops its own `Authorization` header whenever Composer sends a credential for the host, so a request carries one `Authorization` header.
 
 - lockrot withholds an ambient token from the public host when an issuer variable names another host. `GITHUB_TOKEN` counts only when each of
   `GITHUB_SERVER_URL` and `GH_HOST` is unset, empty or names github.com. `GITLAB_TOKEN` counts only
@@ -108,8 +108,9 @@ carries `User-Agent: lockrot`.
   api.github.com.
 
 - Exception: Composer's entry for the host can be a client certificate, or custom headers without
-  an `Authorization` or `PRIVATE-TOKEN` header. A custom-headers list that holds a value which is
-  not a string counts as no header. Such an entry is no credential. The host counts as anonymous,
+  an `Authorization` or `PRIVATE-TOKEN` header. Composer before 2.11.1 sends every element of a
+  `custom-headers` list, and 2.11.1 and newer drop a list that holds a value which is not a string
+  whole. Such a list counts as no header. Such an entry is no credential. The host counts as anonymous,
   so the cap of 50 and the cause `no_token` stay. Composer adds no credential header, and lockrot
   sends its own.
 
