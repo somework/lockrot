@@ -422,7 +422,8 @@ second is `update`, `require` or `why-not`.
 An argument comes from the lock or a repository, so lockrot leaves out a step that breaks this
 rule. The move keeps its `constraint`, `text` and other steps. When a version, constraint or tag
 that a step quotes holds `|`, `<` or `>`, the move has no step at all
-([`command_argument_unsafe`](notes.md#command_argument_unsafe)). `text` shows a command only as the
+([`command_argument_unsafe`](notes.md#command_argument_unsafe)). The `>=` of the php step
+`php:>=8.1` does not count. `text` shows a command only as the
 POSIX rendering of a step in `commands`. Render each argv with one of these renderings:
 
 | Shell | Rendering | Example |

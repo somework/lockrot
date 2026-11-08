@@ -368,8 +368,9 @@ on. The note names the first such failure of the run.
 
 ### <a name="command_argument_unsafe"></a>Command argument unsafe {#command_argument_unsafe}
 
-A move quotes a release name in its steps: the `^<version>` of an update, require or tag
-step, and the `<version>` of a why-not step. When that name holds `|`, `<` or `>`, a Windows shell
+A move quotes a release name in its steps: its `version`, its `constraint` without the caret, or
+`latest.version` on a tag move. The `>=` of the php step `php:>=8.1` is no release name. When that
+name holds `|`, `<` or `>`, a Windows shell
 that you paste the POSIX line into runs another program or redirects to a file. That move
 writes no step: `commands` is empty, and the text ends with the clause `lockrot prints no command, because its
 release name holds |, < or >`. The move check still runs, and no other field of the move changes.

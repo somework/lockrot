@@ -1412,8 +1412,9 @@ libyears: at least 189.8 behind across 194 of 200 packages · 120.2 from direct 
 furthest behind phpdocumentor/reflection-common 2.2.0 at 5.4
 ```
 
-For each package, lockrot takes the years from the installed version's release to the package's
-newest release (the date S2 reads). It counts years of 365.25 days, never below zero, and sums them
+For each package, lockrot takes the years from the installed version's release to the newest
+release on the package's highest line. A newer release on a lower line does not count, so this date
+is not always the one that S2 reads. It counts years of 365.25 days, never below zero, and sums them
 over the packages the run analysed. The installed version's date is the lock's `time`, or its
 [monorepo parent's](#dates-from-the-monorepo). The number does not read the clock. The package
 furthest behind is the one with the highest value. A tie goes to the package whose name sorts first
