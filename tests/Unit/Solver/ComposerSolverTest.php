@@ -935,6 +935,19 @@ final class ComposerSolverTest extends TestCase
         self::assertSame(['acme/lib' => '2.1.0-beta1'], $solver->solve(SolveRequest::require('acme/lib', ['acme/lib' => '^2.0@beta'], false))->installs());
     }
 
+    /** UpdateCommand infers the stability flag of an inline `name:constraint` before it solves. */
+    public function testAnInlineUpdateTakesTheStabilityFlagOfItsPreReleaseConstraint(): void
+    {
+        $solver = self::solver(
+            ['require' => ['a/a' => '^1.0']],
+            [['name' => 'a/a', 'version' => '1.0.0', 'require' => ['b/b' => '>=1.0']], ['name' => 'b/b', 'version' => '1.0.0']],
+            ['a/a' => [['version' => '1.0.0', 'require' => ['b/b' => '>=1.0']]], 'b/b' => [['version' => '1.0.0'], ['version' => '2.0.0-beta1']]]
+        );
+
+        self::assertSame(['b/b' => '2.0.0-beta1'], $solver->solve(SolveRequest::update(['b/b' => '^2.0.0-beta1']))->installs());
+        self::assertFalse($solver->solve(SolveRequest::update(['b/b' => '^2.0']))->resolves(), 'a stable constraint sets no flag, and minimum-stability stable admits no beta');
+    }
+
     /**
      * @param array<string, mixed>                      $root
      * @param list<array<string, mixed>>                $locked
