@@ -93,6 +93,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   installed-branch release and a higher branch's release past the warn years. S10 names the
   signal with `undated_releases`.
   ([What was not checked](docs/verdicts.md#what-was-not-checked))
+- **All formats:** S2 reads a split's newest release by trusted date over every branch, also a
+  lower branch that its monorepo parent dates. A newer shared-commit date that no parent dates
+  leaves S2 unknown. ([Dates from the monorepo](docs/verdicts.md#dates-from-the-monorepo))
+- **All formats:** S6 `last_stable_release` and `last_stable_version`, the moves and libyears read
+  the highest stable line when the newest dated tag sits on a lower line. A branch snapshot's
+  `tag` move never targets a lower line. ([Move](docs/verdicts.md#move))
+- **All formats:** under a highest tag with no trusted date, S8 reads a branch's newest dated
+  release inside `release-warn-years` as a branch that releases. Older, S8 is unknown.
+  ([Within reach](docs/verdicts.md#within-reach))
 - **All formats:** S8, S11's `excludes_target` and the `--explain` branch rows test the target PHP
   at `config.platform.php` when it is a stable release in the target minor, as
   `installed_php.target_runs` does. Else they test the minor's newest patch.
@@ -144,6 +153,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   S10 and the run note `advisories_not_checked` name `composer_json_invalid`. `--fail-on=unchecked`
   then exits 1. Action: fix `composer.json` until `composer validate` passes.
   ([Run notes](docs/notes.md#advisories_not_checked))
+- **CLI:** on Composer before 2.11.1, a `custom-headers` list with a non-string value and an
+  `Authorization` line makes lockrot send no `Authorization` header of its own, because Composer
+  sends the list's. ([Which credentials](docs/internals.md#which-credentials))
 - **Config:** an issuer variable (`GH_HOST` and the others) whose URL holds a backslash in its
   authority, or an `@` in the path, query or fragment, names no public host. lockrot withholds the
   ambient token. `-v` names the host after the last `@`, or "an issuer that URL parsers read two
