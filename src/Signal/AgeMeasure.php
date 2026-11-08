@@ -105,9 +105,10 @@ final class AgeMeasure
     /**
      * The newest dated stable release on the installed version's branch ({@see ReleaseBranch}):
      * the release S8 judges. An undated highest tag hides how much newer the branch's last release
-     * is, so that branch has no reading. Neither has a branch whose newest date is a shared
-     * commit's ({@see sharedCommitDates()}), nor an installed stable version above the
-     * branch's highest stable tag. See docs/verdicts.md#left-behind.
+     * is, so that branch has a reading only when its newest dated release is inside
+     * `release-warn-years`. A branch whose newest date is a shared commit's has no reading
+     * ({@see sharedCommitDates()}), nor has an installed stable version above the branch's highest
+     * stable tag. See docs/verdicts.md#left-behind.
      *
      * @param ?string $metadataStatus as for {@see release()}
      */
@@ -133,11 +134,16 @@ final class AgeMeasure
             return AgeReading::unmeasuredBecause(self::ABOVE_LISTED_RELEASES);
         }
         $at = $own['at'];
-        if ($at === null || $own['highest']['at'] === null || self::sharedCommitDates($metadata, $own)) {
+        if ($at === null || self::sharedCommitDates($metadata, $own)) {
+            return AgeReading::unmeasuredBecause(self::UNDATED_RELEASES);
+        }
+        $reading = $this->reading($at, $own['version'], $own['dated_by'] ?? null, [$this->thresholds->releaseWarnYears(), $this->thresholds->releaseHighYears()], AgeReading::RELEASE);
+        // An undated highest tag is no older than $at, so only a reading with no level decides S8.
+        if ($own['highest']['at'] === null && $reading->level() !== null) {
             return AgeReading::unmeasuredBecause(self::UNDATED_RELEASES);
         }
 
-        return $this->reading($at, $own['version'], $own['dated_by'] ?? null, [$this->thresholds->releaseWarnYears(), $this->thresholds->releaseHighYears()], AgeReading::RELEASE);
+        return $reading;
     }
 
     /**

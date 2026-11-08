@@ -211,6 +211,36 @@ final class AgeMeasureTest extends TestCase
         self::assertUnmeasured(AgeMeasure::UNDATED_RELEASES, $this->measure()->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.3.0']), $metadata)));
     }
 
+    /** An undated highest tag is newer than the branch's dated release, so a dated release inside `release-warn-years` decides S8. */
+    public function testADatedReleaseInsideTheWarnYearsDecidesTheBranchUnderAnUndatedHighestTag(): void
+    {
+        $metadata = FactsBuilder::metadata([['v3.0.0', self::ago(86400)], ['v2.5.1', null], ['v2.5.0', self::ago(Clock::SECONDS_PER_YEAR)]]);
+
+        $reading = $this->measure()->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => 'v2.5.0']), $metadata));
+
+        self::assertTrue($reading->isMeasured(), (string) $reading->unmeasured());
+        self::assertSame('v2.5.0', $reading->version());
+        self::assertSame(1.0, $reading->years());
+        self::assertNull($reading->level());
+        self::assertNull($reading->datedBy());
+    }
+
+    /** A shared commit dates a tag before its release, so its date inside `release-warn-years` decides nothing under an undated highest tag. */
+    public function testASharedCommitDateInsideTheWarnYearsDoesNotDecideTheBranchUnderAnUndatedHighestTag(): void
+    {
+        $on = static fn (string $version, string $commit, ?string $time): array => ['name' => 'vendor/pkg', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => $commit]];
+        $loader = new ArrayLoader();
+        $metadata = PackageMetadata::fromPackages('vendor/pkg', array_map(static fn (array $release) => $loader->load($release), [
+            $on('3.0.0', 'three', self::ago(86400)),
+            $on('2.5.3', 'top', null),
+            $on('2.5.2', 'split', self::ago(Clock::SECONDS_PER_YEAR)),
+            $on('2.5.1', 'split', self::ago(Clock::SECONDS_PER_YEAR)),
+            $on('2.5.0', 'split', self::ago(Clock::SECONDS_PER_YEAR)),
+        ]), new \DateTimeImmutable(self::NOW));
+
+        self::assertUnmeasured(AgeMeasure::UNDATED_RELEASES, $this->measure()->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '2.5.0']), $metadata)));
+    }
+
     /** A pre-release above the branch's newest stable release is not above the branch: S8 reads that stable release. */
     public function testAnInstalledPreReleaseAboveTheNewestStableReadsTheNewestStable(): void
     {
