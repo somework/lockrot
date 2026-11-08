@@ -489,7 +489,7 @@ final class PageGoldensTest extends TestCase
 
     /**
      * SPEC-0.14.md §7.9.21: the check line of a move card names the place that holds the cause of a
-     * refused baseline: the PHP line when the window excludes the target, else the Run tab. Every
+     * refused baseline: the PHP line when the window excludes the target, else the Run data tab. Every
      * other reason keeps the words of `next_step.text`.
      *
      * @param array<mixed, mixed> $run the document's `run`
@@ -503,7 +503,7 @@ final class PageGoldensTest extends TestCase
 
         return \is_array($window) && \is_array($window['target'] ?? null) && $window['target']['inside'] === false
             ? "Composer's solver refuses the lock itself at the target PHP; see the PHP line in the Overview"
-            : "Composer's solver refuses the lock itself; the Run tab names the cause";
+            : "Composer's solver refuses the lock itself; the Run data tab names the cause";
     }
 
     /**
