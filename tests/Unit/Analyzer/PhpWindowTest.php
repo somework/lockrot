@@ -261,6 +261,30 @@ final class PhpWindowTest extends TestCase
         yield 'between two known minors' => ['7.5.0', '7.5', ['5.3', '5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '7.5', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5'], '5.3.0'];
     }
 
+    public function testTheLowerEdgeOfAnInsertedMinorNamesTheLinksBelowIt(): void
+    {
+        $lock = ['packages' => [self::package('acme/a', ['php' => '>=5.2.1'])], 'packages-dev' => []];
+        $below = self::window($lock, ['require' => ['php' => '>=5.2'], 'config' => ['platform' => ['php' => '5.2.17']]], '5.2');
+        $between = self::window($lock, ['require' => ['php' => '>=5.2'], 'config' => ['platform' => ['php' => '7.5.0']]], '7.5');
+
+        self::assertNotNull($below['without_dev']['lower_edge']);
+        self::assertNotNull($between['without_dev']['lower_edge']);
+        self::assertSame(['acme/a'], array_column($below['without_dev']['lower_edge']['set_by'], 'name'));
+        self::assertSame([], $between['without_dev']['lower_edge']['set_by']);
+    }
+
+    public function testAnInsertedMinorThatASetExcludesIsAGapAndAnUpperEdge(): void
+    {
+        $platform = ['config' => ['platform' => ['php' => '7.5.0']]];
+        $gap = self::window(['packages' => [self::package('acme/a', ['php' => '~7.4.0 || ^8.0'])], 'packages-dev' => []], $platform, '7.5');
+        $cap = self::window(['packages' => [self::package('acme/a', ['php' => '~7.4.0'])], 'packages-dev' => []], $platform, '7.5');
+
+        self::assertFalse($gap['target']['inside']);
+        self::assertSame(['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5'], $gap['without_dev']['minors']);
+        self::assertTrue($gap['without_dev']['gaps']);
+        self::assertSame(['excludes' => '7.5', 'links' => ['require']], self::upper($cap['without_dev']));
+    }
+
     public function testTheInsertedMinorIsInTheKnownMinorsThatTheWordsRead(): void
     {
         $window = PhpWindow::of(LockFile::fromArray(['packages' => [], 'packages-dev' => []]), ProjectConfig::empty(), '7.5', self::minors());

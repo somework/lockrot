@@ -1046,13 +1046,14 @@ How lockrot reads the window:
   a later patch of that minor. So with `config.platform.php` 8.4.0, a patch floor such as
   `>=8.4.2` keeps 8.4 in the window, and `lower_edge.php` reads 8.4.2. A cap below that PHP leaves
   the minor out.
-- A target minor above the newest known minor, such as 8.6 before its GA, counts as one more known
-  minor of the window. A set that admits it lists it in `minors`. A cap that excludes it gives
+- A target minor that the release data does not list counts as one more known minor of the
+  window, in version order. Examples are 8.6 before its GA, and 7.5 or 5.2 from
+  `config.platform.php`. A set that admits it lists it in `minors`. A cap that excludes it gives
   `upper_edge` with `excludes` set to that minor, and `set_by` lists the links of the cap. The
   edges, `gaps` and the `php:` line read this minor too. [`capped`](#capped) does not: its R and
   `stops_at`, and the `capped` test of a move, read the known minors without it.
 - lockrot reads the edges and `gaps` on the known minors. PHP 6 and PHP 7.5 to 7.9 do not exist, so
-  `~7.4.0 || ~8.0.0` has no gap.
+  `~7.4.0 || ~8.0.0` has no gap, unless the target's minor is one of them.
 - `lower_edge.php` is the lowest PHP of the first minor in the window. `lower_edge.set_by` lists the
   links that exclude the PHP just below it.
 - `upper_edge.excludes` is the known minor after the window, and `upper_edge.set_by` lists the links

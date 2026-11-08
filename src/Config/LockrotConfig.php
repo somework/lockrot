@@ -280,10 +280,9 @@ final class LockrotConfig
     }
 
     /**
-     * A target that the user sets by option, variable or config key must be a minor that the release
-     * data lists, or one above its newest minor, which can be a PHP that the data predates. The
-     * data, not the run's clock, sets the known minors, so a value is valid on every date. A
-     * `config.platform.php` is not refused: PhpWindow lists its minor.
+     * The target must be a minor that the release data lists, or one above its newest minor, which
+     * can be a PHP that the data predates. The data, not the run's clock, sets the known minors, so
+     * a value is valid on every date.
      *
      * @throws ConfigException for a minor that is neither known nor above the newest known one
      */

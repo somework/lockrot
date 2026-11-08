@@ -240,6 +240,16 @@ final class RunFooterTest extends TestCase
         self::assertSame('php: the lock installs on PHP 5.3 to 8.3; Composer solves at 8.2.0 from config.platform.php; require.php, acme/a, acme/b and 2 more exclude 8.4', $line);
     }
 
+    public function testThePhpLineSpansAPlatformMinorThatTheReleaseDataDoesNotList(): void
+    {
+        $platform = ['config' => ['platform' => ['php' => '7.5.0']]];
+        $span = self::phpLine(['packages' => [self::package('acme/a', ['php' => '>=7.4 <8.1'])], 'packages-dev' => []], $platform, '7.5');
+        $gap = (string) self::phpLine(['packages' => [self::package('acme/a', ['php' => '~7.4.0 || ^8.0'])], 'packages-dev' => []], $platform, '7.5');
+
+        self::assertSame('php: the lock installs on PHP 7.4 to 8.0; Composer solves at 7.5.0 from config.platform.php; acme/a excludes 8.1', $span);
+        self::assertStringStartsWith('php: the lock installs on PHP 7.4 and 8.0 to 8.5, so your target, 7.5, is excluded', $gap);
+    }
+
     public function testThePhpLineOfAnEmptyWindowSaysOnNoPhp(): void
     {
         $line = self::phpLine(['packages' => [self::package('acme/a', ['php' => '<8.0']), self::package('acme/b', ['php' => '>=8.1'])]], [], '8.4');

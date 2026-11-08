@@ -186,7 +186,7 @@ final class LockrotConfigTest extends TestCase
 
     /**
      * Ruling R15-3: only the option, the variable and the config key refuse an unknown minor. A
-     * `config.platform.php` is Composer's own setting, so the run takes its minor and PhpWindow lists it.
+     * `config.platform.php` is Composer's own setting, so the run takes its minor without a refusal.
      *
      * @dataProvider platformPhpsInAnUnlistedMinor
      */
