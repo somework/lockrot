@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rQOMtmeYoBH03bFyyYsQ5l2Ak6hjOp5ORBDlyXOP9OM='; style-src 'sha256-PAtjzikmaZGAeGIP+cxuEenlJ3QYdzKxkEn9QoSHEnw='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fFJVpMNSUyV98z0AHg5CQMR+6FlQk1c7EcT2ttPlCA4='; style-src 'sha256-Yy3OR+VlDOVXliYitbztY1BdwC5VV1YKF2hjFFMHseQ='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -4658,9 +4658,22 @@ span.f2-unit {
   }
 }
 @media (forced-colors: active) {
-  .opt-gate[aria-pressed="true"] {
+  .opt[aria-pressed="true"] {
+    forced-color-adjust: none;
+    background: Highlight;
     border-color: Highlight;
+    color: HighlightText;
     font-weight: 700;
+  }
+  .opt[aria-pressed="true"] .c {
+    color: HighlightText;
+  }
+  .opt[aria-pressed="true"]:focus-visible {
+    outline-color: CanvasText;
+  }
+  .opts > .opt:not(.opt-gate) + .opt-gate[aria-pressed="true"]::before {
+    forced-color-adjust: auto;
+    border-top-color: CanvasText;
   }
 }
 .ci-tag {
@@ -5684,7 +5697,7 @@ span.f2-unit {
   column-gap: 14px;
   row-gap: 2px;
 }
-.al-group-head h2 {
+.al-group-head h3 {
   margin: 0;
   font-size: var(--text-base);
   font-weight: 650;
@@ -5692,7 +5705,7 @@ span.f2-unit {
   color: var(--ink);
   overflow-wrap: anywhere;
 }
-.al-group-head h2 .ac-ver {
+.al-group-head h3 .ac-ver {
   font-weight: 400;
 }
 .al-group-count {
@@ -8893,34 +8906,21 @@ var LockrotReport = (function(exports) {
 	function fixed(value, digits) {
 		return typeof value === "number" && Number.isFinite(value) ? decimal(value, digits) : null;
 	}
-	function exactParts(value) {
-		const view = new DataView(new ArrayBuffer(8));
-		view.setFloat64(0, Math.abs(value));
-		const bits = view.getBigUint64(0);
-		const biased = Number(bits >> 52n);
-		const fraction = bits & (1n << 52n) - 1n;
-		return biased === 0 ? {
-			mantissa: fraction,
-			exponent: -1074
-		} : {
-			mantissa: fraction | 1n << 52n,
-			exponent: biased - 1075
-		};
-	}
 	function decimal(value, digits) {
-		const { mantissa, exponent } = exactParts(value);
-		const scaled = mantissa * 10n ** BigInt(digits);
+		const match = /^(\d+)(?:\.(\d+))?(?:e([+-]\d+))?$/.exec(String(Math.abs(value)));
+		if (match === null) return String(value);
+		const [, whole = "", fraction = "", exponent = "0"] = match;
+		const written = BigInt(whole + fraction);
+		const shift = Number(exponent) + digits - fraction.length;
 		let units;
-		if (exponent >= 0) units = scaled << BigInt(exponent);
+		if (shift >= 0) units = written * 10n ** BigInt(shift);
 		else {
-			const divisor = 1n << BigInt(-exponent);
-			const twiceRest = 2n * (scaled % divisor);
-			units = scaled / divisor;
-			if (twiceRest > divisor || twiceRest === divisor && units % 2n === 1n) units += 1n;
+			const divisor = 10n ** BigInt(-shift);
+			units = written / divisor + (2n * (written % divisor) >= divisor ? 1n : 0n);
 		}
 		const text = units.toString().padStart(digits + 1, "0");
-		const whole = digits === 0 ? text : `${text.slice(0, -digits)}.${text.slice(-digits)}`;
-		return value < 0 ? `-${whole}` : whole;
+		const shown = digits === 0 ? text : `${text.slice(0, -digits)}.${text.slice(-digits)}`;
+		return value < 0 && units > 0n ? `-${shown}` : shown;
 	}
 	function countPhrase(n, of, noun1, nounN) {
 		return `${n} of ${of} ${of === 1 ? noun1 : nounN}`;
@@ -9290,18 +9290,34 @@ var LockrotReport = (function(exports) {
 		"5.6": "7.0",
 		"7.4": "8.0"
 	};
-	function follows(previous, minor) {
+	var minorRank = (minor) => {
+		const [major = 0, next = 0] = minor.split(".").map(Number);
+		return major * 1e3 + next;
+	};
+	function followsGa(previous, minor) {
 		if (NEXT_MAJOR[previous] === minor) return true;
 		const [pMajor, pMinor] = previous.split(".").map(Number);
 		const [major, next] = minor.split(".").map(Number);
 		return pMajor === major && (pMinor ?? 0) + 1 === next;
 	}
-	function minorsWords(minors, gaps) {
+	var majorOf = (minor) => Math.floor(minorRank(minor) / 1e3);
+	var minorBelow = (minor) => {
+		const [major = 0, next = 0] = minor.split(".").map(Number);
+		return `${major}.${next - 1}`;
+	};
+	function follows(previous, minor, known) {
+		const between = (k) => minorRank(previous) < minorRank(k) && minorRank(k) < minorRank(minor);
+		if (known.some(between)) return false;
+		if (known.includes(previous) && followsGa(minorBelow(previous), minor)) return true;
+		if (known.includes(minor) && minor.endsWith(".0") && majorOf(previous) + 1 === majorOf(minor)) return true;
+		return followsGa(previous, minor);
+	}
+	function minorsWords(minors, gaps, known = []) {
 		const runs = [];
 		for (const minor of minors) {
 			const last = runs.at(-1);
 			const previous = last?.at(-1);
-			if (last !== void 0 && previous !== void 0 && (!gaps || follows(previous, minor))) last.push(minor);
+			if (last !== void 0 && previous !== void 0 && (!gaps || follows(previous, minor, known))) last.push(minor);
 			else runs.push([minor]);
 		}
 		return joinAnd(runs.map((run) => run.length === 1 ? run[0] ?? "" : `${run[0] ?? ""} to ${run.at(-1) ?? ""}`));
@@ -9321,15 +9337,15 @@ var LockrotReport = (function(exports) {
 		return req.target === "php" ? `${name} ${req.constraint}` : `${name} ${req.target} ${req.constraint}`;
 	}
 	var reqList = (reqs, withVersion = false) => joinAndCapped([...new Set(reqs.map((req) => reqWords(req, withVersion)))]);
-	function closestWords({ minors, set_by: setBy }) {
-		return `${minorsWords(minors, true)} ${pluralNoun(minors.length, "is", "are")} excluded only by ${reqList(setBy, true)}`;
+	function closestWords({ minors, set_by: setBy }, known) {
+		return `${minorsWords(minors, true, known)} ${pluralNoun(minors.length, "is", "are")} excluded only by ${reqList(setBy, true)}`;
 	}
-	function setCells(set) {
-		if (set.minors.length === 0) return `none${set.closest === null ? "" : ` · ${closestWords(set.closest)}`}`;
+	function setCells(set, known) {
+		if (set.minors.length === 0) return `none${set.closest === null ? "" : ` · ${closestWords(set.closest, known)}`}`;
 		const lower = set.lower_edge;
 		const upper = set.upper_edge;
 		return [
-			minorsWords(set.minors, set.gaps),
+			minorsWords(set.minors, set.gaps, known),
 			...lower === null ? [] : [`lowest ${lower.php}${lower.set_by.length > 0 ? `, set by ${reqList(lower.set_by)}` : ""}`],
 			...upper === null ? [] : [`${upper.excludes} excluded by ${reqList(upper.set_by)}`]
 		].join(" · ");
@@ -9338,6 +9354,7 @@ var LockrotReport = (function(exports) {
 		const [major = "", minor = "0"] = version.split(".");
 		return `${major}.${minor}`;
 	};
+	var targetMinor = (window) => [minorOf(window.target.php)];
 	var STABLE = /^v?(\d+)(?:\.(\d+))?(?:\.\d+){0,2}(?:[._-]?(?:stable|patch|pl|p)(?:[.-]?\d+(?:[.-]\d+)*)?)?(?:\+.*)?$/i;
 	var isStableIn = (version, minor) => {
 		const match = STABLE.exec(version);
@@ -9350,17 +9367,18 @@ var LockrotReport = (function(exports) {
 	function windowFacts({ run }) {
 		const window = run.php_window;
 		if (window === null) return [];
-		const solvesApart = run.move_check !== null && overrideOutsideTarget(run) !== null;
+		const known = targetMinor(window);
+		const solvesApart = overrideOutsideTarget(run) !== null && run.move_check !== null && run.move_check.reason !== "lock_disabled";
 		return [
 			...window.with_dev === null ? [{
 				key: "PHP window",
-				value: setCells(window.without_dev)
+				value: setCells(window.without_dev, known)
 			}] : [{
 				key: "PHP window, with require-dev",
-				value: setCells(window.with_dev)
+				value: setCells(window.with_dev, known)
 			}, {
 				key: "PHP window, without require-dev",
-				value: setCells(window.without_dev)
+				value: setCells(window.without_dev, known)
 			}],
 			...window.platform_override === null ? [] : [{
 				key: "Composer's config.platform.php",
@@ -9374,14 +9392,15 @@ var LockrotReport = (function(exports) {
 		];
 	}
 	var sameMinors = (a, b) => a.minors.length === b.minors.length && a.minors.every((minor, i) => minor === b.minors[i]);
-	function setWords(set) {
-		if (set.minors.length > 0) return `on PHP ${minorsWords(set.minors, set.gaps)}`;
-		return `on no PHP${set.closest === null ? "" : ` (${closestWords(set.closest)})`}`;
+	function setWords(set, known) {
+		if (set.minors.length > 0) return `on PHP ${minorsWords(set.minors, set.gaps, known)}`;
+		return `on no PHP${set.closest === null ? "" : ` (${closestWords(set.closest, known)})`}`;
 	}
 	function windowClause(window) {
 		const { with_dev: withDev, without_dev: withoutDev } = window;
-		if (withDev === null || sameMinors(withDev, withoutDev)) return `this lock installs ${setWords(withoutDev)}`;
-		return `without require-dev this lock installs ${setWords(withoutDev)}, and with require-dev ${setWords(withDev)}`;
+		const known = targetMinor(window);
+		if (withDev === null || sameMinors(withDev, withoutDev)) return `this lock installs ${setWords(withoutDev, known)}`;
+		return `without require-dev this lock installs ${setWords(withoutDev, known)}, and with require-dev ${setWords(withDev, known)}`;
 	}
 	var ROOT_LINKS = [
 		"require",
@@ -9996,7 +10015,7 @@ var LockrotReport = (function(exports) {
 	var RESOLVES_CAVEAT = "if Composer resolves it";
 	var BASELINE_REFUSED_CARD_WORDS = {
 		outside: "Composer's solver refuses the lock itself at the target PHP; see the PHP line in the Overview",
-		other: "Composer's solver refuses the lock itself; the Run tab names the cause"
+		other: "Composer's solver refuses the lock itself; the Run data tab names the cause"
 	};
 	function checkLine(move, run) {
 		const check = move.check;
@@ -10123,7 +10142,7 @@ var LockrotReport = (function(exports) {
 	}
 	function stillRefused(run) {
 		if (run.move_check?.baseline !== "refused") return "";
-		return run.php_window?.target.inside === false ? " Composer still refuses the lock itself: the PHP line in the Overview names the packages." : " Composer still refuses the lock itself: the Run tab names the cause.";
+		return run.php_window?.target.inside === false ? " Composer still refuses the lock itself: the PHP line in the Overview names the packages." : " Composer still refuses the lock itself: the Run data tab names the cause.";
 	}
 	function platformStep(run) {
 		const override = overrideOutsideTarget(run);
@@ -10373,7 +10392,7 @@ var LockrotReport = (function(exports) {
 	};
 	var waysOut = (n) => `${n} ${pluralNoun(n, "way", "ways")} out`;
 	var advisoriesName = (n) => `${n} ${pluralNoun(n, "advisory", "advisories")}`;
-	var showGroupName = (count, severity) => `${count} ${severity}, show the group`;
+	var showGroupName = (count, severity) => `${severity} ${count}, show the group`;
 	//#endregion
 	//#region src/domain/findingRow.ts
 	var securityTerm = (f) => isScoreGraded(f.score) ? f.score.terms.find(isTermSecurity) : void 0;
@@ -11192,6 +11211,7 @@ var LockrotReport = (function(exports) {
 		};
 	}
 	var RADIUS_WORDS = {
+		tab: "Blast radius",
 		list: "Direct requirements, in the order of lockrot's exposure list",
 		itself: (verdict) => `${verdict} itself`,
 		filtered: (n) => `${n} more ${pluralNoun(n, "does", "do")} not match the filter`,
@@ -17699,8 +17719,9 @@ var LockrotReport = (function(exports) {
 					className: "eyebrow ledger-head",
 					"aria-label": OVERVIEW_WORDS.security,
 					children: OVERVIEW_WORDS.security
-				}) : u$1("span", {
+				}) : u$1("h2", {
 					className: "eyebrow ledger-head",
+					"aria-label": OVERVIEW_WORDS.security,
 					children: OVERVIEW_WORDS.security
 				}),
 				answer ?? u$1(S, { children: [
@@ -18075,7 +18096,7 @@ var LockrotReport = (function(exports) {
 					role: "cell",
 					"aria-colspan": ADVISORY_COLUMNS,
 					children: [
-						u$1("h2", { children: [
+						u$1("h3", { children: [
 							finding.package,
 							" ",
 							u$1(Version, {
@@ -18879,12 +18900,19 @@ var LockrotReport = (function(exports) {
 		if (rows.length === 0) return u$1("section", {
 			className: "p2",
 			"data-surface": "packages",
-			children: u$1(EmptyState, { reason: population2(report, "packages").length === 0 ? "emptyLock" : "filtered" })
+			children: [!printed && u$1("h2", {
+				className: "vh",
+				children: "All packages"
+			}), u$1(EmptyState, { reason: population2(report, "packages").length === 0 ? "emptyLock" : "filtered" })]
 		});
 		return u$1("section", {
 			className: "p2",
 			"data-surface": "packages",
 			children: [
+				!printed && u$1("h2", {
+					className: "vh",
+					children: "All packages"
+				}),
 				caption !== null && u$1("p", {
 					className: "p2-caption",
 					children: caption
@@ -19196,17 +19224,24 @@ var LockrotReport = (function(exports) {
 		if (empty !== null) return u$1("section", {
 			className: "radius2",
 			"data-surface": "radius",
-			"aria-label": "Blast radius",
-			children: u$1("p", {
+			"aria-label": RADIUS_WORDS.tab,
+			children: [!printed && u$1("h2", {
+				className: "vh",
+				children: RADIUS_WORDS.tab
+			}), u$1("p", {
 				className: "empty",
 				children: empty
-			})
+			})]
 		});
 		return u$1("section", {
 			className: "radius2",
 			"data-surface": "radius",
-			"aria-label": "Blast radius",
+			"aria-label": RADIUS_WORDS.tab,
 			children: [
+				!printed && u$1("h2", {
+					className: "vh",
+					children: RADIUS_WORDS.tab
+				}),
 				depth !== null && u$1("p", {
 					className: "r2-depth",
 					children: depth
@@ -20102,6 +20137,7 @@ var LockrotReport = (function(exports) {
 	//#endregion
 	//#region src/ui/search/SearchBar.tsx
 	var PLACEHOLDER = "flag:stale score:>=16";
+	var ADVISORIES_PLACEHOLDER = "a package name";
 	function countLine(report, state) {
 		if (state.view === "findings") return countPhrase(applyFilters2(report, state, "findings").length, population2(report, "findings").length, "flagged package", "flagged packages");
 		if (state.view === "packages") return countPhrase(applyFilters2(report, state, "packages").length, population2(report, "packages").length, "package", "packages");
@@ -20132,7 +20168,7 @@ var LockrotReport = (function(exports) {
 					type: "search",
 					className: "search-input",
 					"aria-label": "Filter packages",
-					placeholder: PLACEHOLDER,
+					placeholder: state.view === "advisories" ? ADVISORIES_PLACEHOLDER : PLACEHOLDER,
 					value: state.q,
 					onInput: (event) => {
 						dispatch({
@@ -20894,7 +20930,7 @@ var LockrotReport = (function(exports) {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.14";
+	var version = "0.14.0-rc.16";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");
