@@ -294,8 +294,8 @@
     "branch": "1.x",
     "installed": false,
     "highest": "1.0.2",
-    "highest_released": null,
-    "highest_commit_date": "2024-03-01T00:00:00+00:00",
+    "highest_released": "2026-09-01T00:00:00+00:00",
+    "highest_commit_date": null,
     "newest_dated": "1.0.2",
     "newest_dated_released": "2026-09-01T00:00:00+00:00",
     "dated_by": "akaunting/monorepo",
@@ -309,7 +309,7 @@
     "highest_admits_target_php": true,
     "highest_admits_project_php": true,
     "highest_misses_project_php": null,
-    "released_years": null,
+    "released_years": 0.1,
     "fixes": null
    }
   ]

@@ -96504,7 +96504,7 @@
   },
   {
    "id": "S2-parent-shared-lower‡",
-   "label": "laravel-debugbar-collector whose highest 2.x is dated 2023-06-02 by its own tag, while the lower 1.x tags share one commit dated 2024-03-01 and the monorepo parent dates 1.0.2 2026-09-01: every shared row is dated by the parent, so S2 reads 1.0.2 and does not fire (ruling R15-28d)",
+   "label": "laravel-debugbar-collector whose highest 2.x is dated 2023-06-02 by its own tag, while the lower 1.x tags share one commit dated 2024-03-01 and the monorepo parent dates 1.0.2 2026-09-01: the parent's date resolves the shared commit, so S2 reads 1.0.2 and does not fire (rulings R15-28d and R15-28g)",
    "project": "akaunting",
    "run": {
     "project": "akaunting/akaunting",
@@ -97375,7 +97375,7 @@
     }
    },
    "synthetic_inputs": [
-    "metadata.branches 1.x: highest 1.0.2 on a commit its tags share (2024-03-01), newest_dated 1.0.2 2026-09-01, dated by akaunting/monorepo (‡)"
+    "metadata.branches 1.x: highest 1.0.2 released 2026-09-01, dated by akaunting/monorepo, the parent-dated row shape (‡)"
    ],
    "finding": {
     "package": "akaunting/laravel-debugbar-collector",
@@ -97645,8 +97645,8 @@
        "branch": "1.x",
        "installed": false,
        "highest": "1.0.2",
-       "highest_released": null,
-       "highest_commit_date": "2024-03-01T00:00:00+00:00",
+       "highest_released": "2026-09-01T00:00:00+00:00",
+       "highest_commit_date": null,
        "newest_dated": "1.0.2",
        "newest_dated_released": "2026-09-01T00:00:00+00:00",
        "dated_by": "akaunting/monorepo",
@@ -97660,7 +97660,7 @@
        "highest_admits_target_php": true,
        "highest_admits_project_php": true,
        "highest_misses_project_php": null,
-       "released_years": null,
+       "released_years": 0.1,
        "fixes": null
       }
      ]
@@ -97743,10 +97743,10 @@
       "branch": "1.x",
       "marks": [],
       "latest": "1.0.2",
-      "age": "undated",
+      "age": "0.1y",
       "php": ">=7.3",
       "php_words": null,
-      "bar": "1.0.2, undated, dated by akaunting/monorepo",
+      "bar": "1.0.2, released 0.1 years ago, dated by akaunting/monorepo",
       "folded_in": null
      }
     ],
@@ -97804,7 +97804,7 @@
     "releases": [
      {
       "version": "1.0.2",
-      "time": "2024-03-01T00:00:00+00:00",
+      "time": "2026-09-01T00:00:00+00:00",
       "php": ">=7.3",
       "shared_commit": true
      },
