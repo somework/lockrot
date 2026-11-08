@@ -721,10 +721,6 @@ final class MoveTest extends TestCase
      */
     public static function untrustedNewestTags(): iterable
     {
-        yield 'a dated highest tag beside a newer-dated lower tag on a shared commit' => [
-            [self::release('v2.0.0', '2024-01-01', '>=7.2'), ['shared_commit' => true] + self::release('v1.9.3', '2025-06-01', '>=7.2')],
-            'v1.9.3', '1.x', 'v1.9.3', 'require a tag — the newest is v1.9.3; 1.x needs php >=7.2, which require.php allows; old-promise stays; not checked: left-behind',
-        ];
         yield 'an older dated alpha above stable tags on a shared commit' => [
             array_merge([self::release('v4.0.0-alpha1', '2020-01-01', '>=7.2')], array_map(static fn (string $version): array => ['shared_commit' => true] + self::release($version, '2021-01-01', '>=7.2'), ['v3.1.0', 'v3.2.0', 'v3.3.0'])),
             'v3.3.0', '3.x', 'v3.3.0', 'require a tag — the newest is v3.3.0; 3.x needs php >=7.2, which require.php allows; old-promise stays',
@@ -755,6 +751,23 @@ final class MoveTest extends TestCase
         self::assertSame($text, $move['text']);
         self::assertSame(['requires' => '>=7.2', 'project_allows' => true, 'target_runs' => true, 'raise_to' => null, 'raise_size' => null], $move['php_check']);
         self::assertSame([$s6Version, null, null], self::s6Version($finding));
+        self::assertSame([null, 'undated_releases'], [JsonPath::arrayAt($finding, ['age'])['release'], JsonPath::arrayAt($finding, ['age'])['release_unmeasured']]);
+    }
+
+    /**
+     * Ruling R15-28e: a newer shared-commit date on the lower 1.x line leaves S2 unknown, and the
+     * snapshot with no line of its own moves to the highest line's tag with that tag's own date.
+     */
+    public function testASnapshotBesideANewerSharedDateOnALowerLineRequiresTheHighestLinesTag(): void
+    {
+        $run = ['target_php' => '8.4', 'project_php' => '>=7.2', 'fail_on' => 'high', 'include_dev' => false];
+        $finding = self::analyse(['lock' => [['version' => 'dev-master']], 'root' => ['require' => ['php' => '>=7.2']], 'run' => $run, 'releases' => [
+            self::release('v2.0.0', '2024-01-01', '>=7.2'), ['shared_commit' => true] + self::release('v1.9.3', '2025-06-01', '>=7.2'),
+        ]]);
+        $move = JsonPath::arrayAt($finding, ['next_step']);
+
+        self::assertSame(['tag', '2.x', 'v2.0.0', '2024-01-01T00:00:00+00:00'], [$move['kind'], $move['to_branch'], JsonPath::stringAt($move, ['latest', 'version']), JsonPath::stringAt($move, ['latest', 'released'])]);
+        self::assertSame('v2.0.0', self::s6Version($finding)[0]);
         self::assertSame([null, 'undated_releases'], [JsonPath::arrayAt($finding, ['age'])['release'], JsonPath::arrayAt($finding, ['age'])['release_unmeasured']]);
     }
 
@@ -795,13 +808,16 @@ final class MoveTest extends TestCase
         self::assertSame($s6Version, self::s6Version($finding)[0]);
     }
 
-    /** Ruling R13-A: the test move names the newest tag that S6 reads, not the installed release, when a higher one exists. */
-    public function testAnOldPromiseTestMoveNamesTheNewestTagWhoseDateIsNotTrusted(): void
+    /**
+     * Ruling R13-A: the test move names the newest tag that S6 reads, not the installed release, when a higher one exists.
+     * Ruling R15-28e: a newer shared date on the lower 1.x line leaves S6 on the highest line's v2.0.0.
+     */
+    public function testAnOldPromiseTestMoveNamesTheHighestLinesTagAboveANewerSharedDate(): void
     {
         $move = JsonPath::arrayAt(self::analyse(['releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('v2.0.0', '2020-01-01', '>=7.2'), ['shared_commit' => true] + self::release('v1.9.3', '2020-06-01', '>=7.2')]]), ['next_step']);
 
         self::assertSame(['test', 'test it on PHP 8.4'], [$move['kind'], $move['text']]);
-        self::assertSame(['version' => 'v1.9.3', 'released' => null, 'is_installed' => false, 'relation' => null, 'snapshot_time' => null], $move['latest']);
+        self::assertSame(['version' => 'v2.0.0', 'released' => '2020-01-01T00:00:00+00:00', 'is_installed' => false, 'relation' => null, 'snapshot_time' => null], $move['latest']);
     }
 
     /** Ruling R13-A (r12l.1, Q5): a newer-dated tag below the installed release leaves the installed release as the newest. */

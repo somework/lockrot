@@ -444,13 +444,13 @@ final class AgeMeasureTest extends TestCase
         self::assertUnmeasured(AgeMeasure::UNDATED_RELEASES, $this->measure()->release(FactsBuilder::facts(FactsBuilder::package(['name' => 'illuminate/collections', 'version' => 'v13.0.0']), $metadata)));
     }
 
-    /**
-     * Characterization: S6 and the moves read the newest dated tag, here a lower branch's, not the highest tag v13.0.0.
-     * The 0.15 follow-up decides which tag these readers take.
-     */
-    public function testTheS6VersionOfASplitWithASharedNewestBranchIsTheNewestDatedTag(): void
+    /** Ruling R15-28e: a newest date on a lower line leaves S6 and the moves on the highest line, with its own date. */
+    public function testTheS6VersionOfASplitWithASharedNewestBranchIsTheHighestLinesTag(): void
     {
-        self::assertSame(['v12.70.0', 'v12.70.0'], [self::splitWithASharedNewestBranch(true)->lastStableVersion(), self::splitWithASharedNewestBranch(false)->lastStableVersion()]);
+        $own = self::splitWithASharedNewestBranch(false);
+
+        self::assertSame(['v13.0.0', 'v13.0.0'], [self::splitWithASharedNewestBranch(true)->lastStableVersion(), $own->lastStableVersion()]);
+        self::assertSame(self::ago(270 * 86400), $own->lastStableReleaseAt() === null ? null : $own->lastStableReleaseAt()->format(\DATE_ATOM));
     }
 
     /** v13.0.0 on its own commit 270 days ago, the 12.x tags on one commit 210 days ago, and a parent that dates 12.x or only 11.x. */
