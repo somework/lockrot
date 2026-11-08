@@ -113,6 +113,26 @@ final class UnsafeCommandArgumentTest extends TestCase
         self::assertSame('^3.27.0+x|calc', $move['constraint']);
     }
 
+    public function testTheRunNoteNamesAnUnsafeAlsoMove(): void
+    {
+        self::assertSame([['package' => 'symfony/debug', 'version' => 'v4.4.0+x|calc']], self::noteMoves('either-critical‡', ['v4.4.0' => 'v4.4.0+x|calc']));
+    }
+
+    public function testTheRunNoteNamesTheNextStepBeforeTheAlsoMove(): void
+    {
+        $moves = self::noteMoves('B-also‡', ['v2.8.52' => 'v2.8.52+x|calc', 'v5.4.0' => 'v5.4.0+x<y']);
+
+        self::assertSame([['package' => 'symfony/monolog-bridge', 'version' => 'v2.8.52+x|calc'], ['package' => 'symfony/monolog-bridge', 'version' => 'v5.4.0+x<y']], $moves);
+    }
+
+    /** The report sorts twig/twig before symfony/twig-bridge, so the note does not follow the package names. */
+    public function testTheRunNoteNamesTheMovesInReportOrder(): void
+    {
+        $moves = self::noteMoves('A', ['v3.27.0' => 'v3.27.0+x|calc', 'v4.4.51' => 'v4.4.51+x>y']);
+
+        self::assertSame([['package' => 'twig/twig', 'version' => 'v3.27.0+x|calc'], ['package' => 'symfony/twig-bridge', 'version' => 'v4.4.51+x>y']], $moves);
+    }
+
     public function testASafeMoveKeepsItsPhpStepAndWritesNoNote(): void
     {
         $document = self::document('v3.27.0', 'v3.27.0', 'A');
@@ -182,6 +202,34 @@ final class UnsafeCommandArgumentTest extends TestCase
         $case['inputs'] = $inputs;
 
         return CaseRecording::formatted(CaseHydrator::report($case), FailOn::none(), CaseHydrator::lockJson([$id]));
+    }
+
+    /**
+     * @param array<string, string> $renames release version => the version that replaces it, in the case's package and in its related packages
+     *
+     * @return array<mixed, mixed> `data.moves` of the command_argument_unsafe note
+     */
+    private static function noteMoves(string $id, array $renames): array
+    {
+        $case = CaseHydrator::case($id);
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $rename = static fn (array $releases): array => array_map(static fn ($release): array => \is_array($release) && \is_string($release['version'] ?? null) && isset($renames[$release['version']]) ? ['version' => $renames[$release['version']]] + $release : (array) $release, array_values($releases));
+        $inputs['releases'] = $rename(JsonPath::arrayAt($inputs, ['releases']));
+        if (\is_array($inputs['packages'] ?? null)) {
+            $related = $inputs['packages'];
+            foreach ($related as $name => $facts) {
+                if (\is_array($facts) && \is_array($facts['releases'] ?? null)) {
+                    $related[$name] = ['releases' => $rename($facts['releases'])] + $facts;
+                }
+            }
+            $inputs['packages'] = $related;
+        }
+        $case['inputs'] = $inputs;
+        $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+        $notes = array_values(array_filter(JsonPath::arrayAt($document, ['note_details']), static fn ($note): bool => \is_array($note) && $note['code'] === 'command_argument_unsafe'));
+        self::assertCount(1, $notes);
+
+        return JsonPath::arrayAt($notes[0], ['data', 'moves']);
     }
 
     /**
