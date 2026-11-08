@@ -1,10 +1,10 @@
 {
  "pr": "7d",
  "source": {
-  "cases.json": "13186f8ebe9082d5ac014783e20e384f24608de686aa28970c48b27ee7ee3c8b",
+  "cases.json": "78960a47a7e127d980f5705b66b9de99dd3090420ad8f6062c8e7fbe6bad61cf",
   "model_run_date": "2026-11-08"
  },
- "suite": "the targeted model run passes every step except the counts warning that validation.out is older than cases.json",
+ "suite": "every case and the composite pass the report-2 field reference (I21) with 0 violations",
  "page_goldens": {
   "sha256": "bbdc7e6156d0234dc10c35535805219111a21ded4978cfb7c2ba3ad41e1d39db",
   "rendered": "the model's goldens"
