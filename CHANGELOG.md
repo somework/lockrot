@@ -235,10 +235,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   holds no PHP raise step: only the `update now:` line says to raise `require.php` first.
   ([Security](docs/schema.md#advisories-with-no-fix-expected))
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
-  installs, with require-dev and without, and the links that set each edge. A target minor above
-  the newest known minor counts as one more. `platform_override` is Composer's merged
-  `config.platform.php`. `target.php` and `lower_edge.php` are `X.Y.Z` releases, also for a pin
-  such as `8.4.1-p1`. The text formats print a `php:` line.
+  installs and the links that set each edge. A target minor that the release data does not list
+  counts as one more, in version order. `platform_override` is the merged `config.platform.php`.
+  `target.php` and `lower_edge.php` are `X.Y.Z`. The text formats print a `php:` line.
   ([The PHP window](docs/verdicts.md#the-php-window))
 - **json, table, markdown, github:** `run.php_window.target_fix` names the packages that exclude
   the target PHP, and the answer of Composer's solver to their update at the target: the command,
@@ -331,9 +330,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([extra.lockrot keys](docs/configuration.md#extralockrot-keys))
 - **Breaking:** **json, table, markdown, github:** `libyears.total`, `libyears.direct_requirements`
   and the `libyears:` footer sum the findings' two-decimal values. 0.13 rounded the sum of the
-  unrounded values, so a total can move on the upgrade with no data change. The move grows with
-  the measured findings. Action: reset a tracked baseline of `.libyears.total` at the first 0.14
-  run.
+  unrounded values, so a total can move on the upgrade with no data change, more on a long lock.
+  Action: reset a tracked baseline of `.libyears.total` at the first 0.14 run.
   ([Libyears](docs/schema.md#libyears))
 - **Breaking:** **gitlab, sarif:** one record per flag, plus one per advisory in SARIF. 0.13
   identities stay. SARIF `properties.verdict` is the grade, `signals` is `signal_ids`, `baseline` is
@@ -389,9 +387,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the explanation with no baseline written. Action: give each option once, and run `--explain` in
   its own step. ([Exit codes](docs/ci.md#exit-codes))
 - **Breaking:** **CLI, Config, Install-time:** `--target-php`, `LOCKROT_TARGET_PHP` and
-  `extra.lockrot.target-php` take a major, a minor or a patch: `8.4.2` is `8.4`. Text after the
-  version, or a minor that lockrot does not know below the newest one it knows, exits 2.
-  Install time skips the check. Action: pass a real PHP version.
+  `extra.lockrot.target-php` exit 2 on a minor that lockrot does not know below the newest one it
+  knows, such as `7.5`. The option and the variable also exit 2 on text after the version. Install
+  time skips the check. Action: pass a real PHP version alone.
   ([CLI options](docs/configuration.md#cli-options))
 - **Breaking:** **CLI:** a lock whose `packages`, `packages-dev`, `platform`, `platform-dev`,
   `platform-overrides` or `aliases` section Composer or lockrot cannot read, or that lists two
@@ -400,8 +398,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([Exit codes](docs/ci.md#exit-codes))
 - **Breaking:** **CLI:** `vendor/somework/lockrot/bin/lockrot` exits 2 and runs nothing when the
   composer/composer package that it loads is older than 2.10. It also exits 2 on a non-CLI PHP SAPI
-  with `register_argc_argv=On`. Action: upgrade composer/composer to 2.10 or later, or run the
-  PHAR or `composer lockrot`, with the CLI PHP.
+  with `register_argc_argv=On`. Action: run the PHAR, run `composer lockrot` on Composer 2.10 or
+  newer, or require composer/composer 2.10 or newer, with the CLI PHP.
   ([Exit codes](docs/ci.md#exit-codes))
 - **Breaking:** **CLI:** an empty `--target-php=` exits `2`, as an empty `--fail-on=` and
   `--baseline=` do, and does not fall back to `LOCKROT_TARGET_PHP`, `extra.lockrot.target-php`,

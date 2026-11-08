@@ -383,8 +383,8 @@ maintainer.
       an X.0 release before its day, so add an X.0 date only after that release. Check the file
       before you record `docs/example-run.md`.
 
-    - Re-record `docs/example-run.md` after the version bump, with a PHAR that you build from the
-      release branch and that prints the new version ([The PHAR](#the-phar)):
+    - Re-record `docs/example-run.md` after the version bump. Build the PHAR from the release
+      branch, so that it prints the new version ([The PHAR](#the-phar)):
       `GITHUB_TOKEN=<token> python3 tools/release/example_run.py build/lockrot.phar <planned tag day>`.
       The script runs the page's command on the two snapshots that the page links, with
       `LOCKROT_TODAY` set to that day. It refuses a run with a run note and a clean run that flags a
@@ -475,8 +475,9 @@ maintainer.
            `RELEASED_SCHEMAS` row and the golden pins of step 1. When a schema differs from the
            previous release's, it also holds the `RECORDING_PENDING` entry. Then re-record
            `docs/example-run.md` (`tools/release/example_run.py`) from a PHAR that prints the new
-           version. The contract bundle masks the tool version, so this commit changes no file of
-           the bundle. Without it, the release pull request fails (step 4).
+           version. Push the recording with the bump commit. The contract bundle masks the tool
+           version, so this commit changes no file of the bundle. Without it, the release pull
+           request fails (step 4).
 
 2. Build the PHAR from a clean checkout of the release branch, and check that
    `php build/lockrot.phar --version` prints the new version.

@@ -193,7 +193,7 @@ names what to read for each report-1 field that report-2 removes or redefines.
 | `.evidence` (every fact) | `.evidence` holds the summaries of the counted flags only. Read `[.flags[].summary]` for every flag that fired, accepted ones included, and `[.signals[].summary]` for the rest |
 | `.priority_basis` | `.score`: its `terms`, its `modifiers` and its `text` |
 | `.no_fix_expected`, S9's `fixed_by` and `fixed_on_branch` | `.security` and the `fix` of each S9 row |
-| `.libyears.total` | the same key. It is the sum of the findings' two-decimal `libyears`. 0.13 rounded the sum of the unrounded values, so a total can move with no data change. The move grows with the number of measured findings, by at most about 0.005 for each. `.libyears.direct_requirements` follows the same rule |
+| `.libyears.total` | the same key. It is the sum of the findings' two-decimal `libyears`. 0.13 rounded the sum of the unrounded values, so a total can move with no data change. The move is at most 0.005 for each measured finding, plus 0.005. `.libyears.direct_requirements` follows the same rule |
 | `.libyears_unmeasured == "metadata_unavailable"` | `.libyears_unmeasured == "unavailable" or .libyears_unmeasured == "not_found"` |
 | `.libyears_unmeasured == "no_stable_release_date"` | `shared_commit`, `parent_split`, `undated`, `no_stable_release` or `undated_releases`, the ids that `age` uses for the same cause |
 | S9's `.severity == null` | `.severity == "unrated"`. `moderate` reads `medium`, and `.severity_published` keeps Composer's word |
