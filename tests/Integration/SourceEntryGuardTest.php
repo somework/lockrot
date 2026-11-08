@@ -50,9 +50,7 @@ final class SourceEntryGuardTest extends TestCase
 
         self::assertSame(2, $process->getExitCode(), $process->getErrorOutput());
         self::assertSame('', $process->getOutput());
-        foreach (['composer/composer', 'composer lockrot', 'https://lockrot.dev/phar/'] as $way) {
-            self::assertStringContainsString($way, $process->getErrorOutput());
-        }
+        self::assertSame("lockrot needs the composer/composer package 2.10 or newer, and the vendor directory of this project does not hold it. Run the PHAR (https://lockrot.dev/phar/). Or upgrade Composer to 2.10 or newer and run composer lockrot. Or require composer/composer 2.10 or newer in this project.\n", $process->getErrorOutput());
     }
 
     /**
@@ -94,7 +92,7 @@ final class SourceEntryGuardTest extends TestCase
 
         self::assertSame(2, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
         self::assertSame('', $process->getOutput());
-        self::assertSame("lockrot requires the composer/composer package 2.10 or newer, not the 2.9.5 that it loads. Run composer lockrot, run the PHAR (https://lockrot.dev/phar/), or upgrade that package.\n", $process->getErrorOutput());
+        self::assertSame("lockrot requires the composer/composer package 2.10 or newer, not the 2.9.5 that it loads. Run the PHAR (https://lockrot.dev/phar/). Or upgrade Composer to 2.10 or newer and run composer lockrot. Or require composer/composer 2.10 or newer in this project.\n", $process->getErrorOutput());
     }
 
     /** bin/lockrot repeats the floor as a literal, because no lockrot class can load before its check. */
