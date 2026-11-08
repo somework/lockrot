@@ -107,7 +107,7 @@ final class PackageMetadata
     private ?\DateTimeImmutable $releaseReadingAt;
     private ?string $releaseReadingVersion;
     private ?string $releaseReadingDatedBy;
-    /** @var array{0: \DateTimeImmutable, 1: string}|null the newest dated pre-release: its date and its pretty version */
+    /** @var array{0: \DateTimeImmutable, 1: string, 2: string}|null the newest dated pre-release: its date, its pretty and its normalized version */
     private ?array $newestPreRelease = null;
 
     /**
@@ -223,8 +223,8 @@ final class PackageMetadata
                 $releaseDate = $version->getReleaseDate();
                 if ($releaseDate !== null) {
                     $releaseDate = self::toImmutable($releaseDate);
-                    if (VersionParser::parseStability($version->getVersion()) !== 'stable' && ($newestPreRelease === null || $releaseDate > $newestPreRelease[0])) {
-                        $newestPreRelease = [$releaseDate, $version->getPrettyVersion()];
+                    if (VersionParser::parseStability($version->getVersion()) !== 'stable' && self::newer($releaseDate, $version->getVersion(), $newestPreRelease[0] ?? null, $newestPreRelease[2] ?? null)) {
+                        $newestPreRelease = [$releaseDate, $version->getPrettyVersion(), $version->getVersion()];
                     }
                     if (self::newer($releaseDate, $version->getVersion(), $lastStableReleaseAt, $lastStableNormalized)) {
                         $lastStableReleaseAt = $releaseDate;
@@ -544,7 +544,9 @@ final class PackageMetadata
             $releaseReadingDatedBy = $lastStableDatedBy;
         }
         $highest = $byBranch[$highestBranch] ?? null;
-        if ($releaseReadingAt === null && $highest !== null && !isset($highest['dated_by']) && $highest['highest']['at'] !== null) {
+        // Only a shared commit leaves the own reading unknown beside a dated highest row (R15-28d). An
+        // undated highest tag, a pre-release included, keeps the age unknown.
+        if ($releaseReadingAt === null && $this->lastStableSharesItsCommit && $highest !== null && !isset($highest['dated_by']) && $highest['highest']['at'] !== null) {
             $releaseReadingAt = $highest['highest']['at'];
             $releaseReadingVersion = $highest['highest']['pretty'];
         }

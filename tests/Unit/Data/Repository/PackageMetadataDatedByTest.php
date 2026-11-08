@@ -593,18 +593,46 @@ final class PackageMetadataDatedByTest extends TestCase
         ], new \DateTimeImmutable(self::NOW));
     }
 
-    public function testTheNewestPreReleaseIsTheNewestByDateAndThenByVersion(): void
+    /** @return iterable<string, array{list<array{0: string, 1: string, 2: ?string}>}> */
+    public static function providePreReleasesThatShareTheNewestDate(): iterable
     {
-        $child = $this->split([
-            ['v3.0.0-beta1', 'c-b1', '2025-09-01T00:00:00+00:00'],
-            ['v3.0.0-beta3', 'c-b3', '2025-10-01T00:00:00+00:00'],
-            ['v3.0.0-beta2', 'c-b2', '2025-10-01T00:00:00+00:00'],
-            ['v2.1.0', 'c21', null],
-        ]);
+        $b1 = ['v3.0.0-beta1', 'c-b1', '2025-09-01T00:00:00+00:00'];
+        $b2 = ['v3.0.0-beta2', 'c-b2', '2025-10-01T00:00:00+00:00'];
+        $b3 = ['v3.0.0-beta3', 'c-b3', '2025-10-01T00:00:00+00:00'];
+        $v21 = ['v2.1.0', 'c21', null];
 
-        $dated = $child->datedBy($this->parentOfUndatedV21('2024-01-01T00:00:00+00:00'));
+        yield 'beta2 listed before beta3' => [[$b1, $b2, $b3, $v21]];
+        yield 'beta3 listed before beta2' => [[$b1, $b3, $b2, $v21]];
+    }
+
+    /**
+     * @dataProvider providePreReleasesThatShareTheNewestDate
+     *
+     * @param list<array{0: string, 1: string, 2: ?string}> $tags
+     */
+    #[DataProvider('providePreReleasesThatShareTheNewestDate')]
+    public function testTheNewestPreReleaseIsTheNewestByDateAndThenByVersionWhateverTheListingOrder(array $tags): void
+    {
+        $dated = $this->split($tags)->datedBy($this->parentOfUndatedV21('2024-01-01T00:00:00+00:00'));
 
         self::assertSame('v3.0.0-beta3', $dated->releaseReadingVersion(), 'beta3 and beta2 share the newest date, and beta3 is the higher version');
+    }
+
+    public function testAnUndatedHighestPreReleaseKeepsTheReadingUnknownAfterAParentDatesALowerLine(): void
+    {
+        $child = $this->split([
+            ['v3.0.0-beta1', 'c-b1', null],
+            ['v2.0.0', 'c20', '2020-01-01T00:00:00+00:00'],
+            ['v1.0.0', 'c10', null],
+        ]);
+        $parent = PackageMetadata::fromPackages('acme/monorepo', [
+            $this->load(self::tag('acme/monorepo', 'v1.0.0', 'm10', '2019-01-01T00:00:00+00:00', ['acme/split' => 'self.version'])),
+        ], new \DateTimeImmutable(self::NOW));
+
+        $dated = $child->datedBy($parent);
+
+        self::assertNull($child->releaseReadingAt(), 'the highest tag v3.0.0-beta1 has no time');
+        self::assertNull($dated->releaseReadingAt(), 'the parent dates only v1.0.0, so the undated v3.0.0-beta1 keeps the age unknown');
     }
 
     public function testAPreReleaseOnTheParentDatesDayWinsByVersion(): void
