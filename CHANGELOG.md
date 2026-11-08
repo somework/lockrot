@@ -327,8 +327,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Breaking:** **json, table, markdown, github:** `libyears.total`, `libyears.direct_requirements`
   and the `libyears:` footer sum the findings' two-decimal values. 0.13 rounded the sum of the
-  unrounded values, so a total can move by up to 0.05 on the upgrade with no data change. Action:
-  reset a tracked baseline of `.libyears.total` at the first 0.14 run.
+  unrounded values, so a total can move on the upgrade with no data change. The move grows with
+  the measured findings. Action: reset a tracked baseline of `.libyears.total` at the first 0.14
+  run.
   ([Libyears](docs/schema.md#libyears))
 - **Breaking:** **gitlab, sarif:** one record per flag, plus one per advisory in SARIF. 0.13
   identities stay. SARIF `properties.verdict` is the grade, `signals` is `signal_ids`, `baseline` is
