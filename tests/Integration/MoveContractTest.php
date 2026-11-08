@@ -7,9 +7,11 @@ namespace Lockrot\Tests\Integration;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\Contract\ModelBounds;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Verdict\CommandArgument;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -385,6 +387,24 @@ final class MoveContractTest extends TestCase
         self::assertSame($moves, $listed, 'list a case whose move differs from the model in both DIFFERENCES');
     }
 
+    /** SPEC §5.6: a release name with `|`, `<` or `>` leaves a move no step only when a step quotes it. */
+    public function testTheWhyNotRuleExemptsOnlyAMoveWhoseStepQuotesAnUnsafeValue(): void
+    {
+        $finding = ['package' => 'a/b'];
+        $require = ['kind' => 'require', 'version' => '2.0.0+x|calc', 'constraint' => '^2.0', 'latest' => null, 'check' => ['result' => 'resolves', 'reason' => null]];
+
+        self::assertWhyNot($finding, ['commands' => [['composer', 'require', 'a/b:^2.0']]] + $require);
+        self::assertWhyNot($finding, ['check' => null, 'commands' => []] + $require);
+        try {
+            self::assertWhyNot($finding, ['constraint' => '^2.0.0+x|calc', 'commands' => [['composer', 'require', 'a/b:^2.0.0+x|calc']]] + $require);
+        } catch (ExpectationFailedException $e) {
+            self::assertStringContainsString('require has no step', $e->getMessage());
+
+            return;
+        }
+        self::fail('a step that quotes a release name with a pipe fails the rule');
+    }
+
     /**
      * The model reference: the analyzer's move on a case's inputs is the case's own move, but for
      * the fields {@see DIFFERENCES} names with its reason.
@@ -588,19 +608,44 @@ final class MoveContractTest extends TestCase
         $check = $move['check'];
         $commands = JsonPath::arrayAt($move, ['commands']);
         $quotes = \in_array($move['kind'], ['update', 'require', 'raise-php', 'tag'], true);
-        // SPEC §5.6: a quoted release name with a shell operator, or a lock that Composer ignores, leaves the move no step.
-        if (($quotes && preg_match('{[|<>]}', (\is_string($move['version']) ? $move['version'] : '').(\is_string($move['constraint']) ? $move['constraint'] : '')) === 1) || (\is_array($check) && $check['reason'] === 'lock_disabled')) {
+        $asks = $quotes && \is_string($move['version']) && (!\is_array($check) || $check['result'] !== 'resolves');
+        // SPEC §5.6: a release name with a shell operator that a step quotes, or a lock that Composer ignores, leaves the move no step.
+        if (($quotes && self::quotesUnsafeValue($move, $asks)) || (\is_array($check) && $check['reason'] === 'lock_disabled')) {
             self::assertSame([], $commands, JsonPath::stringAt($move, ['kind']).' has no step');
 
             return;
         }
-        $asks = $quotes && \is_string($move['version']) && (!\is_array($check) || $check['result'] !== 'resolves');
         $whyNot = array_values(array_filter($commands, static fn ($argv): bool => \is_array($argv) && ($argv[1] ?? null) === 'why-not'));
         $step = ['composer', 'why-not', $finding['package'], $move['version'], '--locked'];
         self::assertSame($asks ? [$step] : [], $whyNot, JsonPath::stringAt($move, ['kind']).' why-not');
         if ($asks) {
             self::assertSame($step, end($commands), 'why-not is the last step');
         }
+    }
+
+    /**
+     * Whether a step quotes the move's version, its constraint without the caret or `latest.version`,
+     * and that value holds a shell operator. The steps are the written ones and the why-not step that
+     * $asks expects, because a move with an unsafe value writes none.
+     *
+     * @param array<mixed, mixed> $move
+     */
+    private static function quotesUnsafeValue(array $move, bool $asks): bool
+    {
+        $arguments = array_merge($asks ? [JsonPath::stringAt($move, ['version'])] : [], ...array_map(static fn ($argv): array => \is_array($argv) ? $argv : [], JsonPath::arrayAt($move, ['commands'])));
+        $latest = \is_array($move['latest'] ?? null) ? $move['latest']['version'] ?? null : null;
+        foreach ([$move['version'], \is_string($move['constraint']) ? ltrim($move['constraint'], '^') : null, $latest] as $value) {
+            if (!\is_string($value) || !CommandArgument::holdsShellOperator($value)) {
+                continue;
+            }
+            foreach ($arguments as $argument) {
+                if (\is_string($argument) && strpos($argument, ltrim($value, '^vV')) !== false) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
