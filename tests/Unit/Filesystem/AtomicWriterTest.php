@@ -106,6 +106,35 @@ final class AtomicWriterTest extends TestCase
         self::assertSame(['r.json'], self::entries($dir), 'the temporary file must be cleaned up');
     }
 
+    /**
+     * The temporary file takes the target's read-only mode, then the move fails. On Unix the cleanup
+     * works either way, because unlink() needs the directory's permission and not the file's. The
+     * read-only file target that makes MoveFileEx refuse on Windows has no Unix reproduction, so this
+     * test pins the cleanup for a failed move after the mode was copied, and only Windows CI would
+     * fail without the chmod before unlink.
+     */
+    public function testAFailedMoveOntoAReadOnlyTargetLeavesNoTemporaryFile(): void
+    {
+        if (\DIRECTORY_SEPARATOR === '\\') {
+            self::markTestSkipped('Windows has no Unix permission bits on a directory');
+        }
+        $dir = $this->tempDir();
+        mkdir($dir.'/r.json');
+        file_put_contents($dir.'/r.json/occupied', 'x');
+        chmod($dir.'/r.json', 0555);
+
+        try {
+            AtomicWriter::write($dir.'/r.json', 'report', 'out/r.json');
+            self::fail('The move onto a directory must fail.');
+        } catch (ConfigException $e) {
+            self::assertStringStartsWith('Cannot write out/r.json: ', $e->getMessage());
+        } finally {
+            chmod($dir.'/r.json', 0755);
+        }
+
+        self::assertSame(['r.json'], self::entries($dir), 'the temporary file must be cleaned up');
+    }
+
     /** With no directory to write into, the reason is the write's own, not the cleanup's. */
     public function testAMissingDirectoryReportsTheFailedWrite(): void
     {

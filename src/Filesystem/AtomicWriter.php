@@ -52,6 +52,8 @@ final class AtomicWriter
                 // Read before the cleanup: unlink() can record a failure of its own, which
                 // else replaces the reason the caller needs.
                 $reason = self::reason($failure);
+                // keepPermissions() can have copied a read-only mode, which makes Windows refuse the unlink.
+                @chmod($temporary, 0600);
                 @unlink($temporary);
 
                 throw new ConfigException('Cannot write '.$displayPath.': '.$reason);
