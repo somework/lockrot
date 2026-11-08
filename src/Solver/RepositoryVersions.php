@@ -112,17 +112,30 @@ final class RepositoryVersions implements VersionSource
     {
         $pending = array_diff_key(array_fill_keys($names, null), $this->notFromComposerRepository);
         $this->loaded += array_fill_keys($names, []);
+        $left = $pending;
 
         try {
-            $this->loadTogether($pending);
-        } catch (\Exception $e) {
-            // A transport failure or an answer that does not parse (Seld\JsonLint\ParsingException).
-            // A name with versions still to load, such as an admitted name with its tags only, loads again alone.
-            foreach (array_keys($pending) as $name) {
-                if (!\array_key_exists($name, $this->complete)) {
-                    $this->loaded[$name] = $this->loadOne($name);
+            try {
+                $this->loadTogether($pending);
+            } catch (\Exception $e) {
+                // A transport failure or an answer that does not parse (Seld\JsonLint\ParsingException).
+                // A name with versions still to load, such as an admitted name with its tags only, loads again alone.
+                foreach (array_keys($pending) as $name) {
+                    if (!\array_key_exists($name, $this->complete)) {
+                        $this->loaded[$name] = $this->loadOne($name);
+                    }
+                    unset($left[$name]);
                 }
             }
+        } catch (\Throwable $e) {
+            // An \Error, such as a TypeError on metadata that Composer cannot read, fails the solve, as Composer stops on it.
+            // A name is loaded once, so a later solve that needs a name it leaves must read that name as failed.
+            foreach (array_keys(array_diff_key($left, $this->complete)) as $name) {
+                $this->loaded[$name] = [];
+                $this->failures += [$name => self::FAILED];
+            }
+
+            throw $e;
         }
     }
 
