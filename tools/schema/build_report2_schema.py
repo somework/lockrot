@@ -235,7 +235,8 @@ defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether the mov
                      "`with-dependencies` (adds `--with-dependencies`) or `with-all-dependencies` (adds `--with-all-dependencies`); null unless `result` is `resolves`. Closed."),
                     closed(['inline', 'with-dependencies', 'with-all-dependencies'])),
         'reason': nul(("Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the "
-                       "`moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), "
+                       "`moves_not_checked` note), `advisory_lookup_incomplete` (the advisory lookup did not cover a package of the result), "
+                       "`lock_disabled` (`config.lock` is false, so Composer ignores composer.lock), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), "
                        "`install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), "
                        "`platform_config_invalid` (a `config.platform` entry of the merged config fails the validation of Composer's platform repository: php set to "
                        "false in any letter case, a value that is neither a string nor false, a name that is no platform package, or a version string that Composer "
@@ -543,7 +544,8 @@ def move_props(with_also):
                          "An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. "
                          "A move that `check` resolves only with its dependencies ends its step with `--with-dependencies` or `--with-all-dependencies`, and a move that `check` refuses has no `update` or `require` step. "
                          "Only lockrot's own options start with `-`: `--no-update`, `--dev` and `--no-interaction` in a `require` step, `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step, and `--locked` in a `why-not` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. "
-                         "lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. When a version, constraint or tag that a step quotes holds `|`, `<` or `>`, the move has no step at all, and the note `command_argument_unsafe` names it. `text` shows a command only as the POSIX rendering of a step here. "
+                         "lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. When a version, constraint or tag that a step quotes holds `|`, `<` or `>`, the move has no step at all, and the note `command_argument_unsafe` names it. "
+                         "That rule reads the move's `version`, its `constraint` without the caret and `latest.version` on a `tag` move, never the `>=` of the php step `php:>=8.1`. `text` shows a command only as the POSIX rendering of a step here. "
                          "A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell."),
                         arr('One command as its argument list (`["composer", "require", "php:>=8.1", "--no-update"]`).', {'type': 'string', 'minLength': 1}, minItems=1)),
     }
@@ -1455,7 +1457,7 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
     'score_model': ref('scoreModel'),
     'advisory_lookup': ref('advisoryLookup'),
     'move_check': nul("How Composer's solver checked the run's moves (§5.6). `composer lockrot` always writes it. A run that checks no move says why in `baseline` and `reason`. Null means a report built without the move check, such as the contract fixtures.", obj('The move check of the run.', {
-        'composer': nul('The version of the Composer that solved; null when nothing solved.', {'type': 'string', 'minLength': 1}),
+        'composer': nul('The version of the running Composer, on every `baseline` and every `reason`, also when nothing solved.', {'type': 'string', 'minLength': 1}),
         'blocks_advisories': d('Whether the solve removed the versions that an advisory affects, as Composer does in an update.', {'type': 'boolean'}),
         'blocking_disabled_by': arr("The switches that turn off the advisory blocking of the running Composer, in this order: " + ', '.join('`%s`' % n for n in BLOCKING_SWITCHES) + ". "
                                     "A switch is listed when it holds a value that turns the blocking off and no switch that Composer reads after it turns the blocking on again. "
@@ -1699,7 +1701,8 @@ defs['notePackageNameInvalid'] = obj(("`package_name_invalid`: lock entries whos
 })
 defs['noteCommandArgumentUnsafe'] = obj(("`command_argument_unsafe`: moves that write no step, because a release name that a step quotes holds `|`, `<` "
                                          "or `>`. cmd.exe and PowerShell run or redirect at these characters in a pasted POSIX line. Each such move keeps "
-                                         "its kind, constraint and check, and its `commands[]` is empty. The text names no move."), {
+                                         "its kind, constraint and check, and its `commands[]` is empty. The text names no move. The release name is the move's "
+                                         "`version`, its `constraint` without the caret, or `latest.version` on a `tag` move. The php step's `php:>=8.1` is no release name."), {
     'moves': arr('One entry per such move, in finding order, `next_step` before `also[]`.', obj('A move that writes no step.', {
         'package': d("The finding's package.", ref('packageName')),
         'version': d(("The release name that holds the character, as the repository writes it: the move's `version`, or `latest.version` on a "

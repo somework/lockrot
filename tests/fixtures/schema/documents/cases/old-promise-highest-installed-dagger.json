@@ -1044,7 +1044,7 @@
   "total": 0,
   "direct_requirements": 0,
   "measured": 1,
-  "at_least_count": 1,
+  "at_least_count": 0,
   "unmeasured": {
    "not_from_composer_repository": 0,
    "unavailable": 0,
@@ -1301,7 +1301,7 @@
    "replacement_url": null,
    "note": null,
    "libyears_unmeasured": null,
-   "libyears_at_least": true,
+   "libyears_at_least": false,
    "direct": true,
    "dev": false,
    "reach": "direct",

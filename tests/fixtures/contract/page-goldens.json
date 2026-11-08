@@ -858,7 +858,7 @@
           ],
           [
             "intervention/image 2.7.2",
-            "4.3",
+            "4.4",
             "4.3.3 (2026-09-26)"
           ],
           [
@@ -2048,7 +2048,7 @@
           ],
           [
             "guzzlehttp/guzzle 5.3.4",
-            "6.8",
+            "6.9",
             "8.2.0 (2026-09-06)"
           ],
           [
@@ -2078,7 +2078,7 @@
           ],
           [
             "symfony/security-csrf v5.2.12",
-            "4.8",
+            "4.9",
             "v8.1.0 (2026-05-29)"
           ]
         ],
@@ -5360,7 +5360,7 @@
       "copy_summary": [
         "lockrot report for prestashop/prestashop · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
         "1 of 1 package flagged (100%): 1 graded critical. Flags: left-behind 1, old-promise 1, vulnerable 1.",
-        "In production · required directly · 14 security advisories on 1 package (severity: 6 high, 8 medium) · fix by package: 1 php floor raise · 6.8 libyears behind."
+        "In production · required directly · 14 security advisories on 1 package (severity: 6 high, 8 medium) · fix by package: 1 php floor raise · 6.9 libyears behind."
       ],
       "grade_line": "Project grade: critical · 1 critical finding · 1 of 1 package high or worse",
       "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
@@ -5464,7 +5464,7 @@
         "top": [
           [
             "guzzlehttp/guzzle 5.3.4",
-            "6.8",
+            "6.9",
             "8.2.0 (2026-09-06)"
           ]
         ],
@@ -5769,7 +5769,7 @@
         "top": [
           [
             "php-di/invoker 2.0.0",
-            "8.4",
+            "8.5",
             "2.3.7 (2025-08-30)"
           ],
           [
@@ -9379,7 +9379,7 @@
           ],
           [
             "guzzlehttp/guzzle 5.3.4",
-            "6.8",
+            "6.9",
             "8.2.0 (2026-09-06)"
           ],
           [
@@ -9409,7 +9409,7 @@
           ],
           [
             "symfony/security-csrf v5.2.12",
-            "4.8",
+            "4.9",
             "v8.1.0 (2026-05-29)"
           ]
         ],
@@ -11242,7 +11242,7 @@
           ],
           [
             "doctrine/lexer 3.0.1",
-            "2.6",
+            "2.7",
             "3.0.3 (2026-10-01)"
           ],
           [
@@ -11567,7 +11567,7 @@
           ],
           [
             "doctrine/lexer 3.0.1",
-            "2.6",
+            "2.7",
             "3.0.3 (2026-10-01)"
           ],
           [
@@ -11894,7 +11894,7 @@
           ],
           [
             "doctrine/lexer 3.0.1",
-            "2.6",
+            "2.7",
             "3.0.3 (2026-10-01)"
           ],
           [
@@ -12023,7 +12023,7 @@
       "copy_summary": [
         "lockrot report for mautic/mautic · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.2 · this run fails · --fail-on=high",
         "25 of 188 packages flagged (13%): 6 graded high, 11 medium, 8 low. Flags: abandoned 2, silent 2, pinned 1, left-behind 10, old-promise 5, stale 8, capped 1, vulnerable 1.",
-        "All 25 in production · 2 required directly, 23 pulled in · 1 security advisory on 1 package (severity: 1 low) · fix by package: 1 composer update · 156.3 libyears behind."
+        "All 25 in production · 2 required directly, 23 pulled in · 1 security advisory on 1 package (severity: 1 low) · fix by package: 1 composer update · 156.4 libyears behind."
       ],
       "grade_line": "Project grade: high · 6 high findings · 6 of 188 packages high or worse",
       "figure_line": "25 of 188 packages flagged · 138 ok · 25 finished",
@@ -12252,7 +12252,7 @@
           ],
           [
             "intervention/image 2.7.2",
-            "4.3",
+            "4.4",
             "4.3.3 (2026-09-26)"
           ],
           [
@@ -13313,7 +13313,7 @@
           ],
           [
             "guzzlehttp/guzzle 5.3.4",
-            "6.8",
+            "6.9",
             "8.2.0 (2026-09-06)"
           ],
           [
@@ -13343,7 +13343,7 @@
           ],
           [
             "symfony/security-csrf v5.2.12",
-            "4.8",
+            "4.9",
             "v8.1.0 (2026-05-29)"
           ]
         ],
@@ -15163,7 +15163,7 @@
           ],
           [
             "doctrine/lexer 3.0.1",
-            "2.6",
+            "2.7",
             "3.0.3 (2026-10-01)"
           ],
           [
@@ -15554,7 +15554,7 @@
           ],
           [
             "doctrine/lexer 3.0.1",
-            "2.6",
+            "2.7",
             "3.0.3 (2026-10-01)"
           ],
           [
@@ -16932,7 +16932,7 @@
           ],
           [
             "doctrine/lexer 1.2.1",
-            "6.3",
+            "6.4",
             "3.0.3 (2026-10-01)"
           ],
           [
@@ -18239,7 +18239,7 @@
           ],
           [
             "guzzlehttp/guzzle 5.3.4",
-            "6.8",
+            "6.9",
             "8.2.0 (2026-09-06)"
           ],
           [
@@ -18259,7 +18259,7 @@
           ],
           [
             "symfony/security-csrf v5.2.12",
-            "4.8",
+            "4.9",
             "v8.1.0 (2026-05-29)"
           ],
           [
@@ -22510,7 +22510,7 @@
           ],
           [
             "doctrine/lexer 1.2.1",
-            "6.3",
+            "6.4",
             "3.0.3 (2026-10-01)"
           ],
           [
@@ -24116,6 +24116,166 @@
           }
         ]
       },
+      "sheet_ladder": {}
+    },
+    "platform-minor-excluded‡": {
+      "document": "cases/platform-minor-excluded-dagger.json",
+      "title": "lockrot: 1 of 1 package flagged",
+      "description": "lockrot flagged 1 of 1 package in composer.lock: 1 high. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for wallabag/wallabag · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 7.5 · this run fails · --fail-on=high",
+        "1 of 1 package flagged (100%): 1 graded high. Flags: left-behind 1.",
+        "In production · required directly · no security advisory · 4.2 libyears behind."
+      ],
+      "grade_line": "Project grade: high · 1 high finding · 1 of 1 package high or worse",
+      "figure_line": "1 of 1 package flagged · 0 ok · 0 finished",
+      "load_line": "16 points on 1 flagged package · 16 (100 %) from high or worse · score model 1",
+      "panel": null,
+      "kicker": "lockrot grades each package in composer.lock by its security advisories and its maintenance signals.",
+      "gate_link": "#view=findings&gate=fails",
+      "gate_link_rows": 1,
+      "state_lines": [
+        "PHP: this lock installs on PHP 7.4 and 8.0 to 8.5, so your target, 7.5, is excluded · 1 package excludes 7.5: scheb/2fa-bundle · not checked (the run checked no move). The PHP window"
+      ],
+      "state_links": [
+        {
+          "link": "The PHP window",
+          "href": "#view=run&section=php-window",
+          "count": null
+        }
+      ],
+      "waffle_caption": "1 of 1 package flagged · 0 ok · 0 finished",
+      "lead_scope": "1 in production · 1 required directly",
+      "grade_chips": [
+        "high 1"
+      ],
+      "waffle": [
+        {
+          "verdict": "high",
+          "word": "high",
+          "mark": "fill",
+          "count": 1
+        }
+      ],
+      "ready": {
+        "note": null,
+        "moves": [],
+        "more": null,
+        "more_link": null,
+        "more_link_rows": null,
+        "held_line": null,
+        "held_link": null,
+        "held_link_rows": null,
+        "way_out": "1 needs another way out: 1 blocked",
+        "way_out_link": "#view=findings&gate=fails%2Cwayout",
+        "way_out_link_rows": 1,
+        "none": "No move is ready to run for the findings that fail the gate: none has a checked command that no other package holds."
+      },
+      "security": {
+        "figure": null,
+        "unit": "no security advisory",
+        "note": null,
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "weighs_most": {
+        "caption": "highest score first",
+        "rows": [
+          {
+            "grade": "high",
+            "package": "scheb/2fa-bundle",
+            "link": "#view=findings&pkg=scheb%2F2fa-bundle",
+            "reach": "",
+            "total": 16,
+            "terms": "left-behind 16",
+            "terms_total": null
+          }
+        ],
+        "rest": null,
+        "rest_link": null
+      },
+      "flags_notes": [
+        "0 carry more than one flag · score model 1",
+        "Accepted by the allowlist: none in flagged packages"
+      ],
+      "exposure": null,
+      "depth": {
+        "rows": [
+          "direct 1"
+        ],
+        "sentence": "The flagged package is named by a line of composer.json."
+      },
+      "libyears": {
+        "figure": "4.23",
+        "bound": "",
+        "sub": "over 1 package · 4.23 from direct requirements",
+        "unmeasured": null,
+        "top": [
+          [
+            "scheb/2fa-bundle v5.13.2",
+            "4.2",
+            "v8.6.1 (2026-07-10)"
+          ]
+        ],
+        "heading": "Furthest behind",
+        "none": null
+      },
+      "radius_lead": [
+        "The flagged package is named by a line of composer.json."
+      ],
+      "advisories_lead": {
+        "figure": null,
+        "unit": "no security advisory",
+        "note": null,
+        "lookup_complete": true,
+        "counted_as": []
+      },
+      "findings_groups": [
+        {
+          "grade": "high",
+          "count": "1 package",
+          "gate": "all fail the gate",
+          "major": "1 of 1 move crosses a major"
+        }
+      ],
+      "findings_rows": [
+        {
+          "package": "scheb/2fa-bundle",
+          "fails_gate": true,
+          "reach": "direct",
+          "held": null,
+          "command": null,
+          "raise_words": null,
+          "after": null,
+          "major": "a new major",
+          "blocked": "6.x needs php ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0; target 7.5 runs no newer release",
+          "ready": false,
+          "held_filter": false
+        }
+      ],
+      "ready_count": 0,
+      "gate_partition": {
+        "ready": 0,
+        "held": 0,
+        "wayout": 1
+      },
+      "data_caption": "Every row has data as of 2026-10-01",
+      "data_column": false,
+      "signals_key": [
+        "S8 release branch"
+      ],
+      "advisory_groups": [],
+      "run_notes": [],
+      "php_line": "php: the lock installs on PHP 7.4 and 8.0 to 8.5, so your target, 7.5, is excluded; the update of the package that excludes it is not checked (the run checked no move)",
+      "php_rows": [
+        "PHP window, with require-dev: 7.4 and 8.0 to 8.5 · lowest 7.4.0, set by require.php >=7.4 and scheb/2fa-bundle ~7.4.0 || ^8.0",
+        "PHP window, without require-dev: 7.4 and 8.0 to 8.5 · lowest 7.4.0, set by require.php >=7.4 and scheb/2fa-bundle ~7.4.0 || ^8.0",
+        "Composer's config.platform.php: 7.5.0"
+      ],
+      "platform_step": null,
+      "sheet_moves": {},
+      "sheet_provenance": {},
+      "sheet_holders": {},
       "sheet_ladder": {}
     },
     "empty-lock": {

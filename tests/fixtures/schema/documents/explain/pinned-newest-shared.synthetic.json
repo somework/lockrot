@@ -91,15 +91,15 @@
    "reason": null,
    "replacement": null,
    "quiet_years": null,
-   "to_branch": "1.x",
-   "version": "v1.9.3",
+   "to_branch": "2.x",
+   "version": "v2.0.0",
    "newest": null,
    "constraint": null,
    "latest": {
-    "version": "v1.9.3",
-    "released": null,
+    "version": "v2.0.0",
+    "released": "2024-01-01T00:00:00+00:00",
     "is_installed": false,
-    "relation": null,
+    "relation": "newer",
     "snapshot_time": "2018-06-01T00:00:00+00:00"
    },
    "php_check": {
@@ -118,27 +118,16 @@
      "basis": "tags_only"
     }
    ],
-   "unverified": [
-    {
-     "kind": "flag",
-     "id": "left-behind",
-     "reason": "undated"
-    },
-    {
-     "kind": "flag",
-     "id": "old-promise",
-     "reason": "undated"
-    }
-   ],
+   "unverified": [],
    "adds": [],
    "leaves": [],
-   "clears_all": false,
+   "clears_all": true,
    "if_applied": {
-    "total": 20,
-    "verdict": "high",
-    "lead": "left-behind",
+    "total": 0,
+    "verdict": "ok",
+    "lead": null,
     "deciding_advisory": null,
-    "at_most": true,
+    "at_most": false,
     "assumes": [
      "clears_hold"
     ]
@@ -150,19 +139,19 @@
     [
      "composer",
      "require",
-     "friendsofsymfony/oauth-server-bundle:^1.9.3"
+     "friendsofsymfony/oauth-server-bundle:^2.0.0"
     ],
     [
      "composer",
      "why-not",
      "friendsofsymfony/oauth-server-bundle",
-     "v1.9.3",
+     "v2.0.0",
      "--locked"
     ]
    ],
    "through": [],
    "also": [],
-   "text": "require a tag — the newest is v1.9.3; 1.x needs php >=7.2, which require.php allows; not checked: left-behind, old-promise"
+   "text": "require a tag — the newest is v2.0.0 (2024-01-01); 2.x needs php >=7.2, which require.php allows"
   },
   "security": {
    "status": "clear",
@@ -255,11 +244,11 @@
      "version": "dev-master",
      "reason": "branch_snapshot",
      "has_stable_release": true,
-     "last_stable_release": null,
-     "last_stable_version": "v1.9.3",
+     "last_stable_release": "2024-01-01T00:00:00+00:00",
+     "last_stable_version": "v2.0.0",
      "last_stable_dated_by": null,
      "snapshot_time": "2018-06-01T00:00:00+00:00",
-     "tag_relation": null
+     "tag_relation": "newer"
     }
    },
    {
