@@ -11,6 +11,7 @@ use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\AgeReading;
 use Lockrot\Signal\PackageFacts;
+use Lockrot\Signal\Rule\NoReleaseRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
@@ -351,6 +352,66 @@ final class AgeMeasureTest extends TestCase
     {
         self::assertUnmeasured(AgeMeasure::UNDATED, $this->measure()->pushOf(FactsBuilder::activity(false, null)));
         self::assertSame(1.0, $this->measure()->pushOf(FactsBuilder::activity(false, self::ago(Clock::SECONDS_PER_YEAR)))->years());
+    }
+
+    /**
+     * SPEC §8.4.1: `release` is the newest tag by date. The split's highest branch keeps an old date
+     * of its own, and its lower branch is on a shared commit that only the parent dates.
+     */
+    public function testTheReleaseReadingIsTheNewestTagByDateWhenTheParentDatesALowerBranch(): void
+    {
+        $facts = FactsBuilder::facts(FactsBuilder::package(['name' => 'illuminate/collections', 'version' => 'v12.70.0']), self::lowerBranchDatedSplit(self::ago(4 * Clock::SECONDS_PER_YEAR)));
+
+        $reading = $this->measure()->release($facts);
+
+        self::assertSame('v12.70.0', $reading->version());
+        self::assertSame(self::ago(30 * 86400), $reading->at() !== null ? $reading->at()->format(\DATE_ATOM) : null);
+        self::assertSame('laravel/framework', $reading->datedBy());
+        self::assertNull($reading->level());
+        self::assertNull((new NoReleaseRule(Clock::fixed(self::NOW), new Thresholds()))->evaluate($facts));
+    }
+
+    public function testOnTheSameDateTheReleaseReadingKeepsTheHigherVersion(): void
+    {
+        $facts = FactsBuilder::facts(FactsBuilder::package(['name' => 'illuminate/collections', 'version' => 'v13.0.0']), self::lowerBranchDatedSplit(self::ago(30 * 86400)));
+
+        $reading = $this->measure()->release($facts);
+
+        self::assertSame('v13.0.0', $reading->version());
+        self::assertNull($reading->datedBy());
+    }
+
+    /** The parent dates no release of the split's highest branch, so the lock time of a tag on its own commit stays a release date. */
+    public function testAParentDateOfALowerBranchLeavesTheInstalledReleaseOnItsOwnCommitDated(): void
+    {
+        $installedAt = self::ago(4 * Clock::SECONDS_PER_YEAR);
+        $facts = FactsBuilder::facts(FactsBuilder::package(['name' => 'illuminate/collections', 'version' => 'v13.0.0', 'time' => $installedAt]), self::lowerBranchDatedSplit($installedAt));
+
+        $reading = $this->measure()->installed($facts);
+
+        self::assertSame($installedAt, $reading->at() !== null ? $reading->at()->format(\DATE_ATOM) : null);
+        self::assertNull($reading->datedBy());
+    }
+
+    /**
+     * illuminate/collections: v13.0.0 on its own commit at $highestAt, the 12.x tags on one
+     * commit, and laravel/framework's v12.70.0 released 30 days ago.
+     */
+    private static function lowerBranchDatedSplit(string $highestAt): PackageMetadata
+    {
+        $tag = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => ['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace];
+        $loader = new ArrayLoader();
+        $child = PackageMetadata::fromPackages('illuminate/collections', array_map(static fn (array $release) => $loader->load($release), [
+            $tag('illuminate/collections', 'v13.0.0', 'c13-own', $highestAt),
+            $tag('illuminate/collections', 'v12.70.0', 'c12-shared', self::ago(5 * Clock::SECONDS_PER_YEAR)),
+            $tag('illuminate/collections', 'v12.69.0', 'c12-shared', self::ago(5 * Clock::SECONDS_PER_YEAR)),
+            $tag('illuminate/collections', 'v12.68.0', 'c12-shared', self::ago(5 * Clock::SECONDS_PER_YEAR)),
+        ]), new \DateTimeImmutable(self::NOW));
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $loader->load($tag('laravel/framework', 'v12.70.0', 'f12-70', self::ago(30 * 86400), ['illuminate/collections' => 'self.version'])),
+        ], new \DateTimeImmutable(self::NOW));
+
+        return $child->datedBy($parent);
     }
 
     /**

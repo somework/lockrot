@@ -104,6 +104,8 @@ final class PackageMetadata
     /** The highest stable release not dated after the run clock: the one {@see $newestRequires} reads. */
     private ?StableRelease $newestStable = null;
     private ?string $lastStablePhp = null;
+    private ?\DateTimeImmutable $libyearsNewestAt;
+    private ?string $highestBranchDatedBy;
 
     /**
      * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string}> $latestStableByBranch
@@ -149,6 +151,8 @@ final class PackageMetadata
         $this->sharedCommitVersions = $sharedCommitVersions;
         $this->abandonedBy = $abandonedBy;
         $this->lastStableSharesItsCommit = $lastStableSharesItsCommit;
+        $this->libyearsNewestAt = $lastStableReleaseAt;
+        $this->highestBranchDatedBy = $lastStableDatedBy;
     }
 
     /**
@@ -489,18 +493,35 @@ final class PackageMetadata
             return $this;
         }
 
-        // The package's age is its highest branch's. That branch is in $datedBranches only when
-        // the package could not date its own highest tag.
+        // The highest branch is in $datedBranches only when the package could not date its own
+        // highest tag. Then the package's age is unknown without the parent's date of that branch.
         $lastStableReleaseAt = $this->lastStableReleaseAt;
         $lastStableVersion = $this->lastStableVersion;
         $lastStableDatedBy = $this->lastStableDatedBy;
         $lastStablePhp = $this->lastStablePhp;
+        $highestBranchDatedBy = $this->highestBranchDatedBy;
+        $libyearsNewestAt = $this->libyearsNewestAt;
         $highestBranch = self::highestBranch($byBranch);
         if (\in_array($highestBranch, $datedBranches, true)) {
             $lastStableReleaseAt = $byBranch[$highestBranch]['at'];
             $lastStableVersion = $byBranch[$highestBranch]['version'];
             $lastStableDatedBy = $parent->name;
             $lastStablePhp = $byBranch[$highestBranch]['php'];
+            $highestBranchDatedBy = $parent->name;
+            $libyearsNewestAt = $lastStableReleaseAt;
+        }
+        // SPEC §8.4.1: S2 reads the newest tag by date, so a lower branch that the parent dates
+        // counts too. With no trusted date of the package's highest tag, its age stays unknown.
+        if ($lastStableReleaseAt !== null) {
+            foreach ($datedBranches as $key) {
+                $row = $byBranch[$key];
+                if ($row['at'] !== null && self::newerTag($row['at'], $row['version'], $lastStableReleaseAt, $lastStableVersion)) {
+                    $lastStableReleaseAt = $row['at'];
+                    $lastStableVersion = $row['version'];
+                    $lastStableDatedBy = $parent->name;
+                    $lastStablePhp = $row['php'];
+                }
+            }
         }
 
         $dated = new self(
@@ -527,6 +548,8 @@ final class PackageMetadata
         $dated->newestRequires = $this->newestRequires;
         $dated->newestStable = $this->newestStable;
         $dated->lastStablePhp = $lastStablePhp;
+        $dated->libyearsNewestAt = $libyearsNewestAt;
+        $dated->highestBranchDatedBy = $highestBranchDatedBy;
         $dated->releasesAbove = $this->releasesAbove === null ? null : array_map(
             static fn (StableRelease $release): StableRelease => $release->sharedCommit() ? $release->withDate($parent->releaseDateOf($release->normalized())) : $release,
             $this->releasesAbove
@@ -573,6 +596,20 @@ final class PackageMetadata
         }
 
         return $at >= $than && $thanNormalized !== null && Comparator::greaterThan($normalized, $thanNormalized);
+    }
+
+    /** {@see newer()} for two tags as a repository prints them. A tag that does not parse wins only by a later date. */
+    private static function newerTag(\DateTimeImmutable $at, string $version, \DateTimeImmutable $than, ?string $thanVersion): bool
+    {
+        $parser = new VersionParser();
+        try {
+            $normalized = $parser->normalize($version);
+            $thanNormalized = $thanVersion === null ? null : $parser->normalize($thanVersion);
+        } catch (\UnexpectedValueException $e) {
+            return $at > $than;
+        }
+
+        return self::newer($at, $normalized, $than, $thanNormalized);
     }
 
     private static function commitOf(BasePackage $version): ?string
@@ -667,13 +704,28 @@ final class PackageMetadata
     }
 
     /**
-     * The newest release date of a non-dev version, pre-releases included, or the parent's date
-     * ({@see datedBy()}). Null when the highest tag has no trusted date, or when the newest date
-     * is that of a commit its tags share.
+     * The newest release date of a non-dev version, pre-releases included. A branch that a monorepo
+     * parent dates ({@see datedBy()}) counts with the parent's date. Null when the highest tag has
+     * no trusted date, or when the newest date is that of a commit its tags share.
      */
     public function lastStableReleaseAt(): ?\DateTimeImmutable
     {
         return $this->lastStableReleaseAt;
+    }
+
+    /**
+     * The newest end of libyears: {@see lastStableReleaseAt()}, except that a parent's date of a
+     * branch below the highest one does not count.
+     */
+    public function libyearsNewestAt(): ?\DateTimeImmutable
+    {
+        return $this->libyearsNewestAt;
+    }
+
+    /** The monorepo parent that dated the package's highest branch ({@see datedBy()}), null when none did. */
+    public function highestBranchDatedBy(): ?string
+    {
+        return $this->highestBranchDatedBy;
     }
 
     /**

@@ -26,7 +26,7 @@ final class InstalledRelease
     public const DATED_BY_PARENT = 'dated_by_parent';
     /** The lock's date is a commit this package's tags share, and no parent dates the version. */
     public const SHARED_COMMIT = 'shared_commit';
-    /** The tag shares no commit, but a parent dates the split's newest release, so the lock's date is no release date. */
+    /** The tag shares no commit, but a parent dates the split's highest branch, so the lock's date is no release date. */
     public const PARENT_SPLIT = 'parent_split';
     /** The installed version is a branch, and the lock's date is the commit it points at. */
     public const BRANCH_SNAPSHOT = 'branch_snapshot';
@@ -70,13 +70,13 @@ final class InstalledRelease
         }
         // Either reading sets the lock's date aside. First: fromPackages() marked the installed tag
         // as dated by a commit its neighbours share. Second: the package took a parent's date for
-        // its newest release, so it is a split, and the lock's date of any of its tags is not a
+        // its highest branch, so it is a split, and the lock's date of any of its tags is not a
         // release date, even of one that the repository does not list. The second alone misses a
         // split that no parent dates.
         if ($metadata->sharesItsCommit($package->version())) {
             return new self(self::SHARED_COMMIT, null, $time, null);
         }
-        if ($metadata->lastStableDatedBy() !== null) {
+        if ($metadata->highestBranchDatedBy() !== null) {
             return new self(self::PARENT_SPLIT, null, $time, null);
         }
 
