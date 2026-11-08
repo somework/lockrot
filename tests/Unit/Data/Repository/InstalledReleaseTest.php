@@ -144,6 +144,19 @@ final class InstalledReleaseTest extends TestCase
         self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), $installed->lockTime());
     }
 
+    /** The parent dates other releases but not the split's highest branch, so the lock time of a tag on its own commit is a release date. */
+    public function testATagOnItsOwnCommitIsDatedByTheLockWhenNoParentDatesTheHighestBranch(): void
+    {
+        $installed = InstalledRelease::of(
+            F::package(['version' => 'v5.13.2', 'time' => self::LOCKED_AT]),
+            self::metadata(null, ['5.13.3.0' => '2024-11-21T00:00:00+00:00'])
+        );
+
+        self::assertSame(InstalledRelease::RELEASE, $installed->kind());
+        self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), $installed->at());
+        self::assertNull($installed->datedBy());
+    }
+
     /**
      * The repository marks the installed tag as dated by a commit that its neighbours share, while
      * it dates its own newest release.

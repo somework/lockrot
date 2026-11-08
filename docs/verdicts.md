@@ -434,10 +434,13 @@ request on it.
 - The parent dates the installed version too. Where it lists the same version, its date replaces
   the lock's shared-commit `time` for [libyears](#libyears), `age.installed` and
   [S5](#old-promise). `--explain` prints
-  it as `installed release` (`installed_release_dated_by` in JSON). Where it does not, the
-  package is unmeasured. The reason is `shared_commit` when the installed tag shares its commit.
-  Else it is `parent_split`: a parent dates the newest release of the split, so the lock time of
-  the installed tag is not a release date.
+  it as `installed release` (`installed_release_dated_by` in JSON).
+
+- Where the parent does not list the installed version, the installed tag decides. A tag that
+  shares its commit is unmeasured with the reason `shared_commit`. A tag on its own commit is
+  unmeasured with the reason `parent_split` when a parent dates the split's highest branch. The
+  lock time of that tag is then not a release date. If no parent dates the highest branch,
+  lockrot trusts the lock time of a tag on its own commit.
 
 - A branch the parent does not have, or does not date either, stays unmeasured, as does every
   branch in an install-time run that has spent its [budget](install-time.md#time-budget).
