@@ -233,7 +233,8 @@ S8 is not measured for:
   private fork, or a lock written against a tag since deleted. An installed pre-release above that
   tag is still on the branch, and S8 judges the branch's newest stable release.
 
-- A branch whose highest tag has no [trusted date](#dates-from-the-monorepo).
+- A branch whose highest tag has no [trusted date](#dates-from-the-monorepo), unless the branch's
+  newest release with a trusted date is inside `release-warn-years`.
 
 - An installed branch whose newest dated release is a lower tag that only a commit shared with other
   tags dates. `age.branch_release` is then null with `undated_releases`.

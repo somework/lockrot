@@ -226,6 +226,14 @@ final class AgeMeasureTest extends TestCase
         self::assertNull($reading->datedBy());
     }
 
+    public function testADatedReleaseAtTheWarnYearsDecidesNothingUnderAnUndatedHighestTag(): void
+    {
+        $warnYears = (new Thresholds())->releaseWarnYears();
+        $metadata = FactsBuilder::metadata([['v3.0.0', self::ago(86400)], ['v2.5.1', null], ['v2.5.0', self::ago($warnYears * Clock::SECONDS_PER_YEAR)]]);
+
+        self::assertUnmeasured(AgeMeasure::UNDATED_RELEASES, $this->measure()->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => 'v2.5.0']), $metadata)));
+    }
+
     /** A shared commit dates a tag before its release, so its date inside `release-warn-years` decides nothing under an undated highest tag. */
     public function testASharedCommitDateInsideTheWarnYearsDoesNotDecideTheBranchUnderAnUndatedHighestTag(): void
     {
@@ -386,6 +394,33 @@ final class AgeMeasureTest extends TestCase
         self::assertNull($metadata->lastStableDatedBy());
         self::assertSame('v12.70.0', $metadata->releaseReadingVersion());
         self::assertSame('laravel/framework', $metadata->releaseReadingDatedBy());
+    }
+
+    /**
+     * The parent dates the split's highest branch, whose tags share one commit. A backport on a
+     * lower branch has a newer date of its own commit, so S2 reads the backport.
+     */
+    public function testAnOwnDateOfALowerBranchBeatsTheParentDateOfTheHighestBranch(): void
+    {
+        $tag = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => ['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace];
+        $loader = new ArrayLoader();
+        $child = PackageMetadata::fromPackages('illuminate/collections', array_map(static fn (array $release) => $loader->load($release), [
+            $tag('illuminate/collections', 'v13.2.0', 'c13-shared', self::ago(90 * 86400)),
+            $tag('illuminate/collections', 'v13.1.0', 'c13-shared', self::ago(90 * 86400)),
+            $tag('illuminate/collections', 'v13.0.0', 'c13-shared', self::ago(90 * 86400)),
+            $tag('illuminate/collections', 'v12.9.0', 'c12-own', self::ago(10 * 86400)),
+        ]), new \DateTimeImmutable(self::NOW));
+        $parent = PackageMetadata::fromPackages('laravel/framework', [
+            $loader->load($tag('laravel/framework', 'v13.2.0', 'f13-2', self::ago(60 * 86400), ['illuminate/collections' => 'self.version'])),
+        ], new \DateTimeImmutable(self::NOW));
+        $metadata = $child->datedBy($parent);
+
+        $reading = $this->measure()->release(FactsBuilder::facts(FactsBuilder::package(['name' => 'illuminate/collections', 'version' => 'v12.9.0']), $metadata));
+
+        self::assertSame('v12.9.0', $reading->version());
+        self::assertNull($reading->datedBy());
+        self::assertSame('v13.2.0', $metadata->lastStableVersion());
+        self::assertSame('laravel/framework', $metadata->lastStableDatedBy());
     }
 
     public function testOnTheSameDateTheReleaseReadingKeepsTheHigherVersion(): void

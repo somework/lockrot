@@ -508,18 +508,22 @@ final class PackageMetadata
             $lastStableDatedBy = $parent->name;
             $lastStablePhp = $byBranch[$highestBranch]['php'];
         }
-        // SPEC §8.4.1: S2 reads the newest tag by date, so a lower branch that the parent dates
-        // counts too. With no trusted date of the package's highest tag, its age stays unknown.
+        // SPEC §8.4.1: S2 reads the newest tag by trusted date over every branch row, so a lower
+        // branch that the parent dates counts too. A row dated by a commit that its tags share is
+        // not trusted. Without a trusted date of the newest release, the age stays unknown.
         $releaseReadingAt = $lastStableReleaseAt;
         $releaseReadingVersion = $lastStableVersion;
         $releaseReadingDatedBy = $lastStableDatedBy;
         if ($releaseReadingAt !== null) {
-            foreach ($datedBranches as $key) {
-                $row = $byBranch[$key];
-                if ($row['at'] !== null && self::newerTag($row['at'], $row['version'], $releaseReadingAt, $releaseReadingVersion)) {
+            foreach ($byBranch as $row) {
+                $datedByParent = isset($row['dated_by']);
+                if ($row['at'] === null || (!$datedByParent && $this->sharesItsCommit($row['version']))) {
+                    continue;
+                }
+                if (self::newerTag($row['at'], $row['version'], $releaseReadingAt, $releaseReadingVersion)) {
                     $releaseReadingAt = $row['at'];
                     $releaseReadingVersion = $row['version'];
-                    $releaseReadingDatedBy = $parent->name;
+                    $releaseReadingDatedBy = $datedByParent ? $parent->name : null;
                 }
             }
         }

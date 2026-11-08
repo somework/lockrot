@@ -88,6 +88,14 @@ final class LeftBehindRuleTest extends TestCase
         self::assertSame(Signal::LEVEL_HIGH, $signal->level());
     }
 
+    public function testAnUndatedHighestTagAboveAReleaseInsideTheWarnYearsIsNull(): void
+    {
+        $meta = F::metadata([['3.0.0', '2026-09-01'], ['2.5.1', null], ['2.5.0', '2025-09-14']]);
+
+        self::assertNull($this->rule()->evaluate(F::facts(F::package(['version' => '2.5.0']), $meta)));
+        self::assertSame([], $this->rule()->undatedReleases(F::facts(F::package(['version' => '2.5.0']), $meta)));
+    }
+
     public function testABranchStillReleasingIsNull(): void
     {
         $meta = F::metadata([['2.0.0', '2024-01-10'], ['1.9.9', '2025-01-01'], ['1.9.2', '2019-03-02']]);

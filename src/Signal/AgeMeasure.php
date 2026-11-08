@@ -138,7 +138,8 @@ final class AgeMeasure
             return AgeReading::unmeasuredBecause(self::UNDATED_RELEASES);
         }
         $reading = $this->reading($at, $own['version'], $own['dated_by'] ?? null, [$this->thresholds->releaseWarnYears(), $this->thresholds->releaseHighYears()], AgeReading::RELEASE);
-        // An undated highest tag is no older than $at, so only a reading with no level decides S8.
+        // A trusted release at $at inside release-warn-years already shows a branch that releases.
+        // Older than that, the undated highest tag can be the newer release, so S8 is unknown.
         if ($own['highest']['at'] === null && $reading->level() !== null) {
             return AgeReading::unmeasuredBecause(self::UNDATED_RELEASES);
         }
