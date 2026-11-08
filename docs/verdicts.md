@@ -1128,10 +1128,10 @@ moves: checked with the solver of Composer 2.10.3 against the lock; ext-*, lib-*
 php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
 ```
 
-wallabag 2.6.14 at the target PHP 8.4, whose composer.json requires `php-http/guzzle5-adapter ^2.0`:
+wallabag 2.6.14 at the target PHP 8.4, where three requirements of composer.json and one requirement of a package hold the update:
 
 ```text
-php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer's solver at PHP 8.4 refuses the update of the 3 packages that exclude it: composer.json requires php-http/guzzle5-adapter ^2.0
+php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer's solver at PHP 8.4 refuses the update of the 3 packages that exclude it: composer.json requires bdunogier/guzzle-site-authenticator ^1.1.0, composer.json requires guzzlehttp/guzzle ^5.3.4, composer.json requires php-http/guzzle5-adapter ^2.0 and bdunogier/guzzle-site-authenticator 1.1.0 requires guzzlehttp/guzzle ^5.3.1
 ```
 
 ## <a name="score"></a>The score {#score}
