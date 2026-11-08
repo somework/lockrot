@@ -455,4 +455,44 @@ final class PackageMetadataDatedByTest extends TestCase
 
         self::assertTrue($child->datedBy($parent)->lastStableSharesItsCommit());
     }
+
+    /** debugbar-collector: 2.1.1 on its own commit, three 1.x tags on one commit dated after 2.1.1. */
+    private function splitWithASharedLowerLine(string $sharedAt): PackageMetadata
+    {
+        return PackageMetadata::fromPackages('akaunting/laravel-debugbar-collector', [
+            $this->load(self::tag('akaunting/laravel-debugbar-collector', '2.1.1', 'c2-own', '2023-06-02T07:22:01+00:00')),
+            $this->load(self::tag('akaunting/laravel-debugbar-collector', '1.0.2', 'c1-shared', $sharedAt)),
+            $this->load(self::tag('akaunting/laravel-debugbar-collector', '1.0.1', 'c1-shared', $sharedAt)),
+            $this->load(self::tag('akaunting/laravel-debugbar-collector', '1.0.0', 'c1-shared', $sharedAt)),
+        ], new \DateTimeImmutable(self::NOW));
+    }
+
+    /** Ruling R15-28d: a parent date resolves a shared-commit date that blocks the S2 reading. */
+    public function testASharedLowerLineNewerThanTheReadingAsksTheParentAndTakesItsDate(): void
+    {
+        $child = $this->splitWithASharedLowerLine('2024-03-01T00:00:00+00:00');
+
+        self::assertNull($child->releaseReadingAt(), 'an unresolved shared date newer than 2.1.1 keeps the reading unknown');
+        self::assertNotNull($child->lastStableReleaseAt());
+        self::assertTrue($child->needsParentDates('2', '2.1.1'));
+
+        $parent = PackageMetadata::fromPackages('akaunting/monorepo', [
+            $this->load(self::tag('akaunting/monorepo', '1.0.2', 'm1-02', '2026-09-01T00:00:00+00:00', ['akaunting/laravel-debugbar-collector' => 'self.version'])),
+        ], new \DateTimeImmutable(self::NOW));
+        $dated = $child->datedBy($parent);
+
+        self::assertEquals(new \DateTimeImmutable('2026-09-01T00:00:00+00:00'), $dated->releaseReadingAt());
+        self::assertSame('1.0.2', $dated->releaseReadingVersion());
+        self::assertSame('akaunting/monorepo', $dated->releaseReadingDatedBy());
+        self::assertSame('2.1.1', $dated->lastStableVersion(), 'the metadata keep the highest line');
+        self::assertFalse($dated->needsParentDates('2', '2.1.1'));
+    }
+
+    public function testASharedLowerLineOlderThanTheReadingAsksNoParent(): void
+    {
+        $child = $this->splitWithASharedLowerLine('2022-01-11T10:26:31+00:00');
+
+        self::assertEquals(new \DateTimeImmutable('2023-06-02T07:22:01+00:00'), $child->releaseReadingAt());
+        self::assertFalse($child->needsParentDates('2', '2.1.1'));
+    }
 }

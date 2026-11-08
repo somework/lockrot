@@ -440,6 +440,7 @@ final class PackageMetadata
     /**
      * Whether a monorepo parent could fill a missing date. It can when:
      * - the package's last release is undated
+     * - a shared commit's date that no parent resolves keeps the S2 reading unknown (ruling R15-28d)
      * - the installed branch's highest tag is undated
      * - the installed version's tag shares its commit and no parent has dated it
      * Other branches do not count: every split package has old branches with undated tags.
@@ -449,7 +450,7 @@ final class PackageMetadata
      */
     public function needsParentDates(?string $installedBranch, ?string $installedVersion = null): bool
     {
-        if ($this->hasStableRelease && $this->lastStableReleaseAt === null) {
+        if ($this->hasStableRelease && ($this->lastStableReleaseAt === null || $this->releaseReadingAt === null)) {
             return true;
         }
         if ($installedBranch === null) {
