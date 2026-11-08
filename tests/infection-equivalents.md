@@ -119,6 +119,8 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Data/Repository/PackageMetadata.php` TrueValue `$replaces[$link->getTarget()] = true;` — a set. Only `array_keys()` reads it.
 - `src/Data/Repository/PackageMetadata.php` TrueValue `$sharedCommitVersions[$normalized] = true;` — a set. Only `isset()` reads it.
 - `src/Data/Repository/PackageMetadata.php` ReturnRemoval `return false;` — in needsParentDates(): a branch snapshot has no stable tag on its branch, so the checks after the return also give false.
+- `src/Data/Repository/PackageMetadata.php` GreaterThan `$unresolved = $unresolved === null || $row['at'] > $unresolved ? $row['at'] : $unresolved;` — on two equal dates both operands of the ternary are the same instant.
+- `src/Data/Repository/PackageMetadata.php` GreaterThan, GreaterThanNegotiation `return $at > $than;` — in newerTag(): every version of a branch row and of the reading comes from Composer's loader, which normalizes it at load, so the catch is unreachable.
 - `src/Data/Repository/ReleaseBranch.php` PregMatchRemoveCaret `if (preg_match('/^(\d+)\.(\d+)\.(\d+)\./', $normalized, $m) !== 1) {` — a normalised stable version starts with its major digits, so the anchor changes no match.
 - `src/Data/Repository/RepositoryMetadataLoader.php` ReturnRemoval `return new MetadataBatch($pass1->metadata(), $pass1->stillRemaining(), $failed);` — pass 2 after a spent deadline starts no chunk and marks the same names, so the batch is the same.
 - `src/Data/Repository/RepositoryMetadataLoader.php` TrueValue `return new ChunkPassResult($metadata, $failed, $stillRemaining, $needDev, true);` — pass 2 after a spent deadline starts no chunk and marks the same names, so the batch is the same.
@@ -141,6 +143,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 
 - `src/Filesystem/AtomicWriter.php` TrueValue `return true;` — in the handler of write(): with false, PHP's own handler also gets the warning, and the `@` of each call keeps it silent.
 - `src/Filesystem/AtomicWriter.php` IfNegation `if (\function_exists('fsync')) {` — on PHP 8.1 and later the negated condition only skips the fsync call, which no test can observe.
+- `src/Filesystem/AtomicWriter.php` DecrementInteger, IncrementInteger `@chmod($temporary, 0600);` — Unix unlink() reads the directory's permission, not the file's mode. Only a Windows runner observes the mode, and CI has no Windows job.
 - `src/Filesystem/Path.php` CastString `return strpos($path, $root) === 0 ? (string) substr($path, \strlen($root)) : null;` — `$root` ends in `/` and `$path` does not, so `$path` is longer and `substr()` never returns false.
 - `src/Filesystem/Path.php` LogicalOr, DecrementInteger x2 `if ($a['ino'] === 0 || $b['ino'] === 0) {` — the filesystems of CI and of developers report an inode. Only a Windows filesystem without a file index reaches the fallback.
 - `src/Graph/DependencyGraph.php` TrueValue `$present[$package->name()] = true;` — a set. Only `isset()` reads it.
