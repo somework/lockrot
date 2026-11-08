@@ -443,12 +443,16 @@ maintainer.
            step 6 against the new V, and commit nothing. Do not repin the renderer to the old V.
 
            Before you tag the renderer in step 7, check the gate that its `release.yml` runs on
-           the pin. The query must print `true`:
+           the pin. The gate needs a green CI run of V, and a green full check on a
+           `release/full-check-<sha>` branch or a green CI run on `main`. The query tests the same
+           condition and must print `true`:
 
            ```bash
            gh run list --repo somework/lockrot --commit <V> --event push --status success \
              --json workflowName,headBranch \
-             --jq 'any(.[]; .workflowName == "full-check" and (.headBranch | test("^release/full-check-[0-9a-f]+$")))'
+             --jq 'any(.[]; .workflowName == "CI") and
+               (any(.[]; .workflowName == "full-check" and (.headBranch | test("^release/full-check-[0-9a-f]+$")))
+                or any(.[]; .workflowName == "CI" and .headBranch == "main"))'
            ```
 
            A renderer tag that the gate refuses has no release, and the renderer's tag ruleset
