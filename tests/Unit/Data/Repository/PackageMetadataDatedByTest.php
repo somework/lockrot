@@ -869,6 +869,8 @@ final class PackageMetadataDatedByTest extends TestCase
         self::assertEquals(new \DateTimeImmutable($ownAt), $row['at']);
         self::assertArrayNotHasKey('dated_by', $row);
         self::assertNull($dated->lastStableDatedBy());
+        self::assertSame('1.5.0', $dated->lastStableVersion(), 'ruling R16-16h: the metadata names the release that S2 and the branch row read');
+        self::assertEquals(new \DateTimeImmutable($ownAt), $dated->lastStableReleaseAt());
     }
 
     public function testAParentDateOfATagOnItsOwnCommitDoesNotReplaceItsOwnDate(): void

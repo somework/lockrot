@@ -36,7 +36,8 @@ final class LibyearsTest extends TestCase
         $byBranch = [];
         foreach ($branches as $key => [$version, $at]) {
             $date = $at === null ? null : new \DateTimeImmutable($at);
-            $byBranch[$key] = ['version' => $version, 'at' => $date, 'highest' => ['normalized' => ltrim($version, 'v').'.0', 'pretty' => $version, 'at' => $date, 'php' => null], 'php' => null];
+            // No trusted last release: each highest tag is undated, as a shared commit leaves it.
+            $byBranch[$key] = ['version' => $version, 'at' => $date, 'highest' => ['normalized' => ltrim($version, 'v').'.0', 'pretty' => $version, 'at' => $lastStableReleaseAt === null ? null : $date, 'php' => null], 'php' => null];
         }
 
         return new PackageMetadata('scheb/2fa-bundle', false, null, true, $lastStableReleaseAt === null ? null : new \DateTimeImmutable($lastStableReleaseAt), 'v8.6.1', 12, null, 'library', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), $byBranch);
@@ -419,6 +420,10 @@ final class LibyearsTest extends TestCase
         $parent = self::released('acme/mono', [['v3.0.7', 'm307', '2025-03-01T00:00:00+00:00'], ['v3.1.0', 'm310', '2024-01-01T00:00:00+00:00']], null, $replace);
         yield 'a parent date of a backport on the highest line above the installed line' => ['v1.5.0', '2018-01-01T00:00:00+00:00', self::released('acme/split', $highestLine, 'v1.5.0')->datedBy($parent), 6.0];
         yield 'a pre-release above the highest stable tag' => ['v1.0.0', '2018-01-01T00:00:00+00:00', self::released('acme/split', [['v1.0.0', 'c100', '2018-01-01T00:00:00+00:00'], ['v1.0.1', 'c101', '2019-01-01T00:00:00+00:00'], ['v2.0.0-beta1', 'c2b1', '2020-01-01T00:00:00+00:00']], 'v1.0.0'), 2.0];
+        $ownHighest = [['v1.0.0', 'c100', '2017-01-01T00:00:00+00:00'], ['v1.5.0', 'c150', '2018-01-01T00:00:00+00:00']];
+        yield 'ruling R16-16g: an own date of a backport above an own-dated highest tag' => ['v1.0.0', '2017-01-01T00:00:00+00:00', self::released('acme/split', array_merge($ownHighest, [['v1.4.9', 'c149', '2019-06-01T00:00:00+00:00']]), 'v1.0.0'), 1.0];
+        yield 'ruling R16-16g: a shared-commit date of a backport above an own-dated highest tag' => ['v1.0.0', '2017-01-01T00:00:00+00:00', self::released('acme/split', array_merge($ownHighest, [['v1.4.7', 'cs', '2019-06-01T00:00:00+00:00'], ['v1.4.8', 'cs', '2019-06-01T00:00:00+00:00'], ['v1.4.9', 'cs', '2019-06-01T00:00:00+00:00']]), 'v1.0.0'), 1.0];
+        yield 'ruling R16-16i: a later backport pre-release below the highest stable tag' => ['v1.0.0', '2018-01-01T00:00:00+00:00', self::released('acme/split', [['v1.0.0', 'c100', '2018-01-01T00:00:00+00:00'], ['v2.0.0', 'c200', '2023-01-01T00:00:00+00:00'], ['v3.0.0-alpha1', 'c3a1', '2024-01-01T00:00:00+00:00'], ['v1.9.0-RC1', 'c19r', '2025-01-01T00:00:00+00:00']], 'v1.0.0'), 6.0];
         yield 'roots/wp-config: a pre-release above the only stable tag' => ['1.0.0', '2018-08-10T14:18:38+00:00', self::released('roots/wp-config', [['1.0.0', 'c100', '2018-08-10T14:18:38+00:00'], ['v2.0.0-beta.1', 'c2b1', '2026-03-21T17:18:34+00:00']], '1.0.0'), 7.61];
     }
 
