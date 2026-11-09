@@ -90,6 +90,17 @@ final class ExplanationTest extends TestCase
         self::assertFalse($explanation->installedBranchIsUndated());
     }
 
+    public function testTheInstalledBranchIsNotUndatedWhenItsHighestTagHasAnOwnDate(): void
+    {
+        // S8 is unmeasured for a newer lower tag on a shared commit, but the highest tag's own date is in the row.
+        $metadata = F::metadata([['3.5.0', '2020-01-01T00:00:00+00:00'], ['3.4.0', '2019-01-01T00:00:00+00:00']]);
+        $finding = $this->withBranchReading($this->finding('3.4.0', Verdict::LEFT_BEHIND), AgeReading::unmeasuredBecause(AgeMeasure::UNDATED_RELEASES));
+        $explanation = $this->explanation($finding, F::facts(F::package(['version' => '3.4.0']), $metadata), '8.4');
+
+        self::assertNotNull($explanation->branches()[0]['highest_released']);
+        self::assertFalse($explanation->installedBranchIsUndated());
+    }
+
     public function testABranchSnapshotHasNoInstalledBranchToBeUndated(): void
     {
         // The alias line's row is undated, but no row is the installed one: the footnote would name a branch that no row marks.

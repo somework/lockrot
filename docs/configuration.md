@@ -278,8 +278,8 @@ The document also carries `lockrot`, `package`, `version` and `generated_at`. Th
   finding that the baseline exempts in the report can read `gate.fails` true in the explanation.
 
 In the release-branch table, S8 does not measure a branch whose highest tag is `undated` or dated
-only by a `commit <date>` that other tags share, unless the branch's newest release with a trusted
-date is inside `release-warn-years` ([Left behind](verdicts.md#left-behind),
+only by a `commit <date>` that other tags share. The exception is a branch whose newest dated
+release has a trusted date inside `release-warn-years` ([Left behind](verdicts.md#left-behind),
 [Dates from the monorepo](verdicts.md#dates-from-the-monorepo)). The table's php column gives
 the requirement of each branch's highest tag, the JSON `highest_php` field. The JSON `php` field
 can give another release's requirement ([The PHP test](verdicts.md#the-php-test-in-explain)).

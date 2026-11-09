@@ -156,12 +156,13 @@ final class Explanation
         return $parent === null ? null : [$parent, $branches];
     }
 
-    /** S8 did not measure the installed branch because its releases carry no date that lockrot trusts. */
+    /** The installed branch's highest tag has no release date, and S8 left the branch unmeasured for it. */
     public function installedBranchIsUndated(): bool
     {
         foreach ($this->branches() as $row) {
             if ($row['installed']) {
-                return $this->finding->details()->age()->branchRelease()->unmeasured() === AgeMeasure::UNDATED_RELEASES;
+                return $row['highest_released'] === null
+                    && $this->finding->details()->age()->branchRelease()->unmeasured() === AgeMeasure::UNDATED_RELEASES;
             }
         }
 

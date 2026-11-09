@@ -234,7 +234,7 @@ S8 is not measured for:
   tag is still on the branch, and S8 judges the branch's newest stable release.
 
 - A branch whose highest tag has no [trusted date](#dates-from-the-monorepo), unless the branch's
-  newest release with a trusted date is inside `release-warn-years`.
+  newest dated release has a trusted date inside `release-warn-years`.
 
 - An installed branch whose newest dated release is a lower tag that only a commit shared with other
   tags dates. `age.branch_release` is then null with `undated_releases`.
@@ -539,7 +539,7 @@ origin: Packagist, a private repository, vcs, a path or an archive. packages-dev
   `policy.advisories: false`, lockrot asks and counts every advisory. These switches stop Composer
   from blocking an update (`composer update`, `require` or `remove`), and `composer audit` still
   reports the advisories. `COMPOSER_POLICY_ADVISORIES_BLOCK=1` turns the blocking on again after
-  `policy.advisories: false`, but not after `policy: false`. The note
+  `policy.advisories: false`, but not after `policy: false` or `COMPOSER_POLICY=0`. The note
   [`advisories_disabled_by_policy`](notes.md#advisories_disabled_by_policy) says so.
 
 - An advisory with no severity counts as `unrated`. An advisory with no affected range counts, with

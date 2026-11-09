@@ -528,7 +528,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CLI:** `--explain` prints the footnote "so S8 does not measure the branch" only when S8 did
   not measure the installed branch because of its undated releases.
   ([Explaining one package](docs/configuration.md#explaining-one-package))
-- **All formats:** the run note `advisories_disabled_by_policy` is omitted when
+- **All formats:** lockrot omits the run note `advisories_disabled_by_policy` when
   `COMPOSER_POLICY_ADVISORIES_BLOCK=1` turns the blocking on again after `policy.advisories: false`,
   so the note agrees with `run.move_check.blocks_advisories`.
   ([advisories_disabled_by_policy](docs/notes.md#advisories_disabled_by_policy))
