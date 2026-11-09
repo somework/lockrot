@@ -107,7 +107,7 @@ final class PackageMetadata
     private ?\DateTimeImmutable $releaseReadingAt;
     private ?string $releaseReadingVersion;
     private ?string $releaseReadingDatedBy;
-    /** @var array{0: \DateTimeImmutable, 1: string, 2: string}|null the newest dated pre-release: its date, its pretty and its normalized version */
+    /** @var array{0: \DateTimeImmutable, 1: string, 2: string, 3: bool}|null the newest dated pre-release: its date, its pretty and its normalized version, and whether its commit is a shared one */
     private ?array $newestPreRelease = null;
 
     /**
@@ -224,7 +224,7 @@ final class PackageMetadata
                 if ($releaseDate !== null) {
                     $releaseDate = self::toImmutable($releaseDate);
                     if (VersionParser::parseStability($version->getVersion()) !== 'stable' && self::newer($releaseDate, $version->getVersion(), $newestPreRelease[0] ?? null, $newestPreRelease[2] ?? null)) {
-                        $newestPreRelease = [$releaseDate, $version->getPrettyVersion(), $version->getVersion()];
+                        $newestPreRelease = [$releaseDate, $version->getPrettyVersion(), $version->getVersion(), self::commitOf($version)];
                     }
                     if (self::newer($releaseDate, $version->getVersion(), $lastStableReleaseAt, $lastStableNormalized)) {
                         $lastStableReleaseAt = $releaseDate;
@@ -311,6 +311,10 @@ final class PackageMetadata
             $lastStableReleaseAt = null;
         }
         $releaseReading = [$lastStableReleaseAt, $lastStableVersion];
+        if ($newestPreRelease !== null) {
+            $commit = $newestPreRelease[3];
+            $newestPreRelease[3] = $commit !== null && ($tagsOnCommit[$commit] ?? 0) >= self::SHARED_COMMIT_TAGS;
+        }
         // A monorepo parent keeps a date per release for its children, minus the tags on a shared
         // commit. Any other package keeps none: it has no children, and the map holds one entry
         // per release.
@@ -551,7 +555,8 @@ final class PackageMetadata
             $releaseReadingVersion = $highest['highest']['pretty'];
         }
         if ($releaseReadingAt !== null) {
-            $unresolved = null;
+            // A pre-release on a shared commit has the commit's date, not a release's, so it can only block the reading.
+            $unresolved = $this->newestPreRelease !== null && $this->newestPreRelease[3] ? $this->newestPreRelease[0] : null;
             foreach ($byBranch as $row) {
                 $datedByParent = isset($row['dated_by']);
                 if ($row['at'] === null) {
@@ -568,7 +573,7 @@ final class PackageMetadata
                 }
             }
             // The branch rows hold stable tags only. S2 counts a dated pre-release too (SPEC §8.4.1).
-            if ($this->newestPreRelease !== null && self::newerTag($this->newestPreRelease[0], $this->newestPreRelease[1], $releaseReadingAt, $releaseReadingVersion)) {
+            if ($this->newestPreRelease !== null && !$this->newestPreRelease[3] && self::newerTag($this->newestPreRelease[0], $this->newestPreRelease[1], $releaseReadingAt, $releaseReadingVersion)) {
                 [$releaseReadingAt, $releaseReadingVersion] = $this->newestPreRelease;
                 $releaseReadingDatedBy = null;
             }

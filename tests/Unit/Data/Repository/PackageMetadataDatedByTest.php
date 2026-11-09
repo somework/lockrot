@@ -734,6 +734,61 @@ final class PackageMetadataDatedByTest extends TestCase
         self::assertNull($dated->releaseReadingAt(), 'one shared line is dated 2025-01-01, after v2.0.0 on 2024-06-01');
     }
 
+    /** A parent that replaces the split and lists only v5.0.0: it dates no tag of the split. */
+    private function parentOfV5Only(): PackageMetadata
+    {
+        return PackageMetadata::fromPackages('acme/mono', [
+            $this->load(self::tag('acme/mono', 'v5.0.0', 'm50', '2026-01-01T00:00:00+00:00', ['acme/split' => 'self.version'])),
+        ], new \DateTimeImmutable(self::NOW));
+    }
+
+    /** @return iterable<string, array{list<array{0: string, 1: string, 2: ?string}>, string}> */
+    public static function provideNewestPreReleasesOnASharedCommit(): iterable
+    {
+        $shared = static fn (string $line): array => [["v$line.1", 'c-shared', '2021-01-01T00:00:00+00:00'], ["v$line.2", 'c-shared', '2021-01-01T00:00:00+00:00'], ["v$line.3", 'c-shared', '2021-01-01T00:00:00+00:00']];
+
+        yield 'the shared tags on the highest line' => [array_merge([['v2.1.0', 'c21', '2020-01-01T00:00:00+00:00']], $shared('2.0'), [['v2.2.0-beta1', 'c-shared', '2021-01-01T00:00:00+00:00']]), 'v2.2.0-beta1'];
+        yield 'the shared tags on a lower line' => [array_merge([['v2.1.0', 'c21', '2020-01-01T00:00:00+00:00']], $shared('1.0'), [['v3.0.0-beta1', 'c-shared', '2021-01-01T00:00:00+00:00']]), 'v3.0.0-beta1'];
+    }
+
+    /**
+     * Ruling R16-26: a pre-release on a commit that three stable tags share has the commit's date,
+     * so S2 cannot read it, also after a parent that dates nothing.
+     *
+     * @dataProvider provideNewestPreReleasesOnASharedCommit
+     *
+     * @param list<array{0: string, 1: string, 2: ?string}> $tags
+     */
+    #[DataProvider('provideNewestPreReleasesOnASharedCommit')]
+    public function testANewestPreReleaseOnASharedCommitKeepsTheReadingUnknownAfterAParent(array $tags, string $preRelease): void
+    {
+        $child = $this->split($tags);
+
+        $dated = $child->datedBy($this->parentOfV5Only());
+
+        self::assertNull($child->releaseReadingAt());
+        self::assertNull($dated->releaseReadingAt(), 'the shared date 2021-01-01 is newer than the own date 2020-01-01 of v2.1.0');
+        self::assertSame($preRelease, $dated->releaseReadingVersion());
+        self::assertNull($dated->releaseReadingDatedBy());
+        self::assertTrue($dated->lastStableSharesItsCommit(), 'S10 names the shared commit');
+    }
+
+    public function testANewestPreReleaseOnASharedCommitOlderThanTheReadingDoesNotBlockIt(): void
+    {
+        $child = $this->split([
+            ['v2.1.0', 'c21', '2022-01-01T00:00:00+00:00'],
+            ['v2.0.1', 'c-shared', '2021-01-01T00:00:00+00:00'],
+            ['v2.0.2', 'c-shared', '2021-01-01T00:00:00+00:00'],
+            ['v2.0.3', 'c-shared', '2021-01-01T00:00:00+00:00'],
+            ['v2.2.0-beta1', 'c-shared', '2021-01-01T00:00:00+00:00'],
+        ]);
+
+        $dated = $child->datedBy($this->parentOfV5Only());
+
+        self::assertSame('v2.1.0', $dated->releaseReadingVersion());
+        self::assertEquals(new \DateTimeImmutable('2022-01-01T00:00:00+00:00'), $dated->releaseReadingAt());
+    }
+
     public function testASharedLowerDateOnTheReadingsDateDoesNotBlockIt(): void
     {
         $child = $this->split([
