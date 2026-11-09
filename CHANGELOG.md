@@ -16,9 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** a newest pre-release on a commit that three or more stable tags share keeps S2
   unknown, with an S10 `release_dates` entry, also when a monorepo parent is present.
   ([Dates from the monorepo](docs/verdicts.md#dates-from-the-monorepo))
-- **All formats:** libyears end at the newest release by version: a newer pre-release, else the
-  highest stable tag. A lower stable tag with a later date, own-dated or parent-dated, does not
-  make the project behind. ([Libyears](docs/verdicts.md#libyears))
+- **All formats:** libyears end at the highest release by version: the highest dated pre-release
+  above the highest stable tag, else that tag. A lower tag with a later date, own-dated,
+  parent-dated or on a shared commit, does not make the project behind.
+  ([Libyears](docs/verdicts.md#libyears))
 - **Breaking:** **Baseline:** a finding is worsened by a flag above the recorded one, a new
   advisory, or a known one re-rated or no longer fixable. The gate reads `min(score, 2 × what the
   new facts add)`. A `known` finding fails no `--fail-on` value, `unchecked` included. Action: run
