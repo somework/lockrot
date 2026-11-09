@@ -53,8 +53,8 @@ use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
 final class InstallTimeSummaryTest extends TestCase
