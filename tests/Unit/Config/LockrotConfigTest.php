@@ -302,6 +302,31 @@ final class LockrotConfigTest extends TestCase
     }
 
     /**
+     * Finding 12: a config value that is no version is refused, also when an option or a variable
+     * sets the target.
+     *
+     * @dataProvider configTargetPhpsThatAreNoVersion
+     *
+     * @param array<string, mixed> $env
+     * @param array<string, mixed> $cli
+     */
+    #[DataProvider('configTargetPhpsThatAreNoVersion')]
+    public function testAConfigTargetPhpThatIsNoVersionIsRefusedUnderEverySource(array $env, array $cli): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('target-php must look like "8.4"; got "banana"');
+        LockrotConfig::fromSources(['target-php' => 'banana'], $env, $cli, '8.5.10', null);
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, array<string, mixed>}> */
+    public static function configTargetPhpsThatAreNoVersion(): iterable
+    {
+        yield 'the config key alone' => [[], []];
+        yield 'under an option that wins' => [[], ['target-php' => '8.4']];
+        yield 'under a variable that wins' => [['LOCKROT_TARGET_PHP' => '8.3'], []];
+    }
+
+    /**
      * Ruling R12-4 keeps a minor above the newest known one: a PHP that the release data does not
      * list yet. The check reads no clock, so a LOCKROT_TODAY that is no date does not stop it.
      *
