@@ -676,10 +676,12 @@ final class Finding
     {
         $blocked = [];
         foreach (array_merge($details->skipped(), $checksMissing) as $check) {
-            $blocked = array_merge($blocked, array_intersect([Signal::S2, Signal::S4], $check->blocks()));
+            foreach (array_intersect([Signal::S2, Signal::S4], $check->blocks()) as $signal) {
+                $blocked[$signal] = $signal;
+            }
         }
 
-        return array_values(array_unique($blocked));
+        return array_values($blocked);
     }
 
     /**

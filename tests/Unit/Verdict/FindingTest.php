@@ -762,6 +762,23 @@ final class FindingTest extends TestCase
         self::assertSame($accepted ? '' : 'stale: '.$summary, $document['evidence']);
     }
 
+    /** Two gaps that block the same liveness signal still leave one signal that read the liveness. */
+    public function testTwoGapsThatBlockS4NameTheReleaseReading(): void
+    {
+        $signals = [
+            new Signal(Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S2, ['last_release' => '2022-07-28T00:00:00+00:00', 'years' => 4.2, 'dated_by' => null])),
+            new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [
+                ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']],
+                ['check' => 'gap', 'reason' => 'offline', 'blocks' => ['S4']],
+            ]])),
+        ];
+        $finding = (new FindingBuilder())->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, null, []), true)->build();
+
+        $document = JsonPath::decoded($finding->toArray());
+
+        self::assertSame('last release 2022-07-28 (4.2 years ago); liveness read from releases only', JsonPath::stringAt($document, ['flags', 0, 'summary']));
+    }
+
     /** A corroborating `stale` counts, so it names its reading. `abandoned` never does. */
     public function testOnlyACountedStaleBesideAnotherFlagNamesItsLivenessReading(): void
     {
