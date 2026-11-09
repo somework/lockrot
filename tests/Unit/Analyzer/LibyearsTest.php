@@ -452,6 +452,26 @@ final class LibyearsTest extends TestCase
         self::assertSame(Libyears::UNDATED_RELEASES, Libyears::measure(self::package('v1.0.2', '2019-01-01T00:00:00+00:00'), $metadata)->unmeasuredReason());
     }
 
+    /**
+     * Ruling R16-16i: a highest pre-release above the highest stable tag with an unresolved date
+     * stops the reading. The shared date of the lower tag v1.4.3 is no lower bound for it.
+     */
+    public function testAPreReleaseOnASharedCommitAboveTheHighestStableTagLeavesALowerInstalledTagUnmeasured(): void
+    {
+        $metadata = self::released('acme/split', [
+            ['v1.0.0', 'c100', '2018-01-01T00:00:00+00:00'],
+            ['v1.5.0', 'c150', '2020-01-01T00:00:00+00:00'],
+            ['v1.4.1', 'cs', '2021-01-01T00:00:00+00:00'],
+            ['v1.4.2', 'cs', '2021-01-01T00:00:00+00:00'],
+            ['v1.4.3', 'cs', '2021-01-01T00:00:00+00:00'],
+            ['v2.0.0-beta1', 'cs', '2021-01-01T00:00:00+00:00'],
+        ], 'v1.0.0');
+
+        $measurement = Libyears::measure(self::package('v1.0.0', '2018-01-01T00:00:00+00:00'), $metadata);
+
+        self::assertSame(Libyears::UNDATED_RELEASES, $measurement->unmeasuredReason());
+    }
+
     public function testAVersionComposerCannotNormalizeIsMeasuredFromTheLocksDate(): void
     {
         $metadata = self::splitPackage(['5.13.2.0' => self::twoYearsBefore(self::LATEST)], null, []);

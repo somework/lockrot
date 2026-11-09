@@ -877,13 +877,33 @@ final class PackageMetadata
         if ($row === null) {
             return $this->lastStableReleaseAt;
         }
-        $preRelease = $this->highestPreRelease;
-        if ($preRelease !== null && Comparator::greaterThan($preRelease[2], $row['highest']['normalized'])) {
+        $preRelease = $this->preReleaseAboveTheHighestStableTag();
+        if ($preRelease !== null) {
             // A pre-release on a shared commit has the commit's date, not a release's.
             return $preRelease[3] ? null : $preRelease[0];
         }
 
         return $row['highest']['at'];
+    }
+
+    /**
+     * True when the newest release by version is a pre-release on a shared commit. Its date is the
+     * commit's, so no lower tag's date is a lower bound for it (ruling R16-16i).
+     */
+    public function newestReleaseByVersionSharesItsCommit(): bool
+    {
+        $preRelease = $this->preReleaseAboveTheHighestStableTag();
+
+        return $preRelease !== null && $preRelease[3];
+    }
+
+    /** @return array{0: \DateTimeImmutable, 1: string, 2: string, 3: bool}|null */
+    private function preReleaseAboveTheHighestStableTag(): ?array
+    {
+        $row = $this->latestStableByBranch[self::highestBranch($this->latestStableByBranch)] ?? null;
+        $preRelease = $this->highestPreRelease;
+
+        return $row !== null && $preRelease !== null && Comparator::greaterThan($preRelease[2], $row['highest']['normalized']) ? $preRelease : null;
     }
 
     /**

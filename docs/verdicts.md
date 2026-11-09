@@ -1464,7 +1464,8 @@ went unmeasured ([compatibility.md](compatibility.md#open-sets)).
   newest release above the installed version that has a trusted date. That release can be on a
   higher branch or on the installed branch. A tag's commit is never younger than the release it
   names, so the value is a lower bound: `libyears_at_least` is true, and the root counts such
-  findings in `at_least_count`. The line then reads `at least`.
+  findings in `at_least_count`. The line then reads `at least`. A highest pre-release on a shared
+  commit gets no lower bound: the package is `undated_releases`.
 
 - **Ahead of the newest release.** A package locked on a pre-release above it, or on a tag that
   the repository does not list, counts as zero.
