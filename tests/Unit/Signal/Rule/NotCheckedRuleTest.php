@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Signal\Rule;
 
+use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Clock;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
@@ -621,7 +622,10 @@ final class NotCheckedRuleTest extends TestCase
     public function testAnInstalledTagOnItsOwnCommitIsNotBlamedOnASharedCommit(): void
     {
         $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
-        $metadata = new PackageMetadata('vendor/pkg', false, null, true, new \DateTimeImmutable('2021-08-30T00:00:00+00:00'), 'v4.4.31', 3, null, 'library', new \DateTimeImmutable(self::NOW), [], [], 'acme/parent');
+        $loader = new ArrayLoader();
+        $tag = static fn (string $name, string $version, string $commit, string $time, array $replace = []) => $loader->load(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://example.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
+        $split = PackageMetadata::fromPackages('vendor/pkg', [$tag('vendor/pkg', 'v4.4.30', 'c430', '2020-10-01T00:00:00+00:00'), $tag('vendor/pkg', 'v4.4.31', 'cs', '2021-08-01T00:00:00+00:00'), $tag('vendor/pkg', 'v4.4.29', 'cs', '2021-08-01T00:00:00+00:00'), $tag('vendor/pkg', 'v4.4.28', 'cs', '2021-08-01T00:00:00+00:00')], new \DateTimeImmutable(self::NOW), 'v4.4.30');
+        $metadata = $split->datedBy(PackageMetadata::fromPackages('acme/parent', [$tag('acme/parent', 'v4.4.31', 'p431', '2021-08-30T00:00:00+00:00', ['vendor/pkg' => 'self.version'])], new \DateTimeImmutable(self::NOW)));
         $facts = new PackageFacts(F::package(['version' => 'v4.4.30', 'time' => '2020-10-01T00:00:00+00:00', 'php' => '>=7.1.3']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []);
 
         self::assertFalse($metadata->sharesItsCommit('v4.4.30'));

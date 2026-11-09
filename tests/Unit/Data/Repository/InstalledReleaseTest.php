@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Data\Repository;
 
+use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
@@ -131,13 +132,34 @@ final class InstalledReleaseTest extends TestCase
         self::assertNull($installed->datedBy());
     }
 
+    /**
+     * The split's v5.13.2 sits on its own commit. The parent dates v5.13.3, and v13.31.0 when the
+     * split's v13.31.0 shares its commit.
+     */
+    private static function split(bool $highestSharesItsCommit): PackageMetadata
+    {
+        $loader = new ArrayLoader();
+        $tag = static fn (string $name, string $version, string $commit, string $time, array $replace = []) => $loader->load(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://example.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
+        $highest = $highestSharesItsCommit ? 'cs' : 'c13';
+        $split = PackageMetadata::fromPackages('illuminate/macroable', [
+            $tag('illuminate/macroable', 'v5.13.2', 'c5', self::LOCKED_AT),
+            $tag('illuminate/macroable', 'v13.31.0', $highest, '2026-01-24T13:26:10+00:00'),
+            $tag('illuminate/macroable', 'v13.30.0', 'cs', '2026-01-24T13:26:10+00:00'),
+            $tag('illuminate/macroable', 'v13.29.0', 'cs', '2026-01-24T13:26:10+00:00'),
+            $tag('illuminate/macroable', 'v13.28.0', 'cs', '2026-01-24T13:26:10+00:00'),
+        ], new \DateTimeImmutable(self::NOW), 'v5.13.2');
+        $replace = ['illuminate/macroable' => 'self.version'];
+
+        return $split->datedBy(PackageMetadata::fromPackages('laravel/framework', [
+            $tag('laravel/framework', 'v5.13.3', 'f5', '2024-11-21T00:00:00+00:00', $replace),
+            $tag('laravel/framework', 'v13.31.0', 'f13', '2026-02-01T00:00:00+00:00', $replace),
+        ], new \DateTimeImmutable(self::NOW)));
+    }
+
     /** Ruling R13-31: the tag shares no commit, but a parent dates the split's newest release, so the lock time is no release date. */
     public function testATagOnItsOwnCommitInASplitThatAParentDatesIsAParentSplit(): void
     {
-        $installed = InstalledRelease::of(
-            F::package(['version' => 'v5.13.2', 'time' => self::LOCKED_AT]),
-            self::metadata('laravel/framework', ['5.13.3.0' => '2024-11-21T00:00:00+00:00'])
-        );
+        $installed = InstalledRelease::of(F::package(['version' => 'v5.13.2', 'time' => self::LOCKED_AT]), self::split(true));
 
         self::assertSame(InstalledRelease::PARENT_SPLIT, $installed->kind());
         self::assertNull($installed->at());
@@ -147,10 +169,7 @@ final class InstalledReleaseTest extends TestCase
     /** The parent dates other releases but not the split's highest branch, so the lock time of a tag on its own commit is a release date. */
     public function testATagOnItsOwnCommitIsDatedByTheLockWhenNoParentDatesTheHighestBranch(): void
     {
-        $installed = InstalledRelease::of(
-            F::package(['version' => 'v5.13.2', 'time' => self::LOCKED_AT]),
-            self::metadata(null, ['5.13.3.0' => '2024-11-21T00:00:00+00:00'])
-        );
+        $installed = InstalledRelease::of(F::package(['version' => 'v5.13.2', 'time' => self::LOCKED_AT]), self::split(false));
 
         self::assertSame(InstalledRelease::RELEASE, $installed->kind());
         self::assertEquals(new \DateTimeImmutable(self::LOCKED_AT), $installed->at());
