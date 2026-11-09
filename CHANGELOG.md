@@ -525,6 +525,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **CLI:** `--explain` prints the footnote "so S8 does not measure the branch" only when S8 did
+  not measure the installed branch because of its undated releases.
+  ([Explaining one package](docs/configuration.md#explaining-one-package))
+- **All formats:** the run note `advisories_disabled_by_policy` is omitted when
+  `COMPOSER_POLICY_ADVISORIES_BLOCK=1` turns the blocking on again after `policy.advisories: false`,
+  so the note agrees with `run.move_check.blocks_advisories`.
+  ([advisories_disabled_by_policy](docs/notes.md#advisories_disabled_by_policy))
 - **Config:** an `extra.lockrot.target-php` that names a PHP minor that lockrot does not know
   exits `2` also when `--target-php` or `LOCKROT_TARGET_PHP` overrides it.
   ([Validation](docs/configuration.md#validation))

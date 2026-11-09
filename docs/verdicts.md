@@ -538,7 +538,8 @@ origin: Packagist, a private repository, vcs, a path or an archive. packages-dev
 - Composer's policy never stops the lookup. Under `policy: false`, `COMPOSER_POLICY=0` or
   `policy.advisories: false`, lockrot asks and counts every advisory. These switches stop Composer
   from blocking an update (`composer update`, `require` or `remove`), and `composer audit` still
-  reports the advisories. The note
+  reports the advisories. `COMPOSER_POLICY_ADVISORIES_BLOCK=1` turns the blocking on again after
+  `policy.advisories: false`, but not after `policy: false`. The note
   [`advisories_disabled_by_policy`](notes.md#advisories_disabled_by_policy) says so.
 
 - An advisory with no severity counts as `unrated`. An advisory with no affected range counts, with
