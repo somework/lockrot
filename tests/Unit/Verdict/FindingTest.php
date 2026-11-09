@@ -762,6 +762,27 @@ final class FindingTest extends TestCase
         self::assertSame($accepted ? '' : 'stale: '.$summary, $document['evidence']);
     }
 
+    /** A corroborating `stale` counts, so it names its reading. `abandoned` never does. */
+    public function testOnlyACountedStaleBesideAnotherFlagNamesItsLivenessReading(): void
+    {
+        $s2 = new Signal(Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S2, ['last_release' => '2022-07-28T00:00:00+00:00', 'years' => 4.2, 'dated_by' => null]));
+        $s10 = new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [['check' => 'gap', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']]]]));
+        $pinned = [new Signal(Signal::LEVEL_WARN, 'pinned', SignalDataStub::of(Signal::S6, ['reason' => 'branch_snapshot', 'version' => 'dev-main'])), $s2, $s10];
+        $marked = [new Signal(Signal::LEVEL_HIGH, 'marked', SignalDataStub::of(Signal::S1, ['marked_by' => 'lock'])), $s2, $s10];
+        $corroborated = (new FindingBuilder())->withVersion('dev-main')->withSignals($pinned)->withFlags(FlagSet::fromSignals($pinned, null, []), true)->build();
+        $abandoned = (new FindingBuilder())->withSignals($marked)->withFlags(FlagSet::fromSignals($marked, null, []), true)->build();
+
+        $stale = JsonPath::decoded($corroborated->toArray());
+        $gone = JsonPath::decoded($abandoned->toArray());
+
+        self::assertSame(['pinned', 'stale'], array_column(JsonPath::arrayAt($stale, ['flags']), 'id'));
+        self::assertSame('corroborating', JsonPath::stringAt($stale, ['flags', 1, 'role']));
+        self::assertSame('last release 2022-07-28 (4.2 years ago); liveness read from releases only', JsonPath::stringAt($stale, ['flags', 1, 'summary']));
+        self::assertSame('abandoned', JsonPath::stringAt($gone, ['flags', 0, 'id']));
+        self::assertSame(['reasons' => ['marked'], 'liveness_complete' => false], JsonPath::arrayAt($gone, ['flags', 0, 'degree']));
+        self::assertSame('marked abandoned in composer.lock; last release 2022-07-28 (4.2 years ago)', JsonPath::stringAt($gone, ['flags', 0, 'summary']));
+    }
+
     /** @return iterable<string, array{string, list<string>, bool, string}> */
     public static function livenessReadings(): iterable
     {
