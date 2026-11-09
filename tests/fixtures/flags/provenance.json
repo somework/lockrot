@@ -6,7 +6,7 @@
  },
  "suite": "every case and the composite pass the report-2 field reference (I21) with 0 violations",
  "page_goldens": {
-  "sha256": "bbdc7e6156d0234dc10c35535805219111a21ded4978cfb7c2ba3ad41e1d39db",
+  "sha256": "76c3d4342c73c75a4b2cc850928b14d9d7d40ac0138a7502b8ab392321a6b0e1",
   "rendered": "the model's goldens"
  },
  "dropped": [],
