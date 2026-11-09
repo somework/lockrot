@@ -67,6 +67,17 @@ final class FlagSentence
     }
 
     /**
+     * The clause of a counted `stale` whose liveness one signal read alone, because a check that did
+     * not run blocks the other.
+     *
+     * @param string $blocked `S2` or `S4`, the signal that the check blocks
+     */
+    public static function livenessReadWithout(string $blocked): string
+    {
+        return '; liveness read from '.($blocked === Signal::S2 ? 'pushes' : 'releases').' only';
+    }
+
+    /**
      * The `vulnerable` sentence: the counted advisories by severity, what the installed branch
      * fixes, and the deciding advisory, called "worst" only when its severity is the worst.
      *
