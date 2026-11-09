@@ -1018,6 +1018,33 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('composer.lock', $stderr);
     }
 
+    /** @return iterable<string, array{string}> */
+    public static function scalarLocks(): iterable
+    {
+        yield 'a string' => ['"x"'];
+        yield 'a number' => ['1'];
+        yield 'true' => ['true'];
+        yield 'null' => ['null'];
+    }
+
+    /**
+     * @dataProvider scalarLocks
+     */
+    #[DataProvider('scalarLocks')]
+    public function testALockWithAScalarRootNextToAComposerJsonSaysItMustBeAnObject(string $lock): void
+    {
+        $dir = $this->tempDir('lockrot-scalarlock-');
+        file_put_contents($dir.'/composer.json', '{}');
+        file_put_contents($dir.'/composer.lock', $lock);
+        chdir($dir);
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--format' => 'json']);
+
+        self::assertSame(2, $code, $stderr);
+        self::assertSame('', $stdout);
+        self::assertStringContainsString('composer.lock must contain a JSON object', $stderr);
+    }
+
     public function testInvalidLockrotSchemaIsExit2(): void
     {
         $dir = sys_get_temp_dir().'/lockrot-badschema-'.bin2hex(random_bytes(8));

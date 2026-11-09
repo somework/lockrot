@@ -33,6 +33,7 @@ use Lockrot\Exception\ConfigException;
 use Lockrot\Explain\Explanation;
 use Lockrot\Filesystem\Path;
 use Lockrot\Html\PageData;
+use Lockrot\Json\JsonReader;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ConsoleMarkup;
@@ -184,6 +185,17 @@ final class LockrotCommand extends BaseCommand
             $this->bootstrapError = $e;
 
             return;
+        }
+        $lockPath = Factory::getLockFile(self::composerFile());
+        if (is_file($lockPath)) {
+            try {
+                // Composer's Locker throws a TypeError for a lock whose root is a scalar.
+                JsonReader::readObject($lockPath);
+            } catch (ConfigException $e) {
+                $this->bootstrapError = $e;
+
+                return;
+            }
         }
         if ($input->getOption('offline') === true) {
             // Platform::putEnv() rather than putenv(): Composer reads its environment through
