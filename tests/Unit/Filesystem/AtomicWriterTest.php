@@ -55,6 +55,18 @@ final class AtomicWriterTest extends TestCase
         return array_values(array_diff($entries, ['.', '..']));
     }
 
+    public function testAWriteToTheLongestNameThatTheFilesystemAcceptsLeavesOnlyTheTarget(): void
+    {
+        $dir = $this->tempDir();
+        $name = str_repeat('r', 240).'.json';
+        $path = $dir.'/'.$name;
+
+        AtomicWriter::write($path, '{}', $name);
+
+        self::assertSame('{}', file_get_contents($path));
+        self::assertSame([$name], self::entries($dir));
+    }
+
     public function testWritesTheContentsAndLeavesOnlyTheTarget(): void
     {
         $dir = $this->tempDir();
@@ -297,7 +309,7 @@ final class AtomicWriterTest extends TestCase
             }
         }
 
-        self::assertStringContainsString($dir.'/missing/r.json.'.getmypid().'-', $messages[0]);
+        self::assertStringContainsString($dir.'/missing/.lockrot-'.getmypid().'-', $messages[0]);
         self::assertStringContainsString('.tmp', $messages[0]);
         self::assertNotSame($messages[0], $messages[1]);
     }
