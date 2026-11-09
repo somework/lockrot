@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "7713d4416bb37e025f0128e8a87c17018711a7959b87300985fe24bd6df51e8d",
+        "tests/fixtures/flags/cases.json": "562f36d2dbc228a57d3be872acc5ae2921d04b833c878670ab269f37e7bed08e",
         "tests/fixtures/flags/composite.json": "9555297c629a29bfbc66af13263d464b93830dd004e87adab4fdc7d8696a60e8",
-        "tests/fixtures/flags/provenance.json": "24ba25129ac2549aef000ee988813632acb9bc7238a2d231bde4e81afd2f887f"
+        "tests/fixtures/flags/provenance.json": "d5406c589b82ed529c9d6f4a42d51c4eed91e0390d15b8b13f702a2bb4382e8d"
     },
     "version_mask": {
         "paths": [
@@ -56,14 +56,14 @@
     "case_lock": "each case is formatted beside a composer.lock of its lock entries, as tests/Support/CaseHydrator.php lockJson() lays it out",
     "model_goldens": {
         "compared": {
-            "age_line": 222,
-            "baseline_suffix": 220,
-            "commands_cmd": 201,
-            "commands_posix": 201,
-            "gate_line": 221,
-            "next_step_text": 173,
-            "run_gate_line": 222,
-            "score_text": 221
+            "age_line": 227,
+            "baseline_suffix": 225,
+            "commands_cmd": 206,
+            "commands_posix": 206,
+            "gate_line": 226,
+            "next_step_text": 178,
+            "run_gate_line": 227,
+            "score_text": 226
         },
         "inputs_differ": {
             "baseline_suffix": 2,

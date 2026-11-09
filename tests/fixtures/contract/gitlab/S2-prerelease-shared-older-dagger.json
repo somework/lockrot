@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "akaunting/laravel-debugbar-collector 2.1.1 \u2014 finding medium (8 = stale 8) \u2014 stale: last release 2023-06-02 (3.3 years ago); last push 2023-06-02 (3.3 years ago). Do: \u2014.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "dfd05ab659ce01981d2e6687b8365a57452ce7c0b41afb273a009637c46501fc",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

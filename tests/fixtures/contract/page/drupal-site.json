@@ -1402,8 +1402,8 @@
         ]
     },
     "libyears": {
-        "total": 358.05,
-        "direct_requirements": 11.92,
+        "total": 354.57,
+        "direct_requirements": 11.9,
         "measured": 82,
         "at_least_count": 2,
         "unmeasured": {
@@ -15279,7 +15279,7 @@
             "evidence": "left-behind: branch 9.x last released 2023-09-19 (3.1 years ago); 10.x released 10.6.20 (2026-10-21); vulnerable: 62 advisories: 3 critical, 4 high, 12 medium, 38 unrated, 5 low \u2014 18 of 62 fixed on 9.x (upgrade); worst: CVE-2026-9082 Drupal Core has a SQL Injection issue",
             "allowlist_reason": null,
             "data_date": "2026-10-22T00:00:00+00:00",
-            "libyears": 4.41,
+            "libyears": 4.39,
             "age": {
                 "installed": {
                     "at": "2022-05-25T18:43:19+00:00",
@@ -17589,7 +17589,7 @@
             "evidence": "vulnerable: 16 advisories: 1 critical, 3 high, 5 medium, 2 unrated, 5 low \u2014 2 of 16 fixed on 2.x (upgrade); worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
             "allowlist_reason": null,
             "data_date": "2026-10-22T00:00:00+00:00",
-            "libyears": 4.64,
+            "libyears": 4.28,
             "age": {
                 "installed": {
                     "at": "2022-02-04T06:57:25+00:00",
@@ -22631,7 +22631,7 @@
             "evidence": "vulnerable: 6 advisories: 2 high, 3 medium, 1 low \u2014 none fixed on 9.x; worst: CVE-2024-55637 Drupal core contains a potential PHP Object Injection vulnerability",
             "allowlist_reason": "package type \"metapackage\" only lists dependencies",
             "data_date": "2026-10-22T00:00:00+00:00",
-            "libyears": 4.41,
+            "libyears": 4.39,
             "age": {
                 "installed": {
                     "at": "2022-05-25T18:43:19+00:00",
@@ -49685,7 +49685,7 @@
             "evidence": "",
             "allowlist_reason": null,
             "data_date": "2026-10-22T00:00:00+00:00",
-            "libyears": 3.92,
+            "libyears": 0.84,
             "age": {
                 "installed": {
                     "at": "2022-04-26T16:18:25+00:00",

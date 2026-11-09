@@ -3785,7 +3785,118 @@
     "S10-tag-undated\u2021": {
         "next_step": null
     },
+    "S2-parent-shared-installed\u2021": {
+        "next_step": {
+            "kind": "no-move",
+            "source": "stale",
+            "merged": [],
+            "fix_kind": null,
+            "reason": "package_quiet",
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "\u2014"
+        }
+    },
     "S2-parent-shared-lower\u2021": {
+        "next_step": {
+            "kind": "no-move",
+            "source": "stale",
+            "merged": [],
+            "fix_kind": null,
+            "reason": "package_quiet",
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "\u2014"
+        }
+    },
+    "S2-prerelease-shared-older\u2021": {
+        "next_step": {
+            "kind": "no-move",
+            "source": "stale",
+            "merged": [],
+            "fix_kind": null,
+            "reason": "package_quiet",
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "\u2014"
+        }
+    },
+    "S2-prerelease-shared\u2021": {
         "next_step": {
             "kind": "no-move",
             "source": "stale",
@@ -4387,6 +4498,81 @@
             "text": "require a tag \u2014 the newest is v13.0.0 (2026-01-11), older than your snapshot (2026-02-01); review, or replace; 13.x needs php >=7.2, which require.php allows"
         }
     },
+    "S8-higher-parent-dated\u2021": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "v4.9.0",
+            "newest": "v4.9.0",
+            "constraint": "^4.9",
+            "latest": null,
+            "php_check": {
+                "requires": "^8.1",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.1",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "pagerfanta/twig:^4.9"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "pagerfanta/twig",
+                    "v4.9.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.1, then require pagerfanta/twig ^4.9 \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+        }
+    },
     "S8-higher-shared-alive\u2021": {
         "next_step": {
             "kind": "raise-php",
@@ -4470,6 +4656,111 @@
     },
     "S8-installed-lower-dated\u2021": {
         "next_step": null
+    },
+    "S8-parent-shared-installed\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "left-behind",
+            "merged": [
+                "vulnerable"
+            ],
+            "fix_kind": "upgrade",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "5.x",
+            "version": "v5.4.52",
+            "newest": "v5.4.52",
+            "constraint": "^5.4.52",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2.5",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "target": null,
+                    "constraint": "^2.6",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-4wjj-gy1p-ft3r",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "symfony/monolog-bridge:^5.4.52"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "symfony/monolog-bridge",
+                    "v5.4.52",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "v2.8.52",
+            "held_by": [],
+            "if_applied": null,
+            "check": null
+        },
+        "move_in": "next_step",
+        "partial": null
     },
     "S8-prerelease-installed\u2021": {
         "next_step": {

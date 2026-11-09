@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| medium | `akaunting/laravel-debugbar-collector` | 2.1.1 | stale | `8 = stale 8`<br>**Do:** —<br>*stale:* last push 2023-06-02 (3.3 years ago)<br>checks missing: S2 (undated releases) | direct |
+| medium | `akaunting/laravel-debugbar-collector` | 2.1.1 | stale | `8 = stale 8`<br>**Do:** —<br>*stale:* last push 2023-06-02 (3.3 years ago); liveness read from pushes only<br>checks missing: S2 (undated releases) | direct |
 
 flags: stale 1\
 depth: every flagged package is named in composer.json · direct 1\

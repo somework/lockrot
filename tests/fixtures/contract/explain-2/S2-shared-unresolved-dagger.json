@@ -35,7 +35,7 @@
                     "value": 3.3,
                     "source": "push"
                 },
-                "summary": "last push 2023-06-02 (3.3 years ago)"
+                "summary": "last push 2023-06-02 (3.3 years ago); liveness read from pushes only"
             }
         ],
         "score": {
@@ -228,7 +228,7 @@
                 }
             }
         ],
-        "evidence": "stale: last push 2023-06-02 (3.3 years ago)",
+        "evidence": "stale: last push 2023-06-02 (3.3 years ago); liveness read from pushes only",
         "allowlist_reason": null,
         "data_date": "2026-10-01T17:41:20+00:00",
         "libyears": 0,
