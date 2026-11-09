@@ -287,7 +287,8 @@ final class MaintenanceMoveTest extends TestCase
 
     /**
      * Ruling R15-28e: the tag move of a snapshot with no line of its own targets the highest stable
-     * line, also when S6 names a tag on a lower line.
+     * line. The S6 data is hand-built: PinnedRule names v13.0.0 for these releases, never the
+     * lower-line v12.70.0, so the move does not depend on the line that S6 names.
      */
     public function testASnapshotWithNoLineOfItsOwnTargetsTheHighestLineWhateverLineS6Names(): void
     {

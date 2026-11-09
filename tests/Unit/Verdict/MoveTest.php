@@ -629,7 +629,7 @@ final class MoveTest extends TestCase
 
     /**
      * The newest date is the backport 1.1.9 below the installed 1.2.0, on the installed line. The
-     * test move names the line's highest tag 1.5.0, which came out before the 8.0 GA.
+     * test move names the line's highest tag 1.5.0, which is dated before the 8.0 GA.
      */
     public function testAnOldPromiseBesideANewerDatedBackportBelowTheInstalledReleaseTestsTheHighestTag(): void
     {
