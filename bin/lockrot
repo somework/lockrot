@@ -15,7 +15,7 @@ if (\PHP_SAPI !== 'cli' && \PHP_SAPI !== 'phpdbg') {
     echo 'Warning: run lockrot with the CLI version of PHP, not the '.\PHP_SAPI.' SAPI'.\PHP_EOL;
 }
 
-// The floor of composer.json and of build/phar/composer.json: an older PHP prints one line instead
+// The floor of composer.json and of build/phar/composer.json: PHP 7.1 to 7.3 prints one line instead
 // of a parse error, as the PHAR does. A PHP 7.4 construct anywhere in this file breaks that
 // (SourceEntryGuardTest).
 if (\PHP_VERSION_ID < 70400) {

@@ -461,7 +461,7 @@ request on it.
   every branch row.
   A lower branch that the parent dates counts, and so does a dated pre-release on its own commit.
   A pre-release on a shared commit has no trusted date and keeps S2 unknown, unless its date is
-  older than the reading.
+  not newer than the reading.
 
 - S8 can quote a branch's highest tag, or a lower tag, that only a commit shared with other tags
   dates. A release is never older than its commit, so that date is a lower bound. The summary then says "on or after"
@@ -1068,7 +1068,7 @@ How lockrot reads the window:
   the minor out.
 - A target minor that is not a known minor on the run date counts as one more known minor of the
   window, in version order. A minor is known when its GA date in `resources/php-ga-dates.json` is
-  on or before the run date, so 8.6 is unknown until its GA date. Other examples are 7.5 and 5.2
+  on or before the run date, so 8.6 is not a known minor before its GA date. Other examples are 7.5 and 5.2
   from `config.platform.php`, which the file does not list. A set that admits it lists it in `minors`. A cap that excludes it gives
   `upper_edge` with `excludes` set to that minor, and `set_by` lists the links of the cap. The
   edges, `gaps` and the `php:` line read this minor too. [`capped`](#capped) does not: its R and

@@ -548,7 +548,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **CLI:** on a PHP older than 7.4, the source script `bin/lockrot` prints
+- **CLI:** on PHP 7.1 to 7.3, the source script `bin/lockrot` prints
   `lockrot requires PHP 7.4 or newer` and exits `2`, not a parse error with exit `255`.
   ([Exit codes](docs/ci.md#exit-codes))
 - **CLI:** `--explain` prints the footnote "so S8 does not measure the branch" only when S8 did

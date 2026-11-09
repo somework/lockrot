@@ -77,7 +77,8 @@ the command reports starts with `lockrot:`, any other failure with `lockrot fail
 stack trace to the second. Other text comes from these sources:
 
 - The guards of `bin/lockrot`, which run before the command and exit `2`:
-    - A PHP older than the floor prints `lockrot requires PHP 7.4 or newer` on stderr.
+    - PHP 7.1 to 7.3 prints `lockrot requires PHP 7.4 or newer` on stderr. An older PHP stops at a
+      parse error.
     - A project without the `composer/composer` package prints `lockrot needs the composer/composer
       package 2.10 or newer, …` on stderr.
     - An older `composer/composer` package prints `lockrot requires the composer/composer package
