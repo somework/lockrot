@@ -509,9 +509,9 @@ maintainer.
    ([repository limits](https://docs.github.com/en/repositories/creating-and-managing-repositories/repository-limits)).
    The ruleset of `main` requires a linear history, so a release branch of that size merges only
    as a squash. The repository deletes the head branch when a pull request merges, so the release
-   branch does not keep the commit history. Before you merge, tag the branch head. After the
-   merge, restore the branch from the merged pull request (the "Restore branch" button), and keep
-   it until step 9.
+   branch does not keep the commit history. Before you merge, tag the branch head with an unused
+   `vX.Y.Z-rc.N` and push the tag. Keep `vX.Y.Z` for step 6. After the merge, restore the branch
+   from the merged pull request (the "Restore branch" button), and keep it until step 9.
    Write the squash message as a release summary: the subject names the version, and the body
    lists the user-visible changes of the CHANGELOG section. Do not keep the default
    concatenation of every commit message. Remove `## Review notes` from the message. On a pull
