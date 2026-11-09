@@ -36,7 +36,7 @@ final class LockrotPlugin implements PluginInterface, Capable, EventSubscriberIn
     public function activate(Composer $composer, IOInterface $io): void
     {
         if (!$this->supported()) {
-            $io->writeError('lockrot: Composer '.$this->composerVersion.' is older than '.self::COMPOSER_FLOOR.', so lockrot does nothing. Upgrade Composer, or run the PHAR: https://lockrot.dev/phar/');
+            $io->writeError('lockrot: Composer '.$this->composerVersion.' is older than '.self::COMPOSER_FLOOR.', so lockrot does nothing. Upgrade Composer, or run the PHAR: https://lockrot.dev/phar/', true, IOInterface::QUIET);
         }
     }
 

@@ -16,6 +16,7 @@ use Lockrot\Composer\CommandProvider;
 use Lockrot\Composer\LockrotPlugin;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 
 final class LockrotPluginTest extends TestCase
 {
@@ -64,6 +65,15 @@ final class LockrotPluginTest extends TestCase
 
         self::assertSame('lockrot: Composer '.$version.' is older than 2.10, so lockrot does nothing. Upgrade Composer, or run the PHAR: https://lockrot.dev/phar/'.\PHP_EOL, $io->getOutput());
         self::assertSame([], $plugin->getCapabilities());
+    }
+
+    public function testTheBelow210LineSurvivesQuietMode(): void
+    {
+        $io = new BufferIO('', OutputInterface::VERBOSITY_QUIET);
+
+        (new LockrotPlugin('2.9.5'))->activate(new Composer(), $io);
+
+        self::assertStringContainsString('lockrot: Composer 2.9.5 is older than 2.10', $io->getOutput());
     }
 
     public function testOnlyFromComposer210TheInstallTimeSummaryRuns(): void
