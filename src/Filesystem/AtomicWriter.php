@@ -28,7 +28,7 @@ final class AtomicWriter
         // Unique per run, and in the target's own directory so the rename stays on one filesystem and
         // atomic: two concurrent runs must not rename each other's half-written file. The name does
         // not extend the target's, so a target name at the filesystem's limit still has room.
-        $temporary = \sprintf('%s/.lockrot-%d-%s.tmp', \dirname($path), getmypid(), uniqid('', true));
+        $temporary = \sprintf('%s/lockrot-%d-%s.tmp', \dirname($path), getmypid(), uniqid('', true));
         $failure = null;
         // Not error_get_last(): Composer's ErrorHandler returns true for a suppressed warning, so
         // PHP never records it there.

@@ -50,7 +50,7 @@ lockrot reads the host from the first of these URLs that is set:
 lockrot never uses an older release's URL. No host is built in beyond github.com, bitbucket.org
 and gitlab.com: a host becomes askable only through Composer's `gitlab-domains`. An `https://` URL with
 a port, such as `gitlab.com:443`, is another host to Composer and to lockrot, so it gets no
-`GITLAB_TOKEN`. lockrot drops the port of an `ssh://` or `git://` URL, because that port belongs
+`GITLAB_TOKEN`. lockrot drops the port of an `ssh://`, `git://` or other URL that is not `http://` or `https://`, because that port belongs
 to the SSH or git service, and asks the API of the host on HTTPS. lockrot asks no host about a package, and the finding's `activity` says why, when:
 
 | Case | `activity.reason` | S10 |

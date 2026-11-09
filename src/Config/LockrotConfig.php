@@ -260,7 +260,7 @@ final class LockrotConfig
             self::refuseUnknownMinor('LOCKROT_TARGET_PHP', $fromEnv);
         }
         $fromConfig = $extra['target-php'] ?? null;
-        if (\is_string($fromConfig) && self::isTargetPhpValue($fromConfig)) {
+        if (\is_string($fromConfig) && self::looksLikePhpVersion($fromConfig)) {
             self::refuseUnknownMinor('extra.lockrot.target-php', $fromConfig);
         }
         [$target, $source] = self::pickWithSource([

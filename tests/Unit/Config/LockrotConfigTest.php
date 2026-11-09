@@ -298,6 +298,7 @@ final class LockrotConfigTest extends TestCase
         yield 'the config key at 6.0' => [['target-php' => '6.0'], [], [], 'extra.lockrot.target-php', '6.0', '6.0'];
         yield 'the config key at 7.5 under an option that wins' => [['target-php' => '7.5'], [], ['target-php' => '8.4'], 'extra.lockrot.target-php', '7.5', '7.5'];
         yield 'the config key at 7.5 under a variable that wins' => [['target-php' => '7.5'], ['LOCKROT_TARGET_PHP' => '8.4'], [], 'extra.lockrot.target-php', '7.5', '7.5'];
+        yield 'a config key with a suffix under an option that wins' => [['target-php' => '7.5.x'], [], ['target-php' => '8.4'], 'extra.lockrot.target-php', '7.5', '7.5.x'];
     }
 
     /**

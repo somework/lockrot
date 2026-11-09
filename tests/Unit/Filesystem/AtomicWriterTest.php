@@ -309,7 +309,7 @@ final class AtomicWriterTest extends TestCase
             }
         }
 
-        self::assertStringContainsString($dir.'/missing/.lockrot-'.getmypid().'-', $messages[0]);
+        self::assertStringContainsString($dir.'/missing/lockrot-'.getmypid().'-', $messages[0]);
         self::assertStringContainsString('.tmp', $messages[0]);
         self::assertNotSame($messages[0], $messages[1]);
     }

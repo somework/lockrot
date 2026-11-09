@@ -71,7 +71,7 @@ final class InstallTimeSummary
         } catch (\Throwable $e) {
             // An unexpected failure must not break an install: it becomes one stderr line and the
             // install continues. Exception messages can embed newlines, so oneLine() collapses them.
-            self::writeWarning($io, 'lockrot: install-time check skipped: '.$this->oneLine($e->getMessage()));
+            self::writeWarning($io, 'lockrot: install-time check skipped: '.$this->oneLine($e->getMessage()), IOInterface::QUIET);
         }
     }
 
@@ -89,9 +89,10 @@ final class InstallTimeSummary
      * which is not console markup (see {@see TerminalText}). IOInterface says only whether stdout is
      * decorated, so stderr is assumed to match.
      */
-    private static function writeWarning(IOInterface $io, string $line): void
+    /** @param IOInterface::* $verbosity */
+    private static function writeWarning(IOInterface $io, string $line, int $verbosity = IOInterface::NORMAL): void
     {
-        $io->writeErrorRaw(TerminalText::warning($line, $io->isDecorated()));
+        $io->writeErrorRaw(TerminalText::warning($line, $io->isDecorated()), true, $verbosity);
     }
 
     private function run(InstallerEvent $event): void

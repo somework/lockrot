@@ -200,6 +200,8 @@ final class RepoLocatorTest extends TestCase
         yield 'a git:// URL drops its daemon port' => ['git://gitlab.corp:9418/g/p.git', $located, 'gitlab.corp', [RepoRef::GITLAB, 'gitlab.corp', 'g/p'], null];
         yield 'an ssh:// URL on gitlab.com with port 22' => ['ssh://git@gitlab.com:22/g/p.git', $located, 'gitlab.com', [RepoRef::GITLAB, 'gitlab.com', 'g/p'], null];
         yield 'an ssh:// URL on github.com with port 22' => ['ssh://git@github.com:22/o/r.git', $located, 'github.com', [RepoRef::GITHUB, 'github.com', 'o/r'], null];
+        yield 'a git+ssh:// URL drops its SSH port' => ['git+ssh://git@gitlab.corp:2222/g/p.git', $located, 'gitlab.corp', [RepoRef::GITLAB, 'gitlab.corp', 'g/p'], null];
+        yield 'an ssh+git:// URL drops its SSH port' => ['ssh+git://git@gitlab.corp:2222/g/p.git', $located, 'gitlab.corp', [RepoRef::GITLAB, 'gitlab.corp', 'g/p'], null];
         yield 'an https:// URL keeps its port' => ['https://gitlab.corp:8443/g/p.git', $located, 'gitlab.corp:8443', [RepoRef::GITLAB, 'gitlab.corp:8443', 'g/p'], null];
         yield 'codeberg.org' => ['https://codeberg.org/o/r.git', $unsupported, 'codeberg.org', null, null];
         yield 'git.drupalcode.org without the recipe' => ['https://git.drupalcode.org/project/admin_toolbar.git', $unsupported, 'git.drupalcode.org', null, null];

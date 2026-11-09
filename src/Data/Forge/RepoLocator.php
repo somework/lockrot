@@ -134,8 +134,8 @@ final class RepoLocator
                 return null;
             }
             $port = parse_url($url, \PHP_URL_PORT);
-            // The port of an ssh:// or git:// URL is the transport's, not the API's: Composer's GitLabDriver reads only http(s) URLs.
-            $keepsPort = \is_int($port) && !\in_array(strtolower((string) parse_url($url, \PHP_URL_SCHEME)), ['ssh', 'git'], true);
+            // The port of an ssh:// or git:// URL is the transport's, not the API's: Composer's GitLabDriver reads no such URL.
+            $keepsPort = \is_int($port) && \in_array(strtolower((string) parse_url($url, \PHP_URL_SCHEME)), ['http', 'https'], true);
 
             return [$keepsPort ? $host.':'.$port : $host, (string) parse_url($url, \PHP_URL_PATH)];
         }
