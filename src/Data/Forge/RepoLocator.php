@@ -118,7 +118,7 @@ final class RepoLocator
     }
 
     /**
-     * Host (with its port, when the URL names one) and path of a clone URL in any shape that a lock
+     * Host (with its port, when an http(s) URL names one) and path of a clone URL in any shape that a lock
      * records: `https://host/path.git`, `https://user@host/path`, `git://host/path`,
      * `ssh://git@host/path.git` and the scp-like `git@host:path.git`. The slash form
      * `git@host/path.git` is no URL that git accepts, but locks carry it, so it stays readable. A
@@ -134,8 +134,10 @@ final class RepoLocator
                 return null;
             }
             $port = parse_url($url, \PHP_URL_PORT);
+            // The port of an ssh:// or git:// URL is the transport's, not the API's: Composer's GitLabDriver reads only http(s) URLs.
+            $keepsPort = \is_int($port) && !\in_array(strtolower((string) parse_url($url, \PHP_URL_SCHEME)), ['ssh', 'git'], true);
 
-            return [\is_int($port) ? $host.':'.$port : $host, (string) parse_url($url, \PHP_URL_PATH)];
+            return [$keepsPort ? $host.':'.$port : $host, (string) parse_url($url, \PHP_URL_PATH)];
         }
         // The user part can hold `user:token`: it never reaches the host, which reports print.
         $hasUser = preg_match('{^[^/@]+@(.+)$}', $url, $m) === 1;
