@@ -898,6 +898,57 @@ final class PackageMetadataDatedByTest extends TestCase
         self::assertNull($dated->parentDateOf('not a version'));
     }
 
+    /** The parent dates 1.4.9, and its own 1.x row has an undated highest tag 1.4.10. */
+    private function parentThatDatesTheSharedHighestTagOnly(): PackageMetadata
+    {
+        $undated = self::tag('acme/monorepo', '1.4.10', 'm1410', '2000-01-01T00:00:00+00:00');
+        unset($undated['time']);
+
+        return PackageMetadata::fromPackages('acme/monorepo', [
+            $this->load(self::tag('acme/monorepo', '1.4.9', 'm149', '2019-05-30T00:00:00+00:00', ['acme/split' => 'self.version'])),
+            $this->load($undated),
+        ], new \DateTimeImmutable(self::NOW));
+    }
+
+    public function testAParentDateOfASharedHighestTagDatesTheHighestTagToo(): void
+    {
+        $child = $this->split([
+            ['1.4.9', 'c-shared', '2019-06-01T00:00:00+00:00'],
+            ['1.4.8', 'c-shared', '2019-06-01T00:00:00+00:00'],
+            ['1.4.7', 'c-shared', '2019-06-01T00:00:00+00:00'],
+        ]);
+
+        $dated = $child->datedBy($this->parentThatDatesTheSharedHighestTagOnly());
+        $row = $dated->latestStableByBranch()['1'];
+
+        self::assertSame('1.4.9', $row['version']);
+        self::assertEquals(new \DateTimeImmutable('2019-05-30T00:00:00+00:00'), $row['at']);
+        self::assertEquals(new \DateTimeImmutable('2019-05-30T00:00:00+00:00'), $row['highest']['at']);
+        self::assertSame('acme/monorepo', $row['dated_by'] ?? null);
+        self::assertEquals(new \DateTimeImmutable('2019-05-30T00:00:00+00:00'), $dated->releaseReadingAt());
+        self::assertSame('1.4.9', $dated->releaseReadingVersion());
+        self::assertSame('acme/monorepo', $dated->releaseReadingDatedBy());
+        self::assertEquals(new \DateTimeImmutable('2019-05-30T00:00:00+00:00'), $dated->lastStableReleaseAt());
+        self::assertSame('acme/monorepo', $dated->lastStableDatedBy());
+        self::assertFalse($dated->highestBranchDatedByParent());
+    }
+
+    public function testAParentDateOfASharedTagBelowTheHighestTagLeavesTheHighestTagUndated(): void
+    {
+        $child = $this->split([
+            ['1.4.10', 'c-other', null],
+            ['1.4.9', 'c-shared', '2019-06-01T00:00:00+00:00'],
+            ['1.4.8', 'c-shared', '2019-06-01T00:00:00+00:00'],
+            ['1.4.7', 'c-shared', '2019-06-01T00:00:00+00:00'],
+        ]);
+
+        $row = $child->datedBy($this->parentThatDatesTheSharedHighestTagOnly())->latestStableByBranch()['1'];
+
+        self::assertSame('1.4.9', $row['version']);
+        self::assertSame('acme/monorepo', $row['dated_by'] ?? null);
+        self::assertNull($row['highest']['at'], 'the parent does not date 1.4.10');
+    }
+
     public function testASharedLowerDateOnTheReadingsDateDoesNotBlockIt(): void
     {
         $child = $this->split([

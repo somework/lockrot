@@ -10,8 +10,10 @@ use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Signal\AgeMeasure;
+use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
+use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
@@ -26,15 +28,15 @@ use PHPUnit\Framework\TestCase;
 final class SplitParentDatesTest extends TestCase
 {
     /**
-     * @param list<array{0: string, 1: string, 2: string}> $tags version, commit, time
-     * @param array<string, string>                        $replace
+     * @param list<array{0: string, 1: string, 2: ?string}> $tags version, commit, time (null: no time)
+     * @param array<string, string>                         $replace
      */
     private static function metadata(string $name, array $tags, string $now, ?string $installed = null, array $replace = []): PackageMetadata
     {
         $loader = new ArrayLoader();
         $packages = [];
         foreach ($tags as [$version, $commit, $time]) {
-            $packages[] = $loader->load(['name' => $name, 'version' => $version, 'time' => $time, 'require' => ['php' => '>=7.1'], 'replace' => $replace, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit]]);
+            $packages[] = $loader->load(['name' => $name, 'version' => $version, 'require' => ['php' => '>=7.1'], 'replace' => $replace, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit]] + ($time === null ? [] : ['time' => $time]));
         }
 
         return PackageMetadata::fromPackages($name, $packages, new \DateTimeImmutable($now), $installed);
@@ -172,5 +174,38 @@ final class SplitParentDatesTest extends TestCase
         self::assertSame('acme/mono', $split->lastStableDatedBy(), 'the last release is the parent-dated shared tag');
         self::assertSame($expected, array_intersect_key($levels, array_flip([Signal::S2, Signal::S5, Signal::S8, Signal::S10])));
         self::assertSame([], $causes);
+    }
+
+    /**
+     * 1.4.9 is the highest tag of 1.x and shares its commit. The parent dates 1.4.9, but its own 1.x
+     * row has an undated highest tag, so no parent row replaces the split's 1.x row.
+     */
+    public function testAParentDateOfAHighestTagOnASharedCommitDatesTheBranch(): void
+    {
+        $now = '2026-09-14T00:00:00+00:00';
+        $split = self::metadata('acme/split', [
+            ['1.4.7', 'c-shared', '2019-06-01T00:00:00+00:00'],
+            ['1.4.8', 'c-shared', '2019-06-01T00:00:00+00:00'],
+            ['1.4.9', 'c-shared', '2019-06-01T00:00:00+00:00'],
+            ['2.0.0', 'c200', '2025-06-01T00:00:00+00:00'],
+        ], $now, '1.4.9');
+        $parent = self::metadata('acme/mono', [
+            ['1.4.9', 'm149', '2019-05-30T00:00:00+00:00'],
+            ['1.4.10', 'm1410', null],
+            ['2.0.0', 'm200', '2025-06-01T00:00:00+00:00'],
+        ], $now, null, ['acme/split' => 'self.version']);
+        $facts = new PackageFacts(FactsBuilder::package(['name' => 'acme/split', 'version' => '1.4.9', 'time' => '2019-06-01T00:00:00+00:00', 'php' => '>=7.1']), $split->datedBy($parent), FactsBuilder::activity(false, '2026-09-01T00:00:00+00:00'));
+
+        [$levels, $causes, $summaries] = self::signals($facts, $now);
+        $row = BranchRow::all($facts, new PhpFloor('8.4'), Clock::fixed($now))[1];
+
+        self::assertSame([Signal::S5 => Signal::LEVEL_WARN, Signal::S8 => Signal::LEVEL_HIGH], array_intersect_key($levels, array_flip([Signal::S2, Signal::S5, Signal::S8, Signal::S10])));
+        self::assertSame([], $causes);
+        self::assertStringStartsWith('branch 1.x last released 2019-05-30 (7.3 years ago, dated by acme/mono); ', $summaries[Signal::S8] ?? '');
+        self::assertSame('1.x', $row->branch());
+        self::assertEquals(new \DateTimeImmutable('2019-05-30T00:00:00+00:00'), $row->highestReleased());
+        self::assertNull($row->highestCommitDate(), 'the parent dates the highest tag, so no commit date stands in for it');
+        self::assertSame('acme/mono', $row->datedBy());
+        self::assertFalse($row->newestDatedAtLeast());
     }
 }

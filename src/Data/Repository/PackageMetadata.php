@@ -594,6 +594,8 @@ final class PackageMetadata
         if ($releaseReadingAt === null && $this->lastStableSharesItsCommit && $highest !== null && $highest['highest']['at'] !== null) {
             $releaseReadingAt = $highest['highest']['at'];
             $releaseReadingVersion = $highest['highest']['pretty'];
+            // A parent-dated row dates its highest tag too, or the walk below reads the row's newer parent date.
+            $releaseReadingDatedBy = $highest['dated_by'] ?? null;
         }
         if ($releaseReadingAt !== null) {
             // A pre-release on a shared commit has the commit's date, not a release's, so it can only block the reading.
@@ -665,7 +667,8 @@ final class PackageMetadata
 
     /**
      * The branch row with the parent's date of its newest tag, when that tag shares its commit.
-     * The branch's highest tag stays the newest when its own date is not older than the parent's.
+     * When that tag is the branch's highest tag, the highest tag takes the date too. Else the
+     * highest tag stays the newest when its own date is not older than the parent's.
      * See docs/verdicts.md#dates-from-the-monorepo.
      *
      * @param array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string} $entry
@@ -679,6 +682,9 @@ final class PackageMetadata
             return $entry;
         }
         $highest = $entry['highest'];
+        if ($highest['pretty'] === $entry['version']) {
+            return ['at' => $at, 'highest' => ['at' => $at] + $highest, 'dated_by' => $parent->name] + $entry;
+        }
         if ($highest['at'] !== null && $highest['at'] >= $at) {
             return ['version' => $highest['pretty'], 'at' => $highest['at'], 'highest' => $highest, 'php' => $highest['php']];
         }
