@@ -224,8 +224,9 @@ final class RunFooter
     /**
      * The `moves:` line of `run.move_check`: which Composer checked the moves, once per run with
      * the platform requirements it does not check. Null when the run checked no move.
+     *
+     * @param ?callable(string): string $name marks a variable name as the format marks code
      */
-    /** @param ?callable(string): string $name marks a variable name as the format marks code */
     public static function moveCheck(Report $report, ?callable $name = null): ?string
     {
         $run = $report->moveCheck();
