@@ -11,6 +11,8 @@ use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\BranchRow;
+use Lockrot\Signal\Data\LeftBehindData;
+use Lockrot\Signal\Data\NoReleaseData;
 use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
@@ -42,16 +44,21 @@ final class SplitParentDatesTest extends TestCase
         return PackageMetadata::fromPackages($name, $packages, new \DateTimeImmutable($now), $installed);
     }
 
-    /** @return array{0: array<string, string>, 1: array<string, list<string>>, 2: array<string, string>} the level by signal id, the causes of the S10 `release_dates` entry, and the summary by signal id */
+    /** @return array{0: array<string, string>, 1: array<string, list<string>>, 2: array<string, array{string, ?string}>} the level by signal id, the causes of the S10 `release_dates` entry, and the release day and `dated_by` that S2 and S8 read */
     private static function signals(PackageFacts $facts, string $now): array
     {
         $levels = [];
         $causes = [];
-        $summaries = [];
+        $dates = [];
         foreach (SignalSet::default(Clock::fixed($now), new Thresholds(), '8.4', PhpReleaseDates::load())->evaluate($facts) as $signal) {
             $levels[$signal->id()] = $signal->level();
-            $summaries[$signal->id()] = $signal->summary();
             $data = $signal->data();
+            if ($data instanceof NoReleaseData) {
+                $dates[$signal->id()] = [substr($data->lastRelease(), 0, 10), $data->datedBy()];
+            }
+            if ($data instanceof LeftBehindData) {
+                $dates[$signal->id()] = [substr($data->branchLastRelease(), 0, 10), $data->datedBy()];
+            }
             if ($data instanceof NotCheckedData) {
                 foreach ($data->checks() as $check) {
                     if ($check->check() === 'release_dates') {
@@ -61,7 +68,7 @@ final class SplitParentDatesTest extends TestCase
             }
         }
 
-        return [$levels, $causes, $summaries];
+        return [$levels, $causes, $dates];
     }
 
     /** Ruling R16-26: v2.2.0-beta1 shares the commit of v2.0.1 to v2.0.3, and the parent lists only v5.0.0. */
@@ -84,11 +91,11 @@ final class SplitParentDatesTest extends TestCase
         self::assertSame([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S2]], $causes);
     }
 
-    /** @return iterable<string, array{bool, array<string, string>, string, non-empty-string}> */
+    /** @return iterable<string, array{bool, array<string, string>, string, array{string, string}}> */
     public static function provideSplitsWhoseInstalledSharedTagTheParentDates(): iterable
     {
-        yield 'a releasing 2.x above the installed 1.x' => [true, [Signal::S5 => Signal::LEVEL_WARN, Signal::S8 => Signal::LEVEL_HIGH], Signal::S8, 'branch 1.x last released 2019-05-30 (7.4 years ago, dated by acme/mono); '];
-        yield 'no line above the installed 1.x' => [false, [Signal::S2 => Signal::LEVEL_HIGH, Signal::S5 => Signal::LEVEL_WARN], Signal::S2, 'last release 2019-05-30 (7.4 years ago, dated by acme/mono)'];
+        yield 'a releasing 2.x above the installed 1.x' => [true, [Signal::S5 => Signal::LEVEL_WARN, Signal::S8 => Signal::LEVEL_HIGH], Signal::S8, ['2019-05-30', 'acme/mono']];
+        yield 'no line above the installed 1.x' => [false, [Signal::S2 => Signal::LEVEL_HIGH, Signal::S5 => Signal::LEVEL_WARN], Signal::S2, ['2019-05-30', 'acme/mono']];
     }
 
     /**
@@ -98,10 +105,10 @@ final class SplitParentDatesTest extends TestCase
      * @dataProvider provideSplitsWhoseInstalledSharedTagTheParentDates
      *
      * @param array<string, string> $expected the level by signal id of S2, S5, S8 and S10
-     * @param non-empty-string      $summary  the start of the summary of $judge
+     * @param array{string, string} $read     the release day and `dated_by` that $judge reads
      */
     #[DataProvider('provideSplitsWhoseInstalledSharedTagTheParentDates')]
-    public function testAParentDateOfASharedCommitTagIsTrustedByEverySignal(bool $withTwoX, array $expected, string $judge, string $summary): void
+    public function testAParentDateOfASharedCommitTagIsTrustedByEverySignal(bool $withTwoX, array $expected, string $judge, array $read): void
     {
         $now = '2026-11-09T00:00:00+00:00';
         $tags = [
@@ -122,11 +129,11 @@ final class SplitParentDatesTest extends TestCase
         ], $now, null, ['acme/split' => 'self.version']);
         $package = FactsBuilder::package(['name' => 'acme/split', 'version' => '1.4.9', 'time' => '2019-06-01T00:00:00+00:00', 'php' => '>=7.1']);
 
-        [$levels, $causes, $summaries] = self::signals(new PackageFacts($package, $split->datedBy($parent), FactsBuilder::activity(false, '2026-10-01T00:00:00+00:00')), $now);
+        [$levels, $causes, $dates] = self::signals(new PackageFacts($package, $split->datedBy($parent), FactsBuilder::activity(false, '2026-10-01T00:00:00+00:00')), $now);
 
         self::assertSame($expected, array_intersect_key($levels, array_flip([Signal::S2, Signal::S5, Signal::S8, Signal::S10])));
         self::assertSame([], $causes);
-        self::assertStringStartsWith($summary, $summaries[$judge] ?? '');
+        self::assertSame($read, $dates[$judge] ?? null);
     }
 
     /** @return iterable<string, array{list<array{0: string, 1: string, 2: string}>, list<array{0: string, 1: string, 2: string}>, string, string, array<string, string>}> */
@@ -196,12 +203,12 @@ final class SplitParentDatesTest extends TestCase
         ], $now, null, ['acme/split' => 'self.version']);
         $facts = new PackageFacts(FactsBuilder::package(['name' => 'acme/split', 'version' => '1.4.9', 'time' => '2019-06-01T00:00:00+00:00', 'php' => '>=7.1']), $split->datedBy($parent), FactsBuilder::activity(false, '2026-09-01T00:00:00+00:00'));
 
-        [$levels, $causes, $summaries] = self::signals($facts, $now);
+        [$levels, $causes, $dates] = self::signals($facts, $now);
         $row = BranchRow::all($facts, new PhpFloor('8.4'), Clock::fixed($now))[1];
 
         self::assertSame([Signal::S5 => Signal::LEVEL_WARN, Signal::S8 => Signal::LEVEL_HIGH], array_intersect_key($levels, array_flip([Signal::S2, Signal::S5, Signal::S8, Signal::S10])));
         self::assertSame([], $causes);
-        self::assertStringStartsWith('branch 1.x last released 2019-05-30 (7.3 years ago, dated by acme/mono); ', $summaries[Signal::S8] ?? '');
+        self::assertSame(['2019-05-30', 'acme/mono'], $dates[Signal::S8] ?? null);
         self::assertSame('1.x', $row->branch());
         self::assertEquals(new \DateTimeImmutable('2019-05-30T00:00:00+00:00'), $row->highestReleased());
         self::assertNull($row->highestCommitDate(), 'the parent dates the highest tag, so no commit date stands in for it');

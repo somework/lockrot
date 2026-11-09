@@ -8,6 +8,7 @@ use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Advisory\SecurityAdvisory;
 use Composer\Config;
 use Composer\Semver\Constraint\MatchAllConstraint;
+use Composer\Util\Platform;
 use Lockrot\Data\Advisory\AdvisoryIgnore;
 use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
 use PHPUnit\Framework\TestCase;
@@ -21,14 +22,27 @@ final class AdvisoryIgnoreTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->composerPolicy = getenv('COMPOSER_POLICY');
-        $this->advisoriesBlock = getenv('COMPOSER_POLICY_ADVISORIES_BLOCK');
+        $this->composerPolicy = Platform::getEnv('COMPOSER_POLICY');
+        $this->advisoriesBlock = Platform::getEnv('COMPOSER_POLICY_ADVISORIES_BLOCK');
+        Platform::clearEnv('COMPOSER_POLICY');
+        Platform::clearEnv('COMPOSER_POLICY_ADVISORIES_BLOCK');
     }
 
     protected function tearDown(): void
     {
-        putenv($this->composerPolicy === false ? 'COMPOSER_POLICY' : 'COMPOSER_POLICY='.$this->composerPolicy);
-        putenv($this->advisoriesBlock === false ? 'COMPOSER_POLICY_ADVISORIES_BLOCK' : 'COMPOSER_POLICY_ADVISORIES_BLOCK='.$this->advisoriesBlock);
+        self::restore('COMPOSER_POLICY', $this->composerPolicy);
+        self::restore('COMPOSER_POLICY_ADVISORIES_BLOCK', $this->advisoriesBlock);
+    }
+
+    /** @param string|false $value */
+    private static function restore(string $name, $value): void
+    {
+        if ($value === false) {
+            Platform::clearEnv($name);
+
+            return;
+        }
+        Platform::putEnv($name, $value);
     }
 
     private function full(string $id, ?string $cve, ?string $severity, string $remoteId = 'GHSA-remote', string $package = 'vendor/pkg'): SecurityAdvisory
@@ -189,7 +203,7 @@ final class AdvisoryIgnoreTest extends TestCase
 
     public function testComposerPolicyZeroTurnsTheLookupOffAndNamesTheVariable(): void
     {
-        putenv('COMPOSER_POLICY=0');
+        Platform::putEnv('COMPOSER_POLICY', '0');
 
         $ignore = self::read(['audit' => ['ignore' => ['CVE-2024-0001']]]);
 
@@ -201,7 +215,7 @@ final class AdvisoryIgnoreTest extends TestCase
     /** Composer's Config::get('policy') lets the variable win, so the note names it as `blocking_disabled_by` does. */
     public function testComposerPolicyZeroBesideAPolicyOffNamesTheVariable(): void
     {
-        putenv('COMPOSER_POLICY=0');
+        Platform::putEnv('COMPOSER_POLICY', '0');
 
         $ignore = self::read(['policy' => false]);
 
@@ -213,20 +227,20 @@ final class AdvisoryIgnoreTest extends TestCase
     {
         $config = ['policy' => ['advisories' => false]];
 
-        putenv('COMPOSER_POLICY_ADVISORIES_BLOCK');
+        Platform::clearEnv('COMPOSER_POLICY_ADVISORIES_BLOCK');
         self::assertSame(['policy_key' => 'policy.advisories', 'value' => false], self::read($config)->disabledBy(), 'variable unset');
 
-        putenv('COMPOSER_POLICY_ADVISORIES_BLOCK=1');
+        Platform::putEnv('COMPOSER_POLICY_ADVISORIES_BLOCK', '1');
         self::assertNull(self::read($config)->disabledBy(), 'variable on');
 
-        putenv('COMPOSER_POLICY_ADVISORIES_BLOCK=0');
+        Platform::putEnv('COMPOSER_POLICY_ADVISORIES_BLOCK', '0');
         self::assertSame(['policy_key' => 'policy.advisories', 'value' => false], self::read($config)->disabledBy(), 'variable off');
     }
 
     /** Composer returns before it reads the variable when `policy` is off. */
     public function testTheAdvisoriesBlockVariableDoesNotOverrideAPolicyOff(): void
     {
-        putenv('COMPOSER_POLICY_ADVISORIES_BLOCK=1');
+        Platform::putEnv('COMPOSER_POLICY_ADVISORIES_BLOCK', '1');
 
         self::assertSame(['policy_key' => 'policy', 'value' => false], self::read(['policy' => false])->disabledBy());
     }
