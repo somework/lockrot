@@ -11,6 +11,7 @@ use Lockrot\Clock;
 use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Data\Repository\RepositoryUrl;
+use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\Data\LeftBehindData;
 use Lockrot\Signal\PackageFacts;
@@ -155,12 +156,12 @@ final class Explanation
         return $parent === null ? null : [$parent, $branches];
     }
 
-    /** S8 does not measure a branch whose highest tag has no usable date. */
+    /** S8 did not measure the installed branch because its releases carry no date that lockrot trusts. */
     public function installedBranchIsUndated(): bool
     {
         foreach ($this->branches() as $row) {
             if ($row['installed']) {
-                return $row['highest_released'] === null;
+                return $this->finding->details()->age()->branchRelease()->unmeasured() === AgeMeasure::UNDATED_RELEASES;
             }
         }
 
