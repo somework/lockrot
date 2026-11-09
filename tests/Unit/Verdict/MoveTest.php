@@ -627,6 +627,21 @@ final class MoveTest extends TestCase
         self::assertSame('test it on PHP 8.4 — 1.0.0 is its newest release', $move['text']);
     }
 
+    /**
+     * The newest date is the backport 1.1.9 below the installed 1.2.0, on the installed line. The
+     * test move names the line's highest tag 1.5.0, which came out before the 8.0 GA.
+     */
+    public function testAnOldPromiseBesideANewerDatedBackportBelowTheInstalledReleaseTestsTheHighestTag(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse([
+            'lock' => [['version' => '1.2.0']],
+            'releases' => [self::release('1.2.0', '2019-01-01', '>=7.2'), self::release('1.5.0', '2020-01-01', '>=7.2'), self::release('1.1.9', '2020-06-01', '>=7.2')],
+        ]), ['next_step']);
+
+        self::assertSame(['test', 'old-promise'], [$move['kind'], $move['source']]);
+        self::assertSame(['version' => '1.5.0', 'released' => '2020-01-01T00:00:00+00:00', 'is_installed' => false, 'relation' => null, 'snapshot_time' => null], $move['latest']);
+    }
+
     /** `composer update` installs the highest release the lock's links allow: a conflict holds 1.9.5, so it gets 1.9.0. */
     public function testAnUpdateGetsTheReleaseTheLinksAllow(): void
     {

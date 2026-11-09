@@ -285,6 +285,35 @@ final class MaintenanceMoveTest extends TestCase
         self::assertSame(['v13.0.0', 'tag', '13.x', 'v13.0.0'], [$metadata->lastStableVersion(), $draft->kind(), self::branch($draft), $latest->version()]);
     }
 
+    /**
+     * Ruling R15-28e: the tag move of a snapshot with no line of its own targets the highest stable
+     * line, also when S6 names a tag on a lower line.
+     */
+    public function testASnapshotWithNoLineOfItsOwnTargetsTheHighestLineWhateverLineS6Names(): void
+    {
+        $packages = [];
+        foreach (['v13.0.0' => '2026-01-11', 'v12.70.0' => '2026-03-12'] as $version => $at) {
+            $release = (new ArrayLoader())->load(['name' => 'a/b', 'version' => $version, 'time' => $at.'T00:00:00+00:00']);
+            self::assertInstanceOf(BasePackage::class, $release);
+            $packages[] = $release;
+        }
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => 'dev-master', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $locked = $lock->find('a/b');
+        self::assertNotNull($locked);
+        $facts = new PackageFacts($locked, PackageMetadata::fromPackages('a/b', $packages, new \DateTimeImmutable(self::NOW), 'dev-master'), null, []);
+        $floor = new PhpFloor('8.4');
+        $s6 = new Signal(Signal::LEVEL_WARN, 'pinned', SignalDataStub::of(Signal::S6, ['version' => 'dev-master', 'reason' => 'branch_snapshot', 'has_stable_release' => true,
+            'last_stable_release' => '2026-03-12T00:00:00+00:00', 'last_stable_version' => 'v12.70.0', 'last_stable_dated_by' => null, 'snapshot_time' => '2026-02-01T00:00:00+00:00', 'tag_relation' => 'newer']));
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('dev-master')->withSignals([$s6])->build();
+        $context = new MoveContext($finding, new MoveSubject('a/b', 'dev-master', true, [], '8.4', null), $facts->metadata(), BranchRow::all($facts, $floor, Clock::fixed(self::NOW)), null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true);
+
+        $draft = MaintenanceMove::draft($context, FlagSet::PINNED);
+        $latest = $draft->latest();
+
+        self::assertNotNull($latest);
+        self::assertSame([Move::TAG, '13.x', 'v13.0.0', '2026-01-11T00:00:00+00:00'], [$draft->kind(), self::branch($draft), $latest->version(), $latest->released()]);
+    }
+
     /** With no branch row of S6's newest tag, the tag move reads S6, and the snapshot is never that tag. */
     public function testASnapshotWithNoBranchRowOfItsNewestTagTargetsTheTagThatS6Names(): void
     {
