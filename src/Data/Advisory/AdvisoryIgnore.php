@@ -89,7 +89,9 @@ final class AdvisoryIgnore
         $policy = \is_array($raw) ? $raw : [];
         $audit = $config->get('audit');
         $advisories = AdvisoriesPolicyConfig::fromRawConfig(self::stringKeys($policy), self::stringKeys(\is_array($audit) ? $audit : []), new VersionParser());
-        $disabledBy = ($policy['advisories'] ?? null) === false ? ['policy_key' => 'policy.advisories', 'value' => false] : null;
+        // PolicyConfig::fromConfig() applies COMPOSER_POLICY_ADVISORIES_BLOCK after it parses `policy.advisories`.
+        $off = ($policy['advisories'] ?? null) === false && Platform::getBoolEnv('COMPOSER_POLICY_ADVISORIES_BLOCK') !== true;
+        $disabledBy = $off ? ['policy_key' => 'policy.advisories', 'value' => false] : null;
 
         return new self($advisories->getIgnoreListForOperation('audit'), $advisories->getIgnoreSeverityForOperation('audit'), isset($policy['advisories']), null, $disabledBy);
     }
@@ -158,7 +160,8 @@ final class AdvisoryIgnore
 
     /**
      * The setting that stops Composer's own advisory checks, null when none does: `policy`,
-     * `policy.advisories` or the `COMPOSER_POLICY` variable. It stops
+     * `policy.advisories` (unless `COMPOSER_POLICY_ADVISORIES_BLOCK` turns it on) or the
+     * `COMPOSER_POLICY` variable. It stops
      * install-time blocking only: `composer audit` still reports, and lockrot still asks.
      *
      * @return array{policy_key: string, value: bool|string}|null

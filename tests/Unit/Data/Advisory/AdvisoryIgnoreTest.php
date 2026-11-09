@@ -16,15 +16,19 @@ final class AdvisoryIgnoreTest extends TestCase
 {
     /** @var string|false */
     private $composerPolicy;
+    /** @var string|false */
+    private $advisoriesBlock;
 
     protected function setUp(): void
     {
         $this->composerPolicy = getenv('COMPOSER_POLICY');
+        $this->advisoriesBlock = getenv('COMPOSER_POLICY_ADVISORIES_BLOCK');
     }
 
     protected function tearDown(): void
     {
         putenv($this->composerPolicy === false ? 'COMPOSER_POLICY' : 'COMPOSER_POLICY='.$this->composerPolicy);
+        putenv($this->advisoriesBlock === false ? 'COMPOSER_POLICY_ADVISORIES_BLOCK' : 'COMPOSER_POLICY_ADVISORIES_BLOCK='.$this->advisoriesBlock);
     }
 
     private function full(string $id, ?string $cve, ?string $severity, string $remoteId = 'GHSA-remote', string $package = 'vendor/pkg'): SecurityAdvisory
@@ -202,6 +206,29 @@ final class AdvisoryIgnoreTest extends TestCase
         $ignore = self::read(['policy' => false]);
 
         self::assertSame(['policy_key' => 'COMPOSER_POLICY', 'value' => false], $ignore->disabledBy());
+    }
+
+    /** Composer's PolicyConfig::fromConfig() applies the variable after it parses `policy.advisories`. */
+    public function testTheAdvisoriesBlockVariableOverridesAPolicyAdvisoriesFalse(): void
+    {
+        $config = ['policy' => ['advisories' => false]];
+
+        putenv('COMPOSER_POLICY_ADVISORIES_BLOCK');
+        self::assertSame(['policy_key' => 'policy.advisories', 'value' => false], self::read($config)->disabledBy(), 'variable unset');
+
+        putenv('COMPOSER_POLICY_ADVISORIES_BLOCK=1');
+        self::assertNull(self::read($config)->disabledBy(), 'variable on');
+
+        putenv('COMPOSER_POLICY_ADVISORIES_BLOCK=0');
+        self::assertSame(['policy_key' => 'policy.advisories', 'value' => false], self::read($config)->disabledBy(), 'variable off');
+    }
+
+    /** Composer returns before it reads the variable when `policy` is off. */
+    public function testTheAdvisoriesBlockVariableDoesNotOverrideAPolicyOff(): void
+    {
+        putenv('COMPOSER_POLICY_ADVISORIES_BLOCK=1');
+
+        self::assertSame(['policy_key' => 'policy', 'value' => false], self::read(['policy' => false])->disabledBy());
     }
 
     public function testThePolicyTurnsAdvisoriesOffByItsKeysAndNeverByTheAuditMode(): void

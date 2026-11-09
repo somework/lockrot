@@ -130,7 +130,8 @@ as its fallback), so lockrot ignores no advisory.
 The project's Composer policy turns off Composer's advisory blocking: an update (`composer update`,
 `require` or `remove`) can take a version that a security advisory affects. `composer audit` still
 reports the advisories. lockrot asks its repositories as usual, and the advisories they return
-count. lockrot writes the note only when the lookup ran.
+count. lockrot writes the note only when the lookup ran. It omits the note when
+`COMPOSER_POLICY_ADVISORIES_BLOCK=1` turns the blocking back on after `policy.advisories: false`.
 
 - `data`: `policy_key`, the setting, and `value`, its value.
 - Findings: no change.
