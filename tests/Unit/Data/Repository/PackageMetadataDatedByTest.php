@@ -792,6 +792,23 @@ final class PackageMetadataDatedByTest extends TestCase
         self::assertEquals(new \DateTimeImmutable('2022-01-01T00:00:00+00:00'), $dated->releaseReadingAt());
     }
 
+    /** Ruling R16-26: the shared stable tags here are older than the reading, so only the pre-release blocks it. */
+    public function testANewestPreReleaseOnASharedCommitBlocksANewerReadingThanTheSharedStableTags(): void
+    {
+        $child = $this->split([
+            ['v2.1.0', 'c21', '2020-01-01T00:00:00+00:00'],
+            ['v1.0.1', 'c-shared', '2019-01-01T00:00:00+00:00'],
+            ['v1.0.2', 'c-shared', '2019-01-01T00:00:00+00:00'],
+            ['v1.0.3', 'c-shared', '2019-01-01T00:00:00+00:00'],
+            ['v3.0.0-beta1', 'c-shared', '2021-01-01T00:00:00+00:00'],
+        ]);
+
+        $dated = $child->datedBy($this->parentOfV5Only());
+
+        self::assertNull($dated->releaseReadingAt(), 'the shared date 2021-01-01 of v3.0.0-beta1 is newer than the own date 2020-01-01 of v2.1.0');
+        self::assertNull($dated->releaseReadingDatedBy());
+    }
+
     /** 1.5.0 on its own commit at $ownAt, 1.4.7 to 1.4.9 on one commit 2019-06-01, and the parent's 1.5.0 and 1.4.9. */
     private function splitWithASharedNewestTag(string $ownAt): PackageMetadata
     {

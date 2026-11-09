@@ -203,6 +203,8 @@ final class RepoLocatorTest extends TestCase
         yield 'a git+ssh:// URL drops its SSH port' => ['git+ssh://git@gitlab.corp:2222/g/p.git', $located, 'gitlab.corp', [RepoRef::GITLAB, 'gitlab.corp', 'g/p'], null];
         yield 'an ssh+git:// URL drops its SSH port' => ['ssh+git://git@gitlab.corp:2222/g/p.git', $located, 'gitlab.corp', [RepoRef::GITLAB, 'gitlab.corp', 'g/p'], null];
         yield 'an https:// URL keeps its port' => ['https://gitlab.corp:8443/g/p.git', $located, 'gitlab.corp:8443', [RepoRef::GITLAB, 'gitlab.corp:8443', 'g/p'], null];
+        // RFC 3986 section 3.1: a scheme is case-insensitive.
+        yield 'an HTTPS:// URL in capitals keeps its port' => ['HTTPS://gitlab.corp:8443/g/p.git', $located, 'gitlab.corp:8443', [RepoRef::GITLAB, 'gitlab.corp:8443', 'g/p'], null];
         yield 'codeberg.org' => ['https://codeberg.org/o/r.git', $unsupported, 'codeberg.org', null, null];
         yield 'git.drupalcode.org without the recipe' => ['https://git.drupalcode.org/project/admin_toolbar.git', $unsupported, 'git.drupalcode.org', null, null];
         yield 'an svn URL' => ['https://themes.svn.wordpress.org/twentytwentyfive/', $unsupported, 'themes.svn.wordpress.org', null, null];

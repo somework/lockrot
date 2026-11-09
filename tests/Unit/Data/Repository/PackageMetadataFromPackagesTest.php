@@ -323,6 +323,41 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame('2.0.0-RC1', $metadata->lastStableVersion());
     }
 
+    /**
+     * Ruling R16-16i: libyears end at the highest pre-release by version above the highest stable
+     * tag. RC2 is that release, and RC1 is the newer by date.
+     */
+    public function testTheLibyearsEndIsTheHighestPreReleaseByVersionWhateverTheListingOrder(): void
+    {
+        $on = static fn (string $version, string $commit, string $time): array => ['name' => 'a/b', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]];
+        $stable = $this->load($on('v5.0.0', 'five', '2020-01-01T00:00:00+00:00'));
+        $rc1 = $this->load($on('v6.0.0-RC1', 'rc1', '2021-06-01T00:00:00+00:00'));
+        $rc2 = $this->load($on('v6.0.0-RC2', 'rc2', '2021-03-01T00:00:00+00:00'));
+
+        foreach (['RC1 first' => [$stable, $rc1, $rc2], 'RC2 first' => [$stable, $rc2, $rc1]] as $order => $packages) {
+            $metadata = PackageMetadata::fromPackages('a/b', $packages, new \DateTimeImmutable(self::FIXED));
+
+            self::assertEquals(new \DateTimeImmutable('2021-03-01T00:00:00+00:00'), $metadata->newestReleaseByVersionAt(), $order);
+        }
+    }
+
+    /** Ruling R16-16i: a highest pre-release on a commit that three stable tags share has no trusted date. */
+    public function testAHighestPreReleaseOnASharedCommitLeavesTheLibyearsEndUndated(): void
+    {
+        $on = static fn (string $version, string $commit, string $time): array => ['name' => 'a/b', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]];
+        $packages = [
+            $this->load($on('v4.0.1', 'shared', '2019-01-01T00:00:00+00:00')),
+            $this->load($on('v4.0.2', 'shared', '2019-01-01T00:00:00+00:00')),
+            $this->load($on('v4.0.3', 'shared', '2019-01-01T00:00:00+00:00')),
+            $this->load($on('v5.0.0', 'five', '2020-01-01T00:00:00+00:00')),
+            $this->load($on('v6.0.0-RC1', 'shared', '2021-01-01T00:00:00+00:00')),
+        ];
+
+        $metadata = PackageMetadata::fromPackages('a/b', $packages, new \DateTimeImmutable(self::FIXED));
+
+        self::assertNull($metadata->newestReleaseByVersionAt());
+    }
+
     /** An old alpha of the next major on its own commit must not let S2 read the newer shared-commit date of a stable tag. */
     public function testAnOlderPreReleaseAboveSharedTagsLeavesTheAgeUnmeasured(): void
     {
