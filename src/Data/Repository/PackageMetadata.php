@@ -109,6 +109,7 @@ final class PackageMetadata
     private ?string $releaseReadingDatedBy;
     /** @var array{0: \DateTimeImmutable, 1: string, 2: string, 3: bool}|null the newest dated pre-release: its date, its pretty and its normalized version, and whether its commit is a shared one */
     private ?array $newestPreRelease = null;
+    private bool $highestBranchDatedByParent;
 
     /**
      * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string}> $latestStableByBranch
@@ -154,6 +155,7 @@ final class PackageMetadata
         $this->sharedCommitVersions = $sharedCommitVersions;
         $this->abandonedBy = $abandonedBy;
         $this->lastStableSharesItsCommit = $lastStableSharesItsCommit;
+        $this->highestBranchDatedByParent = $lastStableDatedBy !== null;
         $this->releaseReadingAt = $lastStableReleaseAt;
         $this->releaseReadingVersion = $lastStableVersion;
         $this->releaseReadingDatedBy = $lastStableDatedBy;
@@ -652,6 +654,7 @@ final class PackageMetadata
         $dated->releaseReadingVersion = $releaseReadingVersion;
         $dated->releaseReadingDatedBy = $releaseReadingDatedBy;
         $dated->newestPreRelease = $this->newestPreRelease;
+        $dated->highestBranchDatedByParent = \in_array($highestBranch, $datedBranches, true);
         $dated->releasesAbove = $this->releasesAbove === null ? null : array_map(
             static fn (StableRelease $release): StableRelease => $release->sharedCommit() ? $release->withDate($parent->releaseDateOf($release->normalized())) : $release,
             $this->releasesAbove
@@ -882,6 +885,16 @@ final class PackageMetadata
     public function lastStableSharesItsCommit(): bool
     {
         return $this->lastStableSharesItsCommit;
+    }
+
+    /**
+     * Whether the monorepo parent's row replaced the row of the highest branch ({@see datedBy()}):
+     * the split's highest tag had no trusted date. A parent date of one shared tag does not count.
+     * Without datedBy(), it is whether the constructor names a `$lastStableDatedBy`.
+     */
+    public function highestBranchDatedByParent(): bool
+    {
+        return $this->highestBranchDatedByParent;
     }
 
     /** The monorepo parent that dated `lastStableReleaseAt()` ({@see datedBy()}). Null when the date is the package's own. */

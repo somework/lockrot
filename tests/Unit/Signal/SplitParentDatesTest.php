@@ -7,7 +7,9 @@ namespace Lockrot\Tests\Unit\Signal;
 use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Clock;
 use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Rule\NotCheckedRule;
@@ -123,5 +125,52 @@ final class SplitParentDatesTest extends TestCase
         self::assertSame($expected, array_intersect_key($levels, array_flip([Signal::S2, Signal::S5, Signal::S8, Signal::S10])));
         self::assertSame([], $causes);
         self::assertStringStartsWith($summary, $summaries[$judge] ?? '');
+    }
+
+    /** @return iterable<string, array{list<array{0: string, 1: string, 2: string}>, list<array{0: string, 1: string, 2: string}>, string, string, array<string, string>}> */
+    public static function provideOwnCommitTagsBesideAParentDatedSharedTag(): iterable
+    {
+        yield 'the installed highest tag, the parent dates a shared tag of its line' => [
+            [['v2.1.0', 'c210', '2019-01-01T00:00:00+00:00'], ['v2.0.5', 'c-shared', '2021-01-01T00:00:00+00:00'], ['v2.0.6', 'c-shared', '2021-01-01T00:00:00+00:00'], ['v2.0.7', 'c-shared', '2021-01-01T00:00:00+00:00']],
+            [['v2.0.7', 'm207', '2021-03-01T00:00:00+00:00']],
+            'v2.1.0',
+            '2019-01-01T00:00:00+00:00',
+            [Signal::S2 => Signal::LEVEL_HIGH, Signal::S5 => Signal::LEVEL_WARN],
+        ];
+        yield 'an installed lower line, the parent dates a shared tag of the highest line' => [
+            [['v1.5.0', 'c150', '2018-01-01T00:00:00+00:00'], ['v3.1.0', 'c310', '2024-01-01T00:00:00+00:00'], ['v3.0.5', 'c-shared', '2025-01-01T00:00:00+00:00'], ['v3.0.6', 'c-shared', '2025-01-01T00:00:00+00:00'], ['v3.0.7', 'c-shared', '2025-01-01T00:00:00+00:00']],
+            [['v3.0.7', 'm307', '2025-03-01T00:00:00+00:00'], ['v3.1.0', 'm310', '2024-01-01T00:00:00+00:00']],
+            'v1.5.0',
+            '2018-01-01T00:00:00+00:00',
+            [Signal::S5 => Signal::LEVEL_WARN, Signal::S8 => Signal::LEVEL_HIGH],
+        ];
+    }
+
+    /**
+     * Ruling R16-16b: only a parent row that replaces the highest branch row makes the lock time
+     * of a tag on its own commit a commit date. A parent date of one shared tag does not.
+     *
+     * @dataProvider provideOwnCommitTagsBesideAParentDatedSharedTag
+     *
+     * @param list<array{0: string, 1: string, 2: string}> $tags
+     * @param list<array{0: string, 1: string, 2: string}> $parentTags
+     * @param array<string, string>                        $expected the level by signal id of S2, S5, S8 and S10
+     */
+    #[DataProvider('provideOwnCommitTagsBesideAParentDatedSharedTag')]
+    public function testALockTimeOfATagOnItsOwnCommitStaysAReleaseDateBesideAParentDatedSharedTag(array $tags, array $parentTags, string $installed, string $time, array $expected): void
+    {
+        $now = '2026-09-14T00:00:00+00:00';
+        $split = self::metadata('acme/split', $tags, $now, $installed)->datedBy(self::metadata('acme/mono', $parentTags, $now, null, ['acme/split' => 'self.version']));
+        $facts = new PackageFacts(FactsBuilder::package(['name' => 'acme/split', 'version' => $installed, 'time' => $time, 'php' => '>=7.1']), $split, FactsBuilder::activity(false, '2026-09-01T00:00:00+00:00'));
+
+        $release = InstalledRelease::of($facts->package(), $split);
+        [$levels, $causes] = self::signals($facts, $now);
+
+        self::assertSame([InstalledRelease::RELEASE, $time], [$release->kind(), $release->at() === null ? null : $release->at()->format(\DATE_ATOM)]);
+        $age = (new AgeMeasure(Clock::fixed($now), new Thresholds()))->installed($facts)->at();
+        self::assertSame($time, $age === null ? null : $age->format(\DATE_ATOM));
+        self::assertSame('acme/mono', $split->lastStableDatedBy(), 'the last release is the parent-dated shared tag');
+        self::assertSame($expected, array_intersect_key($levels, array_flip([Signal::S2, Signal::S5, Signal::S8, Signal::S10])));
+        self::assertSame([], $causes);
     }
 }

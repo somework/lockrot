@@ -156,6 +156,8 @@ final class PackageMetadataDatedByTest extends TestCase
         self::assertEquals(new \DateTimeImmutable('2026-09-01T00:00:00+00:00'), $dated->lastStableReleaseAt());
         self::assertSame('v13.24.0', $dated->lastStableVersion());
         self::assertSame('laravel/framework', $dated->lastStableDatedBy());
+        self::assertTrue($dated->highestBranchDatedByParent());
+        self::assertFalse($this->child()->highestBranchDatedByParent());
         self::assertFalse($dated->needsParentDates('8'));
         self::assertFalse($dated->needsParentDates('13'));
     }
@@ -423,6 +425,7 @@ final class PackageMetadataDatedByTest extends TestCase
         $dated = $child->datedBy($parent);
 
         self::assertNull($dated->lastStableReleaseAt(), 'only 8.x was dated; 13.x carries the package\'s age');
+        self::assertFalse($dated->highestBranchDatedByParent());
         self::assertNull($dated->lastStableVersion());
         self::assertNull($dated->lastStableDatedBy());
     }
@@ -824,6 +827,7 @@ final class PackageMetadataDatedByTest extends TestCase
         self::assertSame('1.4.9', $dated->lastStableVersion());
         self::assertEquals(new \DateTimeImmutable('2019-05-30T00:00:00+00:00'), $dated->lastStableReleaseAt(), 'the last release is the parent-dated tag');
         self::assertSame('acme/monorepo', $dated->lastStableDatedBy());
+        self::assertFalse($dated->highestBranchDatedByParent(), 'the parent dated one tag, not the highest branch');
     }
 
     public function testAParentDateOfASharedTagOnALowerLineLeavesTheLastReleaseOnTheHighestLine(): void
