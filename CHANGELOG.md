@@ -525,6 +525,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Config:** an `extra.lockrot.target-php` that names a PHP minor that lockrot does not know
+  exits `2` also when `--target-php` or `LOCKROT_TARGET_PHP` overrides it.
+  ([Validation](docs/configuration.md#validation))
+- **All formats:** for an `ssh://` or `git://` clone URL with a port, lockrot asks the API of the
+  host on HTTPS, not on that port, and a gitlab.com URL with `:22` gets `GITLAB_TOKEN`. An
+  `https://` port stays part of the host. ([Internals](docs/internals.md))
+- **CLI:** a `composer.lock` whose JSON root is a scalar exits `2` with `lockrot: <path> must
+  contain a JSON object` also beside a `composer.json`, not with a Composer type error.
+- **CLI:** the temporary file of `--output` and of the baseline writes has a short name in the
+  target's directory, so a target name near the filesystem limit does not fail with
+  `File name too long`.
+- **Install-time:** on a Composer older than 2.10, `-q` does not hide the
+  `lockrot: Composer <version> is older than 2.10 …` line, so a quiet install shows that
+  `install-time-strict` does not apply. ([Install-time](docs/install-time.md))
 - **CLI, Config:** `--fail-on`, `LOCKROT_FAIL_ON`, the `fail-on` key, the `--explain` value and the
   issuer variables (`GH_HOST` and the others) ignore case under any locale. Under a Turkish locale
   on PHP 7.4 to 8.1, an upper-case `I` in them lower-cased to a byte that is not `i`.
