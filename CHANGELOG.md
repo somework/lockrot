@@ -52,6 +52,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   each name it could serve reads `metadata_unavailable`. 0.13 asked a later repository.
   `--strict-network` makes this exit 1. Action: limit the repository with `only`, or fix its
   credentials or its cache. ([Which repository answers](docs/internals.md#two-passes))
+- **Breaking:** **CLI, Config:** a `--fail-on` value of `critical`, `high`, `medium` or `low`
+  keeps its word and now reads the grade (the score band), not the priority ladder of 0.13.
+  Action: run once without a gate, and compare each finding's grade.
+  ([The score](docs/verdicts.md#score))
 - **All formats:** a new flag `capped` (S11, 8 points) marks an installed release whose
   `require.php` stops below the newest PHP minor that the root php allows. It decides at once, and
   comes after `stale`, so `--fail-on=stale` keeps its reach. A baseline entry that records any
@@ -250,8 +254,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   holds no PHP raise step: only the `update now:` line says to raise `require.php` first.
   ([Security](docs/schema.md#advisories-with-no-fix-expected))
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
-  installs and the links that set each edge. A target minor that the release data does not list
-  counts as one more, in version order. `platform_override` is the merged `config.platform.php`.
+  installs and the links that set each edge. A target minor that is not a known minor on the run
+  date, because its GA date is later or the data omits it, counts as one more, in version order. `platform_override` is the merged `config.platform.php`.
   `target.php` and `lower_edge.php` are `X.Y.Z`. The text formats print a `php:` line.
   ([The PHP window](docs/verdicts.md#the-php-window))
 - **json, table, markdown, github:** `run.php_window.target_fix` names the packages that exclude

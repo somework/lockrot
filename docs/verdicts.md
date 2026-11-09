@@ -18,7 +18,7 @@ each flag's rule, its signals, and what you and the package's maintainer can do 
 | `medium` | The score is 8 to 15 | |
 | `low` | The score is 1 to 7 | |
 | `unknown` | The score is 0, no allowlist entry accepts the package or one of its fired flags, and lockrot read no release metadata for the package | Nothing counts, but lockrot did not judge its release age (S2) or its release branch (S8). The run's [notes](notes.md) say what failed |
-| `finished` | The score is 0, and an allowlist entry accepts the whole package or a flag that fired | Nothing counts, and the [allowlist](configuration.md#the-allowlist) says why: the [built-in list](configuration.md#the-built-in-list), a package type or your own entry |
+| `finished` | The score is 0, and an allowlist entry accepts the whole package or a flag that fired | Nothing counts, and the [allowlist](configuration.md#the-allowlist) says why: the [built-in list](configuration.md#the-built-in-list), a package type or your own entry. A package that a type entry accepts still fires S2 and S8, and the entry accepts the flag they raise |
 | `ok` | The score is 0 | No flag counts |
 
 Verdict order, used by the grade values of [`--fail-on`](ci.md) and the report's sort order:
@@ -1054,9 +1054,10 @@ How lockrot reads the window:
   a later patch of that minor. So with `config.platform.php` 8.4.0, a patch floor such as
   `>=8.4.2` keeps 8.4 in the window, and `lower_edge.php` reads 8.4.2. A cap below that PHP leaves
   the minor out.
-- A target minor that the release data does not list counts as one more known minor of the
-  window, in version order. Examples are 8.6 before its GA, and 7.5 or 5.2 from
-  `config.platform.php`. A set that admits it lists it in `minors`. A cap that excludes it gives
+- A target minor that is not a known minor on the run date counts as one more known minor of the
+  window, in version order. A minor is known when its GA date in `resources/php-ga-dates.json` is
+  on or before the run date, so 8.6 is unknown until its GA date. Other examples are 7.5 and 5.2
+  from `config.platform.php`, which the file does not list. A set that admits it lists it in `minors`. A cap that excludes it gives
   `upper_edge` with `excludes` set to that minor, and `set_by` lists the links of the cap. The
   edges, `gaps` and the `php:` line read this minor too. [`capped`](#capped) does not: its R and
   `stops_at`, and the `capped` test of a move, read the known minors without it.
