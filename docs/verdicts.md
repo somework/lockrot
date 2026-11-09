@@ -18,7 +18,7 @@ each flag's rule, its signals, and what you and the package's maintainer can do 
 | `medium` | The score is 8 to 15 | |
 | `low` | The score is 1 to 7 | |
 | `unknown` | The score is 0, no allowlist entry accepts the package or one of its fired flags, and lockrot read no release metadata for the package | Nothing counts, but lockrot did not judge its release age (S2) or its release branch (S8). The run's [notes](notes.md) say what failed |
-| `finished` | The score is 0, and an allowlist entry accepts the whole package or a flag that fired | Nothing counts, and the [allowlist](configuration.md#the-allowlist) says why: the [built-in list](configuration.md#the-built-in-list), a package type or your own entry. A package that a type entry accepts still fires S2 and S8, and the entry accepts the flag they raise |
+| `finished` | The score is 0, and an allowlist entry accepts the whole package or a flag that fired | Nothing counts, and the [allowlist](configuration.md#the-allowlist) says why: the [built-in list](configuration.md#the-built-in-list), a package type or your own entry. A package that a type entry accepts can still fire S2 and S8, and the entry accepts the flag they raise |
 | `ok` | The score is 0 | No flag counts |
 
 Verdict order, used by the grade values of [`--fail-on`](ci.md) and the report's sort order:

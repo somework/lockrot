@@ -16,7 +16,8 @@ if (\PHP_SAPI !== 'cli' && \PHP_SAPI !== 'phpdbg') {
 }
 
 // The floor of composer.json and of build/phar/composer.json: an older PHP prints one line instead
-// of a parse error, as the PHAR does.
+// of a parse error, as the PHAR does. A PHP 7.4 construct anywhere in this file breaks that
+// (SourceEntryGuardTest).
 if (\PHP_VERSION_ID < 70400) {
     fwrite(\STDERR, "lockrot requires PHP 7.4 or newer\n");
     exit(2);
@@ -120,7 +121,8 @@ $application = new class () extends \Composer\Console\Application {
      */
     private const KEEP = ['lockrot', 'self-update', 'help', 'list', 'completion', '_complete'];
 
-    private bool $manifestHidden = false;
+    /** @var bool */
+    private $manifestHidden = false;
 
     /** @var string|false the caller's own COMPOSER value, false when it was unset */
     private $previousComposerEnv = false;
@@ -199,7 +201,8 @@ $application = new class () extends \Composer\Console\Application {
         }
 
         return new class ($path) implements \Lockrot\SelfUpdate\SignatureVerifierInterface {
-            private string $path;
+            /** @var string */
+            private $path;
 
             public function __construct(string $path)
             {

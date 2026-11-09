@@ -255,7 +255,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([Security](docs/schema.md#advisories-with-no-fix-expected))
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
   installs and the links that set each edge. A target minor that is not a known minor on the run
-  date, because its GA date is later or the data omits it, counts as one more, in version order. `platform_override` is the merged `config.platform.php`.
+  date counts as one more, in version order. Its GA date is after the run date, or the release
+  data omits it. `platform_override` is the merged `config.platform.php`.
   `target.php` and `lower_edge.php` are `X.Y.Z`. The text formats print a `php:` line.
   ([The PHP window](docs/verdicts.md#the-php-window))
 - **json, table, markdown, github:** `run.php_window.target_fix` names the packages that exclude
@@ -525,6 +526,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **CLI:** on a PHP older than 7.4, the source script `bin/lockrot` prints
+  `lockrot requires PHP 7.4 or newer` and exits `2`, not a parse error with exit `255`.
+  ([Exit codes](docs/ci.md#exit-codes))
 - **CLI:** `--explain` prints the footnote "so S8 does not measure the branch" only when S8 did
   not measure the installed branch because of its undated releases.
   ([Explaining one package](docs/configuration.md#explaining-one-package))

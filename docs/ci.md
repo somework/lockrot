@@ -74,11 +74,20 @@ when it reaches a value of the list and the baseline does not exempt it:
 
 The exit code is the same for every output format. On stderr, a configuration or usage error that
 the command reports starts with `lockrot:`, any other failure with `lockrot failed:`. `-v` adds the
-stack trace to the second. The guards of `bin/lockrot` run before the command and print other text
-with exit `2`: a PHP older than the floor (`lockrot requires PHP 7.4 or newer`), a missing or old
-`composer/composer` package (`lockrot requires the composer/composer package 2.10 or newer …`), all
-on stderr, and a non-CLI SAPI with `register_argc_argv` on (`lockrot cannot run safely on a non-CLI
-SAPI …`), on stdout. Do not match `^lockrot:` to tell these cases apart.
+stack trace to the second. Other text comes from these sources:
+
+- The guards of `bin/lockrot`, which run before the command and exit `2`:
+    - A PHP older than the floor prints `lockrot requires PHP 7.4 or newer` on stderr.
+    - A project without the `composer/composer` package prints `lockrot needs the composer/composer
+      package 2.10 or newer, …` on stderr.
+    - An older `composer/composer` package prints `lockrot requires the composer/composer package
+      2.10 or newer, …` on stderr.
+    - A non-CLI SAPI with `register_argc_argv` on prints `lockrot cannot run safely on a non-CLI
+      SAPI …` on stdout.
+- The console application, which exits `1` before a command runs: an unknown command
+  (`Command "…" is not defined.`) or a `--working-dir` that does not exist.
+
+Do not match `^lockrot:` to tell these cases apart.
 
 **Exit `2`** comes from:
 
