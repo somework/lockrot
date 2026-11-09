@@ -259,6 +259,10 @@ final class LockrotConfig
         if (\is_string($fromEnv) && $fromEnv !== '') {
             self::refuseUnknownMinor('LOCKROT_TARGET_PHP', $fromEnv);
         }
+        $fromConfig = $extra['target-php'] ?? null;
+        if (\is_string($fromConfig) && self::isTargetPhpValue($fromConfig)) {
+            self::refuseUnknownMinor('extra.lockrot.target-php', $fromConfig);
+        }
         [$target, $source] = self::pickWithSource([
             RunSettings::SOURCE_OPTION => $cli['target-php'] ?? null,
             RunSettings::SOURCE_ENV => $env['LOCKROT_TARGET_PHP'] ?? null,
@@ -271,9 +275,8 @@ final class LockrotConfig
         if (!self::looksLikePhpVersion($target)) {
             throw new ConfigException('target-php must look like "8.4"; got "'.$target.'"');
         }
-        $settings = [RunSettings::SOURCE_OPTION => '--target-php', RunSettings::SOURCE_CONFIG => 'extra.lockrot.target-php'];
-        if (isset($settings[$source])) {
-            self::refuseUnknownMinor($settings[$source], $target);
+        if ($source === RunSettings::SOURCE_OPTION) {
+            self::refuseUnknownMinor('--target-php', $target);
         }
 
         return [PhpReleaseDates::minorOf($target), $source];
