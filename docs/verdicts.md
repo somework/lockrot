@@ -448,9 +448,15 @@ request on it.
 
 - S2 and S8 carry the parent as `dated_by`, and `--explain` marks the branch rows it supplied.
 
+- Where the parent lists a tag that shares its commit, the parent's date is that tag's release
+  date for S2, S5 and S8. When that tag is the newest of its branch, the branch row carries the
+  parent's date, and S10 `release_dates` names no cause that the parent resolved.
+
 - When the highest tag has a trusted date or a parent date, S2 reads the newest trusted date over
   every branch row.
-  A lower branch that the parent dates counts, and so does a dated pre-release.
+  A lower branch that the parent dates counts, and so does a dated pre-release on its own commit.
+  A pre-release on a shared commit has no trusted date and keeps S2 unknown, unless its date is
+  older than the reading.
 
 - S8 can quote a branch's highest tag, or a lower tag, that only a commit shared with other tags
   dates. A release is never older than its commit, so that date is a lower bound. The summary then says "on or after"
