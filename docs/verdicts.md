@@ -67,6 +67,11 @@ shows.
   a finding shows at most one of them. `abandoned` says which source fired in `degree.reasons`
   (`marked`, `archived`).
 
+- `degree.liveness_complete` is false when a `checks_skipped[]` or `checks_missing[]` entry blocks
+  S2 or S4. The summary of a counted `stale` then names its reading: "liveness read from pushes
+  only" when an entry blocks S2, else "liveness read from releases only". An accepted `stale` and
+  `abandoned` keep their summary.
+
 - `pinned` and `left-behind` never fire together: a branch snapshot is on no release branch.
 
 - `old-promise` and `capped` never fire together: S5 needs a `require.php` with no upper bound,

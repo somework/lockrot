@@ -279,7 +279,7 @@ shapes leave out the parts that do not apply. A score of 0 carries only `model`,
 | `priority` | enum | The grade, else `none`. Deprecated: read `verdict` |
 | `lead` | string or null | The first counted maintenance flag ([Flags](verdicts.md#flags)) |
 | `rank` | integer | The finding's place in the report's order, 1 first |
-| `flags` | array | Every flag that fired, in flag order: `{id, role, baseline, signal_ids, degree, headline, summary}`. `role` is `accepted` on an accepted flag. A flag counts exactly when `score.terms[].flag` names it |
+| `flags` | array | Every flag that fired, in flag order: `{id, role, baseline, signal_ids, degree, headline, summary}`. `role` is `accepted` on an accepted flag. A flag counts exactly when `score.terms[].flag` names it. `summary` is written from the data of `signal_ids`, and a counted `stale` adds its [liveness reading](verdicts.md#flags) |
 | `score` | object | The sum: see [The score](#how-a-priority-was-reached) |
 | `next_step` | object or null | The move: see [The move](#the-move). Null at score 0 |
 | `security` | object | What the advisory lookup found: see [Security](#advisories-with-no-fix-expected) |

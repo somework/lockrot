@@ -354,6 +354,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **All formats:** the summary of a counted `stale` names its liveness reading when a check that
+  did not run blocks S2 or S4: "liveness read from pushes only" or "liveness read from releases
+  only". The evidence line and SARIF carry it. ([Flags](docs/verdicts.md#flags))
 - **Breaking:** **Config:** `ignore[].expires` with a trailing newline, such as `"2027-01-01\n"`,
   exits 2, as `accept-unchecked[].expires` does. 0.13 accepted it. Action: write the date as
   `YYYY-MM-DD` with nothing after it.
