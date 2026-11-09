@@ -481,17 +481,56 @@ final class PackageMetadata
      */
     public function sharesItsCommit(string $version): bool
     {
+        $normalized = self::normalized($version);
+
+        return $normalized !== null && isset($this->sharedCommitVersions[$normalized]);
+    }
+
+    /**
+     * Whether the date of a {@see latestStableByBranch()} row is only that of a commit its newest
+     * tag shares with other stable tags. The tag was released on or after that date. A row that a
+     * monorepo parent dates ({@see datedBy()}) carries a release's date.
+     *
+     * @param array{version: string, dated_by?: string} $branch
+     */
+    public function sharedCommitDates(array $branch): bool
+    {
+        return !isset($branch['dated_by']) && $this->sharesItsCommit($branch['version']);
+    }
+
+    /**
+     * The monorepo parent's release date of the version, in any form the parser takes. Only a
+     * parent's dates count: {@see fromPackages()} keeps the own release dates of any package with a
+     * `self.version` replace too. Null when no parent dated this package ({@see datedBy()}) or the
+     * parent has no trusted date for the version.
+     */
+    public function parentDateOf(string $version): ?\DateTimeImmutable
+    {
+        return $this->releaseDatesBy === null ? null : self::dateIn($this->releaseDates, $version);
+    }
+
+    /** @param array<string, \DateTimeImmutable> $dates by normalized version */
+    private static function dateIn(array $dates, string $version): ?\DateTimeImmutable
+    {
+        $normalized = self::normalized($version);
+
+        return $normalized === null ? null : $dates[$normalized] ?? null;
+    }
+
+    private static function normalized(string $version): ?string
+    {
         try {
-            return isset($this->sharedCommitVersions[(new VersionParser())->normalize($version)]);
+            return (new VersionParser())->normalize($version);
         } catch (\UnexpectedValueException $e) {
-            return false;
+            return null;
         }
     }
 
     /**
      * This package's branches, dated by its monorepo parent's. A branch whose highest tag has no
-     * date takes the parent's entry for the same branch and names the parent under `dated_by`. The
-     * last release and the per-release dates ({@see releaseDateOf()}) follow. A branch that the
+     * date takes the parent's entry for the same branch and names the parent under `dated_by`. A
+     * branch whose newest tag shares its commit takes the parent's date of that tag. The last
+     * release and the per-release dates ({@see releaseDateOf()}) follow. A branch that the
      * parent does not date stays as it was, and a package that the parent does not replace comes
      * back unchanged. Immutable: this object stays unchanged. See docs/verdicts.md#dates-from-the-monorepo.
      */
@@ -504,11 +543,9 @@ final class PackageMetadata
         $parentBranches = $parent->latestStableByBranch();
         $datedBranches = [];
         foreach ($byBranch as $key => $entry) {
-            if ($entry['highest']['at'] !== null) {
-                continue;
-            }
-            $theirs = $parentBranches[$key] ?? null;
+            $theirs = $entry['highest']['at'] === null ? $parentBranches[$key] ?? null : null;
             if ($theirs === null || $theirs['at'] === null || $theirs['highest']['at'] === null) {
+                $byBranch[$key] = $this->withParentDateOfNewest($entry, $parent);
                 continue;
             }
             // The date is the parent's. The php requirement stays this package's own: the lock
@@ -529,7 +566,9 @@ final class PackageMetadata
         $lastStableDatedBy = $this->lastStableDatedBy;
         $lastStablePhp = $this->lastStablePhp;
         $highestBranch = self::highestBranch($byBranch);
-        if (\in_array($highestBranch, $datedBranches, true)) {
+        // A parent date of the shared-commit tag that the package names as its last release dates that release.
+        $lastStableDatedByParent = isset($byBranch[$highestBranch]['dated_by']) && $byBranch[$highestBranch]['version'] === $this->lastStableVersion;
+        if ($lastStableDatedByParent || \in_array($highestBranch, $datedBranches, true)) {
             $lastStableReleaseAt = $byBranch[$highestBranch]['at'];
             $lastStableVersion = $byBranch[$highestBranch]['version'];
             $lastStableDatedBy = $parent->name;
@@ -550,7 +589,7 @@ final class PackageMetadata
         $highest = $byBranch[$highestBranch] ?? null;
         // Read the highest row's own date only when a shared commit hid it. An undated highest tag, a
         // pre-release included, keeps the reading unknown.
-        if ($releaseReadingAt === null && $this->lastStableSharesItsCommit && $highest !== null && !isset($highest['dated_by']) && $highest['highest']['at'] !== null) {
+        if ($releaseReadingAt === null && $this->lastStableSharesItsCommit && $highest !== null && $highest['highest']['at'] !== null) {
             $releaseReadingAt = $highest['highest']['at'];
             $releaseReadingVersion = $highest['highest']['pretty'];
         }
@@ -562,7 +601,7 @@ final class PackageMetadata
                 if ($row['at'] === null) {
                     continue;
                 }
-                if (!$datedByParent && $this->sharesItsCommit($row['version'])) {
+                if ($this->sharedCommitDates($row)) {
                     $unresolved = $unresolved === null || $row['at'] > $unresolved ? $row['at'] : $unresolved;
                     continue;
                 }
@@ -619,6 +658,29 @@ final class PackageMetadata
         );
 
         return $dated;
+    }
+
+    /**
+     * The branch row with the parent's date of its newest tag, when that tag shares its commit.
+     * The branch's highest tag stays the newest when its own date is not older than the parent's.
+     * See docs/verdicts.md#dates-from-the-monorepo.
+     *
+     * @param array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string} $entry
+     *
+     * @return array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string}
+     */
+    private function withParentDateOfNewest(array $entry, self $parent): array
+    {
+        $at = $this->sharesItsCommit($entry['version']) ? self::dateIn($parent->releaseDates, $entry['version']) : null;
+        if ($at === null) {
+            return $entry;
+        }
+        $highest = $entry['highest'];
+        if ($highest['at'] !== null && $highest['at'] >= $at) {
+            return ['version' => $highest['pretty'], 'at' => $highest['at'], 'highest' => $highest, 'php' => $highest['php']];
+        }
+
+        return ['at' => $at, 'dated_by' => $parent->name] + $entry;
     }
 
     /**

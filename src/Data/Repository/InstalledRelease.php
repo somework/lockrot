@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Repository;
 
-use Composer\Semver\VersionParser;
 use Lockrot\Lock\LockedPackage;
 
 /**
@@ -57,13 +56,10 @@ final class InstalledRelease
         if ($metadata === null) {
             return new self($time === null ? self::UNDATED : self::RELEASE, $time, $time, null);
         }
-        // The parent dates the version whether or not the lock has a date. Only a parent counts:
-        // PackageMetadata::fromPackages() keeps release dates for any package with a `self.version`
-        // replace, else guzzlehttp/guzzle dates itself and reads its own release as a shared commit.
-        $datedBy = $metadata->releaseDatesBy();
-        $parent = $datedBy === null ? null : self::parentDateOf($package, $metadata);
+        // The parent dates the version whether or not the lock has a date.
+        $parent = $metadata->parentDateOf($package->version());
         if ($parent !== null) {
-            return new self(self::DATED_BY_PARENT, $parent, $time, $datedBy);
+            return new self(self::DATED_BY_PARENT, $parent, $time, $metadata->releaseDatesBy());
         }
         if ($time === null) {
             return new self(self::UNDATED, null, null, null);
@@ -110,15 +106,5 @@ final class InstalledRelease
     public function isDated(): bool
     {
         return $this->at !== null;
-    }
-
-    /** The parent's date for the installed version, null when it has none or the version does not parse. */
-    private static function parentDateOf(LockedPackage $package, PackageMetadata $metadata): ?\DateTimeImmutable
-    {
-        try {
-            return $metadata->releaseDateOf((new VersionParser())->normalize($package->version()));
-        } catch (\UnexpectedValueException $e) {
-            return null;
-        }
     }
 }

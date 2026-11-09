@@ -107,8 +107,8 @@ final class AgeMeasure
      * the release S8 judges. An undated highest tag hides how much newer the branch's last release
      * is, so that branch has a reading only when its newest dated release is inside
      * `release-warn-years`. A branch whose newest date is a shared commit's has no reading
-     * ({@see sharedCommitDates()}), nor has an installed stable version above the branch's highest
-     * stable tag. See docs/verdicts.md#left-behind.
+     * ({@see PackageMetadata::sharedCommitDates()}), nor has an installed stable version above the
+     * branch's highest stable tag. See docs/verdicts.md#left-behind.
      *
      * @param ?string $metadataStatus as for {@see release()}
      */
@@ -134,7 +134,7 @@ final class AgeMeasure
             return AgeReading::unmeasuredBecause(self::ABOVE_LISTED_RELEASES);
         }
         $at = $own['at'];
-        if ($at === null || self::sharedCommitDates($metadata, $own)) {
+        if ($at === null || $metadata->sharedCommitDates($own)) {
             return AgeReading::unmeasuredBecause(self::UNDATED_RELEASES);
         }
         $reading = $this->reading($at, $own['version'], $own['dated_by'] ?? null, [$this->thresholds->releaseWarnYears(), $this->thresholds->releaseHighYears()], AgeReading::RELEASE);
@@ -193,27 +193,16 @@ final class AgeMeasure
     }
 
     /**
-     * Whether the branch's `at` is only a lower bound of its release: the highest tag with no trusted
-     * date, or a tag on a shared commit ({@see self::sharedCommitDates()}). A monorepo parent's
-     * date and a lower tag with a date of its own are exact.
+     * Whether the branch's `at` is only a lower bound of its release: the highest tag with no
+     * trusted date, or a tag on a shared commit ({@see PackageMetadata::sharedCommitDates()}). A
+     * monorepo parent's date and a lower tag with a date of its own are exact.
      *
      * @param array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string} $branch a {@see PackageMetadata::latestStableByBranch()} entry
      */
     public static function releaseDateIsLowerBound(PackageMetadata $metadata, array $branch): bool
     {
         return ($branch['highest']['at'] === null && $branch['version'] === $branch['highest']['pretty'])
-            || self::sharedCommitDates($metadata, $branch);
-    }
-
-    /**
-     * Whether the branch's date is that of a commit its tag shares with other stable tags. The tag
-     * was released on or after that date. A monorepo parent's date is a release's.
-     *
-     * @param array{version: string, dated_by?: string} $branch a {@see PackageMetadata::latestStableByBranch()} entry
-     */
-    private static function sharedCommitDates(PackageMetadata $metadata, array $branch): bool
-    {
-        return !isset($branch['dated_by']) && $metadata->sharesItsCommit($branch['version']);
+            || $metadata->sharedCommitDates($branch);
     }
 
     /** The reason of an installed release that has no trusted date: libyears reads the same id. */
