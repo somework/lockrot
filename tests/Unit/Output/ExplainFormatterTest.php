@@ -450,6 +450,26 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString(" 3 of 3 · composer update (lowest fix); after it: 0, ok, if Composer resolves it\n", $text);
     }
 
+    /** Ruling R17-1: a row whose every form installs no release names that, not the caveat. */
+    public function testARowWhoseMoveInstallsNoReleaseSaysSoInPlaceOfTheCaveat(): void
+    {
+        $case = CaseHydrator::case('E');
+        $package = JsonPath::stringAt($case, ['finding', 'package']);
+        $analysis = CaseHydrator::analysisOf($case);
+        $finding = $analysis->finding($package);
+        $facts = $analysis->facts($package);
+        self::assertNotNull($finding);
+        self::assertNotNull($facts);
+        $moves = $finding->details()->moves();
+        $after = $moves->rowIfApplied('5.x');
+        self::assertNotNull($after);
+        $noRelease = new Moves($moves->nextStep(), $moves->moveIn(), $moves->fixKind(), $moves->partial(), ['5.x' => $after], ['5.x' => MoveCheck::installsNoRelease('5.x-dev')]);
+
+        $text = self::plain(new Explanation($finding->withMoves($noRelease), $facts, new Thresholds(), '8.4', $analysis->report()));
+
+        self::assertStringContainsString(" 3 of 3 · composer update (lowest fix); after it: 0, ok; Composer's solver installs no release of it\n", $text);
+    }
+
     public function testJsonCarriesTheEnvelopeAndTheExplanation(): void
     {
         $finding = (new FindingBuilder())->withDataDate(new \DateTimeImmutable(F::NOW))->build();

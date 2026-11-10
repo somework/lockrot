@@ -65,7 +65,7 @@ final class MoveCheck implements \JsonSerializable
         self::SOLVER_ERROR => "Composer's solver failed on it",
         self::ADVISORY_LOOKUP_INCOMPLETE => 'the advisory lookup did not cover a package in the result',
         self::LOCK_DISABLED => 'config.lock is false, so Composer ignores composer.lock',
-        self::INSTALLS_NO_RELEASE => 'Composer installs no release of it',
+        self::INSTALLS_NO_RELEASE => "Composer's solver installs no release of it",
     ];
 
     /** @var self::RESOLVES|self::REFUSED|self::NOT_CHECKED */
@@ -73,7 +73,6 @@ final class MoveCheck implements \JsonSerializable
     private ?string $form;
     private ?string $reason;
     private ?string $installs;
-    private ?string $dev = null;
 
     /** @param self::RESOLVES|self::REFUSED|self::NOT_CHECKED $result */
     private function __construct(string $result, ?string $form, ?string $reason, ?string $installs = null)
@@ -85,18 +84,15 @@ final class MoveCheck implements \JsonSerializable
     }
 
     /**
-     * A check of a move whose every resolving form keeps or installs no release of the moved package:
-     * its locked version, or $dev. A snapshot is no release that a move proposes, and Composer's
-     * advisory blocking skips it (ruling R17-1).
+     * Every resolving form keeps the moved package's locked version or installs a dev version of it.
+     * A snapshot is no release that a move proposes, and Composer's advisory blocking skips it
+     * (ruling R17-1).
      *
-     * @param ?string $dev the dev version that the package has after the solve, null when it has none
+     * @param ?string $installs the version that the first resolving form, in form order, installs or keeps; null when it drops the package
      */
-    public static function installsNoRelease(?string $dev): self
+    public static function installsNoRelease(?string $installs): self
     {
-        $check = new self(self::NOT_CHECKED, null, self::INSTALLS_NO_RELEASE);
-        $check->dev = $dev;
-
-        return $check;
+        return new self(self::NOT_CHECKED, null, self::INSTALLS_NO_RELEASE, $installs);
     }
 
     /** Whether $version is a release: not null and not a dev version, a branch alias included. */
@@ -146,19 +142,18 @@ final class MoveCheck implements \JsonSerializable
         return $this->reason;
     }
 
-    /** The release that the resolving form installs, null unless the check resolves. */
+    /** The release that the resolving form installs, or the version of {@see installsNoRelease()}; null otherwise. */
     public function installs(): ?string
     {
         return $this->installs;
     }
 
-    /** The dev version that {@see installsNoRelease()} names, null on every other check. */
-    public function dev(): ?string
+    public function installsNoReleaseOfIt(): bool
     {
-        return $this->dev;
+        return $this->reason === self::INSTALLS_NO_RELEASE;
     }
 
-    /** The installed release when it sorts below `$newest`, else null: also when either one is missing or does not parse. */
+    /** The installed release when it sorts below `$newest`, else null: also when the check does not resolve, or a version is missing or does not parse. */
     public function installsBelow(?string $newest): ?string
     {
         return $this->installsBeside($newest, '<');
@@ -173,6 +168,9 @@ final class MoveCheck implements \JsonSerializable
     /** @param '<'|'>' $operator */
     private function installsBeside(?string $newest, string $operator): ?string
     {
+        if (!$this->isResolved()) {
+            return null;
+        }
         $parser = new VersionParser();
         try {
             return Comparator::compare($parser->normalize((string) $this->installs), $operator, $parser->normalize((string) $newest)) ? $this->installs : null;

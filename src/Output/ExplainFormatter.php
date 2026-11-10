@@ -462,9 +462,13 @@ final class ExplainFormatter
         if ($after !== null) {
             // D10: the caveat stays only where Composer's solver did not check the move.
             $checked = $check !== null && $check->result() !== MoveCheck::NOT_CHECKED;
-            $cell .= '; after it: '.($after->atMost() ? 'at most ' : '').$after->total().', '.$after->verdict().($checked ? '' : ', if Composer resolves it');
+            $noRelease = $check !== null && $check->installsNoReleaseOfIt();
+            $cell .= '; after it: '.($after->atMost() ? 'at most ' : '').$after->total().', '.$after->verdict().($checked || $noRelease ? '' : ', if Composer resolves it');
             if ($check !== null && $checked) {
                 $cell .= $check->isResolved() ? "; Composer's solver resolves it" : "; Composer's solver refuses it";
+            }
+            if ($noRelease) {
+                $cell .= '; '.MoveCheck::reasonWords(MoveCheck::INSTALLS_NO_RELEASE);
             }
         }
 

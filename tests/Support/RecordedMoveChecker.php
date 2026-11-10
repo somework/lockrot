@@ -253,7 +253,9 @@ final class RecordedMoveChecker implements MoveChecker
             case MoveCheck::REFUSED:
                 return MoveCheck::refused();
             default:
-                return MoveCheck::notChecked(self::required($check, 'reason'));
+                $reason = self::required($check, 'reason');
+
+                return $reason === MoveCheck::INSTALLS_NO_RELEASE && $installs !== null ? MoveCheck::installsNoRelease($installs) : MoveCheck::notChecked($reason);
         }
     }
 

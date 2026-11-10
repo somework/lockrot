@@ -188,7 +188,7 @@ final class ComposerSolver
         // Composer blocks a release by each name that it replaces too.
         $held = array_merge([], ...array_map(static fn (BasePackage $package): array => $package->getNames(false), $answer->getNewLockPackages(false)));
 
-        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), $this->withoutMetUnreached($this->failures($loaded->asked()), $built, $answer), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)));
+        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), $this->withoutMetUnreached($this->failures($loaded->asked()), $built, $answer), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)), $held);
     }
 
     /**

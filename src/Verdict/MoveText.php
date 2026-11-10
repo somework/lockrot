@@ -80,7 +80,7 @@ final class MoveText
         if ($through !== '' && \in_array(Move::TRANSITIVE, $move->composerMovesBecause(), true)) {
             $text .= '; '.$through;
         }
-        $parts[] = [$text.self::checked($move->check()).self::movesWith($move).($move->unsafeArgument() === null ? '' : self::NO_COMMAND), false];
+        $parts[] = [$text.self::checked($move).self::movesWith($move).($move->unsafeArgument() === null ? '' : self::NO_COMMAND), false];
         $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride(), $subject->isBaselineRefused());
 
         return self::joined(array_merge([[$step, false]], $step === '' ? $parts : self::sentenceStart($parts)));
@@ -153,10 +153,14 @@ final class MoveText
     }
 
     /** D10: what Composer's solver said about the move, or why lockrot did not ask it. */
-    private static function checked(?MoveCheck $check): string
+    private static function checked(Move $move): string
     {
+        $check = $move->check();
         if ($check === null) {
             return '';
+        }
+        if ($check->installsNoReleaseOfIt()) {
+            return self::noRelease($check->installs(), $move);
         }
         switch ($check->result()) {
             case MoveCheck::RESOLVES:
@@ -164,11 +168,22 @@ final class MoveText
             case MoveCheck::REFUSED:
                 return "; Composer's solver refuses it against the lock";
             default:
-                $dev = $check->dev();
-                $words = $dev === null ? MoveCheck::reasonWords((string) $check->reason()) : 'Composer installs '.$dev.', a dev version';
-
-                return '; not checked with Composer\'s solver ('.$words.'), so it holds only if Composer resolves it';
+                return '; not checked with Composer\'s solver ('.MoveCheck::reasonWords((string) $check->reason()).'), so it holds only if Composer resolves it';
         }
+    }
+
+    /** Ruling R17-1: the version that every resolving form gives in place of the move's newest, a dev version or the locked release, or the reason words when the solve drops the package. */
+    private static function noRelease(?string $installs, Move $move): string
+    {
+        if ($installs === null) {
+            return '; '.MoveCheck::reasonWords(MoveCheck::INSTALLS_NO_RELEASE);
+        }
+        $latest = $move->latest();
+        $newest = ($move->kind() === Move::TAG && $latest !== null ? $latest->version() : $move->newest()) ?? $move->version();
+
+        return MoveCheck::isRelease($installs)
+            ? "; Composer's solver keeps ".$installs.', not '.$newest.', so this command does not reach it'
+            : "; Composer's solver installs ".$installs.', a dev version, not '.$newest.', so this command does not reach a release';
     }
 
     /** ", with an update of h/x (to 2.1.0)", one entry per holder that the joint request moves. */
@@ -202,7 +217,7 @@ final class MoveText
             return [
                 [self::raise($move), false],
                 [$command ?? 'update it with Composer', $command !== null],
-                [($below === '' ? ' (gets '.$gets.')' : $below).self::clears($move).self::adds($move), false],
+                [($below !== '' ? $below : ($check !== null && $check->installsNoReleaseOfIt() ? '' : ' (gets '.$gets.')')).self::clears($move).self::adds($move), false],
             ];
         }
 

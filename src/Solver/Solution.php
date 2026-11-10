@@ -28,6 +28,8 @@ final class Solution
     private array $updatedFrom = [];
     /** @var list<string> */
     private array $advisoryUnread = [];
+    /** @var array<string>|null */
+    private ?array $held = null;
     /** @var array{class: string, message: string}|null */
     private ?array $error = null;
 
@@ -50,12 +52,14 @@ final class Solution
      * @param array<string, string> $updatedFrom name => the locked pretty version, for each name that the solve updates
      * @param array<string, string> $unloaded       the names that the solve asked for and could not load
      * @param list<string>          $advisoryUnread the names that the result holds and whose advisories the solve could not read
+     * @param array<string>|null    $held           every name that the result holds, a replaced name included; null when unknown
      */
-    public static function resolved(array $installs, array $updatedFrom = [], array $unloaded = [], array $advisoryUnread = []): self
+    public static function resolved(array $installs, array $updatedFrom = [], array $unloaded = [], array $advisoryUnread = [], ?array $held = null): self
     {
         $solution = new self($installs, [], null, $unloaded);
         $solution->updatedFrom = $updatedFrom;
         $solution->advisoryUnread = $advisoryUnread;
+        $solution->held = $held;
 
         return $solution;
     }
@@ -121,6 +125,12 @@ final class Solution
     public function unloaded(): array
     {
         return $this->unloaded;
+    }
+
+    /** Whether the result holds $name: false when the solve drops it, true when the solution does not know. */
+    public function keeps(string $name): bool
+    {
+        return $this->held === null || \in_array($name, $this->held, true);
     }
 
     /** @return list<string> the names that the result holds and whose advisories the solve could not read */

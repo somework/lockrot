@@ -260,7 +260,7 @@ final class SolverChecker implements MoveChecker
             } elseif (!$solution->resolves()) {
                 $refusal = $solution;
             } elseif ($release && !MoveCheck::isRelease($solution->installs()[$moved[0]] ?? null)) {
-                $noRelease ??= $solution;
+                $noRelease ??= [$solution->installs()[$moved[0]] ?? ($solution->keeps($moved[0]) ? $this->lockedVersion($moved[0]) : null)];
             } elseif (self::installsNewest($solution, $moved[0], $newest)) {
                 return [$form, $solution];
             } elseif ($resolved === null || self::installsHigher($solution, $resolved[1], $moved[0])) {
@@ -269,9 +269,7 @@ final class SolverChecker implements MoveChecker
         }
 
         if ($resolved === null && $stopped === null && $noRelease !== null) {
-            $after = $noRelease->installs()[$moved[0]] ?? $this->lockedVersion($moved[0]);
-
-            return new CheckOutcome(MoveCheck::installsNoRelease($after === null || MoveCheck::isRelease($after) ? null : $after));
+            return new CheckOutcome(MoveCheck::installsNoRelease($noRelease[0]));
         }
 
         // @phpstan-ignore return.type (every form ran, and none resolved, stopped or installed no release, so each one refused)
