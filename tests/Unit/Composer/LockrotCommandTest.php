@@ -2105,6 +2105,27 @@ final class LockrotCommandTest extends TestCase
         }
     }
 
+    /** The variable alone, as `composer --no-network` sets it, makes the run offline: the same setting and the same note as --offline. */
+    public function testComposerDisableNetworkWithoutTheFlagReadsAsOffline(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        $previous = Platform::getEnv('COMPOSER_DISABLE_NETWORK');
+        Platform::putEnv('COMPOSER_DISABLE_NETWORK', '1');
+        try {
+            $observed = $this->observeDuringRun(['--target-php' => '8.4'], $this->loader());
+            chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+            [, $stdout] = $this->runRecordingWriteOptions(['--format' => 'json', '--target-php' => '8.4'], $this->loader());
+
+            self::assertTrue($observed['offline']);
+            $json = json_decode($stdout, true);
+            self::assertIsArray($json, $stdout);
+            $codes = array_column(JsonPath::arrayAt($json, ['note_details']), 'code');
+            self::assertContains('offline', $codes);
+        } finally {
+            $this->restoreGlobalEnv('COMPOSER_DISABLE_NETWORK', $previous);
+        }
+    }
+
     /**
      * A writable copy of the fixture project $lockPath belongs to, with the working directory moved
      * into it: the baseline file is written next to composer.json, and the fixture directories are

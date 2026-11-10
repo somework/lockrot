@@ -131,7 +131,7 @@ final class LockrotConfig
     /**
      * Composer's own reading of COMPOSER_DISABLE_NETWORK, `(bool)` of the value as HttpDownloader
      * takes it: any value but empty or `0`, `prime` included, turns the network off, so the run
-     * reads as `--offline`. The metadata loader and the move check take their flag from here.
+     * reads as `--offline`.
      *
      * @param array<string, mixed> $env
      */
