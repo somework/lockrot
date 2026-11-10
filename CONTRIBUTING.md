@@ -287,9 +287,9 @@ The archive's dependencies are locked in `build/phar/composer.lock`, which is co
   `build/phar/` and commit the lock.
 
 `.github/workflows/phar-audit.yml` runs `composer audit --locked` on that lock when it changes and
-every week. Dependabot does not watch `build/phar/`, so a red run is the only report of an advisory
-against a bundled dependency. Update the named package in `build/phar/`, commit the lock, and
-release the fix.
+every week. Dependabot does not watch `build/phar/`, so this audit reports an advisory against a
+bundled dependency. On a red run, update the named package in `build/phar/`. Commit the lock.
+Release the fix.
 
 ### Rebuilding a release
 

@@ -1,10 +1,8 @@
-# The PHAR bundles the production dependencies of build/phar/composer.lock, which Dependabot does
-# not watch: the lock names a path repository that Dependabot cannot resolve, and a bump of
-# composer/composer also moves the recordings (CONTRIBUTING, "The PHAR"). This audit reports an
-# advisory against a bundled version, on a change of the lock and weekly, because an advisory
-# appears without a change in the lock. A red run means: run `composer update` for the named
-# package in build/phar/ and commit the lock. workflow_dispatch needs this file on the default
-# branch, and GitHub runs schedule there.
+# The PHAR bundles the production dependencies of build/phar/composer.lock. .github/dependabot.yml
+# has one composer entry (directory "/", development dependencies only), so nothing else reports
+# an advisory against them. The audit runs on a change of the lock and weekly, because an advisory
+# appears without a change in the lock. On a red run, update the named package with `composer
+# update` in build/phar/ and commit the lock. --abandoned=report keeps an abandoned package from failing it.
 name: phar-audit
 on:
   pull_request:
@@ -29,4 +27,4 @@ jobs:
           php-version: '8.4'
           coverage: none
           tools: composer:2.10.3
-      - run: composer audit --locked --no-interaction --working-dir=build/phar
+      - run: composer audit --locked --abandoned=report --no-interaction --working-dir=build/phar
