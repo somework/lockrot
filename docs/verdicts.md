@@ -987,6 +987,11 @@ Limits of the check:
 - When lockrot read no release of the move's row, or a requirement has no constraint, it tries no
   move (`check.reason` `no_release_read`). The commands stay, unless Composer's `config.lock` is
   false.
+- A form resolves a move only when its solve installs a release of the moved package. When each
+  form that resolves keeps the locked version or installs a dev version, such as a branch alias
+  inside the caret at minimum-stability `dev`, the move is not checked (`check.reason`
+  `installs_no_release`). The text names the version that the solve gives. A recorded answer
+  that names no release keeps `resolves`.
 - It stops a chain of refusals after `Analyzer::CHECK_PASSES` passes. A new request after the
   last one is not checked (`check.reason` `pass_cap`).
 - When Composer's solver fails on a request, the move is not checked (`check.reason`
