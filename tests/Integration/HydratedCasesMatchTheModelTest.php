@@ -142,7 +142,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'origin.kind', 'signals[].id', 'unchecked_accepted[].{check,reason}', 'run.signal_ids',
         ],
         'php_line' => ['run.php_window', 'run.target_php'],
-        'report' => ['security.gets', 'chain', 'depth', 'libyears', 'libyears_unmeasured', 'libyears_at_least', 'signals[].summary'],
+        'report' => ['security.gets', 'security.feeds', 'chain', 'depth', 'libyears', 'libyears_unmeasured', 'libyears_at_least', 'signals[].summary'],
         'baseline_suffix' => [
             'baseline.status', 'baseline.advisories_now.{known,new}', 'baseline.worsened_by[].{id,kind,why}',
             'baseline.worsened_by[].recorded.{fix_kind,severity}', 'baseline.worsened_by[].now.{fix_kind,severity}', 'flags[].baseline.{covered_by,state}',
