@@ -347,8 +347,8 @@ A committed baseline does not make an upgrade silent. A package that a release s
 `new`. A package whose facts worsen (a higher flag, a new advisory, a higher rating or a lost fix)
 is `worsened`. A `new` finding fails the run when it reaches `--fail-on`. A `worsened` one fails
 when its [gate score](baseline.md#the-gate-score) reaches a grade value. A flag value reads the
-flags that the baseline does not cover, and `vulnerable` reads the advisories that it does not
-know ([The gate score](baseline.md#the-gate-score)). An unchanged lock can cross a
+flags that the baseline does not cover, `vulnerable` reads the advisories that it does not know,
+and `unchecked` reads the finding's S10. An unchanged lock can cross a
 threshold too, as its packages' releases age ([baseline.md](baseline.md)).
 
 ## Extending lockrot
