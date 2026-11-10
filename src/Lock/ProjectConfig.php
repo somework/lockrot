@@ -6,6 +6,7 @@ namespace Lockrot\Lock;
 
 use Composer\Repository\PlatformRepository;
 use Lockrot\Allowlist\ProjectIgnoreList;
+use Lockrot\Allowlist\UncheckedAcceptanceEntry;
 use Lockrot\Config\ConfigSchema;
 use Lockrot\Config\UnknownKeys;
 use Lockrot\Exception\ConfigException;
@@ -171,6 +172,16 @@ final class ProjectConfig
             if (\is_array($rows[$index])) {
                 unset($rows[$index]['flags']);
                 $schemaInput['ignore'] = $rows;
+            }
+        }
+        $accepted = \is_array($lockrotExtra['accept-unchecked'] ?? null) ? $lockrotExtra['accept-unchecked'] : [];
+        foreach ($accepted as $index => $row) {
+            $refusal = \is_int($index) ? UncheckedAcceptanceEntry::repositoryRefusal($index, $row) : null;
+            if ($refusal !== null && \is_array($row)) {
+                $refusals[] = $refusal;
+                // The schema reads a placeholder in its place, so that its regex does not speak too.
+                $accepted[$index] = array_merge($row, ["repository" => "x://h"]);
+                $schemaInput['accept-unchecked'] = $accepted;
             }
         }
         try {
