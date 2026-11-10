@@ -448,7 +448,7 @@ them.
 - Findings: the entries have none.
 - `sets_network_failures`: no.
 
-### Lock out of sync {#lock_out_of_sync}
+### <a name="lock_out_of_sync"></a>Lock out of sync {#lock_out_of_sync}
 
 The lock file does not match composer.json: its `content-hash` differs from the hash that Composer
 computes from composer.json, as in `composer install`. lockrot still judges the lock as written. A

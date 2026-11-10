@@ -246,6 +246,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `gitlab` or `html` to stdout repeats the line on stderr, so `2>&1` makes the file not valid JSON.
   Action: read stdout alone, because `-q` also silences the report.
   ([Reading the gate line](docs/ci.md#reading-the-gate-line))
+- **Run notes:** the note `lock_out_of_sync` says that the lock does not match composer.json, as
+  `composer install` warns, and lists the root requirements that the lock does not hold.
+  ([Lock out of sync](docs/notes.md#lock_out_of_sync))
 - **JSON:** `run.move_check.blocking_disabled_by` lists each environment variable and composer.json
   key that turns Composer's advisory blocking off. The move check then blocks no advisory.
   `policy.advisories.audit: ignore` alone writes no run note `advisories_disabled_by_policy`.
