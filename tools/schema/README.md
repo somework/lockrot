@@ -7,7 +7,7 @@ differs from the committed files (`.github/workflows/ci.yml`, the step "The gene
 negatives match tools/schema"). The `-1` files are not generated. `CONTRIBUTING.md`, "Changing a schema", holds
 their checklist.
 
-The scripts use the Python standard library only.
+The Python scripts use the standard library only. `hydrated-divergences` is a PHP script that reads the vendor autoloader.
 
 ## Commands
 
@@ -49,6 +49,7 @@ job of `.github/workflows/ci.yml` runs `emit_dts.py` and `emit_bundle.js` and fa
 | `ts/emit_dts.py` | `resources/lockrot-report-2.schema.json` | `types/lockrot-report-2.known.d.ts`, `ts/known-map.json`, `ts/probes.generated.ts` |
 | `node/emit_bundle.js` | `tests/fixtures/contract/report-2/` | `tests/fixtures/bundle.generated.ts` |
 | `project_fixtures.py` | the reference model's `cases.json`, `docs/` and `page-goldens.json` | `tests/fixtures/flags/`, `tests/fixtures/schema/documents/`, `tests/fixtures/contract/page-goldens.json` |
+| `hydrated-divergences` | `tests/fixtures/flags/cases.json`, the recorded `tests/fixtures/contract/report-2/` and `explain-2/` | standard output: each field that `HydratedCasesMatchTheModelTest` compares, where a recording differs from the model and `DIFFERENCES` does not list it |
 
 `ship_text.py` is the shipping pass that the builders apply to every description: it removes the
 references a published description must not hold. A unit test applies its expression `SHIP_BANNED`

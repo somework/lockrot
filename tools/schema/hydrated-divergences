@@ -1,0 +1,68 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+// Lists each field where lockrot's recording of a hydrated case differs from the model's case, one
+// tab-separated line each: case id, package, field path, lockrot's value, the model's value.
+// It reads the fields that HydratedCasesMatchTheModelTest compares, and omits the paths and the
+// signals or flags that the test's DIFFERENCES list. A value that a side does not hold reads `-`.
+//
+//   tools/schema/hydrated-divergences
+require __DIR__.'/../../vendor/autoload.php';
+
+use Lockrot\Tests\Integration\HydratedCasesMatchTheModelTest;
+use Lockrot\Tests\Support\Contract\Fields;
+use Lockrot\Tests\Support\JsonPath;
+
+const ABSENT = '-';
+
+/**
+ * @param mixed $model
+ * @param mixed $lockrot
+ *
+ * @return iterable<string, array{mixed, mixed}> each differing leaf by its path; a list is one leaf
+ */
+function differences($model, $lockrot, string $path): iterable
+{
+    if (isMap($model) && isMap($lockrot)) {
+        foreach (array_keys($model + $lockrot) as $key) {
+            $child = $path === '' ? (string) $key : (preg_match('/^(signals|flags)$/', $path) === 1 ? $path.'['.$key.']' : $path.'.'.$key);
+            yield from differences(\array_key_exists($key, $model) ? $model[$key] : ABSENT, \array_key_exists($key, $lockrot) ? $lockrot[$key] : ABSENT, $child);
+        }
+
+        return;
+    }
+    if ($model !== $lockrot) {
+        yield $path => [$model, $lockrot];
+    }
+}
+
+/**
+ * @param mixed $value
+ *
+ * @phpstan-assert-if-true array<mixed, mixed> $value
+ */
+function isMap($value): bool
+{
+    return \is_array($value) && $value !== [] && array_keys($value) !== range(0, \count($value) - 1);
+}
+
+/** @param mixed $value */
+function text($value): string
+{
+    return $value === ABSENT ? ABSENT : (string) json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+}
+
+$lines = [];
+$documents = [];
+foreach (HydratedCasesMatchTheModelTest::caseLines() as [$id, $line]) {
+    $documents[$id] ??= HydratedCasesMatchTheModelTest::documents($id);
+    [$model, $lockrot, $kept] = HydratedCasesMatchTheModelTest::unlisted($id, $line, ...$documents[$id]);
+    foreach (differences(Fields::only($model, $kept), Fields::only($lockrot, $kept), '') as $path => [$modelValue, $lockrotValue]) {
+        $lines[$id][$path] = implode("\t", [$id, JsonPath::stringAt($model, ['package']), $path, text($lockrotValue), text($modelValue)]);
+    }
+}
+foreach ($lines as $byPath) {
+    ksort($byPath);
+    echo implode("\n", $byPath), "\n";
+}

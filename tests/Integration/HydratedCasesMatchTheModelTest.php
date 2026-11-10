@@ -19,7 +19,8 @@ use PHPUnit\Framework\TestCase;
  * the case's finding, run and branch rows (SPEC-0.14.md §7.9.8, §7.9.13). The model's goldens
  * (`cases[].golden`, §7.9.14) render those fields of the model's case. Where lockrot's recording of
  * the hydrated case has the same fields, the page writes the model's golden. Each field list holds
- * the paths that the model's renderer of that golden reads.
+ * the paths that the model's renderer of that golden reads. The `report` list holds the finding
+ * fields that no golden renders: the page and report-2 consumers read them all the same.
  *
  * @coversNothing
  *
@@ -52,6 +53,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         ],
         'readings' => [
             'activity.{event,forge,host}', 'age.push.years', 'age.release.years', 'branch', 'replacement', 'version',
+            'checks_missing[].blocks', 'checks_skipped[].blocks',
             'details.metadata.branches[].{branch,highest,installed}', 'details.metadata.branches[].fixes.fixed',
             'flags[].degree.{liveness_complete,reasons}', 'flags[].headline.{source,value}', 'flags[].{id,role}', 'next_step.{kind,to_branch}',
             'next_step.replacement.{package,url}', 'score.decided_by', 'score.parts.security.of', 'score.terms[].{flag,part,severity}',
@@ -140,6 +142,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'origin.kind', 'signals[].id', 'unchecked_accepted[].{check,reason}', 'run.signal_ids',
         ],
         'php_line' => ['run.php_window', 'run.target_php'],
+        'report' => ['security.gets', 'chain', 'depth', 'libyears', 'libyears_unmeasured', 'libyears_at_least', 'signals[].summary'],
         'baseline_suffix' => [
             'baseline.status', 'baseline.advisories_now.{known,new}', 'baseline.worsened_by[].{id,kind,why}',
             'baseline.worsened_by[].recorded.{fix_kind,severity}', 'baseline.worsened_by[].now.{fix_kind,severity}', 'flags[].baseline.{covered_by,state}',
@@ -221,6 +224,9 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'baseline_suffix' => [
                 [['flags[old-promise]'], self::TIE],
             ],
+            'report' => [
+                [['signals[S5]'], self::TIE],
+            ],
         ],
         'B-offline‡' => [
             'moves' => [
@@ -265,6 +271,9 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['signals[S3]'], self::BITBUCKET],
             ],
             'checks' => [
+                [['signals[S3]'], self::BITBUCKET],
+            ],
+            'report' => [
                 [['signals[S3]'], self::BITBUCKET],
             ],
         ],
@@ -436,32 +445,19 @@ final class HydratedCasesMatchTheModelTest extends TestCase
     public function testTheRecordingHasTheModelsFieldsOfEachLine(string $id, string $line): void
     {
         $case = CaseHydrator::case($id);
-        $model = self::documentOf(JsonPath::arrayAt($case, ['finding']), JsonPath::arrayAt($case, ['run']), self::branchesOf($case['details'] ?? null));
-        $name = CaseRecording::fileName($id);
-        $report = JsonPath::decodeFile(self::CONTRACT.'report-2/'.$name.'.json');
-        $explain = JsonPath::decodeFile(self::CONTRACT.'explain-2/'.$name.'.json');
-        $lockrot = self::documentOf(self::findingOf($report, JsonPath::stringAt($case, ['finding', 'package'])), JsonPath::arrayAt($report, ['run']), self::branchesOf($explain));
-        $modelDocument = $model;
-        $lockrotDocument = $lockrot;
-        $listed = [];
+        [$modelDocument, $lockrotDocument] = self::documents($id);
         foreach (self::DIFFERENCES[$id][$line] ?? [] as [$paths]) {
             foreach ($paths as $path) {
                 $item = self::item($path);
                 if ($item !== null) {
-                    // One signal or flag that only one side has: the other items keep their comparison.
-                    $modelItems = JsonPath::arrayAt($model, [$item[0]]);
-                    $lockrotItems = JsonPath::arrayAt($lockrot, [$item[0]]);
-                    self::assertNotSame(\array_key_exists($item[1], $modelItems), \array_key_exists($item[1], $lockrotItems), $id.' '.$line.': '.$path.' is on both sides again: take it off DIFFERENCES');
-                    unset($modelItems[$item[1]], $lockrotItems[$item[1]]);
-                    $model[$item[0]] = $modelItems;
-                    $lockrot[$item[0]] = $lockrotItems;
+                    $onModel = \array_key_exists($item[1], JsonPath::arrayAt($modelDocument, [$item[0]]));
+                    self::assertNotSame($onModel, \array_key_exists($item[1], JsonPath::arrayAt($lockrotDocument, [$item[0]])), $id.' '.$line.': '.$path.' is on both sides again: take it off DIFFERENCES');
                     continue;
                 }
-                self::assertNotSame(Fields::only($model, [$path]), Fields::only($lockrot, [$path]), $id.' '.$line.': '.$path.' agrees with the model again: take it off DIFFERENCES');
-                $listed[] = $path;
+                self::assertNotSame(Fields::only($modelDocument, [$path]), Fields::only($lockrotDocument, [$path]), $id.' '.$line.': '.$path.' agrees with the model again: take it off DIFFERENCES');
             }
         }
-        $kept = array_values(array_diff(self::paths(self::LINES[$line]), $listed));
+        [$model, $lockrot, $kept, $listed] = self::unlisted($id, $line, $modelDocument, $lockrotDocument);
 
         self::assertSame(Fields::only($model, $kept), Fields::only($lockrot, $kept), $id.' '.$line.': the recording differs from the model in the fields that the line reads');
         $commands = array_values(array_intersect($listed, ['next_step.commands', 'next_step.also[].commands']));
@@ -493,6 +489,56 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 self::assertTrue(JsonPath::has($lockrotDocument, ['run', 'move_check']) && JsonPath::arrayAt($lockrotDocument, ['run'])['move_check'] === null, $id.' '.$line.': lockrot writes none');
             }
         }
+    }
+
+    /**
+     * The model's case and lockrot's recording of it as one document each: the finding, `run` and
+     * `details`, with signals and flags keyed by id. tools/schema/hydrated-divergences reads them too.
+     *
+     * @return array{array<mixed, mixed>, array<mixed, mixed>} the model's document, then lockrot's
+     */
+    public static function documents(string $id): array
+    {
+        $case = CaseHydrator::case($id);
+        $name = CaseRecording::fileName($id);
+        $report = JsonPath::decodeFile(self::CONTRACT.'report-2/'.$name.'.json');
+        $explain = JsonPath::decodeFile(self::CONTRACT.'explain-2/'.$name.'.json');
+
+        return [
+            self::documentOf(JsonPath::arrayAt($case, ['finding']), JsonPath::arrayAt($case, ['run']), self::branchesOf($case['details'] ?? null)),
+            self::documentOf(self::findingOf($report, JsonPath::stringAt($case, ['finding', 'package'])), JsonPath::arrayAt($report, ['run']), self::branchesOf($explain)),
+        ];
+    }
+
+    /**
+     * Both documents without the signals and flags that the line's DIFFERENCES entry of the case
+     * names, the line's paths that the entry does not name, and the paths that it names.
+     *
+     * @param array<mixed, mixed> $model
+     * @param array<mixed, mixed> $lockrot
+     *
+     * @return array{array<mixed, mixed>, array<mixed, mixed>, list<string>, list<string>}
+     */
+    public static function unlisted(string $id, string $line, array $model, array $lockrot): array
+    {
+        $listed = [];
+        foreach (self::DIFFERENCES[$id][$line] ?? [] as [$paths]) {
+            foreach ($paths as $path) {
+                $item = self::item($path);
+                if ($item === null) {
+                    $listed[] = $path;
+                    continue;
+                }
+                // One signal or flag that only one side has: the other items keep their comparison.
+                $modelItems = JsonPath::arrayAt($model, [$item[0]]);
+                $lockrotItems = JsonPath::arrayAt($lockrot, [$item[0]]);
+                unset($modelItems[$item[1]], $lockrotItems[$item[1]]);
+                $model[$item[0]] = $modelItems;
+                $lockrot[$item[0]] = $lockrotItems;
+            }
+        }
+
+        return [$model, $lockrot, array_values(array_diff(self::paths(self::LINES[$line]), $listed)), $listed];
     }
 
     /**
