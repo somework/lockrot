@@ -292,12 +292,37 @@ $application = new class () extends \Composer\Console\Application {
             return null;
         }
         try {
-            $this->find($name);
+            $command = $this->find($name);
+            $subject = $this->subjectOf($command, $input);
+            if ($subject !== null && $command->getName() === 'help') {
+                $this->find($subject);
+            } elseif ($subject !== null && $command->getName() === 'list') {
+                $this->findNamespace($subject);
+            }
         } catch (\Symfony\Component\Console\Exception\CommandNotFoundException $e) {
             return $e->getMessage();
         }
 
         return null;
+    }
+
+    /** The command or namespace that `help` or `list` names, null for any other command or no name. */
+    private function subjectOf(\Symfony\Component\Console\Command\Command $command, \Symfony\Component\Console\Input\InputInterface $input): ?string
+    {
+        $argument = ['help' => 'command_name', 'list' => 'namespace'][$command->getName()] ?? null;
+        if ($argument === null) {
+            return null;
+        }
+        $probe = clone $input;
+        $command->mergeApplicationDefinition();
+        try {
+            $probe->bind($command->getDefinition());
+        } catch (\Symfony\Component\Console\Exception\ExceptionInterface $e) {
+            return null;
+        }
+        $subject = $probe->hasArgument($argument) ? $probe->getArgument($argument) : null;
+
+        return \is_string($subject) && $subject !== '' ? $subject : null;
     }
 
     private function refuseUsage(\Symfony\Component\Console\Output\OutputInterface $output, string $reason): int

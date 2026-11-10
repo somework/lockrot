@@ -35,6 +35,8 @@ final class SourceEntryUsageErrorTest extends TestCase
         yield 'a value after a space that the console reads as the command' => [['--output', 'json:r.json'], 'lockrot: There are no commands defined in the "json" namespace.'];
         yield 'a --working-dir that does not exist' => [['--working-dir={dir}/missing'], 'lockrot: --working-dir names a directory that does not exist: {dir}/missing'];
         yield 'a -d that does not exist, before the command' => [['-d', '{dir}/missing', 'lockrot'], 'lockrot: --working-dir names a directory that does not exist: {dir}/missing'];
+        yield 'help for an unknown command' => [['help', 'nope'], 'lockrot: Command "nope" is not defined.'];
+        yield 'list of an unknown namespace' => [['list', 'nosuch'], 'lockrot: There are no commands defined in the "nosuch" namespace.'];
     }
 
     /**
@@ -50,15 +52,6 @@ final class SourceEntryUsageErrorTest extends TestCase
         self::assertSame(2, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
         self::assertSame('', $process->getOutput());
         self::assertSame(str_replace('{dir}', $this->dir, $line)."\n", $process->getErrorOutput());
-    }
-
-    public function testAnUnknownCommandNameForHelpIsExitTwoWithALockrotLine(): void
-    {
-        $process = $this->lockrot(['help', 'nope']);
-
-        self::assertSame(2, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
-        self::assertSame('', $process->getOutput());
-        self::assertContains('lockrot: Command "nope" is not defined.', explode("\n", $process->getErrorOutput()));
     }
 
     /** @param list<string> $arguments */
