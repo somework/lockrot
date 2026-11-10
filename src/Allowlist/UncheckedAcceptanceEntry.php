@@ -85,8 +85,7 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
     }
 
     /**
-     * The refusal of an entry's `repository` that config-2's pattern refuses too, in lockrot's own
-     * words, or null. It lets the message of the reader speak before the schema's regex.
+     * The refusal of an entry's `repository` in lockrot's own words, or null.
      *
      * @param mixed $row
      */

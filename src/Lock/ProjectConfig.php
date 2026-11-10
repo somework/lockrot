@@ -189,7 +189,7 @@ final class ProjectConfig
             if ($refusal !== null && \is_array($row)) {
                 $refusals[] = $refusal;
                 // The schema reads a placeholder in its place, so that its regex does not speak too.
-                $accepted[$index] = array_merge($row, ["repository" => "x://h"]);
+                $accepted[$index] = ['repository' => 'x://h'] + $row;
                 $schemaInput['accept-unchecked'] = $accepted;
             }
         }
