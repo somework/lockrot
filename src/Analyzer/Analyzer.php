@@ -660,7 +660,7 @@ final class Analyzer
         return $finding
             ->withComposerJson($composerJsonRead, $graph->namedIn($package->name()))
             ->withFlags($flags, $facts->metadataStatus() === PackageFacts::METADATA_READ)
-            ->withDetails(FindingDetails::of($facts, $entry, $floor, $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts), $accepted, $droppedDates));
+            ->withDetails(FindingDetails::of($facts, $entry, $floor, $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts), $accepted, $droppedDates, $signalSet->notChecked()));
     }
 
     /**

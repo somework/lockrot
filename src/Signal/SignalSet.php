@@ -90,6 +90,18 @@ final class SignalSet
         return $copy;
     }
 
+    /** The S10 rule, for the callers that must name the same blocked signals. */
+    public function notChecked(): ?NotCheckedRule
+    {
+        foreach ($this->rules as $rule) {
+            if ($rule instanceof NotCheckedRule) {
+                return $rule;
+            }
+        }
+
+        return null;
+    }
+
     public function thresholds(): Thresholds
     {
         return $this->thresholds;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Allowlist\AllowlistEntry;
+use Lockrot\Clock;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryFeed;
@@ -14,6 +15,7 @@ use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
+use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\StableRelease;
 use Lockrot\Lock\LockFile;
@@ -24,10 +26,15 @@ use Lockrot\Security\Gets;
 use Lockrot\Security\Holder;
 use Lockrot\Security\PackageFixes;
 use Lockrot\Security\PhpCheck;
+use Lockrot\Signal\ConstraintOpenness;
 use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
+use Lockrot\Signal\Rule\LeftBehindRule;
+use Lockrot\Signal\Rule\NotCheckedRule;
+use Lockrot\Signal\Rule\OldPromiseRule;
 use Lockrot\Signal\Signal;
+use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
@@ -68,6 +75,45 @@ final class FindingDetailsTest extends TestCase
         self::assertSame($check, $security['check']);
         self::assertSame($records, $security['records']);
         self::assertSame($feeds, $security['feeds'], 'the feeds as the lookup gave them');
+    }
+
+    /** @return iterable<string, array{PackageFacts}> a package with no lock time and an open `require.php`, whose metadata was not read */
+    public static function unreadMetadata(): iterable
+    {
+        $vcs = F::looked(new PackageFacts(F::package(['fromComposerRepository' => false, 'php' => '>=5.6']), null, null, []), ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY);
+        $path = LockFile::fromArray(['packages' => [['name' => 'vendor/p', 'version' => '1.0.0', 'require' => ['php' => '>=5.6'], 'dist' => ['type' => 'path', 'url' => '../p']]]])->find('vendor/p');
+        self::assertNotNull($path);
+        $unavailable = new PackageFacts(F::package(['php' => '>=5.6']), null, null, [], null, null, null, true);
+
+        yield 'B1 vcs package whose S10 entry a raised S1 dropped' => [$vcs];
+        yield 'B2 path package' => [F::looked(new PackageFacts($path, null, null, []))];
+        yield 'B3 Composer-repository package with unavailable metadata' => [F::looked($unavailable)];
+    }
+
+    /** @dataProvider unreadMetadata */
+    #[DataProvider('unreadMetadata')]
+    public function testTheSkippedMetadataCheckNamesTheSameSignalsAsS10(PackageFacts $facts): void
+    {
+        $details = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null, FindingBuilder::unmeasuredAge(), [], null, self::notChecked());
+
+        $skip = array_values(array_filter($details->skipped(), static fn ($check): bool => $check->check() === 'release_metadata'));
+
+        self::assertCount(1, $skip);
+        self::assertSame([Signal::S2, Signal::S5, Signal::S8], $skip[0]->blocks());
+    }
+
+    public function testTheSkippedMetadataCheckLeavesS5OutWithALockTime(): void
+    {
+        $facts = F::looked(new PackageFacts(F::package(['fromComposerRepository' => false, 'php' => '>=5.6', 'time' => '2019-01-01T00:00:00+00:00']), null, null, []));
+
+        $skip = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null, FindingBuilder::unmeasuredAge(), [], null, self::notChecked())->skipped();
+
+        self::assertSame([Signal::S2, Signal::S8], array_values(array_filter($skip, static fn ($check): bool => $check->check() === 'release_metadata'))[0]->blocks());
+    }
+
+    private static function notChecked(): NotCheckedRule
+    {
+        return new NotCheckedRule(new LeftBehindRule(Clock::fixed('2026-09-01T00:00:00+00:00'), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
     }
 
     public function testARunWithoutALookupWritesNoFeedAndNoRecords(): void

@@ -85,29 +85,36 @@ final class FindingDetails
         $this->fixes = $fixes;
     }
 
+    /** A lookup that some feed answered, or that counted an advisory, is partial, whether or not the feed counted one. */
+    public static function isPartialLookup(PackageFacts $facts): bool
+    {
+        $coverage = $facts->advisoryCoverage();
+
+        return ($coverage !== null && $coverage->records() !== null) || $facts->advisories() !== [];
+    }
+
     /**
      * @param list<IgnoredAdvisory> $ignored the advisories Composer's audit ignore lists keep out of S9
      * @param list<Signal>          $signals         the finding's signals: S10 tells a gap from a skip
      * @param ?string               $metadataFailure what the repository that lists the package answered instead of its metadata
      * @param list<AcceptedCheck>     $accepted        the S10 entries that `accept-unchecked` accepted: each one is a skip
      * @param ?Check                  $droppedDates    the `release_dates` gap that the S10 filter dropped, a skip
+     * @param ?NotCheckedRule         $notChecked      decides the signals that unread release metadata blocks, as S10 does
      */
-    public static function of(PackageFacts $facts, ?AllowlistEntry $entry, PhpFloor $floor, array $ignored, array $signals, ?string $metadataFailure, Age $age, array $accepted = [], ?Check $droppedDates = null): self
+    public static function of(PackageFacts $facts, ?AllowlistEntry $entry, PhpFloor $floor, array $ignored, array $signals, ?string $metadataFailure, Age $age, array $accepted = [], ?Check $droppedDates = null, ?NotCheckedRule $notChecked = null): self
     {
         $package = $facts->package();
         $status = $facts->metadataStatus();
         $coverage = $facts->advisoryCoverage();
         $reason = $coverage === null ? AdvisoryCoverage::NO_FEED : $coverage->reason();
         $requires = $package->requirePhp();
-        // A lookup that some feed answered is partial, whether or not that feed counted an advisory.
-        $answered = $coverage !== null && $coverage->records() !== null;
-        $check = $reason === null ? 'complete' : ($answered || $facts->advisories() !== [] ? 'partial' : 'not_run');
+        $check = $reason === null ? 'complete' : (self::isPartialLookup($facts) ? 'partial' : 'not_run');
 
         $details = new self(
             $status,
             $status === PackageFacts::METADATA_UNAVAILABLE && $metadataFailure !== null ? MetadataFailure::reason($metadataFailure) : null,
             $status === PackageFacts::METADATA_UNAVAILABLE ? $metadataFailure : null,
-            self::skippedChecks($facts, $signals, $reason, $accepted, $droppedDates),
+            self::skippedChecks($facts, $signals, $reason, $accepted, $droppedDates, $notChecked),
             ['requires' => $requires, 'target_runs' => $requires === null ? null : $floor->admitsTarget($requires), 'project_allows' => $requires === null ? null : $floor->allowsProject($requires)],
             $entry,
             $check,
@@ -192,7 +199,7 @@ final class FindingDetails
      *
      * @return list<Check>
      */
-    private static function skippedChecks(PackageFacts $facts, array $signals, ?string $advisoryReason, array $accepted, ?Check $droppedDates): array
+    private static function skippedChecks(PackageFacts $facts, array $signals, ?string $advisoryReason, array $accepted, ?Check $droppedDates, ?NotCheckedRule $notChecked): array
     {
         $inS10 = [];
         $capped = false;
@@ -223,7 +230,7 @@ final class FindingDetails
             $skipped[] = $acceptedSkips['release_metadata'];
         } elseif ($facts->metadataStatus() !== PackageFacts::METADATA_READ) {
             if (!\in_array('release_metadata', $inS10, true)) {
-                $skipped[] = new Check('release_metadata', $facts->metadataStatus(), $capped ? [Signal::S2, Signal::S8, Signal::S11] : [Signal::S2, Signal::S8]);
+                $skipped[] = new Check('release_metadata', $facts->metadataStatus(), $notChecked !== null ? $notChecked->metadataBlocks($facts, $capped) : ($capped ? [Signal::S2, Signal::S8, Signal::S11] : [Signal::S2, Signal::S8]));
             }
         } elseif (ReleaseBranch::of($facts->package()->version()) === null) {
             $skipped[] = new Check('release_branch', 'branch_snapshot', [Signal::S8]);
