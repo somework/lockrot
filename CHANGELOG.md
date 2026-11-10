@@ -556,12 +556,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   from a run with one. No run reads an answer that 0.13 cached, so the first online run on 0.14
   fetches each answer again. Action: run `--offline` only after one online run with the same token
   state. ([Caching](docs/internals.md#caching))
+- **Breaking:** **Config:** `COMPOSER_DISABLE_NETWORK` set to a value other than empty or `0`
+  acts as `--offline`, as in Composer. An uncached package reads `unavailable` (`offline`), not
+  `not_found`, and the `--strict-network` exit code can change either way. Action: unset the
+  variable for an online run. ([Options](docs/configuration.md#cli-options))
 - **table, markdown:** the footer reads `Run lockrot with --format=json for details.`, because the
   standalone PHAR has no `composer lockrot` command.
-- **Config:** `COMPOSER_DISABLE_NETWORK` acts as `--offline` in the main run when it is not empty
-  and not `0`, `prime` included, as in Composer. Uncached packages read unavailable with the reason
-  `offline`, and a move that needs such a package reads `not_checked` (`check.reason` `offline`).
-  ([Options](docs/configuration.md#cli-options))
 - **json, html, sarif, gitlab, `--explain`:** invalid UTF-8 in a transport or repository message no
   longer stops the document. Each invalid byte reads as U+FFFD.
 - **Install-time:** an activity request that the `install-time-budget` stopped before it started
