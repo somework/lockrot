@@ -40,7 +40,7 @@ final class PhpWindow implements \JsonSerializable
     /** Host features: whether Composer's platform holds them depends on the PHP build of the host. */
     public const HOST_FEATURES = ['php-debug', 'php-ipv6', 'php-zts'];
 
-    /** The version that Composer gives the root when it reads `self.version` in a root link (`Locker::getPlatformRequirements`). */
+    /** Stands for the root version of a composer.json link, as `Locker::getPlatformRequirements` reads `1.0.0` for the lock `platform`. */
     private const ROOT_VERSION = '1.0.0';
 
     /** @var Data */
