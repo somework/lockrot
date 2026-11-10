@@ -20,7 +20,7 @@ use Lockrot\Output\FormatContext;
 final class LockFile
 {
     /** Composer's package name pattern (composer-schema.json, `name`). */
-    private const NAME = '{^[a-z0-9](?:[_.-]?[a-z0-9]+)*/[a-z0-9](?:(?:[_.]|-{1,2})?[a-z0-9]+)*$}D';
+    private const NAME = '{^[a-z0-9](?:[_.-]?[a-z0-9]++)*+/[a-z0-9](?:(?:[_.]|-{1,2})?[a-z0-9]++)*+$}D';
 
     /** @var array<string, LockedPackage> */
     private array $packages;

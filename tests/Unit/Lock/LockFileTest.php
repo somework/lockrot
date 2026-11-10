@@ -652,4 +652,16 @@ final class LockFileTest extends TestCase
         self::assertSame($prefix.$cause->getMessage(), $thrown->getMessage());
         self::assertSame(0, $thrown->getCode(), 'lockrot carries no exception codes; a run exits on its verdict, not on these');
     }
+
+    /**
+     * The limits are set when a PHP starts, because a pattern compiled earlier can ignore them at
+     * run time. A name that cannot match must end the scan without hitting the backtrack limit.
+     */
+    public function testACraftedNameIsRefusedWithoutBacktracking(): void
+    {
+        $script = 'require '.var_export(\dirname(__DIR__, 3).'/vendor/autoload.php', true).'; echo (int) '.LockFile::class.'::isComposerName("a/".str_repeat("a", 200)."!"), preg_last_error_msg();';
+        $output = shell_exec(escapeshellarg(\PHP_BINARY).' -d pcre.jit=0 -d pcre.backtrack_limit=1000 -r '.escapeshellarg($script));
+
+        self::assertSame('0No error', $output);
+    }
 }
