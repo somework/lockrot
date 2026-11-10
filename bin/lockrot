@@ -252,13 +252,60 @@ $application = new class () extends \Composer\Console\Application {
             return 0;
         }
 
+        $usageError = $this->usageErrorBeforeTheCommand($input);
+        if ($usageError !== null) {
+            return $this->refuseUsage($output, $usageError);
+        }
+
         $this->hideProjectManifest();
 
         try {
             return parent::doRun($input, $output);
+        } catch (\Symfony\Component\Console\Exception\ExceptionInterface $e) {
+            // help, list and completion read their own arguments: lockrot's commands refuse theirs
+            // themselves ({@see \Lockrot\Composer\RejectsUnreadableInput}).
+            return $this->refuseUsage($output, $e->getMessage());
         } finally {
             $this->revealProjectManifest();
         }
+    }
+
+    /**
+     * Composer's doRun() exits 1 for these two, which lockrot keeps for the gate. The check runs
+     * before Composer's, which also prints a hint about disabled plugins for an unknown command.
+     */
+    private function usageErrorBeforeTheCommand(\Symfony\Component\Console\Input\InputInterface $input): ?string
+    {
+        $workingDir = $input->getParameterOption(['--working-dir', '-d'], null, true);
+        if (\is_string($workingDir) && !is_dir($workingDir)) {
+            return '--working-dir names a directory that does not exist: '.$workingDir;
+        }
+
+        $probe = clone $input;
+        try {
+            $probe->bind($this->getDefinition());
+        } catch (\Symfony\Component\Console\Exception\ExceptionInterface $e) {
+            // Symfony's doRun() reads the command name from a half-bound input too.
+        }
+        $name = $this->getCommandName($probe);
+        if ($name === null) {
+            return null;
+        }
+        try {
+            $this->find($name);
+        } catch (\Symfony\Component\Console\Exception\CommandNotFoundException $e) {
+            return $e->getMessage();
+        }
+
+        return null;
+    }
+
+    private function refuseUsage(\Symfony\Component\Console\Output\OutputInterface $output, string $reason): int
+    {
+        $target = $output instanceof \Symfony\Component\Console\Output\ConsoleOutputInterface ? $output->getErrorOutput() : $output;
+        $target->writeln(\Lockrot\Output\TerminalText::error('lockrot: '.$reason, $target->isDecorated()), \Symfony\Component\Console\Output\OutputInterface::OUTPUT_RAW);
+
+        return \Lockrot\Config\Policy::EXIT_ERROR;
     }
 
     protected function doRunCommand(\Symfony\Component\Console\Command\Command $command, \Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output): int

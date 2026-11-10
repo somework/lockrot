@@ -85,8 +85,8 @@ stack trace to the second. Other text comes from these sources:
       2.10 or newer, …` on stderr.
     - A non-CLI SAPI with `register_argc_argv` on prints `lockrot cannot run safely on a non-CLI
       SAPI …` on stdout.
-- The console application, which exits `1` before a command runs: an unknown command
-  (`Command "…" is not defined.`) or a `--working-dir` that does not exist.
+- In plugin mode, Composer's application, which exits `1` before `lockrot` runs: an unknown
+  command (`Command "…" is not defined.`) or a `--working-dir` that does not exist.
 
 Do not match `^lockrot:` to tell these cases apart.
 
@@ -118,6 +118,10 @@ Do not match `^lockrot:` to tell these cases apart.
   of one kind in `--fail-on`, `none` beside another value, and `vulnerable-low`.
 - A command line lockrot cannot read: an unknown option, an option without its value, a value given
   to a flag, an argument too many. lockrot checks it before it reads any file.
+- In the PHAR and `vendor/bin/lockrot`, an unknown command or a `--working-dir` that does not
+  exist. An option value after a space before the command name is an unknown command:
+  `lockrot.phar --output json:r.json` stops at `There are no commands defined in the "json"
+  namespace`. Join the value with `=`: `--output=json:r.json`.
 - `--fail-on`, `--baseline` or `--target-php` given twice, also with the same value
   ([configuration.md](configuration.md#cli-options)).
 - A baseline lockrot cannot read, a baseline-1 file included, and a baseline of another score model
@@ -153,14 +157,14 @@ Other exit paths:
 
 ### When exit `1` does not come from lockrot {#exit-1-not-from-lockrot}
 
-Composer or Symfony can stop before lockrot runs, with their own exit `1`:
+In plugin mode, Composer can stop before lockrot runs, with its own exit `1`. The PHAR and
+`vendor/bin/lockrot` exit `2` for these usage errors:
 
 | Symptom | Cause | Fix |
 |---|---|---|
 | Exit `1` with a report and a `gate: fails` line, or under `--generate-baseline` with a `lockrot: baseline written` line | lockrot's own exit `1`: a finding failed `--fail-on`, or `--strict-network`. Under `--generate-baseline`, only `--strict-network` gives it | Read the `gate:` line. This exit is the gate at work |
-| Exit `1`, Composer's error box or Symfony's message, no `lockrot:` line | An unknown command: `composer lokrot`, `php lockrot.phar nope` | Fix the command name |
+| Exit `1`, Composer's error box or Symfony's message, no `lockrot:` line | An unknown command (`composer lokrot`) or a `--working-dir` that does not exist | Fix the command name or the directory |
 | Exit `1`, `Command "lockrot" is not defined`, after a `lockrot: Composer <version> is older than 2.10` line | The plugin runs on a Composer older than 2.10, so it adds no `lockrot` command | Upgrade Composer to 2.10 or later, or run the [PHAR](phar.md) |
-| Exit `1`, `There are no commands defined in the "json" namespace` | `php lockrot.phar --output json:r.json`: before the command name, Symfony reads a value after a space as the command | Join the value with `=`: `--output=json:r.json` |
 | Exit `1`, Composer's error box about `composer.json`, in plugin mode | Composer cannot parse or validate `composer.json` | Fix the file. The PHAR reads the file itself and exits `2` for it |
 
 ## <a name="reading-the-gate-line"></a>Reading the gate line {#reading-the-gate-line}

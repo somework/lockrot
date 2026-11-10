@@ -592,6 +592,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CLI:** on PHP 7.1 to 7.3, the source script `bin/lockrot` prints
   `lockrot requires PHP 7.4 or newer` and exits `2`, not a parse error with exit `255`.
   ([Exit codes](docs/ci.md#exit-codes))
+- **CLI:** the PHAR and `vendor/bin/lockrot` exit `2` with a `lockrot:` line on an unknown command,
+  a `--working-dir` that does not exist, and a bad argument to `help` or `list`, not `1`. In plugin
+  mode, Composer still exits `1` for them. ([Exit codes](docs/ci.md#exit-codes))
 - **CLI:** `--explain` prints the footnote "so S8 does not measure the branch" only when S8 did
   not measure the installed branch because of its undated releases.
   ([Explaining one package](docs/configuration.md#explaining-one-package))
