@@ -421,17 +421,18 @@ final class LibyearsTest extends TestCase
         $highestLine = [['v1.5.0', 'c150', '2018-01-01T00:00:00+00:00'], ['v3.1.0', 'c310', '2024-01-01T00:00:00+00:00'], ['v3.0.5', 'cs', '2025-01-01T00:00:00+00:00'], ['v3.0.6', 'cs', '2025-01-01T00:00:00+00:00'], ['v3.0.7', 'cs', '2025-01-01T00:00:00+00:00']];
         $parent = self::released('acme/mono', [['v3.0.7', 'm307', '2025-03-01T00:00:00+00:00'], ['v3.1.0', 'm310', '2024-01-01T00:00:00+00:00']], null, $replace);
         yield 'a parent date of a backport on the highest line above the installed line' => ['v1.5.0', '2018-01-01T00:00:00+00:00', self::released('acme/split', $highestLine, 'v1.5.0')->datedBy($parent), 6.0];
-        yield 'a pre-release above the highest stable tag' => ['v1.0.0', '2018-01-01T00:00:00+00:00', self::released('acme/split', [['v1.0.0', 'c100', '2018-01-01T00:00:00+00:00'], ['v1.0.1', 'c101', '2019-01-01T00:00:00+00:00'], ['v2.0.0-beta1', 'c2b1', '2020-01-01T00:00:00+00:00']], 'v1.0.0'), 2.0];
+        yield 'ruling O5: a dated pre-release above the highest stable tag' => ['v1.0.0', '2018-01-01T00:00:00+00:00', self::released('acme/split', [['v1.0.0', 'c100', '2018-01-01T00:00:00+00:00'], ['v1.0.1', 'c101', '2019-01-01T00:00:00+00:00'], ['v2.0.0-beta1', 'c2b1', '2020-01-01T00:00:00+00:00']], 'v1.0.0'), 1.0];
         $ownHighest = [['v1.0.0', 'c100', '2017-01-01T00:00:00+00:00'], ['v1.5.0', 'c150', '2018-01-01T00:00:00+00:00']];
         yield 'ruling R16-16g: an own date of a backport above an own-dated highest tag' => ['v1.0.0', '2017-01-01T00:00:00+00:00', self::released('acme/split', array_merge($ownHighest, [['v1.4.9', 'c149', '2019-06-01T00:00:00+00:00']]), 'v1.0.0'), 1.0];
         yield 'ruling R16-16g: a shared-commit date of a backport above an own-dated highest tag' => ['v1.0.0', '2017-01-01T00:00:00+00:00', self::released('acme/split', array_merge($ownHighest, [['v1.4.7', 'cs', '2019-06-01T00:00:00+00:00'], ['v1.4.8', 'cs', '2019-06-01T00:00:00+00:00'], ['v1.4.9', 'cs', '2019-06-01T00:00:00+00:00']]), 'v1.0.0'), 1.0];
-        yield 'ruling R16-16i: a later backport pre-release below the highest stable tag' => ['v1.0.0', '2018-01-01T00:00:00+00:00', self::released('acme/split', [['v1.0.0', 'c100', '2018-01-01T00:00:00+00:00'], ['v2.0.0', 'c200', '2023-01-01T00:00:00+00:00'], ['v3.0.0-alpha1', 'c3a1', '2024-01-01T00:00:00+00:00'], ['v1.9.0-RC1', 'c19r', '2025-01-01T00:00:00+00:00']], 'v1.0.0'), 6.0];
-        yield 'roots/wp-config: a pre-release above the only stable tag' => ['1.0.0', '2018-08-10T14:18:38+00:00', self::released('roots/wp-config', [['1.0.0', 'c100', '2018-08-10T14:18:38+00:00'], ['v2.0.0-beta.1', 'c2b1', '2026-03-21T17:18:34+00:00']], '1.0.0'), 7.61];
+        yield 'ruling O5: pre-releases above and below the highest stable tag' => ['v1.0.0', '2018-01-01T00:00:00+00:00', self::released('acme/split', [['v1.0.0', 'c100', '2018-01-01T00:00:00+00:00'], ['v2.0.0', 'c200', '2023-01-01T00:00:00+00:00'], ['v3.0.0-alpha1', 'c3a1', '2024-01-01T00:00:00+00:00'], ['v1.9.0-RC1', 'c19r', '2025-01-01T00:00:00+00:00']], 'v1.0.0'), 5.0];
+        yield 'roots/wp-config, ruling O5: the only stable tag below a pre-release' => ['1.0.0', '2018-08-10T14:18:38+00:00', self::released('roots/wp-config', [['1.0.0', 'c100', '2018-08-10T14:18:38+00:00'], ['v2.0.0-beta.1', 'c2b1', '2026-03-21T17:18:34+00:00']], '1.0.0'), 0.0];
+        yield 'ruling O5: an installed pre-release below the highest stable tag' => ['v2.0.0-RC1', '2019-01-01T00:00:00+00:00', self::released('acme/split', [['v1.0.0', 'c100', '2018-01-01T00:00:00+00:00'], ['v2.0.0-RC1', 'c2r1', '2019-01-01T00:00:00+00:00'], ['v2.0.0', 'c200', '2021-01-01T00:00:00+00:00']], 'v2.0.0-RC1'), 2.0];
     }
 
     /**
-     * The newest end is the date of the newest release by version: a pre-release above the highest
-     * stable tag, else that tag. A lower tag with a later date does not put the lock behind.
+     * The newest end is the date of the highest stable tag. A pre-release never ends libyears, and a
+     * lower tag with a later date does not put the lock behind (rulings R16-16g, O5).
      *
      * @dataProvider provideLowerTagsDatedLater
      */
@@ -444,21 +445,36 @@ final class LibyearsTest extends TestCase
         self::assertEqualsWithDelta($years, $measurement->years() ?? -1.0, 0.005);
     }
 
-    /** Ruling R16-26: a pre-release on a shared commit has the commit's date, so it is not the newest end. */
-    public function testAPreReleaseOnASharedCommitAboveTheHighestStableTagHasNoTrustedDate(): void
+    /** Ruling O5: a pre-release on a shared commit above the installed highest stable tag does not end libyears. */
+    public function testThePreReleaseOnASharedCommitAboveTheInstalledHighestStableTagLeavesItZeroBehind(): void
     {
         $split = self::released('acme/split', [['v1.0.0', 'cs', '2019-01-01T00:00:00+00:00'], ['v1.0.1', 'cs', '2019-01-01T00:00:00+00:00'], ['v1.0.2', 'cs', '2019-01-01T00:00:00+00:00'], ['v2.0.0-beta1', 'cs', '2019-01-01T00:00:00+00:00']], 'v1.0.2');
         $metadata = $split->datedBy(self::released('acme/mono', [['v1.0.2', 'm102', '2019-06-01T00:00:00+00:00']], null, ['acme/split' => 'self.version']));
 
-        self::assertNotNull($metadata->lastStableReleaseAt(), 'the parent dates the highest stable tag');
-        self::assertSame(Libyears::UNDATED_RELEASES, Libyears::measure(self::package('v1.0.2', '2019-01-01T00:00:00+00:00'), $metadata)->unmeasuredReason());
+        $measurement = Libyears::measure(self::package('v1.0.2', '2019-01-01T00:00:00+00:00'), $metadata);
+
+        self::assertFalse($measurement->isAtLeast());
+        self::assertSame(0.0, $measurement->years());
+    }
+
+    /** Ruling O5: an installed pre-release above the highest stable tag is 0 behind, also without a trusted date of its own. */
+    public function testAnInstalledPreReleaseAboveTheHighestStableTagIsZeroBehind(): void
+    {
+        $metadata = self::released('acme/split', [['v1.0.0', 'c100', '2018-01-01T00:00:00+00:00'], ['v2.0.0-beta1', 'c2b1', '2020-01-01T00:00:00+00:00']], 'v2.0.0-beta1');
+
+        foreach (['dated by the lock' => '2020-01-01T00:00:00+00:00', 'undated' => null] as $what => $time) {
+            $measurement = Libyears::measure(self::package('v2.0.0-beta1', $time), $metadata);
+
+            self::assertFalse($measurement->isAtLeast(), $what);
+            self::assertSame(0.0, $measurement->years(), $what);
+        }
     }
 
     /**
-     * Ruling R16-16i: a highest pre-release above the highest stable tag with an unresolved date
-     * stops the reading. The shared date of the lower tag v1.4.3 is no lower bound for it.
+     * Ruling O5: a pre-release on a shared commit above the highest stable tag does not stop the
+     * reading. The own date of the highest stable tag v1.5.0 ends libyears.
      */
-    public function testAPreReleaseOnASharedCommitAboveTheHighestStableTagLeavesALowerInstalledTagUnmeasured(): void
+    public function testAPreReleaseOnASharedCommitAboveTheHighestStableTagLeavesALowerInstalledTagMeasured(): void
     {
         $metadata = self::released('acme/split', [
             ['v1.0.0', 'c100', '2018-01-01T00:00:00+00:00'],
@@ -471,7 +487,8 @@ final class LibyearsTest extends TestCase
 
         $measurement = Libyears::measure(self::package('v1.0.0', '2018-01-01T00:00:00+00:00'), $metadata);
 
-        self::assertSame(Libyears::UNDATED_RELEASES, $measurement->unmeasuredReason());
+        self::assertFalse($measurement->isAtLeast());
+        self::assertEqualsWithDelta(2.0, $measurement->years() ?? -1.0, 0.005);
     }
 
     public function testAVersionComposerCannotNormalizeIsMeasuredFromTheLocksDate(): void

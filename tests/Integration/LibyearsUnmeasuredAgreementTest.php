@@ -131,7 +131,7 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
             self::assertSame($reason, $code, $what.': the facts the analysis was decided on');
             self::assertSame($years === null ? null : round($years, 2), $row['libyears'], $what.': the years between the two ends');
             $metadata = $facts->metadata();
-            $lowerBound = $years !== null && $metadata !== null && $metadata->newestReleaseByVersionAt() === null && !$metadata->isTheNewestReleaseByVersion($facts->package()->version());
+            $lowerBound = $years !== null && $metadata !== null && $metadata->highestStableTagAt() === null && !$metadata->isAtOrAboveTheHighestStableTag($facts->package()->version());
             self::assertSame($lowerBound, $row['libyears_at_least'], $what.': a lower bound exactly when the newest release is undated');
             if ($lowerBound) {
                 $this->seen[self::LOWER_BOUND] = ($this->seen[self::LOWER_BOUND] ?? 0) + 1;
@@ -164,7 +164,7 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
         if ($package->isBranchSnapshot()) {
             return [Libyears::BRANCH_SNAPSHOT, null];
         }
-        if ($metadata->isTheNewestReleaseByVersion($package->version())) {
+        if ($metadata->isAtOrAboveTheHighestStableTag($package->version())) {
             return [null, 0.0];
         }
         $release = InstalledRelease::of($package, $metadata);
@@ -175,8 +175,8 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
         if (!$metadata->hasStableRelease()) {
             return [Libyears::NO_STABLE_RELEASE, null];
         }
-        // LibyearsTest pins the newest end by version (rulings R16-16c, R16-16g, R16-16i): this test checks the two ends agree.
-        $newest = $metadata->newestReleaseByVersionAt() ?? self::newestDatedAbove($metadata, $package->version());
+        // LibyearsTest pins the newest end at the highest stable tag (rulings R16-16c, R16-16g, O5): this test checks the two ends agree.
+        $newest = $metadata->highestStableTagAt() ?? self::newestDatedAbove($metadata, $package->version());
         if ($newest === null) {
             return [Libyears::UNDATED_RELEASES, null];
         }

@@ -16,11 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** a newest pre-release on a commit that three or more stable tags share keeps S2
   unknown, with an S10 `release_dates` entry, also when a monorepo parent is present.
   ([Dates from the monorepo](docs/verdicts.md#dates-from-the-monorepo))
-- **All formats:** libyears end at the highest release by version: the highest dated pre-release
-  above the highest stable tag, else that tag. A lower tag with a later date, own-dated,
-  parent-dated or on a shared commit, does not make the project behind. An installed version that
-  is that release is 0 behind, also when its own date is untrusted (`shared_commit`, `undated`).
-  ([Libyears](docs/verdicts.md#libyears))
+- **All formats:** libyears end at the highest stable tag. A pre-release never ends libyears,
+  dated or not, so a package whose newest tag is a pre-release reads fewer libyears (roots/wp-config
+  1.0.0 below 2.0.0-beta.1: 7.61 to 0). A lower tag with a later date, own-dated, parent-dated or on
+  a shared commit, does not make the project behind. An installed version that is the highest
+  stable tag, or a pre-release above it, is 0 behind, also when its own date is untrusted
+  (`shared_commit`, `undated`). ([Libyears](docs/verdicts.md#libyears))
 - **Breaking:** **Baseline:** a finding is worsened by a flag above the recorded one, a new
   advisory, or a known one re-rated or no longer fixable. The gate reads `min(score, 2 × what the
   new facts add)`. A `known` finding fails no `--fail-on` value, `unchecked` included. Action: run

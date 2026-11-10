@@ -105,27 +105,27 @@ final class CaseHydratorTest extends TestCase
         return ['inputs' => ['releases' => $releases, 'parent' => $parent] + JsonPath::arrayAt($case, ['inputs'])] + $case;
     }
 
-    /** R16-26: a pre-release on the commit of three stable tags has no trusted date, so S2 and libyears read nothing (case S2-prerelease-shared‡). */
+    /** R16-26: a pre-release on the commit of three stable tags has no trusted date, so S2 reads nothing. Libyears end at the installed highest stable tag (ruling O5, case S2-prerelease-shared‡). */
     public function testAPreReleaseOnASharedCommitDatesNothing(): void
     {
         $case = self::withSharedPreRelease(CaseHydrator::case('S2-prerelease-shared‡'), '2023-08-01');
 
         $finding = self::hydratedFinding($case);
 
-        self::assertSame([null, 'undated_releases', false], [$finding['libyears'], $finding['libyears_unmeasured'], $finding['libyears_at_least']]);
+        self::assertSame([0, null, false], [$finding['libyears'], $finding['libyears_unmeasured'], $finding['libyears_at_least']]);
         $signals = array_column(JsonPath::arrayAt($finding, ['signals']), 'summary', 'id');
         self::assertArrayNotHasKey('S2', $signals);
         self::assertSame('the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it', $signals['S10'] ?? null);
     }
 
-    /** R15-28d and R16-16i: an older shared commit leaves S2 to the highest stable tag's own date, and libyears stays unmeasured (case S2-prerelease-shared-older‡). */
+    /** R15-28d: an older shared commit leaves S2 to the highest stable tag's own date. Libyears end at the installed highest stable tag (ruling O5, case S2-prerelease-shared-older‡). */
     public function testAnOlderSharedPreReleaseLeavesS2ToTheOwnDate(): void
     {
         $case = self::withSharedPreRelease(CaseHydrator::case('S2-prerelease-shared-older‡'), '2023-01-01');
 
         $finding = self::hydratedFinding($case);
 
-        self::assertSame([null, 'undated_releases', false], [$finding['libyears'], $finding['libyears_unmeasured'], $finding['libyears_at_least']]);
+        self::assertSame([0, null, false], [$finding['libyears'], $finding['libyears_unmeasured'], $finding['libyears_at_least']]);
         self::assertSame(['version' => '2.1.1', 'at' => '2023-06-02T07:22:01+00:00', 'dated_by' => null], array_intersect_key(JsonPath::arrayAt($finding, ['age', 'release']), ['version' => 0, 'at' => 0, 'dated_by' => 0]));
         self::assertContains('S2', array_column(JsonPath::arrayAt($finding, ['signals']), 'id'));
         self::assertSame([], $finding['checks_missing']);

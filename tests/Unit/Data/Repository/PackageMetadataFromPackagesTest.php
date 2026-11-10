@@ -323,11 +323,8 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame('2.0.0-RC1', $metadata->lastStableVersion());
     }
 
-    /**
-     * Ruling R16-16i: libyears end at the highest pre-release by version above the highest stable
-     * tag. RC2 is that release, and RC1 is the newer by date.
-     */
-    public function testTheLibyearsEndIsTheHighestPreReleaseByVersionWhateverTheListingOrder(): void
+    /** Ruling O5: libyears end at the highest stable tag. RC1 and RC2 above it end nothing, whatever the listing order. */
+    public function testTheLibyearsEndIsTheHighestStableTagWhateverThePreReleasesAboveIt(): void
     {
         $on = static fn (string $version, string $commit, string $time): array => ['name' => 'a/b', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]];
         $stable = $this->load($on('v5.0.0', 'five', '2020-01-01T00:00:00+00:00'));
@@ -337,13 +334,13 @@ final class PackageMetadataFromPackagesTest extends TestCase
         foreach (['RC1 first' => [$stable, $rc1, $rc2], 'RC2 first' => [$stable, $rc2, $rc1]] as $order => $packages) {
             $metadata = PackageMetadata::fromPackages('a/b', $packages, new \DateTimeImmutable(self::FIXED));
 
-            self::assertEquals(new \DateTimeImmutable('2021-03-01T00:00:00+00:00'), $metadata->newestReleaseByVersionAt(), $order);
-            self::assertFalse($metadata->newestReleaseByVersionSharesItsCommit(), $order);
+            self::assertEquals(new \DateTimeImmutable('2020-01-01T00:00:00+00:00'), $metadata->highestStableTagAt(), $order);
+            self::assertTrue($metadata->isAtOrAboveTheHighestStableTag('v5.0.0'), $order);
         }
     }
 
-    /** Ruling R16-16i: a highest pre-release on a commit that three stable tags share has no trusted date. */
-    public function testAHighestPreReleaseOnASharedCommitLeavesTheLibyearsEndUndated(): void
+    /** Ruling O5: a highest pre-release on a commit that three stable tags share does not end libyears. */
+    public function testAHighestPreReleaseOnASharedCommitLeavesTheHighestStableTagTheLibyearsEnd(): void
     {
         $on = static fn (string $version, string $commit, string $time): array => ['name' => 'a/b', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]];
         $packages = [
@@ -356,8 +353,9 @@ final class PackageMetadataFromPackagesTest extends TestCase
 
         $metadata = PackageMetadata::fromPackages('a/b', $packages, new \DateTimeImmutable(self::FIXED));
 
-        self::assertNull($metadata->newestReleaseByVersionAt());
-        self::assertTrue($metadata->newestReleaseByVersionSharesItsCommit());
+        self::assertEquals(new \DateTimeImmutable('2020-01-01T00:00:00+00:00'), $metadata->highestStableTagAt());
+        self::assertTrue($metadata->isAtOrAboveTheHighestStableTag('v5.0.0'));
+        self::assertTrue($metadata->isAtOrAboveTheHighestStableTag('v6.0.0-RC1'), 'a pre-release above the highest stable tag is at the end');
     }
 
     /** An old alpha of the next major on its own commit must not let S2 read the newer shared-commit date of a stable tag. */
