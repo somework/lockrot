@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Repository;
 
+use Lockrot\Json\JsonWriter;
+
 /**
  * A package's repository URL, and any text that quotes one, as a report prints it. The URL of a
  * private repository can carry a token, as `https://gitlab-ci-token:$CI_JOB_TOKEN@…` does, and a
@@ -130,7 +132,7 @@ final class RepositoryUrl
         $remotes = $urls === null ? null : preg_replace(self::REMOTE_USER, '', $urls);
         $paths = $remotes === null ? null : self::pathsIn($remotes);
 
-        $valid = json_decode((string) json_encode($paths ?? self::WITHHELD, \JSON_INVALID_UTF8_SUBSTITUTE));
+        $valid = json_decode((string) JsonWriter::encode($paths ?? self::WITHHELD, \JSON_INVALID_UTF8_SUBSTITUTE));
 
         return \is_string($valid) ? $valid : self::WITHHELD;
     }
