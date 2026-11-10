@@ -716,10 +716,12 @@ final class CaseHydrator
               + ($marking !== null && ($marking['by'] ?? null) === 'repository' ? ['abandoned' => $marking['replacement'] ?? true] : [])
               + ($registry !== null ? ['notification-url' => $registry] : []);
             if (($release['shared_commit'] ?? false) === true) {
-                // Two more spellings of the release on its commit reach PackageMetadata::SHARED_COMMIT_TAGS.
-                $data['source'] = ['type' => 'git', 'url' => $source ?? 'https://github.com/'.$package.'.git', 'reference' => 'shared-'.$version];
+                // The shared-commit releases of one date sit on one commit, as a subtree split tags them. Only stable
+                // tags count towards PackageMetadata::SHARED_COMMIT_TAGS, so a pre-release needs stable tags of its date.
+                $data['source'] = ['type' => 'git', 'url' => $source ?? 'https://github.com/'.$package.'.git', 'reference' => 'shared-'.(\is_string($release['time'] ?? null) ? $release['time'] : $version)];
                 $bare = ltrim($version, 'v');
-                foreach (['v' === $version[0] ? $bare : 'v'.$bare, $bare.'.0'] as $alias) {
+                // Two more spellings of a stable release on its commit reach SHARED_COMMIT_TAGS alone.
+                foreach (VersionParser::parseStability($version) === 'stable' ? ['v' === $version[0] ? $bare : 'v'.$bare, $bare.'.0'] : [] as $alias) {
                     $aliases[] = (new ArrayLoader())->load(['version' => $alias] + $data);
                 }
             }

@@ -164,6 +164,21 @@ class ACaseWithoutBranchRowsHydratesFromItsRunReleases(unittest.TestCase):
 
         self.assertEqual('2021-08-30T10:00:00+00:00', inputs['lock'][0]['time'])
 
+    def test_a_run_release_on_a_shared_commit_keeps_the_mark(self):
+        given = [{'version': '3.0.0-beta1', 'time': '2023-08-01T00:00:00+00:00', 'php': '>=8.1', 'shared_commit': True},
+                 {'version': '4.7.1', 'time': '2023-08-01T00:00:00+00:00', 'php': '^7.4 || ~8.0.0', 'shared_commit': True}]
+
+        inputs = project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN, 'run_inputs': {'_releases': given}})
+
+        self.assertEqual({'3.0.0-beta1': True, '4.7.1': True}, {r['version']: r.get('shared_commit') for r in inputs['releases']})
+
+    def test_the_run_parent_that_dates_no_shared_tag_joins_the_inputs(self):
+        parent = {'name': 'acme/monorepo', 'releases': [{'version': '4.17.0', 'time': '2025-01-01T00:00:00+00:00'}]}
+
+        inputs = project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN, 'run_inputs': {'_releases': self.RELEASES, '_parent': parent}})
+
+        self.assertEqual(parent, inputs['parent'])
+
     def test_a_case_without_branch_rows_and_without_run_releases_gets_none(self):
         self.assertIsNone(project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN}))
 

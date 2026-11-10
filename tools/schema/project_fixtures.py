@@ -576,6 +576,9 @@ def inputs_of(case):
     if checks:
         inputs['checks'] = checks
         inputs['move_check'] = move_check_of(run['move_check'], world, run.get('php_window'))
+    if run_inputs.get('_parent') is not None and 'parent' not in inputs:
+        # A monorepo parent that dates no shared tag of the split: lockrot still reads the split's own dates beside it (R15-28d).
+        inputs['parent'] = run_inputs['_parent']
     if run_inputs.get('_php_lock') is not None:
         inputs['php_lock'] = run_inputs['_php_lock']
     if run_inputs.get('_config_platform_php') is not None:
@@ -612,11 +615,13 @@ def world_releases(world, releases):
 
 
 def run_releases(given, releases):
-    """The package's releases, with the time and the php that each `{version, time, php}` of $given sets. A version that
-    the projection lacks joins it. The run inputs' `_releases` use this form."""
+    """The package's releases, with the time and the php that each `{version, time, php, shared_commit?}` of $given sets,
+    and its shared-commit mark when it has one. A version that the projection lacks joins it. The run inputs' `_releases`
+    use this form."""
     by_version = {r['version']: r for r in releases}
     for g in given:
-        by_version[g['version']] = dict(by_version.get(g['version'], {}), version=g['version'], time=g.get('time'), php=g.get('php'))
+        by_version[g['version']] = dict(by_version.get(g['version'], {}), version=g['version'], time=g.get('time'), php=g.get('php'),
+                                        **({'shared_commit': True} if g.get('shared_commit') else {}))
     return sorted(by_version.values(), key=lambda r: r['version'])
 
 

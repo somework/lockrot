@@ -83,6 +83,70 @@ final class CaseHydratorTest extends TestCase
         self::assertContains(JsonPath::stringAt($case, ['finding', 'package']), $packages);
     }
 
+    /**
+     * The case with the model's releases of S2-prerelease-shared‡ and S2-prerelease-shared-older‡:
+     * 3.0.0-beta1 sits on the commit of the three 1.x tags, above the highest 2.x tag on its own
+     * commit. The monorepo parent replaces the split and dates no shared tag.
+     *
+     * @param array<mixed, mixed> $case
+     *
+     * @return array<mixed, mixed>
+     */
+    private static function withSharedPreRelease(array $case, string $date): array
+    {
+        $shared = static fn (string $version, string $php): array => ['version' => $version, 'time' => $date.'T00:00:00+00:00', 'php' => $php, 'shared_commit' => true];
+        $releases = [
+            $shared('1.0.0', '>=7.3'), $shared('1.0.1', '>=7.3'), $shared('1.0.2', '>=7.3'),
+            ['version' => '2.1.1', 'time' => '2023-06-02T07:22:01+00:00', 'php' => '>=8.0'],
+            $shared('3.0.0-beta1', '>=8.1'),
+        ];
+        $parent = ['name' => 'akaunting/monorepo', 'releases' => [['version' => '2.1.1', 'time' => '2023-06-02T07:22:01+00:00']]];
+
+        return ['inputs' => ['releases' => $releases, 'parent' => $parent] + JsonPath::arrayAt($case, ['inputs'])] + $case;
+    }
+
+    /** R16-26: a pre-release on the commit of three stable tags has no trusted date, so S2 and libyears read nothing (case S2-prerelease-shared‡). */
+    public function testAPreReleaseOnASharedCommitDatesNothing(): void
+    {
+        $case = self::withSharedPreRelease(CaseHydrator::case('S2-prerelease-shared‡'), '2023-08-01');
+
+        $finding = self::hydratedFinding($case);
+
+        self::assertSame([null, 'undated_releases', false], [$finding['libyears'], $finding['libyears_unmeasured'], $finding['libyears_at_least']]);
+        $signals = array_column(JsonPath::arrayAt($finding, ['signals']), 'summary', 'id');
+        self::assertArrayNotHasKey('S2', $signals);
+        self::assertSame('the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it', $signals['S10'] ?? null);
+    }
+
+    /** R15-28d and R16-16i: an older shared commit leaves S2 to the highest stable tag's own date, and libyears stays unmeasured (case S2-prerelease-shared-older‡). */
+    public function testAnOlderSharedPreReleaseLeavesS2ToTheOwnDate(): void
+    {
+        $case = self::withSharedPreRelease(CaseHydrator::case('S2-prerelease-shared-older‡'), '2023-01-01');
+
+        $finding = self::hydratedFinding($case);
+
+        self::assertSame([null, 'undated_releases', false], [$finding['libyears'], $finding['libyears_unmeasured'], $finding['libyears_at_least']]);
+        self::assertSame(['version' => '2.1.1', 'at' => '2023-06-02T07:22:01+00:00', 'dated_by' => null], array_intersect_key(JsonPath::arrayAt($finding, ['age', 'release']), ['version' => 0, 'at' => 0, 'dated_by' => 0]));
+        self::assertContains('S2', array_column(JsonPath::arrayAt($finding, ['signals']), 'id'));
+        self::assertSame([], $finding['checks_missing']);
+    }
+
+    /**
+     * @param array<mixed, mixed> $case
+     *
+     * @return array<mixed, mixed> the hydrated finding of the case's package
+     */
+    private static function hydratedFinding(array $case): array
+    {
+        foreach (JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::report($case)->toArray()), ['findings']) as $row) {
+            self::assertIsArray($row);
+            if (JsonPath::stringAt($row, ['package']) === JsonPath::stringAt($case, ['finding', 'package'])) {
+                return $row;
+            }
+        }
+        self::fail('the case package has no finding');
+    }
+
     /** Case not-found-cached‡ gives its 404 a cache time: lockrot serves that 404 from the cache and reports the time. */
     public function testACached404HydratesFromTheCache(): void
     {
