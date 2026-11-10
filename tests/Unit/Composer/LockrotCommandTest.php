@@ -355,6 +355,14 @@ final class LockrotCommandTest extends TestCase
         }
     }
 
+    /** The gate line says why the job failed, so a size cap must never read as able to cut it. */
+    public function testTheMarkdownMaxBytesHelpNamesTheGateLineAsKept(): void
+    {
+        $description = $this->command()->getDefinition()->getOption('markdown-max-bytes')->getDescription();
+
+        self::assertStringContainsString('The heading, the `gate:` line, the table head', $description);
+    }
+
     /**
      * `composer list` shows the description: it names every flag, `vulnerable` included, because
      * every counted advisory scores. `--all` adds the findings that have no grade.
