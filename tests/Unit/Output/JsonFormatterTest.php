@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\JsonFormatter;
@@ -33,6 +34,18 @@ final class JsonFormatterTest extends TestCase
         self::assertSame('medium', $json['findings'][0]['verdict'], 'stale 8 is medium');
         self::assertSame(['n'], $json['notes']);
         self::assertSame(1, $json['counts']['medium']);
+    }
+
+    /** A reason phrase that is not UTF-8 reaches the report through a run note, and the document still encodes. */
+    public function testAMessageWithInvalidUtf8StillGivesADocument(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
+        $note = RunNote::advisoriesUnavailable('https://repo.example.org', new \RuntimeException("HTTP 503 Servi\xE7e Unavailable"));
+
+        $json = json_decode((new JsonFormatter())->format(new Report([], [$note], $at, 0, 0)), true);
+
+        self::assertIsArray($json);
+        self::assertSame(["security advisories unavailable from https://repo.example.org: HTTP 503 Servi\u{FFFD}e Unavailable"], $json['notes']);
     }
 
     public function testJsonCarriesThePriorityOnEveryFindingAndTheReportTotals(): void

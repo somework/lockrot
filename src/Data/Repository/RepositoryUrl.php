@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Repository;
 
-use Lockrot\Json\JsonWriter;
-
 /**
  * A package's repository URL, and any text that quotes one, as a report prints it. The URL of a
  * private repository can carry a token, as `https://gitlab-ci-token:$CI_JOB_TOKEN@…` does, and a
@@ -17,6 +15,9 @@ use Lockrot\Json\JsonWriter;
 final class RepositoryUrl
 {
     /** What a report quotes in place of a message PCRE could not finish reading. */
+    /** A byte outside every well-formed UTF-8 sequence (RFC 3629): the valid sequences are skipped. */
+    private const INVALID_UTF8 = '{(?:[\x00-\x7F]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})(*SKIP)(*FAIL)|[\x80-\xFF]}';
+
     public const WITHHELD = '(withheld: lockrot could not redact this message)';
 
     /** Where a URL starts in a text: a scheme and `://`, or `:\/\/` as JSON escapes it. */
@@ -132,9 +133,7 @@ final class RepositoryUrl
         $remotes = $urls === null ? null : preg_replace(self::REMOTE_USER, '', $urls);
         $paths = $remotes === null ? null : self::pathsIn($remotes);
 
-        $valid = json_decode((string) JsonWriter::encode($paths ?? self::WITHHELD, \JSON_INVALID_UTF8_SUBSTITUTE));
-
-        return \is_string($valid) ? $valid : self::WITHHELD;
+        return ($paths === null ? null : preg_replace(self::INVALID_UTF8, "\u{FFFD}", $paths)) ?? self::WITHHELD;
     }
 
     private static function urlsIn(string $text): ?string
