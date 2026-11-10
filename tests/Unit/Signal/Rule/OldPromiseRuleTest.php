@@ -176,7 +176,12 @@ final class OldPromiseRuleTest extends TestCase
     {
         self::assertFalse($this->rule()->missesATrustedDate(F::facts(self::splitPackage(), self::splitMetadata('2021-08-30T00:00:00+00:00'))), 'the parent dates it');
         self::assertFalse($this->rule()->missesATrustedDate(F::facts(self::splitPackage())), 'without metadata the lock date stands');
-        self::assertFalse($this->rule()->missesATrustedDate(F::facts(F::package(['php' => '>=7.1.3']))), 'without metadata nothing says the date is a commit\'s');
+        self::assertFalse($this->rule()->missesATrustedDate(F::facts(F::package(['php' => '>=7.1.3', 'time' => '2019-01-01T00:00:00+00:00']))), 'without metadata nothing says the date is a commit\'s');
+    }
+
+    public function testNoLockTimeAndNoMetadataLeavesS5Undecided(): void
+    {
+        self::assertTrue($this->rule()->missesATrustedDate(F::facts(F::package(['php' => '>=7.1.3']))));
     }
 
     public function testAnUntrustedDateThatS5CouldNotUseLeavesNothingUndecided(): void

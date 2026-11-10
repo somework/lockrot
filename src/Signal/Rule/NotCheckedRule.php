@@ -118,7 +118,15 @@ final class NotCheckedRule implements SignalRule
         $reason = $facts->activityNotChecked();
         $origin = $facts->package()->origin()->kind();
         if ($reason === self::NOT_FROM_COMPOSER_REPOSITORY && \in_array($origin, self::ORIGIN_GAPS, true)) {
-            $unchecked[] = new Check('release_metadata', $reason, $this->capped !== null && $this->capped->evaluate($facts) !== null ? [Signal::S2, Signal::S8, Signal::S11] : [Signal::S2, Signal::S8]);
+            $blocks = [Signal::S2];
+            if ($this->oldPromise !== null && $this->oldPromise->missesATrustedDate($facts)) {
+                $blocks[] = Signal::S5;
+            }
+            $blocks[] = Signal::S8;
+            if ($this->capped !== null && $this->capped->evaluate($facts) !== null) {
+                $blocks[] = Signal::S11;
+            }
+            $unchecked[] = new Check('release_metadata', $reason, $blocks);
             $unchecked[] = new Check('repository_activity', $reason, [Signal::S3, Signal::S4]);
         } elseif ($reason === self::HOST_NOT_SUPPORTED || isset(self::ACTIVITY_WORDS[$reason ?? ''])) {
             $unchecked[] = new Check('repository_activity', (string) $reason, [Signal::S3, Signal::S4]);
@@ -292,7 +300,7 @@ final class NotCheckedRule implements SignalRule
             $cause = self::ORIGIN_CAUSE[$origin ?? ''] ?? 'not installed from a Composer repository';
         }
         if ($entry->check() === 'release_metadata') {
-            return 'release metadata not checked ('.$cause.'), so S2 and S8 could not be read';
+            return 'release metadata not checked ('.$cause.'), so '.ListWords::of(array_values(array_diff($entry->blocks(), [Signal::S11]))).' could not be read';
         }
         if ($entry->check() === 'repository_activity') {
             return 'repository activity not checked ('.$cause.'), so S3 and S4 could not be read';
