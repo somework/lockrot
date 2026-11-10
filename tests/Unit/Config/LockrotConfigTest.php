@@ -227,6 +227,14 @@ final class LockrotConfigTest extends TestCase
         yield 'a word' => ['eight'];
     }
 
+    /** Composer's version parser keeps a `dev-` branch name, so a platform php can reach the target as no version. */
+    public function testAPlatformPhpThatIsABranchNameIsRefused(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('target-php must look like "8.4"; got "dev-main"');
+        LockrotConfig::fromSources([], [], [], '8.5.10', 'dev-main');
+    }
+
     public function testAVPrefixedTargetPhpOptionIsStillRefused(): void
     {
         $this->expectException(ConfigException::class);
@@ -296,6 +304,34 @@ final class LockrotConfigTest extends TestCase
         yield 'the variable at 7.5' => [[], ['LOCKROT_TARGET_PHP' => '7.5'], [], 'LOCKROT_TARGET_PHP', '7.5', '7.5'];
         yield 'the variable under an option that wins' => [[], ['LOCKROT_TARGET_PHP' => '6.0'], ['target-php' => '8.4'], 'LOCKROT_TARGET_PHP', '6.0', '6.0'];
         yield 'the config key at 6.0' => [['target-php' => '6.0'], [], [], 'extra.lockrot.target-php', '6.0', '6.0'];
+        yield 'the config key at 7.5 under an option that wins' => [['target-php' => '7.5'], [], ['target-php' => '8.4'], 'extra.lockrot.target-php', '7.5', '7.5'];
+        yield 'the config key at 7.5 under a variable that wins' => [['target-php' => '7.5'], ['LOCKROT_TARGET_PHP' => '8.4'], [], 'extra.lockrot.target-php', '7.5', '7.5'];
+        yield 'a config key with a suffix under an option that wins' => [['target-php' => '7.5.x'], [], ['target-php' => '8.4'], 'extra.lockrot.target-php', '7.5', '7.5.x'];
+    }
+
+    /**
+     * Finding 12: a config value that is no version is refused, also when an option or a variable
+     * sets the target.
+     *
+     * @dataProvider configTargetPhpsThatAreNoVersion
+     *
+     * @param array<string, mixed> $env
+     * @param array<string, mixed> $cli
+     */
+    #[DataProvider('configTargetPhpsThatAreNoVersion')]
+    public function testAConfigTargetPhpThatIsNoVersionIsRefusedUnderEverySource(array $env, array $cli): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('target-php must look like "8.4"; got "banana"');
+        LockrotConfig::fromSources(['target-php' => 'banana'], $env, $cli, '8.5.10', null);
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, array<string, mixed>}> */
+    public static function configTargetPhpsThatAreNoVersion(): iterable
+    {
+        yield 'the config key alone' => [[], []];
+        yield 'under an option that wins' => [[], ['target-php' => '8.4']];
+        yield 'under a variable that wins' => [['LOCKROT_TARGET_PHP' => '8.3'], []];
     }
 
     /**

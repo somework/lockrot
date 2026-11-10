@@ -84,9 +84,12 @@ final class Libyears
         if (!$metadata->hasStableRelease()) {
             return LibyearsMeasurement::unmeasured(self::NO_STABLE_RELEASE);
         }
-        $newest = $metadata->lastStableReleaseAt();
+        $newest = $metadata->newestReleaseByVersionAt();
         if ($newest !== null) {
             return LibyearsMeasurement::of(self::yearsBetween($installed, $newest));
+        }
+        if ($metadata->newestReleaseByVersionSharesItsCommit()) {
+            return LibyearsMeasurement::unmeasured(self::UNDATED_RELEASES);
         }
         $above = self::newestTrustedDateAbove($metadata, $package->version());
 

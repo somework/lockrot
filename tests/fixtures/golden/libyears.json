@@ -1,8 +1,8 @@
 {
     "apps/wallabag_wallabag": {
         "block": {
-            "total": 162.05,
-            "direct_requirements": 108.0,
+            "total": 160.39,
+            "direct_requirements": 107.99,
             "measured": 194,
             "unmeasured": {
                 "not_from_composer_repository": 0,
@@ -110,7 +110,7 @@
             "php-http/discovery": 0.0,
             "php-http/httplug": 0.0,
             "php-http/message": 0.0,
-            "php-http/promise": 1.65,
+            "php-http/promise": 0.0,
             "phpdocumentor/reflection-common": 0.0,
             "phpdocumentor/reflection-docblock": 1.28,
             "phpdocumentor/type-resolver": 1.16,
@@ -187,7 +187,7 @@
             "symfony/proxy-manager-bridge": 1.1,
             "symfony/psr-http-message-bridge": 2.84,
             "symfony/routing": 0.24,
-            "symfony/runtime": 0.03,
+            "symfony/runtime": 0.02,
             "symfony/security-bundle": 1.93,
             "symfony/security-core": 1.75,
             "symfony/security-csrf": 1.67,
@@ -226,7 +226,7 @@
     },
     "apps/nextcloud_3rdparty": {
         "block": {
-            "total": 47.48,
+            "total": 45.83,
             "direct_requirements": 13.3,
             "measured": 94,
             "unmeasured": {
@@ -290,7 +290,7 @@
             "pear/pear_exception": 0.0,
             "php-http/guzzle7-adapter": 0.0,
             "php-http/httplug": 0.0,
-            "php-http/promise": 1.65,
+            "php-http/promise": 0.0,
             "php-opencloud/openstack": 0.0,
             "phpseclib/phpseclib": 0.2,
             "pimple/pimple": 0.0,

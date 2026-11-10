@@ -54,6 +54,7 @@ use Lockrot\Verdict\ScoreModel;
 use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
 final class InstallTimeSummaryTest extends TestCase
@@ -662,6 +663,18 @@ final class InstallTimeSummaryTest extends TestCase
         $output = $io->getOutput();
         self::assertStringContainsString('lockrot: install-time check skipped:', $output);
         self::assertStringContainsString('ci/rot.json not found', $output);
+    }
+
+    public function testTheSkippedLineSurvivesQuietMode(): void
+    {
+        // Under install-time-strict, `composer install -q` must still say that the gate did not run.
+        $this->project(['install-time-strict' => true, 'fail-on' => 'old-promise', 'baseline' => 'ci/rot.json']);
+        $io = new BufferIO('', OutputInterface::VERBOSITY_QUIET);
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        self::assertStringContainsString('lockrot: install-time check skipped:', $io->getOutput());
     }
 
     public function testAMalformedBaselineIsReportedAsASkippedCheckAndNeverBreaksTheInstall(): void

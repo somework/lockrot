@@ -146,8 +146,11 @@ final class Analyzer
         return $clone;
     }
 
-    /** A copy whose moves Composer's solver checks (docs/verdicts.md#the-move-check). */
-    /** @param positive-int $passes the cap on the passes that ask Composer ({@see CHECK_PASSES}) */
+    /**
+     * A copy whose moves Composer's solver checks (docs/verdicts.md#the-move-check).
+     *
+     * @param positive-int $passes the cap on the passes that ask Composer ({@see CHECK_PASSES})
+     */
     public function withMoveChecks(MoveChecks $checks, int $passes = self::CHECK_PASSES): self
     {
         $clone = clone $this;

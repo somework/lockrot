@@ -24,6 +24,51 @@ final class SourceEntryGuardTest extends TestCase
         (new Process(['rm', '-rf', $this->dir]))->run();
     }
 
+    /**
+     * PHP parses the whole script before the PHP 7.4 guard runs, so a PHP 7.4 construct in it turns
+     * the guard's line into a parse error on an older PHP: an arrow function, `??=`, a typed
+     * property, a numeric separator or array unpacking.
+     */
+    public function testTheSourceScriptHasNoSyntaxThatAPhpBelowItsGuardCannotParse(): void
+    {
+        $tokens = array_values(array_filter(
+            token_get_all((string) file_get_contents(\dirname(__DIR__, 2).'/bin/lockrot')),
+            static fn ($token): bool => !\is_array($token) || !\in_array($token[0], [\T_WHITESPACE, \T_COMMENT, \T_DOC_COMMENT], true),
+        ));
+        // PHP 8 reads `\Foo\Bar` as one name token, PHP 7.4 as a separator and strings.
+        $typeStarts = array_merge([\T_STRING, \T_ARRAY, \T_NS_SEPARATOR], \defined('T_NAME_FULLY_QUALIFIED') ? [\constant('T_NAME_QUALIFIED'), \constant('T_NAME_FULLY_QUALIFIED')] : []);
+        $found = [];
+        $open = [];
+        foreach ($tokens as $i => $token) {
+            if (\is_array($token) && \in_array($token[0], [\T_FN, \T_COALESCE_EQUAL], true)) {
+                $found[] = $token[1].' on line '.$token[2];
+            }
+            if (\is_array($token) && \in_array($token[0], [\T_LNUMBER, \T_DNUMBER], true) && strpos($token[1], '_') !== false) {
+                $found[] = 'a numeric separator on line '.$token[2];
+            }
+            // `...` unpacks an array only inside an array literal: `[...$a]` or `array(...$a)`.
+            if ($token === '[' || $token === '(') {
+                $open[] = $token === '[' || (\is_array($tokens[$i - 1] ?? null) && $tokens[$i - 1][0] === \T_ARRAY) ? 'array' : 'call';
+            } elseif ($token === ']' || $token === ')') {
+                array_pop($open);
+            } elseif (\is_array($token) && $token[0] === \T_ELLIPSIS && end($open) === 'array') {
+                $found[] = 'array unpacking on line '.$token[2];
+            }
+            if (!\is_array($token) || !\in_array($token[0], [\T_PRIVATE, \T_PROTECTED, \T_PUBLIC, \T_VAR], true)) {
+                continue;
+            }
+            $next = $tokens[$i + 1] ?? null;
+            if (\is_array($next) && $next[0] === \T_STATIC) {
+                $next = $tokens[$i + 2] ?? null;
+            }
+            if ($next === '?' || (\is_array($next) && \in_array($next[0], $typeStarts, true))) {
+                $found[] = 'a typed property on line '.$token[2];
+            }
+        }
+
+        self::assertSame([], $found);
+    }
+
     /** On a web SAPI with register_argc_argv=On, a query string can set the command line. */
     public function testTheSourceScriptDoesNotRunOnAWebSapiThatReadsArgvFromTheQueryString(): void
     {

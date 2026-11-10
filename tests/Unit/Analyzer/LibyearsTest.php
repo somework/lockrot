@@ -36,7 +36,8 @@ final class LibyearsTest extends TestCase
         $byBranch = [];
         foreach ($branches as $key => [$version, $at]) {
             $date = $at === null ? null : new \DateTimeImmutable($at);
-            $byBranch[$key] = ['version' => $version, 'at' => $date, 'highest' => ['normalized' => ltrim($version, 'v').'.0', 'pretty' => $version, 'at' => $date, 'php' => null], 'php' => null];
+            // No trusted last release: each highest tag is undated, as a shared commit leaves it.
+            $byBranch[$key] = ['version' => $version, 'at' => $date, 'highest' => ['normalized' => ltrim($version, 'v').'.0', 'pretty' => $version, 'at' => $lastStableReleaseAt === null ? null : $date, 'php' => null], 'php' => null];
         }
 
         return new PackageMetadata('scheb/2fa-bundle', false, null, true, $lastStableReleaseAt === null ? null : new \DateTimeImmutable($lastStableReleaseAt), 'v8.6.1', 12, null, 'library', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), $byBranch);
@@ -61,11 +62,15 @@ final class LibyearsTest extends TestCase
         yield 'a branch with metadata' => [self::package('dev-main'), $latest, null, null, Libyears::BRANCH_SNAPSHOT, false];
         yield 'a branch the lock does not date' => [self::package('2.x-dev', null), $latest, null, null, Libyears::BRANCH_SNAPSHOT, false];
         yield 'the installed tag on a shared commit' => [self::package(), self::splitPackage([], null), null, null, Libyears::SHARED_COMMIT, false];
-        yield 'the installed tag on its own commit in a split that a parent dates' => [self::package(), self::splitPackage([], 'laravel/framework', []), null, null, Libyears::PARENT_SPLIT, false];
+        $split = self::released('illuminate/macroable', [['v5.13.2', 'c5', self::LOCKED_AT], ['v13.31.0', 'cs', self::LATEST], ['v13.30.0', 'cs', self::LATEST], ['v13.29.0', 'cs', self::LATEST]], 'v5.13.2');
+        $parent = self::released('laravel/framework', [['v13.31.0', 'f13', self::LATEST]], null, ['illuminate/macroable' => 'self.version']);
+        yield 'the installed tag on its own commit in a split that a parent dates' => [self::package(), $split->datedBy($parent), null, null, Libyears::PARENT_SPLIT, false];
         yield 'a lock entry without a time' => [self::package('v5.13.2', null), $latest, null, null, Libyears::UNDATED, false];
         yield 'stable releases, none dated, and nothing dated above' => [self::package(), self::metadata(null), null, null, Libyears::UNDATED_RELEASES, false];
         yield 'only pre-releases, installed at a dated one' => [self::package('1.0.0-beta3'), self::preReleasesOnly(), null, null, Libyears::NO_STABLE_RELEASE, false];
         yield 'a lower bound, from the newest dated release above' => [self::package(), self::metadata(null, ['8' => ['v8.6.1', '2026-01-24T13:26:10+00:00'], '5' => ['v5.13.2', self::LOCKED_AT]]), null, 4.06, null, true];
+        $undatedHighest = ['version' => 'v8.5.0', 'at' => new \DateTimeImmutable(self::LATEST), 'highest' => ['normalized' => '8.6.1.0', 'pretty' => 'v8.6.1', 'at' => null, 'php' => null], 'php' => null];
+        yield 'an undated highest tag above a dated lower tag: a lower bound' => [self::package(), new PackageMetadata('scheb/2fa-bundle', false, null, true, new \DateTimeImmutable(self::LATEST), 'v8.5.0', 12, null, 'library', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), ['8' => $undatedHighest]), null, 4.06, null, true];
         yield 'ahead of the last stable release, clamped to zero' => [self::package(), self::metadata('2019-01-23T15:23:04+00:00'), null, 0.0, null, false];
     }
 
@@ -284,7 +289,11 @@ final class LibyearsTest extends TestCase
 
     public function testATrustedNewestReleaseDateOutranksTheBranchView(): void
     {
-        $behind = Libyears::measure(self::package(), self::metadata('2026-01-24T13:26:10+00:00', ['8' => ['v8.6.1', '2030-01-01T00:00:00+00:00']]))->years();
+        // The branch view reads v8.5.0, the 8.x tag with the newest date, and the highest tag v8.6.1 is older.
+        $later = new \DateTimeImmutable('2030-01-01T00:00:00+00:00');
+        $row = ['version' => 'v8.5.0', 'at' => $later, 'highest' => ['normalized' => '8.6.1.0', 'pretty' => 'v8.6.1', 'at' => new \DateTimeImmutable('2026-01-24T13:26:10+00:00'), 'php' => null], 'php' => null];
+        $metadata = new PackageMetadata('scheb/2fa-bundle', false, null, true, $later, 'v8.5.0', 12, null, 'library', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), ['8' => $row]);
+        $behind = Libyears::measure(self::package(), $metadata)->years();
         self::assertNotNull($behind);
         self::assertEqualsWithDelta(4.06, $behind, 0.005);
     }
@@ -385,6 +394,82 @@ final class LibyearsTest extends TestCase
         ], $now);
 
         self::assertSame(0.0, Libyears::measure(self::package('v13.0.0'), $child->datedBy($parent))->years());
+    }
+
+    /**
+     * @param list<array{string, string, string}> $tags    version, commit, time
+     * @param array<string, string>               $replace
+     */
+    private static function released(string $name, array $tags, ?string $installed, array $replace = []): PackageMetadata
+    {
+        $loader = new ArrayLoader();
+        $releases = array_map(static fn (array $tag) => $loader->load(['name' => $name, 'version' => $tag[0], 'time' => $tag[2], 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $tag[1]], 'replace' => $replace]), $tags);
+
+        return PackageMetadata::fromPackages($name, $releases, new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), $installed);
+    }
+
+    /** @return iterable<string, array{string, string, PackageMetadata, float}> the installed version, its lock time, the metadata, the years */
+    public static function provideLowerTagsDatedLater(): iterable
+    {
+        $installedHighest = [['v2.1.0', 'c210', '2019-01-01T00:00:00+00:00']];
+        $shared = [['v2.0.5', 'cs', '2021-01-01T00:00:00+00:00'], ['v2.0.6', 'cs', '2021-01-01T00:00:00+00:00'], ['v2.0.7', 'cs', '2021-01-01T00:00:00+00:00']];
+        $replace = ['acme/split' => 'self.version'];
+        yield 'an own date of a backport' => ['v2.1.0', '2019-01-01T00:00:00+00:00', self::released('acme/split', array_merge($installedHighest, [['v2.0.7', 'c207', '2021-03-01T00:00:00+00:00']]), 'v2.1.0'), 0.0];
+        yield 'a parent date of a backport on a shared commit' => ['v2.1.0', '2019-01-01T00:00:00+00:00', self::released('acme/split', array_merge($installedHighest, $shared), 'v2.1.0')->datedBy(self::released('acme/mono', [['v2.0.7', 'm207', '2021-03-01T00:00:00+00:00']], null, $replace)), 0.0];
+        $highestLine = [['v1.5.0', 'c150', '2018-01-01T00:00:00+00:00'], ['v3.1.0', 'c310', '2024-01-01T00:00:00+00:00'], ['v3.0.5', 'cs', '2025-01-01T00:00:00+00:00'], ['v3.0.6', 'cs', '2025-01-01T00:00:00+00:00'], ['v3.0.7', 'cs', '2025-01-01T00:00:00+00:00']];
+        $parent = self::released('acme/mono', [['v3.0.7', 'm307', '2025-03-01T00:00:00+00:00'], ['v3.1.0', 'm310', '2024-01-01T00:00:00+00:00']], null, $replace);
+        yield 'a parent date of a backport on the highest line above the installed line' => ['v1.5.0', '2018-01-01T00:00:00+00:00', self::released('acme/split', $highestLine, 'v1.5.0')->datedBy($parent), 6.0];
+        yield 'a pre-release above the highest stable tag' => ['v1.0.0', '2018-01-01T00:00:00+00:00', self::released('acme/split', [['v1.0.0', 'c100', '2018-01-01T00:00:00+00:00'], ['v1.0.1', 'c101', '2019-01-01T00:00:00+00:00'], ['v2.0.0-beta1', 'c2b1', '2020-01-01T00:00:00+00:00']], 'v1.0.0'), 2.0];
+        $ownHighest = [['v1.0.0', 'c100', '2017-01-01T00:00:00+00:00'], ['v1.5.0', 'c150', '2018-01-01T00:00:00+00:00']];
+        yield 'ruling R16-16g: an own date of a backport above an own-dated highest tag' => ['v1.0.0', '2017-01-01T00:00:00+00:00', self::released('acme/split', array_merge($ownHighest, [['v1.4.9', 'c149', '2019-06-01T00:00:00+00:00']]), 'v1.0.0'), 1.0];
+        yield 'ruling R16-16g: a shared-commit date of a backport above an own-dated highest tag' => ['v1.0.0', '2017-01-01T00:00:00+00:00', self::released('acme/split', array_merge($ownHighest, [['v1.4.7', 'cs', '2019-06-01T00:00:00+00:00'], ['v1.4.8', 'cs', '2019-06-01T00:00:00+00:00'], ['v1.4.9', 'cs', '2019-06-01T00:00:00+00:00']]), 'v1.0.0'), 1.0];
+        yield 'ruling R16-16i: a later backport pre-release below the highest stable tag' => ['v1.0.0', '2018-01-01T00:00:00+00:00', self::released('acme/split', [['v1.0.0', 'c100', '2018-01-01T00:00:00+00:00'], ['v2.0.0', 'c200', '2023-01-01T00:00:00+00:00'], ['v3.0.0-alpha1', 'c3a1', '2024-01-01T00:00:00+00:00'], ['v1.9.0-RC1', 'c19r', '2025-01-01T00:00:00+00:00']], 'v1.0.0'), 6.0];
+        yield 'roots/wp-config: a pre-release above the only stable tag' => ['1.0.0', '2018-08-10T14:18:38+00:00', self::released('roots/wp-config', [['1.0.0', 'c100', '2018-08-10T14:18:38+00:00'], ['v2.0.0-beta.1', 'c2b1', '2026-03-21T17:18:34+00:00']], '1.0.0'), 7.61];
+    }
+
+    /**
+     * The newest end is the date of the newest release by version: a pre-release above the highest
+     * stable tag, else that tag. A lower tag with a later date does not put the lock behind.
+     *
+     * @dataProvider provideLowerTagsDatedLater
+     */
+    #[DataProvider('provideLowerTagsDatedLater')]
+    public function testALowerTagDatedLaterIsNotTheNewestEnd(string $installed, string $time, PackageMetadata $metadata, float $years): void
+    {
+        $measurement = Libyears::measure(self::package($installed, $time), $metadata);
+
+        self::assertFalse($measurement->isAtLeast());
+        self::assertEqualsWithDelta($years, $measurement->years() ?? -1.0, 0.005);
+    }
+
+    /** Ruling R16-26: a pre-release on a shared commit has the commit's date, so it is not the newest end. */
+    public function testAPreReleaseOnASharedCommitAboveTheHighestStableTagHasNoTrustedDate(): void
+    {
+        $split = self::released('acme/split', [['v1.0.0', 'cs', '2019-01-01T00:00:00+00:00'], ['v1.0.1', 'cs', '2019-01-01T00:00:00+00:00'], ['v1.0.2', 'cs', '2019-01-01T00:00:00+00:00'], ['v2.0.0-beta1', 'cs', '2019-01-01T00:00:00+00:00']], 'v1.0.2');
+        $metadata = $split->datedBy(self::released('acme/mono', [['v1.0.2', 'm102', '2019-06-01T00:00:00+00:00']], null, ['acme/split' => 'self.version']));
+
+        self::assertNotNull($metadata->lastStableReleaseAt(), 'the parent dates the highest stable tag');
+        self::assertSame(Libyears::UNDATED_RELEASES, Libyears::measure(self::package('v1.0.2', '2019-01-01T00:00:00+00:00'), $metadata)->unmeasuredReason());
+    }
+
+    /**
+     * Ruling R16-16i: a highest pre-release above the highest stable tag with an unresolved date
+     * stops the reading. The shared date of the lower tag v1.4.3 is no lower bound for it.
+     */
+    public function testAPreReleaseOnASharedCommitAboveTheHighestStableTagLeavesALowerInstalledTagUnmeasured(): void
+    {
+        $metadata = self::released('acme/split', [
+            ['v1.0.0', 'c100', '2018-01-01T00:00:00+00:00'],
+            ['v1.5.0', 'c150', '2020-01-01T00:00:00+00:00'],
+            ['v1.4.1', 'cs', '2021-01-01T00:00:00+00:00'],
+            ['v1.4.2', 'cs', '2021-01-01T00:00:00+00:00'],
+            ['v1.4.3', 'cs', '2021-01-01T00:00:00+00:00'],
+            ['v2.0.0-beta1', 'cs', '2021-01-01T00:00:00+00:00'],
+        ], 'v1.0.0');
+
+        $measurement = Libyears::measure(self::package('v1.0.0', '2018-01-01T00:00:00+00:00'), $metadata);
+
+        self::assertSame(Libyears::UNDATED_RELEASES, $measurement->unmeasuredReason());
     }
 
     public function testAVersionComposerCannotNormalizeIsMeasuredFromTheLocksDate(): void

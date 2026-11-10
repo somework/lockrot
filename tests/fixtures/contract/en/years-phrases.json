@@ -57,6 +57,10 @@
             "phrase": "1.4 years ago"
         },
         {
+            "value": 1.6,
+            "phrase": "1.6 years ago"
+        },
+        {
             "value": 1.7,
             "phrase": "1.7 years ago"
         },
@@ -95,6 +99,10 @@
         {
             "value": 3.0,
             "phrase": "3.0 years ago"
+        },
+        {
+            "value": 3.2,
+            "phrase": "3.2 years ago"
         },
         {
             "value": 3.3,

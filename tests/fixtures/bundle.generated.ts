@@ -63815,6 +63815,1385 @@ export const d_S10_tag_undated_dagger = {
     ]
 } satisfies Report2;
 
+export const d_S2_parent_shared_installed_dagger = {
+    "$schema": "https://lockrot.dev/schema/report-2.json",
+    "lockrot": {
+        "version": "0.14.0",
+        "schema": 2
+    },
+    "generated_at": "2026-10-01T17:41:20+00:00",
+    "run": {
+        "project": "akaunting/akaunting",
+        "root_package": "akaunting/akaunting",
+        "target_php": "8.4",
+        "target_php_source": "option",
+        "project_php": "^8.1",
+        "project_php_lowest": "8.1.0",
+        "lock_file": "composer.lock",
+        "fail_on": "high",
+        "fail_on_source": "option",
+        "gates": [
+            {
+                "value": "high",
+                "kind": "grade",
+                "threshold": "high"
+            }
+        ],
+        "strict_network": false,
+        "mode": "check",
+        "include_dev": false,
+        "thresholds": {
+            "release-warn-years": 3,
+            "release-high-years": 5,
+            "push-warn-years": 3,
+            "push-high-years": 5
+        },
+        "flag_ids": [
+            "abandoned",
+            "silent",
+            "pinned",
+            "left-behind",
+            "old-promise",
+            "stale",
+            "capped",
+            "vulnerable"
+        ],
+        "verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "unknown",
+            "finished",
+            "ok"
+        ],
+        "graded_verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+        ],
+        "signal_ids": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6",
+            "S7",
+            "S8",
+            "S9",
+            "S10",
+            "S11"
+        ],
+        "fix_model": 1,
+        "text_grammar": 1,
+        "score_model": {
+            "id": 1,
+            "score_text_grammar": 1,
+            "flag_order": [
+                "abandoned",
+                "silent",
+                "pinned",
+                "left-behind",
+                "old-promise",
+                "stale",
+                "capped",
+                "vulnerable"
+            ],
+            "parts": [
+                {
+                    "id": "maintenance",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "pinned",
+                        "left-behind",
+                        "old-promise",
+                        "stale",
+                        "capped"
+                    ],
+                    "combine": "lead_plus_share"
+                },
+                {
+                    "id": "security",
+                    "flag_ids": [
+                        "vulnerable"
+                    ],
+                    "combine": "max"
+                }
+            ],
+            "flags": [
+                {
+                    "id": "abandoned",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "abandoned",
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S1",
+                        "S3"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "silent",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "silent",
+                        "pinned",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-high-years",
+                        "push-high-years"
+                    ],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "pinned",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 22,
+                    "max_maintenance_flags": [
+                        "pinned",
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S6"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "left-behind",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 20,
+                    "max_maintenance_flags": [
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S8"
+                    ],
+                    "thresholds": [
+                        "release-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "old-promise",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 18,
+                    "max_maintenance_flags": [
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S5"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "stale",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 10,
+                    "max_maintenance_flags": [
+                        "stale",
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-warn-years",
+                        "push-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "capped",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S11"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "vulnerable",
+                    "part": "security",
+                    "points": null,
+                    "band": null,
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": null,
+                    "max_maintenance_flags": null,
+                    "raised_by": [
+                        "S9"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "severities"
+                    },
+                    "points_from": "severities"
+                }
+            ],
+            "severities": [
+                {
+                    "id": "critical",
+                    "points": 32,
+                    "band": "critical",
+                    "points_no_reachable_fix": 64,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 4,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "high",
+                    "points": 16,
+                    "band": "high",
+                    "points_no_reachable_fix": 32,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 3,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "unrated",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": "medium",
+                    "basis": {
+                        "points": "counts_as"
+                    }
+                },
+                {
+                    "id": "low",
+                    "points": 2,
+                    "band": "low",
+                    "points_no_reachable_fix": 4,
+                    "band_no_reachable_fix": "low",
+                    "gate_rank": 1,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "share",
+                        "of": "medium",
+                        "share": {
+                            "num": 1,
+                            "den": 4
+                        }
+                    }
+                }
+            ],
+            "fix_kinds": [
+                {
+                    "id": "update",
+                    "ease": 1,
+                    "doubles": false
+                },
+                {
+                    "id": "upgrade",
+                    "ease": 2,
+                    "doubles": false
+                },
+                {
+                    "id": "raise-php",
+                    "ease": 3,
+                    "doubles": false
+                },
+                {
+                    "id": "unknown",
+                    "ease": 4,
+                    "doubles": false
+                },
+                {
+                    "id": "blocked",
+                    "ease": 5,
+                    "doubles": true
+                },
+                {
+                    "id": "none",
+                    "ease": 6,
+                    "doubles": true
+                }
+            ],
+            "bands": [
+                {
+                    "verdict": "critical",
+                    "floor": 32
+                },
+                {
+                    "verdict": "high",
+                    "floor": 16
+                },
+                {
+                    "verdict": "medium",
+                    "floor": 8
+                },
+                {
+                    "verdict": "low",
+                    "floor": 1
+                }
+            ],
+            "zero_verdicts": [
+                {
+                    "verdict": "finished",
+                    "when": "allowlisted"
+                },
+                {
+                    "verdict": "unknown",
+                    "when": "no_metadata"
+                },
+                {
+                    "verdict": "ok",
+                    "when": "otherwise"
+                }
+            ],
+            "exact_unit": 0.5,
+            "rounding": "floor_once",
+            "max_total": 104,
+            "bar_max": 64,
+            "bar_overflow": "clip",
+            "exclusive_groups": [
+                {
+                    "id": "liveness",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "stale"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "branch",
+                    "flag_ids": [
+                        "pinned",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_age",
+                    "flag_ids": [
+                        "silent",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_push",
+                    "flag_ids": [
+                        "left-behind",
+                        "stale"
+                    ],
+                    "holds_unless": {
+                        "threshold": "push-warn-years",
+                        "below": "release-warn-years"
+                    }
+                },
+                {
+                    "id": "php_bound",
+                    "flag_ids": [
+                        "old-promise",
+                        "capped"
+                    ],
+                    "holds_unless": null
+                }
+            ],
+            "sort": [
+                {
+                    "key": "verdict",
+                    "path": "verdict",
+                    "dir": "order",
+                    "order": [
+                        [
+                            "critical"
+                        ],
+                        [
+                            "high"
+                        ],
+                        [
+                            "medium"
+                        ],
+                        [
+                            "low"
+                        ],
+                        [
+                            "unknown"
+                        ],
+                        [
+                            "finished",
+                            "ok"
+                        ]
+                    ],
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "security",
+                    "path": "score.parts.security.contribution",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "score",
+                    "path": "score.exact",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "direct",
+                    "path": "direct",
+                    "dir": "true_first",
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "package",
+                    "path": "package",
+                    "dir": "asc",
+                    "collation": "bytes",
+                    "default": null
+                }
+            ],
+            "rules": [
+                {
+                    "id": "counted",
+                    "stage": 1,
+                    "kind": "select",
+                    "applies_to": "flags",
+                    "accept_group": "liveness",
+                    "accept_covers": "listed_and_below",
+                    "why": "accepted-facts-shown-not-counted",
+                    "doc": "score-counted",
+                    "illustration": null
+                },
+                {
+                    "id": "lead-first",
+                    "stage": 2,
+                    "kind": "select",
+                    "applies_to": "maintenance",
+                    "order": "flag_order",
+                    "share": {
+                        "num": 1,
+                        "den": 1
+                    },
+                    "why": "strongest-fact-in-full",
+                    "doc": "score-lead-first",
+                    "illustration": null
+                },
+                {
+                    "id": "corroborating-share",
+                    "stage": 3,
+                    "kind": "share",
+                    "applies_to": "maintenance",
+                    "share": {
+                        "num": 1,
+                        "den": 4
+                    },
+                    "why": "correlated-evidence",
+                    "doc": "score-corroborating-share",
+                    "illustration": {
+                        "lead": "left-behind",
+                        "flag": "old-promise",
+                        "weight": 16,
+                        "points": 4
+                    }
+                },
+                {
+                    "id": "advisory-points",
+                    "stage": 4,
+                    "kind": "lookup",
+                    "applies_to": "security",
+                    "table": "severities",
+                    "why": "severity-points",
+                    "doc": "score-advisory-points",
+                    "illustration": null
+                },
+                {
+                    "id": "no-reachable-fix-multiplier",
+                    "stage": 5,
+                    "kind": "multiply",
+                    "applies_to": "advisory",
+                    "factor": 2,
+                    "when_fix": [
+                        "none",
+                        "blocked"
+                    ],
+                    "why": "one-band-up",
+                    "doc": "score-no-reachable-fix-multiplier",
+                    "illustration": {
+                        "severity": "high",
+                        "before": 16,
+                        "after": 32,
+                        "band_before": "high",
+                        "band_after": "critical"
+                    }
+                },
+                {
+                    "id": "security-max",
+                    "stage": 6,
+                    "kind": "max",
+                    "applies_to": "security",
+                    "tie_break": [
+                        {
+                            "key": "points",
+                            "dir": "desc",
+                            "collation": null
+                        },
+                        {
+                            "key": "severity",
+                            "dir": "order",
+                            "collation": null
+                        },
+                        {
+                            "key": "id",
+                            "dir": "asc",
+                            "collation": "bytes"
+                        }
+                    ],
+                    "why": "one-number-per-part",
+                    "doc": "score-security-max",
+                    "illustration": null
+                },
+                {
+                    "id": "divide-reach",
+                    "stage": 7,
+                    "kind": "divide",
+                    "applies_to": "maintenance",
+                    "by": 2,
+                    "when": [
+                        "transitive",
+                        "unreached"
+                    ],
+                    "why": "reach-halves-maintenance",
+                    "doc": "score-divide-reach",
+                    "illustration": {
+                        "flag": "abandoned",
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "security-exempt-from-reach",
+                    "stage": 8,
+                    "kind": "exempt",
+                    "applies_to": "security",
+                    "of": "divide-reach",
+                    "why": "exploitability-independent-of-reach",
+                    "doc": "score-security-exempt-from-reach",
+                    "illustration": {
+                        "severity": "critical",
+                        "reach": "transitive",
+                        "total": 32
+                    }
+                },
+                {
+                    "id": "sum",
+                    "stage": 9,
+                    "kind": "combine",
+                    "applies_to": "total",
+                    "op": "sum",
+                    "ratio_from": "medium",
+                    "why": "parts-add",
+                    "doc": "score-sum",
+                    "illustration": {
+                        "maintenance": 16,
+                        "security": 16,
+                        "total": 32,
+                        "band": "critical",
+                        "low_maintenance": 4,
+                        "low_security": 4,
+                        "low_total": 8,
+                        "low_band": "medium"
+                    }
+                },
+                {
+                    "id": "divide-dev",
+                    "stage": 10,
+                    "kind": "divide",
+                    "applies_to": "total",
+                    "by": 2,
+                    "when": [
+                        "dev"
+                    ],
+                    "why": "dev-halves-total",
+                    "doc": "score-divide-dev",
+                    "illustration": {
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "floor-once",
+                    "stage": 11,
+                    "kind": "floor",
+                    "applies_to": "total",
+                    "why": "integer-band-edges",
+                    "doc": "score-floor-once",
+                    "illustration": {
+                        "exact": 4.5,
+                        "total": 4
+                    }
+                },
+                {
+                    "id": "band-floors",
+                    "stage": 12,
+                    "kind": "band",
+                    "applies_to": "total",
+                    "ratio": 2,
+                    "ratio_from": "medium",
+                    "why": "two-floor-parts-make-next",
+                    "doc": "score-band-floors",
+                    "illustration": null
+                },
+                {
+                    "id": "zero-verdicts",
+                    "stage": 13,
+                    "kind": "zero",
+                    "applies_to": "total",
+                    "table": "zero_verdicts",
+                    "why": "score-zero-says-why",
+                    "doc": "score-zero-verdicts",
+                    "illustration": null
+                },
+                {
+                    "id": "sort",
+                    "stage": 14,
+                    "kind": "order",
+                    "applies_to": "findings",
+                    "why": "advisory-findings-first",
+                    "doc": "score-sort",
+                    "illustration": null
+                },
+                {
+                    "id": "gate-bounded-new",
+                    "stage": 15,
+                    "kind": "gate",
+                    "applies_to": "gate",
+                    "cap_multiplier": 2,
+                    "why": "new-fact-sets-level",
+                    "doc": "score-gate-bounded-new",
+                    "illustration": {
+                        "score": 36,
+                        "new": 16,
+                        "gate": 32
+                    }
+                },
+                {
+                    "id": "baseline-cover",
+                    "stage": 16,
+                    "kind": "cover",
+                    "applies_to": "gate",
+                    "order": "flag_order",
+                    "covers": "listed_and_below",
+                    "why": "recorded-lead-covers-below",
+                    "doc": "score-baseline-cover",
+                    "illustration": null
+                }
+            ],
+            "docs": "https://lockrot.dev/verdicts/model-1/"
+        },
+        "advisory_lookup": {
+            "scope": "all",
+            "scope_source": "default",
+            "packages_asked": 1,
+            "packages_not_asked": 0,
+            "other_repositories": 0,
+            "repositories": [
+                {
+                    "composer_repository": "composer repo (https://repo.packagist.org)",
+                    "registry": "packagist.org",
+                    "outcome": "answered",
+                    "reason": null,
+                    "message": null,
+                    "packages_with_records": 0,
+                    "records": 0
+                }
+            ]
+        },
+        "move_check": null,
+        "php_window": {
+            "platform_override": null,
+            "host_requires": [],
+            "with_dev": {
+                "minors": [
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.1.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "without_dev": {
+                "minors": [
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.1.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "target": {
+                "php": "8.4.99",
+                "inside": true
+            },
+            "target_fix": null
+        },
+        "score_rules_used": {
+            "counted": 0,
+            "lead-first": 1,
+            "corroborating-share": 0,
+            "advisory-points": 0,
+            "no-reachable-fix-multiplier": 0,
+            "security-max": 0,
+            "divide-reach": 0,
+            "security-exempt-from-reach": 0,
+            "sum": 0,
+            "divide-dev": 0,
+            "floor-once": 0,
+            "band-floors": 1,
+            "zero-verdicts": 0,
+            "sort": null,
+            "gate-bounded-new": 0,
+            "baseline-cover": 0
+        }
+    },
+    "activity_cache_oldest_at": null,
+    "activity_cache_age_hours": null,
+    "packages_checked": 1,
+    "packages_flagged": 1,
+    "packages_multi_flag": 0,
+    "include_dev": false,
+    "not_from_composer_repository": 0,
+    "packages_unchecked_accepted": 0,
+    "network_failures": false,
+    "counts": {
+        "critical": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 0,
+        "unknown": 0,
+        "finished": 0,
+        "ok": 0
+    },
+    "abandoned": {
+        "total": 0,
+        "with_replacement": 0,
+        "with_suggestion": 0
+    },
+    "priorities": {
+        "critical": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 0,
+        "none": 0
+    },
+    "flags": {
+        "abandoned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "silent": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "pinned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "left-behind": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "old-promise": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "stale": {
+            "carrying": 1,
+            "leading": 1,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 1,
+                "low": 0
+            }
+        },
+        "capped": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "vulnerable": {
+            "carrying": 0,
+            "leading": null,
+            "accepted": null,
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        }
+    },
+    "exposure": [],
+    "exposure_rule": {
+        "max_fan_in": 8
+    },
+    "unattributed": [],
+    "rot_depth": {
+        "flagged": 1,
+        "measured": 1,
+        "unmeasured": {
+            "unreached": 0,
+            "no_composer_json": 0
+        },
+        "by_reach": {
+            "direct": 1,
+            "transitive": 0,
+            "unreached": 0
+        },
+        "not_in_composer_json": 0,
+        "require_dev_not_walked": 0,
+        "production": 1,
+        "development": 0,
+        "by_depth": [
+            {
+                "depth": 0,
+                "flagged": 1
+            }
+        ],
+        "max_depth": 0,
+        "deepest": []
+    },
+    "libyears": {
+        "total": 0,
+        "direct_requirements": 0,
+        "measured": 1,
+        "at_least_count": 0,
+        "unmeasured": {
+            "not_from_composer_repository": 0,
+            "unavailable": 0,
+            "not_found": 0,
+            "branch_snapshot": 0,
+            "shared_commit": 0,
+            "parent_split": 0,
+            "undated": 0,
+            "no_stable_release": 0,
+            "undated_releases": 0
+        },
+        "furthest_behind": null,
+        "packages": 1
+    },
+    "baseline": null,
+    "gate": {
+        "fails": false,
+        "tripped_by": [],
+        "fail_on_applied": true,
+        "reaching": 0,
+        "failing": 0,
+        "exempt": {
+            "baseline": 0
+        },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
+        "failing_by": [
+            {
+                "value": "high",
+                "failing": 0
+            }
+        ],
+        "not_applied": [],
+        "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)"
+    },
+    "security": {
+        "check": "complete",
+        "packages": {
+            "vulnerable": 0,
+            "unchecked": 0,
+            "ignored": 0,
+            "clear": 1
+        },
+        "advisories": {
+            "counted": 0,
+            "ignored": 0
+        },
+        "severities": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "unrated": 0,
+            "low": 0
+        },
+        "fixes": {
+            "update": 0,
+            "upgrade": 0,
+            "raise-php": 0,
+            "unknown": 0,
+            "blocked": 0,
+            "none": 0
+        },
+        "update_now": [],
+        "update_now_command": null,
+        "fix_unknown": 0
+    },
+    "data_date": "2026-10-01T17:41:20+00:00",
+    "notes": [],
+    "note_details": [],
+    "findings": [
+        {
+            "package": "akaunting/laravel-debugbar-collector",
+            "version": "2.1.1",
+            "branch": "2.x",
+            "installed_php": {
+                "requires": ">=8.0",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "medium",
+            "priority": "medium",
+            "lead": "stale",
+            "rank": 1,
+            "flags": [
+                {
+                    "id": "stale",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S2",
+                        "S4"
+                    ],
+                    "degree": {
+                        "liveness_complete": true
+                    },
+                    "headline": {
+                        "unit": "years",
+                        "value": 3.3,
+                        "source": "push"
+                    },
+                    "summary": "last release 2023-08-01 (3.2 years ago, dated by akaunting/monorepo); last push 2023-06-02 (3.3 years ago)"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 8,
+                "exact": 8,
+                "rounded_down": false,
+                "band": {
+                    "floor": 8,
+                    "next": "high",
+                    "to_next": 8
+                },
+                "decided_by": "maintenance",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 8,
+                        "alone": {
+                            "total": 8,
+                            "verdict": "medium"
+                        }
+                    },
+                    "security": {
+                        "status": "clear",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        },
+                        "of": 0,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "stale",
+                        "role": "lead",
+                        "weight": 8,
+                        "divisor": 1,
+                        "points": 8,
+                        "contribution": 8
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [],
+                "text": "8 = stale 8"
+            },
+            "next_step": {
+                "kind": "no-move",
+                "source": "stale",
+                "merged": [],
+                "fix_kind": null,
+                "reason": "package_quiet",
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": null,
+                "version": null,
+                "newest": null,
+                "constraint": null,
+                "latest": null,
+                "php_check": null,
+                "crosses_major": null,
+                "held_by": [],
+                "clears": [],
+                "unverified": [],
+                "adds": [],
+                "leaves": [
+                    {
+                        "kind": "flag",
+                        "id": "stale"
+                    }
+                ],
+                "clears_all": false,
+                "if_applied": null,
+                "check": null,
+                "moves_with": [],
+                "composer_moves_because": [],
+                "commands": [],
+                "through": [],
+                "also": [],
+                "text": "\u2014"
+            },
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "akaunting/laravel-debugbar-collector",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/akaunting/laravel-debugbar-collector",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "akaunting/laravel-debugbar-collector"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "akaunting/laravel-debugbar-collector"
+            ],
+            "signals": [
+                {
+                    "id": "S2",
+                    "level": "warn",
+                    "summary": "last release 2023-08-01 (3.2 years ago, dated by akaunting/monorepo)",
+                    "data": {
+                        "last_release": "2023-08-01T00:00:00+00:00",
+                        "last_version": "2.1.1",
+                        "years": 3.2,
+                        "dated_by": "akaunting/monorepo"
+                    }
+                },
+                {
+                    "id": "S4",
+                    "level": "warn",
+                    "summary": "last push 2023-06-02 (3.3 years ago)",
+                    "data": {
+                        "last_push": "2023-06-02T07:23:06+00:00",
+                        "repo": "akaunting/laravel-debugbar-collector",
+                        "host": "github.com",
+                        "years": 3.3,
+                        "forge": "github",
+                        "event": "push"
+                    }
+                }
+            ],
+            "evidence": "stale: last release 2023-08-01 (3.2 years ago, dated by akaunting/monorepo); last push 2023-06-02 (3.3 years ago)",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0,
+            "age": {
+                "installed": {
+                    "at": "2023-08-01T00:00:00+00:00",
+                    "years": 3.2,
+                    "dated_by": "akaunting/monorepo"
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "2.1.1",
+                    "at": "2023-08-01T00:00:00+00:00",
+                    "years": 3.2,
+                    "level": "warn",
+                    "dated_by": "akaunting/monorepo"
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "2.1.1",
+                    "at": "2023-08-01T00:00:00+00:00",
+                    "years": 3.2,
+                    "level": "warn",
+                    "dated_by": "akaunting/monorepo"
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2023-06-02T07:23:06+00:00",
+                    "years": 3.3,
+                    "level": "warn"
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        }
+    ]
+} satisfies Report2;
+
 export const d_S2_parent_shared_lower_dagger = {
     "$schema": "https://lockrot.dev/schema/report-2.json",
     "lockrot": {
@@ -65153,6 +66532,2773 @@ export const d_S2_parent_shared_lower_dagger = {
                     "years": 0.1,
                     "level": null,
                     "dated_by": "akaunting/monorepo"
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "2.1.1",
+                    "at": "2023-06-02T07:22:01+00:00",
+                    "years": 3.3,
+                    "level": "warn",
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2023-06-02T07:23:06+00:00",
+                    "years": 3.3,
+                    "level": "warn"
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        }
+    ]
+} satisfies Report2;
+
+export const d_S2_prerelease_shared_dagger = {
+    "$schema": "https://lockrot.dev/schema/report-2.json",
+    "lockrot": {
+        "version": "0.14.0",
+        "schema": 2
+    },
+    "generated_at": "2026-10-01T17:41:20+00:00",
+    "run": {
+        "project": "akaunting/akaunting",
+        "root_package": "akaunting/akaunting",
+        "target_php": "8.4",
+        "target_php_source": "option",
+        "project_php": "^8.1",
+        "project_php_lowest": "8.1.0",
+        "lock_file": "composer.lock",
+        "fail_on": "high",
+        "fail_on_source": "option",
+        "gates": [
+            {
+                "value": "high",
+                "kind": "grade",
+                "threshold": "high"
+            }
+        ],
+        "strict_network": false,
+        "mode": "check",
+        "include_dev": false,
+        "thresholds": {
+            "release-warn-years": 3,
+            "release-high-years": 5,
+            "push-warn-years": 3,
+            "push-high-years": 5
+        },
+        "flag_ids": [
+            "abandoned",
+            "silent",
+            "pinned",
+            "left-behind",
+            "old-promise",
+            "stale",
+            "capped",
+            "vulnerable"
+        ],
+        "verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "unknown",
+            "finished",
+            "ok"
+        ],
+        "graded_verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+        ],
+        "signal_ids": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6",
+            "S7",
+            "S8",
+            "S9",
+            "S10",
+            "S11"
+        ],
+        "fix_model": 1,
+        "text_grammar": 1,
+        "score_model": {
+            "id": 1,
+            "score_text_grammar": 1,
+            "flag_order": [
+                "abandoned",
+                "silent",
+                "pinned",
+                "left-behind",
+                "old-promise",
+                "stale",
+                "capped",
+                "vulnerable"
+            ],
+            "parts": [
+                {
+                    "id": "maintenance",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "pinned",
+                        "left-behind",
+                        "old-promise",
+                        "stale",
+                        "capped"
+                    ],
+                    "combine": "lead_plus_share"
+                },
+                {
+                    "id": "security",
+                    "flag_ids": [
+                        "vulnerable"
+                    ],
+                    "combine": "max"
+                }
+            ],
+            "flags": [
+                {
+                    "id": "abandoned",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "abandoned",
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S1",
+                        "S3"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "silent",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "silent",
+                        "pinned",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-high-years",
+                        "push-high-years"
+                    ],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "pinned",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 22,
+                    "max_maintenance_flags": [
+                        "pinned",
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S6"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "left-behind",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 20,
+                    "max_maintenance_flags": [
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S8"
+                    ],
+                    "thresholds": [
+                        "release-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "old-promise",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 18,
+                    "max_maintenance_flags": [
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S5"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "stale",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 10,
+                    "max_maintenance_flags": [
+                        "stale",
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-warn-years",
+                        "push-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "capped",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S11"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "vulnerable",
+                    "part": "security",
+                    "points": null,
+                    "band": null,
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": null,
+                    "max_maintenance_flags": null,
+                    "raised_by": [
+                        "S9"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "severities"
+                    },
+                    "points_from": "severities"
+                }
+            ],
+            "severities": [
+                {
+                    "id": "critical",
+                    "points": 32,
+                    "band": "critical",
+                    "points_no_reachable_fix": 64,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 4,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "high",
+                    "points": 16,
+                    "band": "high",
+                    "points_no_reachable_fix": 32,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 3,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "unrated",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": "medium",
+                    "basis": {
+                        "points": "counts_as"
+                    }
+                },
+                {
+                    "id": "low",
+                    "points": 2,
+                    "band": "low",
+                    "points_no_reachable_fix": 4,
+                    "band_no_reachable_fix": "low",
+                    "gate_rank": 1,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "share",
+                        "of": "medium",
+                        "share": {
+                            "num": 1,
+                            "den": 4
+                        }
+                    }
+                }
+            ],
+            "fix_kinds": [
+                {
+                    "id": "update",
+                    "ease": 1,
+                    "doubles": false
+                },
+                {
+                    "id": "upgrade",
+                    "ease": 2,
+                    "doubles": false
+                },
+                {
+                    "id": "raise-php",
+                    "ease": 3,
+                    "doubles": false
+                },
+                {
+                    "id": "unknown",
+                    "ease": 4,
+                    "doubles": false
+                },
+                {
+                    "id": "blocked",
+                    "ease": 5,
+                    "doubles": true
+                },
+                {
+                    "id": "none",
+                    "ease": 6,
+                    "doubles": true
+                }
+            ],
+            "bands": [
+                {
+                    "verdict": "critical",
+                    "floor": 32
+                },
+                {
+                    "verdict": "high",
+                    "floor": 16
+                },
+                {
+                    "verdict": "medium",
+                    "floor": 8
+                },
+                {
+                    "verdict": "low",
+                    "floor": 1
+                }
+            ],
+            "zero_verdicts": [
+                {
+                    "verdict": "finished",
+                    "when": "allowlisted"
+                },
+                {
+                    "verdict": "unknown",
+                    "when": "no_metadata"
+                },
+                {
+                    "verdict": "ok",
+                    "when": "otherwise"
+                }
+            ],
+            "exact_unit": 0.5,
+            "rounding": "floor_once",
+            "max_total": 104,
+            "bar_max": 64,
+            "bar_overflow": "clip",
+            "exclusive_groups": [
+                {
+                    "id": "liveness",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "stale"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "branch",
+                    "flag_ids": [
+                        "pinned",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_age",
+                    "flag_ids": [
+                        "silent",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_push",
+                    "flag_ids": [
+                        "left-behind",
+                        "stale"
+                    ],
+                    "holds_unless": {
+                        "threshold": "push-warn-years",
+                        "below": "release-warn-years"
+                    }
+                },
+                {
+                    "id": "php_bound",
+                    "flag_ids": [
+                        "old-promise",
+                        "capped"
+                    ],
+                    "holds_unless": null
+                }
+            ],
+            "sort": [
+                {
+                    "key": "verdict",
+                    "path": "verdict",
+                    "dir": "order",
+                    "order": [
+                        [
+                            "critical"
+                        ],
+                        [
+                            "high"
+                        ],
+                        [
+                            "medium"
+                        ],
+                        [
+                            "low"
+                        ],
+                        [
+                            "unknown"
+                        ],
+                        [
+                            "finished",
+                            "ok"
+                        ]
+                    ],
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "security",
+                    "path": "score.parts.security.contribution",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "score",
+                    "path": "score.exact",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "direct",
+                    "path": "direct",
+                    "dir": "true_first",
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "package",
+                    "path": "package",
+                    "dir": "asc",
+                    "collation": "bytes",
+                    "default": null
+                }
+            ],
+            "rules": [
+                {
+                    "id": "counted",
+                    "stage": 1,
+                    "kind": "select",
+                    "applies_to": "flags",
+                    "accept_group": "liveness",
+                    "accept_covers": "listed_and_below",
+                    "why": "accepted-facts-shown-not-counted",
+                    "doc": "score-counted",
+                    "illustration": null
+                },
+                {
+                    "id": "lead-first",
+                    "stage": 2,
+                    "kind": "select",
+                    "applies_to": "maintenance",
+                    "order": "flag_order",
+                    "share": {
+                        "num": 1,
+                        "den": 1
+                    },
+                    "why": "strongest-fact-in-full",
+                    "doc": "score-lead-first",
+                    "illustration": null
+                },
+                {
+                    "id": "corroborating-share",
+                    "stage": 3,
+                    "kind": "share",
+                    "applies_to": "maintenance",
+                    "share": {
+                        "num": 1,
+                        "den": 4
+                    },
+                    "why": "correlated-evidence",
+                    "doc": "score-corroborating-share",
+                    "illustration": {
+                        "lead": "left-behind",
+                        "flag": "old-promise",
+                        "weight": 16,
+                        "points": 4
+                    }
+                },
+                {
+                    "id": "advisory-points",
+                    "stage": 4,
+                    "kind": "lookup",
+                    "applies_to": "security",
+                    "table": "severities",
+                    "why": "severity-points",
+                    "doc": "score-advisory-points",
+                    "illustration": null
+                },
+                {
+                    "id": "no-reachable-fix-multiplier",
+                    "stage": 5,
+                    "kind": "multiply",
+                    "applies_to": "advisory",
+                    "factor": 2,
+                    "when_fix": [
+                        "none",
+                        "blocked"
+                    ],
+                    "why": "one-band-up",
+                    "doc": "score-no-reachable-fix-multiplier",
+                    "illustration": {
+                        "severity": "high",
+                        "before": 16,
+                        "after": 32,
+                        "band_before": "high",
+                        "band_after": "critical"
+                    }
+                },
+                {
+                    "id": "security-max",
+                    "stage": 6,
+                    "kind": "max",
+                    "applies_to": "security",
+                    "tie_break": [
+                        {
+                            "key": "points",
+                            "dir": "desc",
+                            "collation": null
+                        },
+                        {
+                            "key": "severity",
+                            "dir": "order",
+                            "collation": null
+                        },
+                        {
+                            "key": "id",
+                            "dir": "asc",
+                            "collation": "bytes"
+                        }
+                    ],
+                    "why": "one-number-per-part",
+                    "doc": "score-security-max",
+                    "illustration": null
+                },
+                {
+                    "id": "divide-reach",
+                    "stage": 7,
+                    "kind": "divide",
+                    "applies_to": "maintenance",
+                    "by": 2,
+                    "when": [
+                        "transitive",
+                        "unreached"
+                    ],
+                    "why": "reach-halves-maintenance",
+                    "doc": "score-divide-reach",
+                    "illustration": {
+                        "flag": "abandoned",
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "security-exempt-from-reach",
+                    "stage": 8,
+                    "kind": "exempt",
+                    "applies_to": "security",
+                    "of": "divide-reach",
+                    "why": "exploitability-independent-of-reach",
+                    "doc": "score-security-exempt-from-reach",
+                    "illustration": {
+                        "severity": "critical",
+                        "reach": "transitive",
+                        "total": 32
+                    }
+                },
+                {
+                    "id": "sum",
+                    "stage": 9,
+                    "kind": "combine",
+                    "applies_to": "total",
+                    "op": "sum",
+                    "ratio_from": "medium",
+                    "why": "parts-add",
+                    "doc": "score-sum",
+                    "illustration": {
+                        "maintenance": 16,
+                        "security": 16,
+                        "total": 32,
+                        "band": "critical",
+                        "low_maintenance": 4,
+                        "low_security": 4,
+                        "low_total": 8,
+                        "low_band": "medium"
+                    }
+                },
+                {
+                    "id": "divide-dev",
+                    "stage": 10,
+                    "kind": "divide",
+                    "applies_to": "total",
+                    "by": 2,
+                    "when": [
+                        "dev"
+                    ],
+                    "why": "dev-halves-total",
+                    "doc": "score-divide-dev",
+                    "illustration": {
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "floor-once",
+                    "stage": 11,
+                    "kind": "floor",
+                    "applies_to": "total",
+                    "why": "integer-band-edges",
+                    "doc": "score-floor-once",
+                    "illustration": {
+                        "exact": 4.5,
+                        "total": 4
+                    }
+                },
+                {
+                    "id": "band-floors",
+                    "stage": 12,
+                    "kind": "band",
+                    "applies_to": "total",
+                    "ratio": 2,
+                    "ratio_from": "medium",
+                    "why": "two-floor-parts-make-next",
+                    "doc": "score-band-floors",
+                    "illustration": null
+                },
+                {
+                    "id": "zero-verdicts",
+                    "stage": 13,
+                    "kind": "zero",
+                    "applies_to": "total",
+                    "table": "zero_verdicts",
+                    "why": "score-zero-says-why",
+                    "doc": "score-zero-verdicts",
+                    "illustration": null
+                },
+                {
+                    "id": "sort",
+                    "stage": 14,
+                    "kind": "order",
+                    "applies_to": "findings",
+                    "why": "advisory-findings-first",
+                    "doc": "score-sort",
+                    "illustration": null
+                },
+                {
+                    "id": "gate-bounded-new",
+                    "stage": 15,
+                    "kind": "gate",
+                    "applies_to": "gate",
+                    "cap_multiplier": 2,
+                    "why": "new-fact-sets-level",
+                    "doc": "score-gate-bounded-new",
+                    "illustration": {
+                        "score": 36,
+                        "new": 16,
+                        "gate": 32
+                    }
+                },
+                {
+                    "id": "baseline-cover",
+                    "stage": 16,
+                    "kind": "cover",
+                    "applies_to": "gate",
+                    "order": "flag_order",
+                    "covers": "listed_and_below",
+                    "why": "recorded-lead-covers-below",
+                    "doc": "score-baseline-cover",
+                    "illustration": null
+                }
+            ],
+            "docs": "https://lockrot.dev/verdicts/model-1/"
+        },
+        "advisory_lookup": {
+            "scope": "all",
+            "scope_source": "default",
+            "packages_asked": 1,
+            "packages_not_asked": 0,
+            "other_repositories": 0,
+            "repositories": [
+                {
+                    "composer_repository": "composer repo (https://repo.packagist.org)",
+                    "registry": "packagist.org",
+                    "outcome": "answered",
+                    "reason": null,
+                    "message": null,
+                    "packages_with_records": 0,
+                    "records": 0
+                }
+            ]
+        },
+        "move_check": null,
+        "php_window": {
+            "platform_override": null,
+            "host_requires": [],
+            "with_dev": {
+                "minors": [
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.1.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "without_dev": {
+                "minors": [
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.1.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "target": {
+                "php": "8.4.99",
+                "inside": true
+            },
+            "target_fix": null
+        },
+        "score_rules_used": {
+            "counted": 0,
+            "lead-first": 1,
+            "corroborating-share": 0,
+            "advisory-points": 0,
+            "no-reachable-fix-multiplier": 0,
+            "security-max": 0,
+            "divide-reach": 0,
+            "security-exempt-from-reach": 0,
+            "sum": 0,
+            "divide-dev": 0,
+            "floor-once": 0,
+            "band-floors": 1,
+            "zero-verdicts": 0,
+            "sort": null,
+            "gate-bounded-new": 0,
+            "baseline-cover": 0
+        }
+    },
+    "activity_cache_oldest_at": null,
+    "activity_cache_age_hours": null,
+    "packages_checked": 1,
+    "packages_flagged": 1,
+    "packages_multi_flag": 0,
+    "include_dev": false,
+    "not_from_composer_repository": 0,
+    "packages_unchecked_accepted": 0,
+    "network_failures": false,
+    "counts": {
+        "critical": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 0,
+        "unknown": 0,
+        "finished": 0,
+        "ok": 0
+    },
+    "abandoned": {
+        "total": 0,
+        "with_replacement": 0,
+        "with_suggestion": 0
+    },
+    "priorities": {
+        "critical": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 0,
+        "none": 0
+    },
+    "flags": {
+        "abandoned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "silent": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "pinned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "left-behind": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "old-promise": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "stale": {
+            "carrying": 1,
+            "leading": 1,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 1,
+                "low": 0
+            }
+        },
+        "capped": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "vulnerable": {
+            "carrying": 0,
+            "leading": null,
+            "accepted": null,
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        }
+    },
+    "exposure": [],
+    "exposure_rule": {
+        "max_fan_in": 8
+    },
+    "unattributed": [],
+    "rot_depth": {
+        "flagged": 1,
+        "measured": 1,
+        "unmeasured": {
+            "unreached": 0,
+            "no_composer_json": 0
+        },
+        "by_reach": {
+            "direct": 1,
+            "transitive": 0,
+            "unreached": 0
+        },
+        "not_in_composer_json": 0,
+        "require_dev_not_walked": 0,
+        "production": 1,
+        "development": 0,
+        "by_depth": [
+            {
+                "depth": 0,
+                "flagged": 1
+            }
+        ],
+        "max_depth": 0,
+        "deepest": []
+    },
+    "libyears": {
+        "total": 0,
+        "direct_requirements": 0,
+        "measured": 1,
+        "at_least_count": 0,
+        "unmeasured": {
+            "not_from_composer_repository": 0,
+            "unavailable": 0,
+            "not_found": 0,
+            "branch_snapshot": 0,
+            "shared_commit": 0,
+            "parent_split": 0,
+            "undated": 0,
+            "no_stable_release": 0,
+            "undated_releases": 0
+        },
+        "furthest_behind": null,
+        "packages": 1
+    },
+    "baseline": null,
+    "gate": {
+        "fails": false,
+        "tripped_by": [],
+        "fail_on_applied": true,
+        "reaching": 0,
+        "failing": 0,
+        "exempt": {
+            "baseline": 0
+        },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
+        "failing_by": [
+            {
+                "value": "high",
+                "failing": 0
+            }
+        ],
+        "not_applied": [],
+        "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)"
+    },
+    "security": {
+        "check": "complete",
+        "packages": {
+            "vulnerable": 0,
+            "unchecked": 0,
+            "ignored": 0,
+            "clear": 1
+        },
+        "advisories": {
+            "counted": 0,
+            "ignored": 0
+        },
+        "severities": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "unrated": 0,
+            "low": 0
+        },
+        "fixes": {
+            "update": 0,
+            "upgrade": 0,
+            "raise-php": 0,
+            "unknown": 0,
+            "blocked": 0,
+            "none": 0
+        },
+        "update_now": [],
+        "update_now_command": null,
+        "fix_unknown": 0
+    },
+    "data_date": "2026-10-01T17:41:20+00:00",
+    "notes": [],
+    "note_details": [],
+    "findings": [
+        {
+            "package": "akaunting/laravel-debugbar-collector",
+            "version": "2.1.1",
+            "branch": "2.x",
+            "installed_php": {
+                "requires": ">=8.0",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "medium",
+            "priority": "medium",
+            "lead": "stale",
+            "rank": 1,
+            "flags": [
+                {
+                    "id": "stale",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S4"
+                    ],
+                    "degree": {
+                        "liveness_complete": false
+                    },
+                    "headline": {
+                        "unit": "years",
+                        "value": 3.3,
+                        "source": "push"
+                    },
+                    "summary": "last push 2023-06-02 (3.3 years ago); liveness read from pushes only"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 8,
+                "exact": 8,
+                "rounded_down": false,
+                "band": {
+                    "floor": 8,
+                    "next": "high",
+                    "to_next": 8
+                },
+                "decided_by": "maintenance",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 8,
+                        "alone": {
+                            "total": 8,
+                            "verdict": "medium"
+                        }
+                    },
+                    "security": {
+                        "status": "clear",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        },
+                        "of": 0,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "stale",
+                        "role": "lead",
+                        "weight": 8,
+                        "divisor": 1,
+                        "points": 8,
+                        "contribution": 8
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [],
+                "text": "8 = stale 8"
+            },
+            "next_step": {
+                "kind": "no-move",
+                "source": "stale",
+                "merged": [],
+                "fix_kind": null,
+                "reason": "package_quiet",
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": null,
+                "version": null,
+                "newest": null,
+                "constraint": null,
+                "latest": null,
+                "php_check": null,
+                "crosses_major": null,
+                "held_by": [],
+                "clears": [],
+                "unverified": [],
+                "adds": [],
+                "leaves": [
+                    {
+                        "kind": "flag",
+                        "id": "stale"
+                    }
+                ],
+                "clears_all": false,
+                "if_applied": null,
+                "check": null,
+                "moves_with": [],
+                "composer_moves_because": [],
+                "commands": [],
+                "through": [],
+                "also": [],
+                "text": "\u2014"
+            },
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [
+                {
+                    "check": "release_dates",
+                    "reason": "undated_releases",
+                    "blocks": [
+                        "S2"
+                    ]
+                }
+            ],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "akaunting/laravel-debugbar-collector",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/akaunting/laravel-debugbar-collector",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "akaunting/laravel-debugbar-collector"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "akaunting/laravel-debugbar-collector"
+            ],
+            "signals": [
+                {
+                    "id": "S4",
+                    "level": "warn",
+                    "summary": "last push 2023-06-02 (3.3 years ago)",
+                    "data": {
+                        "last_push": "2023-06-02T07:23:06+00:00",
+                        "repo": "akaunting/laravel-debugbar-collector",
+                        "host": "github.com",
+                        "years": 3.3,
+                        "forge": "github",
+                        "event": "push"
+                    }
+                },
+                {
+                    "id": "S10",
+                    "level": "info",
+                    "summary": "the age of the package was not read (a release it reads is dated by a commit its tags share), so S2 could not measure it",
+                    "data": {
+                        "unchecked": [
+                            {
+                                "check": "release_dates",
+                                "reason": "undated_releases",
+                                "blocks": [
+                                    "S2"
+                                ]
+                            }
+                        ],
+                        "blocks": [
+                            "S2"
+                        ]
+                    }
+                }
+            ],
+            "evidence": "stale: last push 2023-06-02 (3.3 years ago); liveness read from pushes only",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0,
+            "age": {
+                "installed": {
+                    "at": "2023-06-02T07:22:01+00:00",
+                    "years": 3.3,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": null,
+                "release_unmeasured": "undated_releases",
+                "branch_release": {
+                    "version": "2.1.1",
+                    "at": "2023-06-02T07:22:01+00:00",
+                    "years": 3.3,
+                    "level": "warn",
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2023-06-02T07:23:06+00:00",
+                    "years": 3.3,
+                    "level": "warn"
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        }
+    ]
+} satisfies Report2;
+
+export const d_S2_prerelease_shared_older_dagger = {
+    "$schema": "https://lockrot.dev/schema/report-2.json",
+    "lockrot": {
+        "version": "0.14.0",
+        "schema": 2
+    },
+    "generated_at": "2026-10-01T17:41:20+00:00",
+    "run": {
+        "project": "akaunting/akaunting",
+        "root_package": "akaunting/akaunting",
+        "target_php": "8.4",
+        "target_php_source": "option",
+        "project_php": "^8.1",
+        "project_php_lowest": "8.1.0",
+        "lock_file": "composer.lock",
+        "fail_on": "high",
+        "fail_on_source": "option",
+        "gates": [
+            {
+                "value": "high",
+                "kind": "grade",
+                "threshold": "high"
+            }
+        ],
+        "strict_network": false,
+        "mode": "check",
+        "include_dev": false,
+        "thresholds": {
+            "release-warn-years": 3,
+            "release-high-years": 5,
+            "push-warn-years": 3,
+            "push-high-years": 5
+        },
+        "flag_ids": [
+            "abandoned",
+            "silent",
+            "pinned",
+            "left-behind",
+            "old-promise",
+            "stale",
+            "capped",
+            "vulnerable"
+        ],
+        "verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "unknown",
+            "finished",
+            "ok"
+        ],
+        "graded_verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+        ],
+        "signal_ids": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6",
+            "S7",
+            "S8",
+            "S9",
+            "S10",
+            "S11"
+        ],
+        "fix_model": 1,
+        "text_grammar": 1,
+        "score_model": {
+            "id": 1,
+            "score_text_grammar": 1,
+            "flag_order": [
+                "abandoned",
+                "silent",
+                "pinned",
+                "left-behind",
+                "old-promise",
+                "stale",
+                "capped",
+                "vulnerable"
+            ],
+            "parts": [
+                {
+                    "id": "maintenance",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "pinned",
+                        "left-behind",
+                        "old-promise",
+                        "stale",
+                        "capped"
+                    ],
+                    "combine": "lead_plus_share"
+                },
+                {
+                    "id": "security",
+                    "flag_ids": [
+                        "vulnerable"
+                    ],
+                    "combine": "max"
+                }
+            ],
+            "flags": [
+                {
+                    "id": "abandoned",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "abandoned",
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S1",
+                        "S3"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "silent",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "silent",
+                        "pinned",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-high-years",
+                        "push-high-years"
+                    ],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "pinned",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 22,
+                    "max_maintenance_flags": [
+                        "pinned",
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S6"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "left-behind",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 20,
+                    "max_maintenance_flags": [
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S8"
+                    ],
+                    "thresholds": [
+                        "release-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "old-promise",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 18,
+                    "max_maintenance_flags": [
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S5"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "stale",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 10,
+                    "max_maintenance_flags": [
+                        "stale",
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-warn-years",
+                        "push-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "capped",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S11"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "vulnerable",
+                    "part": "security",
+                    "points": null,
+                    "band": null,
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": null,
+                    "max_maintenance_flags": null,
+                    "raised_by": [
+                        "S9"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "severities"
+                    },
+                    "points_from": "severities"
+                }
+            ],
+            "severities": [
+                {
+                    "id": "critical",
+                    "points": 32,
+                    "band": "critical",
+                    "points_no_reachable_fix": 64,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 4,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "high",
+                    "points": 16,
+                    "band": "high",
+                    "points_no_reachable_fix": 32,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 3,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "unrated",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": "medium",
+                    "basis": {
+                        "points": "counts_as"
+                    }
+                },
+                {
+                    "id": "low",
+                    "points": 2,
+                    "band": "low",
+                    "points_no_reachable_fix": 4,
+                    "band_no_reachable_fix": "low",
+                    "gate_rank": 1,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "share",
+                        "of": "medium",
+                        "share": {
+                            "num": 1,
+                            "den": 4
+                        }
+                    }
+                }
+            ],
+            "fix_kinds": [
+                {
+                    "id": "update",
+                    "ease": 1,
+                    "doubles": false
+                },
+                {
+                    "id": "upgrade",
+                    "ease": 2,
+                    "doubles": false
+                },
+                {
+                    "id": "raise-php",
+                    "ease": 3,
+                    "doubles": false
+                },
+                {
+                    "id": "unknown",
+                    "ease": 4,
+                    "doubles": false
+                },
+                {
+                    "id": "blocked",
+                    "ease": 5,
+                    "doubles": true
+                },
+                {
+                    "id": "none",
+                    "ease": 6,
+                    "doubles": true
+                }
+            ],
+            "bands": [
+                {
+                    "verdict": "critical",
+                    "floor": 32
+                },
+                {
+                    "verdict": "high",
+                    "floor": 16
+                },
+                {
+                    "verdict": "medium",
+                    "floor": 8
+                },
+                {
+                    "verdict": "low",
+                    "floor": 1
+                }
+            ],
+            "zero_verdicts": [
+                {
+                    "verdict": "finished",
+                    "when": "allowlisted"
+                },
+                {
+                    "verdict": "unknown",
+                    "when": "no_metadata"
+                },
+                {
+                    "verdict": "ok",
+                    "when": "otherwise"
+                }
+            ],
+            "exact_unit": 0.5,
+            "rounding": "floor_once",
+            "max_total": 104,
+            "bar_max": 64,
+            "bar_overflow": "clip",
+            "exclusive_groups": [
+                {
+                    "id": "liveness",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "stale"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "branch",
+                    "flag_ids": [
+                        "pinned",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_age",
+                    "flag_ids": [
+                        "silent",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_push",
+                    "flag_ids": [
+                        "left-behind",
+                        "stale"
+                    ],
+                    "holds_unless": {
+                        "threshold": "push-warn-years",
+                        "below": "release-warn-years"
+                    }
+                },
+                {
+                    "id": "php_bound",
+                    "flag_ids": [
+                        "old-promise",
+                        "capped"
+                    ],
+                    "holds_unless": null
+                }
+            ],
+            "sort": [
+                {
+                    "key": "verdict",
+                    "path": "verdict",
+                    "dir": "order",
+                    "order": [
+                        [
+                            "critical"
+                        ],
+                        [
+                            "high"
+                        ],
+                        [
+                            "medium"
+                        ],
+                        [
+                            "low"
+                        ],
+                        [
+                            "unknown"
+                        ],
+                        [
+                            "finished",
+                            "ok"
+                        ]
+                    ],
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "security",
+                    "path": "score.parts.security.contribution",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "score",
+                    "path": "score.exact",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "direct",
+                    "path": "direct",
+                    "dir": "true_first",
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "package",
+                    "path": "package",
+                    "dir": "asc",
+                    "collation": "bytes",
+                    "default": null
+                }
+            ],
+            "rules": [
+                {
+                    "id": "counted",
+                    "stage": 1,
+                    "kind": "select",
+                    "applies_to": "flags",
+                    "accept_group": "liveness",
+                    "accept_covers": "listed_and_below",
+                    "why": "accepted-facts-shown-not-counted",
+                    "doc": "score-counted",
+                    "illustration": null
+                },
+                {
+                    "id": "lead-first",
+                    "stage": 2,
+                    "kind": "select",
+                    "applies_to": "maintenance",
+                    "order": "flag_order",
+                    "share": {
+                        "num": 1,
+                        "den": 1
+                    },
+                    "why": "strongest-fact-in-full",
+                    "doc": "score-lead-first",
+                    "illustration": null
+                },
+                {
+                    "id": "corroborating-share",
+                    "stage": 3,
+                    "kind": "share",
+                    "applies_to": "maintenance",
+                    "share": {
+                        "num": 1,
+                        "den": 4
+                    },
+                    "why": "correlated-evidence",
+                    "doc": "score-corroborating-share",
+                    "illustration": {
+                        "lead": "left-behind",
+                        "flag": "old-promise",
+                        "weight": 16,
+                        "points": 4
+                    }
+                },
+                {
+                    "id": "advisory-points",
+                    "stage": 4,
+                    "kind": "lookup",
+                    "applies_to": "security",
+                    "table": "severities",
+                    "why": "severity-points",
+                    "doc": "score-advisory-points",
+                    "illustration": null
+                },
+                {
+                    "id": "no-reachable-fix-multiplier",
+                    "stage": 5,
+                    "kind": "multiply",
+                    "applies_to": "advisory",
+                    "factor": 2,
+                    "when_fix": [
+                        "none",
+                        "blocked"
+                    ],
+                    "why": "one-band-up",
+                    "doc": "score-no-reachable-fix-multiplier",
+                    "illustration": {
+                        "severity": "high",
+                        "before": 16,
+                        "after": 32,
+                        "band_before": "high",
+                        "band_after": "critical"
+                    }
+                },
+                {
+                    "id": "security-max",
+                    "stage": 6,
+                    "kind": "max",
+                    "applies_to": "security",
+                    "tie_break": [
+                        {
+                            "key": "points",
+                            "dir": "desc",
+                            "collation": null
+                        },
+                        {
+                            "key": "severity",
+                            "dir": "order",
+                            "collation": null
+                        },
+                        {
+                            "key": "id",
+                            "dir": "asc",
+                            "collation": "bytes"
+                        }
+                    ],
+                    "why": "one-number-per-part",
+                    "doc": "score-security-max",
+                    "illustration": null
+                },
+                {
+                    "id": "divide-reach",
+                    "stage": 7,
+                    "kind": "divide",
+                    "applies_to": "maintenance",
+                    "by": 2,
+                    "when": [
+                        "transitive",
+                        "unreached"
+                    ],
+                    "why": "reach-halves-maintenance",
+                    "doc": "score-divide-reach",
+                    "illustration": {
+                        "flag": "abandoned",
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "security-exempt-from-reach",
+                    "stage": 8,
+                    "kind": "exempt",
+                    "applies_to": "security",
+                    "of": "divide-reach",
+                    "why": "exploitability-independent-of-reach",
+                    "doc": "score-security-exempt-from-reach",
+                    "illustration": {
+                        "severity": "critical",
+                        "reach": "transitive",
+                        "total": 32
+                    }
+                },
+                {
+                    "id": "sum",
+                    "stage": 9,
+                    "kind": "combine",
+                    "applies_to": "total",
+                    "op": "sum",
+                    "ratio_from": "medium",
+                    "why": "parts-add",
+                    "doc": "score-sum",
+                    "illustration": {
+                        "maintenance": 16,
+                        "security": 16,
+                        "total": 32,
+                        "band": "critical",
+                        "low_maintenance": 4,
+                        "low_security": 4,
+                        "low_total": 8,
+                        "low_band": "medium"
+                    }
+                },
+                {
+                    "id": "divide-dev",
+                    "stage": 10,
+                    "kind": "divide",
+                    "applies_to": "total",
+                    "by": 2,
+                    "when": [
+                        "dev"
+                    ],
+                    "why": "dev-halves-total",
+                    "doc": "score-divide-dev",
+                    "illustration": {
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "floor-once",
+                    "stage": 11,
+                    "kind": "floor",
+                    "applies_to": "total",
+                    "why": "integer-band-edges",
+                    "doc": "score-floor-once",
+                    "illustration": {
+                        "exact": 4.5,
+                        "total": 4
+                    }
+                },
+                {
+                    "id": "band-floors",
+                    "stage": 12,
+                    "kind": "band",
+                    "applies_to": "total",
+                    "ratio": 2,
+                    "ratio_from": "medium",
+                    "why": "two-floor-parts-make-next",
+                    "doc": "score-band-floors",
+                    "illustration": null
+                },
+                {
+                    "id": "zero-verdicts",
+                    "stage": 13,
+                    "kind": "zero",
+                    "applies_to": "total",
+                    "table": "zero_verdicts",
+                    "why": "score-zero-says-why",
+                    "doc": "score-zero-verdicts",
+                    "illustration": null
+                },
+                {
+                    "id": "sort",
+                    "stage": 14,
+                    "kind": "order",
+                    "applies_to": "findings",
+                    "why": "advisory-findings-first",
+                    "doc": "score-sort",
+                    "illustration": null
+                },
+                {
+                    "id": "gate-bounded-new",
+                    "stage": 15,
+                    "kind": "gate",
+                    "applies_to": "gate",
+                    "cap_multiplier": 2,
+                    "why": "new-fact-sets-level",
+                    "doc": "score-gate-bounded-new",
+                    "illustration": {
+                        "score": 36,
+                        "new": 16,
+                        "gate": 32
+                    }
+                },
+                {
+                    "id": "baseline-cover",
+                    "stage": 16,
+                    "kind": "cover",
+                    "applies_to": "gate",
+                    "order": "flag_order",
+                    "covers": "listed_and_below",
+                    "why": "recorded-lead-covers-below",
+                    "doc": "score-baseline-cover",
+                    "illustration": null
+                }
+            ],
+            "docs": "https://lockrot.dev/verdicts/model-1/"
+        },
+        "advisory_lookup": {
+            "scope": "all",
+            "scope_source": "default",
+            "packages_asked": 1,
+            "packages_not_asked": 0,
+            "other_repositories": 0,
+            "repositories": [
+                {
+                    "composer_repository": "composer repo (https://repo.packagist.org)",
+                    "registry": "packagist.org",
+                    "outcome": "answered",
+                    "reason": null,
+                    "message": null,
+                    "packages_with_records": 0,
+                    "records": 0
+                }
+            ]
+        },
+        "move_check": null,
+        "php_window": {
+            "platform_override": null,
+            "host_requires": [],
+            "with_dev": {
+                "minors": [
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.1.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "without_dev": {
+                "minors": [
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "8.1.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^8.1",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "target": {
+                "php": "8.4.99",
+                "inside": true
+            },
+            "target_fix": null
+        },
+        "score_rules_used": {
+            "counted": 0,
+            "lead-first": 1,
+            "corroborating-share": 0,
+            "advisory-points": 0,
+            "no-reachable-fix-multiplier": 0,
+            "security-max": 0,
+            "divide-reach": 0,
+            "security-exempt-from-reach": 0,
+            "sum": 0,
+            "divide-dev": 0,
+            "floor-once": 0,
+            "band-floors": 1,
+            "zero-verdicts": 0,
+            "sort": null,
+            "gate-bounded-new": 0,
+            "baseline-cover": 0
+        }
+    },
+    "activity_cache_oldest_at": null,
+    "activity_cache_age_hours": null,
+    "packages_checked": 1,
+    "packages_flagged": 1,
+    "packages_multi_flag": 0,
+    "include_dev": false,
+    "not_from_composer_repository": 0,
+    "packages_unchecked_accepted": 0,
+    "network_failures": false,
+    "counts": {
+        "critical": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 0,
+        "unknown": 0,
+        "finished": 0,
+        "ok": 0
+    },
+    "abandoned": {
+        "total": 0,
+        "with_replacement": 0,
+        "with_suggestion": 0
+    },
+    "priorities": {
+        "critical": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 0,
+        "none": 0
+    },
+    "flags": {
+        "abandoned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "silent": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "pinned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "left-behind": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "old-promise": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "stale": {
+            "carrying": 1,
+            "leading": 1,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 1,
+                "low": 0
+            }
+        },
+        "capped": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "vulnerable": {
+            "carrying": 0,
+            "leading": null,
+            "accepted": null,
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        }
+    },
+    "exposure": [],
+    "exposure_rule": {
+        "max_fan_in": 8
+    },
+    "unattributed": [],
+    "rot_depth": {
+        "flagged": 1,
+        "measured": 1,
+        "unmeasured": {
+            "unreached": 0,
+            "no_composer_json": 0
+        },
+        "by_reach": {
+            "direct": 1,
+            "transitive": 0,
+            "unreached": 0
+        },
+        "not_in_composer_json": 0,
+        "require_dev_not_walked": 0,
+        "production": 1,
+        "development": 0,
+        "by_depth": [
+            {
+                "depth": 0,
+                "flagged": 1
+            }
+        ],
+        "max_depth": 0,
+        "deepest": []
+    },
+    "libyears": {
+        "total": 0,
+        "direct_requirements": 0,
+        "measured": 1,
+        "at_least_count": 0,
+        "unmeasured": {
+            "not_from_composer_repository": 0,
+            "unavailable": 0,
+            "not_found": 0,
+            "branch_snapshot": 0,
+            "shared_commit": 0,
+            "parent_split": 0,
+            "undated": 0,
+            "no_stable_release": 0,
+            "undated_releases": 0
+        },
+        "furthest_behind": null,
+        "packages": 1
+    },
+    "baseline": null,
+    "gate": {
+        "fails": false,
+        "tripped_by": [],
+        "fail_on_applied": true,
+        "reaching": 0,
+        "failing": 0,
+        "exempt": {
+            "baseline": 0
+        },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 0
+        },
+        "failing_packages": [],
+        "failing_by": [
+            {
+                "value": "high",
+                "failing": 0
+            }
+        ],
+        "not_applied": [],
+        "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)"
+    },
+    "security": {
+        "check": "complete",
+        "packages": {
+            "vulnerable": 0,
+            "unchecked": 0,
+            "ignored": 0,
+            "clear": 1
+        },
+        "advisories": {
+            "counted": 0,
+            "ignored": 0
+        },
+        "severities": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "unrated": 0,
+            "low": 0
+        },
+        "fixes": {
+            "update": 0,
+            "upgrade": 0,
+            "raise-php": 0,
+            "unknown": 0,
+            "blocked": 0,
+            "none": 0
+        },
+        "update_now": [],
+        "update_now_command": null,
+        "fix_unknown": 0
+    },
+    "data_date": "2026-10-01T17:41:20+00:00",
+    "notes": [],
+    "note_details": [],
+    "findings": [
+        {
+            "package": "akaunting/laravel-debugbar-collector",
+            "version": "2.1.1",
+            "branch": "2.x",
+            "installed_php": {
+                "requires": ">=8.0",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "medium",
+            "priority": "medium",
+            "lead": "stale",
+            "rank": 1,
+            "flags": [
+                {
+                    "id": "stale",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S2",
+                        "S4"
+                    ],
+                    "degree": {
+                        "liveness_complete": true
+                    },
+                    "headline": {
+                        "unit": "years",
+                        "value": 3.3,
+                        "source": "release"
+                    },
+                    "summary": "last release 2023-06-02 (3.3 years ago); last push 2023-06-02 (3.3 years ago)"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 8,
+                "exact": 8,
+                "rounded_down": false,
+                "band": {
+                    "floor": 8,
+                    "next": "high",
+                    "to_next": 8
+                },
+                "decided_by": "maintenance",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 8,
+                        "alone": {
+                            "total": 8,
+                            "verdict": "medium"
+                        }
+                    },
+                    "security": {
+                        "status": "clear",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        },
+                        "of": 0,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "stale",
+                        "role": "lead",
+                        "weight": 8,
+                        "divisor": 1,
+                        "points": 8,
+                        "contribution": 8
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [],
+                "text": "8 = stale 8"
+            },
+            "next_step": {
+                "kind": "no-move",
+                "source": "stale",
+                "merged": [],
+                "fix_kind": null,
+                "reason": "package_quiet",
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": null,
+                "version": null,
+                "newest": null,
+                "constraint": null,
+                "latest": null,
+                "php_check": null,
+                "crosses_major": null,
+                "held_by": [],
+                "clears": [],
+                "unverified": [],
+                "adds": [],
+                "leaves": [
+                    {
+                        "kind": "flag",
+                        "id": "stale"
+                    }
+                ],
+                "clears_all": false,
+                "if_applied": null,
+                "check": null,
+                "moves_with": [],
+                "composer_moves_because": [],
+                "commands": [],
+                "through": [],
+                "also": [],
+                "text": "\u2014"
+            },
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "akaunting/laravel-debugbar-collector",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/akaunting/laravel-debugbar-collector",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "akaunting/laravel-debugbar-collector"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "akaunting/laravel-debugbar-collector"
+            ],
+            "signals": [
+                {
+                    "id": "S2",
+                    "level": "warn",
+                    "summary": "last release 2023-06-02 (3.3 years ago)",
+                    "data": {
+                        "last_release": "2023-06-02T07:22:01+00:00",
+                        "last_version": "2.1.1",
+                        "years": 3.3,
+                        "dated_by": null
+                    }
+                },
+                {
+                    "id": "S4",
+                    "level": "warn",
+                    "summary": "last push 2023-06-02 (3.3 years ago)",
+                    "data": {
+                        "last_push": "2023-06-02T07:23:06+00:00",
+                        "repo": "akaunting/laravel-debugbar-collector",
+                        "host": "github.com",
+                        "years": 3.3,
+                        "forge": "github",
+                        "event": "push"
+                    }
+                }
+            ],
+            "evidence": "stale: last release 2023-06-02 (3.3 years ago); last push 2023-06-02 (3.3 years ago)",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0,
+            "age": {
+                "installed": {
+                    "at": "2023-06-02T07:22:01+00:00",
+                    "years": 3.3,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "2.1.1",
+                    "at": "2023-06-02T07:22:01+00:00",
+                    "years": 3.3,
+                    "level": "warn",
+                    "dated_by": null
                 },
                 "release_unmeasured": null,
                 "branch_release": {
@@ -67813,7 +71959,7 @@ export const d_S2_shared_unresolved_dagger = {
                         "value": 3.3,
                         "source": "push"
                     },
-                    "summary": "last push 2023-06-02 (3.3 years ago)"
+                    "summary": "last push 2023-06-02 (3.3 years ago); liveness read from pushes only"
                 }
             ],
             "score": {
@@ -68006,7 +72152,7 @@ export const d_S2_shared_unresolved_dagger = {
                     }
                 }
             ],
-            "evidence": "stale: last push 2023-06-02 (3.3 years ago)",
+            "evidence": "stale: last push 2023-06-02 (3.3 years ago); liveness read from pushes only",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 0,
@@ -75969,6 +80115,1494 @@ export const d_S6_snapshot_backport_newer_dagger = {
     ]
 } satisfies Report2;
 
+export const d_S8_higher_parent_dated_dagger = {
+    "$schema": "https://lockrot.dev/schema/report-2.json",
+    "lockrot": {
+        "version": "0.14.0",
+        "schema": 2
+    },
+    "generated_at": "2026-10-01T17:41:20+00:00",
+    "run": {
+        "project": "wallabag/wallabag",
+        "root_package": "wallabag/wallabag",
+        "target_php": "8.4",
+        "target_php_source": "option",
+        "project_php": ">=7.4",
+        "project_php_lowest": "7.4.0",
+        "lock_file": "composer.lock",
+        "fail_on": "high",
+        "fail_on_source": "option",
+        "gates": [
+            {
+                "value": "high",
+                "kind": "grade",
+                "threshold": "high"
+            }
+        ],
+        "strict_network": false,
+        "mode": "check",
+        "include_dev": false,
+        "thresholds": {
+            "release-warn-years": 3,
+            "release-high-years": 5,
+            "push-warn-years": 3,
+            "push-high-years": 5
+        },
+        "flag_ids": [
+            "abandoned",
+            "silent",
+            "pinned",
+            "left-behind",
+            "old-promise",
+            "stale",
+            "capped",
+            "vulnerable"
+        ],
+        "verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "unknown",
+            "finished",
+            "ok"
+        ],
+        "graded_verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+        ],
+        "signal_ids": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6",
+            "S7",
+            "S8",
+            "S9",
+            "S10",
+            "S11"
+        ],
+        "fix_model": 1,
+        "text_grammar": 1,
+        "score_model": {
+            "id": 1,
+            "score_text_grammar": 1,
+            "flag_order": [
+                "abandoned",
+                "silent",
+                "pinned",
+                "left-behind",
+                "old-promise",
+                "stale",
+                "capped",
+                "vulnerable"
+            ],
+            "parts": [
+                {
+                    "id": "maintenance",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "pinned",
+                        "left-behind",
+                        "old-promise",
+                        "stale",
+                        "capped"
+                    ],
+                    "combine": "lead_plus_share"
+                },
+                {
+                    "id": "security",
+                    "flag_ids": [
+                        "vulnerable"
+                    ],
+                    "combine": "max"
+                }
+            ],
+            "flags": [
+                {
+                    "id": "abandoned",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "abandoned",
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S1",
+                        "S3"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "silent",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "silent",
+                        "pinned",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-high-years",
+                        "push-high-years"
+                    ],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "pinned",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 22,
+                    "max_maintenance_flags": [
+                        "pinned",
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S6"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "left-behind",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 20,
+                    "max_maintenance_flags": [
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S8"
+                    ],
+                    "thresholds": [
+                        "release-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "old-promise",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 18,
+                    "max_maintenance_flags": [
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S5"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "stale",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 10,
+                    "max_maintenance_flags": [
+                        "stale",
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-warn-years",
+                        "push-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "capped",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S11"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "vulnerable",
+                    "part": "security",
+                    "points": null,
+                    "band": null,
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": null,
+                    "max_maintenance_flags": null,
+                    "raised_by": [
+                        "S9"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "severities"
+                    },
+                    "points_from": "severities"
+                }
+            ],
+            "severities": [
+                {
+                    "id": "critical",
+                    "points": 32,
+                    "band": "critical",
+                    "points_no_reachable_fix": 64,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 4,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "high",
+                    "points": 16,
+                    "band": "high",
+                    "points_no_reachable_fix": 32,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 3,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "unrated",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": "medium",
+                    "basis": {
+                        "points": "counts_as"
+                    }
+                },
+                {
+                    "id": "low",
+                    "points": 2,
+                    "band": "low",
+                    "points_no_reachable_fix": 4,
+                    "band_no_reachable_fix": "low",
+                    "gate_rank": 1,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "share",
+                        "of": "medium",
+                        "share": {
+                            "num": 1,
+                            "den": 4
+                        }
+                    }
+                }
+            ],
+            "fix_kinds": [
+                {
+                    "id": "update",
+                    "ease": 1,
+                    "doubles": false
+                },
+                {
+                    "id": "upgrade",
+                    "ease": 2,
+                    "doubles": false
+                },
+                {
+                    "id": "raise-php",
+                    "ease": 3,
+                    "doubles": false
+                },
+                {
+                    "id": "unknown",
+                    "ease": 4,
+                    "doubles": false
+                },
+                {
+                    "id": "blocked",
+                    "ease": 5,
+                    "doubles": true
+                },
+                {
+                    "id": "none",
+                    "ease": 6,
+                    "doubles": true
+                }
+            ],
+            "bands": [
+                {
+                    "verdict": "critical",
+                    "floor": 32
+                },
+                {
+                    "verdict": "high",
+                    "floor": 16
+                },
+                {
+                    "verdict": "medium",
+                    "floor": 8
+                },
+                {
+                    "verdict": "low",
+                    "floor": 1
+                }
+            ],
+            "zero_verdicts": [
+                {
+                    "verdict": "finished",
+                    "when": "allowlisted"
+                },
+                {
+                    "verdict": "unknown",
+                    "when": "no_metadata"
+                },
+                {
+                    "verdict": "ok",
+                    "when": "otherwise"
+                }
+            ],
+            "exact_unit": 0.5,
+            "rounding": "floor_once",
+            "max_total": 104,
+            "bar_max": 64,
+            "bar_overflow": "clip",
+            "exclusive_groups": [
+                {
+                    "id": "liveness",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "stale"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "branch",
+                    "flag_ids": [
+                        "pinned",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_age",
+                    "flag_ids": [
+                        "silent",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_push",
+                    "flag_ids": [
+                        "left-behind",
+                        "stale"
+                    ],
+                    "holds_unless": {
+                        "threshold": "push-warn-years",
+                        "below": "release-warn-years"
+                    }
+                },
+                {
+                    "id": "php_bound",
+                    "flag_ids": [
+                        "old-promise",
+                        "capped"
+                    ],
+                    "holds_unless": null
+                }
+            ],
+            "sort": [
+                {
+                    "key": "verdict",
+                    "path": "verdict",
+                    "dir": "order",
+                    "order": [
+                        [
+                            "critical"
+                        ],
+                        [
+                            "high"
+                        ],
+                        [
+                            "medium"
+                        ],
+                        [
+                            "low"
+                        ],
+                        [
+                            "unknown"
+                        ],
+                        [
+                            "finished",
+                            "ok"
+                        ]
+                    ],
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "security",
+                    "path": "score.parts.security.contribution",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "score",
+                    "path": "score.exact",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "direct",
+                    "path": "direct",
+                    "dir": "true_first",
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "package",
+                    "path": "package",
+                    "dir": "asc",
+                    "collation": "bytes",
+                    "default": null
+                }
+            ],
+            "rules": [
+                {
+                    "id": "counted",
+                    "stage": 1,
+                    "kind": "select",
+                    "applies_to": "flags",
+                    "accept_group": "liveness",
+                    "accept_covers": "listed_and_below",
+                    "why": "accepted-facts-shown-not-counted",
+                    "doc": "score-counted",
+                    "illustration": null
+                },
+                {
+                    "id": "lead-first",
+                    "stage": 2,
+                    "kind": "select",
+                    "applies_to": "maintenance",
+                    "order": "flag_order",
+                    "share": {
+                        "num": 1,
+                        "den": 1
+                    },
+                    "why": "strongest-fact-in-full",
+                    "doc": "score-lead-first",
+                    "illustration": null
+                },
+                {
+                    "id": "corroborating-share",
+                    "stage": 3,
+                    "kind": "share",
+                    "applies_to": "maintenance",
+                    "share": {
+                        "num": 1,
+                        "den": 4
+                    },
+                    "why": "correlated-evidence",
+                    "doc": "score-corroborating-share",
+                    "illustration": {
+                        "lead": "left-behind",
+                        "flag": "old-promise",
+                        "weight": 16,
+                        "points": 4
+                    }
+                },
+                {
+                    "id": "advisory-points",
+                    "stage": 4,
+                    "kind": "lookup",
+                    "applies_to": "security",
+                    "table": "severities",
+                    "why": "severity-points",
+                    "doc": "score-advisory-points",
+                    "illustration": null
+                },
+                {
+                    "id": "no-reachable-fix-multiplier",
+                    "stage": 5,
+                    "kind": "multiply",
+                    "applies_to": "advisory",
+                    "factor": 2,
+                    "when_fix": [
+                        "none",
+                        "blocked"
+                    ],
+                    "why": "one-band-up",
+                    "doc": "score-no-reachable-fix-multiplier",
+                    "illustration": {
+                        "severity": "high",
+                        "before": 16,
+                        "after": 32,
+                        "band_before": "high",
+                        "band_after": "critical"
+                    }
+                },
+                {
+                    "id": "security-max",
+                    "stage": 6,
+                    "kind": "max",
+                    "applies_to": "security",
+                    "tie_break": [
+                        {
+                            "key": "points",
+                            "dir": "desc",
+                            "collation": null
+                        },
+                        {
+                            "key": "severity",
+                            "dir": "order",
+                            "collation": null
+                        },
+                        {
+                            "key": "id",
+                            "dir": "asc",
+                            "collation": "bytes"
+                        }
+                    ],
+                    "why": "one-number-per-part",
+                    "doc": "score-security-max",
+                    "illustration": null
+                },
+                {
+                    "id": "divide-reach",
+                    "stage": 7,
+                    "kind": "divide",
+                    "applies_to": "maintenance",
+                    "by": 2,
+                    "when": [
+                        "transitive",
+                        "unreached"
+                    ],
+                    "why": "reach-halves-maintenance",
+                    "doc": "score-divide-reach",
+                    "illustration": {
+                        "flag": "abandoned",
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "security-exempt-from-reach",
+                    "stage": 8,
+                    "kind": "exempt",
+                    "applies_to": "security",
+                    "of": "divide-reach",
+                    "why": "exploitability-independent-of-reach",
+                    "doc": "score-security-exempt-from-reach",
+                    "illustration": {
+                        "severity": "critical",
+                        "reach": "transitive",
+                        "total": 32
+                    }
+                },
+                {
+                    "id": "sum",
+                    "stage": 9,
+                    "kind": "combine",
+                    "applies_to": "total",
+                    "op": "sum",
+                    "ratio_from": "medium",
+                    "why": "parts-add",
+                    "doc": "score-sum",
+                    "illustration": {
+                        "maintenance": 16,
+                        "security": 16,
+                        "total": 32,
+                        "band": "critical",
+                        "low_maintenance": 4,
+                        "low_security": 4,
+                        "low_total": 8,
+                        "low_band": "medium"
+                    }
+                },
+                {
+                    "id": "divide-dev",
+                    "stage": 10,
+                    "kind": "divide",
+                    "applies_to": "total",
+                    "by": 2,
+                    "when": [
+                        "dev"
+                    ],
+                    "why": "dev-halves-total",
+                    "doc": "score-divide-dev",
+                    "illustration": {
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "floor-once",
+                    "stage": 11,
+                    "kind": "floor",
+                    "applies_to": "total",
+                    "why": "integer-band-edges",
+                    "doc": "score-floor-once",
+                    "illustration": {
+                        "exact": 4.5,
+                        "total": 4
+                    }
+                },
+                {
+                    "id": "band-floors",
+                    "stage": 12,
+                    "kind": "band",
+                    "applies_to": "total",
+                    "ratio": 2,
+                    "ratio_from": "medium",
+                    "why": "two-floor-parts-make-next",
+                    "doc": "score-band-floors",
+                    "illustration": null
+                },
+                {
+                    "id": "zero-verdicts",
+                    "stage": 13,
+                    "kind": "zero",
+                    "applies_to": "total",
+                    "table": "zero_verdicts",
+                    "why": "score-zero-says-why",
+                    "doc": "score-zero-verdicts",
+                    "illustration": null
+                },
+                {
+                    "id": "sort",
+                    "stage": 14,
+                    "kind": "order",
+                    "applies_to": "findings",
+                    "why": "advisory-findings-first",
+                    "doc": "score-sort",
+                    "illustration": null
+                },
+                {
+                    "id": "gate-bounded-new",
+                    "stage": 15,
+                    "kind": "gate",
+                    "applies_to": "gate",
+                    "cap_multiplier": 2,
+                    "why": "new-fact-sets-level",
+                    "doc": "score-gate-bounded-new",
+                    "illustration": {
+                        "score": 36,
+                        "new": 16,
+                        "gate": 32
+                    }
+                },
+                {
+                    "id": "baseline-cover",
+                    "stage": 16,
+                    "kind": "cover",
+                    "applies_to": "gate",
+                    "order": "flag_order",
+                    "covers": "listed_and_below",
+                    "why": "recorded-lead-covers-below",
+                    "doc": "score-baseline-cover",
+                    "illustration": null
+                }
+            ],
+            "docs": "https://lockrot.dev/verdicts/model-1/"
+        },
+        "advisory_lookup": {
+            "scope": "all",
+            "scope_source": "default",
+            "packages_asked": 1,
+            "packages_not_asked": 0,
+            "other_repositories": 0,
+            "repositories": [
+                {
+                    "composer_repository": "composer repo (https://repo.packagist.org)",
+                    "registry": "packagist.org",
+                    "outcome": "answered",
+                    "reason": null,
+                    "message": null,
+                    "packages_with_records": 0,
+                    "records": 0
+                }
+            ]
+        },
+        "move_check": null,
+        "php_window": {
+            "platform_override": null,
+            "host_requires": [],
+            "with_dev": {
+                "minors": [
+                    "7.4",
+                    "8.0",
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "7.4.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=7.4",
+                            "dev": false
+                        },
+                        {
+                            "name": "pagerfanta/core",
+                            "version": "v3.8.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^7.4 || ^8.0",
+                            "dev": false
+                        },
+                        {
+                            "name": "pagerfanta/twig",
+                            "version": "v3.8.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^7.4 || ^8.0",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "without_dev": {
+                "minors": [
+                    "7.4",
+                    "8.0",
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "7.4.0",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=7.4",
+                            "dev": false
+                        },
+                        {
+                            "name": "pagerfanta/core",
+                            "version": "v3.8.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^7.4 || ^8.0",
+                            "dev": false
+                        },
+                        {
+                            "name": "pagerfanta/twig",
+                            "version": "v3.8.0",
+                            "link": "require",
+                            "target": "php",
+                            "constraint": "^7.4 || ^8.0",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "target": {
+                "php": "8.4.99",
+                "inside": true
+            },
+            "target_fix": null
+        },
+        "score_rules_used": {
+            "counted": 0,
+            "lead-first": 1,
+            "corroborating-share": 0,
+            "advisory-points": 0,
+            "no-reachable-fix-multiplier": 0,
+            "security-max": 0,
+            "divide-reach": 0,
+            "security-exempt-from-reach": 0,
+            "sum": 0,
+            "divide-dev": 0,
+            "floor-once": 0,
+            "band-floors": 1,
+            "zero-verdicts": 0,
+            "sort": null,
+            "gate-bounded-new": 0,
+            "baseline-cover": 0
+        }
+    },
+    "activity_cache_oldest_at": null,
+    "activity_cache_age_hours": null,
+    "packages_checked": 3,
+    "packages_flagged": 1,
+    "packages_multi_flag": 0,
+    "include_dev": false,
+    "not_from_composer_repository": 0,
+    "packages_unchecked_accepted": 0,
+    "network_failures": false,
+    "counts": {
+        "critical": 0,
+        "high": 1,
+        "medium": 0,
+        "low": 0,
+        "unknown": 0,
+        "finished": 0,
+        "ok": 0
+    },
+    "abandoned": {
+        "total": 0,
+        "with_replacement": 0,
+        "with_suggestion": 0
+    },
+    "priorities": {
+        "critical": 0,
+        "high": 1,
+        "medium": 0,
+        "low": 0,
+        "none": 0
+    },
+    "flags": {
+        "abandoned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "silent": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "pinned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "left-behind": {
+            "carrying": 1,
+            "leading": 1,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 1,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "old-promise": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "stale": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "capped": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "vulnerable": {
+            "carrying": 0,
+            "leading": null,
+            "accepted": null,
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        }
+    },
+    "exposure": [],
+    "exposure_rule": {
+        "max_fan_in": 8
+    },
+    "unattributed": [],
+    "rot_depth": {
+        "flagged": 1,
+        "measured": 1,
+        "unmeasured": {
+            "unreached": 0,
+            "no_composer_json": 0
+        },
+        "by_reach": {
+            "direct": 1,
+            "transitive": 0,
+            "unreached": 0
+        },
+        "not_in_composer_json": 0,
+        "require_dev_not_walked": 0,
+        "production": 1,
+        "development": 0,
+        "by_depth": [
+            {
+                "depth": 0,
+                "flagged": 1
+            }
+        ],
+        "max_depth": 0,
+        "deepest": []
+    },
+    "libyears": {
+        "total": null,
+        "direct_requirements": null,
+        "measured": 0,
+        "at_least_count": 0,
+        "unmeasured": {
+            "not_from_composer_repository": 0,
+            "unavailable": 0,
+            "not_found": 0,
+            "branch_snapshot": 0,
+            "shared_commit": 0,
+            "parent_split": 1,
+            "undated": 0,
+            "no_stable_release": 0,
+            "undated_releases": 0
+        },
+        "furthest_behind": null,
+        "packages": 1
+    },
+    "baseline": null,
+    "gate": {
+        "fails": true,
+        "tripped_by": [
+            "fail_on"
+        ],
+        "fail_on_applied": true,
+        "reaching": 1,
+        "failing": 1,
+        "exempt": {
+            "baseline": 0
+        },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "pagerfanta/twig"
+        ],
+        "failing_by": [
+            {
+                "value": "high",
+                "failing": 1
+            }
+        ],
+        "not_applied": [],
+        "text": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)"
+    },
+    "security": {
+        "check": "complete",
+        "packages": {
+            "vulnerable": 0,
+            "unchecked": 0,
+            "ignored": 0,
+            "clear": 1
+        },
+        "advisories": {
+            "counted": 0,
+            "ignored": 0
+        },
+        "severities": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "unrated": 0,
+            "low": 0
+        },
+        "fixes": {
+            "update": 0,
+            "upgrade": 0,
+            "raise-php": 0,
+            "unknown": 0,
+            "blocked": 0,
+            "none": 0
+        },
+        "update_now": [],
+        "update_now_command": null,
+        "fix_unknown": 0
+    },
+    "data_date": "2026-10-01T17:41:20+00:00",
+    "notes": [],
+    "note_details": [],
+    "findings": [
+        {
+            "package": "pagerfanta/twig",
+            "version": "v3.8.0",
+            "branch": "3.x",
+            "installed_php": {
+                "requires": "^7.4 || ^8.0",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "high",
+            "priority": "high",
+            "lead": "left-behind",
+            "rank": 1,
+            "flags": [
+                {
+                    "id": "left-behind",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S8"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "years",
+                        "value": 3.5,
+                        "source": "branch"
+                    },
+                    "summary": "branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-10), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 16,
+                "exact": 16,
+                "rounded_down": false,
+                "band": {
+                    "floor": 16,
+                    "next": "critical",
+                    "to_next": 16
+                },
+                "decided_by": "maintenance",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 16,
+                        "alone": {
+                            "total": 16,
+                            "verdict": "high"
+                        }
+                    },
+                    "security": {
+                        "status": "clear",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        },
+                        "of": 0,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "left-behind",
+                        "role": "lead",
+                        "weight": 16,
+                        "divisor": 1,
+                        "points": 16,
+                        "contribution": 16
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [],
+                "text": "16 = left-behind 16"
+            },
+            "next_step": {
+                "kind": "raise-php",
+                "source": "left-behind",
+                "merged": [],
+                "fix_kind": null,
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "4.x",
+                "version": "v4.9.0",
+                "newest": "v4.9.0",
+                "constraint": "^4.9",
+                "latest": null,
+                "php_check": {
+                    "requires": "^8.1",
+                    "project_allows": false,
+                    "target_runs": true,
+                    "raise_to": ">=8.1",
+                    "raise_size": "major"
+                },
+                "crosses_major": true,
+                "held_by": [],
+                "clears": [
+                    {
+                        "kind": "flag",
+                        "id": "left-behind",
+                        "basis": "branch_releasing"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold",
+                        "composer_resolves"
+                    ]
+                },
+                "check": null,
+                "moves_with": [],
+                "composer_moves_because": [
+                    "crosses_major"
+                ],
+                "commands": [
+                    [
+                        "composer",
+                        "require",
+                        "php:>=8.1",
+                        "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "require",
+                        "pagerfanta/twig:^4.9"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "pagerfanta/twig",
+                        "v4.9.0",
+                        "--locked"
+                    ]
+                ],
+                "through": [],
+                "also": [],
+                "text": "raise require.php to >=8.1, then require pagerfanta/twig ^4.9 \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            },
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "Pagerfanta/twig",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/pagerfanta/twig",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": "parent_split",
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "pagerfanta/twig"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "pagerfanta/twig"
+            ],
+            "signals": [
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: pagerfanta/core (left-behind)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "pagerfanta/core",
+                                "chain": [
+                                    "pagerfanta/twig",
+                                    "pagerfanta/core"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "S8",
+                    "level": "warn",
+                    "summary": "branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-10), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach",
+                    "data": {
+                        "branch": "3.x",
+                        "branch_last_release": "2023-04-15T16:39:14+00:00",
+                        "branch_last_version": "v3.8.0",
+                        "years": 3.5,
+                        "newest_branch": "4.x",
+                        "newest_version": "v4.9.0",
+                        "newest_release": "2025-03-10T09:00:00+00:00",
+                        "newest_php": "^8.1",
+                        "newest_within_reach": false,
+                        "floor_php": ">=7.4",
+                        "floor_source": "project",
+                        "reachable_branch": null,
+                        "reachable_version": null,
+                        "reachable_release": null,
+                        "suggested_constraint": null,
+                        "dated_by": null,
+                        "reachable_php": null,
+                        "reachable_admits": null,
+                        "newest_years": 1.6,
+                        "reachable_years": null,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": null
+                    }
+                }
+            ],
+            "evidence": "left-behind: branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-10), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": null,
+            "age": {
+                "installed": null,
+                "installed_unmeasured": "parent_split",
+                "release": {
+                    "version": "v4.9.0",
+                    "at": "2025-03-10T09:00:00+00:00",
+                    "years": 1.6,
+                    "level": null,
+                    "dated_by": "pagerfanta/pagerfanta"
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "v3.8.0",
+                    "at": "2023-04-15T16:39:14+00:00",
+                    "years": 3.5,
+                    "level": "warn",
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-09-08T18:12:53+00:00",
+                    "years": 0.1,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": true,
+                "fails": true,
+                "exempt_by": null,
+                "by": [
+                    {
+                        "value": "high",
+                        "kind": "grade",
+                        "facts": [
+                            {
+                                "kind": "flag",
+                                "id": "left-behind"
+                            }
+                        ]
+                    }
+                ],
+                "basis": null
+            }
+        }
+    ]
+} satisfies Report2;
+
 export const d_S8_higher_shared_alive_dagger = {
     "$schema": "https://lockrot.dev/schema/report-2.json",
     "lockrot": {
@@ -81510,6 +87144,1658 @@ export const d_S8_installed_lower_dated_dagger = {
                 "fails": false,
                 "exempt_by": null,
                 "by": [],
+                "basis": null
+            }
+        }
+    ]
+} satisfies Report2;
+
+export const d_S8_parent_shared_installed_dagger = {
+    "$schema": "https://lockrot.dev/schema/report-2.json",
+    "lockrot": {
+        "version": "0.14.0",
+        "schema": 2
+    },
+    "generated_at": "2026-10-01T17:41:20+00:00",
+    "run": {
+        "project": "matomo/matomo",
+        "root_package": "matomo/matomo",
+        "target_php": "8.4",
+        "target_php_source": "option",
+        "project_php": ">=7.2.5",
+        "project_php_lowest": "7.2.5",
+        "lock_file": "composer.lock",
+        "fail_on": "high",
+        "fail_on_source": "option",
+        "gates": [
+            {
+                "value": "high",
+                "kind": "grade",
+                "threshold": "high"
+            }
+        ],
+        "strict_network": false,
+        "mode": "check",
+        "include_dev": false,
+        "thresholds": {
+            "release-warn-years": 3,
+            "release-high-years": 5,
+            "push-warn-years": 3,
+            "push-high-years": 5
+        },
+        "flag_ids": [
+            "abandoned",
+            "silent",
+            "pinned",
+            "left-behind",
+            "old-promise",
+            "stale",
+            "capped",
+            "vulnerable"
+        ],
+        "verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "unknown",
+            "finished",
+            "ok"
+        ],
+        "graded_verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+        ],
+        "signal_ids": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6",
+            "S7",
+            "S8",
+            "S9",
+            "S10",
+            "S11"
+        ],
+        "fix_model": 1,
+        "text_grammar": 1,
+        "score_model": {
+            "id": 1,
+            "score_text_grammar": 1,
+            "flag_order": [
+                "abandoned",
+                "silent",
+                "pinned",
+                "left-behind",
+                "old-promise",
+                "stale",
+                "capped",
+                "vulnerable"
+            ],
+            "parts": [
+                {
+                    "id": "maintenance",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "pinned",
+                        "left-behind",
+                        "old-promise",
+                        "stale",
+                        "capped"
+                    ],
+                    "combine": "lead_plus_share"
+                },
+                {
+                    "id": "security",
+                    "flag_ids": [
+                        "vulnerable"
+                    ],
+                    "combine": "max"
+                }
+            ],
+            "flags": [
+                {
+                    "id": "abandoned",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "abandoned",
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S1",
+                        "S3"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "silent",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "silent",
+                        "pinned",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-high-years",
+                        "push-high-years"
+                    ],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "pinned",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 22,
+                    "max_maintenance_flags": [
+                        "pinned",
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S6"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "left-behind",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 20,
+                    "max_maintenance_flags": [
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S8"
+                    ],
+                    "thresholds": [
+                        "release-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "old-promise",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 18,
+                    "max_maintenance_flags": [
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S5"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "stale",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 10,
+                    "max_maintenance_flags": [
+                        "stale",
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-warn-years",
+                        "push-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "capped",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "capped"
+                    ],
+                    "raised_by": [
+                        "S11"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "vulnerable",
+                    "part": "security",
+                    "points": null,
+                    "band": null,
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": null,
+                    "max_maintenance_flags": null,
+                    "raised_by": [
+                        "S9"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "severities"
+                    },
+                    "points_from": "severities"
+                }
+            ],
+            "severities": [
+                {
+                    "id": "critical",
+                    "points": 32,
+                    "band": "critical",
+                    "points_no_reachable_fix": 64,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 4,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "high",
+                    "points": 16,
+                    "band": "high",
+                    "points_no_reachable_fix": 32,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 3,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "unrated",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": "medium",
+                    "basis": {
+                        "points": "counts_as"
+                    }
+                },
+                {
+                    "id": "low",
+                    "points": 2,
+                    "band": "low",
+                    "points_no_reachable_fix": 4,
+                    "band_no_reachable_fix": "low",
+                    "gate_rank": 1,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "share",
+                        "of": "medium",
+                        "share": {
+                            "num": 1,
+                            "den": 4
+                        }
+                    }
+                }
+            ],
+            "fix_kinds": [
+                {
+                    "id": "update",
+                    "ease": 1,
+                    "doubles": false
+                },
+                {
+                    "id": "upgrade",
+                    "ease": 2,
+                    "doubles": false
+                },
+                {
+                    "id": "raise-php",
+                    "ease": 3,
+                    "doubles": false
+                },
+                {
+                    "id": "unknown",
+                    "ease": 4,
+                    "doubles": false
+                },
+                {
+                    "id": "blocked",
+                    "ease": 5,
+                    "doubles": true
+                },
+                {
+                    "id": "none",
+                    "ease": 6,
+                    "doubles": true
+                }
+            ],
+            "bands": [
+                {
+                    "verdict": "critical",
+                    "floor": 32
+                },
+                {
+                    "verdict": "high",
+                    "floor": 16
+                },
+                {
+                    "verdict": "medium",
+                    "floor": 8
+                },
+                {
+                    "verdict": "low",
+                    "floor": 1
+                }
+            ],
+            "zero_verdicts": [
+                {
+                    "verdict": "finished",
+                    "when": "allowlisted"
+                },
+                {
+                    "verdict": "unknown",
+                    "when": "no_metadata"
+                },
+                {
+                    "verdict": "ok",
+                    "when": "otherwise"
+                }
+            ],
+            "exact_unit": 0.5,
+            "rounding": "floor_once",
+            "max_total": 104,
+            "bar_max": 64,
+            "bar_overflow": "clip",
+            "exclusive_groups": [
+                {
+                    "id": "liveness",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "stale"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "branch",
+                    "flag_ids": [
+                        "pinned",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_age",
+                    "flag_ids": [
+                        "silent",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_push",
+                    "flag_ids": [
+                        "left-behind",
+                        "stale"
+                    ],
+                    "holds_unless": {
+                        "threshold": "push-warn-years",
+                        "below": "release-warn-years"
+                    }
+                },
+                {
+                    "id": "php_bound",
+                    "flag_ids": [
+                        "old-promise",
+                        "capped"
+                    ],
+                    "holds_unless": null
+                }
+            ],
+            "sort": [
+                {
+                    "key": "verdict",
+                    "path": "verdict",
+                    "dir": "order",
+                    "order": [
+                        [
+                            "critical"
+                        ],
+                        [
+                            "high"
+                        ],
+                        [
+                            "medium"
+                        ],
+                        [
+                            "low"
+                        ],
+                        [
+                            "unknown"
+                        ],
+                        [
+                            "finished",
+                            "ok"
+                        ]
+                    ],
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "security",
+                    "path": "score.parts.security.contribution",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "score",
+                    "path": "score.exact",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "direct",
+                    "path": "direct",
+                    "dir": "true_first",
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "package",
+                    "path": "package",
+                    "dir": "asc",
+                    "collation": "bytes",
+                    "default": null
+                }
+            ],
+            "rules": [
+                {
+                    "id": "counted",
+                    "stage": 1,
+                    "kind": "select",
+                    "applies_to": "flags",
+                    "accept_group": "liveness",
+                    "accept_covers": "listed_and_below",
+                    "why": "accepted-facts-shown-not-counted",
+                    "doc": "score-counted",
+                    "illustration": null
+                },
+                {
+                    "id": "lead-first",
+                    "stage": 2,
+                    "kind": "select",
+                    "applies_to": "maintenance",
+                    "order": "flag_order",
+                    "share": {
+                        "num": 1,
+                        "den": 1
+                    },
+                    "why": "strongest-fact-in-full",
+                    "doc": "score-lead-first",
+                    "illustration": null
+                },
+                {
+                    "id": "corroborating-share",
+                    "stage": 3,
+                    "kind": "share",
+                    "applies_to": "maintenance",
+                    "share": {
+                        "num": 1,
+                        "den": 4
+                    },
+                    "why": "correlated-evidence",
+                    "doc": "score-corroborating-share",
+                    "illustration": {
+                        "lead": "left-behind",
+                        "flag": "old-promise",
+                        "weight": 16,
+                        "points": 4
+                    }
+                },
+                {
+                    "id": "advisory-points",
+                    "stage": 4,
+                    "kind": "lookup",
+                    "applies_to": "security",
+                    "table": "severities",
+                    "why": "severity-points",
+                    "doc": "score-advisory-points",
+                    "illustration": null
+                },
+                {
+                    "id": "no-reachable-fix-multiplier",
+                    "stage": 5,
+                    "kind": "multiply",
+                    "applies_to": "advisory",
+                    "factor": 2,
+                    "when_fix": [
+                        "none",
+                        "blocked"
+                    ],
+                    "why": "one-band-up",
+                    "doc": "score-no-reachable-fix-multiplier",
+                    "illustration": {
+                        "severity": "high",
+                        "before": 16,
+                        "after": 32,
+                        "band_before": "high",
+                        "band_after": "critical"
+                    }
+                },
+                {
+                    "id": "security-max",
+                    "stage": 6,
+                    "kind": "max",
+                    "applies_to": "security",
+                    "tie_break": [
+                        {
+                            "key": "points",
+                            "dir": "desc",
+                            "collation": null
+                        },
+                        {
+                            "key": "severity",
+                            "dir": "order",
+                            "collation": null
+                        },
+                        {
+                            "key": "id",
+                            "dir": "asc",
+                            "collation": "bytes"
+                        }
+                    ],
+                    "why": "one-number-per-part",
+                    "doc": "score-security-max",
+                    "illustration": null
+                },
+                {
+                    "id": "divide-reach",
+                    "stage": 7,
+                    "kind": "divide",
+                    "applies_to": "maintenance",
+                    "by": 2,
+                    "when": [
+                        "transitive",
+                        "unreached"
+                    ],
+                    "why": "reach-halves-maintenance",
+                    "doc": "score-divide-reach",
+                    "illustration": {
+                        "flag": "abandoned",
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "security-exempt-from-reach",
+                    "stage": 8,
+                    "kind": "exempt",
+                    "applies_to": "security",
+                    "of": "divide-reach",
+                    "why": "exploitability-independent-of-reach",
+                    "doc": "score-security-exempt-from-reach",
+                    "illustration": {
+                        "severity": "critical",
+                        "reach": "transitive",
+                        "total": 32
+                    }
+                },
+                {
+                    "id": "sum",
+                    "stage": 9,
+                    "kind": "combine",
+                    "applies_to": "total",
+                    "op": "sum",
+                    "ratio_from": "medium",
+                    "why": "parts-add",
+                    "doc": "score-sum",
+                    "illustration": {
+                        "maintenance": 16,
+                        "security": 16,
+                        "total": 32,
+                        "band": "critical",
+                        "low_maintenance": 4,
+                        "low_security": 4,
+                        "low_total": 8,
+                        "low_band": "medium"
+                    }
+                },
+                {
+                    "id": "divide-dev",
+                    "stage": 10,
+                    "kind": "divide",
+                    "applies_to": "total",
+                    "by": 2,
+                    "when": [
+                        "dev"
+                    ],
+                    "why": "dev-halves-total",
+                    "doc": "score-divide-dev",
+                    "illustration": {
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "floor-once",
+                    "stage": 11,
+                    "kind": "floor",
+                    "applies_to": "total",
+                    "why": "integer-band-edges",
+                    "doc": "score-floor-once",
+                    "illustration": {
+                        "exact": 4.5,
+                        "total": 4
+                    }
+                },
+                {
+                    "id": "band-floors",
+                    "stage": 12,
+                    "kind": "band",
+                    "applies_to": "total",
+                    "ratio": 2,
+                    "ratio_from": "medium",
+                    "why": "two-floor-parts-make-next",
+                    "doc": "score-band-floors",
+                    "illustration": null
+                },
+                {
+                    "id": "zero-verdicts",
+                    "stage": 13,
+                    "kind": "zero",
+                    "applies_to": "total",
+                    "table": "zero_verdicts",
+                    "why": "score-zero-says-why",
+                    "doc": "score-zero-verdicts",
+                    "illustration": null
+                },
+                {
+                    "id": "sort",
+                    "stage": 14,
+                    "kind": "order",
+                    "applies_to": "findings",
+                    "why": "advisory-findings-first",
+                    "doc": "score-sort",
+                    "illustration": null
+                },
+                {
+                    "id": "gate-bounded-new",
+                    "stage": 15,
+                    "kind": "gate",
+                    "applies_to": "gate",
+                    "cap_multiplier": 2,
+                    "why": "new-fact-sets-level",
+                    "doc": "score-gate-bounded-new",
+                    "illustration": {
+                        "score": 36,
+                        "new": 16,
+                        "gate": 32
+                    }
+                },
+                {
+                    "id": "baseline-cover",
+                    "stage": 16,
+                    "kind": "cover",
+                    "applies_to": "gate",
+                    "order": "flag_order",
+                    "covers": "listed_and_below",
+                    "why": "recorded-lead-covers-below",
+                    "doc": "score-baseline-cover",
+                    "illustration": null
+                }
+            ],
+            "docs": "https://lockrot.dev/verdicts/model-1/"
+        },
+        "advisory_lookup": {
+            "scope": "all",
+            "scope_source": "default",
+            "packages_asked": 1,
+            "packages_not_asked": 0,
+            "other_repositories": 0,
+            "repositories": [
+                {
+                    "composer_repository": "composer repo (https://repo.packagist.org)",
+                    "registry": "packagist.org",
+                    "outcome": "answered",
+                    "reason": null,
+                    "message": null,
+                    "packages_with_records": 1,
+                    "records": 1
+                }
+            ]
+        },
+        "move_check": null,
+        "php_window": {
+            "platform_override": null,
+            "host_requires": [],
+            "with_dev": {
+                "minors": [
+                    "7.2",
+                    "7.3",
+                    "7.4",
+                    "8.0",
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "7.2.5",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=7.2.5",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "without_dev": {
+                "minors": [
+                    "7.2",
+                    "7.3",
+                    "7.4",
+                    "8.0",
+                    "8.1",
+                    "8.2",
+                    "8.3",
+                    "8.4",
+                    "8.5"
+                ],
+                "gaps": false,
+                "lower_edge": {
+                    "php": "7.2.5",
+                    "set_by": [
+                        {
+                            "name": null,
+                            "version": null,
+                            "link": "require",
+                            "target": "php",
+                            "constraint": ">=7.2.5",
+                            "dev": false
+                        }
+                    ]
+                },
+                "upper_edge": null,
+                "closest": null
+            },
+            "target": {
+                "php": "8.4.99",
+                "inside": true
+            },
+            "target_fix": null
+        },
+        "score_rules_used": {
+            "counted": 0,
+            "lead-first": 1,
+            "corroborating-share": 1,
+            "advisory-points": 1,
+            "no-reachable-fix-multiplier": 0,
+            "security-max": 0,
+            "divide-reach": 0,
+            "security-exempt-from-reach": 0,
+            "sum": 1,
+            "divide-dev": 0,
+            "floor-once": 0,
+            "band-floors": 1,
+            "zero-verdicts": 0,
+            "sort": null,
+            "gate-bounded-new": 0,
+            "baseline-cover": 0
+        }
+    },
+    "activity_cache_oldest_at": null,
+    "activity_cache_age_hours": null,
+    "packages_checked": 1,
+    "packages_flagged": 1,
+    "packages_multi_flag": 1,
+    "include_dev": false,
+    "not_from_composer_repository": 0,
+    "packages_unchecked_accepted": 0,
+    "network_failures": false,
+    "counts": {
+        "critical": 1,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "unknown": 0,
+        "finished": 0,
+        "ok": 0
+    },
+    "abandoned": {
+        "total": 0,
+        "with_replacement": 0,
+        "with_suggestion": 0
+    },
+    "priorities": {
+        "critical": 1,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "none": 0
+    },
+    "flags": {
+        "abandoned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "silent": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "pinned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "left-behind": {
+            "carrying": 1,
+            "leading": 1,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 1,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "old-promise": {
+            "carrying": 1,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 1,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "stale": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "capped": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "vulnerable": {
+            "carrying": 1,
+            "leading": null,
+            "accepted": null,
+            "by_verdict": {
+                "critical": 1,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        }
+    },
+    "exposure": [],
+    "exposure_rule": {
+        "max_fan_in": 8
+    },
+    "unattributed": [],
+    "rot_depth": {
+        "flagged": 1,
+        "measured": 1,
+        "unmeasured": {
+            "unreached": 0,
+            "no_composer_json": 0
+        },
+        "by_reach": {
+            "direct": 1,
+            "transitive": 0,
+            "unreached": 0
+        },
+        "not_in_composer_json": 0,
+        "require_dev_not_walked": 0,
+        "production": 1,
+        "development": 0,
+        "by_depth": [
+            {
+                "depth": 0,
+                "flagged": 1
+            }
+        ],
+        "max_depth": 0,
+        "deepest": []
+    },
+    "libyears": {
+        "total": 6.25,
+        "direct_requirements": 6.25,
+        "measured": 1,
+        "at_least_count": 0,
+        "unmeasured": {
+            "not_from_composer_repository": 0,
+            "unavailable": 0,
+            "not_found": 0,
+            "branch_snapshot": 0,
+            "shared_commit": 0,
+            "parent_split": 0,
+            "undated": 0,
+            "no_stable_release": 0,
+            "undated_releases": 0
+        },
+        "furthest_behind": {
+            "package": "symfony/monolog-bridge",
+            "version": "v2.6.13",
+            "libyears": 6.25,
+            "at_least": false
+        },
+        "packages": 1
+    },
+    "baseline": null,
+    "gate": {
+        "fails": true,
+        "tripped_by": [
+            "fail_on"
+        ],
+        "fail_on_applied": true,
+        "reaching": 1,
+        "failing": 1,
+        "exempt": {
+            "baseline": 0
+        },
+        "standing": {
+            "known": 0,
+            "new": 0,
+            "worsened": 0,
+            "none": 1
+        },
+        "failing_packages": [
+            "symfony/monolog-bridge"
+        ],
+        "failing_by": [
+            {
+                "value": "high",
+                "failing": 1
+            }
+        ],
+        "not_applied": [],
+        "text": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)"
+    },
+    "security": {
+        "check": "complete",
+        "packages": {
+            "vulnerable": 1,
+            "unchecked": 0,
+            "ignored": 0,
+            "clear": 0
+        },
+        "advisories": {
+            "counted": 1,
+            "ignored": 0
+        },
+        "severities": {
+            "critical": 0,
+            "high": 1,
+            "medium": 0,
+            "unrated": 0,
+            "low": 0
+        },
+        "fixes": {
+            "update": 0,
+            "upgrade": 1,
+            "raise-php": 0,
+            "unknown": 0,
+            "blocked": 0,
+            "none": 0
+        },
+        "update_now": [],
+        "update_now_command": null,
+        "fix_unknown": 0
+    },
+    "data_date": "2026-10-01T17:41:20+00:00",
+    "notes": [],
+    "note_details": [],
+    "findings": [
+        {
+            "package": "symfony/monolog-bridge",
+            "version": "v2.6.13",
+            "branch": "2.x",
+            "installed_php": {
+                "requires": ">=5.3.3",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "critical",
+            "priority": "critical",
+            "lead": "left-behind",
+            "rank": 1,
+            "flags": [
+                {
+                    "id": "left-behind",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S8"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "years",
+                        "value": 6.3,
+                        "source": "branch"
+                    },
+                    "summary": "branch 2.x last released 2020-06-01 (6.3 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                },
+                {
+                    "id": "old-promise",
+                    "role": "corroborating",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S5"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "php",
+                        "value": 5,
+                        "source": null
+                    },
+                    "summary": "released 2020-06-01 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                },
+                {
+                    "id": "vulnerable",
+                    "role": "security",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S9"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "advisories",
+                        "value": 1,
+                        "source": null
+                    },
+                    "summary": "1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 36,
+                "exact": 36,
+                "rounded_down": false,
+                "band": {
+                    "floor": 32,
+                    "next": null,
+                    "to_next": null
+                },
+                "decided_by": "combination",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 20,
+                        "alone": {
+                            "total": 20,
+                            "verdict": "high"
+                        }
+                    },
+                    "security": {
+                        "status": "counted",
+                        "contribution": 16,
+                        "alone": {
+                            "total": 16,
+                            "verdict": "high"
+                        },
+                        "of": 1,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "left-behind",
+                        "role": "lead",
+                        "weight": 16,
+                        "divisor": 1,
+                        "points": 16,
+                        "contribution": 16
+                    },
+                    {
+                        "part": "maintenance",
+                        "flag": "old-promise",
+                        "role": "corroborating",
+                        "weight": 16,
+                        "divisor": 4,
+                        "points": 4,
+                        "contribution": 4
+                    },
+                    {
+                        "part": "security",
+                        "flag": "vulnerable",
+                        "role": "security",
+                        "advisory": "PKSA-4wjj-gy1p-ft3r",
+                        "severity": "high",
+                        "fix_kind": "upgrade",
+                        "weight": 16,
+                        "multiplier": 1,
+                        "points": 16,
+                        "contribution": 16
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "left-behind"
+                        },
+                        "revealed": [],
+                        "total": 32,
+                        "verdict": "critical",
+                        "lead": "old-promise",
+                        "deciding_advisory": "PKSA-4wjj-gy1p-ft3r",
+                        "at_least": false
+                    },
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "old-promise"
+                        },
+                        "revealed": [],
+                        "total": 32,
+                        "verdict": "critical",
+                        "lead": "left-behind",
+                        "deciding_advisory": "PKSA-4wjj-gy1p-ft3r",
+                        "at_least": false
+                    },
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "vulnerable"
+                        },
+                        "revealed": [],
+                        "total": 20,
+                        "verdict": "high",
+                        "lead": "left-behind",
+                        "deciding_advisory": null,
+                        "at_least": false
+                    }
+                ],
+                "text": "36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory]"
+            },
+            "next_step": {
+                "kind": "require",
+                "source": "left-behind",
+                "merged": [
+                    "vulnerable"
+                ],
+                "fix_kind": "upgrade",
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "5.x",
+                "version": "v5.4.52",
+                "newest": "v5.4.52",
+                "constraint": "^5.4.52",
+                "latest": null,
+                "php_check": {
+                    "requires": ">=7.2.5",
+                    "project_allows": true,
+                    "target_runs": true,
+                    "raise_to": null,
+                    "raise_size": null
+                },
+                "crosses_major": true,
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "target": null,
+                        "constraint": "^2.6",
+                        "holder": null
+                    }
+                ],
+                "clears": [
+                    {
+                        "kind": "flag",
+                        "id": "left-behind",
+                        "basis": "branch_releasing"
+                    },
+                    {
+                        "kind": "flag",
+                        "id": "old-promise",
+                        "basis": "released_after_ga"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-4wjj-gy1p-ft3r",
+                        "basis": "outside_range"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold",
+                        "composer_resolves"
+                    ]
+                },
+                "check": null,
+                "moves_with": [],
+                "composer_moves_because": [
+                    "crosses_major"
+                ],
+                "commands": [
+                    [
+                        "composer",
+                        "require",
+                        "symfony/monolog-bridge:^5.4.52"
+                    ],
+                    [
+                        "composer",
+                        "why-not",
+                        "symfony/monolog-bridge",
+                        "v5.4.52",
+                        "--locked"
+                    ]
+                ],
+                "through": [],
+                "also": [],
+                "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
+            },
+            "security": {
+                "status": "vulnerable",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 1,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 1,
+                        "reason": null
+                    }
+                ],
+                "worst": "high",
+                "counts": {
+                    "critical": 0,
+                    "high": 1,
+                    "medium": 0,
+                    "unrated": 0,
+                    "low": 0
+                },
+                "ignored": [],
+                "ignored_count": 0,
+                "fix_kind": "upgrade",
+                "installed_branch_fixes": {
+                    "fixed": 0,
+                    "unknown": 0,
+                    "of": 1,
+                    "fix_kind": null,
+                    "lowest": null,
+                    "newest": "v2.8.52",
+                    "held_by": [],
+                    "if_applied": null,
+                    "check": null
+                },
+                "move_in": "next_step",
+                "gets": {
+                    "version": "v2.8.52",
+                    "php_check": {
+                        "requires": ">=5.3.9",
+                        "project_allows": true,
+                        "target_runs": true,
+                        "raise_to": null,
+                        "raise_size": null
+                    },
+                    "clears": [],
+                    "clears_all": false
+                },
+                "partial": null
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "symfony/monolog-bridge",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/symfony/monolog-bridge",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "symfony/monolog-bridge"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "symfony/monolog-bridge"
+            ],
+            "signals": [
+                {
+                    "id": "S5",
+                    "level": "warn",
+                    "summary": "released 2020-06-01 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "data": {
+                        "target_php": "8.4",
+                        "target_major": "8.0",
+                        "ga_date": "2020-11-26",
+                        "php_constraint": ">=5.3.3",
+                        "written_for_php": 5,
+                        "released": "2020-06-01T00:00:00+00:00"
+                    }
+                },
+                {
+                    "id": "S8",
+                    "level": "high",
+                    "summary": "branch 2.x last released 2020-06-01 (6.3 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "data": {
+                        "branch": "2.x",
+                        "branch_last_release": "2020-06-01T00:00:00+00:00",
+                        "branch_last_version": "v2.6.13",
+                        "years": 6.3,
+                        "newest_branch": "6.x",
+                        "newest_version": "v6.4.45",
+                        "newest_release": "2026-08-30T01:18:12+00:00",
+                        "newest_php": ">=8.1",
+                        "newest_within_reach": false,
+                        "floor_php": ">=7.2.5",
+                        "floor_source": "project",
+                        "reachable_branch": "5.x",
+                        "reachable_version": "v5.4.52",
+                        "reachable_release": "2026-05-07T16:46:23+00:00",
+                        "suggested_constraint": "^5.4",
+                        "dated_by": "symfony/symfony",
+                        "reachable_php": ">=7.2.5",
+                        "reachable_admits": {
+                            "project": true,
+                            "target": true
+                        },
+                        "newest_years": 0.1,
+                        "reachable_years": 0.4,
+                        "newest_release_at_least": false,
+                        "reachable_release_at_least": false
+                    }
+                },
+                {
+                    "id": "S9",
+                    "level": "high",
+                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
+                    "data": {
+                        "advisories": [
+                            {
+                                "id": "PKSA-4wjj-gy1p-ft3r",
+                                "cve": "CVE-2026-45077",
+                                "title": "Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+                                "link": "https://symfony.com/cve-2026-45077",
+                                "reported_at": "2026-05-20T08:00:00+00:00",
+                                "severity": "high",
+                                "severity_published": "high",
+                                "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12",
+                                "counted": true,
+                                "points": 16,
+                                "deciding": true,
+                                "fix": {
+                                    "kind": "upgrade",
+                                    "to_branch": "5.x",
+                                    "version": "v5.4.52",
+                                    "newest": "v5.4.52",
+                                    "on_installed_branch": false,
+                                    "php": ">=7.2.5",
+                                    "admits_target_php": true,
+                                    "admits_project_php": true,
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "target": null,
+                                            "constraint": "^2.6",
+                                            "holder": null
+                                        }
+                                    ],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            }
+                        ],
+                        "releases_read": true,
+                        "complete": true
+                    }
+                }
+            ],
+            "evidence": "left-behind: branch 2.x last released 2020-06-01 (6.3 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2020-06-01 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 6.25,
+            "age": {
+                "installed": {
+                    "at": "2020-06-01T00:00:00+00:00",
+                    "years": 6.3,
+                    "dated_by": "symfony/symfony"
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "v6.4.45",
+                    "at": "2026-08-30T01:18:12+00:00",
+                    "years": 0.1,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "v2.6.13",
+                    "at": "2020-06-01T00:00:00+00:00",
+                    "years": 6.3,
+                    "level": "high",
+                    "dated_by": "symfony/symfony"
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-09-23T14:28:05+00:00",
+                    "years": 0,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": true,
+                "fails": true,
+                "exempt_by": null,
+                "by": [
+                    {
+                        "value": "high",
+                        "kind": "grade",
+                        "facts": [
+                            {
+                                "kind": "flag",
+                                "id": "left-behind"
+                            },
+                            {
+                                "kind": "advisory",
+                                "id": "PKSA-4wjj-gy1p-ft3r"
+                            }
+                        ]
+                    }
+                ],
                 "basis": null
             }
         }
@@ -185486,7 +192772,7 @@ export const d_ignored_marking_unchecked_dagger = {
                         "value": 4.2,
                         "source": "release"
                     },
-                    "summary": "last release 2022-07-28 (4.2 years ago)"
+                    "summary": "last release 2022-07-28 (4.2 years ago); liveness read from releases only"
                 }
             ],
             "score": {
@@ -185780,7 +193066,7 @@ export const d_ignored_marking_unchecked_dagger = {
                     }
                 }
             ],
-            "evidence": "old-promise: released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; stale: last release 2022-07-28 (4.2 years ago)",
+            "evidence": "old-promise: released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; stale: last release 2022-07-28 (4.2 years ago); liveness read from releases only",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 1.76,

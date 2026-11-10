@@ -92,6 +92,20 @@ final class ContractBundleIsCurrentTest extends TestCase
         self::assertSame(['sha256' => $expected], JsonPath::decodeFile(ContractBundle::DIRECTORY.'/contract-files.json'), 're-record with tools/report/record');
     }
 
+    /** The page goldens are copied, not recorded, so no recording catches a copy that skips the provenance. */
+    public function testBothProvenanceRecordsNameTheCommittedPageGoldens(): void
+    {
+        $hash = hash_file('sha256', ContractBundle::DIRECTORY.'/page-goldens.json');
+        $records = [
+            'the contract provenance' => ContractBundle::DIRECTORY.'/provenance.json',
+            'the flags provenance' => \dirname(ContractBundle::DIRECTORY).'/flags/provenance.json',
+        ];
+
+        foreach ($records as $name => $path) {
+            self::assertSame($hash, JsonPath::stringAt(JsonPath::decodeFile($path), ['page_goldens', 'sha256']), $name.' names other page goldens than the committed page-goldens.json');
+        }
+    }
+
     public function testTheBundleHashIsTheHashOfTheCommittedFiles(): void
     {
         self::assertSame(trim((string) file_get_contents(ContractBundle::DIRECTORY.'/bundle_sha256')), ContractBundle::sha256(ContractBundle::bundleFiles()));

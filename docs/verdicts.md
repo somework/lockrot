@@ -18,7 +18,7 @@ each flag's rule, its signals, and what you and the package's maintainer can do 
 | `medium` | The score is 8 to 15 | |
 | `low` | The score is 1 to 7 | |
 | `unknown` | The score is 0, no allowlist entry accepts the package or one of its fired flags, and lockrot read no release metadata for the package | Nothing counts, but lockrot did not judge its release age (S2) or its release branch (S8). The run's [notes](notes.md) say what failed |
-| `finished` | The score is 0, and an allowlist entry accepts the whole package or a flag that fired | Nothing counts, and the [allowlist](configuration.md#the-allowlist) says why: the [built-in list](configuration.md#the-built-in-list), a package type or your own entry |
+| `finished` | The score is 0, and an allowlist entry accepts the whole package or a flag that fired | Nothing counts, and the [allowlist](configuration.md#the-allowlist) says why: the [built-in list](configuration.md#the-built-in-list), a package type or your own entry. A package that a type entry accepts can still fire S2 and S8, and the entry accepts the flag they raise |
 | `ok` | The score is 0 | No flag counts |
 
 Verdict order, used by the grade values of [`--fail-on`](ci.md) and the report's sort order:
@@ -66,6 +66,11 @@ shows.
 - `abandoned`, `silent` and `stale` are one reading of whether anyone still ships the package, so
   a finding shows at most one of them. `abandoned` says which source fired in `degree.reasons`
   (`marked`, `archived`).
+
+- `degree.liveness_complete` is false when a `checks_skipped[]` or `checks_missing[]` entry blocks
+  S2 or S4. The summary of a counted `stale` then names its reading: "liveness read from pushes
+  only" when an entry blocks S2, else "liveness read from releases only". An accepted `stale` and
+  `abandoned` keep their summary.
 
 - `pinned` and `left-behind` never fire together: a branch snapshot is on no release branch.
 
@@ -234,7 +239,7 @@ S8 is not measured for:
   tag is still on the branch, and S8 judges the branch's newest stable release.
 
 - A branch whose highest tag has no [trusted date](#dates-from-the-monorepo), unless the branch's
-  newest release with a trusted date is inside `release-warn-years`.
+  newest dated release has a trusted date inside `release-warn-years`.
 
 - An installed branch whose newest dated release is a lower tag that only a commit shared with other
   tags dates. `age.branch_release` is then null with `undated_releases`.
@@ -448,9 +453,15 @@ request on it.
 
 - S2 and S8 carry the parent as `dated_by`, and `--explain` marks the branch rows it supplied.
 
+- Where the parent lists a tag that shares its commit, the parent's date is that tag's release
+  date for S2, S5 and S8. When that tag is the newest of its branch, the branch row carries the
+  parent's date, and S10 `release_dates` names no cause that the parent resolved.
+
 - When the highest tag has a trusted date or a parent date, S2 reads the newest trusted date over
   every branch row.
-  A lower branch that the parent dates counts, and so does a dated pre-release.
+  A lower branch that the parent dates counts, and so does a dated pre-release on its own commit.
+  A pre-release on a shared commit has no trusted date and keeps S2 unknown, unless its date is
+  not newer than the reading.
 
 - S8 can quote a branch's highest tag, or a lower tag, that only a commit shared with other tags
   dates. A release is never older than its commit, so that date is a lower bound. The summary then says "on or after"
@@ -538,7 +549,8 @@ origin: Packagist, a private repository, vcs, a path or an archive. packages-dev
 - Composer's policy never stops the lookup. Under `policy: false`, `COMPOSER_POLICY=0` or
   `policy.advisories: false`, lockrot asks and counts every advisory. These switches stop Composer
   from blocking an update (`composer update`, `require` or `remove`), and `composer audit` still
-  reports the advisories. The note
+  reports the advisories. `COMPOSER_POLICY_ADVISORIES_BLOCK=1` turns the blocking on again after
+  `policy.advisories: false`, but not after `policy: false` or `COMPOSER_POLICY=0`. The note
   [`advisories_disabled_by_policy`](notes.md#advisories_disabled_by_policy) says so.
 
 - An advisory with no severity counts as `unrated`. An advisory with no affected range counts, with
@@ -1054,9 +1066,10 @@ How lockrot reads the window:
   a later patch of that minor. So with `config.platform.php` 8.4.0, a patch floor such as
   `>=8.4.2` keeps 8.4 in the window, and `lower_edge.php` reads 8.4.2. A cap below that PHP leaves
   the minor out.
-- A target minor that the release data does not list counts as one more known minor of the
-  window, in version order. Examples are 8.6 before its GA, and 7.5 or 5.2 from
-  `config.platform.php`. A set that admits it lists it in `minors`. A cap that excludes it gives
+- A target minor that is not a known minor on the run date counts as one more known minor of the
+  window, in version order. A minor is known when its GA date in `resources/php-ga-dates.json` is
+  on or before the run date, so 8.6 is not a known minor before its GA date. Other examples are 7.5 and 5.2
+  from `config.platform.php`, which the file does not list. A set that admits it lists it in `minors`. A cap that excludes it gives
   `upper_edge` with `excludes` set to that minor, and `set_by` lists the links of the cap. The
   edges, `gaps` and the `php:` line read this minor too. [`capped`](#capped) does not: its R and
   `stops_at`, and the `capped` test of a move, read the known minors without it.
@@ -1416,9 +1429,10 @@ libyears: at least 189.8 behind across 194 of 200 packages · 120.2 from direct 
 furthest behind phpdocumentor/reflection-common 2.2.0 at 5.4
 ```
 
-For each package, lockrot takes the years from the installed version's release to the newest
-release on the package's highest line. A newer release on a lower line does not count, so this date
-is not always the one that S2 reads. It counts years of 365.25 days, never below zero, and sums them
+For each package, lockrot takes the years from the installed version's release to the package's
+highest release by version. That is the highest dated pre-release above the highest stable tag,
+else the highest stable tag. A lower tag with a later date does not count, so this date is not
+always the one that S2 reads. It counts years of 365.25 days, never below zero, and sums them
 over the packages the run analysed. The installed version's date is the lock's `time`, or its
 [monorepo parent's](#dates-from-the-monorepo). The number does not read the clock. The package
 furthest behind is the one with the highest value. A tie goes to the package whose name sorts first
@@ -1446,11 +1460,12 @@ applies:
 The keys are an [open set](schema.md#open-sets): read one you do not know as another way a package
 went unmeasured ([compatibility.md](compatibility.md#open-sets)).
 
-- **Lower bounds.** When the newest tag has no trusted date, lockrot measures the package to the
+- **Lower bounds.** When that release has no trusted date, lockrot measures the package to the
   newest release above the installed version that has a trusted date. That release can be on a
   higher branch or on the installed branch. A tag's commit is never younger than the release it
   names, so the value is a lower bound: `libyears_at_least` is true, and the root counts such
-  findings in `at_least_count`. The line then reads `at least`.
+  findings in `at_least_count`. The line then reads `at least`. A highest pre-release on a shared
+  commit gets no lower bound: the package is `undated_releases`.
 
 - **Ahead of the newest release.** A package locked on a pre-release above it, or on a tag that
   the repository does not list, counts as zero.

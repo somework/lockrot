@@ -44,7 +44,7 @@
                     "level": "warning",
                     "rank": 50.0,
                     "message": {
-                        "text": "akaunting/laravel-debugbar-collector 2.1.1 \u2014 finding medium, 8 = stale 8 \u2014 stale: last push 2023-06-02 (3.3 years ago). Do: \u2014."
+                        "text": "akaunting/laravel-debugbar-collector 2.1.1 \u2014 finding medium, 8 = stale 8 \u2014 stale: last push 2023-06-02 (3.3 years ago); liveness read from pushes only. Do: \u2014."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "akaunting/laravel-debugbar-collector"

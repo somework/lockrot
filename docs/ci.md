@@ -72,8 +72,23 @@ when it reaches a value of the list and the baseline does not exempt it:
 | `1` | A finding failed a `--fail-on` value and the baseline does not exempt it, or `--strict-network` is on and a run note counts as a network failure | The report. Nothing under `--generate-baseline` |
 | `2` | lockrot could not run or could not finish: an input, configuration or usage error, or a file it could not write | Nothing, except when an `--output` file fails (outside `--generate-baseline`): the report is already on stdout |
 
-The exit code is the same for every output format. On stderr, a configuration or usage error starts
-with `lockrot:`, any other failure with `lockrot failed:`. `-v` adds the stack trace to the second.
+The exit code is the same for every output format. On stderr, a configuration or usage error that
+the command reports starts with `lockrot:`, any other failure with `lockrot failed:`. `-v` adds the
+stack trace to the second. Other text comes from these sources:
+
+- The guards of `bin/lockrot`, which run before the command and exit `2`:
+    - PHP 7.1 to 7.3 prints `lockrot requires PHP 7.4 or newer` on stderr. An older PHP stops at a
+      parse error.
+    - A project without the `composer/composer` package prints `lockrot needs the composer/composer
+      package 2.10 or newer, …` on stderr.
+    - An older `composer/composer` package prints `lockrot requires the composer/composer package
+      2.10 or newer, …` on stderr.
+    - A non-CLI SAPI with `register_argc_argv` on prints `lockrot cannot run safely on a non-CLI
+      SAPI …` on stdout.
+- The console application, which exits `1` before a command runs: an unknown command
+  (`Command "…" is not defined.`) or a `--working-dir` that does not exist.
+
+Do not match `^lockrot:` to tell these cases apart.
 
 **Exit `2`** comes from:
 

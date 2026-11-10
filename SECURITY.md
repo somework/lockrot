@@ -61,7 +61,7 @@ How lockrot writes a report or a baseline:
   by rename. No directory sync follows the rename on any PHP version. A target that no run
   replaced stays whole.
 
-- A run that stops during a write can leave a `*.tmp` file beside the target. When lockrot cannot
+- A run that stops during a write can leave a `lockrot-*.tmp` file beside the target. When lockrot cannot
   write a file, it tries to remove its own `*.tmp` file and exits `2` ([Exit codes](docs/ci.md#exit-codes)).
   If the removal fails, the `*.tmp` file stays. `self-update` stages the new archive beside the PHAR
   ([Keeping it updated](docs/phar.md#keeping-it-updated)).

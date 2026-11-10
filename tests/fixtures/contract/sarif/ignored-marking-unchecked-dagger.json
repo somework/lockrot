@@ -159,7 +159,7 @@
                     "level": "warning",
                     "rank": 25.0,
                     "message": {
-                        "text": "symfony/debug v3.4.47 \u2014 finding high, 18 = old-promise 16 + stale 2 [\u00bc of 8] \u2014 stale: last release 2022-07-28 (4.2 years ago). Do: require symfony/debug ^4.4.44 \u2014 clears old-promise; 4.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; stale stays; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "symfony/debug v3.4.47 \u2014 finding high, 18 = old-promise 16 + stale 2 [\u00bc of 8] \u2014 stale: last release 2022-07-28 (4.2 years ago); liveness read from releases only. Do: require symfony/debug ^4.4.44 \u2014 clears old-promise; 4.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; stale stays; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "symfony/debug"

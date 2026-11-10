@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **high** | `symfony/debug` | v3.4.47 | old-promise · stale | `18 = old-promise 16 + stale 2 [¼ of 8]`<br>**Do:** require symfony/debug ^4.4.44 — clears old-promise; 4.x needs php \>=7.1.3, which require.php allows; the target php 8.4 runs it; stale stays; a new major brings its own requirements, which lockrot does not solve<br>*old-promise:* released 2020-10-24 for PHP 5 (php "^5.5.9\|\>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested<br>*stale:* last release 2022-07-28 (4.2 years ago)<br>*abandoned marking ignored* (policy.abandoned: symfony/debug): removed in the 7.x upgrade<br>checks missing: S3, S4 (rate limited) | direct |
+| **high** | `symfony/debug` | v3.4.47 | old-promise · stale | `18 = old-promise 16 + stale 2 [¼ of 8]`<br>**Do:** require symfony/debug ^4.4.44 — clears old-promise; 4.x needs php \>=7.1.3, which require.php allows; the target php 8.4 runs it; stale stays; a new major brings its own requirements, which lockrot does not solve<br>*old-promise:* released 2020-10-24 for PHP 5 (php "^5.5.9\|\>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested<br>*stale:* last release 2022-07-28 (4.2 years ago); liveness read from releases only<br>*abandoned marking ignored* (policy.abandoned: symfony/debug): removed in the 7.x upgrade<br>checks missing: S3, S4 (rate limited) | direct |
 
 flags: old-promise 1 · stale 1 · 1 package carries more than one\
 depth: every flagged package is named in composer.json · direct 1\

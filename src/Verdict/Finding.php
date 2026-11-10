@@ -63,7 +63,6 @@ final class Finding
     private PackageOrigin $origin;
     /** The registry that named the replacement, which decides where it is linked. */
     private ?string $replacementNamedBy;
-    /** report-1's S9 facts, which the report-1 readers read: S9's data is report-2's. */
     /** Null for a finding built without its flags. */
     private ?Score $score = null;
     private ?string $grade = null;
@@ -660,14 +659,29 @@ final class Finding
      */
     private function context(FindingDetails $details, array $checksMissing): ScoreContext
     {
-        $livenessComplete = true;
         $s3Unread = false;
         foreach (array_merge($details->skipped(), $checksMissing) as $check) {
-            $livenessComplete = $livenessComplete && array_intersect($check->blocks(), [Signal::S2, Signal::S4]) === [];
             $s3Unread = $s3Unread || \in_array(Signal::S3, $check->blocks(), true);
         }
 
-        return new ScoreContext($this->maintenanceJudged, $details->advisoriesComplete(), $livenessComplete, $s3Unread, ReleaseBranch::of($this->version) === null && (!$this->maintenanceJudged || self::tagMayBeLeftBehind($details->moves()->nextStep())));
+        return new ScoreContext($this->maintenanceJudged, $details->advisoriesComplete(), self::livenessBlocked($details, $checksMissing) === [], $s3Unread, ReleaseBranch::of($this->version) === null && (!$this->maintenanceJudged || self::tagMayBeLeftBehind($details->moves()->nextStep())));
+    }
+
+    /**
+     * @param list<Check> $checksMissing S10's checks as report-2 writes them
+     *
+     * @return list<string> S2 and S4, each one that a skipped or missing check blocks
+     */
+    private static function livenessBlocked(FindingDetails $details, array $checksMissing): array
+    {
+        $blocked = [];
+        foreach (array_merge($details->skipped(), $checksMissing) as $check) {
+            foreach (array_intersect([Signal::S2, Signal::S4], $check->blocks()) as $signal) {
+                $blocked[$signal] = $signal;
+            }
+        }
+
+        return array_values($blocked);
     }
 
     /**
@@ -736,11 +750,13 @@ final class Finding
     {
         $data = array_map(static fn (Signal $signal): SignalData => $signal->data(), $signals);
         $security = $basis->securityTerm();
+        $blocked = self::livenessBlocked($this->details(), self::checksOf($signals));
+        $counted = array_map(static fn (MaintenanceTerm $term): string => $term->flag(), $basis->maintenanceTerms());
         $summaries = [];
         foreach ($flags->fired() as $flag) {
             $summaries[$flag] = $flag === FlagSet::VULNERABLE
                 ? $this->details()->vulnerableSummary($rows, $branch, $security === null ? '' : $security->severity())
-                : FlagSentence::maintenance($flag, $data);
+                : FlagSentence::maintenance($flag, $data).($flag === FlagSet::STALE && \count($blocked) === 1 && \in_array($flag, $counted, true) ? FlagSentence::livenessReadWithout($blocked[0]) : '');
         }
 
         return $summaries;

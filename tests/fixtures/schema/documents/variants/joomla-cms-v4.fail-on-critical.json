@@ -21960,7 +21960,8 @@
      "role": "accepted",
      "baseline": null,
      "signal_ids": [
-      "S1"
+      "S1",
+      "S2"
      ],
      "degree": {
       "reasons": [
@@ -21973,7 +21974,7 @@
       "value": "marked",
       "source": null
      },
-     "summary": "marked abandoned by its registry, replacement: web-token/jwt-library"
+     "summary": "marked abandoned by its registry, replacement: web-token/jwt-library; last release 2023-05-18 (3.4 years ago)"
     }
    ],
    "score": {
@@ -22089,6 +22090,17 @@
       "replacement": "web-token/jwt-library",
       "marked_by": "repository",
       "replacement_url": null
+     }
+    },
+    {
+     "id": "S2",
+     "level": "warn",
+     "summary": "last release 2023-05-18 (3.4 years ago)",
+     "data": {
+      "last_release": "2023-05-18T16:20:51+00:00",
+      "last_version": "3.2.1",
+      "years": 3.4,
+      "dated_by": null
      }
     },
     {

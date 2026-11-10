@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Verdict changes
 
+- **All formats:** a monorepo parent's date of a tag that shares its commit is the release date of
+  that tag for S2, S5 and S8. S10 `release_dates` names no cause that the parent resolved, so
+  `stale` and `left-behind` can fire on such a split.
+  ([Dates from the monorepo](docs/verdicts.md#dates-from-the-monorepo))
+- **All formats:** a newest pre-release on a commit that three or more stable tags share keeps S2
+  unknown, with an S10 `release_dates` entry, also when a monorepo parent is present.
+  ([Dates from the monorepo](docs/verdicts.md#dates-from-the-monorepo))
+- **All formats:** libyears end at the highest release by version: the highest dated pre-release
+  above the highest stable tag, else that tag. A lower tag with a later date, own-dated,
+  parent-dated or on a shared commit, does not make the project behind.
+  ([Libyears](docs/verdicts.md#libyears))
 - **Breaking:** **Baseline:** a finding is worsened by a flag above the recorded one, a new
   advisory, or a known one re-rated or no longer fixable. The gate reads `min(score, 2 × what the
   new facts add)`. A `known` finding fails no `--fail-on` value, `unchecked` included. Action: run
@@ -52,6 +63,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   each name it could serve reads `metadata_unavailable`. 0.13 asked a later repository.
   `--strict-network` makes this exit 1. Action: limit the repository with `only`, or fix its
   credentials or its cache. ([Which repository answers](docs/internals.md#two-passes))
+- **Breaking:** **CLI, Config:** a `--fail-on` value of `critical`, `high`, `medium` or `low`
+  keeps its word and now reads the grade (the score band), not the priority ladder of 0.13.
+  Action: run once without a gate, and compare each finding's grade.
+  ([The score](docs/verdicts.md#score))
 - **All formats:** a new flag `capped` (S11, 8 points) marks an installed release whose
   `require.php` stops below the newest PHP minor that the root php allows. It decides at once, and
   comes after `stale`, so `--fail-on=stale` keeps its reach. A baseline entry that records any
@@ -212,6 +227,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   not parse, for example one with a bad port. It printed the raw value.
 - **All formats:** under Composer's `cache-read-only` (`COMPOSER_CACHE_READ_ONLY`), lockrot writes
   nothing to its repository-activity cache. It wrote there.
+- **All formats:** for an `ssh://`, `git://` or `git+ssh://` clone URL with a port, lockrot asks
+  the API of the host on HTTPS, not on that port, and an `ssh://` gitlab.com URL with `:22` gets
+  `GITLAB_TOKEN`. An `https://` port stays part of the host. This affects a lock whose packages
+  name such a URL. ([Internals](docs/internals.md))
+- **Install-time:** on a Composer older than 2.10, `-q` does not hide the
+  `lockrot: Composer <version> is older than 2.10 …` line, so a quiet install shows that
+  `install-time-strict` does not apply. The `lockrot: install-time check skipped: …` line also
+  survives `-q`. This affects installs that run with `-q`. ([Install-time](docs/install-time.md))
 
 ### Added
 
@@ -250,8 +273,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   holds no PHP raise step: only the `update now:` line says to raise `require.php` first.
   ([Security](docs/schema.md#advisories-with-no-fix-expected))
 - **json, table, markdown, github:** `run.php_window` gives the PHP minors on which the lock
-  installs and the links that set each edge. A target minor that the release data does not list
-  counts as one more, in version order. `platform_override` is the merged `config.platform.php`.
+  installs and the links that set each edge. A target minor that is not a known minor on the run
+  date counts as one more, in version order. Its GA date is after the run date, or the release
+  data omits it. `platform_override` is the merged `config.platform.php`.
   `target.php` and `lower_edge.php` are `X.Y.Z`. The text formats print a `php:` line.
   ([The PHP window](docs/verdicts.md#the-php-window))
 - **json, table, markdown, github:** `run.php_window.target_fix` names the packages that exclude
@@ -339,6 +363,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **All formats:** the summary of a counted `stale` names its liveness reading when a check that
+  did not run blocks S2 or S4: "liveness read from pushes only" or "liveness read from releases
+  only". The evidence line and SARIF carry it. ([Flags](docs/verdicts.md#flags))
 - **Breaking:** **Config:** `ignore[].expires` with a trailing newline, such as `"2027-01-01\n"`,
   exits 2, as `accept-unchecked[].expires` does. 0.13 accepted it. Action: write the date as
   `YYYY-MM-DD` with nothing after it.
@@ -521,6 +548,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **CLI:** on PHP 7.1 to 7.3, the source script `bin/lockrot` prints
+  `lockrot requires PHP 7.4 or newer` and exits `2`, not a parse error with exit `255`.
+  ([Exit codes](docs/ci.md#exit-codes))
+- **CLI:** `--explain` prints the footnote "so S8 does not measure the branch" only when S8 did
+  not measure the installed branch because of its undated releases.
+  ([Explaining one package](docs/configuration.md#explaining-one-package))
+- **All formats:** lockrot omits the run note `advisories_disabled_by_policy` when
+  `COMPOSER_POLICY_ADVISORIES_BLOCK=1` turns the blocking on again after `policy.advisories: false`,
+  so the note agrees with `run.move_check.blocks_advisories`.
+  ([advisories_disabled_by_policy](docs/notes.md#advisories_disabled_by_policy))
+- **Config:** an `extra.lockrot.target-php` that is no version, or that names a PHP minor that
+  lockrot does not know, exits `2` also when `--target-php` or `LOCKROT_TARGET_PHP` overrides it.
+  ([Validation](docs/configuration.md#validation))
+- **CLI:** beside a `composer.json`, a `composer.lock` that is not valid JSON or whose root is not
+  a JSON object exits `2` with the `lockrot:` message of the lock, not with a Composer type error or
+  `lockrot failed:`. ([Exit codes](docs/ci.md#exit-codes))
+- **CLI:** the temporary file of `--output` and of the baseline writes has a short name in the
+  target's directory, so a target name near the filesystem limit does not fail with
+  `File name too long`.
 - **CLI, Config:** `--fail-on`, `LOCKROT_FAIL_ON`, the `fail-on` key, the `--explain` value and the
   issuer variables (`GH_HOST` and the others) ignore case under any locale. Under a Turkish locale
   on PHP 7.4 to 8.1, an upper-case `I` in them lower-cased to a byte that is not `i`.

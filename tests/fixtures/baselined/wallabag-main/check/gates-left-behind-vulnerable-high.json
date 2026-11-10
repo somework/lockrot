@@ -1313,8 +1313,8 @@
         ]
     },
     "libyears": {
-        "total": 262.56,
-        "direct_requirements": 132.41,
+        "total": 260.9,
+        "direct_requirements": 132.4,
         "measured": 265,
         "at_least_count": 3,
         "unmeasured": {
@@ -41993,7 +41993,7 @@
             "evidence": "",
             "allowlist_reason": null,
             "data_date": "2026-10-14T00:00:00+00:00",
-            "libyears": 0.03,
+            "libyears": 0.02,
             "age": {
                 "installed": {
                     "at": "2026-05-23T12:08:41+00:00",
@@ -49560,7 +49560,7 @@
             "evidence": "",
             "allowlist_reason": null,
             "data_date": "2026-10-14T00:00:00+00:00",
-            "libyears": 1.65,
+            "libyears": 0,
             "age": {
                 "installed": {
                     "at": "2024-03-15T13:55:21+00:00",

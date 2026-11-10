@@ -107,8 +107,11 @@ final class PackageMetadata
     private ?\DateTimeImmutable $releaseReadingAt;
     private ?string $releaseReadingVersion;
     private ?string $releaseReadingDatedBy;
-    /** @var array{0: \DateTimeImmutable, 1: string, 2: string}|null the newest dated pre-release: its date, its pretty and its normalized version */
+    /** @var array{0: \DateTimeImmutable, 1: string, 2: string, 3: bool}|null the newest dated pre-release: its date, its pretty and its normalized version, and whether its commit is a shared one */
     private ?array $newestPreRelease = null;
+    /** @var array{0: \DateTimeImmutable, 1: string, 2: string, 3: bool}|null the highest dated pre-release by version, in the shape of {@see $newestPreRelease} */
+    private ?array $highestPreRelease = null;
+    private bool $highestBranchDatedByParent = false;
 
     /**
      * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string}> $latestStableByBranch
@@ -197,6 +200,7 @@ final class PackageMetadata
         // Dated or not, unlike $commitByVersion: the shared-commit tags are read from it.
         $commitOfTag = [];
         $newestPreRelease = null;
+        $highestPreRelease = null;
         /** @var array<string, array{0: BasePackage, 1: ?\DateTimeImmutable, 2: ?string}> $stable by normalized version: the release, its date, its php */
         $stable = [];
 
@@ -223,8 +227,12 @@ final class PackageMetadata
                 $releaseDate = $version->getReleaseDate();
                 if ($releaseDate !== null) {
                     $releaseDate = self::toImmutable($releaseDate);
-                    if (VersionParser::parseStability($version->getVersion()) !== 'stable' && self::newer($releaseDate, $version->getVersion(), $newestPreRelease[0] ?? null, $newestPreRelease[2] ?? null)) {
-                        $newestPreRelease = [$releaseDate, $version->getPrettyVersion(), $version->getVersion()];
+                    $preRelease = VersionParser::parseStability($version->getVersion()) !== 'stable';
+                    if ($preRelease && self::newer($releaseDate, $version->getVersion(), $newestPreRelease[0] ?? null, $newestPreRelease[2] ?? null)) {
+                        $newestPreRelease = [$releaseDate, $version->getPrettyVersion(), $version->getVersion(), self::commitOf($version)];
+                    }
+                    if ($preRelease && ($highestPreRelease === null || Comparator::greaterThan($version->getVersion(), $highestPreRelease[2]))) {
+                        $highestPreRelease = [$releaseDate, $version->getPrettyVersion(), $version->getVersion(), self::commitOf($version)];
                     }
                     if (self::newer($releaseDate, $version->getVersion(), $lastStableReleaseAt, $lastStableNormalized)) {
                         $lastStableReleaseAt = $releaseDate;
@@ -311,6 +319,14 @@ final class PackageMetadata
             $lastStableReleaseAt = null;
         }
         $releaseReading = [$lastStableReleaseAt, $lastStableVersion];
+        if ($newestPreRelease !== null) {
+            $commit = $newestPreRelease[3];
+            $newestPreRelease[3] = $commit !== null && ($tagsOnCommit[$commit] ?? 0) >= self::SHARED_COMMIT_TAGS;
+        }
+        if ($highestPreRelease !== null) {
+            $commit = $highestPreRelease[3];
+            $highestPreRelease[3] = $commit !== null && ($tagsOnCommit[$commit] ?? 0) >= self::SHARED_COMMIT_TAGS;
+        }
         // A monorepo parent keeps a date per release for its children, minus the tags on a shared
         // commit. Any other package keeps none: it has no children, and the map holds one entry
         // per release.
@@ -370,6 +386,7 @@ final class PackageMetadata
         );
         [$metadata->releaseReadingAt, $metadata->releaseReadingVersion] = $releaseReading;
         $metadata->newestPreRelease = $newestPreRelease;
+        $metadata->highestPreRelease = $highestPreRelease;
         if ($installedVersion !== null) {
             $metadata->keepReleases($versions, $stable, $sharedCommitVersions, $dataDate, $installedVersion);
         }
@@ -477,17 +494,56 @@ final class PackageMetadata
      */
     public function sharesItsCommit(string $version): bool
     {
+        $normalized = self::normalized($version);
+
+        return $normalized !== null && isset($this->sharedCommitVersions[$normalized]);
+    }
+
+    /**
+     * Whether the date of a {@see latestStableByBranch()} row is only that of a commit its newest
+     * tag shares with other stable tags. The tag was released on or after that date. A row that a
+     * monorepo parent dates ({@see datedBy()}) carries a release's date.
+     *
+     * @param array{version: string, dated_by?: string} $branch
+     */
+    public function sharedCommitDates(array $branch): bool
+    {
+        return !isset($branch['dated_by']) && $this->sharesItsCommit($branch['version']);
+    }
+
+    /**
+     * The monorepo parent's release date of the version, in any form the parser takes. Only a
+     * parent's dates count: {@see fromPackages()} keeps the own release dates of any package with a
+     * `self.version` replace too. Null when no parent dated this package ({@see datedBy()}) or the
+     * parent has no trusted date for the version.
+     */
+    public function parentDateOf(string $version): ?\DateTimeImmutable
+    {
+        return $this->releaseDatesBy === null ? null : self::dateIn($this->releaseDates, $version);
+    }
+
+    /** @param array<string, \DateTimeImmutable> $dates by normalized version */
+    private static function dateIn(array $dates, string $version): ?\DateTimeImmutable
+    {
+        $normalized = self::normalized($version);
+
+        return $normalized === null ? null : $dates[$normalized] ?? null;
+    }
+
+    private static function normalized(string $version): ?string
+    {
         try {
-            return isset($this->sharedCommitVersions[(new VersionParser())->normalize($version)]);
+            return (new VersionParser())->normalize($version);
         } catch (\UnexpectedValueException $e) {
-            return false;
+            return null;
         }
     }
 
     /**
      * This package's branches, dated by its monorepo parent's. A branch whose highest tag has no
-     * date takes the parent's entry for the same branch and names the parent under `dated_by`. The
-     * last release and the per-release dates ({@see releaseDateOf()}) follow. A branch that the
+     * date takes the parent's entry for the same branch and names the parent under `dated_by`. A
+     * branch whose newest tag shares its commit takes the parent's date of that tag. The last
+     * release and the per-release dates ({@see releaseDateOf()}) follow. A branch that the
      * parent does not date stays as it was, and a package that the parent does not replace comes
      * back unchanged. Immutable: this object stays unchanged. See docs/verdicts.md#dates-from-the-monorepo.
      */
@@ -500,11 +556,9 @@ final class PackageMetadata
         $parentBranches = $parent->latestStableByBranch();
         $datedBranches = [];
         foreach ($byBranch as $key => $entry) {
-            if ($entry['highest']['at'] !== null) {
-                continue;
-            }
-            $theirs = $parentBranches[$key] ?? null;
+            $theirs = $entry['highest']['at'] === null ? $parentBranches[$key] ?? null : null;
             if ($theirs === null || $theirs['at'] === null || $theirs['highest']['at'] === null) {
+                $byBranch[$key] = $this->withParentDateOfNewest($entry, $parent);
                 continue;
             }
             // The date is the parent's. The php requirement stays this package's own: the lock
@@ -525,10 +579,17 @@ final class PackageMetadata
         $lastStableDatedBy = $this->lastStableDatedBy;
         $lastStablePhp = $this->lastStablePhp;
         $highestBranch = self::highestBranch($byBranch);
-        if (\in_array($highestBranch, $datedBranches, true)) {
+        // A parent date of the shared-commit tag that the package names as its last release dates that release.
+        $lastStableDatedByParent = isset($byBranch[$highestBranch]['dated_by']) && $byBranch[$highestBranch]['version'] === $this->lastStableVersion;
+        // Ruling R16-16h1: the last release is the newest tag by date, and the parent dates the shared
+        // tag that it named older than the highest tag's own date.
+        $ownHighestNewest = isset($byBranch[$highestBranch]) && !isset($byBranch[$highestBranch]['dated_by'])
+            && ($this->latestStableByBranch[$highestBranch]['version'] ?? null) === $this->lastStableVersion
+            && $byBranch[$highestBranch]['version'] !== $this->lastStableVersion;
+        if ($lastStableDatedByParent || $ownHighestNewest || \in_array($highestBranch, $datedBranches, true)) {
             $lastStableReleaseAt = $byBranch[$highestBranch]['at'];
             $lastStableVersion = $byBranch[$highestBranch]['version'];
-            $lastStableDatedBy = $parent->name;
+            $lastStableDatedBy = $ownHighestNewest ? null : $parent->name;
             $lastStablePhp = $byBranch[$highestBranch]['php'];
         }
         // SPEC §8.4.1: S2 reads the newest tag by trusted date over every branch row, so a lower
@@ -546,18 +607,21 @@ final class PackageMetadata
         $highest = $byBranch[$highestBranch] ?? null;
         // Read the highest row's own date only when a shared commit hid it. An undated highest tag, a
         // pre-release included, keeps the reading unknown.
-        if ($releaseReadingAt === null && $this->lastStableSharesItsCommit && $highest !== null && !isset($highest['dated_by']) && $highest['highest']['at'] !== null) {
+        if ($releaseReadingAt === null && $this->lastStableSharesItsCommit && $highest !== null && $highest['highest']['at'] !== null) {
             $releaseReadingAt = $highest['highest']['at'];
             $releaseReadingVersion = $highest['highest']['pretty'];
+            // A parent-dated row dates its highest tag too, or the walk below reads the row's newer parent date.
+            $releaseReadingDatedBy = $highest['dated_by'] ?? null;
         }
         if ($releaseReadingAt !== null) {
-            $unresolved = null;
+            // A pre-release on a shared commit has the commit's date, not a release's, so it can only block the reading.
+            $unresolved = $this->newestPreRelease !== null && $this->newestPreRelease[3] ? $this->newestPreRelease[0] : null;
             foreach ($byBranch as $row) {
                 $datedByParent = isset($row['dated_by']);
                 if ($row['at'] === null) {
                     continue;
                 }
-                if (!$datedByParent && $this->sharesItsCommit($row['version'])) {
+                if ($this->sharedCommitDates($row)) {
                     $unresolved = $unresolved === null || $row['at'] > $unresolved ? $row['at'] : $unresolved;
                     continue;
                 }
@@ -568,7 +632,7 @@ final class PackageMetadata
                 }
             }
             // The branch rows hold stable tags only. S2 counts a dated pre-release too (SPEC §8.4.1).
-            if ($this->newestPreRelease !== null && self::newerTag($this->newestPreRelease[0], $this->newestPreRelease[1], $releaseReadingAt, $releaseReadingVersion)) {
+            if ($this->newestPreRelease !== null && !$this->newestPreRelease[3] && self::newerTag($this->newestPreRelease[0], $this->newestPreRelease[1], $releaseReadingAt, $releaseReadingVersion)) {
                 [$releaseReadingAt, $releaseReadingVersion] = $this->newestPreRelease;
                 $releaseReadingDatedBy = null;
             }
@@ -608,12 +672,41 @@ final class PackageMetadata
         $dated->releaseReadingVersion = $releaseReadingVersion;
         $dated->releaseReadingDatedBy = $releaseReadingDatedBy;
         $dated->newestPreRelease = $this->newestPreRelease;
+        $dated->highestPreRelease = $this->highestPreRelease;
+        $dated->highestBranchDatedByParent = \in_array($highestBranch, $datedBranches, true);
         $dated->releasesAbove = $this->releasesAbove === null ? null : array_map(
             static fn (StableRelease $release): StableRelease => $release->sharedCommit() ? $release->withDate($parent->releaseDateOf($release->normalized())) : $release,
             $this->releasesAbove
         );
 
         return $dated;
+    }
+
+    /**
+     * The branch row with the parent's date of its newest tag, when that tag shares its commit.
+     * When that tag is the branch's highest tag, the highest tag takes the date too. Else the
+     * highest tag stays the newest when its own date is not older than the parent's.
+     * See docs/verdicts.md#dates-from-the-monorepo.
+     *
+     * @param array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string} $entry
+     *
+     * @return array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string}
+     */
+    private function withParentDateOfNewest(array $entry, self $parent): array
+    {
+        $at = $this->sharesItsCommit($entry['version']) ? self::dateIn($parent->releaseDates, $entry['version']) : null;
+        if ($at === null) {
+            return $entry;
+        }
+        $highest = $entry['highest'];
+        if ($highest['pretty'] === $entry['version']) {
+            return ['at' => $at, 'highest' => ['at' => $at] + $highest, 'dated_by' => $parent->name] + $entry;
+        }
+        if ($highest['at'] !== null && $highest['at'] >= $at) {
+            return ['version' => $highest['pretty'], 'at' => $highest['at'], 'highest' => $highest, 'php' => $highest['php']];
+        }
+
+        return ['at' => $at, 'dated_by' => $parent->name] + $entry;
     }
 
     /**
@@ -773,6 +866,47 @@ final class PackageMetadata
     }
 
     /**
+     * The trusted date of the newest release by version, the newest end of libyears: the highest
+     * dated pre-release when it is above the highest stable tag, else that tag. A lower tag with a
+     * later date does not count (rulings R16-16c, R16-16g, R16-16i). Null when the release has no
+     * trusted date. Without a branch row, {@see lastStableReleaseAt()}.
+     */
+    public function newestReleaseByVersionAt(): ?\DateTimeImmutable
+    {
+        $row = $this->latestStableByBranch[self::highestBranch($this->latestStableByBranch)] ?? null;
+        if ($row === null) {
+            return $this->lastStableReleaseAt;
+        }
+        $preRelease = $this->preReleaseAboveTheHighestStableTag();
+        if ($preRelease !== null) {
+            // A pre-release on a shared commit has the commit's date, not a release's.
+            return $preRelease[3] ? null : $preRelease[0];
+        }
+
+        return $row['highest']['at'];
+    }
+
+    /**
+     * True when the newest release by version is a pre-release on a shared commit. Its date is the
+     * commit's, so no lower tag's date is a lower bound for it (ruling R16-16i).
+     */
+    public function newestReleaseByVersionSharesItsCommit(): bool
+    {
+        $preRelease = $this->preReleaseAboveTheHighestStableTag();
+
+        return $preRelease !== null && $preRelease[3];
+    }
+
+    /** @return array{0: \DateTimeImmutable, 1: string, 2: string, 3: bool}|null */
+    private function preReleaseAboveTheHighestStableTag(): ?array
+    {
+        $row = $this->latestStableByBranch[self::highestBranch($this->latestStableByBranch)] ?? null;
+        $preRelease = $this->highestPreRelease;
+
+        return $row !== null && $preRelease !== null && Comparator::greaterThan($preRelease[2], $row['highest']['normalized']) ? $preRelease : null;
+    }
+
+    /**
      * The date of the release that S2 judges: the newest trusted date of a non-dev tag, pre-releases
      * included, also a parent date of a lower branch (SPEC §8.4.1 `age.release`). A tie goes to the
      * higher version. Null when the highest tag has no trusted date, or when a newer date is a shared
@@ -815,6 +949,15 @@ final class PackageMetadata
     public function lastStableSharesItsCommit(): bool
     {
         return $this->lastStableSharesItsCommit;
+    }
+
+    /**
+     * Whether the monorepo parent's row replaced the row of the highest branch ({@see datedBy()}):
+     * the split's highest tag had no trusted date. A parent date of one shared tag does not count.
+     */
+    public function highestBranchDatedByParent(): bool
+    {
+        return $this->highestBranchDatedByParent;
     }
 
     /** The monorepo parent that dated `lastStableReleaseAt()` ({@see datedBy()}). Null when the date is the package's own. */

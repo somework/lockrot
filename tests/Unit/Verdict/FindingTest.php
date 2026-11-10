@@ -735,6 +735,81 @@ final class FindingTest extends TestCase
         yield 'skipped release metadata beside S3 unread' => ['1.0.0', false, [['S3']], false, true];
     }
 
+    /**
+     * A counted `stale` read from one liveness signal names that signal in its summary and in the
+     * evidence line. An accepted `stale` keeps its summary.
+     *
+     * @param list<string> $blocked the blocks of the one S10 gap
+     *
+     * @dataProvider livenessReadings
+     */
+    #[DataProvider('livenessReadings')]
+    public function testACountedStaleReadFromOneLivenessSignalSaysSo(string $fires, array $blocked, bool $accepted, string $summary): void
+    {
+        $data = $fires === Signal::S2
+            ? SignalDataStub::of(Signal::S2, ['last_release' => '2022-07-28T00:00:00+00:00', 'years' => 4.2, 'dated_by' => null])
+            : SignalDataStub::of(Signal::S4, ['last_push' => '2023-06-02T00:00:00+00:00', 'years' => 3.3, 'event' => 'push']);
+        $signals = [new Signal(Signal::LEVEL_WARN, 'old', $data)];
+        if ($blocked !== []) {
+            $signals[] = new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [['check' => 'gap', 'reason' => 'no_token', 'blocks' => $blocked]]]));
+        }
+        $entry = $accepted ? new AllowlistEntry('vendor/pkg', null, 'kept', null, AllowlistEntry::BY_PROJECT, [FlagSet::STALE]) : null;
+        $finding = (new FindingBuilder())->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, $entry, []), true)->build();
+
+        $document = JsonPath::decoded($finding->toArray());
+
+        self::assertSame($summary, JsonPath::stringAt($document, ['flags', 0, 'summary']));
+        self::assertSame($accepted ? '' : 'stale: '.$summary, $document['evidence']);
+    }
+
+    /** Two gaps that block the same liveness signal still leave one signal that read the liveness. */
+    public function testTwoGapsThatBlockS4NameTheReleaseReading(): void
+    {
+        $signals = [
+            new Signal(Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S2, ['last_release' => '2022-07-28T00:00:00+00:00', 'years' => 4.2, 'dated_by' => null])),
+            new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [
+                ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']],
+                ['check' => 'gap', 'reason' => 'offline', 'blocks' => ['S4']],
+            ]])),
+        ];
+        $finding = (new FindingBuilder())->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, null, []), true)->build();
+
+        $document = JsonPath::decoded($finding->toArray());
+
+        self::assertSame('last release 2022-07-28 (4.2 years ago); liveness read from releases only', JsonPath::stringAt($document, ['flags', 0, 'summary']));
+    }
+
+    /** A corroborating `stale` counts, so it names its reading. `abandoned` never does. */
+    public function testOnlyACountedStaleBesideAnotherFlagNamesItsLivenessReading(): void
+    {
+        $s2 = new Signal(Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S2, ['last_release' => '2022-07-28T00:00:00+00:00', 'years' => 4.2, 'dated_by' => null]));
+        $s10 = new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [['check' => 'gap', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']]]]));
+        $pinned = [new Signal(Signal::LEVEL_WARN, 'pinned', SignalDataStub::of(Signal::S6, ['reason' => 'branch_snapshot', 'version' => 'dev-main'])), $s2, $s10];
+        $marked = [new Signal(Signal::LEVEL_HIGH, 'marked', SignalDataStub::of(Signal::S1, ['marked_by' => 'lock'])), $s2, $s10];
+        $corroborated = (new FindingBuilder())->withVersion('dev-main')->withSignals($pinned)->withFlags(FlagSet::fromSignals($pinned, null, []), true)->build();
+        $abandoned = (new FindingBuilder())->withSignals($marked)->withFlags(FlagSet::fromSignals($marked, null, []), true)->build();
+
+        $stale = JsonPath::decoded($corroborated->toArray());
+        $gone = JsonPath::decoded($abandoned->toArray());
+
+        self::assertSame(['pinned', 'stale'], array_column(JsonPath::arrayAt($stale, ['flags']), 'id'));
+        self::assertSame('corroborating', JsonPath::stringAt($stale, ['flags', 1, 'role']));
+        self::assertSame('last release 2022-07-28 (4.2 years ago); liveness read from releases only', JsonPath::stringAt($stale, ['flags', 1, 'summary']));
+        self::assertSame('abandoned', JsonPath::stringAt($gone, ['flags', 0, 'id']));
+        self::assertSame(['reasons' => ['marked'], 'liveness_complete' => false], JsonPath::arrayAt($gone, ['flags', 0, 'degree']));
+        self::assertSame('marked abandoned in composer.lock; last release 2022-07-28 (4.2 years ago)', JsonPath::stringAt($gone, ['flags', 0, 'summary']));
+    }
+
+    /** @return iterable<string, array{string, list<string>, bool, string}> */
+    public static function livenessReadings(): iterable
+    {
+        yield 'every check ran' => [Signal::S2, [], false, 'last release 2022-07-28 (4.2 years ago)'];
+        yield 'S2 blocked' => [Signal::S4, ['S2'], false, 'last push 2023-06-02 (3.3 years ago); liveness read from pushes only'];
+        yield 'S4 blocked' => [Signal::S2, ['S3', 'S4'], false, 'last release 2022-07-28 (4.2 years ago); liveness read from releases only'];
+        yield 'S4 blocked, stale accepted' => [Signal::S2, ['S4'], true, 'last release 2022-07-28 (4.2 years ago)'];
+        yield 'a gap that blocks neither' => [Signal::S2, ['S8'], false, 'last release 2022-07-28 (4.2 years ago)'];
+    }
+
     /** S10's gaps keep their check, their reason and their blocks. */
     public function testChecksMissingWritesS10sChecks(): void
     {

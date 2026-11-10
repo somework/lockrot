@@ -17,6 +17,8 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Security\BranchFixes;
 use Lockrot\Security\PackageFixes;
+use Lockrot\Signal\AgeMeasure;
+use Lockrot\Signal\AgeReading;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\PinnedRule;
@@ -27,6 +29,7 @@ use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
+use Lockrot\Verdict\Age;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\Verdict;
@@ -54,6 +57,57 @@ final class ExplanationTest extends TestCase
     private function finding(string $version, string $verdict, array $signals = []): Finding
     {
         return (new FindingBuilder())->withVersion($version)->withVerdict($verdict)->withSignals($signals)->withChain(['root/app', 'vendor/pkg'])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
+    }
+
+    /** The finding with its S8 branch reading replaced: the footnote follows what S8 read, not the row. */
+    private function withBranchReading(Finding $finding, AgeReading $branchRelease): Finding
+    {
+        $details = $finding->details();
+        $age = new Age($details->age()->installed(), $details->age()->release(), $branchRelease, $details->age()->push());
+
+        return $finding->withDetails(new FindingDetails($details->metadataStatus(), null, null, $details->skipped(), $details->installedPhp(), $details->entry(), 'complete', null, [], null, $details->activity(), $age, null, null));
+    }
+
+    public function testTheInstalledBranchIsNotUndatedWhenAnOwnDatedReleaseInsideTheWindowMakesS8MeasureIt(): void
+    {
+        // pagerfanta/twig, ruling R15-29 A: the highest tag is undated, v3.8.0 is dated and inside release-warn-years.
+        $metadata = F::metadata([['v3.8.1', null], ['v3.8.0', '2025-06-01T00:00:00+00:00']]);
+        $finding = $this->withBranchReading($this->finding('v3.8.0', Verdict::OK), AgeReading::measured(new \DateTimeImmutable('2025-06-01T00:00:00+00:00'), 13, 1.3, 'v3.8.0', null, null, AgeReading::RELEASE));
+        $explanation = $this->explanation($finding, F::facts(F::package(['version' => 'v3.8.0']), $metadata), '8.4');
+
+        self::assertNull($explanation->branches()[0]['highest_released']);
+        self::assertFalse($explanation->installedBranchIsUndated());
+    }
+
+    public function testTheInstalledBranchIsNotUndatedWhenTheVersionIsAboveEveryListedRelease(): void
+    {
+        // tubalmartin/cssmin: the installed tag is above the listed ones, an undated highest tag is not the cause.
+        $metadata = F::metadata([['v4.1.0', null]]);
+        $finding = $this->withBranchReading($this->finding('v4.1.1', Verdict::OK), AgeReading::unmeasuredBecause(AgeMeasure::ABOVE_LISTED_RELEASES));
+        $explanation = $this->explanation($finding, F::facts(F::package(['version' => 'v4.1.1']), $metadata), '8.4');
+
+        self::assertNull($explanation->branches()[0]['highest_released']);
+        self::assertFalse($explanation->installedBranchIsUndated());
+    }
+
+    public function testTheInstalledBranchIsNotUndatedWhenItsHighestTagHasAnOwnDate(): void
+    {
+        // S8 is unmeasured for a newer lower tag on a shared commit, but the highest tag's own date is in the row.
+        $metadata = F::metadata([['3.5.0', '2020-01-01T00:00:00+00:00'], ['3.4.0', '2019-01-01T00:00:00+00:00']]);
+        $finding = $this->withBranchReading($this->finding('3.4.0', Verdict::LEFT_BEHIND), AgeReading::unmeasuredBecause(AgeMeasure::UNDATED_RELEASES));
+        $explanation = $this->explanation($finding, F::facts(F::package(['version' => '3.4.0']), $metadata), '8.4');
+
+        self::assertNotNull($explanation->branches()[0]['highest_released']);
+        self::assertFalse($explanation->installedBranchIsUndated());
+    }
+
+    public function testABranchSnapshotHasNoInstalledBranchToBeUndated(): void
+    {
+        // The alias line's row is undated, but no row is the installed one: the footnote would name a branch that no row marks.
+        $finding = $this->withBranchReading($this->finding('dev-main', Verdict::PINNED), AgeReading::unmeasuredBecause(AgeMeasure::UNDATED_RELEASES));
+        $explanation = $this->explanation($finding, F::facts(F::package(['version' => 'dev-main']), F::metadata([['1.0.0', null]])), '8.4');
+
+        self::assertFalse($explanation->installedBranchIsUndated());
     }
 
     public function testTheExplanationCarriesTheFindingsLibyears(): void
@@ -84,7 +138,8 @@ final class ExplanationTest extends TestCase
     public function testAnUndatedHighestTagOnTheInstalledBranchIsReportedAsSuch(): void
     {
         $metadata = F::metadata([['13.0.0', '2026-01-01T00:00:00+00:00'], ['10.49.0', null], ['10.13.1', '2023-03-17T00:00:00+00:00']]);
-        $explanation = $this->explanation($this->finding('10.48.28', Verdict::OK), F::facts(F::package(['version' => '10.48.28']), $metadata), '8.4');
+        $finding = $this->withBranchReading($this->finding('10.48.28', Verdict::OK), AgeReading::unmeasuredBecause(AgeMeasure::UNDATED_RELEASES));
+        $explanation = $this->explanation($finding, F::facts(F::package(['version' => '10.48.28']), $metadata), '8.4');
 
         self::assertTrue($explanation->installedBranchIsUndated());
         $installed = $explanation->branches()[1];
@@ -110,7 +165,8 @@ final class ExplanationTest extends TestCase
             $loader->load($on('10.13.1', 'split', '2023-06-05T12:46:42+00:00')),
             $loader->load($on('9.0.0', null, null)),
         ], new \DateTimeImmutable(F::NOW));
-        $explanation = $this->explanation($this->finding('10.48.28', Verdict::OK), F::facts(F::package(['version' => '10.48.28']), $metadata), '8.4');
+        $finding = $this->withBranchReading($this->finding('10.48.28', Verdict::OK), AgeReading::unmeasuredBecause(AgeMeasure::UNDATED_RELEASES));
+        $explanation = $this->explanation($finding, F::facts(F::package(['version' => '10.48.28']), $metadata), '8.4');
 
         [$shared, $undated] = $explanation->branches();
 

@@ -2,7 +2,7 @@
   akaunting/laravel-debugbar-collector 2.1.1  direct  ·  stale
       8 = stale 8
       do: —
-      stale        last push 2023-06-02 (3.3 years ago)
+      stale        last push 2023-06-02 (3.3 years ago); liveness read from pushes only
       checks missing: S2 (undated releases)
 
 1 package checked · 1 flagged: medium 1
