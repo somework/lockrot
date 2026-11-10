@@ -14,6 +14,7 @@ use Lockrot\Score\CountedAdvisory;
 use Lockrot\Score\Standing;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Data\AdvisoryRow;
+use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\LeftBehindData;
 use Lockrot\Signal\Data\PinnedData;
 use Lockrot\Signal\PackageFacts;
@@ -733,6 +734,20 @@ final class FindingTest extends TestCase
         yield 'S2 blocked, then S3 unread' => ['1.0.0', true, [['S2'], ['S3']], false, true];
         yield 'a skipped branch check beside S3 unread' => ['dev-main', true, [['S3']], true, true];
         yield 'skipped release metadata beside S3 unread' => ['1.0.0', false, [['S3']], false, true];
+    }
+
+    public function testASkippedCheckThatBlocksS3LeavesS3UnreadWithoutAnS10Gap(): void
+    {
+        $signals = [new Signal(Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S2, ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => 5.4, 'dated_by' => null]))];
+        $entry = new AllowlistEntry('vendor/pkg', null, 'kept', null, AllowlistEntry::BY_PROJECT, [FlagSet::STALE]);
+        $finding = (new FindingBuilder())->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, $entry, []))->build();
+        $skipped = [new Check('repository_archived', 'no_token', [Signal::S3])];
+        $details = new FindingDetails('read', null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null);
+
+        $document = JsonPath::decoded($finding->withDetails($details)->toArray());
+
+        self::assertSame([], $document['checks_missing']);
+        self::assertTrue(JsonPath::arrayAt($document, ['score', 'accepted', 0, 'if_counted'])['at_least']);
     }
 
     /**
