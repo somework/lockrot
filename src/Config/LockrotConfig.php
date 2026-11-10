@@ -90,7 +90,7 @@ final class LockrotConfig
             $failOn,
             $targetPhp,
             $includeDev,
-            ($cli['offline'] ?? null) === true,
+            ($cli['offline'] ?? null) === true || self::isNetworkDisabledByEnvironment($env),
             ($cli['strict-network'] ?? null) === true,
             $format,
             self::resolveBaseline($extra, $cli),
@@ -126,6 +126,20 @@ final class LockrotConfig
         }
 
         return $value;
+    }
+
+    /**
+     * Composer's own reading of COMPOSER_DISABLE_NETWORK: any value but empty or `0` turns the
+     * network off, so the run reads as `--offline`. `prime` is the exception, as in Composer's Git
+     * layer: it asks for a cache fill, not for the absence of requests.
+     *
+     * @param array<string, mixed> $env
+     */
+    public static function isNetworkDisabledByEnvironment(array $env): bool
+    {
+        $value = $env['COMPOSER_DISABLE_NETWORK'] ?? '';
+
+        return \is_string($value) && $value !== '' && $value !== '0' && $value !== 'prime';
     }
 
     /**

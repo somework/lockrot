@@ -483,6 +483,29 @@ final class LockrotConfigTest extends TestCase
         self::assertFalse(LockrotConfig::fromSources([], ['LOCKROT_DISABLE' => '0'], [], '8.5.10', null)->isDisabled());
     }
 
+    /**
+     * @dataProvider networkDisabledValues
+     */
+    public function testComposerDisableNetworkReadsAsOffline(?string $value, bool $offline): void
+    {
+        $env = $value === null ? [] : ['COMPOSER_DISABLE_NETWORK' => $value];
+
+        self::assertSame($offline, LockrotConfig::fromSources([], $env, [], '8.5.10', null)->offline());
+    }
+
+    /**
+     * @return iterable<string, array{0: ?string, 1: bool}>
+     */
+    public static function networkDisabledValues(): iterable
+    {
+        yield 'unset' => [null, false];
+        yield 'empty' => ['', false];
+        yield 'zero' => ['0', false];
+        yield 'prime keeps the network' => ['prime', false];
+        yield 'one' => ['1', true];
+        yield 'any other value' => ['true', true];
+    }
+
     public function testInvalidFailOn(): void
     {
         $this->expectException(ConfigException::class);
