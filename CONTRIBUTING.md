@@ -550,6 +550,20 @@ maintainer.
        and publishes its schemas.
     2. When the deploy passes, re-run the failed `phar.yml` job (`gh run rerun <run id> --failed`).
        It then publishes the release and asks lockrot.dev to rebuild.
+
+    The step that asks lockrot.dev to rebuild is `continue-on-error`, so a failed request leaves
+    the release green. Before step 7, check that the site serves what the release notes link to:
+
+    ```bash
+    gh run list --repo somework/lockrot.dev --workflow deploy.yml --limit 1
+    curl -fsI https://lockrot.dev/changes/X.Y/
+    curl -fs https://lockrot.dev/baseline/ | grep -c 'moving-from-a-baseline-1-file'
+    ```
+
+    The deploy run must be green and newer than the tag, the first `curl` applies to an `X.Y.0`
+    release with an upgrade page, and the `grep` must not print `0` when the release refuses a
+    baseline-1 file. If a check fails, run `gh workflow run deploy.yml --repo somework/lockrot.dev`
+    and check again.
 7. When the published release changes what lockrot writes (a schema differs from the previous
    release's), record it and pin the hashes ([Recording a release](#recording-a-release)). Then
    remove the version from `RECORDING_PENDING`. `SchemaEvolutionTest` fails when a release whose
