@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Lock;
 
+use Composer\Package\Locker;
 use Composer\Repository\PlatformRepository;
 use Lockrot\Allowlist\ProjectIgnoreList;
 use Lockrot\Allowlist\UncheckedAcceptanceEntry;
@@ -41,6 +42,8 @@ final class ProjectConfig
     /** @var array<string, array<string, string>> `require` or `require-dev` => lowercased name => the key as written */
     private array $keys = [];
     private bool $read = true;
+    /** The bytes of composer.json, for the freshness test of the lock; null when the config did not come from a file. */
+    private ?string $manifestContents = null;
 
     /**
      * @param list<string> $requires
@@ -77,7 +80,13 @@ final class ProjectConfig
             return self::empty();
         }
 
-        return self::fromArray(JsonReader::readObject($path));
+        $config = self::fromArray(JsonReader::readObject($path));
+        $contents = file_get_contents($path);
+        if ($contents !== false) {
+            $config->manifestContents = $contents;
+        }
+
+        return $config;
     }
 
     /** @param array<string, mixed> $json */
@@ -236,6 +245,44 @@ final class ProjectConfig
         }
 
         return $keys;
+    }
+
+    /**
+     * The root requirements that the lock lacks, when the lock is not fresh against composer.json;
+     * null when it is fresh, or when there is no way to tell: no file, or a lock with no hash. The
+     * test is Composer's own ({@see Locker::isFresh()}), and the list can be empty, because a
+     * changed constraint changes the hash too.
+     *
+     * @return list<string>|null
+     */
+    public function lockOutOfSync(LockFile $lock, bool $includeDev): ?array
+    {
+        if ($this->manifestContents === null) {
+            return null;
+        }
+        if ($lock->contentHash() !== null && $lock->contentHash() !== '') {
+            try {
+                $fresh = Locker::getContentHash($this->manifestContents) === $lock->contentHash();
+            } catch (\Throwable $e) {
+                return null;
+            }
+        } elseif ($lock->legacyHash() !== null && $lock->legacyHash() !== '') {
+            $fresh = md5($this->manifestContents) === $lock->legacyHash();
+        } else {
+            return null;
+        }
+        if ($fresh) {
+            return null;
+        }
+        $locked = [];
+        foreach ($lock->packages(true) as $package) {
+            $locked[$package->name()] = true;
+        }
+        $required = $includeDev ? array_merge($this->requires, $this->devRequires) : $this->requires;
+        $missing = array_values(array_unique(array_filter($required, static fn (string $name): bool => !isset($locked[$name]))));
+        sort($missing);
+
+        return $missing;
     }
 
     public function isRead(): bool

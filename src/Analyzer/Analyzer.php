@@ -202,6 +202,10 @@ final class Analyzer
         $graph = DependencyGraph::fromLock($lock, $project, $includeDev);
         $now = $this->clock->now();
         $notes = $lock->skippedNames() === [] ? [] : [RunNote::packageNameInvalid($lock->skippedNames())];
+        $missing = $project->lockOutOfSync($lock, $includeDev);
+        if ($missing !== null) {
+            $notes[] = RunNote::lockOutOfSync($missing);
+        }
         if ($this->offline) {
             $notes[] = RunNote::offline();
         }

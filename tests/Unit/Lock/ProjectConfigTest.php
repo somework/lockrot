@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Lock;
 
+use Composer\Package\Locker;
 use Lockrot\Exception\ConfigException;
+use Lockrot\Lock\LockFile;
 use Lockrot\Lock\OriginFacts;
 use Lockrot\Lock\ProjectConfig;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -29,6 +31,76 @@ final class ProjectConfigTest extends TestCase
         self::assertSame('silent', $cfg->lockrotExtra()['fail-on']);
         self::assertSame('8.1.0', $cfg->platformPhp());
         self::assertSame('^7.4 || ^8.0', $cfg->requirePhp());
+    }
+
+    /**
+     * @param array<string, mixed> $manifest
+     * @param array<string, mixed> $lockExtra
+     * @param list<string>         $locked
+     */
+    private static function outOfSync(array $manifest, array $lockExtra, array $locked, bool $includeDev = false, bool $writeManifest = true): ?array
+    {
+        $dir = sys_get_temp_dir().'/lockrot-sync-'.bin2hex(random_bytes(4));
+        mkdir($dir);
+        $json = (string) json_encode($manifest);
+        $file = $dir.'/composer.json';
+        if ($writeManifest) {
+            file_put_contents($file, $json);
+        }
+        $lock = LockFile::fromArray(array_merge(['packages' => array_map(static fn (string $n): array => ['name' => $n, 'version' => '1.0.0'], $locked)], $lockExtra));
+        $result = ProjectConfig::fromFile($file)->lockOutOfSync($lock, $includeDev);
+        if ($writeManifest) {
+            unlink($file);
+        }
+        rmdir($dir);
+
+        return $result;
+    }
+
+    public function testALockWhoseHashDiffersNamesTheRootRequirementsItLacks(): void
+    {
+        $manifest = ['require' => ['psr/log' => '^3.0', 'psr/container' => '^2.0'], 'require-dev' => ['acme/dev' => '*']];
+        $stale = ['content-hash' => 'deadbeef'];
+
+        self::assertSame(['psr/container'], self::outOfSync($manifest, $stale, ['psr/log']));
+        self::assertSame(['acme/dev', 'psr/container'], self::outOfSync($manifest, $stale, ['psr/log'], true));
+    }
+
+    public function testAPlatformRequirementThatIsNotLockedIsNeverMissing(): void
+    {
+        $manifest = ['require' => ['php' => '>=7.4', 'ext-json' => '*', 'lib-curl' => '*', 'composer-plugin-api' => '^2', 'psr/log' => '^3.0']];
+
+        self::assertSame([], self::outOfSync($manifest, ['content-hash' => 'deadbeef'], ['psr/log']));
+    }
+
+    public function testAChangedConstraintMakesTheLockStaleWithNoMissingName(): void
+    {
+        self::assertSame([], self::outOfSync(['require' => ['psr/log' => '^3.0']], ['content-hash' => 'deadbeef'], ['psr/log']));
+    }
+
+    public function testAFreshLockGivesNoNote(): void
+    {
+        $manifest = ['require' => ['psr/log' => '^3.0']];
+
+        self::assertNull(self::outOfSync($manifest, ['content-hash' => Locker::getContentHash((string) json_encode($manifest))], ['psr/log']));
+    }
+
+    public function testALockOnlyRunGivesNoNote(): void
+    {
+        self::assertNull(self::outOfSync(['require' => ['psr/log' => '^3.0']], ['content-hash' => 'deadbeef'], [], false, false));
+    }
+
+    public function testALockWithNoHashGivesNoNote(): void
+    {
+        self::assertNull(self::outOfSync(['require' => ['psr/log' => '^3.0']], [], []));
+    }
+
+    public function testALockWithOnlyTheLegacyHashIsComparedWithTheFileHash(): void
+    {
+        $manifest = ['require' => ['psr/log' => '^3.0']];
+
+        self::assertNull(self::outOfSync($manifest, ['hash' => md5((string) json_encode($manifest))], ['psr/log']));
+        self::assertSame(['psr/log'], self::outOfSync($manifest, ['hash' => 'deadbeef'], []));
     }
 
     /** `require.php` is read as written. A project that promises no PHP, or an unreadable promise, has none. */
