@@ -503,6 +503,7 @@ final class LockrotConfigTest extends TestCase
         yield 'zero' => ['0', false];
         yield 'prime' => ['prime', true];
         yield 'one' => ['1', true];
+        yield 'false is still a non-empty string' => ['false', true];
         yield 'any other value' => ['true', true];
     }
 
