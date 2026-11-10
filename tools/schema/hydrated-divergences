@@ -68,6 +68,15 @@ function hydrated(string $file): iterable
         if (!\is_array($case) || !\is_array($case['inputs'] ?? null)) {
             continue;
         }
+        // A projection into another tree writes the case documents beside its cases.json, and the clock reads them.
+        $document = \dirname($file, 2).'/schema/documents/cases/'.CaseRecording::fileName(JsonPath::stringAt($case, ['id'])).'.json';
+        if (!\array_key_exists('clock', $case) && is_file($document)) {
+            $case['clock'] = JsonPath::stringAt(JsonPath::decodeFile($document), ['generated_at']);
+        } elseif (!\array_key_exists('clock', $case)) {
+            fwrite(STDERR, JsonPath::stringAt($case, ['id'])."\tnot hydrated: the tree of the cases has no document of the case\n");
+
+            continue;
+        }
         $recording = CaseRecording::of($case);
         yield JsonPath::stringAt($case, ['id']) => HydratedCasesMatchTheModelTest::documentsOf($case, JsonPath::decoded(json_decode($recording->formats()['json'], true, 512, JSON_THROW_ON_ERROR)), JsonPath::decoded(json_decode($recording->explain(), true, 512, JSON_THROW_ON_ERROR)));
     }
