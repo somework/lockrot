@@ -38,6 +38,7 @@ do, what each gap does to findings, and what to do about it.
 | [`ignore_does_not_cover_advisories`](#ignore_does_not_cover_advisories) | An `ignore[]` entry matches a package with a counted advisory | no | None: the advisories count | Accept the advisory in Composer's audit policy, if that is the decision ([accepting advisories](verdicts.md#accepting-advisories)) |
 | [`not_from_composer_repository`](#not_from_composer_repository) | Some packages come from no Composer repository, and lockrot does not check them | no | `from_composer_repository` is false. S10 `not_from_composer_repository` on a vcs or unknown origin | Nothing on the project's side. A `type: composer` repository's operator can make it advertise a notify URL |
 | [`package_name_invalid`](#package_name_invalid) | Some lock entries carry a name that is no Composer package name | no | Those entries get no finding | Check the lock entries that the note's `packages` names |
+| [`lock_out_of_sync`](#lock_out_of_sync) | The lock file does not match composer.json, as `composer install` warns | no | None: lockrot judges the lock as written | Run `composer update` |
 
 ## <a name="reading-a-note"></a>Reading a note {#reading-a-note}
 
@@ -445,6 +446,18 @@ them.
 
 - `data`: `packages`, the names from the lock or the transaction, lowercased as Composer reads them.
 - Findings: the entries have none.
+- `sets_network_failures`: no.
+
+### Lock out of sync {#lock_out_of_sync}
+
+The lock file does not match composer.json: its `content-hash` differs from the hash that Composer
+computes from composer.json, as in `composer install`. lockrot still judges the lock as written. A
+run without composer.json, or a lock without a hash, gets no such note.
+
+- `data`: `missing`, the root requirements that the lock does not hold, sorted. It lists
+  `require-dev` names only when the run reads require-dev, and never a platform requirement. It can
+  be empty: a changed constraint also changes the hash.
+- Findings: none change.
 - `sets_network_failures`: no.
 
 ## Related
