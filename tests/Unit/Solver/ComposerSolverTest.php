@@ -750,6 +750,20 @@ final class ComposerSolverTest extends TestCase
         self::assertSame([true, ['acme/p' => '1.1.0'], ['acme/p', 'acme/q']], [$solution->resolves(), $solution->installs(), $solution->advisoryUnread()]);
     }
 
+    /** A solve that drops acme/q for a release that replaces it does not keep acme/q: the lock no longer holds that name's own package. */
+    public function testASolveDoesNotKeepAPackageThatAReplacingReleaseDrops(): void
+    {
+        $solver = self::solver(
+            ['require' => ['acme/p' => '^1.0', 'acme/q' => '^1.0']],
+            [['name' => 'acme/p', 'version' => '1.0.0'], ['name' => 'acme/q', 'version' => '1.0.0']],
+            ['acme/p' => [['version' => '1.0.0'], ['version' => '1.1.0', 'replace' => ['acme/q' => 'self.version']]], 'acme/q' => [['version' => '1.0.0']]]
+        );
+
+        $solution = $solver->solve(SolveRequest::update(['acme/p' => '^1.1', 'acme/q' => '']));
+
+        self::assertSame([true, ['acme/p' => '1.1.0'], false, true], [$solution->resolves(), $solution->installs(), $solution->keeps('acme/q'), $solution->keeps('acme/p')]);
+    }
+
     /** Composer blocks no release by a name that it only provides, so an unread provided name stays out. */
     public function testASolveLeavesOutTheUnreadNameThatAHeldReleaseOnlyProvides(): void
     {

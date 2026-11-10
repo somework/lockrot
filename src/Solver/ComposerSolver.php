@@ -186,9 +186,11 @@ final class ComposerSolver
 
         // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
         // Composer blocks a release by each name that it replaces too.
-        $held = array_merge([], ...array_map(static fn (BasePackage $package): array => $package->getNames(false), $answer->getNewLockPackages(false)));
+        $lockPackages = $answer->getNewLockPackages(false);
+        $held = array_merge([], ...array_map(static fn (BasePackage $package): array => $package->getNames(false), $lockPackages));
+        $kept = array_map(static fn (BasePackage $package): string => $package->getName(), $lockPackages);
 
-        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), $this->withoutMetUnreached($this->failures($loaded->asked()), $built, $answer), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)), $held);
+        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), $this->withoutMetUnreached($this->failures($loaded->asked()), $built, $answer), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)), $kept);
     }
 
     /**
