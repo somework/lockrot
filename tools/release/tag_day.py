@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Fail a release whose CHANGELOG.md heading names another day than the tag.
 
-    python3 tools/release/tag_day.py <X.Y.Z> <YYYY-MM-DD of the tag>
+    python3 tools/release/tag_day.py <X.Y.Z> <YYYY-MM-DD of the tag> [--warning]
+
+The tag day is the tagger's local day: `git for-each-ref refs/tags/vX.Y.Z --format='%(taggerdate:short)'`.
+With --warning a mismatch is annotated as a warning and the exit code stays 0.
 
 The heading `## [X.Y.Z] - YYYY-MM-DD` is dated on the tag day (CONTRIBUTING, "Cutting a release"),
 and the release notes, the changelog and docs/example-run.md all repeat that day. A tag that slips a
@@ -35,14 +38,15 @@ def problems(changelog: str, version: str, day: str) -> List[str]:
 
 
 def main(argv: List[str]) -> int:
-    if len(argv) != 3:
+    warning = argv[3:] == ['--warning']
+    if len(argv) != (4 if warning else 3):
         print(__doc__.strip().splitlines()[2].strip(), file=sys.stderr)
         return 2
     with open(os.path.join(ROOT, 'CHANGELOG.md'), encoding='utf-8') as handle:
         found = problems(handle.read(), argv[1], argv[2])
     for problem in found:
-        print('::error::' + problem)
-    return 1 if found else 0
+        print('::%s::%s' % ('warning' if warning else 'error', problem))
+    return 1 if found and not warning else 0
 
 
 if __name__ == '__main__':

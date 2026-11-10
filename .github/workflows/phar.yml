@@ -47,6 +47,13 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         env: {GH_TOKEN: '${{ github.token }}'}
         run: tools/report/check-vendored
+      # A pushed v* tag cannot move (the tag ruleset), so a day mismatch only warns here. The
+      # maintainer runs the same check before the push (CONTRIBUTING, "Cutting a release").
+      - name: The CHANGELOG heading is dated on the tag day
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          DAY="$(git for-each-ref "refs/tags/$GITHUB_REF_NAME" --format='%(taggerdate:short)')"
+          python3 tools/release/tag_day.py "${GITHUB_REF_NAME#v}" "$DAY" --warning
       # Every report, explanation, baseline and config names its schema by URL in `$schema`, so the
       # release waits until lockrot.dev serves the schemas that this tag carries. lockrot.dev serves
       # the newest tag's file for a number that a tag publishes, so a release that widens a -2 schema
@@ -182,12 +189,6 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
         with: {name: lockrot.phar, path: build}
-      # The day is the committer date of the tagged commit in UTC. A tag that slips past the
-      # CHANGELOG day needs the date pull request first (CONTRIBUTING, "Cutting a release").
-      - name: The CHANGELOG heading is dated on the tag day
-        run: |
-          DAY="$(TZ=UTC git log -1 --format=%cd --date=format-local:%Y-%m-%d "$GITHUB_REF_NAME")"
-          python3 tools/release/tag_day.py "${GITHUB_REF_NAME#v}" "$DAY"
       - name: The release notes come from the CHANGELOG section of the tag
         run: python3 tools/release/release_notes.py "${GITHUB_REF_NAME#v}" > "$RUNNER_TEMP/notes.md"
       # The TypeScript contract of report-2 ships as release assets only: types/ is export-ignored, so

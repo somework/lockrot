@@ -41,7 +41,8 @@ class TheTagDay(unittest.TestCase):
 
     def test_main_exits_1_on_a_mismatch_and_0_on_a_match(self):
         script = os.path.join(ROOT, 'tools', 'release', 'tag_day.py')
-        day = tag_day.heading_day(open(os.path.join(ROOT, 'CHANGELOG.md'), encoding='utf-8').read(), '0.13.0')
+        with open(os.path.join(ROOT, 'CHANGELOG.md'), encoding='utf-8') as handle:
+            day = tag_day.heading_day(handle.read(), '0.13.0')
 
         match = subprocess.run([sys.executable, script, '0.13.0', day], capture_output=True, text=True)
         mismatch = subprocess.run([sys.executable, script, '0.13.0', '2000-01-01'], capture_output=True, text=True)
@@ -51,6 +52,15 @@ class TheTagDay(unittest.TestCase):
         self.assertEqual(1, mismatch.returncode)
         self.assertIn('::error::', mismatch.stdout)
         self.assertEqual(2, usage.returncode)
+
+    def test_main_with_warning_annotates_a_mismatch_and_exits_0(self):
+        script = os.path.join(ROOT, 'tools', 'release', 'tag_day.py')
+
+        warned = subprocess.run([sys.executable, script, '0.13.0', '2000-01-01', '--warning'], capture_output=True, text=True)
+
+        self.assertEqual(0, warned.returncode)
+        self.assertTrue(warned.stdout.startswith('::warning::'), warned.stdout)
+        self.assertNotIn('::error::', warned.stdout)
 
 
 if __name__ == '__main__':

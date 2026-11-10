@@ -535,16 +535,23 @@ maintainer.
 5. When a schema file changes, `.github/workflows/schemas.yml` asks lockrot.dev to publish it.
    Approve the `schemas` environment of the lockrot.dev run, then check that each new schema URL
    answers (`curl -fsI https://lockrot.dev/schema/<document>-<number>.json`).
-6. When the `ci.yml` push run of the squash commit on `main` passes, tag the commit `vX.Y.Z` and
-   push the tag. If the tag day changed after the merge, tag the commit of the date pull request
+6. When the `ci.yml` push run of the squash commit on `main` passes, tag the commit `vX.Y.Z` with
+   `git tag -a`. Before you push the tag, check that its day is the day of the `## [X.Y.Z]`
+   heading:
+
+    ```bash
+    python3 tools/release/tag_day.py X.Y.Z "$(git for-each-ref refs/tags/vX.Y.Z --format='%(taggerdate:short)')"
+    ```
+
+    If the check fails, delete the local tag, fix the date first, and tag again. Push the tag only
+    when the check passes, because the tag ruleset forbids moving or deleting a pushed `v*` tag.
+    `phar.yml` repeats the check as a warning. Then push the tag. If the tag day changed after the merge, tag the commit of the date pull request
    instead, when its `ci.yml` push run passes. `.github/workflows/phar.yml` refuses these tags:
 
     - a tag that is not on `main`, or whose `ci.yml` push run on `main` did not pass
     - a tag whose vendored renderer is not an attested release
     - a tag whose `-2` schemas lockrot.dev does not serve as the tag holds them
     - a tag whose archive prints another version
-    - a tag whose commit day (UTC) differs from the date of the `## [X.Y.Z]` heading of
-      `CHANGELOG.md` (`tools/release/tag_day.py`)
 
     It builds, signs and attests the PHAR, runs it on PHP 7.4, then publishes the GitHub release
     and asks lockrot.dev to rebuild. Its step "The release notes come from the CHANGELOG section of
