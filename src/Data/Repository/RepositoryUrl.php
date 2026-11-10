@@ -121,6 +121,8 @@ final class RepositoryUrl
      *
      * The text is scanned, not matched as a whole, so its length costs time and never the redaction.
      * A message that PCRE cannot read is {@see WITHHELD}.
+     * A byte that is not valid UTF-8 (a reason phrase, a body cut inside a character) reads as
+     * U+FFFD, so that every JSON format can encode the report.
      */
     public static function inText(string $text): string
     {
@@ -128,7 +130,9 @@ final class RepositoryUrl
         $remotes = $urls === null ? null : preg_replace(self::REMOTE_USER, '', $urls);
         $paths = $remotes === null ? null : self::pathsIn($remotes);
 
-        return $paths ?? self::WITHHELD;
+        $valid = json_decode((string) json_encode($paths ?? self::WITHHELD, \JSON_INVALID_UTF8_SUBSTITUTE));
+
+        return \is_string($valid) ? $valid : self::WITHHELD;
     }
 
     private static function urlsIn(string $text): ?string

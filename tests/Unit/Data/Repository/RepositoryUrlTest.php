@@ -271,4 +271,19 @@ final class RepositoryUrlTest extends TestCase
 
         self::assertSame(RepositoryUrl::WITHHELD, $output);
     }
+
+    public function testAMessageWithInvalidUtf8KeepsItsValidTextAndStaysEncodable(): void
+    {
+        $cut = substr('{"error":"'.str_repeat('a', 189).'Доступ запрещён"}', 0, 200);
+        $phrase = "Server says \xC9rror at https://ci:s3cr3t@repo.acme.test/p";
+
+        foreach ([$cut, $phrase] as $message) {
+            $output = RepositoryUrl::inText($message);
+
+            self::assertSame(1, preg_match('//u', $output), 'valid UTF-8');
+            self::assertNotFalse(json_encode($output));
+        }
+        self::assertStringContainsString("Server says \u{FFFD}rror at https://repo.acme.test/p", RepositoryUrl::inText($phrase));
+        self::assertStringEndsWith(str_repeat('a', 189)."\u{FFFD}", RepositoryUrl::inText($cut));
+    }
 }
