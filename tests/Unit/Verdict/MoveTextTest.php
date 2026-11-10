@@ -132,6 +132,36 @@ final class MoveTextTest extends TestCase
         self::assertStringStartsWith('First set config.platform.php to your PHP 8.4 release: Composer\'s config sets 8.1.0. Raise require.php to >=8.1, then update it with Composer', MoveText::render($move));
     }
 
+    /** @return iterable<string, array{?string, ?string, ?string, string}> */
+    public static function phpSubjects(): iterable
+    {
+        yield 'the branch first' => ['5.x', 'v5.4.52', '^5.4', '; 5.x needs php >=7.2.5'];
+        yield 'the version when no branch' => [null, 'v5.4.52', '^5.4', '; v5.4.52 needs php >=7.2.5'];
+        yield 'the constraint when no branch and no version' => [null, null, '^5.4', '; ^5.4 needs php >=7.2.5'];
+    }
+
+    /**
+     * Ruling W17-X3a: the php clause names `to_branch`, else `latest.version`, else `version`, else `constraint`.
+     *
+     * @dataProvider phpSubjects
+     */
+    #[DataProvider('phpSubjects')]
+    public function testThePhpClauseNamesTheFirstSubjectThatTheMoveHas(?string $toBranch, ?string $version, ?string $constraint, string $clause): void
+    {
+        $subject = new MoveSubject('symfony/monolog-bridge', 'v4.4.0', true, [], '8.4', null);
+        $move = new Move(Move::REQUIRE, FlagSet::LEFT_BEHIND, [], null, null, null, null, $toBranch, $version, $version, $constraint, null, PhpCheck::of('>=7.2.5', new PhpFloor('8.4', '>=7.2.5')), true, [], [], [], [], [], null, [], [], $subject);
+
+        self::assertStringContainsString($clause.', which require.php allows', MoveText::render($move));
+    }
+
+    public function testThePhpClauseIsOmittedWhenTheMoveHasNoSubject(): void
+    {
+        $subject = new MoveSubject('symfony/monolog-bridge', 'v4.4.0', true, [], '8.4', null);
+        $move = new Move(Move::REQUIRE, FlagSet::LEFT_BEHIND, [], null, null, null, null, null, null, null, null, null, PhpCheck::of('>=7.2.5', new PhpFloor('8.4', '>=7.2.5')), true, [], [], [], [], [], null, [], [], $subject);
+
+        self::assertStringNotContainsString('needs php', MoveText::render($move));
+    }
+
     /** The refused tail of the platform step is a sentence too. */
     public function testTheMoveClauseAfterTheRefusedTailStartsWithACapitalLetter(): void
     {

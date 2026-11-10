@@ -404,7 +404,12 @@ final class MoveText
             return '';
         }
         $latest = $move->latest();
-        $text = '; '.($move->toBranch() ?? ($latest === null ? '' : $latest->version())).' needs php '.$requires;
+        // Ruling W17-X3a: the first of to_branch, latest.version, version and constraint.
+        $phpSubject = $move->toBranch() ?? ($latest === null ? null : $latest->version()) ?? $move->version() ?? $move->constraint();
+        if ($phpSubject === null) {
+            return '';
+        }
+        $text = '; '.$phpSubject.' needs php '.$requires;
         if ($check->projectAllows() === true) {
             $text .= ', which require.php allows';
         } elseif ($check->raiseSize() !== null) {
