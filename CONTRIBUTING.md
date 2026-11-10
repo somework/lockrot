@@ -240,6 +240,8 @@ GITHUB_TOKEN=$(gh auth token) bin/record-schema-evolution <version> <YYYY-MM-DD>
 The script verifies the release PHAR before it runs it and refuses a version that is already
 recorded. Then add the version to every per-version constant in `SchemaEvolutionTest`. The
 docblock of each constant says where its value comes from.
+`testTheBaselineAnOlderReleaseWroteIsRefused` needs no change: it expects a refusal for a recorded
+baseline-1 file and a successful read for a recorded baseline-2 file.
 
 ## Curated data
 
