@@ -177,6 +177,24 @@ final class DevInstallMoveTest extends TestCase
         self::assertSame("composer update 'acme/lib:^1.0.9' — clears the advisory; Composer's solver keeps 1.0.0, not 1.0.9, so this command does not reach it", $move->text());
     }
 
+    /** The first resolving form removes the package from the lock: the text names the package, and `installs` is null. */
+    public function testAnUpdateWhoseFirstResolvingFormRemovesThePackageSaysSo(): void
+    {
+        $package = 'acme/lib';
+        $lock = LockFile::fromArray(['packages' => [['name' => $package, 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $remote = [['version' => '1.0.0', 'time' => '2026-01-01T00:00:00+00:00'], ['version' => '1.0.9', 'time' => '2026-02-01T00:00:00+00:00']];
+        $checker = new RecordedMoveChecker(['*' => ['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::INSTALLS_NO_RELEASE, 'installs' => null, 'holds' => []]], []);
+        $advisory = ['id' => 'GHSA-x', 'cve' => null, 'title' => null, 'link' => null, 'reported_at' => null, 'severity' => 'high', 'severity_published' => 'high', 'affected_versions' => '<1.0.5', 'counted' => true, 'points' => 16, 'fix' => ['kind' => 'update'], 'baseline' => null];
+        $signals = [new Signal(Signal::LEVEL_HIGH, '1 advisory', SignalDataStub::of(Signal::S9, ['advisories' => [$advisory], 'releases_read' => true, 'complete' => true]))];
+        $finding = (new FindingBuilder())->withPackage($package)->withVersion('1.0.0')->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, null, [new CountedAdvisory('GHSA-x', 'high', 'update')]))->build();
+        [$context, $row] = self::context($finding, $package, '1.0.0', $lock, $remote, $checker, ['GHSA-x' => '<1.0.5']);
+        [$lower] = $context->lowestAdmitted($row, '^1.0.5');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::UPDATE, FlagSet::VULNERABLE)->to($row, $lower, null), [], Fix::UPDATE, $context);
+
+        self::assertSame("composer update 'acme/lib:^1.0.9' — clears the advisory; Composer's solver removes acme/lib from the lock, not 1.0.9, so this command does not reach it", $move->text());
+    }
+
     /**
      * A recorded check keeps its result: the rule reads only the installs of a live solve, and a
      * recorded answer that names no release is a resolve (SPEC 5.6, `installs`).
