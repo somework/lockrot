@@ -66,7 +66,8 @@ final class CheckOutcome
     /**
      * The move after its joint request ({@see \Lockrot\Verdict\MoveChecks}). The joint
      * solve resolves the move when it installs the moved package inside the move's constraint and
-     * changes a holder's release. The move then has no hold and lists each changed holder. A new
+     * changes a holder's release. The move then has no hold and lists each changed holder. A dev
+     * version of the moved package is no release that the move installs (ruling R17-1). A new
      * install of the same tag is no change, but a branch version can move to another commit.
      * A solve that moves a holder from a release to a dev version does not resolve the move: the
      * advisory blocking of the Composer that runs lockrot can skip a dev version. Nor does a solve that moves a holder below its release: the
@@ -82,7 +83,7 @@ final class CheckOutcome
             return $joint;
         }
         $installs = $joint->changes()[$package] ?? null;
-        if (!$check->isResolved() || $installs === null || !self::satisfies($constraint, $installs)) {
+        if (!$check->isResolved() || !MoveCheck::isRelease($installs) || !self::satisfies($constraint, (string) $installs)) {
             return $this;
         }
         $movesWith = [];

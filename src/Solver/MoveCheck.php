@@ -42,9 +42,10 @@ final class MoveCheck implements \JsonSerializable
     public const SOLVER_ERROR = 'solver_error';
     public const ADVISORY_LOOKUP_INCOMPLETE = 'advisory_lookup_incomplete';
     public const LOCK_DISABLED = 'lock_disabled';
+    public const INSTALLS_NO_RELEASE = 'installs_no_release';
 
     /** The reasons that lockrot writes, in the order that the schema lists them. */
-    public const REASONS = [self::BASELINE_REFUSED, self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NOT_FROM_COMPOSER_REPOSITORY, self::NO_COMPOSER_JSON, self::COMPOSER_JSON_INVALID, self::PLATFORM_CONFIG_INVALID, self::NO_RELEASE_READ, self::PASS_CAP, self::SOLVER_ERROR, self::ADVISORY_LOOKUP_INCOMPLETE, self::LOCK_DISABLED];
+    public const REASONS = [self::BASELINE_REFUSED, self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NOT_FROM_COMPOSER_REPOSITORY, self::NO_COMPOSER_JSON, self::COMPOSER_JSON_INVALID, self::PLATFORM_CONFIG_INVALID, self::NO_RELEASE_READ, self::PASS_CAP, self::SOLVER_ERROR, self::ADVISORY_LOOKUP_INCOMPLETE, self::LOCK_DISABLED, self::INSTALLS_NO_RELEASE];
 
     /** The reasons that leave the baseline itself unchecked (`run.move_check.reason`), in the schema's order. */
     public const BASELINE_REASONS = [self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NO_COMPOSER_JSON, self::COMPOSER_JSON_INVALID, self::PLATFORM_CONFIG_INVALID, self::SOLVER_ERROR, self::LOCK_DISABLED];
@@ -64,6 +65,7 @@ final class MoveCheck implements \JsonSerializable
         self::SOLVER_ERROR => "Composer's solver failed on it",
         self::ADVISORY_LOOKUP_INCOMPLETE => 'the advisory lookup did not cover a package in the result',
         self::LOCK_DISABLED => 'config.lock is false, so Composer ignores composer.lock',
+        self::INSTALLS_NO_RELEASE => 'Composer installs no release of it',
     ];
 
     /** @var self::RESOLVES|self::REFUSED|self::NOT_CHECKED */
@@ -71,6 +73,7 @@ final class MoveCheck implements \JsonSerializable
     private ?string $form;
     private ?string $reason;
     private ?string $installs;
+    private ?string $dev = null;
 
     /** @param self::RESOLVES|self::REFUSED|self::NOT_CHECKED $result */
     private function __construct(string $result, ?string $form, ?string $reason, ?string $installs = null)
@@ -79,6 +82,27 @@ final class MoveCheck implements \JsonSerializable
         $this->form = $form;
         $this->reason = $reason;
         $this->installs = $installs;
+    }
+
+    /**
+     * A check of a move whose every resolving form keeps or installs no release of the moved package:
+     * its locked version, or $dev. A snapshot is no release that a move proposes, and Composer's
+     * advisory blocking skips it (ruling R17-1).
+     *
+     * @param ?string $dev the dev version that the package has after the solve, null when it has none
+     */
+    public static function installsNoRelease(?string $dev): self
+    {
+        $check = new self(self::NOT_CHECKED, null, self::INSTALLS_NO_RELEASE);
+        $check->dev = $dev;
+
+        return $check;
+    }
+
+    /** Whether $version is a release: not null and not a dev version, a branch alias included. */
+    public static function isRelease(?string $version): bool
+    {
+        return $version !== null && VersionParser::parseStability($version) !== 'dev';
     }
 
     /**
@@ -126,6 +150,12 @@ final class MoveCheck implements \JsonSerializable
     public function installs(): ?string
     {
         return $this->installs;
+    }
+
+    /** The dev version that {@see installsNoRelease()} names, null on every other check. */
+    public function dev(): ?string
+    {
+        return $this->dev;
     }
 
     /** The installed release when it sorts below `$newest`, else null: also when either one is missing or does not parse. */

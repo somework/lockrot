@@ -164,7 +164,10 @@ final class MoveText
             case MoveCheck::REFUSED:
                 return "; Composer's solver refuses it against the lock";
             default:
-                return '; not checked with Composer\'s solver ('.MoveCheck::reasonWords((string) $check->reason()).'), so it holds only if Composer resolves it';
+                $dev = $check->dev();
+                $words = $dev === null ? MoveCheck::reasonWords((string) $check->reason()) : 'Composer installs '.$dev.', a dev version';
+
+                return '; not checked with Composer\'s solver ('.$words.'), so it holds only if Composer resolves it';
         }
     }
 

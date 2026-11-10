@@ -232,6 +232,18 @@ final class CheckOutcomeTest extends TestCase
         self::assertSame([MoveCheck::REFUSED, [$hold], []], [$joined->check()->result(), $joined->holds(), $joined->movesWith()]);
     }
 
+    /** Ruling R17-1: the branch alias 2.x-dev lies inside `^2.0`, but a dev version of the moved package is no release that the move installs. */
+    public function testAJointSolveThatInstallsADevVersionOfTheMovedPackageKeepsTheFirstRefusal(): void
+    {
+        $hold = new Holder(Holder::PACKAGE, 'h/x', '1.0.0', Holder::REQUIRE, '^1.0');
+        $outcome = new CheckOutcome(MoveCheck::refused(), [$hold]);
+        $joint = (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE, '2.x-dev')))->withChanges(['acme/lib' => '2.x-dev', 'h/x' => '1.1.0'], ['acme/lib' => '1.0.0', 'h/x' => '1.0.0']);
+
+        $joined = $outcome->joinedWith($joint, 'acme/lib', '^2.0', ['h/x']);
+
+        self::assertSame([MoveCheck::REFUSED, [$hold], []], [$joined->check()->result(), $joined->holds(), $joined->movesWith()]);
+    }
+
     /** R4-2: the joint solve downgrades h/x from 2.0.0 to 1.9.0, so the step that it gives is no update of h/x. */
     public function testAJointSolveThatMovesAHolderBelowItsLockedReleaseKeepsTheFirstRefusal(): void
     {

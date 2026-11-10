@@ -1589,8 +1589,8 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'resolves', 'form' => 'with-dependencies', 'reason' => null, 'installs' => '5.3.9'], $outcome->check()->jsonSerialize());
     }
 
-    /** No form installs a release of the package: the inline form stays, the first on the tie. */
-    public function testWhenNoFormInstallsTheMovedPackageTheInlineFormStays(): void
+    /** Ruling R17-1: every form keeps the locked 5.2.2, so no form installs a release, and the move names no dev version. */
+    public function testWhenNoFormInstallsTheMovedPackageTheMoveIsNotChecked(): void
     {
         $remote = self::webauthnRemote(false);
         $remote['web-auth/webauthn-lib'] = [
@@ -1601,7 +1601,8 @@ final class SolverCheckerTest extends TestCase
 
         $outcome = $checker->check(MoveQuery::update('web-auth/webauthn-lib', '^5.2.0', '5.2.0', null, '5.4.0'));
 
-        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => null], $outcome->check()->jsonSerialize());
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::INSTALLS_NO_RELEASE, 'installs' => null], $outcome->check()->jsonSerialize());
+        self::assertNull($outcome->check()->dev());
     }
 
     /** No form installs a newest release that does not parse: the form that installs the highest release wins. */

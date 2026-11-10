@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Solver;
 
 use Composer\Composer;
+use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
 use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
@@ -204,7 +205,7 @@ final class SolverChecker implements MoveChecker
         if (\in_array($query->package(), $this->notFromComposerRepository, true)) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::NOT_FROM_COMPOSER_REPOSITORY));
         }
-        $tried = $this->forms($query->request(), [$query->package()], $query->newest());
+        $tried = $this->forms($query->request(), [$query->package()], $query->newest(), true);
         if ($tried instanceof CheckOutcome) {
             return $tried;
         }
@@ -234,17 +235,21 @@ final class SolverChecker implements MoveChecker
      * The request as listed, then `-w`, then `-W`, folded into one answer (ruling R6-1). A clean
      * resolve wins: the first form that installs $newest, else the form that installs the highest
      * release, the first on a tie. Else the first form that the budget, Composer or a load stopped
-     * gives its outcome. Only when every form is a clean refusal does the move read refused: a null
-     * form with the last refusal.
+     * gives its outcome. With $release, a form that installs no release of the package (it keeps the
+     * package or installs a dev version) does not resolve. When no other form resolves or stops, the
+     * move reads {@see MoveCheck::installsNoRelease()} (ruling R17-1). Only when every form is a clean
+     * refusal does the move read refused: a null form with the last refusal.
      *
-     * @param non-empty-list<string> $moved the names that the request moves, the move's package first
+     * @param non-empty-list<string> $moved   the names that the request moves, the move's package first
+     * @param bool                   $release whether a form resolves only when it installs a release of the package
      *
      * @return array{0: MoveCheck::INLINE|MoveCheck::WITH_DEPENDENCIES|MoveCheck::WITH_ALL_DEPENDENCIES|null, 1: Solution}|CheckOutcome
      */
-    private function forms(SolveRequest $request, array $moved, ?string $newest = null)
+    private function forms(SolveRequest $request, array $moved, ?string $newest = null, bool $release = false)
     {
         $resolved = null;
         $stopped = null;
+        $noRelease = null;
         $refusal = null;
         // `-W` frees more packages than `-w`, and Composer then blocks more of their locked
         // versions, so `-W` can refuse a move that `-w` resolves: each form is asked in turn.
@@ -254,6 +259,8 @@ final class SolverChecker implements MoveChecker
                 $stopped ??= $solution;
             } elseif (!$solution->resolves()) {
                 $refusal = $solution;
+            } elseif ($release && !MoveCheck::isRelease($solution->installs()[$moved[0]] ?? null)) {
+                $noRelease ??= $solution;
             } elseif (self::installsNewest($solution, $moved[0], $newest)) {
                 return [$form, $solution];
             } elseif ($resolved === null || self::installsHigher($solution, $resolved[1], $moved[0])) {
@@ -261,8 +268,26 @@ final class SolverChecker implements MoveChecker
             }
         }
 
-        // @phpstan-ignore return.type (every form ran, and none resolved or stopped, so each one refused)
+        if ($resolved === null && $stopped === null && $noRelease !== null) {
+            $after = $noRelease->installs()[$moved[0]] ?? $this->lockedVersion($moved[0]);
+
+            return new CheckOutcome(MoveCheck::installsNoRelease($after === null || MoveCheck::isRelease($after) ? null : $after));
+        }
+
+        // @phpstan-ignore return.type (every form ran, and none resolved, stopped or installed no release, so each one refused)
         return $resolved ?? $stopped ?? [null, $refusal];
+    }
+
+    /** The locked version of $package, which a solve that changes nothing of it keeps. */
+    private function lockedVersion(string $package): ?string
+    {
+        foreach ($this->solver->locked()->getPackages() as $locked) {
+            if (!$locked instanceof AliasPackage && $locked->getName() === $package) {
+                return $locked->getPrettyVersion();
+            }
+        }
+
+        return null;
     }
 
     /** Whether the solve installs $newest of $package, or $newest is null. */
