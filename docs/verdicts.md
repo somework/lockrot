@@ -988,10 +988,11 @@ Limits of the check:
   move (`check.reason` `no_release_read`). The commands stay, unless Composer's `config.lock` is
   false.
 - A form resolves a move only when its solve installs a release of the moved package. When each
-  form that resolves keeps the locked version or installs a dev version, such as a branch alias
-  inside the caret at minimum-stability `dev`, the check reads `not_checked` with `check.reason`
-  `installs_no_release`. `check.installs` names the version of the first such form, and the
-  move's text names it beside the newest release.
+  form that resolves keeps the locked version, installs a dev version or removes the package, the
+  check reads `not_checked` with `check.reason` `installs_no_release`. A dev version is, for
+  example, a branch alias inside the caret at minimum-stability `dev`. `check.installs` names the
+  version of the first such form, or is null when that form removes the package. The move's text
+  names it beside the newest release, and `if_applied.assumes` holds `composer_resolves`.
 - It stops a chain of refusals after `Analyzer::CHECK_PASSES` passes. A new request after the
   last one is not checked (`check.reason` `pass_cap`).
 - When Composer's solver fails on a request, the move is not checked (`check.reason`

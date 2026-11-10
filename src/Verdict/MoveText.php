@@ -556,7 +556,7 @@ final class MoveText
                 return 'the packages that hold it may need to move too';
             case Move::CROSSES_MAJOR:
                 $check = $move->check();
-                $solved = $check !== null && $check->result() !== MoveCheck::NOT_CHECKED;
+                $solved = $check !== null && ($check->result() !== MoveCheck::NOT_CHECKED || $check->installsNoReleaseOfIt());
 
                 return (strpos((string) $move->toBranch(), '0.') === 0 ? 'a new 0.x line (Composer treats 0.x minors as breaking)' : 'a new major').' brings its own requirements'.($solved ? '' : ', which lockrot does not solve');
             case Move::TRANSITIVE:

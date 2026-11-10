@@ -65,7 +65,7 @@ final class MoveCheck implements \JsonSerializable
         self::SOLVER_ERROR => "Composer's solver failed on it",
         self::ADVISORY_LOOKUP_INCOMPLETE => 'the advisory lookup did not cover a package in the result',
         self::LOCK_DISABLED => 'config.lock is false, so Composer ignores composer.lock',
-        self::INSTALLS_NO_RELEASE => "Composer's solver installs no release of it",
+        self::INSTALLS_NO_RELEASE => "Composer's solver does not reach the release",
     ];
 
     /** @var self::RESOLVES|self::REFUSED|self::NOT_CHECKED */

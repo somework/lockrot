@@ -450,8 +450,8 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString(" 3 of 3 · composer update (lowest fix); after it: 0, ok, if Composer resolves it\n", $text);
     }
 
-    /** Ruling R17-1: a row whose every form installs no release names that, not the caveat. */
-    public function testARowWhoseMoveInstallsNoReleaseSaysSoInPlaceOfTheCaveat(): void
+    /** Rulings R17-1 and R17-Q1: the score after a move that reaches no release holds only if Composer resolves it. */
+    public function testARowWhoseMoveInstallsNoReleaseKeepsTheCaveatAndSaysSo(): void
     {
         $case = CaseHydrator::case('E');
         $package = JsonPath::stringAt($case, ['finding', 'package']);
@@ -467,7 +467,7 @@ final class ExplainFormatterTest extends TestCase
 
         $text = self::plain(new Explanation($finding->withMoves($noRelease), $facts, new Thresholds(), '8.4', $analysis->report()));
 
-        self::assertStringContainsString(" 3 of 3 · composer update (lowest fix); after it: 0, ok; Composer's solver installs no release of it\n", $text);
+        self::assertStringContainsString(" 3 of 3 · composer update (lowest fix); after it: 0, ok, if Composer resolves it; Composer's solver does not reach the release\n", $text);
     }
 
     public function testJsonCarriesTheEnvelopeAndTheExplanation(): void

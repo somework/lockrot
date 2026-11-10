@@ -61,7 +61,7 @@ final class MoveCheckTest extends TestCase
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::INSTALLS_NO_RELEASE, 'installs' => '1.0.0'], $check->jsonSerialize());
         self::assertNull($check->installsBelow('1.0.9'));
         self::assertNull(MoveCheck::installsNoRelease('9.0.0')->installsAbove('1.0.9'));
-        self::assertSame("Composer's solver installs no release of it", MoveCheck::reasonWords(MoveCheck::INSTALLS_NO_RELEASE));
+        self::assertSame("Composer's solver does not reach the release", MoveCheck::reasonWords(MoveCheck::INSTALLS_NO_RELEASE));
     }
 
     /** SPEC §7.9.21 holds the words, and the update-now note of §6.2 reads them. */

@@ -16,6 +16,7 @@ use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Score\CountedAdvisory;
+use Lockrot\Score\IfApplied;
 use Lockrot\Security\Fix;
 use Lockrot\Security\FixFinder;
 use Lockrot\Security\LinkIndex;
@@ -157,6 +158,7 @@ final class DevInstallMoveTest extends TestCase
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::INSTALLS_NO_RELEASE, 'installs' => 'dev-main'], $check->jsonSerialize());
         self::assertSame($commands, $move->commands());
         self::assertStringEndsWith("; Composer's solver installs dev-main, a dev version, not 2.0.0, so this command does not reach a release", $move->text());
+        self::assertStringNotContainsString('which lockrot does not solve', $move->text(), 'the solver ran on the move');
     }
 
     /** Every form keeps the locked release 1.0.0: the text says that the command does not reach the newest, and names no dev version. */
@@ -175,6 +177,9 @@ final class DevInstallMoveTest extends TestCase
         $move = MoveBuilder::build(MoveDraft::of(Move::UPDATE, FlagSet::VULNERABLE)->to($row, $lower, null), [], Fix::UPDATE, $context);
 
         self::assertSame("composer update 'acme/lib:^1.0.9' — clears the advisory; Composer's solver keeps 1.0.0, not 1.0.9, so this command does not reach it", $move->text());
+        $ifApplied = $move->ifApplied();
+        self::assertNotNull($ifApplied);
+        self::assertContains(IfApplied::COMPOSER_RESOLVES, $ifApplied->assumes(), 'the score after the move assumes the release that the solver does not install');
     }
 
     /** The first resolving form removes the package from the lock: the text names the package, and `installs` is null. */
