@@ -717,7 +717,8 @@ writes the move as `next_step`. Abridged from a recorded run on wallabag's lock:
 
 - **The release of a test.** `latest` of a `test` move is the first of these that applies:
 
-    1. S6's `last_stable_version`, when it is above the installed version.
+    1. The newest tag, a pre-release included, when it is above the installed version. It is
+       the highest tag when that tag has no trusted date, else the newest tag by date.
     2. The highest stable tag, with its own trusted date or null, when it is above the installed
        version.
     3. The installed release, with `is_installed` true and the date that [S5](#old-promise) reads

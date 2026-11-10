@@ -144,18 +144,6 @@ final class MoveContext
         return null;
     }
 
-    /** The S6 version ({@see PackageMetadata::lastStableVersion()}), null without metadata. */
-    public function lastStableVersion(): ?string
-    {
-        return $this->metadata === null ? null : $this->metadata->lastStableVersion();
-    }
-
-    /** The `require.php` of the S6 version, null without metadata or with no requirement. */
-    public function lastStablePhp(): ?string
-    {
-        return $this->metadata === null ? null : $this->metadata->lastStablePhp();
-    }
-
     /** {@see PackageMetadata::newestTagVersion()}, null without metadata. */
     public function newestTagVersion(): ?string
     {
@@ -170,13 +158,6 @@ final class MoveContext
     public function newestTagPhp(): ?string
     {
         return $this->metadata === null ? null : $this->metadata->newestTagPhp();
-    }
-
-    public function lastStableReleased(): ?string
-    {
-        $at = $this->metadata === null ? null : $this->metadata->lastStableReleaseAt();
-
-        return $at === null ? null : $at->format(\DATE_ATOM);
     }
 
     public function fixes(): ?PackageFixes

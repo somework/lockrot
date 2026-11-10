@@ -336,6 +336,30 @@ final class MaintenanceMoveTest extends TestCase
         self::assertSame([Move::TAG, 'v1.0.0-beta1', '2025-06-01T00:00:00+00:00', 'newer', false], [$draft->kind(), $latest->version(), $latest->released(), $latest->relation(), $latest->isInstalled()]);
     }
 
+    /** Ruling W17-X1 reads S6 from stable tags only. The test move still names the newest tag, a pre-release included. */
+    public function testAnOldPromiseTestMoveNamesANewerPreReleaseAsTheNewestRelease(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'time' => '2018-08-10T00:00:00+00:00', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $locked = $lock->find('a/b');
+        self::assertNotNull($locked);
+        $packages = [];
+        foreach (['1.0.0' => '2018-08-10T00:00:00+00:00', 'v2.0.0-beta.1' => '2026-03-21T00:00:00+00:00'] as $version => $time) {
+            $release = (new ArrayLoader())->load(['name' => 'a/b', 'version' => $version, 'time' => $time, 'require' => ['php' => '>=5.6']]);
+            self::assertInstanceOf(BasePackage::class, $release);
+            $packages[] = $release;
+        }
+        $facts = new PackageFacts($locked, PackageMetadata::fromPackages('a/b', $packages, new \DateTimeImmutable(self::NOW), '1.0.0'), null, []);
+        $floor = new PhpFloor('8.4');
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
+        $context = new MoveContext($finding, new MoveSubject('a/b', '1.0.0', true, [], '8.4', null), $facts->metadata(), BranchRow::all($facts, $floor, Clock::fixed(self::NOW)), null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true);
+
+        $draft = MaintenanceMove::draft($context, FlagSet::OLD_PROMISE);
+        $latest = $draft->latest();
+
+        self::assertNotNull($latest);
+        self::assertSame([Move::TEST, 'v2.0.0-beta.1', '2026-03-21T00:00:00+00:00', false], [$draft->kind(), $latest->version(), $latest->released(), $latest->isInstalled()]);
+    }
+
     /** @return iterable<string, array{string, string, ?string, string, string}> */
     public static function unreadRows(): iterable
     {

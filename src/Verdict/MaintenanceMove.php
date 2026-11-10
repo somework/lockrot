@@ -168,9 +168,11 @@ final class MaintenanceMove
             }
         }
         $installedVersion = $context->subject()->version();
-        $newestVersion = $context->lastStableVersion();
+        $newestVersion = $context->newestTagVersion();
         if ($newestVersion !== null && self::isAboveVersion($newestVersion, $installedVersion)) {
-            return MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE)->withLatest(new Latest($newestVersion, $context->lastStableReleased(), false, null, null), null);
+            $released = $context->newestTagReleasedAt();
+
+            return MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE)->withLatest(new Latest($newestVersion, $released === null ? null : $released->format(\DATE_ATOM), false, null, null), null);
         }
         $highest = $context->rows()[0] ?? null;
         if ($highest !== null && self::isAboveVersion($highest->highest(), $installedVersion)) {
