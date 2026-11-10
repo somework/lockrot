@@ -21,6 +21,7 @@ use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\NetworkCancelledException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -771,6 +772,28 @@ final class RepositoryMetadataLoaderTest extends TestCase
 
             self::assertSame(self::CHUNK_FAILURE, $failed[$names[0]] ?? null);
             self::assertSame(MetadataFailure::FETCH_FAILED, MetadataFailure::reason($failed[$names[0]]));
+        } finally {
+            $server->stop();
+        }
+    }
+
+    /**
+     * Without a cached root packages.json, Composer cancels the request with status 499 and the
+     * message "Network disabled": that is the offline case, not a failed fetch.
+     */
+    public function testOfflineACancelledRequestReadsOfflineAndOnlineItReadsFetchFailed(): void
+    {
+        $server = FixtureRepositoryServer::fromLockFiles([self::WALLABAG_LOCK]);
+        $server->start();
+        try {
+            $name = $this->wallabagNames()[0];
+            $repository = $this->repositoryFailingFor($server, $name, 'Network disabled, request canceled: https://repo.packagist.org/packages.json', NetworkCancelledException::class);
+
+            $offline = (new RepositoryMetadataLoader([$repository], Clock::fixed(self::FIXED), true))->load(self::names([$name]))->failed();
+            $online = (new RepositoryMetadataLoader([$repository], Clock::fixed(self::FIXED)))->load(self::names([$name]))->failed();
+
+            self::assertSame(MetadataFailure::OFFLINE, MetadataFailure::reason($offline[$name] ?? null));
+            self::assertSame(MetadataFailure::FETCH_FAILED, MetadataFailure::reason($online[$name] ?? null));
         } finally {
             $server->stop();
         }

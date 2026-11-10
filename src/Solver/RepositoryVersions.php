@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
+use Composer\Downloader\TransportException;
 use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
 use Composer\Package\Version\StabilityFilter;
@@ -197,6 +198,7 @@ final class RepositoryVersions implements VersionSource
     private function loadOne(string $name): array
     {
         $failed = false;
+        $cancelledOnly = true;
         $hidden = false;
         $loaded = [];
         foreach ($this->repositories as $repository) {
@@ -229,6 +231,8 @@ final class RepositoryVersions implements VersionSource
                     return $this->overBudget([$name => null]);
                 }
                 $failed = true;
+                // Composer cancels a request with 499 when the network is disabled.
+                $cancelledOnly = $cancelledOnly && $e instanceof TransportException && $e->getStatusCode() === 499;
                 // Composer aborts on a failed canonical repository. A repository that lists the name answers for it:
                 // its tags without its dev versions are no answer.
                 if ($versions !== [] || self::isCanonical($repository)) {
@@ -242,7 +246,7 @@ final class RepositoryVersions implements VersionSource
             }
         }
         if ($failed) {
-            $this->failures[$name] = self::FAILED;
+            $this->failures[$name] = $this->offline && $cancelledOnly ? self::OFFLINE : self::FAILED;
 
             return [];
         }
