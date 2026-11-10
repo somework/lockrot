@@ -12,6 +12,7 @@ use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Clock;
+use Lockrot\Composer\ComposerHttpClient;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
@@ -721,6 +722,30 @@ final class AnalyzerTest extends TestCase
         self::assertTrue($report->hadNetworkFailures());
     }
 
+
+    public function testActivityRequestsThatTheBudgetStoppedBeforeTheyStartedReadAsTheBudgetCause(): void
+    {
+        $stopped = new class () implements HttpClientInterface {
+            public function fetchAll(array $urls, array $headers = []): array
+            {
+                $out = [];
+                foreach ($urls as $url) {
+                    $out[$url] = HttpResult::failure($url, ComposerHttpClient::BUDGET_SPENT, new \DateTimeImmutable('2026-09-14T06:00:00+00:00'));
+                }
+
+                return $out;
+            }
+        };
+        $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/pkg', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+
+        $report = $this->analyzer($this->loader(['vendor/pkg' => $this->ancient()]), $stopped, true, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
+
+        $notes = implode("\n", $report->notes());
+        self::assertStringNotContainsString('unreachable', $notes);
+        self::assertContains('repository activity not checked: install-time budget exhausted', $report->notes());
+        $s10 = array_values(array_filter($report->findings()[0]->signals(), static fn ($s): bool => $s->id() === 'S10'));
+        self::assertStringContainsString('the install-time budget ran out', $s10[0]->summary());
+    }
 
     public function testAllowlistAccessorReturnsConstructorValue(): void
     {

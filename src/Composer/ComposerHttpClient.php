@@ -31,6 +31,9 @@ use Lockrot\Deadline;
  */
 final class ComposerHttpClient implements HttpClientInterface
 {
+    /** The error of a request that the install-time budget stopped before it began: no host failed, so the cause is the budget. */
+    public const BUDGET_SPENT = 'install-time budget spent';
+
     public const DEFAULT_TIMEOUT = 10;
     /** Composer's own cap on the hops of one request. */
     private const MAX_REDIRECTS = 20;
@@ -247,7 +250,7 @@ final class ComposerHttpClient implements HttpClientInterface
             $this->run($starts);
         }
         foreach ($stopped as $url) {
-            $results[$url] = HttpResult::failure($url, 'install-time budget spent', $this->clock->now());
+            $results[$url] = HttpResult::failure($url, self::BUDGET_SPENT, $this->clock->now());
         }
         foreach ($urls as $url) {
             if (!isset($results[$url])) {
@@ -348,7 +351,7 @@ final class ComposerHttpClient implements HttpClientInterface
         for ($hop = 0; $hop <= self::MAX_REDIRECTS && $target !== ''; ++$hop) {
             // Each request blocks until it ends, so it takes only what the install-time budget has left.
             if ($this->deadline->isPast()) {
-                $results[$url] = HttpResult::failure($url, 'install-time budget spent', $this->clock->now());
+                $results[$url] = HttpResult::failure($url, self::BUDGET_SPENT, $this->clock->now());
 
                 return;
             }
