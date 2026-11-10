@@ -59,7 +59,7 @@ function text($value): string
 }
 
 /**
- * Each hydrated case of $file with lockrot's documents of it, hydrated now.
+ * Each hydrated case of $file with lockrot's documents of it, hydrated in this run.
  *
  * @return iterable<string, array{array<mixed, mixed>, array<mixed, mixed>}>
  */
