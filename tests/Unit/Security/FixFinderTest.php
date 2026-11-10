@@ -580,7 +580,20 @@ final class FixFinderTest extends TestCase
         $gets = $finder->find($facts)->gets();
 
         self::assertNotNull($gets);
-        self::assertSame([null, true], [$gets->version(), $gets->phpCheck()->targetRuns()]);
+        self::assertSame([true, null], [$gets->isCapped(), $gets->version()]);
+        $lower = $gets->at('1.1.0');
+        self::assertSame(['1.1.0', '>=7.4', ['A'], true], [$lower->version(), $lower->phpCheck()->requires(), $lower->clears(), $lower->clearsAll()]);
+    }
+
+    /** `at()` gives the facts of each release above the installed one, and a release that the scan does not know keeps the picked facts. */
+    public function testGetsAtAReleaseGivesThatReleasesOwnFacts(): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4 <8.5'], ['1.2.0', '>=8.1']], ['A' => '<1.1.0']);
+        $gets = (new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::empty())))->find($facts)->gets();
+        self::assertNotNull($gets);
+
+        self::assertSame(['1.2.0', false, '>=7.4 <8.5'], [$gets->version(), $gets->isCapped(), $gets->at('v1.1.0')->phpCheck()->requires()]);
+        self::assertSame(['9.0.0', '>=8.1'], [$gets->at('9.0.0')->version(), $gets->at('9.0.0')->phpCheck()->requires()]);
     }
 
     /** The php check of `gets` reads the php of the release that `gets` names, not the branch's newest. */

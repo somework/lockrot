@@ -224,30 +224,59 @@ final class FindingDetailsTest extends TestCase
         ], JsonPath::decoded($security['gets']));
     }
 
-    /** @return iterable<string, array{?MoveCheck, ?string}> */
+    /** @return iterable<string, array{?MoveCheck, ?array{version: string, requires: string, clears: list<mixed>}}> */
     public static function checksOfACappedGets(): iterable
     {
-        yield 'a resolving solve names the release that it installs' => [MoveCheck::resolves(MoveCheck::INLINE, '1.2.0'), '1.2.0'];
+        yield 'a resolving solve names the release that it installs, with its own php and clears' => [MoveCheck::resolves(MoveCheck::INLINE, '1.1.0'), ['version' => '1.1.0', 'requires' => '>=7.4 <8.5', 'clears' => []]];
         yield 'a refused solve leaves no release' => [MoveCheck::refused(), null];
         yield 'no check leaves no release' => [null, null];
     }
 
     /**
-     * MODEL r16: when a refusal caps every release, a checked solve that installs a release
-     * outranks the caps (ruling R2-1). Without one, `gets` is null.
+     * When a refusal caps every release, a checked solve that installs a release outranks the caps
+     * (ruling R2-1), and `gets` describes that release. Without one, `gets` is null.
+     *
+     * @param ?array{version: string, requires: string, clears: list<mixed>} $expected
      */
     #[DataProvider('checksOfACappedGets')]
-    public function testACheckedSolveOutranksTheCapsOfEveryRelease(?MoveCheck $check, ?string $version): void
+    public function testACheckedSolveOutranksTheCapsOfEveryRelease(?MoveCheck $check, ?array $expected): void
+    {
+        $gets = self::getsOf(Gets::capped(self::php('>=8.1'))->withReleases(self::releases()), $check);
+
+        self::assertSame($expected, $gets === null ? null : ['version' => JsonPath::stringAt($gets, ['version']), 'requires' => JsonPath::stringAt($gets, ['php_check', 'requires']), 'clears' => array_column(JsonPath::arrayAt($gets, ['clears']), 'id')]);
+    }
+
+    /** Case mc-split‡: the solve installs 1.1.0 below the newest 1.2.0, so `gets` gives the php and the clears of 1.1.0. */
+    public function testASolveBelowTheNewestDescribesTheReleaseThatItInstalls(): void
+    {
+        $gets = self::getsOf((new Gets('1.2.0', self::php('>=8.1'), ['PKSA-a'], true))->withReleases(self::releases()), MoveCheck::resolves(MoveCheck::INLINE, '1.1.0'));
+
+        self::assertNotNull($gets);
+        self::assertSame(['1.1.0', '>=7.4 <8.5', [], false], [$gets['version'], JsonPath::stringAt($gets, ['php_check', 'requires']), $gets['clears'], $gets['clears_all']]);
+    }
+
+    /** @return array<string, Gets> by normalized version */
+    private static function releases(): array
+    {
+        return ['1.1.0.0' => new Gets('1.1.0', self::php('>=7.4 <8.5'), [], false), '1.2.0.0' => new Gets('1.2.0', self::php('>=8.1'), ['PKSA-a'], true)];
+    }
+
+    private static function php(string $requires): PhpCheck
+    {
+        return PhpCheck::of($requires, new PhpFloor('8.4', '>=7.4'));
+    }
+
+    /** @return ?array<mixed, mixed> the `security.gets` of $gets, with $check as the installed row's check */
+    private static function getsOf(Gets $gets, ?MoveCheck $check): ?array
     {
         $branch = new BranchFixes('1.x', true, 0, 1, new Candidate(new StableRelease('1.2.0.0', '1.2.0', null, '>=8.1', false), '1', Fix::UPGRADE, []), '1.2.0', ['PKSA-a']);
-        $capped = new Gets(null, PhpCheck::of('>=8.1', new PhpFloor('8.4', '>=8.1')), ['PKSA-a'], true);
-        $details = (new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$branch], $capped, null, null), FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null))
+        $details = (new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$branch], $gets, null, null), FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null))
             ->withMoves(new Moves(null, null, null, null, [], $check === null ? [] : ['1.x' => $check]));
         $rows = self::rows([['id' => 'PKSA-a', 'severity' => 'medium', 'fix' => ['kind' => 'upgrade', 'on_installed_branch' => true]]]);
 
-        $gets = $details->toSecurityArray($rows, '1.x')['gets'];
+        $security = JsonPath::decoded($details->toSecurityArray($rows, '1.x'));
 
-        self::assertSame($version === null ? null : ['version' => $version], $gets === null ? null : ['version' => JsonPath::decoded($gets)['version']]);
+        return \is_array($security['gets'] ?? null) ? $security['gets'] : null;
     }
 
     /** Without the scan, the S9 rows give the branch row: each row on the branch is fixed, each without a kind is not known. */
