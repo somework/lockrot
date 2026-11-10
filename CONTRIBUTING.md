@@ -390,6 +390,10 @@ maintainer.
       an X.0 release before its day, so add an X.0 date only after that release. Check the file
       before you record `docs/example-run.md`.
 
+    - Refresh `resources/monorepo-parents.json` with `bin/refresh-monorepo-parents`. It rereads the
+      `replace` list of each listed monorepo from Packagist. Commit the file when the diff adds a
+      split package. A package that the file does not list cannot be dated from its parent.
+
     - Re-record `docs/example-run.md` after the version bump. Build the PHAR from the release
       branch, so that it prints the new version ([The PHAR](#the-phar)):
       `GITHUB_TOKEN=<token> python3 tools/release/example_run.py build/lockrot.phar <planned tag day>`.
