@@ -1507,20 +1507,10 @@
     },
     "data_date": "2026-10-22T00:00:00+00:00",
     "notes": [
-        "lock: the lock file does not match composer.json: run composer update",
         "Repository activity not checked for 11 packages on hosts lockrot cannot ask: git.drupalcode.org (11). A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host.",
         "moves not checked: Composer's solver refuses the lock itself at php 8.3.99, so it would refuse every move: laminas/laminas-diactoros 2.8.0 requires php ^7.3 || ~8.0.0 || ~8.1.0."
     ],
     "note_details": [
-        {
-            "code": "lock_out_of_sync",
-            "text": "lock: the lock file does not match composer.json: run composer update",
-            "docs_url": "https://lockrot.dev/notes/#lock_out_of_sync",
-            "sets_network_failures": false,
-            "data": {
-                "missing": []
-            }
-        },
         {
             "code": "repository_activity_host_not_supported",
             "text": "Repository activity not checked for 11 packages on hosts lockrot cannot ask: git.drupalcode.org (11). A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host.",
