@@ -90,7 +90,7 @@ final class LockrotConfig
             $failOn,
             $targetPhp,
             $includeDev,
-            ($cli['offline'] ?? null) === true || self::isNetworkDisabledByEnvironment($env),
+            ($cli['offline'] ?? null) === true || self::isNetworkDisabledBy($env['COMPOSER_DISABLE_NETWORK'] ?? null),
             ($cli['strict-network'] ?? null) === true,
             $format,
             self::resolveBaseline($extra, $cli),
@@ -133,12 +133,10 @@ final class LockrotConfig
      * takes it: any value but empty or `0`, `prime` included, turns the network off, so the run
      * reads as `--offline`.
      *
-     * @param array<string, mixed> $env
+     * @param mixed $value the value of COMPOSER_DISABLE_NETWORK, false or null when it is not set
      */
-    public static function isNetworkDisabledByEnvironment(array $env): bool
+    public static function isNetworkDisabledBy($value): bool
     {
-        $value = $env['COMPOSER_DISABLE_NETWORK'] ?? '';
-
         return \is_string($value) && $value !== '' && $value !== '0';
     }
 

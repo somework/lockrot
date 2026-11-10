@@ -204,7 +204,7 @@ final class SelfUpdateCommand extends BaseCommand
      */
     private static function networkDisabled(): bool
     {
-        return LockrotConfig::isNetworkDisabledByEnvironment(['COMPOSER_DISABLE_NETWORK' => Platform::getEnv('COMPOSER_DISABLE_NETWORK')]);
+        return LockrotConfig::isNetworkDisabledBy(Platform::getEnv('COMPOSER_DISABLE_NETWORK'));
     }
 
     /**
