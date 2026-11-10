@@ -131,6 +131,22 @@ final class CaseHydratorTest extends TestCase
         self::assertSame([], $finding['checks_missing']);
     }
 
+    /** Case feeds-drupal‡: the root's composer repository answers before packagist, with its own records. */
+    public function testAnAnsweredFeedBesidePackagistHydratesFirstWithItsRecords(): void
+    {
+        $case = CaseHydrator::case('feeds-drupal‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $root = ['repositories' => [['type' => 'composer', 'url' => 'https://packages.drupal.org/8']]] + JsonPath::arrayAt($inputs, ['root']);
+        $run = ['advisory_answers' => [['composer_repository' => 'composer repo (https://packages.drupal.org/8)', 'records' => 0]]] + JsonPath::arrayAt($inputs, ['run']);
+        $case = ['inputs' => ['root' => $root, 'run' => $run] + $inputs] + $case;
+
+        $report = JsonPath::decoded(CaseHydrator::report($case)->toArray());
+        $finding = self::hydratedFinding($case);
+
+        self::assertSame(JsonPath::arrayAt($case, ['finding', 'security', 'feeds']), JsonPath::arrayAt($finding, ['security', 'feeds']));
+        self::assertSame(JsonPath::arrayAt($case, ['run', 'advisory_lookup', 'repositories']), JsonPath::arrayAt($report, ['run', 'advisory_lookup', 'repositories']));
+    }
+
     /**
      * @param array<mixed, mixed> $case
      *

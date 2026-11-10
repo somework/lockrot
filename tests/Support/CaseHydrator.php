@@ -428,7 +428,7 @@ final class CaseHydrator
             SignalSet::default($clock, new Thresholds(), $targetPhp, PhpReleaseDates::load(), $projectPhp, $lock->platform()['php'] ?? null),
             $clock,
             ($activity['reason'] ?? null) === NotCheckedRule::OFFLINE,
-            self::advisoryLoader($packages, self::advisories(\is_array($inputs['other_advisories'] ?? null) ? $inputs['other_advisories'] : []), \is_string($run['advisories_unchecked'] ?? null) ? $run['advisories_unchecked'] : null, self::advisoryFailures($run)),
+            self::advisoryLoader($packages, self::advisories(\is_array($inputs['other_advisories'] ?? null) ? $inputs['other_advisories'] : []), \is_string($run['advisories_unchecked'] ?? null) ? $run['advisories_unchecked'] : null, self::advisoryFailures($run), self::advisoryAnswers($run)),
             null,
             self::abandonedIgnore(\is_array($inputs['abandoned_ignore'] ?? null) ? $inputs['abandoned_ignore'] : null)
         );
@@ -924,6 +924,22 @@ final class CaseHydrator
     }
 
     /**
+     * @param array<mixed, mixed> $run
+     *
+     * @return array<string, int> the records of the case package in each answered repository beside packagist, by repository
+     */
+    private static function advisoryAnswers(array $run): array
+    {
+        $answers = [];
+        foreach (\is_array($run['advisory_answers'] ?? null) ? $run['advisory_answers'] : [] as $answer) {
+            self::assertArray($answer);
+            $answers[JsonPath::stringAt($answer, ['composer_repository'])] = JsonPath::intAt($answer, ['records']);
+        }
+
+        return $answers;
+    }
+
+    /**
      * Each package's counted advisories, the ignored ones and the feeds' records: `records` counts
      * every advisory of the name on any version, else the advisories given count.
      *
@@ -931,11 +947,13 @@ final class CaseHydrator
      * @param list<Advisory>                                                                                 $others    those on other versions of the case's package
      * @param ?string                                                                                        $unchecked why the lookup did not complete, null when it answered. Packagist answers a `lookup_failed` lookup, because another repository failed
      * @param list<array{composer_repository: string, reason: string, message: ?string}>                   $failures  the repositories that failed beside the answered packagist one, as the model's run lists them
+     * @param array<string, int>                                                                             $answers   the case package's records in each answered repository beside packagist, which packagist does not hold
      */
-    private static function advisoryLoader(array $packages, array $others, ?string $unchecked, array $failures): AdvisoryLoaderInterface
+    private static function advisoryLoader(array $packages, array $others, ?string $unchecked, array $failures, array $answers = []): AdvisoryLoaderInterface
     {
         $repository = 'composer repo (https://repo.packagist.org)';
-        $answers = $unchecked === null || $unchecked === AdvisoryCoverage::LOOKUP_FAILED;
+        $answered = $unchecked === null || $unchecked === AdvisoryCoverage::LOOKUP_FAILED;
+        $own = $answers;
         $failedFeeds = array_map(static fn (array $failure): AdvisoryFeed => AdvisoryFeed::failed($failure['composer_repository'], $failure['message']), $failures);
         $counted = [];
         $ignored = [];
@@ -947,15 +965,25 @@ final class CaseHydrator
             $all = array_merge($facts['advisories'], $others);
             $others = [];
             $records = $facts['records'] ?? \count(array_unique(array_map(static fn (Advisory $advisory): string => $advisory->id(), $all)));
-            $total += $records;
-            $withRecords += $records === 0 ? 0 : 1;
-            $names[$name] = new AdvisoryNameCoverage($answers ? array_merge($failedFeeds, [AdvisoryFeed::answered($repository, $records)]) : [], $answers ? $records : null, $unchecked);
+            $answeredFeeds = [];
+            foreach (array_keys($answers) as $other) {
+                $answeredFeeds[] = AdvisoryFeed::answered($other, $own[$other] ?? 0);
+            }
+            $packagist = $records - array_sum($own);
+            $own = [];
+            $total += $packagist;
+            $withRecords += $packagist === 0 ? 0 : 1;
+            $names[$name] = new AdvisoryNameCoverage($answered ? array_merge($failedFeeds, $answeredFeeds, [AdvisoryFeed::answered($repository, $packagist)]) : [], $answered ? $records : null, $unchecked);
             $counted += $facts['advisories'] === [] ? [] : [$name => $facts['advisories']];
             $ignored += $facts['ignored'] === [] ? [] : [$name => $facts['ignored']];
             $every += $all === [] ? [] : [$name => $all];
         }
         $failed = array_map(static fn (array $failure): AdvisoryRepository => AdvisoryRepository::of($failure['composer_repository'], AdvisoryRepository::FAILED, $failure['reason'], $failure['message']), $failures);
-        $repositories = array_merge($failed, [$answers ? AdvisoryRepository::of($repository, AdvisoryRepository::ANSWERED)->withRecords($total, $withRecords) : AdvisoryRepository::of($repository, AdvisoryRepository::NOT_ASKED, $unchecked)]);
+        $besides = [];
+        foreach ($answers as $other => $count) {
+            $besides[] = AdvisoryRepository::of($other, AdvisoryRepository::ANSWERED)->withRecords($count, $count === 0 ? 0 : 1);
+        }
+        $repositories = array_merge($failed, $besides, [$answered ? AdvisoryRepository::of($repository, AdvisoryRepository::ANSWERED)->withRecords($total, $withRecords) : AdvisoryRepository::of($repository, AdvisoryRepository::NOT_ASKED, $unchecked)]);
         $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, $repositories, 0, $names);
         $notes = array_map(static fn (array $failure): RunNote => RunNote::advisoriesUnavailable(
             $failure['composer_repository'],

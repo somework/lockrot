@@ -133,6 +133,28 @@ class ACaseWithoutBranchRowsHydratesFromItsRunReleases(unittest.TestCase):
 
         self.assertNotIn('advisory_failures', inputs['run'])
 
+    def test_the_root_repositories_of_the_run_inputs_join_the_root(self):
+        drupal = {'type': 'composer', 'url': 'https://packages.drupal.org/8'}
+
+        inputs = project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN, 'run_inputs': {'_releases': self.RELEASES, '_root_repositories': [drupal]}})
+
+        self.assertEqual([drupal], inputs['root']['repositories'])
+
+    def test_an_answered_feed_beside_packagist_joins_the_run_inputs_with_its_records(self):
+        feeds = [{'composer_repository': 'composer repo (https://packages.drupal.org/8)', 'registry': 'packages.drupal.org', 'answer': 'answered', 'records': 0, 'reason': None},
+                 {'composer_repository': 'composer repo (https://repo.packagist.org)', 'registry': 'packagist.org', 'answer': 'answered', 'records': 26, 'reason': None}]
+        finding = dict(self.FINDING, security=dict(self.FINDING['security'], records=26, feeds=feeds))
+
+        inputs = project_fixtures.inputs_of({'finding': finding, 'run': self.RUN, 'run_inputs': {'_releases': self.RELEASES}})
+
+        self.assertEqual([{'composer_repository': 'composer repo (https://packages.drupal.org/8)', 'records': 0}], inputs['run']['advisory_answers'])
+
+    def test_a_run_with_packagist_alone_names_no_other_answers(self):
+        inputs = project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN, 'run_inputs': {'_releases': self.RELEASES}})
+
+        self.assertNotIn('advisory_answers', inputs['run'])
+        self.assertNotIn('repositories', inputs['root'])
+
     def test_the_run_root_require_replaces_the_projected_constraint(self):
         finding = dict(self.FINDING, direct=True, named_in=['require'])
 

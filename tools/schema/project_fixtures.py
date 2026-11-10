@@ -529,6 +529,11 @@ def inputs_of(case):
                 for r in (run.get('advisory_lookup') or {}).get('repositories') or [] if r['outcome'] == 'failed']
     if failures:
         inputs['run']['advisory_failures'] = failures
+    # The hydrator builds the packagist answer from the package records: an answered feed beside it keeps its own records.
+    answers = [{k: r[k] for k in ('composer_repository', 'records')}
+               for r in f['security'].get('feeds') or [] if r['answer'] == 'answered' and r['registry'] != 'packagist.org']
+    if answers:
+        inputs['run']['advisory_answers'] = answers
     s7 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S7'), None) or {}
     below = {p['package']: p['chain'] for p in s7.get('packages', [])}
     related = case.get('related') or {}
@@ -584,9 +589,12 @@ def inputs_of(case):
     if run_inputs.get('_config_platform_php') is not None:
         inputs['config_platform_php'] = run_inputs['_config_platform_php']
     act = f.get('activity') or {}
-    if f['origin']['kind'] == 'vcs' and act.get('host') and inputs['root'] is not None:
+    repositories = list(run_inputs.get('_root_repositories') or [])
+    if f['origin']['kind'] == 'vcs' and act.get('host'):
         # The project's vcs repository serves the package: lockrot names its origin from it.
-        inputs['root']['repositories'] = [{'type': 'vcs', 'url': 'https://%s/%s.git' % (act['host'], act['repo'])}]
+        repositories.append({'type': 'vcs', 'url': 'https://%s/%s.git' % (act['host'], act['repo'])})
+    if repositories and inputs['root'] is not None:
+        inputs['root']['repositories'] = repositories
     return inputs
 
 
