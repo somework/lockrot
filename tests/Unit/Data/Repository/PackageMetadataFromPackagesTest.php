@@ -313,14 +313,54 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertSame(3, PackageMetadata::SHARED_COMMIT_TAGS, 'the threshold the tests above cross with a third tag');
     }
 
-    /** A highest tag that is a pre-release sits on a commit that no stable tag counts, so its date stands. */
-    public function testAPreReleaseHighestTagOnItsOwnCommitKeepsItsDate(): void
+    /** Ruling W17-X1: S6 and `last_stable_*` read stable tags only. S2 still reads the dated pre-release on its own commit. */
+    public function testAHighestPreReleaseIsNotTheLastStableReleaseButStillDatesTheAge(): void
+    {
+        $on = static fn (string $version, string $commit, string $time): array => ['name' => 'a/b', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]];
+        $packages = [$this->load($on('2.0.0-RC1', 'rc', '2026-02-01T00:00:00+00:00')), $this->load($on('1.0.0', 'one', '2025-01-01T00:00:00+00:00'))];
+
+        foreach (['RC1 first' => $packages, 'RC1 last' => array_reverse($packages)] as $order => $versions) {
+            $metadata = PackageMetadata::fromPackages('a/b', $versions, new \DateTimeImmutable(self::FIXED));
+
+            self::assertEquals(new \DateTimeImmutable('2025-01-01T00:00:00+00:00'), $metadata->lastStableReleaseAt(), $order);
+            self::assertSame('1.0.0', $metadata->lastStableVersion(), $order);
+            self::assertEquals(new \DateTimeImmutable('2026-02-01T00:00:00+00:00'), $metadata->releaseReadingAt(), $order);
+            self::assertSame('2.0.0-RC1', $metadata->releaseReadingVersion(), $order);
+        }
+    }
+
+    /** Ruling W17-X1: an undated highest pre-release leaves the age unknown, and the last stable release keeps its date. */
+    public function testAnUndatedHighestPreReleaseLeavesTheLastStableReleaseDated(): void
+    {
+        $on = static fn (string $version, string $commit, ?string $time): array => array_filter(['name' => 'a/b', 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]]);
+        $metadata = PackageMetadata::fromPackages('a/b', [$this->load($on('2.0.0-beta1', 'beta', null)), $this->load($on('1.0.0', 'one', '2025-01-01T00:00:00+00:00'))], new \DateTimeImmutable(self::FIXED));
+
+        self::assertEquals(new \DateTimeImmutable('2025-01-01T00:00:00+00:00'), $metadata->lastStableReleaseAt());
+        self::assertSame('1.0.0', $metadata->lastStableVersion());
+        self::assertNull($metadata->releaseReadingAt());
+    }
+
+    /** Ruling W17-X1: a package with pre-releases only has no last stable release. */
+    public function testAPackageWithPreReleasesOnlyHasNoLastStableRelease(): void
     {
         $on = static fn (string $version, string $commit): array => ['name' => 'a/b', 'version' => $version, 'time' => '2026-02-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/a/b.git', 'reference' => $commit]];
-        $metadata = PackageMetadata::fromPackages('a/b', [$this->load($on('2.0.0-RC1', 'rc')), $this->load($on('1.0.0', 'one'))], new \DateTimeImmutable(self::FIXED));
+        $metadata = PackageMetadata::fromPackages('a/b', [$this->load($on('1.0.0-RC1', 'rc1')), $this->load($on('1.0.0-beta1', 'beta1'))], new \DateTimeImmutable(self::FIXED));
 
-        self::assertEquals(new \DateTimeImmutable('2026-02-01T00:00:00+00:00'), $metadata->lastStableReleaseAt());
-        self::assertSame('2.0.0-RC1', $metadata->lastStableVersion());
+        self::assertFalse($metadata->hasStableRelease());
+        self::assertTrue($metadata->hasTag());
+        self::assertNull($metadata->lastStableReleaseAt());
+        self::assertNull($metadata->lastStableVersion());
+        self::assertEquals(new \DateTimeImmutable('2026-02-01T00:00:00+00:00'), $metadata->releaseReadingAt());
+    }
+
+    /** Ruling R17-X1a: build metadata does not make a tag a pre-release. */
+    public function testATagWithBuildMetadataIsAStableRelease(): void
+    {
+        $metadata = PackageMetadata::fromPackages('a/b', [$this->load(['name' => 'a/b', 'version' => 'v4.0.0+x', 'time' => '2025-01-01T00:00:00+00:00'])], new \DateTimeImmutable(self::FIXED));
+
+        self::assertTrue($metadata->hasStableRelease());
+        self::assertSame('v4.0.0+x', $metadata->lastStableVersion());
+        self::assertEquals(new \DateTimeImmutable('2025-01-01T00:00:00+00:00'), $metadata->lastStableReleaseAt());
     }
 
     /** Ruling O5: libyears end at the highest stable tag. RC1 and RC2 above it end nothing, whatever the listing order. */
@@ -456,7 +496,8 @@ final class PackageMetadataFromPackagesTest extends TestCase
 
         self::assertSame(['3'], array_map('strval', array_keys($meta->latestStableByBranch())));
         self::assertSame('3.2.3', $meta->latestStableByBranch()['3']['version']);
-        self::assertSame('4.0.0-beta1', $meta->lastStableVersion(), 'S2 keeps counting every tag');
+        self::assertSame('3.2.3', $meta->lastStableVersion(), 'ruling W17-X1: S6 reads stable tags only');
+        self::assertSame('4.0.0-beta1', $meta->releaseReadingVersion(), 'S2 keeps counting every tag');
     }
 
     public function testDevOnlyHasNoStableRelease(): void

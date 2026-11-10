@@ -34,7 +34,7 @@ final class PinnedRule implements SignalRule
 
             return new Signal(Signal::LEVEL_WARN, 'pinned to branch snapshot '.$package->version(), self::data($package, $metadata, self::REASON_BRANCH_SNAPSHOT, $snapshotTime));
         }
-        if ($metadata !== null && !$metadata->hasStableRelease()) {
+        if ($metadata !== null && !$metadata->hasTag()) {
             return new Signal(Signal::LEVEL_WARN, 'no tagged release in its repository', self::data($package, $metadata, self::REASON_NO_STABLE_RELEASE, null));
         }
 

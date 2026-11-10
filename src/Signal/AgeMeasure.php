@@ -91,7 +91,7 @@ final class AgeMeasure
         if ($metadata === null) {
             return AgeReading::unmeasuredBecause(self::metadataReason($facts, $metadataStatus));
         }
-        if (!$metadata->hasStableRelease()) {
+        if (!$metadata->hasTag()) {
             return AgeReading::unmeasuredBecause(self::NO_STABLE_RELEASE);
         }
         $at = $metadata->releaseReadingAt();

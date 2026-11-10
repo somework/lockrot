@@ -156,6 +156,22 @@ final class MoveContext
         return $this->metadata === null ? null : $this->metadata->lastStablePhp();
     }
 
+    /** {@see PackageMetadata::newestTagVersion()}, null without metadata. */
+    public function newestTagVersion(): ?string
+    {
+        return $this->metadata === null ? null : $this->metadata->newestTagVersion();
+    }
+
+    public function newestTagReleasedAt(): ?\DateTimeImmutable
+    {
+        return $this->metadata === null ? null : $this->metadata->newestTagAt();
+    }
+
+    public function newestTagPhp(): ?string
+    {
+        return $this->metadata === null ? null : $this->metadata->newestTagPhp();
+    }
+
     public function lastStableReleased(): ?string
     {
         $at = $this->metadata === null ? null : $this->metadata->lastStableReleaseAt();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+use Composer\Semver\VersionParser;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Security\Holder;
 use Lockrot\Solver\MoveCheck;
@@ -303,11 +304,17 @@ final class MoveText
             $text = self::raise($move).'move it to a tag — '.$word.' is '.$version.($via === '' ? '' : ', through '.$via);
         }
         $released = $latest === null ? null : $latest->released();
-        $text .= ($released === null ? '' : ' ('.substr($released, 0, 10).')').self::below($move, $version);
+        $text .= ($released === null ? '' : ' ('.substr($released, 0, 10).')').self::preRelease($version).self::below($move, $version);
         if ($latest !== null && $latest->relation() === 'older') {
             $text .= ', older than your snapshot ('.substr((string) $latest->snapshotTime(), 0, 10).'); review, or replace';
         }
         return $text.self::phpClause($move, $subject).self::adds($move);
+    }
+
+    /** Ruling R17-X1a: a pinned move with no stable tag targets a pre-release. */
+    private static function preRelease(string $version): string
+    {
+        return $version !== '' && VersionParser::parseStability($version) !== 'stable' ? ', a pre-release' : '';
     }
 
     private static function requirement(Move $move, MoveSubject $subject): string

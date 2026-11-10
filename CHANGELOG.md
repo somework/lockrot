@@ -22,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a shared commit, does not make the project behind. An installed version that is the highest
   stable tag, or a pre-release above it, is 0 behind, also when its own date is untrusted
   (`shared_commit`, `undated`). ([Libyears](docs/verdicts.md#libyears))
+- **Breaking:** **All formats:** S6 and the `has_stable_release` and `last_stable_*` fields read
+  stable tags only. A tag with build metadata counts, a pre-release does not. S2 still reads
+  pre-releases. A snapshot with pre-release tags only moves to the newest one, and its line says
+  `a pre-release`. Action: read `has_stable_release` false as "no stable tag".
+  ([What S6 carries](docs/verdicts.md#what-s6-carries))
 - **Breaking:** **Baseline:** a finding is worsened by a flag above the recorded one, a new
   advisory, or a known one re-rated or no longer fixable. The gate reads `min(score, 2 × what the
   new facts add)`. A `known` finding fails no `--fail-on` value, `unchecked` included. Action: run

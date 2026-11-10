@@ -168,8 +168,8 @@ S6's evidence reads the same whether or not the package ever released. Its `data
 |---|---|
 | `version` | The installed version, as the lock writes it |
 | `reason` | `branch_snapshot` when the installed version is a branch (checked first), `no_stable_release` when it is not and the repository lists no tagged version. An [open set](schema.md#open-sets) |
-| `has_stable_release` | Whether the repository lists any tagged version. A pre-release counts, a branch does not. Null when lockrot loaded no repository metadata for the package (a `vcs` or `path` entry, a package the repository does not list, metadata that did not load) |
-| `last_stable_release`, `last_stable_version` | The newest *dated* tagged release, a pre-release included, which is not always the highest tag. A newest date on a line below the highest stable line gives way to the newest dated release of that line. Both are null with no tagged release or with no metadata. `last_stable_release` is null, and `last_stable_version` set, in two cases that no [monorepo parent](#dates-from-the-monorepo) dates. When the highest tag has no date that lockrot trusts, the version is that tag. When the newest date is a shared commit's on a lower tag of the highest line, the version is that lower tag. A set `last_stable_release` implies a set `last_stable_version` |
+| `has_stable_release` | Whether the repository lists a stable tag. A pre-release and a branch do not count, a tag with build metadata (`v4.0.0+x`) does. Null when lockrot loaded no repository metadata for the package (a `vcs` or `path` entry, a package the repository does not list, metadata that did not load) |
+| `last_stable_release`, `last_stable_version` | The newest *dated* stable tag, which is not always the highest tag. A pre-release never counts. A newest date on a line below the highest stable line gives way to the newest dated release of that line. Both are null with no stable tag or with no metadata. `last_stable_release` is null, and `last_stable_version` set, in two cases that no [monorepo parent](#dates-from-the-monorepo) dates. When the highest tag has no date that lockrot trusts, the version is that tag. When the newest date is a shared commit's on a lower tag of the highest line, the version is that lower tag. A set `last_stable_release` implies a set `last_stable_version` |
 | `last_stable_dated_by` | The monorepo parent that dated that release, else null |
 | `snapshot_time` | For a snapshot, the lock's `time`: the date of the commit the branch pointed at, not a release. Null for `no_stable_release`, and when the lock entry has no `time` |
 | `tag_relation` | How the newest tag compares with the snapshot: `older`, `newer` or `same`, else null. An [open set](schema.md#open-sets) |
@@ -711,9 +711,9 @@ writes the move as `next_step`. Abridged from a recorded run on wallabag's lock:
   That php decides between `tag` and `blocked`, and the `old-promise` and `capped`
   facts of the move read it. The move adds `old-promise` only when that tag declares `require.php`.
   A `blocked` move to a tag names the php of the tag, and a `blocked` move with no tag names the
-  branch's `php`. With only pre-release tags, the move targets the pre-release that S6 names, with
-  `to_branch` null. Its `php_check` reads that pre-release's own `require.php`, and the line names
-  the release where a branch move names its branch.
+  branch's `php`. With only pre-release tags, S6 names no tag, and the move targets the newest
+  pre-release, with `to_branch` null. Its `php_check` reads that pre-release's own `require.php`.
+  The line names the release where a branch move names its branch, and adds `a pre-release`.
 
 - **The release of a test.** `latest` of a `test` move is the first of these that applies:
 

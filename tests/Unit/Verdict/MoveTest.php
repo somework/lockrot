@@ -794,14 +794,14 @@ final class MoveTest extends TestCase
 
         self::assertSame(['tag', '4.x', ['version' => 'v4.0.0', 'released' => '2025-01-01T00:00:00+00:00', 'is_installed' => false, 'relation' => 'newer']], [$move['kind'], $move['to_branch'], array_diff_key(JsonPath::arrayAt($move, ['latest']), ['snapshot_time' => true])]);
         self::assertSame('require a tag — the newest is v4.0.0 (2025-01-01); 4.x needs php >=7.2, which require.php allows', JsonPath::stringAt($move, ['text']));
-        self::assertSame(['v4.1.0-beta1', '2025-06-01T00:00:00+00:00', 'newer'], self::s6Version($finding));
+        self::assertSame(['v4.0.0', '2025-01-01T00:00:00+00:00', 'newer'], self::s6Version($finding), 'ruling W17-X1: S6 reads stable tags only');
     }
 
     /** @return iterable<string, array{list<array{version: string, time: ?string, php: ?string}>, string}> */
     public static function preReleasesOnAMajorWithNoStableTag(): iterable
     {
-        yield 'a dated pre-release' => [[self::release('v3.3.0', '2021-01-01', '>=7.2'), self::release('v4.0.0-beta1', '2022-01-01', '>=8.5')], 'v4.0.0-beta1'];
-        yield 'an undated pre-release' => [[self::release('v3.3.0', '2021-01-01', '>=7.2'), self::release('v4.0.0-beta1', null, '>=8.5')], 'v4.0.0-beta1'];
+        yield 'a dated pre-release' => [[self::release('v3.3.0', '2021-01-01', '>=7.2'), self::release('v4.0.0-beta1', '2022-01-01', '>=8.5')], 'v3.3.0'];
+        yield 'an undated pre-release' => [[self::release('v3.3.0', '2021-01-01', '>=7.2'), self::release('v4.0.0-beta1', null, '>=8.5')], 'v3.3.0'];
     }
 
     /**
@@ -886,14 +886,14 @@ final class MoveTest extends TestCase
     /** @return iterable<string, array{?string, ?string, ?string, array{requires: ?string, project_allows: ?bool, target_runs: ?bool, raise_to: ?string, raise_size: ?string}, non-empty-string}> */
     public static function preReleaseOnlySnapshots(): iterable
     {
-        yield 'dated, with php' => ['2025-06-01', 'newer', '>=7.2', ['requires' => '>=7.2', 'project_allows' => true, 'target_runs' => true, 'raise_to' => null, 'raise_size' => null], 'require a tag — the newest is v1.0.0-beta1 (2025-06-01); v1.0.0-beta1 needs php >=7.2, which require.php allows'];
-        yield 'undated, with no php' => [null, null, null, ['requires' => null, 'project_allows' => null, 'target_runs' => null, 'raise_to' => null, 'raise_size' => null], 'require a tag — the newest is v1.0.0-beta1'];
+        yield 'dated, with php' => ['2025-06-01', 'newer', '>=7.2', ['requires' => '>=7.2', 'project_allows' => true, 'target_runs' => true, 'raise_to' => null, 'raise_size' => null], 'require a tag — the newest is v1.0.0-beta1 (2025-06-01), a pre-release; v1.0.0-beta1 needs php >=7.2, which require.php allows'];
+        yield 'undated, with no php' => [null, null, null, ['requires' => null, 'project_allows' => null, 'target_runs' => null, 'raise_to' => null, 'raise_size' => null], 'require a tag — the newest is v1.0.0-beta1, a pre-release'];
     }
 
     /**
      * Ruling R13-A (r12l.1, Q4): with only pre-release tags no branch row exists, so the pinned
-     * move targets the S6 version, and I18b keeps it from `no-tag`. Its php_check reads that
-     * pre-release's own require.php.
+     * move targets the newest tag, and I18b keeps it from `no-tag`. Its php_check reads that
+     * pre-release's own require.php. Ruling W17-X1: S6 names no stable tag.
      *
      * @param array{requires: ?string, project_allows: ?bool, target_runs: ?bool, raise_to: ?string, raise_size: ?string} $phpCheck
      * @param non-empty-string                                                                                       $text
@@ -909,6 +909,7 @@ final class MoveTest extends TestCase
         self::assertSame(['tag', null, $phpCheck], [$move['kind'], $move['to_branch'], $move['php_check']]);
         self::assertSame(['version' => 'v1.0.0-beta1', 'released' => $date === null ? null : $date.'T00:00:00+00:00', 'is_installed' => false, 'relation' => $relation], array_diff_key(JsonPath::arrayAt($move, ['latest']), ['snapshot_time' => true]));
         self::assertStringStartsWith($text, JsonPath::stringAt($move, ['text']));
+        self::assertSame([null, null, null], self::s6Version($finding));
     }
 
     /** Ruling R13-A (r12l.1, no-row blocked): a pre-release that the target cannot run blocks the pinned move. */
