@@ -8,6 +8,8 @@ use Composer\Downloader\TransportException;
 use Composer\Json\JsonFile;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
+use Composer\Package\Locker;
+use Composer\Repository\PlatformRepository;
 use Composer\Semver\VersionParser;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Allowlist\AllowlistEntry;
@@ -377,9 +379,11 @@ final class CaseHydrator
         $packages = self::packages($inputs);
         $package = (string) array_key_first($packages);
         $activity = $packages[$package]['activity'];
-        $lock = LockFile::fromArray(self::lockData(self::entries($inputs, $packages), $packages, $inputs));
+        $lockData = self::lockData(self::entries($inputs, $packages), $packages, $inputs);
         $root = self::root($inputs, $packages);
-        $project = $root === null ? ProjectConfig::empty() : ProjectConfig::fromArray($root);
+        $unlocked = $root === null ? null : self::unlockedRoot($root, $lockData);
+        $project = $root === null ? ProjectConfig::empty() : ($unlocked === null ? ProjectConfig::fromArray($root) : self::manifest($root));
+        $lock = LockFile::fromArray($unlocked === null ? $lockData : $lockData + ['content-hash' => Locker::getContentHash(JsonFile::encode($unlocked))]);
         $clock = self::clock($case);
         if ($lock->find($package) === null) {
             throw new \InvalidArgumentException('the lock has no '.$package);
@@ -597,6 +601,52 @@ final class CaseHydrator
         }
 
         return $root;
+    }
+
+    /**
+     * The root as the lock was written for it, when the root requires a package that the lock does
+     * not hold: that require came after the lock (case lock-out-of-sync‡). Null when the lock
+     * holds every package that the root requires, so the lock has no content-hash to compare.
+     *
+     * @param array<string, mixed>              $root
+     * @param array{packages: list<array<mixed, mixed>>, packages-dev?: list<array<mixed, mixed>>} $lock
+     *
+     * @return array<string, mixed>|null
+     */
+    private static function unlockedRoot(array $root, array $lock): ?array
+    {
+        $locked = array_map('strtolower', array_filter(array_column(array_merge($lock['packages'], $lock['packages-dev'] ?? []), 'name'), 'is_string'));
+        $before = $root;
+        foreach (['require', 'require-dev'] as $section) {
+            $links = \is_array($root[$section] ?? null) ? $root[$section] : [];
+            $before[$section] = array_filter($links, static fn ($name): bool => PlatformRepository::isPlatformPackage((string) $name) || \in_array(strtolower((string) $name), $locked, true), \ARRAY_FILTER_USE_KEY);
+            if ($before[$section] === [] && !isset($root[$section])) {
+                unset($before[$section]);
+            }
+        }
+
+        return $before === $root ? null : $before;
+    }
+
+    /**
+     * The project that reads $root as its composer.json, so that lockrot compares the lock's
+     * content-hash with it.
+     *
+     * @param array<string, mixed> $root
+     */
+    private static function manifest(array $root): ProjectConfig
+    {
+        $path = tempnam(sys_get_temp_dir(), 'lockrot-case-root');
+        if ($path === false) {
+            throw new \RuntimeException('no temporary file for the case root');
+        }
+        try {
+            file_put_contents($path, JsonFile::encode($root));
+
+            return ProjectConfig::fromFile($path);
+        } finally {
+            unlink($path);
+        }
     }
 
     /**

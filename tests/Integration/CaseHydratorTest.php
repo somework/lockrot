@@ -382,6 +382,24 @@ final class CaseHydratorTest extends TestCase
         return [];
     }
 
+    /**
+     * Case lock-out-of-sync‡: a root `require` that the lock does not hold came after the lock. The
+     * lock's content-hash is the one of the root without it, so lockrot gives the run note.
+     */
+    public function testARootRequireThatTheLockDoesNotHoldGivesTheLockOutOfSyncNote(): void
+    {
+        $case = CaseHydrator::case('A');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $root = JsonPath::arrayAt($inputs, ['root']);
+        $root['require'] = JsonPath::arrayAt($root, ['require']) + ['acme/feature-flags' => '^1.0'];
+        $inputs['root'] = $root;
+        $unlocked = ['inputs' => $inputs] + $case;
+
+        $notes = static fn (array $case): array => array_values(array_filter(JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::report($case)->toArray()), ['notes']), static fn ($note): bool => \is_string($note) && strpos($note, 'lock: ') === 0));
+
+        self::assertSame([[], ['lock: the lock file does not match composer.json (acme/feature-flags is required but not locked): run composer update']], [$notes($case), $notes($unlocked)]);
+    }
+
     public function testACaseWithoutInputsIsRefused(): void
     {
         $this->expectException(\InvalidArgumentException::class);
