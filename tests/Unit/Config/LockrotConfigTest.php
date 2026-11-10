@@ -501,7 +501,7 @@ final class LockrotConfigTest extends TestCase
         yield 'unset' => [null, false];
         yield 'empty' => ['', false];
         yield 'zero' => ['0', false];
-        yield 'prime keeps the network' => ['prime', false];
+        yield 'prime' => ['prime', true];
         yield 'one' => ['1', true];
         yield 'any other value' => ['true', true];
     }

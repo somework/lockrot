@@ -129,9 +129,9 @@ final class LockrotConfig
     }
 
     /**
-     * Composer's own reading of COMPOSER_DISABLE_NETWORK: any value but empty or `0` turns the
-     * network off, so the run reads as `--offline`. `prime` is the exception, as in Composer's Git
-     * layer: it asks for a cache fill, not for the absence of requests.
+     * Composer's own reading of COMPOSER_DISABLE_NETWORK, `(bool)` of the value as HttpDownloader
+     * takes it: any value but empty or `0`, `prime` included, turns the network off, so the run
+     * reads as `--offline`. The metadata loader and the move check take their flag from here.
      *
      * @param array<string, mixed> $env
      */
@@ -139,7 +139,7 @@ final class LockrotConfig
     {
         $value = $env['COMPOSER_DISABLE_NETWORK'] ?? '';
 
-        return \is_string($value) && $value !== '' && $value !== '0' && $value !== 'prime';
+        return \is_string($value) && $value !== '' && $value !== '0';
     }
 
     /**
