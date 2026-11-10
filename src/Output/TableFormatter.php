@@ -197,7 +197,7 @@ final class TableFormatter implements FormatterInterface
         foreach (self::wrapBetweenItems(RunGateText::render($gate, $this->context->runOf($report)), $wrap) as $line) {
             $lines[] = $gate->fails() ? \sprintf('<fg=red>%s</fg=red>', $line) : $line;
         }
-        foreach (self::wrapKeepingCommands(RunFooter::dataAsOf($report).'. Run composer lockrot --format=json for details.', $wrap) as $line) {
+        foreach (self::wrapKeepingCommands(RunFooter::dataAsOf($report).'. Run lockrot with --format=json for details.', $wrap) as $line) {
             $lines[] = $line;
         }
         $notes = $report->notes();
@@ -232,7 +232,7 @@ final class TableFormatter implements FormatterInterface
     }
 
     /** Commands the footer names: one thing to copy, so each stays on one line and can overflow. */
-    private const COMMANDS = ['composer lockrot --format=json', 'composer audit'];
+    private const COMMANDS = ['composer audit'];
 
     /**
      * @param list<string> $commands more commands that $text names, before the neutraliser

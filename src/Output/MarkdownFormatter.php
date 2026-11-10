@@ -205,7 +205,7 @@ final class MarkdownFormatter implements FormatterInterface
             }
         }
         $lines[] = '';
-        $lines[] = '<sub>'.self::text(($report->packagesChecked() === 1 ? '1 package checked' : $report->packagesChecked().' packages checked').' — '.lcfirst(RunFooter::dataAsOf($report))).'. Run `composer lockrot --format=json` for details.</sub>';
+        $lines[] = '<sub>'.self::text(($report->packagesChecked() === 1 ? '1 package checked' : $report->packagesChecked().' packages checked').' — '.lcfirst(RunFooter::dataAsOf($report))).'. Run lockrot with `--format=json` for details.</sub>';
 
         return $lines;
     }

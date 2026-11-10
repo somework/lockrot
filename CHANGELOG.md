@@ -550,6 +550,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **table, markdown:** the footer reads `Run lockrot with --format=json for details.`, not
+  `composer lockrot`, because the standalone PHAR has no `composer lockrot` command. Action: match
+  on the footer text only if a script reads it.
 - **CLI:** `COMPOSER_DISABLE_NETWORK` acts as `--offline` in the main run when it is not empty and
   not `0`, `prime` included, as in Composer. Uncached packages read unavailable with the reason
   `offline`, and the move check reads `not_checked`.

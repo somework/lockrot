@@ -110,11 +110,12 @@ final class TableFormatterTest extends TestCase
         self::assertSame(['        (policy.abandoned: doctrine/*): the cache', '        goes with the 9.0 upgrade'], \array_slice($lines, $marking + 1, 2));
     }
 
-    public function testAWrapNeverSplitsTheCommandThatTheDataLineNames(): void
+    public function testTheFooterNamesNoCommandThatOnlyThePluginHas(): void
     {
         $lines = self::lines(ConsoleMarkup::render(self::formatter(100, 'high')->format(self::composite()), false));
 
-        self::assertContains('composer lockrot --format=json for details.', $lines);
+        self::assertStringContainsString('Run lockrot with --format=json for details.', implode(' ', $lines));
+        self::assertStringNotContainsString('composer lockrot --format=json', implode(' ', $lines));
     }
 
     public function testAFailingGateLineIsRed(): void
@@ -190,7 +191,7 @@ final class TableFormatterTest extends TestCase
         }
 
         self::assertSame(['packages checked', 'flags:', 'depth:', 'security:', 'fix, by package:', 'update now:', 'libyears:', 'pulled in by:', 'advisories:', 'gate:', 'Data as of'], $order);
-        self::assertMatchesRegularExpression('/^Data as of \d{4}-\d{2}-\d{2} \(package repositories, repository hosts\) · score model 1\. Run composer lockrot --format=json for details\.$/', $lines[\count($lines) - 1]);
+        self::assertMatchesRegularExpression('/^Data as of \d{4}-\d{2}-\d{2} \(package repositories, repository hosts\) · score model 1\. Run lockrot with --format=json for details\.$/', $lines[\count($lines) - 1]);
     }
 
     public function testACleanRunSaysNothingIsFlaggedAndStillPrintsTheGateAndTheDataLine(): void
@@ -202,7 +203,7 @@ final class TableFormatterTest extends TestCase
         self::assertSame('1 package checked · nothing flagged', $lines[0]);
         self::assertStringStartsWith('advisories: ', $lines[2]);
         self::assertStringStartsWith('gate: off · --fail-on=none (default) · target php ', $lines[3]);
-        self::assertSame('Data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for details.', $lines[4]);
+        self::assertSame('Data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run lockrot with --format=json for details.', $lines[4]);
     }
 
     /**
