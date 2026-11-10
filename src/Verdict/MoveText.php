@@ -182,7 +182,7 @@ final class MoveText
             return "; Composer's solver removes ".$move->subject()->package().' from the lock, not '.$newest.', so this command does not reach it';
         }
 
-        return MoveCheck::isRelease($installs)
+        return MoveCheck::isRelease($installs) || $installs === $move->subject()->version()
             ? "; Composer's solver keeps ".$installs.', not '.$newest.', so this command does not reach it'
             : "; Composer's solver installs ".$installs.', a dev version, not '.$newest.', so this command does not reach a release';
     }

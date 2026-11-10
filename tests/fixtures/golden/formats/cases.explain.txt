@@ -3221,7 +3221,7 @@ score     18 = pinned 16 + stale 2 [¼ of 8]     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require a tag — the newest is 1.6.2 (2019-01-23); 1.x needs php >=5.5, which require.php allows; it was released before your target PHP's major, so old-promise would count; stale stays; Composer's solver installs dev-master, a dev version, not 1.6.2, so this command does not reach a release
+do        require a tag — the newest is 1.6.2 (2019-01-23); 1.x needs php >=5.5, which require.php allows; it was released before your target PHP's major, so old-promise would count; stale stays; Composer's solver keeps dev-master, not 1.6.2, so this command does not reach it
           clears pinned
 
 flags

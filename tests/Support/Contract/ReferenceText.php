@@ -104,7 +104,7 @@ final class ReferenceText
         // After the platform step a clause in words starts a sentence, and a command keeps its case.
         $text = $step === '' || strpos($text, 'composer ') === 0 ? $text : ucfirst($text);
 
-        return $step.$text.self::checked($move, $package).self::movesWith($move).self::noCommand($move, $kind);
+        return $step.$text.self::checked($move, $package, Fields::string($in, 'version')).self::movesWith($move).self::noCommand($move, $kind);
     }
 
     /**
@@ -152,7 +152,7 @@ final class ReferenceText
     }
 
     /** @param array<mixed, mixed> $move */
-    private static function checked(array $move, string $package): string
+    private static function checked(array $move, string $package, string $version): string
     {
         $check = Fields::nullableObject($move, 'check');
         if ($check === null) {
@@ -166,7 +166,7 @@ final class ReferenceText
                 return "; Composer's solver removes ".$package.' from the lock, not '.$newest.', so this command does not reach it';
             }
 
-            return VersionParser::parseStability($installs) === 'dev'
+            return VersionParser::parseStability($installs) === 'dev' && $installs !== $version
                 ? "; Composer's solver installs ".$installs.', a dev version, not '.$newest.', so this command does not reach a release'
                 : "; Composer's solver keeps ".$installs.', not '.$newest.', so this command does not reach it';
         }

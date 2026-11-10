@@ -1,6 +1,6 @@
 {
     "score_text": "18 = pinned 16 + stale 2 [¼ of 8]",
-    "next_step_text": "require a tag — the newest is 1.6.2 (2019-01-23); 1.x needs php >=5.5, which require.php allows; it was released before your target PHP's major, so old-promise would count; stale stays; Composer's solver installs dev-master, a dev version, not 1.6.2, so this command does not reach a release",
+    "next_step_text": "require a tag — the newest is 1.6.2 (2019-01-23); 1.x needs php >=5.5, which require.php allows; it was released before your target PHP's major, so old-promise would count; stale stays; Composer's solver keeps dev-master, not 1.6.2, so this command does not reach it",
     "gate_line": null,
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: newest release 1.6.2 2019-01-23 (7.7 years ago); last push 2024-01-12 (2.7 years ago)",

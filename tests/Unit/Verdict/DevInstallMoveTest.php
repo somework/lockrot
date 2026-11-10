@@ -64,13 +64,13 @@ final class DevInstallMoveTest extends TestCase
     }
 
     /**
-     * acme/other is pinned to dev-main, and the tag move `^1.2.3` keeps or installs dev-main in every
-     * form. The move is not checked, and its text says that the command does not reach a release.
+     * acme/other is pinned to dev-main, and the tag move `^1.2.3` solves to dev-main in every form. The
+     * move is not checked. Its text names the locked version that the solver keeps (ruling R17-1b).
      *
      * @dataProvider remoteCommits
      */
     #[DataProvider('remoteCommits')]
-    public function testATagMoveThatEveryFormSolvesToTheBranchAliasIsNotCheckedAndNamesTheDevVersion(string $commit): void
+    public function testATagMoveThatEveryFormSolvesToTheLockedBranchIsNotCheckedAndKeepsIt(string $commit): void
     {
         $package = 'acme/other';
         $source = static fn (string $reference): array => ['source' => ['type' => 'git', 'url' => 'https://example.org/other.git', 'reference' => $reference]];
@@ -87,7 +87,7 @@ final class DevInstallMoveTest extends TestCase
         self::assertNotNull($check);
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::INSTALLS_NO_RELEASE, 'installs' => 'dev-main'], $check->jsonSerialize());
         self::assertSame([['composer', 'require', $package.':^1.2.3'], ['composer', 'why-not', $package, '1.2.3', '--locked']], $move->commands());
-        self::assertSame("require a tag — the newest is 1.2.3 (2026-01-01), older than your snapshot (2026-09-01); review, or replace; Composer's solver installs dev-main, a dev version, not 1.2.3, so this command does not reach a release", $move->text());
+        self::assertSame("require a tag — the newest is 1.2.3 (2026-01-01), older than your snapshot (2026-09-01); review, or replace; Composer's solver keeps dev-main, not 1.2.3, so this command does not reach it", $move->text());
     }
 
     /**
