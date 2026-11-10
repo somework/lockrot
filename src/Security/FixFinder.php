@@ -106,7 +106,7 @@ final class FixFinder
         return new PackageFixes(
             $fixes,
             $rows,
-            $this->gets($package->name(), $onInstalled, $ranged, \count($advisories)),
+            $this->gets($package->name(), array_merge([$package->name()], array_keys($package->replaces())), $onInstalled, $ranged, \count($advisories)),
             $move,
             self::partial($onInstalled, $ranged, \count($advisories)),
             $allowed
@@ -306,19 +306,28 @@ final class FixFinder
      * `composer update <package>` installs the highest release on the installed branch that the
      * lock's links allow and the target runs, whatever `require.php` says. With none that the target
      * runs, the highest one that the links allow says why. A package hold of a refusal that admits a
-     * release is a lock link of that release (ruling R17-13a). A solve that installs another release
-     * names that release ({@see \Lockrot\Verdict\FindingDetails}, SPEC §5.6 ruling R2).
+     * release is a lock link of that release (ruling R17-13a). When such holds exclude every release
+     * that the links allow, the Gets names no version and the target runs its php check: only a
+     * solve names a release then. A solve that installs another release names that release
+     * ({@see \Lockrot\Verdict\FindingDetails}, SPEC §5.6 ruling R2).
      *
+     * @param list<string>                       $names       the package's name and each name that it replaces
      * @param list<Candidate>                    $onInstalled ascending
      * @param array<string, ConstraintInterface> $ranged
      */
-    private function gets(string $package, array $onInstalled, array $ranged, int $of): ?Gets
+    private function gets(string $package, array $names, array $onInstalled, array $ranged, int $of): ?Gets
     {
         $release = null;
         $blocked = null;
+        $capped = null;
         foreach ($onInstalled as $candidate) {
             $normalized = $candidate->release()->normalized();
-            if ($this->links->excluding($package, $normalized) !== [] || $this->refusalExcludes($normalized)) {
+            if ($this->links->excluding($package, $normalized) !== []) {
+                continue;
+            }
+            if ($this->refusalExcludes($normalized, $names)) {
+                $capped = $candidate;
+
                 continue;
             }
             if ($this->floor->admitsTarget($candidate->release()->php()) === false) {
@@ -329,7 +338,7 @@ final class FixFinder
         }
         $release ??= $blocked;
         if ($release === null) {
-            return null;
+            return $capped === null ? null : self::cappedGets($capped, $this->floor, $ranged, $of);
         }
         $check = PhpCheck::of($release->php(), $this->floor);
         if ($check->targetRuns() === false) {
@@ -341,17 +350,38 @@ final class FixFinder
     }
 
     /**
-     * Whether a package hold of a refusal that admits the release does not admit it. The hold's
-     * constraint is read against the release, as a lock link on the package is: a conflict excludes
-     * what it matches, `self.version` admits only the holder's own version. A root hold is a link
-     * that {@see LinkIndex} already reads.
+     * The Gets of the highest release that the links allow, when refusal holds cap every release:
+     * no version, and null when the target cannot run that release either.
+     *
+     * @param array<string, ConstraintInterface> $ranged
      */
-    private function refusalExcludes(string $normalized): bool
+    private static function cappedGets(Candidate $capped, PhpFloor $floor, array $ranged, int $of): ?Gets
+    {
+        $check = PhpCheck::of($capped->php(), $floor);
+        if ($check->targetRuns() === false) {
+            return null;
+        }
+        $clears = self::cleared($capped, $ranged);
+
+        return new Gets(null, $check, $clears, \count($clears) === $of);
+    }
+
+    /**
+     * Whether a package hold of a refusal that admits the release excludes it. The hold counts only
+     * when its link names the package: no target, or one of $names. Its constraint is read against
+     * the release, as a lock link on the package is: a conflict excludes what it matches,
+     * `self.version` admits only the holder's own version. A root hold is a link that
+     * {@see LinkIndex} already reads.
+     *
+     * @param list<string> $names the package's name and each name that it replaces
+     */
+    private function refusalExcludes(string $normalized, array $names): bool
     {
         $release = new Constraint('==', $normalized);
         $parser = new VersionParser();
         foreach ($this->refused->holding($normalized) as $holder) {
-            if ($holder->source() !== Holder::PACKAGE) {
+            $target = $holder->target();
+            if ($holder->source() !== Holder::PACKAGE || ($target !== null && !\in_array(strtolower($target), $names, true))) {
                 continue;
             }
             try {

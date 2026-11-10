@@ -35,11 +35,13 @@ use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Rule\OldPromiseRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Solver\MoveCheck;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\FindingDetails;
+use Lockrot\Verdict\Moves;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -220,6 +222,32 @@ final class FindingDetailsTest extends TestCase
             'clears' => [['kind' => 'advisory', 'id' => 'PKSA-a', 'basis' => 'outside_range']],
             'clears_all' => false,
         ], JsonPath::decoded($security['gets']));
+    }
+
+    /** @return iterable<string, array{?MoveCheck, ?string}> */
+    public static function checksOfACappedGets(): iterable
+    {
+        yield 'a resolving solve names the release that it installs' => [MoveCheck::resolves(MoveCheck::INLINE, '1.2.0'), '1.2.0'];
+        yield 'a refused solve leaves no release' => [MoveCheck::refused(), null];
+        yield 'no check leaves no release' => [null, null];
+    }
+
+    /**
+     * MODEL r16: when a refusal caps every release, a checked solve that installs a release
+     * outranks the caps (ruling R2-1). Without one, `gets` is null.
+     */
+    #[DataProvider('checksOfACappedGets')]
+    public function testACheckedSolveOutranksTheCapsOfEveryRelease(?MoveCheck $check, ?string $version): void
+    {
+        $branch = new BranchFixes('1.x', true, 0, 1, new Candidate(new StableRelease('1.2.0.0', '1.2.0', null, '>=8.1', false), '1', Fix::UPGRADE, []), '1.2.0', ['PKSA-a']);
+        $capped = new Gets(null, PhpCheck::of('>=8.1', new PhpFloor('8.4', '>=8.1')), ['PKSA-a'], true);
+        $details = (new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$branch], $capped, null, null), FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null))
+            ->withMoves(new Moves(null, null, null, null, [], $check === null ? [] : ['1.x' => $check]));
+        $rows = self::rows([['id' => 'PKSA-a', 'severity' => 'medium', 'fix' => ['kind' => 'upgrade', 'on_installed_branch' => true]]]);
+
+        $gets = $details->toSecurityArray($rows, '1.x')['gets'];
+
+        self::assertSame($version === null ? null : ['version' => $version], $gets === null ? null : ['version' => JsonPath::decoded($gets)['version']]);
     }
 
     /** Without the scan, the S9 rows give the branch row: each row on the branch is fixed, each without a kind is not known. */

@@ -15,6 +15,7 @@ use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Score\IfApplied;
 use Lockrot\Security\BranchFixes;
 use Lockrot\Security\Fix;
+use Lockrot\Security\Gets;
 use Lockrot\Security\Holder;
 use Lockrot\Security\PackageFixes;
 use Lockrot\Security\Severity;
@@ -318,6 +319,9 @@ final class FindingDetails
         }
         $gets = $this->fixes === null ? null : $this->fixes->gets();
         $installed = $this->installedBranchFixes($rows, $branch);
+        $getsVersion = $gets === null ? null : $this->getsVersion($gets, $installed);
+        // A Gets with no version that the target runs is capped by refusals: only a checked solve names a release.
+        $gets = $gets !== null && $getsVersion === null && $gets->phpCheck()->targetRuns() !== false ? null : $gets;
 
         return $out + [
             'worst' => self::worst($standing->counts()),
@@ -328,7 +332,7 @@ final class FindingDetails
             'installed_branch_fixes' => $installed === null ? null : $this->rowFixes($installed),
             'move_in' => $this->moves()->moveIn(),
             'gets' => $gets === null ? null : [
-                'version' => $this->getsVersion($gets->version(), $installed),
+                'version' => $getsVersion,
                 'php_check' => $gets->phpCheck(),
                 'clears' => array_map(static fn (string $id): array => ['kind' => 'advisory', 'id' => $id, 'basis' => 'outside_range'], self::inS9Order($gets->clears(), $rows)),
                 'clears_all' => $gets->clearsAll(),
@@ -337,10 +341,18 @@ final class FindingDetails
         ];
     }
 
-    /** The release that the installed branch's checked move installs, when it is not the release `composer update` targets. */
-    private function getsVersion(?string $version, ?BranchFixes $installed): ?string
+    /**
+     * The release that the installed branch's checked move installs, when it is not the release
+     * `composer update` targets. A resolving solve also outranks the refusals that cap every
+     * release (ruling R2-1).
+     */
+    private function getsVersion(Gets $gets, ?BranchFixes $installed): ?string
     {
         $check = $installed === null ? null : $this->moves()->rowCheck($installed->branch());
+        $version = $gets->version();
+        if ($version === null && $gets->phpCheck()->targetRuns() !== false) {
+            return $check !== null && $check->isResolved() ? $check->installs() : null;
+        }
 
         return ($check === null ? null : $check->installsBelow($version) ?? $check->installsAbove($version)) ?? $version;
     }
