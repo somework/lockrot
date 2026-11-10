@@ -804,8 +804,10 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
       Composer installs only one of the two.
 
     A hold of the package's own release reads `<package> <version>, its own release`, then its
-    link. A hold names its holder's verdict only at the holder's locked version, because a
-    verdict grades the installed release. A root hold names the composer.json section that lists
+    link. A graded holder adds `itself <lead>`, its lead flag. A graded holder with no lead flag
+    adds `itself <verdict>: <flags>`. The text names a holder only at the holder's locked version,
+    because a verdict grades the installed release. The JSON `held_by[].holder` carries the
+    `verdict`, `lead` and `flag_ids`. A root hold names the composer.json section that lists
     the package, and a `require-dev` hold ends its link with " in require-dev". A root requirement
     that admits the move's release is no hold.
 
