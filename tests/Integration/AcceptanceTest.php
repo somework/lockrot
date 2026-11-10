@@ -286,7 +286,7 @@ final class AcceptanceTest extends TestCase
         self::assertNull($f['wallabag/rulerz']->libyears(), 'a dev-master pin is not measured');
         self::assertEqualsWithDelta(4.06, (float) $f['scheb/2fa-backup-code']->libyears(), 0.005, 'a split whose newest tags share a commit: measured to the newest dated release above, a lower bound');
         self::assertEqualsWithDelta(4.23, (float) $f['scheb/2fa-bundle']->libyears(), 0.005, 'while the monorepo itself is dated exactly');
-        self::assertNull($f['symfony/polyfill-ctype']->libyears(), 'the newest tag is undated and nothing dated sits above the installed version');
+        self::assertSame(0.0, $f['symfony/polyfill-ctype']->libyears(), 'the installed release is the newest by version, so it is zero behind, whatever its date is (ruling R17-13b)');
         self::assertNull($f['pagerfanta/twig']->libyears(), 'the installed tag itself shares a commit: the lock dates it by that, not by its release');
         self::assertSame(0.0, $f['sensio/framework-extra-bundle']->libyears(), 'abandoned, and zero libyears behind: the installed release is the last one');
         self::assertEqualsWithDelta(3.36, (float) $f['psr/log']->libyears(), 0.005, 'finished, and three years behind a 3.x it will never need — the docs quote this');

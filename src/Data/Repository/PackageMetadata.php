@@ -897,6 +897,17 @@ final class PackageMetadata
         return $preRelease !== null && $preRelease[3];
     }
 
+    /**
+     * True when the version is the newest release by version: the highest stable tag, with no
+     * dated pre-release above it (ruling R17-13b). A pre-release without a date is not seen.
+     */
+    public function isTheNewestReleaseByVersion(string $version): bool
+    {
+        $row = $this->latestStableByBranch[self::highestBranch($this->latestStableByBranch)] ?? null;
+
+        return $row !== null && self::normalized($version) === $row['highest']['normalized'] && $this->preReleaseAboveTheHighestStableTag() === null;
+    }
+
     /** @return array{0: \DateTimeImmutable, 1: string, 2: string, 3: bool}|null */
     private function preReleaseAboveTheHighestStableTag(): ?array
     {

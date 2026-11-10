@@ -76,6 +76,9 @@ final class Libyears
         if ($package->isBranchSnapshot()) {
             return LibyearsMeasurement::unmeasured(self::BRANCH_SNAPSHOT);
         }
+        if ($metadata->isTheNewestReleaseByVersion($package->version())) {
+            return LibyearsMeasurement::of(0.0);
+        }
         $release = InstalledRelease::of($package, $metadata);
         $installed = $release->at();
         if ($installed === null) {

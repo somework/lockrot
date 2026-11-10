@@ -1438,7 +1438,8 @@ furthest behind phpdocumentor/reflection-common 2.2.0 at 5.4
 
 For each package, lockrot takes the years from the installed version's release to the package's
 highest release by version. That is the highest dated pre-release above the highest stable tag,
-else the highest stable tag. A lower tag with a later date does not count, so this date is not
+else the highest stable tag. When the installed version is that release, the package is 0 behind,
+also when its own date is untrusted. A lower tag with a later date does not count, so this date is not
 always the one that S2 reads. It counts years of 365.25 days, never below zero, and sums them
 over the packages the run analysed. The installed version's date is the lock's `time`, or its
 [monorepo parent's](#dates-from-the-monorepo). The number does not read the clock. The package
@@ -1460,7 +1461,7 @@ applies:
 | `not_from_composer_repository` | lockrot asked for no metadata: a `path`, `vcs`, `artifact` or inline `package` entry, or a `type: composer` repository that advertises no notify URL. The finding's `from_composer_repository` is false |
 | `unavailable`, `not_found` | lockrot asked for metadata and did not get it, or the repository does not list the package. Equal to `metadata.status` |
 | `branch_snapshot` | The installed version is a branch (`dev-main`, `2.x-dev`): it has a commit date, not a release date, and `pinned` already says what there is to say |
-| `shared_commit`, `parent_split`, `undated` | The installed release has no date lockrot trusts: its commit carries other tags, a parent dates the newest release of its split, or the lock entry has no `time`. The same ids as `age.installed_unmeasured` |
+| `shared_commit`, `parent_split`, `undated` | The installed release is not the highest release by version and has no date lockrot trusts: its commit carries other tags, a parent dates the newest release of its split, or the lock entry has no `time`. The same ids as `age.installed_unmeasured` |
 | `no_stable_release` | The package has no tagged release |
 | `undated_releases` | The package has tagged releases, and no release above the installed one has a trusted date. `age.release_unmeasured` uses the same id when the highest stable tag has no trusted date, also when older tags have one |
 

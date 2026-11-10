@@ -131,7 +131,7 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
             self::assertSame($reason, $code, $what.': the facts the analysis was decided on');
             self::assertSame($years === null ? null : round($years, 2), $row['libyears'], $what.': the years between the two ends');
             $metadata = $facts->metadata();
-            $lowerBound = $years !== null && $metadata !== null && $metadata->newestReleaseByVersionAt() === null;
+            $lowerBound = $years !== null && $metadata !== null && $metadata->newestReleaseByVersionAt() === null && !$metadata->isTheNewestReleaseByVersion($facts->package()->version());
             self::assertSame($lowerBound, $row['libyears_at_least'], $what.': a lower bound exactly when the newest release is undated');
             if ($lowerBound) {
                 $this->seen[self::LOWER_BOUND] = ($this->seen[self::LOWER_BOUND] ?? 0) + 1;
@@ -163,6 +163,9 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
         }
         if ($package->isBranchSnapshot()) {
             return [Libyears::BRANCH_SNAPSHOT, null];
+        }
+        if ($metadata->isTheNewestReleaseByVersion($package->version())) {
+            return [null, 0.0];
         }
         $release = InstalledRelease::of($package, $metadata);
         $installed = $release->at();

@@ -71,6 +71,8 @@ final class LibyearsTest extends TestCase
         yield 'a lower bound, from the newest dated release above' => [self::package(), self::metadata(null, ['8' => ['v8.6.1', '2026-01-24T13:26:10+00:00'], '5' => ['v5.13.2', self::LOCKED_AT]]), null, 4.06, null, true];
         $undatedHighest = ['version' => 'v8.5.0', 'at' => new \DateTimeImmutable(self::LATEST), 'highest' => ['normalized' => '8.6.1.0', 'pretty' => 'v8.6.1', 'at' => null, 'php' => null], 'php' => null];
         yield 'an undated highest tag above a dated lower tag: a lower bound' => [self::package(), new PackageMetadata('scheb/2fa-bundle', false, null, true, new \DateTimeImmutable(self::LATEST), 'v8.5.0', 12, null, 'library', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), ['8' => $undatedHighest]), null, 4.06, null, true];
+        yield 'the installed tag is the highest stable and has no date' => [self::package('v5.13.2', null), self::metadata(null, ['5' => ['v5.13.2', null]]), null, 0.0, null, false];
+        yield 'the installed tag is the highest stable, the lock dates it' => [self::package(), self::metadata(null, ['5' => ['v5.13.2', null]]), null, 0.0, null, false];
         yield 'ahead of the last stable release, clamped to zero' => [self::package(), self::metadata('2019-01-23T15:23:04+00:00'), null, 0.0, null, false];
     }
 
@@ -272,7 +274,7 @@ final class LibyearsTest extends TestCase
             '4' => ['v4.9.9', '2026-03-01T00:00:00+00:00'],
         ]);
 
-        self::assertNull(Libyears::measure(self::package(), $metadata)->years());
+        self::assertSame(0.0, Libyears::measure(self::package(), $metadata)->years(), 'the installed release is the newest by version, so the later 4.x date does not count');
     }
 
     public function testOnTheInstalledBranchOnlyAHigherVersionCounts(): void
