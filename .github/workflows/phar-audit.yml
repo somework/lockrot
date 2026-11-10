@@ -1,0 +1,32 @@
+# The PHAR bundles the production dependencies of build/phar/composer.lock, which Dependabot does
+# not watch: the lock names a path repository that Dependabot cannot resolve, and a bump of
+# composer/composer also moves the recordings (CONTRIBUTING, "The PHAR"). This audit reports an
+# advisory against a bundled version, on a change of the lock and weekly, because an advisory
+# appears without a change in the lock. A red run means: run `composer update` for the named
+# package in build/phar/ and commit the lock. workflow_dispatch needs this file on the default
+# branch, and GitHub runs schedule there.
+name: phar-audit
+on:
+  pull_request:
+    paths:
+      - 'build/phar/composer.lock'
+      - '.github/workflows/phar-audit.yml'
+  schedule:
+    - cron: '41 4 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer:2.10.3
+      - run: composer audit --locked --no-interaction --working-dir=build/phar

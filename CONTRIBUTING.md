@@ -286,6 +286,11 @@ The archive's dependencies are locked in `build/phar/composer.lock`, which is co
 - To bump `composer/composer` or another dependency of the archive, run `composer update` in
   `build/phar/` and commit the lock.
 
+`.github/workflows/phar-audit.yml` runs `composer audit --locked` on that lock when it changes and
+every week. Dependabot does not watch `build/phar/`, so a red run is the only report of an advisory
+against a bundled dependency. Update the named package in `build/phar/`, commit the lock, and
+release the fix.
+
 ### Rebuilding a release
 
 To check that a published `lockrot.phar` is the one its tag builds:
