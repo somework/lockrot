@@ -338,6 +338,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
             $metadata = PackageMetadata::fromPackages('a/b', $packages, new \DateTimeImmutable(self::FIXED));
 
             self::assertEquals(new \DateTimeImmutable('2021-03-01T00:00:00+00:00'), $metadata->newestReleaseByVersionAt(), $order);
+            self::assertFalse($metadata->newestReleaseByVersionSharesItsCommit(), $order);
         }
     }
 
@@ -356,6 +357,7 @@ final class PackageMetadataFromPackagesTest extends TestCase
         $metadata = PackageMetadata::fromPackages('a/b', $packages, new \DateTimeImmutable(self::FIXED));
 
         self::assertNull($metadata->newestReleaseByVersionAt());
+        self::assertTrue($metadata->newestReleaseByVersionSharesItsCommit());
     }
 
     /** An old alpha of the next major on its own commit must not let S2 read the newer shared-commit date of a stable tag. */

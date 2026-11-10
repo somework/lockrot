@@ -227,6 +227,14 @@ final class LockrotConfigTest extends TestCase
         yield 'a word' => ['eight'];
     }
 
+    /** Composer's version parser keeps a `dev-` branch name, so a platform php can reach the target as no version. */
+    public function testAPlatformPhpThatIsABranchNameIsRefused(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('target-php must look like "8.4"; got "dev-main"');
+        LockrotConfig::fromSources([], [], [], '8.5.10', 'dev-main');
+    }
+
     public function testAVPrefixedTargetPhpOptionIsStillRefused(): void
     {
         $this->expectException(ConfigException::class);
