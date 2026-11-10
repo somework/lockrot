@@ -18,4 +18,4 @@ php: the lock installs on PHP 8.1 to 8.5
 
 **Update now:** `composer update 'guzzlehttp/psr7:^2.12.3'`
 
-<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

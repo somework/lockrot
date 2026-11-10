@@ -1630,7 +1630,7 @@
           ],
           "properties": {
             "result": {
-              "description": "`resolves`: the solver installs the move in `form`; `refused`: no form installs it, and `held_by` names the holds; `not_checked`: lockrot did not ask, `reason` says why. Closed.",
+              "description": "`resolves`: the solver installs the move in `form`; `refused`: no form installs it, and `held_by` names the holds; `not_checked`: lockrot did not ask, or every solve installs no release of the package, `reason` says why. Closed.",
               "type": "string",
               "enum": [
                 "resolves",
@@ -1655,7 +1655,7 @@
               ]
             },
             "reason": {
-              "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `advisory_lookup_incomplete` (the advisory lookup did not cover a package of the result), `lock_disabled` (`config.lock` is false, so Composer ignores composer.lock), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), `platform_config_invalid` (a `config.platform` entry of the merged config fails the validation of Composer's platform repository: php set to false in any letter case, a value that is neither a string nor false, a name that is no platform package, or a version string that Composer cannot normalize, such as `^8.2` or an ext-* value `^1.0`), `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note). An open set.",
+              "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `advisory_lookup_incomplete` (the advisory lookup did not cover a package of the result), `lock_disabled` (`config.lock` is false, so Composer ignores composer.lock), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), `platform_config_invalid` (a `config.platform` entry of the merged config fails the validation of Composer's platform repository: php set to false in any letter case, a value that is neither a string nor false, a name that is no platform package, or a version string that Composer cannot normalize, such as `^8.2` or an ext-* value `^1.0`), `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note), `installs_no_release` (each form that resolves keeps the locked release, installs a dev version of the package, a branch alias included, or removes it, so no form reaches a release: the move's text names what the solver installs). An open set.",
               "oneOf": [
                 {
                   "type": "string",
@@ -1673,7 +1673,8 @@
                     "pass_cap",
                     "solver_error",
                     "advisory_lookup_incomplete",
-                    "lock_disabled"
+                    "lock_disabled",
+                    "installs_no_release"
                   ]
                 },
                 {
@@ -1682,7 +1683,7 @@
               ]
             },
             "installs": {
-              "description": "The release of the moved package that the resolving form installs, as its repository lists it. Null unless `result` is `resolves`, and null when the check was recorded without it.",
+              "description": "The release of the moved package that the resolving form installs, as its repository lists it. Null unless `result` is `resolves`, and null when the check was recorded without it. On `not_checked` with `installs_no_release`, the version that the first resolving form installs or keeps: a dev version, or the locked release. Null when that form removes the package from the lock.",
               "type": [
                 "string",
                 "null"
@@ -1692,7 +1693,7 @@
           },
           "allOf": [
             {
-              "description": "`form` is set exactly on `resolves`, `reason` exactly on `not_checked`, and `installs` only on `resolves`.",
+              "description": "`form` is set exactly on `resolves`, `reason` exactly on `not_checked`, and `installs` only on `resolves` and on `installs_no_release`.",
               "anyOf": [
                 {
                   "properties": {
@@ -1738,10 +1739,38 @@
                       "type": "null"
                     },
                     "reason": {
-                      "type": "string"
+                      "type": "string",
+                      "not": {
+                        "enum": [
+                          "installs_no_release"
+                        ]
+                      }
                     },
                     "installs": {
                       "type": "null"
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "result": {
+                      "enum": [
+                        "not_checked"
+                      ]
+                    },
+                    "form": {
+                      "type": "null"
+                    },
+                    "reason": {
+                      "enum": [
+                        "installs_no_release"
+                      ]
+                    },
+                    "installs": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     }
                   }
                 }

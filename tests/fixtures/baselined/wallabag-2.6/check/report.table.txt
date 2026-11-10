@@ -1108,7 +1108,7 @@ deepest: hoa/ustring and hoa/zformat, 4 hops (kphoen/rulerz › hoa/ruler › ho
 security: 20 vulnerable packages · 64 advisories: 1 critical, 17 high, 30 medium, 3 unrated, 13 low ·
 packages-dev not checked (pass --dev)
 fix, by package: composer update 8 · upgrade 9 · php floor raise 2 · no fix 1
-libyears: at least 385.4 behind across 204 of 210 packages · 220.0 from direct requirements ·
+libyears: at least 385.5 behind across 204 of 210 packages · 220.1 from direct requirements ·
 furthest behind willdurand/jsonp-callback-validator v1.1.0 at 8.0
 pulled in by: kphoen/rulerz-bundle 15 · kphoen/rulerz 14 · wallabag/phpepub 5 · nelmio/api-doc-bundle 3 ·
 pagerfanta/doctrine-orm-adapter 3 · … and 31 more
@@ -1119,7 +1119,7 @@ the 3 packages that exclude it: composer.json requires php-http/guzzle5-adapter 
 baseline: 48 known · 61 new · 6 worsened · 2 stale (lockrot-baseline.json)
 <fg=red>gate: fails · --fail-on=high · 46 findings fail it; 38 reach it and the baseline exempts them ·</fg=red>
 <fg=red>target php 8.4 (--target-php)</fg=red>
-Data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run lockrot with --format=json for
 details.
 note: moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move:
 laminas/laminas-code 4.7.1 requires php \>=7.4, \<8.2.

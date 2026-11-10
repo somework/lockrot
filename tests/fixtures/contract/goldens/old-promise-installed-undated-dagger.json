@@ -9,7 +9,7 @@
         "4.x                  not read (undated releases)",
         "newest               not read (undated releases)",
         "last push            2023-12-22   2.8 years ago                 below push-warn-years 3",
-        "libyears not measured: undated releases"
+        "libyears 0.0 behind the newest stable release"
     ],
     "baseline_suffix": null,
     "commands_posix": [],

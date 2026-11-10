@@ -15,4 +15,4 @@ php: the lock installs on PHP 7.4 to 8.5; Composer solves at 7.4.29 from config.
 
 - note: moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: scheb/2fa-bundle v5.13.2 requires symfony/framework-bundle ^4.4 \|\| ^5.0.
 
-<sub>6 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>6 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

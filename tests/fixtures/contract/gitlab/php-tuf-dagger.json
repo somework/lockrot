@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/unknown",
+        "description": "php-tuf/php-tuf 1.0.3 \u2014 finding unknown (0).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "5c881f9a6554ba950f1cdb67f9d13c25a554b24c5e9c1e4dd2a2ca94795d9c27",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/unchecked",
+        "description": "php-tuf/php-tuf 1.0.3 \u2014 finding unknown (0) \u2014 checks missing: S2, S3, S4, S5, S8 (not from a Composer repository).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "ebbdbd16d62b5156a0da6501ccc17da84b5f887fc046f6a8b128f7dd3ad0a965",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

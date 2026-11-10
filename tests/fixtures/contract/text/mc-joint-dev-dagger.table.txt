@@ -20,5 +20,5 @@ moves: checked with the solver of Composer 2.10.3 against the lock; ext-*, lib-*
 requirements not checked
 php: the lock installs on PHP 7.4 to 8.5
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)
-Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with --format=json for
 details.

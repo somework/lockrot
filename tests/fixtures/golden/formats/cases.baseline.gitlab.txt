@@ -77,6 +77,8 @@ lockrot/capped minor Bug Risk: ezyang/htmlpurifier v4.17.0 — finding low (4 = 
 lockrot/capped minor Bug Risk: nette/schema v1.3.2 — finding low (4 = capped 8 ÷ 2 transitive) — capped: requires php 8.1 - 8.4: it stops at 8.4, so the newest PHP, 8.5, is excluded. Do: composer update nette/schema (gets v1.3.6) — clears capped. (via laravel/framework and pragmarx/google2fa-laravel)
 lockrot/capped major Bug Risk: ocramius/proxy-manager 2.2.4 — finding low (4 = capped 8 ÷ 2 transitive) — capped: requires php ^7.2.0: it stops at 7.4, so the newest PHP, 8.5, is excluded. Do: no move: no release above 2.2.4 admits PHP 8.5. (via symfony/proxy-manager-bridge)
 lockrot/unknown info Bug Risk: drupal/core 10.6.18 — finding unknown (0).
+lockrot/unknown info Bug Risk: php-tuf/php-tuf 1.0.3 — finding unknown (0).
+lockrot/unchecked major Bug Risk: php-tuf/php-tuf 1.0.3 — finding unknown (0) — checks missing: S2, S3, S4, S5, S8 (not from a Composer repository).
 lockrot/unknown info Bug Risk: bower-asset/jquery 3.7.1 — finding unknown (0). (via yiisoft/yii2, yiisoft/yii2-bootstrap5 and yiisoft/yii2-symfonymailer)
 lockrot/unchecked major Bug Risk: bower-asset/jquery 3.7.1 — finding unknown (0) — checks missing: S2, S3, S4, S8 (origin unknown). (via yiisoft/yii2, yiisoft/yii2-bootstrap5 and yiisoft/yii2-symfonymailer)
 lockrot/finished info Bug Risk: akaunting/laravel-version 1.0.4 — finding finished (0 (stale accepted)).

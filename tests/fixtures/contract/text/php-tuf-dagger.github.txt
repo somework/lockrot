@@ -1,0 +1,4 @@
+::notice file=composer.lock,line=4,title=lockrot%3A unknown::php-tuf/php-tuf 1.0.3: 0. checks missing: S2, S3, S4, S5, S8 (not from a Composer repository).
+::notice title=lockrot::1 package is not from a Composer repository: its release metadata and repository activity were not read
+php: the lock installs on PHP 8.3 to 8.5
+gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

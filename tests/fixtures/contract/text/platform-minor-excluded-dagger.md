@@ -12,4 +12,4 @@ libyears: 4.2 behind across the one package · 4.2 from direct requirements · f
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)\
 php: the lock installs on PHP 7.4 and 8.0 to 8.5, so your target, 7.5, is excluded; the update of the package that excludes it is not checked (the run checked no move)
 
-<sub>6 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>6 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

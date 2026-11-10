@@ -1,8 +1,8 @@
 {
     "apps/wallabag_wallabag": {
         "block": {
-            "total": 160.39,
-            "direct_requirements": 107.99,
+            "total": 160.29,
+            "direct_requirements": 107.89,
             "measured": 195,
             "unmeasured": {
                 "not_from_composer_repository": 0,
@@ -210,7 +210,7 @@
             "tecnickcom/tcpdf": 0.4,
             "thecodingmachine/safe": 2.84,
             "twig/extra-bundle": 0.0,
-            "twig/string-extra": 0.1,
+            "twig/string-extra": 0.0,
             "twig/twig": 0.0,
             "wallabag/phpepub": 0.0,
             "wallabag/rulerz": null,

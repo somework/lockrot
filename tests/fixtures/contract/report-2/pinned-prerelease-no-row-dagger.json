@@ -1362,8 +1362,8 @@
                         "version": "dev-master",
                         "reason": "branch_snapshot",
                         "has_stable_release": true,
-                        "last_stable_release": "2025-06-01T00:00:00+00:00",
-                        "last_stable_version": "v5.0.0-beta1",
+                        "last_stable_release": "2025-01-01T00:00:00+00:00",
+                        "last_stable_version": "v4.0.0",
                         "last_stable_dated_by": null,
                         "snapshot_time": "2018-06-01T00:00:00+00:00",
                         "tag_relation": "newer"

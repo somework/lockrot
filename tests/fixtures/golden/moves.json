@@ -8682,6 +8682,186 @@
             "text": "require symfony/google-mailer ^5.4 (gets v5.4.19, below the newest v5.4.45) \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements; Composer's solver checked it against the lock"
         }
     },
+    "gets-replace-held\u2021": {
+        "next_step": {
+            "kind": "require",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "upgrade",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "5.x",
+            "version": "v5.4.52",
+            "newest": "v5.4.53",
+            "constraint": "^5.4.52",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2.5",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [
+                {
+                    "source": "package",
+                    "package": "incenteev/composer-parameter-handler",
+                    "version": "v2.1.5",
+                    "link": "replace",
+                    "target": "symfony/yaml",
+                    "constraint": "^5.4",
+                    "holder": {
+                        "verdict": "ok",
+                        "lead": null,
+                        "flag_ids": [],
+                        "direct": true,
+                        "replacement": null,
+                        "next_step": null
+                    }
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-b14r-zh1d-vdrc",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-ft77-7h5f-p3r6",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-v5yj-8nmz-sk2q",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": {
+                "result": "refused",
+                "form": null,
+                "reason": null,
+                "installs": null
+            },
+            "moves_with": [],
+            "composer_moves_because": [
+                "holders"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "why-not",
+                    "symfony/yaml",
+                    "v5.4.52",
+                    "--locked"
+                ]
+            ],
+            "through": [
+                {
+                    "package": "incenteev/composer-parameter-handler",
+                    "installed_version": "v2.1.5",
+                    "installed_requires": true,
+                    "newest_stable": {
+                        "version": "v2.3.0",
+                        "released": "2025-11-26T14:10:46+00:00"
+                    },
+                    "newest_requires": true,
+                    "newest_requires_unmeasured": null,
+                    "local": false,
+                    "newest_is_installed": false
+                },
+                {
+                    "package": "nelmio/api-doc-bundle",
+                    "installed_version": "v4.11.1",
+                    "installed_requires": false,
+                    "newest_stable": {
+                        "version": "v5.12.2",
+                        "released": "2026-09-14T11:12:11+00:00"
+                    },
+                    "newest_requires": null,
+                    "newest_requires_unmeasured": "through_other_package",
+                    "local": false,
+                    "newest_is_installed": false
+                },
+                {
+                    "package": "php-amqplib/rabbitmq-bundle",
+                    "installed_version": "2.17.4",
+                    "installed_requires": true,
+                    "newest_stable": {
+                        "version": "2.19.0",
+                        "released": "2026-01-16T12:34:27+00:00"
+                    },
+                    "newest_requires": true,
+                    "newest_requires_unmeasured": null,
+                    "local": false,
+                    "newest_is_installed": false
+                }
+            ],
+            "also": [],
+            "text": "move symfony/yaml to ^5.4.52 through incenteev/composer-parameter-handler, nelmio/api-doc-bundle and php-amqplib/rabbitmq-bundle \u2014 clears 3 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by incenteev/composer-parameter-handler v2.1.5 (replaces symfony/yaml ^5.4); the packages that hold it may need to move too; Composer's solver refuses it against the lock"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 3,
+            "unknown": 0,
+            "of": 3,
+            "fix_kind": "upgrade",
+            "lowest": "v5.4.52",
+            "newest": "v5.4.53",
+            "held_by": [
+                {
+                    "source": "package",
+                    "package": "incenteev/composer-parameter-handler",
+                    "version": "v2.1.5",
+                    "link": "replace",
+                    "target": "symfony/yaml",
+                    "constraint": "^5.4",
+                    "holder": {
+                        "verdict": "ok",
+                        "lead": null,
+                        "flag_ids": [],
+                        "direct": true,
+                        "replacement": null,
+                        "next_step": null
+                    }
+                }
+            ],
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": {
+                "result": "refused",
+                "form": null,
+                "reason": null,
+                "installs": null
+            }
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
     "github-archived-unread\u2021": {
         "next_step": {
             "kind": "find-alternative",
@@ -9951,6 +10131,43 @@
         "move_in": "next_step",
         "partial": null
     },
+    "libyears-prerelease-undated\u2021": {
+        "next_step": {
+            "kind": "no-move",
+            "source": "stale",
+            "merged": [],
+            "fix_kind": null,
+            "reason": "package_quiet",
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "\u2014"
+        }
+    },
     "local-path-advisory": {
         "next_step": {
             "kind": "no-move",
@@ -10064,6 +10281,108 @@
             "also": [],
             "text": "replace with symfony/error-handler (named by its registry); lockrot found no path from your requirements to it: `composer why` names what requires it"
         }
+    },
+    "lock-out-of-sync\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "update",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.12.3",
+            "newest": "2.13.1",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "^7.2.5 || ^8.0",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-7qs6-zvnz-h66r",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-gm5x-j3mz-71n9",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-jj5t-2zs1-dcfm",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-vznr-tgp9-fd7d",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "guzzlehttp/psr7"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "guzzlehttp/psr7",
+                    "2.12.3",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update guzzlehttp/psr7 (gets 2.13.1) \u2014 clears 4 advisories"
+        },
+        "fix_kind": "update",
+        "installed_branch_fixes": {
+            "fixed": 4,
+            "unknown": 0,
+            "of": 4,
+            "fix_kind": "update",
+            "lowest": "2.12.3",
+            "newest": "2.13.1",
+            "held_by": [],
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null
+        },
+        "move_in": "next_step",
+        "partial": null
     },
     "long-range\u2021": {
         "next_step": {
@@ -15093,6 +15412,209 @@
         "move_in": "next_step",
         "partial": null
     },
+    "move-check-dev-tag\u2021": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "1.6.2",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "1.6.2",
+                "released": "2019-01-23T15:23:04+00:00",
+                "is_installed": false,
+                "relation": "newer",
+                "snapshot_time": "2018-06-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=5.5",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_before_ga"
+                }
+            ],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 18,
+                "verdict": "high",
+                "lead": "old-promise",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": {
+                "result": "not_checked",
+                "form": null,
+                "reason": "installs_no_release",
+                "installs": "dev-master"
+            },
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "friendsofsymfony/oauth-server-bundle:^1.6.2"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "friendsofsymfony/oauth-server-bundle",
+                    "1.6.2",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest is 1.6.2 (2019-01-23); 1.x needs php >=5.5, which require.php allows; it was released before your target PHP's major, so old-promise would count; stale stays; Composer's solver installs dev-master, a dev version, not 1.6.2, so this command does not reach a release"
+        }
+    },
+    "move-check-dev-update\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "update",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.12.3",
+            "newest": "2.13.1",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "^7.2.5 || ^8.0",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-7qs6-zvnz-h66r",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-gm5x-j3mz-71n9",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-jj5t-2zs1-dcfm",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-vznr-tgp9-fd7d",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": {
+                "result": "not_checked",
+                "form": null,
+                "reason": "installs_no_release",
+                "installs": "2.x-dev"
+            },
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "guzzlehttp/psr7:^2.12.3"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "guzzlehttp/psr7",
+                    "2.12.3",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update 'guzzlehttp/psr7:^2.12.3' \u2014 clears 4 advisories; Composer's solver installs 2.x-dev, a dev version, not 2.13.1, so this command does not reach a release"
+        },
+        "fix_kind": "update",
+        "installed_branch_fixes": {
+            "fixed": 4,
+            "unknown": 0,
+            "of": 4,
+            "fix_kind": "update",
+            "lowest": "2.12.3",
+            "newest": "2.13.1",
+            "held_by": [],
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "check": {
+                "result": "not_checked",
+                "form": null,
+                "reason": "installs_no_release",
+                "installs": "2.x-dev"
+            }
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
     "move-check\u2021": {
         "next_step": {
             "kind": "update",
@@ -16411,6 +16933,9 @@
             "also": [],
             "text": "move genealabs/laravel-pivot-events to ^12.0 through genealabs/laravel-model-caching \u2014 clears left-behind; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of genealabs/laravel-model-caching (13.1.11) no longer requires it"
         }
+    },
+    "php-tuf\u2021": {
+        "next_step": null
     },
     "pinned-alpha-over-shared\u2021": {
         "next_step": {

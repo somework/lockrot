@@ -60,9 +60,9 @@
 flags: abandoned 19 · silent 8 · pinned 4 · left-behind 11 · old-promise 10 · stale 10 · capped 1 · 11 packages carry more than one\
 depth: 34 of 52 flagged packages are named by no line of composer.json · direct 18 · 1 hop 17 · 2 hops 10 · 3 hops 5 · 4 hops 2 · deepest: `hoa/ustring` and `hoa/zformat`, 4 hops (`wallabag/rulerz` › `hoa/ruler` › `hoa/compiler` › `hoa/regex` › `hoa/ustring`)\
 security: no vulnerable package · advisories not checked\
-libyears: at least 160.4 behind across 194 of 200 packages · 108.0 from direct requirements · furthest behind `smalot/pdfparser` v1.1.0 at 4.7\
+libyears: at least 160.3 behind across 195 of 200 packages · 107.9 from direct requirements · furthest behind `smalot/pdfparser` v1.1.0 at 4.7\
 pulled in by: `wallabag/rulerz-bundle` 15 · `wallabag/rulerz` 14 · `wallabag/phpepub` 5 · `scheb/2fa-google-authenticator` 3 · `friendsofsymfony/oauth-server-bundle` 2 · … and 21 more\
 advisories: 0 packages asked, 200 not asked\
 php: the lock installs on PHP 8.2 to 8.4; `lcobucci/clock` excludes 8.5
 
-<sub>200 packages checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>200 packages checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

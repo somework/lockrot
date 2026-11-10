@@ -41,5 +41,5 @@ pulled in by: laravel/framework 1 · laravel/nightwatch 1 · spatie/laravel-mark
 advisories: 4 packages asked · packagist.org answered (46 on record for 2 packages)
 php: the lock installs on PHP 8.4 to 8.5
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
-Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with --format=json for
 details.

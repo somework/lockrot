@@ -15,4 +15,4 @@ php: the lock installs on PHP 8.1 to 8.5
 
 - note: GitHub did not answer for 1 repositories (private, renamed or removed); repository activity missing
 
-<sub>3 packages checked — data as of 2026-10-01 (package repositories; repository activity from lockrot's cache, up to 82 h old) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>3 packages checked — data as of 2026-10-01 (package repositories; repository activity from lockrot's cache, up to 82 h old) · score model 1. Run lockrot with `--format=json` for details.</sub>

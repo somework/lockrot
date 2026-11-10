@@ -14,4 +14,4 @@ php: the lock installs on PHP 7.4 to 8.5
 
 - note: lockrot prints no command for 1 move: a release name holds \|, \< or \>, which cmd.exe and PowerShell run or redirect
 
-<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

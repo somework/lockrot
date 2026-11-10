@@ -360,7 +360,8 @@
    "pass_cap",
    "solver_error",
    "advisory_lookup_incomplete",
-   "lock_disabled"
+   "lock_disabled",
+   "installs_no_release"
   ],
   "open": true,
   "integer": false
@@ -3121,7 +3122,8 @@
    "pass_cap",
    "solver_error",
    "advisory_lookup_incomplete",
-   "lock_disabled"
+   "lock_disabled",
+   "installs_no_release"
   ],
   "open": true,
   "integer": false
@@ -3289,7 +3291,8 @@
    "update_now_not_checked",
    "move_check_failed",
    "package_name_invalid",
-   "command_argument_unsafe"
+   "command_argument_unsafe",
+   "lock_out_of_sync"
   ],
   "open": true,
   "integer": false
@@ -3614,6 +3617,18 @@
   ],
   "values": [
    "command_argument_unsafe"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode28",
+  "pointer": "#/definitions/noteDetail/anyOf/27/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/27/properties/code"
+  ],
+  "values": [
+   "lock_out_of_sync"
   ],
   "open": false,
   "integer": false

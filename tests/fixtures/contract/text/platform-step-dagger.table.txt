@@ -20,7 +20,7 @@ moves: not checked, because Composer's solver refuses the lock itself (see the m
 php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer's solver at PHP 8.4 refuses the update of
 the 2 packages that exclude it: composer.json requires php-http/guzzle5-adapter ^2.0
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
-Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with --format=json for
 details.
 note: 2 packages are not from a Composer repository: their release metadata and repository activity were not read
 note: moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move:

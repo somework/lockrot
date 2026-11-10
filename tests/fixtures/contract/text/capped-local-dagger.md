@@ -16,4 +16,4 @@ php: the lock installs on PHP 7.4 to 8.0, so your target, 8.4, is excluded; the 
 - note: 2 packages are not from a Composer repository: their release metadata and repository activity were not read
 - note: extra.lockrot.ignore\[\] accepts maintenance flags only, not advisories: mautic/core-lib: 5 counted advisories; accept them in Composer's audit policy if that is the decision
 
-<sub>128 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>128 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

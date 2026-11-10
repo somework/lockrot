@@ -14,4 +14,4 @@ advisories: 1 package asked · packagist.org answered (4 on record for 1 package
 moves: not checked (config.lock is false, so Composer ignores composer.lock)\
 php: the lock installs on PHP 8.1 to 8.5
 
-<sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

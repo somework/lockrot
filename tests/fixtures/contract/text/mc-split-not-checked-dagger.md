@@ -18,4 +18,4 @@ php: the lock installs on PHP 8.1 to 8.4; `symfony/routing` excludes 8.5
 
 - note: moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: acme/rt-glue 1.0.0 requires acme/rt-tokens ^2.0.
 
-<sub>3 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>3 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

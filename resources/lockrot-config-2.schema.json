@@ -13,7 +13,7 @@
                 "type": "object",
                 "properties": {
                     "check": {
-                        "description": "The check that lockrot did not run: `repository_activity` (S3 and S4), `release_metadata` (S2 and S8) or `advisories` (S9). For a package outside every Composer repository, an accepted `release_metadata` also accepts the unknown fix of each counted advisory, because the fix scan reads the same releases. Its score can then be lower than with the releases read.",
+                        "description": "The check that lockrot did not run: `repository_activity` (S3 and S4), `release_metadata` (S2 and S8, with S5 when S5 could fire and S11 when S11 fired) or `advisories` (S9). For a package outside every Composer repository, an accepted `release_metadata` also accepts the unknown fix of each counted advisory, because the fix scan reads the same releases. Its score can then be lower than with the releases read.",
                         "type": "string",
                         "enum": [
                             "repository_activity",

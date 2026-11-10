@@ -80,7 +80,7 @@
 flags: abandoned 21 · silent 8 · pinned 4 · left-behind 23 · old-promise 18 · stale 15 · capped 1 · vulnerable 2 · 20 packages carry more than one\
 depth: 51 of 72 flagged packages are named by no line of composer.json · direct 21 · 1 hop 30 · 2 hops 13 · 3 hops 6 · 4 hops 2 · 18 in packages-dev · deepest: `hoa/ustring` and `hoa/zformat`, 4 hops (`wallabag/rulerz` › `hoa/ruler` › `hoa/compiler` › `hoa/regex` › `hoa/ustring`)\
 security: 2 vulnerable packages · 3 advisories: 1 high, 2 medium\
-libyears: at least 260.9 behind across 265 of 271 packages · 132.4 from direct requirements · furthest behind `sebastian/version` 3.0.2 at 6.0\
+libyears: at least 260.8 behind across 266 of 271 packages · 132.3 from direct requirements · furthest behind `sebastian/version` 3.0.2 at 6.0\
 pulled in by: `wallabag/rulerz-bundle` 15 · `wallabag/rulerz` 14 · `phpunit/phpunit` 13 · `wallabag/phpepub` 5 · `friendsofphp/php-cs-fixer` 3 · … and 27 more\
 advisories: 271 packages asked · composer repo (http\://127.0.0.1) answered (187 on record for 53 packages)\
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-\*, lib-\*, php-debug, php-ipv6 and php-zts requirements not checked\
@@ -91,4 +91,4 @@ baseline: 47 known · 26 new · 2 worsened · 9 stale (lockrot-baseline.json)
 
 - note: baseline lists 9 packages no longer in composer.lock: endroid/qr-code, guzzlehttp/guzzle, guzzlehttp/ringphp, guzzlehttp/streams, php-http/guzzle5-adapter … and 4 more
 
-<sub>271 packages checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>271 packages checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

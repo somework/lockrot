@@ -161,12 +161,15 @@ final class CaseTextGoldensTest extends TestCase
                     $expected = [
                         'resolves' => 'checked with Composer',
                         'refused' => 'Composer refuses the move',
-                        'not_checked' => 'if Composer resolves it (not checked: '.PageGoldensTest::cardReasonWords($reason, JsonPath::arrayAt($case, ['run'])).')',
+                        // The solver ran, so the card line reads the reason words alone (SPEC-0.14.md, ruling R17-Q2).
+                        'not_checked' => $reason === MoveCheck::INSTALLS_NO_RELEASE
+                            ? MoveCheck::reasonWords($reason)
+                            : 'if Composer resolves it (not checked: '.PageGoldensTest::cardReasonWords($reason, JsonPath::arrayAt($case, ['run'])).')',
                     ][(string) $result] ?? ($runChecked ? (\in_array('composer_resolves', $assumes, true) ? 'if Composer resolves it' : null) : 'if Composer resolves it (not checked: the run checked no move)');
                 }
                 $after = JsonPath::decoded($cards[$i] ?? [])['after'] ?? null;
                 $conditions = \is_array($after) && \is_array($after['conditions'] ?? null) ? $after['conditions'] : [];
-                $actual = array_values(preg_grep('/^(checked with Composer|Composer refuses the move|if Composer resolves it)/', array_filter($conditions, 'is_string')) ?: []);
+                $actual = array_values(preg_grep('/^(checked with Composer|Composer refuses the move|if Composer resolves it|'.preg_quote(MoveCheck::reasonWords(MoveCheck::INSTALLS_NO_RELEASE), '/').'$)/', array_filter($conditions, 'is_string')) ?: []);
                 $lines[] = $expected;
                 if ($actual !== ($expected === null ? [] : [$expected]) || ($expected !== null && ($move['if_applied'] ?? null) === null && $after !== ['result' => null, 'conditions' => [$expected]])) {
                     $differ[$id.' card '.$i] = ['expected' => $expected, 'after' => $after];
@@ -177,6 +180,7 @@ final class CaseTextGoldensTest extends TestCase
         self::assertSame([], $differ);
         self::assertContains('checked with Composer', $lines, 'no case golden shows a move that Composer resolves');
         self::assertContains('if Composer resolves it (not checked: the run checked no move)', $lines, 'no case golden shows a run that checked no move');
+        self::assertContains(MoveCheck::reasonWords(MoveCheck::INSTALLS_NO_RELEASE), $lines, 'no case golden shows a move whose solve reaches no release');
     }
 
     /**

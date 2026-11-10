@@ -17,4 +17,4 @@ php: the lock installs on PHP 8.1 to 8.5
 
 - note: moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: typo3/html-sanitizer v2.2.0 requires acme/san-tokens ^2.0.
 
-<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

@@ -101,7 +101,8 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'security' => [
             'details.metadata.branches[].{branch,installed}', 'details.metadata.branches[].fixes.{fix_kind,fixed,lowest,newest,of}',
             'details.metadata.branches[].fixes.held_by[].{package,source}',
-            'details.metadata.branches[].fixes.if_applied.{assumes,at_most,total,verdict}', 'next_step.held_by[].{package,source}',
+            'details.metadata.branches[].fixes.if_applied.{assumes,at_most,total,verdict}', 'details.metadata.branches[].fixes.check.{form,installs,reason,result}',
+            'next_step.held_by[].{package,source}',
             'next_step.to_branch', 'origin.kind', 'package', 'score.parts.security.of',
             'security.{check,fix_kind,ignored_count,records,status,unchecked_reason}', 'security.counts.{critical,high,low,medium,unrated}',
             'security.ignored[].{by,cve,id,reason,severity}', 'security.partial.clears[].{id,kind}',
@@ -348,6 +349,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             ],
         ],
     ];
+
 
     private const MOVE_VERSION = 'The model leaves `version` null on a move whose constraint comes from S8. lockrot names the lowest release that the constraint admits, and the why-not step of a move that does not resolve names it. The move card prints `newest` and reads `version` only when `newest` is null.';
 

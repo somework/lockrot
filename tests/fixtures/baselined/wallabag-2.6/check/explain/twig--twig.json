@@ -851,7 +851,7 @@
         "evidence": "vulnerable: 15 advisories: 1 critical, 3 high, 5 medium, 2 unrated, 4 low \u2014 all fixed on 3.x (php floor raise); worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
         "allowlist_reason": null,
         "data_date": "2026-10-14T00:00:00+00:00",
-        "libyears": 1.52,
+        "libyears": 1.65,
         "age": {
             "installed": {
                 "at": "2024-11-07T12:34:41+00:00",

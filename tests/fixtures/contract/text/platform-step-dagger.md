@@ -16,4 +16,4 @@ php: the lock installs on PHP 7.4, so your target, 8.4, is excluded; Composer's 
 - note: 2 packages are not from a Composer repository: their release metadata and repository activity were not read
 - note: moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code 4.7.1 requires php \>=7.4, \<8.2.
 
-<sub>8 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>8 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

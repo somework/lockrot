@@ -15,9 +15,9 @@
 flags: abandoned 1 · silent 2 · pinned 3 · old-promise 2 · stale 3 · 3 packages carry more than one\
 depth: 2 of 7 flagged packages are named by no line of composer.json · direct 5 · 1 hop 1 · 3 hops 1 · deepest: `pear/console_getopt`, 3 hops (`matomo/decompress` › `pear/archive_tar` › `pear/pear-core-minimal` › `pear/console_getopt`)\
 security: no vulnerable package · advisories not checked\
-libyears: 0.9 behind across 47 of 52 packages · 0.1 from direct requirements · furthest behind `maxmind-db/reader` v1.13.1 at 0.8\
+libyears: 0.9 behind across 49 of 52 packages · 0.1 from direct requirements · furthest behind `maxmind-db/reader` v1.13.1 at 0.8\
 pulled in by: `matomo/cache` 1 · `matomo/decompress` 1\
 advisories: 0 packages asked, 52 not asked\
 php: the lock installs on PHP 8.1 to 8.5; Composer solves at 8.1.0 from config.platform.php
 
-<sub>52 packages checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>52 packages checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

@@ -20,5 +20,5 @@ advisories: 0 packages asked, 1 not asked (offline) · packagist.org not asked (
 php: the lock installs on PHP 7.2 to 8.5
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · advisories not applied to 1 package: not checked (offline) ·</fg=red>
 <fg=red>target php 8.4 (--target-php)</fg=red>
-Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with --format=json for
 details.

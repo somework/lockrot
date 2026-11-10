@@ -16,4 +16,4 @@ php: the lock installs on PHP 7.4 to 8.5
 
 **Update now:** `composer update 'typo3/html-sanitizer:^2.3.2'`
 
-<sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

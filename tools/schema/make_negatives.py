@@ -821,6 +821,11 @@ def _(d): d['findings'][0]['unchecked_accepted'][0]['accepted_by']['expires'] = 
 def _(d): del d['findings'][0]['unchecked_accepted'][0]['accepted_by']['value']
 @case('o9-blocks-of-another-check', 'host-accepted-dagger', 'findings[0].unchecked_accepted[0]')
 def _(d): d['findings'][0]['unchecked_accepted'][0]['blocks'] = ['S9']
+# A release_metadata entry blocks S2 and S8, and S5 and S11 only in signal order.
+@case('f32-release-metadata-blocks-s9', 'vcs-accepted-dagger', 'findings[0].unchecked_accepted[0]')
+def _(d): d['findings'][0]['unchecked_accepted'][0]['blocks'] = ['S2', 'S8', 'S9']
+@case('f32-release-metadata-blocks-out-of-order', 'vcs-accepted-dagger', 'findings[0].unchecked_accepted[0]')
+def _(d): d['findings'][0]['unchecked_accepted'][0]['blocks'] = ['S2', 'S8', 'S5']
 @case('o9-reason-of-another-check', 'host-accepted-dagger', 'findings[0].unchecked_accepted[0]')
 def _(d): d['findings'][0]['unchecked_accepted'][0]['reason'] = 'no_feed'
 @case('o9-root-count-zero', 'host-accepted-dagger', '(root)')

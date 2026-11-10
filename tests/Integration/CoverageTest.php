@@ -61,7 +61,7 @@ final class CoverageTest extends TestCase
                 $this->record($name, $schema, $schema, '#', json_decode((string) file_get_contents(substr($path, -3) === '.gz' ? 'compress.zlib://'.$path : $path)));
             }
         }
-        self::assertSame([Schemas::REPORT => 443, Schemas::EXPLAIN => 361, Schemas::BASELINE => 142, Schemas::CONFIG => 79], $counts, 'tests/fixtures/schema/documents/provenance.json');
+        self::assertSame([Schemas::REPORT => 451, Schemas::EXPLAIN => 372, Schemas::BASELINE => 142, Schemas::CONFIG => 79], $counts, 'tests/fixtures/schema/documents/provenance.json');
 
         $shared = [];
         foreach ((array) $schemas[Schemas::EXPLAIN]->definitions as $definition => $node) {
@@ -317,7 +317,7 @@ final class CoverageTest extends TestCase
             [self::D.'withoutRow/properties/revealed/items/properties/role', ['accepted'], self::NOT_REACHED.' (a without[] row that reveals an accepted flag)'],
             [self::D.'securityVulnerable/properties/partial/oneOf/0/properties/if_applied/properties/assumes/items', ['composer_resolves'],
                 "the open set lists a move's known values: NextStep::partial() assumes clears_hold, and no_new_advisories on an incomplete lookup, as its description says. next_step.if_applied.assumes carries the value"],
-            [self::D.'noteUpdateNowNotChecked/properties/reason', ['baseline_refused', 'unloaded_name', 'offline', 'not_from_composer_repository', 'no_composer_json', 'composer_json_invalid', 'no_release_read', 'pass_cap', 'solver_error', 'advisory_lookup_incomplete', 'platform_config_invalid'],
+            [self::D.'noteUpdateNowNotChecked/properties/reason', ['baseline_refused', 'unloaded_name', 'offline', 'not_from_composer_repository', 'no_composer_json', 'composer_json_invalid', 'no_release_read', 'pass_cap', 'solver_error', 'advisory_lookup_incomplete', 'platform_config_invalid', 'installs_no_release'],
                 "the note's reason is a value of check.reason, which the move-check documents carry each. A document carries install_time_budget"],
             [self::D.'noteUpdateNowNotChecked/properties/reason', ['lock_disabled'],
                 'under config.lock false no update-now candidate exists, so the note never names lock_disabled (ruling R14-22)'],

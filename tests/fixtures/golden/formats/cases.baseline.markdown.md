@@ -1,6 +1,6 @@
-### lockrot: 55 of 60 packages flagged — critical 11 · high 21 · medium 16 · low 7
+### lockrot: 55 of 61 packages flagged — critical 11 · high 21 · medium 16 · low 7
 
-**gate: fails** · --fail-on=high,unchecked · 33 findings fail it (high 31, unchecked 4); 2 reach it and the baseline exempts them · target php 8.4 (--target-php)
+**gate: fails** · --fail-on=high,unchecked · 34 findings fail it (high 31, unchecked 5); 2 reach it and the baseline exempts them · target php 8.4 (--target-php)
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
@@ -60,17 +60,18 @@
 | low | `nette/schema` | v1.3.2 | capped | `4 = capped 8 ÷ 2 transitive (baseline: new package)`<br>**Do:** `composer update nette/schema` (gets v1.3.6) — clears capped<br>*capped:* requires php 8.1 - 8.4: it stops at 8.4, so the newest PHP, 8.5, is excluded<br>*age:* installed v1.3.2 released 2024-10-06 (2.0 years ago); 1.x last released v1.3.6 2026-08-16 (0.1 years ago), its newest release; last push 2026-09-10 (0.1 years ago) | laravel/framework and pragmarx/google2fa-laravel |
 | **low** | `ocramius/proxy-manager` | 2.2.4 | capped | `4 = capped 8 ÷ 2 transitive (baseline: new package)`<br>**Do:** no move: no release above 2.2.4 admits PHP 8.5<br>*capped:* requires php ^7.2.0: it stops at 7.4, so the newest PHP, 8.5, is excluded<br>*age:* installed 2.2.4 released 2022-03-05 (4.6 years ago); last push 2026-09-25 (less than three weeks ago)<br>checks missing: S2 (undated releases) | symfony/proxy-manager-bridge |
 | unknown | `drupal/core` | 10.6.18 | unknown | `0`<br>pulls in 3 flagged packages: guzzlehttp/guzzle (vulnerable), pear/console\_getopt (silent), pear/pear\_exception (stale) | direct |
+| **unknown** | `php-tuf/php-tuf` | 1.0.3 | unknown | `0`<br>checks missing: S2, S3, S4, S5, S8 (not from a Composer repository) | direct |
 | **unknown** | `bower-asset/jquery` | 3.7.1 | unknown | `0`<br>checks missing: S2, S3, S4, S8 (origin unknown) | yiisoft/yii2, yiisoft/yii2-bootstrap5 and yiisoft/yii2-symfonymailer |
 | finished | `akaunting/laravel-version` | 1.0.4 | finished · stale (accepted) | `0 (stale accepted)` | direct |
 | ok | `doctrine/annotations` | 2.0.2 | ok | `0`<br>*abandoned marking ignored* (policy.abandoned: doctrine/\*): the annotations reader goes with the ORM 3 upgrade | mautic/core-lib |
 | ok | `scheb/2fa-google-authenticator` | v8.6.1 | ok | `0 (baseline: known)`<br>`gate 0 = min(0, 2 × 0) (the new facts bound it); new: 0`<br>checks missing: S2 (undated releases) | pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more |
 
 flags: abandoned 7 · silent 1 · pinned 5 · left-behind 18 · old-promise 13 · stale 8 · capped 7 · vulnerable 19 · 20 packages carry more than one\
-depth: 22 of 55 flagged packages are named by no line of composer.json · direct 32 · 1 hop 15 · 2 hops 4 · 4 hops 1 · unreached 3 · deepest: `robrichards/xmlseclibs`, 4 hops (`mautic/core-lib` › `lightsaml/sp-bundle` › `lightsaml/symfony-bridge` › `lightsaml/lightsaml` › `robrichards/xmlseclibs`) · 1 more is named only in require-dev, which this run did not walk (pass --dev)\
+depth: 22 of 55 flagged packages are named by no line of composer.json · direct 32 · 1 hop 15 · 2 hops 3 · 3 hops 1 · 4 hops 1 · unreached 3 · deepest: `robrichards/xmlseclibs`, 4 hops (`mautic/core-lib` › `lightsaml/sp-bundle` › `lightsaml/symfony-bridge` › `lightsaml/lightsaml` › `robrichards/xmlseclibs`) · 1 more is named only in require-dev, which this run did not walk (pass --dev)\
 security: 19 vulnerable packages · 88 advisories: 3 critical, 29 high, 40 medium, 3 unrated, 13 low\
-libyears: at least 134.3 behind across 50 of 60 packages · 77.1 from direct requirements · furthest behind `symfony/monolog-bridge` v2.6.13 at 10.6\
+libyears: at least 126.7 behind across 51 of 61 packages · 69.5 from direct requirements · furthest behind `symfony/monolog-bridge` v2.6.13 at 10.6\
 pulled in by: `mautic/core-lib` 7 · `guzzlehttp/guzzle` 2 · `laravel/framework` 2 · `akaunting/laravel-apexcharts` 1 · `friendsofsymfony/user-bundle` 1 · … and 8 more\
-advisories: 60 packages asked · packagist.org answered (291 on record for 24 packages)\
+advisories: 61 packages asked · packagist.org answered (291 on record for 24 packages)\
 php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 11 packages that exclude it is not checked (the run checked no move)\
 baseline: 3 known · 49 new · 4 worsened · 0 stale (lockrot-baseline.json)
 
@@ -78,4 +79,4 @@ baseline: 3 known · 49 new · 4 worsened · 0 stale (lockrot-baseline.json)
 
 - note: the baseline was written for php 8.5 (the PHP running lockrot) and this run targets php 8.4 (--target-php): fix changes against the baseline are not compared
 
-<sub>60 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>61 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

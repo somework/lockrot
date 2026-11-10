@@ -312,34 +312,7 @@
     }
    },
    "move_in": "next_step",
-   "gets": {
-    "version": "v5.4.53",
-    "php_check": {
-     "requires": ">=7.2.5",
-     "project_allows": true,
-     "target_runs": true,
-     "raise_to": null,
-     "raise_size": null
-    },
-    "clears": [
-     {
-      "kind": "advisory",
-      "id": "PKSA-b14r-zh1d-vdrc",
-      "basis": "outside_range"
-     },
-     {
-      "kind": "advisory",
-      "id": "PKSA-ft77-7h5f-p3r6",
-      "basis": "outside_range"
-     },
-     {
-      "kind": "advisory",
-      "id": "PKSA-v5yj-8nmz-sk2q",
-      "basis": "outside_range"
-     }
-    ],
-    "clears_all": true
-   },
+   "gets": null,
    "partial": null
   },
   "checks_missing": [],

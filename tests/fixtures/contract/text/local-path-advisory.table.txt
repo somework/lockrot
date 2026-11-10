@@ -20,6 +20,6 @@ advisories: 1 package asked · packagist.org answered (230 on record for 44 pack
 php: the lock installs on PHP 7.4 to 8.0, so your target, 8.4, is excluded; the update of the package that excludes it
 is not checked (the run checked no move)
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
-Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with --format=json for
 details.
 note: 2 packages are not from a Composer repository: their release metadata and repository activity were not read

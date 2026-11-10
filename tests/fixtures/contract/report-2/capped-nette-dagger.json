@@ -1093,15 +1093,20 @@
             },
             {
                 "depth": 2,
+                "flagged": 0
+            },
+            {
+                "depth": 3,
                 "flagged": 1
             }
         ],
-        "max_depth": 2,
+        "max_depth": 3,
         "deepest": [
             {
                 "package": "nette/schema",
                 "chain": [
-                    "pragmarx/google2fa-laravel",
+                    "laravel/framework",
+                    "league/commonmark",
                     "league/config",
                     "nette/schema"
                 ]
@@ -1425,11 +1430,12 @@
             "dev": false,
             "reach": "transitive",
             "chain": [
-                "pragmarx/google2fa-laravel",
+                "laravel/framework",
+                "league/commonmark",
                 "league/config",
                 "nette/schema"
             ],
-            "depth": 2,
+            "depth": 3,
             "depth_unmeasured": null,
             "named_in": [],
             "direct_dependents": [

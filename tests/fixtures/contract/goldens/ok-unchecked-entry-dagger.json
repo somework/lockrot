@@ -9,7 +9,7 @@
         "8.x                  not read (undated releases)",
         "newest               not read (undated releases)",
         "last push            2026-07-10   0.2 years ago                 below push-warn-years 3",
-        "libyears not measured: dated only by a commit its tags share"
+        "libyears 0.0 behind the newest stable release"
     ],
     "baseline_suffix": "(baseline: known)",
     "commands_posix": [],
