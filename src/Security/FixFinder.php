@@ -8,6 +8,7 @@ use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\Intervals;
+use Composer\Semver\VersionParser;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Data\Repository\StableRelease;
@@ -304,8 +305,9 @@ final class FixFinder
     /**
      * `composer update <package>` installs the highest release on the installed branch that the
      * lock's links allow and the target runs, whatever `require.php` says. With none that the target
-     * runs, the highest one that the links allow says why. A refusal of the move check does not lower
-     * it: only the release that a solve installs does ({@see \Lockrot\Verdict\FindingDetails}, SPEC §5.6 ruling R2).
+     * runs, the highest one that the links allow says why. A package hold of a refusal that admits a
+     * release is a lock link of that release (ruling R17-13a). A solve that installs another release
+     * names that release ({@see \Lockrot\Verdict\FindingDetails}, SPEC §5.6 ruling R2).
      *
      * @param list<Candidate>                    $onInstalled ascending
      * @param array<string, ConstraintInterface> $ranged
@@ -315,7 +317,8 @@ final class FixFinder
         $release = null;
         $blocked = null;
         foreach ($onInstalled as $candidate) {
-            if ($this->links->excluding($package, $candidate->release()->normalized()) !== []) {
+            $normalized = $candidate->release()->normalized();
+            if ($this->links->excluding($package, $normalized) !== [] || $this->refusalExcludes($normalized)) {
                 continue;
             }
             if ($this->floor->admitsTarget($candidate->release()->php()) === false) {
@@ -335,6 +338,33 @@ final class FixFinder
         $clears = self::cleared($release, $ranged);
 
         return new Gets($release->release()->pretty(), $check, $clears, \count($clears) === $of);
+    }
+
+    /**
+     * Whether a package hold of a refusal that admits the release does not admit it. The hold's
+     * constraint is read against the release, as a lock link on the package is: a conflict excludes
+     * what it matches, `self.version` admits only the holder's own version. A root hold is a link
+     * that {@see LinkIndex} already reads.
+     */
+    private function refusalExcludes(string $normalized): bool
+    {
+        $release = new Constraint('==', $normalized);
+        $parser = new VersionParser();
+        foreach ($this->refused->holding($normalized) as $holder) {
+            if ($holder->source() !== Holder::PACKAGE) {
+                continue;
+            }
+            try {
+                $constraint = $holder->constraint() === 'self.version' ? new Constraint('==', $parser->normalize((string) $holder->version())) : $parser->parseConstraints($holder->constraint());
+            } catch (\UnexpectedValueException $e) {
+                continue;
+            }
+            if ($holder->link() === Holder::CONFLICT ? $constraint->matches($release) : !$constraint->matches($release)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

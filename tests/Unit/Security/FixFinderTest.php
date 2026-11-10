@@ -524,8 +524,47 @@ final class FixFinderTest extends TestCase
     }
 
     /**
-     * A conflict of the lock holds 1.3.0. The refusal of `^1.2` lowers neither the newest release of the
-     * branch nor `gets`: no solve installs 1.1.0 (SPEC §5.3, ruling R2-1).
+     * Ruling R17-13a: a package hold of a refusal that admits a release counts as a lock link for
+     * `gets`, when the hold's link does not admit that release.
+     *
+     * @return iterable<string, array{0: string, 1: Holder, 2: ?string}>
+     */
+    public static function packageHoldsOfARefusal(): iterable
+    {
+        $require = static fn (string $constraint): Holder => new Holder(Holder::PACKAGE, 'a/b', '1.2.0', Holder::REQUIRE, $constraint, 'x/kernel');
+        yield 'a hold that excludes the newest leaves the release below it' => ['^1.2', $require('^2.0'), '1.1.0'];
+        yield 'a hold that excludes every release above the installed one leaves none' => ['^1.1', $require('^2.0'), null];
+        yield 'a hold whose link admits the newest leaves it' => ['^1.2', $require('^1.0'), '1.2.0'];
+        yield 'a conflict that matches the newest excludes it' => ['^1.2', new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::CONFLICT, '>=1.2', 'x/kernel'), '1.1.0'];
+        yield 'a root hold is a link of the lock already, so the refusal adds nothing' => ['^1.2', new Holder(Holder::ROOT, null, null, Holder::ROOT_REQUIRE, '^2.0', 'x/kernel'), '1.2.0'];
+    }
+
+    /**
+     * @dataProvider packageHoldsOfARefusal
+     */
+    #[DataProvider('packageHoldsOfARefusal')]
+    public function testThePackageHoldOfARefusalCapsGetsAsALockLink(string $refused, Holder $hold, ?string $gets): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4'], ['1.2.0', '>=7.4']], ['A' => '<1.1.0']);
+        $finder = new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::fromArray(['require' => ['a/b' => '^1.0']])));
+
+        $held = $finder->withRefused(RefusedMoves::none()->with($refused, [$hold]))->find($facts);
+        $free = $finder->find($facts);
+
+        self::assertSame($gets, $held->gets() === null ? null : $held->gets()->version());
+        $installed = $held->installedBranch();
+        self::assertNotNull($installed);
+        self::assertNotNull($free->installedBranch());
+        self::assertSame(
+            [$free->installedBranch()->newest(), $free->forAdvisory('A')->newest()],
+            [$installed->newest(), $held->forAdvisory('A')->newest()],
+            'installed_branch_fixes.newest and the S9 fix newest keep what the links allow (ruling R3-2)'
+        );
+    }
+
+    /**
+     * A conflict of the lock holds 1.3.0. The refusal of `^1.2` that names a root hold lowers neither
+     * the newest release of the branch nor `gets`: no solve installs 1.1.0 (SPEC §5.3, ruling R2-1).
      */
     public function testTheNewestOfTheInstalledBranchAndGetsAreWhatTheLinksAllowWhateverTheSolverRefuses(): void
     {
