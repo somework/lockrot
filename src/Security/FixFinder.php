@@ -375,8 +375,8 @@ final class FixFinder
     /**
      * Whether a package hold of a refusal that admits the release excludes it. The hold counts only
      * when its link names the package: no target, or one of $names. Its constraint is read against
-     * the release, as a lock link on the package is: a conflict excludes what it matches,
-     * `self.version` admits only the holder's own version. A root hold is a link that
+     * the release, as a lock link on the package is: a conflict excludes what it matches, a replace
+     * excludes every release, `self.version` admits only the holder's own version. A root hold is a link that
      * {@see LinkIndex} already reads.
      *
      * @param list<string> $names the package's name and each name that it replaces
@@ -389,6 +389,10 @@ final class FixFinder
             $target = $holder->target();
             if ($holder->source() !== Holder::PACKAGE || ($target !== null && !\in_array(strtolower($target), $names, true))) {
                 continue;
+            }
+            // Composer's same-name rule makes a replace conflict with every version of the name.
+            if ($holder->link() === Holder::REPLACE) {
+                return true;
             }
             try {
                 $constraint = $holder->constraint() === 'self.version' ? new Constraint('==', $parser->normalize((string) $holder->version())) : $parser->parseConstraints($holder->constraint());

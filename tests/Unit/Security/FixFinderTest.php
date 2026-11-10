@@ -541,6 +541,8 @@ final class FixFinderTest extends TestCase
         yield 'a conflict that matches the newest excludes it' => ['^1.2', new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::CONFLICT, '>=1.2'), '1.1.0'];
         yield 'a root hold is a link of the lock already, so the refusal adds nothing' => ['^1.2', new Holder(Holder::ROOT, null, null, Holder::ROOT_REQUIRE, '^2.0'), '1.2.0'];
         yield 'a hold that excludes every release above the installed one leaves no version' => ['^1.1', $require('^2.0'), null];
+        // Ruling R17-Q4: Composer's same-name rule conflicts on every version of a replaced name.
+        yield 'a replace hold caps every release, also the one that its self.version names' => ['^1.1', new Holder(Holder::PACKAGE, 'c/c', '1.2.0', Holder::REPLACE, 'self.version', 'a/b'), null];
     }
 
     /**
