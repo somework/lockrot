@@ -524,10 +524,10 @@ final class ComposerHttpClientTest extends TestCase
     }
 
     /**
-     * Only a request that never started reads the budget as its cause. One that started, and whose
-     * retry the budget then blocked, keeps its failure: a host did not answer.
+     * Only a request that never started reads {@see HttpResult::BUDGET_SPENT}. Composer drops the
+     * failure that a blocked retry follows, so a started request reads the budget after its start.
      */
-    public function testARequestThatStartedAndWasStoppedOnItsRetryKeepsItsFailure(): void
+    public function testARequestThatTheBudgetStopsOnItsRetryReadsBudgetSpentAfterStart(): void
     {
         $started = 'https://api.github.com/repos/vendor/one';
         $queued = 'https://api.github.com/repos/vendor/two';
@@ -542,7 +542,7 @@ final class ComposerHttpClientTest extends TestCase
 
         $results = self::summarize($client->fetchAll([$started, $queued], self::HEADERS));
 
-        self::assertSame([0, null, 'Access to "'.$started.'" is blocked.'], $results[$started]);
+        self::assertSame([0, null, ComposerHttpClient::BUDGET_SPENT_AFTER_START], $results[$started], 'a retry after the budget names the budget, not a blocked URL');
         self::assertSame([0, null, HttpResult::BUDGET_SPENT], $results[$queued]);
     }
 
@@ -721,7 +721,7 @@ final class ComposerHttpClientTest extends TestCase
 
         $results = $client->fetchAll([$url], self::HEADERS);
 
-        self::assertSame([$url => [0, null, 'Access to "https://objects.example.com/name" is blocked.']], self::summarize($results), 'the request started, so its failure stays');
+        self::assertSame([$url => [0, null, ComposerHttpClient::BUDGET_SPENT_AFTER_START]], self::summarize($results), 'the request started, so the budget stopped it after its start');
         self::assertSame([$url], $downloader->started, 'the target does not start after the budget');
     }
 
@@ -759,7 +759,7 @@ final class ComposerHttpClientTest extends TestCase
 
         $results = $client->fetchAll([$url], self::HEADERS);
 
-        self::assertSame([$url => [0, null, 'Access to "https://api.github.com/repositories/1" is blocked.']], self::summarize($results));
+        self::assertSame([$url => [0, null, ComposerHttpClient::BUDGET_SPENT_AFTER_START]], self::summarize($results));
         self::assertSame([], $downloader->followed, 'the hop after the budget is not followed');
     }
 

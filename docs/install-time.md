@@ -107,7 +107,7 @@ timeout, and Composer can retry a failed transfer. With curl, the timeout of one
 An advisory that a repository publishes in its metadata takes that timeout too. A request to a
 repository's advisory API times out after 10 seconds
 ([Composer 2.10.0](https://github.com/composer/composer/blob/2.10.0/src/Composer/Repository/ComposerRepository.php)).
-A repository-activity request that the budget stops before it starts sends no request. Its package reads S10 with the cause `install_time_budget`, and the run adds the note `repository_activity_not_checked`. A request that had started and that the budget stops at a retry or a redirect keeps its failure: its package reads S10 `fetch_failed`.
+A repository-activity request that the budget stops before it starts sends no request. Its package reads S10 with the cause `install_time_budget`, and the run adds the note `repository_activity_not_checked`. A request that had started and that the budget stops at a retry or a redirect reads S10 `fetch_failed`, and the run note gives the spent budget as its error.
 A move-check solve that has started runs to its end, past the budget. The budget stops only a solve
 that has not started.
 With a warm cache, Composer sends fewer requests. `composer lockrot` has no budget.

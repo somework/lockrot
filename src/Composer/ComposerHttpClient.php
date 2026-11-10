@@ -175,18 +175,22 @@ final class ComposerHttpClient implements HttpClientInterface
         $redirects = [];
         /** @var array<string, string> $stopped the URLs whose request the install-time budget kept from starting */
         $stopped = [];
-        /** @var array<string, true> $asked the URLs whose start the callable below has seen: a later ask is a hop or a retry */
+        /** @var array<string, true> $asked the URLs whose start {@see $budgetEnded} has seen: a later ask is a hop or a retry */
         $asked = [];
+        /** @var array<string, string> $cut the started URLs whose hop or retry the install-time budget blocked */
+        $cut = [];
         // Composer's curl downloader asks this before each request, hop and retry starts.
-        // Requests above its limit wait in a queue. A hop or a retry of a started request keeps the
-        // failure of that request.
-        $budgetEnded = function (string $url) use (&$stopped, &$asked): bool {
+        // Requests above its limit wait in a queue. Composer drops the answer that a blocked hop or
+        // retry follows, so the request reads as cut after its start.
+        $budgetEnded = function (string $url) use (&$stopped, &$asked, &$cut): bool {
             $started = isset($asked[$url]);
             $asked[$url] = true;
             if (!$this->deadline->isPast()) {
                 return false;
             }
-            if (!$started) {
+            if ($started) {
+                $cut[$url] = $url;
+            } else {
                 $stopped[$url] = $url;
             }
 
@@ -258,6 +262,9 @@ final class ComposerHttpClient implements HttpClientInterface
         }
         foreach ($stopped as $url) {
             $results[$url] = HttpResult::failure($url, HttpResult::BUDGET_SPENT, $this->clock->now());
+        }
+        foreach ($cut as $url) {
+            $results[$url] = HttpResult::failure($url, self::BUDGET_SPENT_AFTER_START, $this->clock->now());
         }
         foreach ($urls as $url) {
             if (!isset($results[$url])) {

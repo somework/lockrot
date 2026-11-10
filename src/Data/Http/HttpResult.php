@@ -10,7 +10,7 @@ final class HttpResult
     /**
      * The error of a request that the install-time budget kept from starting at all. No host failed,
      * so the cause of the missing answer is the budget. A request that started and was stopped
-     * later (a retry, a redirect hop) keeps its own failure.
+     * later (a retry, a redirect hop) reads {@see \Lockrot\Composer\ComposerHttpClient::BUDGET_SPENT_AFTER_START}.
      */
     public const BUDGET_SPENT = 'install-time budget spent';
 
