@@ -15,6 +15,8 @@ use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Score\CountedAdvisory;
+use Lockrot\Security\Fix;
 use Lockrot\Security\FixFinder;
 use Lockrot\Security\LinkIndex;
 use Lockrot\Signal\BranchRow;
@@ -86,6 +88,38 @@ final class DevInstallMoveTest extends TestCase
         self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::INSTALLS_NO_RELEASE, 'dev-main'], [$check->result(), $check->reason(), $check->dev()]);
         self::assertSame([['composer', 'require', $package.':^1.2.3'], ['composer', 'why-not', $package, '1.2.3', '--locked']], $move->commands());
         self::assertStringNotContainsString("Composer's solver checked it", $move->text());
+        self::assertStringContainsString("; not checked with Composer's solver (Composer installs dev-main, a dev version), so it holds only if Composer resolves it", $move->text());
+    }
+
+    /**
+     * Case U: acme/lib 1.0.0 is vulnerable, and its dev-main alias 1.x-dev lies in the caret, so each
+     * form of the update installs dev-main. The move is not checked and prints no solver-checked words.
+     */
+    public function testAnUpdateThatEveryFormSolvesToTheBranchAliasIsNotCheckedAndNamesTheDevVersion(): void
+    {
+        $package = 'acme/lib';
+        $lock = LockFile::fromArray(['packages' => [['name' => $package, 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $remote = [
+            ['version' => '1.0.0', 'time' => '2026-01-01T00:00:00+00:00'],
+            ['version' => '1.0.9', 'time' => '2026-02-01T00:00:00+00:00'],
+            ['version' => 'dev-main', 'time' => '2026-09-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://example.org/lib.git', 'reference' => 'bbbb']] + self::ALIAS,
+        ];
+        $checker = self::checker([$package => '^1.0'], $lock, [$package => $remote]);
+        $advisory = ['id' => 'GHSA-x', 'cve' => null, 'title' => null, 'link' => null, 'reported_at' => null, 'severity' => 'high', 'severity_published' => 'high', 'affected_versions' => '<1.0.5', 'counted' => true, 'points' => 16, 'fix' => ['kind' => 'update'], 'baseline' => null];
+        $signals = [new Signal(Signal::LEVEL_HIGH, '1 advisory', SignalDataStub::of(Signal::S9, ['advisories' => [$advisory], 'releases_read' => true, 'complete' => true]))];
+        $finding = (new FindingBuilder())->withPackage($package)->withVersion('1.0.0')->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, null, [new CountedAdvisory('GHSA-x', 'high', 'update')]))->build();
+        [$context, $row] = self::context($finding, $package, '1.0.0', $lock, $remote, $checker, ['GHSA-x' => '<1.0.5']);
+        [$lower] = $context->lowestAdmitted($row, '^1.0.5');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::UPDATE, FlagSet::VULNERABLE)->to($row, $lower, null), [], Fix::UPDATE, $context);
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::INSTALLS_NO_RELEASE, 'installs' => null], $checker->check(MoveQuery::update($package, '^1.0.5', '1.0.5', null, '1.0.9'))->check()->jsonSerialize());
+        $check = $move->check();
+        self::assertNotNull($check);
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::INSTALLS_NO_RELEASE, 'dev-main'], [$check->result(), $check->reason(), $check->dev()]);
+        self::assertSame([['composer', 'update', $package.':^1.0.9'], ['composer', 'why-not', $package, '1.0.9', '--locked']], $move->commands());
+        self::assertStringNotContainsString("Composer's solver checked it", $move->text());
+        self::assertStringNotContainsString('gets dev-main', $move->text());
         self::assertStringContainsString("; not checked with Composer's solver (Composer installs dev-main, a dev version), so it holds only if Composer resolves it", $move->text());
     }
 
