@@ -149,6 +149,16 @@ final class PackageMetadataDatedByTest extends TestCase
         self::assertSame('^7.3|^8.0', $branch['highest']['php'], 'the highest tag keeps the child\'s requirement too');
     }
 
+    /** The newest tag that a move names takes the parent date as the last stable release does (ruling W17-X1). */
+    public function testTheNewestTagFollowsWhenTheParentDatesItsHighestBranch(): void
+    {
+        $dated = $this->child()->datedBy($this->parent());
+
+        self::assertSame('v13.24.0', $dated->newestTagVersion());
+        self::assertEquals(new \DateTimeImmutable('2026-09-01T00:00:00+00:00'), $dated->newestTagAt());
+        self::assertNull($this->child()->newestTagAt());
+    }
+
     public function testThePackagesOwnLastReleaseFollowsWhenTheParentDatesItsHighestBranch(): void
     {
         $dated = $this->child()->datedBy($this->parent());

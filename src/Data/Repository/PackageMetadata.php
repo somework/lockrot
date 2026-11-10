@@ -256,6 +256,10 @@ final class PackageMetadata
                 // normalized strings only: the loader never parses `version`.
                 $normalized = $version->getVersion();
                 $branch = ReleaseBranch::of($normalized);
+                // A stable tag with no release branch, such as the date version 20200101, still counts for S6.
+                if ($branch === null && VersionParser::parseStability($normalized) === 'stable') {
+                    $stable[$normalized] ??= [$version, $releaseDate, self::phpOf($version)];
+                }
                 if ($branch !== null && VersionParser::parseStability($normalized) === 'stable') {
                     $commit = self::commitOf($version);
                     if ($commit !== null) {
@@ -582,21 +586,19 @@ final class PackageMetadata
         $lastStableVersion = $this->lastStableVersion;
         $lastStableDatedBy = $this->lastStableDatedBy;
         $lastStablePhp = $this->lastStablePhp;
-        $newestVersion = $this->newestVersion;
         $highestBranch = self::highestBranch($byBranch);
-        // A parent date of the shared-commit tag that the package names as its last release dates that release.
-        $lastStableDatedByParent = isset($byBranch[$highestBranch]['dated_by']) && $byBranch[$highestBranch]['version'] === $this->lastStableVersion;
-        // Ruling R16-16h1: the last release is the newest tag by date, and the parent dates the shared
-        // tag that it named older than the highest tag's own date.
-        $ownHighestNewest = isset($byBranch[$highestBranch]) && !isset($byBranch[$highestBranch]['dated_by'])
-            && ($this->latestStableByBranch[$highestBranch]['version'] ?? null) === $this->lastStableVersion
-            && $byBranch[$highestBranch]['version'] !== $this->lastStableVersion;
-        if ($lastStableDatedByParent || $ownHighestNewest || \in_array($highestBranch, $datedBranches, true)) {
-            $lastStableReleaseAt = $byBranch[$highestBranch]['at'];
-            $lastStableVersion = $byBranch[$highestBranch]['version'];
+        $line = $this->highestLineAfterParent($byBranch, $highestBranch, $datedBranches, $this->lastStableVersion);
+        if ($line !== null) {
+            [$lastStableReleaseAt, $lastStableVersion, $lastStablePhp, $ownHighestNewest] = $line;
             $lastStableDatedBy = $ownHighestNewest ? null : $parent->name;
-            $lastStablePhp = $byBranch[$highestBranch]['php'];
-            $newestVersion = $lastStableVersion;
+        }
+        // The newest tag, a pre-release included, takes the same parent date as the last stable release.
+        $newestVersion = $this->newestVersion;
+        $newestAt = $this->newestAt;
+        $newestPhp = $this->newestPhp;
+        $newestLine = $this->highestLineAfterParent($byBranch, $highestBranch, $datedBranches, $this->newestVersion);
+        if ($newestLine !== null) {
+            [$newestAt, $newestVersion, $newestPhp] = $newestLine;
         }
         // SPEC §8.4.1: S2 reads the newest tag by trusted date over every branch row, so a lower
         // branch that the parent dates counts too. A shared commit's date is only a lower bound of
@@ -678,9 +680,9 @@ final class PackageMetadata
         $dated->releaseReadingVersion = $releaseReadingVersion;
         $dated->releaseReadingDatedBy = $releaseReadingDatedBy;
         $dated->newestPreRelease = $this->newestPreRelease;
-        $dated->newestVersion = $this->newestVersion;
-        $dated->newestAt = $this->newestAt;
-        $dated->newestPhp = $this->newestPhp;
+        $dated->newestVersion = $newestVersion;
+        $dated->newestAt = $newestAt;
+        $dated->newestPhp = $newestPhp;
         $dated->hasTag = $this->hasTag;
         $dated->highestBranchDatedByParent = \in_array($highestBranch, $datedBranches, true);
         $dated->releasesAbove = $this->releasesAbove === null ? null : array_map(
@@ -689,6 +691,33 @@ final class PackageMetadata
         );
 
         return $dated;
+    }
+
+    /**
+     * The highest branch row after the parent dated it, when it replaces $version as the package's
+     * newest release: the parent dates that row, or names the shared tag $version, or the highest
+     * tag's own date beats the parent's (ruling R16-16h1). Null when $version stays.
+     *
+     * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string}> $byBranch
+     * @param list<string>                                                                                                                                                                             $datedBranches
+     *
+     * @return ?array{0: ?\DateTimeImmutable, 1: string, 2: ?string, 3: bool} the date, the version, the php requirement, and whether the date is the package's own
+     */
+    private function highestLineAfterParent(array $byBranch, string $highestBranch, array $datedBranches, ?string $version): ?array
+    {
+        $row = $byBranch[$highestBranch] ?? null;
+        if ($row === null) {
+            return null;
+        }
+        $datedByParent = isset($row['dated_by']) && $row['version'] === $version;
+        $ownHighestNewest = !isset($row['dated_by'])
+            && ($this->latestStableByBranch[$highestBranch]['version'] ?? null) === $version
+            && $row['version'] !== $version;
+        if (!$datedByParent && !$ownHighestNewest && !\in_array($highestBranch, $datedBranches, true)) {
+            return null;
+        }
+
+        return [$row['at'], $row['version'], $row['php'], $ownHighestNewest];
     }
 
     /**

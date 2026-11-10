@@ -363,6 +363,19 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertEquals(new \DateTimeImmutable('2025-01-01T00:00:00+00:00'), $metadata->lastStableReleaseAt());
     }
 
+    /** A date version such as 20200101 has no release branch, and it is still a stable tag (ruling W17-X1). */
+    public function testADateVersionWithNoReleaseBranchIsTheLastStableRelease(): void
+    {
+        $metadata = PackageMetadata::fromPackages('a/b', [
+            $this->load(['name' => 'a/b', 'version' => '20190101', 'time' => '2019-01-01T00:00:00+00:00']),
+            $this->load(['name' => 'a/b', 'version' => '20200101', 'time' => '2020-01-01T00:00:00+00:00']),
+        ], new \DateTimeImmutable(self::FIXED));
+
+        self::assertSame('20200101', $metadata->lastStableVersion());
+        self::assertEquals(new \DateTimeImmutable('2020-01-01T00:00:00+00:00'), $metadata->lastStableReleaseAt());
+        self::assertEquals(new \DateTimeImmutable('2020-01-01T00:00:00+00:00'), $metadata->highestStableTagAt());
+    }
+
     /** Ruling O5: libyears end at the highest stable tag. RC1 and RC2 above it end nothing, whatever the listing order. */
     public function testTheLibyearsEndIsTheHighestStableTagWhateverThePreReleasesAboveIt(): void
     {
