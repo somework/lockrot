@@ -180,8 +180,10 @@ gate: fails · --fail-on=high · 42 findings fail it · target php 8.4 (--target
   counted apart: `1 reaches it and the baseline exempts it`.
 - `--strict-network: a lookup failed` when `--strict-network` tripped.
 - One clause per gap of packages whose advisories lockrot did not check (`unchecked`):
-  `advisories not applied to 6 packages: not checked (offline)`. A grade or `vulnerable` value
-  cannot fail on those advisories, and the clause says so. A vulnerable finding whose lookup was
+  `advisories not applied to 6 packages: not checked (offline)`. lockrot writes the clause only
+  when the list holds a grade or `vulnerable` value, which are the values that read advisories.
+  With only a flag value or `unchecked`, the line has no clause and `gate.not_applied` is `[]`.
+  A grade or `vulnerable` value cannot fail on those advisories, and the clause says so. A vulnerable finding whose lookup was
   partial gets no clause: it shows as `security.check` `partial` with its run note. That note
   sets whether `--strict-network` fails ([Run notes](notes.md)).
 - Last, the target PHP and its source. `(the running PHP)` says that nothing pinned it.
@@ -247,8 +249,9 @@ one in [`extra.lockrot.accept-unchecked`](configuration.md#accept-unchecked), wi
   run wrote then shows as fixed in code scanning and in the merge-request widget, not as
   accepted. The json report holds what was accepted: `unchecked_accepted[]` on each finding and
   `packages_unchecked_accepted` at the root.
-- An accepted `no_feed` still leaves the advisories unchecked: the `gate:` line counts the package
-  in its `advisories not applied` clause.
+- An accepted `no_feed` still leaves the advisories unchecked. When the list holds a grade or
+  `vulnerable` value, the `gate:` line counts the package in its `advisories not applied` clause.
+  With `--fail-on=unchecked` alone, the line has no clause.
 
 A path package, an artifact or an inline `package` entry is a skip, not S10. To fail on such a
 package anyway, check its skips with jq:

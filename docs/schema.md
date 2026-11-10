@@ -345,7 +345,7 @@ findings, by what `run` says.
 | `standing` | object | `{known, new, worsened, none}`: the findings that reach a value, by their `baseline.status`. `none` counts a null `baseline`. The four counts add up to `reaching` |
 | `failing_packages` | array | The `package` of each finding whose `gate.fails` is true, in `findings` order. It holds as many package names as `failing` counts, so it is empty in a `generate_baseline` run |
 | `failing_by` | array | `{value, failing}` per value of `run.gates`, zero counts included |
-| `not_applied` | array | `{check, packages, reason}` per gap of packages whose advisories lockrot did not check (`unchecked`). A vulnerable finding whose lookup was partial has no entry: it shows as `security.check` `partial` |
+| `not_applied` | array | `{check, packages, reason}` per gap of packages whose advisories lockrot did not check (`unchecked`). Written only when `run.gates` holds a `grade` or `vulnerable` kind, else `[]`. A vulnerable finding whose lookup was partial has no entry: it shows as `security.check` `partial` |
 | `text` | string | The [`gate:` line](ci.md#reading-the-gate-line): prose, not contract |
 
 Each finding's `gate`:
