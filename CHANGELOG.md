@@ -158,6 +158,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   sending the runner's token, when a setup step writes it into `github-oauth`. Action: if you put a github.com or gitlab.com token in
   `GITHUB_TOKEN` or `GITLAB_TOKEN` on such a runner, move it to `LOCKROT_GITHUB_TOKEN` or
   `LOCKROT_GITLAB_TOKEN`. ([Which credentials](docs/internals.md#which-credentials))
+- **PHAR:** the PHAR bundles `symfony/filesystem` v5.4.56, which fixes advisory PKSA-g499-cm4q-v35y
+  (GHSA-6prc-h956-hxjq, affects below 5.4.56). Action: update the PHAR with `self-update`.
 - **Breaking:** **Baseline:** `--generate-baseline` refuses a baseline path named `composer.json`
   or `composer.lock`, a file that `COMPOSER` names, or a name with a colon or a trailing dot or
   space. It exits 2 on every OS, so it never writes over the project's Composer files. Action: if
@@ -238,6 +240,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Breaking:** **All formats:** a `gate:` line says whether the run fails, which `--fail-on`
+  value decided it and how many findings fail. json writes it as `gate.text` with `failing_by`,
+  `standing`, `failing_packages` and `not_applied`. A failing run that writes `json`, `sarif`,
+  `gitlab` or `html` to stdout repeats the line on stderr, so `2>&1` makes the file not valid JSON.
+  Action: read stdout alone, because `-q` also silences the report.
+  ([Reading the gate line](docs/ci.md#reading-the-gate-line))
 - **JSON:** `run.move_check.blocking_disabled_by` lists each environment variable and composer.json
   key that turns Composer's advisory blocking off. The move check then blocks no advisory.
   `policy.advisories.audit: ignore` alone writes no run note `advisories_disabled_by_policy`.
@@ -299,13 +307,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Config:** `ignore[].flags` accepts named maintenance flags. A liveness word also accepts the
   words below it. Without it an entry accepts them all.
   ([The allowlist](docs/configuration.md#the-allowlist))
-- **Breaking:** **All formats:** a `gate:` line says whether the run fails, which `--fail-on`
-  value and source decided it, and how many findings fail each value. json writes it as
-  `gate.text`, with `failing_by`, `standing`, `failing_packages` and `not_applied`, each advisory
-  gap that no `unchecked` failure closes. A failing run that writes `json`, `sarif`, `gitlab` or
-  `html` to stdout repeats the line on stderr. 0.13 printed nothing there, so a job that merges stderr into
-  the report file (`2>&1`) breaks. Action: read stdout alone.
-  ([Reading the gate line](docs/ci.md#reading-the-gate-line))
 - **Config, json:** `extra.lockrot.accept-unchecked` accepts a check that lockrot did not run (a
   host it cannot ask, no advisory feed, a package from vcs or an unknown origin) by host,
   repository or package, with a reason and an optional `expires`. A `repository` entry matches a
@@ -343,8 +344,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `policy.advisories: false` or `COMPOSER_POLICY=0`, which wins over `config.policy`. lockrot still
   asks, and every advisory still counts. ([Run notes](docs/notes.md#advisories_disabled_by_policy))
 - **markdown:** `--markdown-max-bytes` keeps a report written through `--output` within a byte
-  budget. The report ends at a whole row, and a last row counts the rows it left out.
-  ([In CI](docs/ci.md))
+  budget. The report ends at a whole row, and a last row counts the rows it left out. The heading,
+  the `gate:` line, the table head and the footer always print. ([In CI](docs/ci.md))
 - **github, gitlab, sarif:** when advisories were not checked, one run-level record
   (`lockrot/advisories-unchecked`) names each advisory repository that failed or that lockrot did
   not ask, with the reason. sarif adds a `note` notification per repository that lockrot did not
@@ -364,6 +365,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking:** **CLI:** every 0.14.x run that gates, or writes json, sarif, gitlab or a baseline,
+  prints one upgrade notice on stderr that links the upgrade page. `2>&1` into a report makes the
+  file not valid JSON. Action: read stdout alone, because `-q` also silences the report.
+  ([Upgrading to 0.14](docs/changes/0.14.md))
 - **All formats:** the summary of a counted `stale` names its liveness reading when a check that
   did not run blocks S2 or S4: "liveness read from pushes only" or "liveness read from releases
   only". The evidence line and SARIF carry it. ([Flags](docs/verdicts.md#flags))
@@ -462,10 +467,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Baseline:** when a `--generate-baseline` run reads a baseline-2 file, its reports compare
   with that file, as a check run does. They carry the root `baseline` and each finding's `baseline`.
   ([What --generate-baseline does](docs/baseline.md#what-generate-baseline-does))
-- **Breaking:** **CLI:** every 0.14.x run that gates, or writes json, sarif, gitlab or a baseline,
-  prints one upgrade notice on stderr that links the upgrade page. 0.13 printed nothing there. A
-  job that merges stderr into the report file (`2>&1`) writes a file that is no valid JSON, so
-  its next step breaks. Action: read stdout alone. `-q` also silences the report. ([Upgrading to 0.14](docs/changes/0.14.md))
 - **table, markdown, github, install-time, `--explain`:** each finding prints its grade, its flags
   and its move. All but install-time add the score line and one evidence line per counted flag. The
   table footer adds the `flags:`, `depth:`, `security:`, `fix, by package:`, `update now:` and
@@ -550,15 +551,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **table, markdown:** the footer reads `Run lockrot with --format=json for details.`, not
-  `composer lockrot`, because the standalone PHAR has no `composer lockrot` command. Action: match
-  on the footer text only if a script reads it.
-- **CLI:** `COMPOSER_DISABLE_NETWORK` acts as `--offline` in the main run when it is not empty and
-  not `0`, `prime` included, as in Composer. Uncached packages read unavailable with the reason
-  `offline`, and the move check reads `not_checked`.
+- **Breaking:** **CLI:** the activity cache keys an answer on whether lockrot's own credential
+  header went out, so a cached 404 from a run without a token does not hide a private repository
+  from a run with one. No run reads an answer that 0.13 cached, so the first online run on 0.14
+  fetches each answer again. Action: run `--offline` only after one online run with the same token
+  state. ([Caching](docs/internals.md#caching))
+- **table, markdown:** the footer reads `Run lockrot with --format=json for details.`, because the
+  standalone PHAR has no `composer lockrot` command.
+- **Config:** `COMPOSER_DISABLE_NETWORK` acts as `--offline` in the main run when it is not empty
+  and not `0`, `prime` included, as in Composer. Uncached packages read unavailable with the reason
+  `offline`, and a move that needs such a package reads `not_checked` (`check.reason` `offline`).
   ([Options](docs/configuration.md#cli-options))
-- **CLI:** the `--markdown-max-bytes` help lists the `gate:` line among the lines that always
-  print.
+- **json, html, sarif, gitlab, `--explain`:** invalid UTF-8 in a transport or repository message no
+  longer stops the document. Each invalid byte reads as U+FFFD.
+- **Install-time:** an activity request that the `install-time-budget` stopped before it started
+  reads S10 `install_time_budget`, not `fetch_failed`, and adds no "host did not answer" note.
+  ([Time budget](docs/install-time.md#time-budget))
+- **CLI:** the check of package names in the lock cannot backtrack on a crafted name, so such a
+  lock no longer stalls the run.
+- **Config:** an `accept-unchecked` `repository` entry with a user name or password is refused, with
+  a message that names the rule. ([The allowlist](docs/configuration.md#the-allowlist))
+- **json:** a root `php` constraint `self.version` reads as Composer reads it, so `run.php_window`
+  is not null for it.
+- **All formats:** when the `release_metadata` check cannot judge S5 (no lock `time`, open
+  `require.php`), it names S5 among its blocks, so the Checks strip and `--fail-on=unchecked` do
+  not count S5 as quiet. ([What was not checked](docs/verdicts.md#what-was-not-checked))
+- **All formats:** on a partial advisory lookup, S10 says S9 "may be incomplete", not "could not
+  be read".
 - **CLI:** on PHP 7.1 to 7.3, the source script `bin/lockrot` prints
   `lockrot requires PHP 7.4 or newer` and exits `2`, not a parse error with exit `255`.
   ([Exit codes](docs/ci.md#exit-codes))
@@ -619,11 +638,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   UTC day. A value that is no ISO 8601 calendar date, such as `2026-02-30`, is a configuration
   error that names the value. ([Testing hooks](docs/configuration.md#testing-hooks))
 - **All formats:** a lock URL with a long run of slashes does not stall the run.
-- **Breaking:** **CLI:** a cached 404 from a run without a token does not hide a private repository from a later
-  run with a token. The activity cache keys an answer on whether lockrot's own credential header
-  went out, so no run reads an answer that 0.13 cached. The first online run on 0.14 fetches each
-  answer again, anonymous runs too. Action: run `--offline` only after one online run with the
-  same token state. ([Caching](docs/internals.md#caching))
 - **CLI:** the activity cache stores only a JSON answer or a 404, so a proxy page or a redirect
   does not replace a cached answer. A failed refetch of an expired 404 leaves the repository
   unchecked (S10 `fetch_failed`). A 404 from the cache carries its fetch time in
