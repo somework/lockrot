@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Integration;
 
 use Composer\Factory;
 use Composer\IO\NullIO;
+use Composer\Package\Locker;
 use Composer\Repository\RepositoryFactory;
 use Composer\Repository\RepositoryInterface;
 use Lockrot\Allowlist\BuiltinAllowlist;
@@ -144,7 +145,7 @@ final class PublishedReportPrivacyTest extends TestCase
         self::assertTrue(mkdir($this->dir.'/cache', 0777, true));
         $repositories = array_map(static fn (string $url): array => ['type' => 'composer', 'url' => $url], $urls);
         file_put_contents($this->dir.'/composer.json', (string) json_encode(['name' => 'acme/app', 'repositories' => $repositories, 'require' => ['acme/private-lib' => '^1.0', 'acme/local-lib' => 'dev-main']]));
-        file_put_contents($this->dir.'/composer.lock', (string) json_encode(['content-hash' => 'x', 'packages' => [
+        file_put_contents($this->dir.'/composer.lock', (string) json_encode(['content-hash' => Locker::getContentHash((string) file_get_contents($this->dir.'/composer.json')), 'packages' => [
             [
                 'name' => 'acme/private-lib',
                 'version' => '1.0.0',

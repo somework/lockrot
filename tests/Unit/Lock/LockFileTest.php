@@ -33,7 +33,7 @@ final class LockFileTest extends TestCase
         $lock = LockFile::fromFile(self::MINI);
         self::assertCount(4, $lock->packages(false));
         self::assertCount(5, $lock->packages(true));
-        self::assertSame('abc123', $lock->contentHash());
+        self::assertSame('aeb7ebbb156e3d3c5f9012d2cc9c8f04', $lock->contentHash(), 'Composer\'s content hash of the fixture\'s composer.json');
     }
 
     public function testPackageFields(): void
@@ -333,7 +333,7 @@ final class LockFileTest extends TestCase
         self::assertNotNull($foundNew);
         self::assertTrue($foundNew->isDev());
         self::assertNotNull($updated->find('vendor/transitive'), 'every other entry is carried over unchanged');
-        self::assertSame('abc123', $updated->contentHash(), 'the content hash is carried over unchanged');
+        self::assertSame('aeb7ebbb156e3d3c5f9012d2cc9c8f04', $updated->contentHash(), 'the content hash is carried over unchanged');
 
         $originalDirect = $lock->find('vendor/direct');
         self::assertNotNull($originalDirect);

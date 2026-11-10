@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Composer\Package\CompletePackage;
+use Composer\Package\Locker;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
@@ -77,7 +78,7 @@ final class ReplacementUrlTest extends TestCase
             'time' => '2020-01-01T00:00:00+00:00',
         ], static fn ($value): bool => $value !== null);
         file_put_contents($this->dir.'/composer.json', (string) json_encode(['name' => 'acme/app']));
-        file_put_contents($this->dir.'/composer.lock', (string) json_encode(['content-hash' => 'x', 'packages' => [
+        file_put_contents($this->dir.'/composer.lock', (string) json_encode(['content-hash' => Locker::getContentHash((string) file_get_contents($this->dir.'/composer.json')), 'packages' => [
             $entry('acme/metadata-from-packagist', self::PACKAGIST),
             // The entry came from packagist.org, but the metadata lockrot read, and the replacement in it, came from Private Packagist.
             $entry('acme/metadata-from-private-packagist', self::PACKAGIST),
