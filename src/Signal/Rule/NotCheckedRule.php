@@ -82,6 +82,9 @@ final class NotCheckedRule implements SignalRule
     /** A highest tag that the signal reads is on a commit that other tags share. */
     public const CAUSE_SHARED_COMMIT = 'shared_commit';
 
+    /** The cause of an `advisories` entry whose lookup some feed answered ({@see Check::causes()}). */
+    private const CAUSE_PARTIAL = 'partial';
+
     /** The words of each cause of a `release_dates` entry, one clause per cause. */
     private const DATE_CAUSES = [
         self::CAUSE_LOCK_UNDATED => 'the lock gives the installed release no date',
@@ -141,7 +144,9 @@ final class NotCheckedRule implements SignalRule
         $coverage = $facts->advisoryCoverage();
         $advisories = $coverage === null ? null : $coverage->reason();
         if ($advisories !== null && isset(self::ADVISORY_CAUSES[$advisories])) {
-            $unchecked[] = new Check('advisories', $advisories, [Signal::S9]);
+            // `security.check` is partial when a feed answered or an advisory counts: S9 may fire, so the words say "incomplete".
+            $partial = $advisories === AdvisoryCoverage::LOOKUP_FAILED && ($coverage->records() !== null || $facts->advisories() !== []);
+            $unchecked[] = new Check('advisories', $advisories, [Signal::S9], $partial ? [self::CAUSE_PARTIAL => [Signal::S9]] : []);
         }
 
         $host = $reason === self::HOST_NOT_SUPPORTED ? $facts->activityLookup()->where()->host() : null;
@@ -304,6 +309,9 @@ final class NotCheckedRule implements SignalRule
         }
         if ($entry->check() === 'repository_activity') {
             return 'repository activity not checked ('.$cause.'), so S3 and S4 could not be read';
+        }
+        if ($entry->check() === 'advisories' && isset($entry->causes()[self::CAUSE_PARTIAL])) {
+            return 'security advisories not checked in full (a Composer repository did not return them), so S9 may be incomplete';
         }
         if ($entry->check() === 'advisories') {
             return 'security advisories not checked ('.(self::ADVISORY_CAUSES[$entry->reason()] ?? $entry->reason()).'), so S9 could not be read';

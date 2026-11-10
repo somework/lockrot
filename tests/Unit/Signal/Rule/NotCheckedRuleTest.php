@@ -390,6 +390,18 @@ final class NotCheckedRuleTest extends TestCase
         self::assertSame('security advisories not checked ('.$cause.'), so S9 could not be read', $s10->summary());
     }
 
+    /** A feed that answered makes `security.check` partial, so S9 can fire and the words say "incomplete". */
+    public function testAFailedLookupAfterAFeedAnsweredSaysS9MayBeIncomplete(): void
+    {
+        $facts = new PackageFacts(F::package(), self::dated(), F::activity(false, '2026-09-01T00:00:00+00:00'), [], null, null, new AdvisoryNameCoverage([], 2, 'lookup_failed'));
+
+        $s10 = $this->rule()->evaluate($facts);
+
+        self::assertNotNull($s10);
+        self::assertSame([['check' => 'advisories', 'reason' => 'lookup_failed', 'blocks' => [Signal::S9]]], JsonPath::decoded($s10->data())['unchecked']);
+        self::assertSame('security advisories not checked in full (a Composer repository did not return them), so S9 may be incomplete', $s10->summary());
+    }
+
     /** @return iterable<string, array{?string}> */
     public static function advisorySkips(): iterable
     {
