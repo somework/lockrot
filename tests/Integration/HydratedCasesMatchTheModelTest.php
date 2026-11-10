@@ -39,7 +39,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
      * The fields that each block golden reads (SPEC-0.14.md §7.9.14): dotted keys of the finding, `run.` and `details.`.
      * `{a,b}` reads each.
      */
-    private const LINES = [
+    public const LINES = [
         'verdict_line' => [
             'verdict', 'score.total', 'score.modifiers[].{after,applies_to,before}', 'score.parts.maintenance.alone.verdict',
             'score.parts.security.alone.verdict', 'run.graded_verdicts', 'activity.{event,forge,host}', 'age.push.years', 'age.release.years',
@@ -499,11 +499,20 @@ final class HydratedCasesMatchTheModelTest extends TestCase
      */
     public static function documents(string $id): array
     {
-        $case = CaseHydrator::case($id);
         $name = CaseRecording::fileName($id);
-        $report = JsonPath::decodeFile(self::CONTRACT.'report-2/'.$name.'.json');
-        $explain = JsonPath::decodeFile(self::CONTRACT.'explain-2/'.$name.'.json');
 
+        return self::documentsOf(CaseHydrator::case($id), JsonPath::decodeFile(self::CONTRACT.'report-2/'.$name.'.json'), JsonPath::decodeFile(self::CONTRACT.'explain-2/'.$name.'.json'));
+    }
+
+    /**
+     * @param array<mixed, mixed> $case
+     * @param array<mixed, mixed> $report  lockrot's report-2 document of the case
+     * @param array<mixed, mixed> $explain lockrot's explain-2 document of the case's package
+     *
+     * @return array{array<mixed, mixed>, array<mixed, mixed>} the model's document, then lockrot's
+     */
+    public static function documentsOf(array $case, array $report, array $explain): array
+    {
         return [
             self::documentOf(JsonPath::arrayAt($case, ['finding']), JsonPath::arrayAt($case, ['run']), self::branchesOf($case['details'] ?? null)),
             self::documentOf(self::findingOf($report, JsonPath::stringAt($case, ['finding', 'package'])), JsonPath::arrayAt($report, ['run']), self::branchesOf($explain)),

@@ -7,10 +7,14 @@ declare(strict_types=1);
 // It reads the fields that HydratedCasesMatchTheModelTest compares, and omits the paths and the
 // signals or flags that the test's DIFFERENCES list. A value that a side does not hold reads `-`.
 //
-//   tools/schema/hydrated-divergences
+//   tools/schema/hydrated-divergences                       reads the recordings of tests/fixtures/contract/
+//   tools/schema/hydrated-divergences --cases <cases.json>  hydrates each case of a projected cases.json, such as
+//                                                           one that project_fixtures.py writes outside the repository
 require __DIR__.'/../../vendor/autoload.php';
 
 use Lockrot\Tests\Integration\HydratedCasesMatchTheModelTest;
+use Lockrot\Tests\Support\CaseHydrator;
+use Lockrot\Tests\Support\Contract\CaseRecording;
 use Lockrot\Tests\Support\Contract\Fields;
 use Lockrot\Tests\Support\JsonPath;
 
@@ -53,13 +57,45 @@ function text($value): string
     return $value === ABSENT ? ABSENT : (string) json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 }
 
+/**
+ * Each hydrated case of $file with lockrot's documents of it, hydrated now.
+ *
+ * @return iterable<string, array{array<mixed, mixed>, array<mixed, mixed>}>
+ */
+function hydrated(string $file): iterable
+{
+    foreach (JsonPath::arrayAt(JsonPath::decodeFile($file), ['cases']) as $case) {
+        if (!\is_array($case) || !\is_array($case['inputs'] ?? null)) {
+            continue;
+        }
+        $recording = CaseRecording::of($case);
+        yield JsonPath::stringAt($case, ['id']) => HydratedCasesMatchTheModelTest::documentsOf($case, JsonPath::decoded(json_decode($recording->formats()['json'], true, 512, JSON_THROW_ON_ERROR)), JsonPath::decoded(json_decode($recording->explain(), true, 512, JSON_THROW_ON_ERROR)));
+    }
+}
+
+/** @return iterable<string, array{array<mixed, mixed>, array<mixed, mixed>}> */
+function recorded(): iterable
+{
+    foreach (JsonPath::arrayAt(JsonPath::decodeFile(CaseHydrator::CASES), ['cases']) as $case) {
+        if (\is_array($case) && \is_array($case['inputs'] ?? null)) {
+            $id = JsonPath::stringAt($case, ['id']);
+            yield $id => HydratedCasesMatchTheModelTest::documents($id);
+        }
+    }
+}
+
+// The cases hydrate in one process, as tools/report/record hydrates them.
+ini_set('memory_limit', '2G');
+/** @var list<string> $argv */
+$argv = $_SERVER['argv'];
+$cases = ($argv[1] ?? null) === '--cases' ? ($argv[2] ?? '') : null;
 $lines = [];
-$documents = [];
-foreach (HydratedCasesMatchTheModelTest::caseLines() as [$id, $line]) {
-    $documents[$id] ??= HydratedCasesMatchTheModelTest::documents($id);
-    [$model, $lockrot, $kept] = HydratedCasesMatchTheModelTest::unlisted($id, $line, ...$documents[$id]);
-    foreach (differences(Fields::only($model, $kept), Fields::only($lockrot, $kept), '') as $path => [$modelValue, $lockrotValue]) {
-        $lines[$id][$path] = implode("\t", [$id, JsonPath::stringAt($model, ['package']), $path, text($lockrotValue), text($modelValue)]);
+foreach ($cases === null ? recorded() : hydrated($cases) as $id => $documents) {
+    foreach (array_keys(HydratedCasesMatchTheModelTest::LINES) as $line) {
+        [$model, $lockrot, $kept] = HydratedCasesMatchTheModelTest::unlisted($id, $line, ...$documents);
+        foreach (differences(Fields::only($model, $kept), Fields::only($lockrot, $kept), '') as $path => [$modelValue, $lockrotValue]) {
+            $lines[$id][$path] = implode("\t", [$id, JsonPath::stringAt($model, ['package']), $path, text($lockrotValue), text($modelValue)]);
+        }
     }
 }
 foreach ($lines as $byPath) {

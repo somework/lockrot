@@ -341,3 +341,37 @@ class ACaseWhoseDesignedRowsMissItsNewestReleaseIsNotHydrated(unittest.TestCase)
         self.assertIsNone(project_fixtures.unhydrated(self.case('2.12.3')))
         self.assertIsNone(project_fixtures.unhydrated(self.case('3.0.0-beta.1')))
         self.assertIsNone(project_fixtures.unhydrated(self.case('3.0.0', world=False)))
+
+
+class ADirectDependentThatDoesNotRequireThePackageKeepsTheModelsChain(unittest.TestCase):
+    """capped-nette‡: a second direct dependent reaches the package through the chain, never by a shorter path."""
+    FINDING = dict(ACaseWithoutBranchRowsHydratesFromItsRunReleases.FINDING, package='nette/schema', version='v1.3.2',
+                   chain=['laravel/framework', 'league/commonmark', 'league/config', 'nette/schema'],
+                   direct_dependents=['laravel/framework', 'pragmarx/google2fa-laravel'],
+                   next_step={'through': [{'package': 'pragmarx/google2fa-laravel', 'installed_version': 'v2.2.0', 'installed_requires': False,
+                                           'newest_requires': False, 'newest_requires_unmeasured': None, 'newest_stable': None}],
+                              'also': [], 'held_by': []})
+
+    @staticmethod
+    def shortest_chain(inputs, target):
+        """The chain by which a breadth-first walk from the root's requirements, in their order, first reaches $target."""
+        links = {e['name']: list((e.get('require') or {}).keys()) for e in inputs['lock']}
+        queue = [[name] for name in inputs['root']['require'] if name in links]
+        seen = {chain[0] for chain in queue}
+        while queue:
+            chain = queue.pop(0)
+            if chain[-1] == target:
+                return chain
+            for name in links.get(chain[-1], []):
+                if name not in seen and name in links:
+                    seen.add(name)
+                    queue.append(chain + [name])
+        return None
+
+    def test_the_hydrated_lock_reaches_the_package_first_by_the_models_chain(self):
+        case = {'finding': self.FINDING, 'run': ACaseWithoutBranchRowsHydratesFromItsRunReleases.RUN,
+                'run_inputs': {'_releases': ACaseWithoutBranchRowsHydratesFromItsRunReleases.RELEASES}}
+
+        inputs = project_fixtures.inputs_of(case)
+
+        self.assertEqual(self.FINDING['chain'], self.shortest_chain(inputs, 'nette/schema'))

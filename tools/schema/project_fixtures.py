@@ -482,7 +482,9 @@ def inputs_of(case):
         if name != f['package'] and name not in lock:
             root_require.setdefault(name, '*')
             requires_it = (through.get(name) or {}).get('installed_requires') is not False or len(chain) < 3
-            entry(name).setdefault('require', {})[f['package'] if requires_it else chain[-2]] = '*'
+            # A link below chain[1] gives the package a shorter chain than the model's. chain[1] ties it, and the walk takes
+            # chain[0] first, because chain[0] comes first in the root's require.
+            entry(name).setdefault('require', {})[f['package'] if requires_it else chain[1]] = '*'
     moves = [m for m in [f.get('next_step')] if m] + [m for m in ((f.get('next_step') or {}).get('also') or [])]
     held = ([h for a in advisories for h in a['fix']['held_by']] + [h for m in moves for h in m['held_by']]
             + [h for r in rows for h in ((r.get('fixes') or {}).get('held_by') or [])])
