@@ -139,7 +139,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** a move whose every resolving solve keeps the locked version or installs a dev
   version of the package reads `not_checked` with `installs_no_release`, and `check.installs`
-  names that version. It read `resolves` before, so a move that read as checked can read as not
+  names that version. The move's text says that the command does not reach a release, with no
+  "(gets …)". It read `resolves` before, so a move that read as checked can read as not
   checked, and `update_now` does not take it. ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** when Composer's `config.lock` is false, the move check is `not_checked` with
   `lock_disabled`, and no move has a command. Composer refuses a partial update without a lock. A
