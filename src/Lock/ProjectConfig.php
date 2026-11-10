@@ -260,29 +260,18 @@ final class ProjectConfig
         if ($this->manifestContents === null) {
             return null;
         }
-        if ($lock->contentHash() !== null && $lock->contentHash() !== '') {
-            try {
-                $fresh = Locker::getContentHash($this->manifestContents) === $lock->contentHash();
-            } catch (\Throwable $e) {
-                return null;
-            }
-        } elseif ($lock->legacyHash() !== null && $lock->legacyHash() !== '') {
-            $fresh = md5($this->manifestContents) === $lock->legacyHash();
-        } else {
+        $hash = $lock->contentHash() ?? '';
+        $legacy = $lock->legacyHash() ?? '';
+        if ($hash === '' && $legacy === '') {
             return null;
         }
-        if ($fresh) {
-            return null;
-        }
-        $locked = [];
-        foreach ($lock->packages(true) as $package) {
-            $locked[$package->name()] = true;
-        }
-        $required = $includeDev ? array_merge($this->requires, $this->devRequires) : $this->requires;
-        $missing = array_values(array_unique(array_filter($required, static fn (string $name): bool => !isset($locked[$name]))));
-        sort($missing);
+        try {
+            $fresh = $hash !== '' ? Locker::getContentHash($this->manifestContents) === $hash : md5($this->manifestContents) === $legacy;
 
-        return $missing;
+            return $fresh ? null : MissingRequirements::of($this->manifestContents, $lock, $includeDev);
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     public function isRead(): bool

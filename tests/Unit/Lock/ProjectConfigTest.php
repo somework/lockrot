@@ -36,7 +36,7 @@ final class ProjectConfigTest extends TestCase
     /**
      * @param array<string, mixed> $manifest
      * @param array<string, mixed> $lockExtra
-     * @param list<string>         $locked
+     * @param list<string|array<string, mixed>> $locked a name, or the lock entry itself
      */
     private static function outOfSync(array $manifest, array $lockExtra, array $locked, bool $includeDev = false, bool $writeManifest = true): ?array
     {
@@ -47,7 +47,7 @@ final class ProjectConfigTest extends TestCase
         if ($writeManifest) {
             file_put_contents($file, $json);
         }
-        $lock = LockFile::fromArray(array_merge(['packages' => array_map(static fn (string $n): array => ['name' => $n, 'version' => '1.0.0'], $locked)], $lockExtra));
+        $lock = LockFile::fromArray(array_merge(['packages' => array_map(static fn ($n): array => \is_array($n) ? $n : ['name' => $n, 'version' => '1.0.0'], $locked)], $lockExtra));
         $result = ProjectConfig::fromFile($file)->lockOutOfSync($lock, $includeDev);
         if ($writeManifest) {
             unlink($file);
@@ -64,6 +64,48 @@ final class ProjectConfigTest extends TestCase
 
         self::assertSame(['psr/container'], self::outOfSync($manifest, $stale, ['psr/log']));
         self::assertSame(['acme/dev', 'psr/container'], self::outOfSync($manifest, $stale, ['psr/log'], true));
+    }
+
+    /** Composer's own probe: a name that a locked package provides is present, a name that nothing holds is not. */
+    public function testAProvidedNameIsPresent(): void
+    {
+        $manifest = ['require' => ['psr/log-implementation' => '*', 'monolog/monolog' => '^2.0', 'vendor/gone' => '*']];
+        $monolog = ['name' => 'monolog/monolog', 'version' => '2.9.0', 'provide' => ['psr/log-implementation' => '1.0.0']];
+
+        self::assertSame(['vendor/gone'], self::outOfSync($manifest, ['content-hash' => 'deadbeef'], [$monolog]));
+    }
+
+    public function testAReplacedNameIsPresentWhetherTheLockOrTheRootReplacesIt(): void
+    {
+        $manifest = ['replace' => ['acme/root-replaced' => 'self.version'], 'require' => ['acme/root-replaced' => '*', 'acme/lock-replaced' => '*', 'acme/gone' => '*']];
+        $bundle = ['name' => 'acme/bundle', 'version' => '1.0.0', 'replace' => ['acme/lock-replaced' => 'self.version']];
+
+        self::assertSame(['acme/gone'], self::outOfSync($manifest, ['content-hash' => 'deadbeef'], [$bundle]));
+    }
+
+    public function testASelfVersionRequirementIsNeverMissing(): void
+    {
+        $manifest = ['require' => ['acme/sub' => 'self.version', 'acme/gone' => '*']];
+
+        self::assertSame(['acme/gone'], self::outOfSync($manifest, ['content-hash' => 'deadbeef'], []));
+    }
+
+    public function testARequirementIsCheckedAgainstTheNonDevPackagesAndARequireDevAgainstAll(): void
+    {
+        $manifest = ['require' => ['acme/tool' => '*'], 'require-dev' => ['acme/test' => '*']];
+        $lock = ['content-hash' => 'deadbeef', 'packages-dev' => [['name' => 'acme/tool', 'version' => '1.0.0'], ['name' => 'acme/test', 'version' => '1.0.0']]];
+
+        self::assertSame(['acme/tool'], self::outOfSync($manifest, $lock, [], true));
+    }
+
+    public function testAManifestThatComposerCannotHashGivesNoNote(): void
+    {
+        $property = new \ReflectionProperty(ProjectConfig::class, 'manifestContents');
+        $property->setAccessible(true);
+        $config = ProjectConfig::fromArray(['require' => ['acme/gone' => '*']]);
+        $property->setValue($config, '{ not json');
+
+        self::assertNull($config->lockOutOfSync(LockFile::fromArray(['content-hash' => 'deadbeef', 'packages' => []]), false));
     }
 
     public function testAPlatformRequirementThatIsNotLockedIsNeverMissing(): void

@@ -771,6 +771,22 @@ final class AnalyzerTest extends TestCase
         self::assertStringContainsString('"fetch_failed"', $reasons['vendor/failed']);
     }
 
+    public function testAStaleLockGivesTheLockOutOfSyncNote(): void
+    {
+        $dir = sys_get_temp_dir().'/lockrot-stale-'.bin2hex(random_bytes(4));
+        mkdir($dir);
+        file_put_contents($dir.'/composer.json', '{"require":{"vendor/pkg":"^1.0","vendor/new":"^1.0"}}');
+        $lock = LockFile::fromArray(['content-hash' => 'deadbeef', 'packages' => [['name' => 'vendor/pkg', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+
+        $report = $this->analyzer($this->loader(['vendor/pkg' => $this->ancient()]), $this->http([]), true, new Allowlist([]))->analyze($lock, ProjectConfig::fromFile($dir.'/composer.json'), false);
+        unlink($dir.'/composer.json');
+        rmdir($dir);
+
+        $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::LOCK_OUT_OF_SYNC));
+        self::assertCount(1, $notes);
+        self::assertSame(['missing' => ['vendor/new']], $notes[0]->data());
+    }
+
     public function testAllowlistAccessorReturnsConstructorValue(): void
     {
         $allowlist = new Allowlist([new AllowlistEntry('vendor/*', null, 'complete', null, 'builtin')]);

@@ -53,7 +53,8 @@ final class LockFile
     }
 
     /**
-     * A lock loads only when Composer can install it and it keeps lockrot's own rules. `packages` is
+     * A lock loads when it keeps lockrot's own rules, though Composer could refuse to install it: a
+     * root requirement that it does not hold is a run note, not a refusal. `packages` is
      * a list, `packages-dev` is null or a list, and each `name` is a string. No name is
      * listed twice, case ignored, because a finding needs one entry per package. A platform map
      * follows Composer: the later of two keys that differ in case wins.
