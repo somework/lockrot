@@ -299,11 +299,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Config:** `ignore[].flags` accepts named maintenance flags. A liveness word also accepts the
   words below it. Without it an entry accepts them all.
   ([The allowlist](docs/configuration.md#the-allowlist))
-- **All formats:** a `gate:` line says whether the run fails, which `--fail-on` value and source
-  decided it, and how many findings fail each value. json writes it as `gate.text`, with
-  `failing_by`, `standing`, `failing_packages` and `not_applied`, each advisory gap that no
-  `unchecked` failure closes. A failing run that writes `json`, `sarif`, `gitlab` or `html` to
-  stdout repeats the line on stderr.
+- **Breaking:** **All formats:** a `gate:` line says whether the run fails, which `--fail-on`
+  value and source decided it, and how many findings fail each value. json writes it as
+  `gate.text`, with `failing_by`, `standing`, `failing_packages` and `not_applied`, each advisory
+  gap that no `unchecked` failure closes. A failing run that writes `json`, `sarif`, `gitlab` or
+  `html` to stdout repeats the line on stderr. 0.13 printed nothing there, so a job that merges stderr into
+  the report file (`2>&1`) breaks. Action: read stdout alone.
   ([Reading the gate line](docs/ci.md#reading-the-gate-line))
 - **Config, json:** `extra.lockrot.accept-unchecked` accepts a check that lockrot did not run (a
   host it cannot ask, no advisory feed, a package from vcs or an unknown origin) by host,
@@ -461,9 +462,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Baseline:** when a `--generate-baseline` run reads a baseline-2 file, its reports compare
   with that file, as a check run does. They carry the root `baseline` and each finding's `baseline`.
   ([What --generate-baseline does](docs/baseline.md#what-generate-baseline-does))
-- **CLI:** every 0.14.x run that gates, or writes json, sarif, gitlab or a baseline, prints one
-  upgrade notice on stderr that links the upgrade page. Read stdout alone (do not merge `2>&1`).
-  `-q` also silences the report. ([Upgrading to 0.14](docs/changes/0.14.md))
+- **Breaking:** **CLI:** every 0.14.x run that gates, or writes json, sarif, gitlab or a baseline,
+  prints one upgrade notice on stderr that links the upgrade page. 0.13 printed nothing there. A
+  job that merges stderr into the report file (`2>&1`) writes a file that is no valid JSON, so
+  its next step breaks. Action: read stdout alone. `-q` also silences the report. ([Upgrading to 0.14](docs/changes/0.14.md))
 - **table, markdown, github, install-time, `--explain`:** each finding prints its grade, its flags
   and its move. All but install-time add the score line and one evidence line per counted flag. The
   table footer adds the `flags:`, `depth:`, `security:`, `fix, by package:`, `update now:` and
@@ -548,6 +550,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **CLI:** `COMPOSER_DISABLE_NETWORK` acts as `--offline` in the main run when it is not empty and
+  not `0`, `prime` included, as in Composer. Uncached packages read unavailable with the reason
+  `offline`, and the move check reads `not_checked`.
+  ([Options](docs/configuration.md#cli-options))
+- **CLI:** the `--markdown-max-bytes` help lists the `gate:` line among the lines that always
+  print.
 - **CLI:** on PHP 7.1 to 7.3, the source script `bin/lockrot` prints
   `lockrot requires PHP 7.4 or newer` and exits `2`, not a parse error with exit `255`.
   ([Exit codes](docs/ci.md#exit-codes))
@@ -608,7 +616,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   UTC day. A value that is no ISO 8601 calendar date, such as `2026-02-30`, is a configuration
   error that names the value. ([Testing hooks](docs/configuration.md#testing-hooks))
 - **All formats:** a lock URL with a long run of slashes does not stall the run.
-- **CLI:** a cached 404 from a run without a token does not hide a private repository from a later
+- **Breaking:** **CLI:** a cached 404 from a run without a token does not hide a private repository from a later
   run with a token. The activity cache keys an answer on whether lockrot's own credential header
   went out, so no run reads an answer that 0.13 cached. The first online run on 0.14 fetches each
   answer again, anonymous runs too. Action: run `--offline` only after one online run with the
