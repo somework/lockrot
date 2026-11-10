@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Repository;
 
+use Composer\Downloader\TransportException;
 use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
-use Composer\Downloader\TransportException;
 use Composer\Repository\ComposerRepository;
 use Composer\Repository\FilterRepository;
 use Composer\Repository\RepositoryInterface;
