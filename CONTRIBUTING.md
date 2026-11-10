@@ -534,6 +534,8 @@ maintainer.
     - a tag whose vendored renderer is not an attested release
     - a tag whose `-2` schemas lockrot.dev does not serve as the tag holds them
     - a tag whose archive prints another version
+    - a tag whose commit day (UTC) differs from the date of the `## [X.Y.Z]` heading of
+      `CHANGELOG.md` (`tools/release/tag_day.py`)
 
     It builds, signs and attests the PHAR, runs it on PHP 7.4, then publishes the GitHub release
     and asks lockrot.dev to rebuild. Its step "The release notes come from the CHANGELOG section of
@@ -560,8 +562,8 @@ maintainer.
     curl -fs https://lockrot.dev/baseline/ | grep -c 'moving-from-a-baseline-1-file'
     ```
 
-    The deploy run must be green and newer than the tag, the first `curl` applies to an `X.Y.0`
-    release with an upgrade page, and the `grep` must not print `0` when the release refuses a
+    The deploy run must be green and newer than the tag. The first `curl` applies to an `X.Y.0`
+    release with an upgrade page. The `grep` must not print `0` when the release refuses a
     baseline-1 file. If a check fails, run `gh workflow run deploy.yml --repo somework/lockrot.dev`
     and check again.
 7. When the published release changes what lockrot writes (a schema differs from the previous
