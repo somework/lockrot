@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fFJVpMNSUyV98z0AHg5CQMR+6FlQk1c7EcT2ttPlCA4='; style-src 'sha256-Yy3OR+VlDOVXliYitbztY1BdwC5VV1YKF2hjFFMHseQ='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-C2RamrpJeYAy35fBSI+BtrOt6dVn7t8VBUAZCkusHqM='; style-src 'sha256-a0x+0KRkDhePmoM5CQGsUr/8YD3qWYKJVNmgfNN7FJc='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -541,7 +541,7 @@ summary:focus-visible::after {
 .run-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 18px;
+  gap: 4px 10px;
   align-items: center;
   font-size: var(--text-s);
   color: var(--muted);
@@ -12865,6 +12865,34 @@ var LockrotReport = (function(exports) {
 		});
 	}
 	//#endregion
+	//#region src/domain/share.ts
+	var DATA_AS_OF = "data as of";
+	var AGES_AS_OF = "ages as of";
+	var DATA_AND_AGES_AS_OF = "data and ages as of";
+	var dataDay = (dataDate) => dataDate === null ? "—" : day(dataDate);
+	function runningLine(project, dataDate, agesDate, toolVersion) {
+		return [
+			project,
+			`${DATA_AS_OF} ${dataDate}`,
+			`${AGES_AS_OF} ${agesDate}`,
+			...toolVersion !== null ? [`lockrot ${toolVersion}`] : []
+		].join("  ·  ");
+	}
+	var printSheetIntro = (pkg) => `Printed from the sheet of ${pkg}. Close the sheet to print the whole report.`;
+	function cssString(text) {
+		return `"${text.replace(/["\\\u0000-\u001f\u007f]/g, (ch) => ch === "\"" || ch === "\\" ? `\\${ch}` : `\\${ch.charCodeAt(0).toString(16)} `)}"`;
+	}
+	function printSections(view) {
+		const base = [
+			"summary",
+			"findings",
+			"advisories",
+			"radius",
+			"run"
+		];
+		return view === "packages" ? [...base, "packages"] : base;
+	}
+	//#endregion
 	//#region src/domain/scoreWhy.ts
 	var DEV_WORD = vocabTable({ dev: "packages-dev" });
 	function notJudgedLine(finding) {
@@ -12893,7 +12921,7 @@ var LockrotReport = (function(exports) {
 		return [`abandoned marking ignored (${ignored.by}: ${ignored.rules.map((r) => r.pattern).join(", ")})` + (reasons ? `: ${reasons}` : "") + (constraints.length > 0 ? ` (constraint ${constraints.join(", ")} not applied, as composer audit does not apply it)` : "")];
 	}
 	function header(finding, score, report) {
-		const asOf = ` · ages as of ${day(report.generated_at)}`;
+		const asOf = ` · ${AGES_AS_OF} ${day(report.generated_at)}`;
 		if (!score) return `0 · ${finding.verdict}${asOf}`;
 		const { floor, next, to_next: toNext } = score.band;
 		const short = next && toNext !== null ? ` · ${toNext} ${pluralNoun(toNext, "point", "points")} short of ${next}` : "";
@@ -13805,6 +13833,9 @@ var LockrotReport = (function(exports) {
 			after: branchFixWords(finding, n, ctx.installedRung)
 		});
 	}
+	function livenessQualifier(finding) {
+		return [...finding.checks_skipped, ...finding.checks_missing].some((c) => c.blocks.includes("S2")) ? "read from pushes only" : "read from releases only";
+	}
 	function flagReading(finding, flag, run, ctx) {
 		const { id, summary } = flag;
 		switch (flag.id) {
@@ -13820,7 +13851,7 @@ var LockrotReport = (function(exports) {
 			case "stale": {
 				const value = typeof flag.headline.value === "number" ? flag.headline.value : null;
 				const text = flag.headline.source === "release" ? `Nothing has been released for ${oneDecimal(value)} years` : `There has been no ${finding.activity.event ?? "push"} for ${oneDecimal(value)} years`;
-				return reading(flag.id, !flag.degree.liveness_complete ? `${text} (read from releases only)` : text);
+				return reading(flag.id, flag.degree.liveness_complete ? text : `${text} (${livenessQualifier(finding)})`);
 			}
 			case "pinned": {
 				const pin = signalData(finding, "S6");
@@ -15953,31 +15984,6 @@ var LockrotReport = (function(exports) {
 		});
 	}
 	//#endregion
-	//#region src/domain/share.ts
-	var DATA_AS_OF = "data as of";
-	var dataDay = (dataDate) => dataDate === null ? "—" : day(dataDate);
-	function runningLine(project, dataDate, toolVersion) {
-		return [
-			project,
-			`${DATA_AS_OF} ${dataDate}`,
-			...toolVersion !== null ? [`lockrot ${toolVersion}`] : []
-		].join("  ·  ");
-	}
-	var printSheetIntro = (pkg) => `Printed from the sheet of ${pkg}. Close the sheet to print the whole report.`;
-	function cssString(text) {
-		return `"${text.replace(/["\\\u0000-\u001f\u007f]/g, (ch) => ch === "\"" || ch === "\\" ? `\\${ch}` : `\\${ch.charCodeAt(0).toString(16)} `)}"`;
-	}
-	function printSections(view) {
-		const base = [
-			"summary",
-			"findings",
-			"advisories",
-			"radius",
-			"run"
-		];
-		return view === "packages" ? [...base, "packages"] : base;
-	}
-	//#endregion
 	//#region src/ui/common/GateFlag.tsx
 	function Flag({ text }) {
 		const dashes = /^-+/.exec(text)?.[0] ?? "";
@@ -16193,9 +16199,40 @@ var LockrotReport = (function(exports) {
 			};
 		}, [ref]);
 	}
+	function HeaderDates({ dataDate, generatedAt }) {
+		const ages = u$1("b", {
+			className: "mono",
+			children: day(generatedAt)
+		});
+		if (dataDate === null) return u$1("span", { children: [
+			AGES_AS_OF,
+			" ",
+			ages
+		] });
+		if (dataDay(dataDate) === day(generatedAt)) return u$1("span", {
+			title: `${DATA_AND_AGES_AS_OF} ${day(generatedAt)}`,
+			children: [
+				u$1("span", {
+					className: "vh",
+					children: "data and ages "
+				}),
+				"as of ",
+				ages
+			]
+		});
+		return u$1("span", { children: [
+			"data ",
+			u$1("b", {
+				className: "mono",
+				children: dataDay(dataDate)
+			}),
+			" · ages ",
+			ages
+		] });
+	}
 	function Header({ theme, onToggleTheme, onOpenGlossary, children, inert = false }) {
 		const { model } = useReport();
-		const { run, lockrot, data_date } = model.report;
+		const { run, lockrot, data_date, generated_at } = model.report;
 		const ref = useMeasuredHeight("--topbar-h");
 		useGateFactFit(ref);
 		const project = projectName(run);
@@ -16237,14 +16274,10 @@ var LockrotReport = (function(exports) {
 							className: "mono",
 							children: run.target_php
 						})] }),
-						u$1("span", { children: [
-							DATA_AS_OF,
-							" ",
-							u$1("b", {
-								className: "mono",
-								children: dataDay(data_date)
-							})
-						] }),
+						u$1(HeaderDates, {
+							dataDate: data_date,
+							generatedAt: generated_at
+						}),
 						u$1("span", { children: ["lockrot ", u$1("b", {
 							className: "mono",
 							children: lockrot.version
@@ -20023,9 +20056,9 @@ var LockrotReport = (function(exports) {
 				if (mounted) return;
 				mounted = true;
 				const { model } = latest.current;
-				const { run, lockrot, data_date } = model.report;
+				const { run, lockrot, data_date, generated_at } = model.report;
 				const project = projectName(run);
-				root.style.setProperty(RUNNING_HEAD, cssString(runningLine(project, dataDay(data_date), lockrot.version)));
+				root.style.setProperty(RUNNING_HEAD, cssString(runningLine(project, dataDay(data_date), day(generated_at), lockrot.version)));
 				R(k$1(PrintDocument, { base: latest.current }), node);
 			};
 			const unmount = () => {
@@ -20153,7 +20186,7 @@ var LockrotReport = (function(exports) {
 	function activeFilterCount(state) {
 		return activeFilters(state.filters).length + (state.q.trim() === "" ? 0 : 1);
 	}
-	function SearchBar({ inputRef }) {
+	function SearchBar({ inputRef, shortcutsOn }) {
 		const { model, state, dispatch } = useReport();
 		const { report } = model;
 		const filterable = population2(report, state.view).length > 0;
@@ -20186,7 +20219,7 @@ var LockrotReport = (function(exports) {
 					children: "Clear"
 				})]
 			}),
-			filterable && u$1("p", {
+			filterable && shortcutsOn && u$1("p", {
 				className: "hint",
 				children: [
 					"Press ",
@@ -20802,7 +20835,10 @@ var LockrotReport = (function(exports) {
 									folded: true,
 									inert: sheet
 								}),
-								state.view !== "overview" && u$1(SearchBar, { inputRef: search }),
+								state.view !== "overview" && u$1(SearchBar, {
+									inputRef: search,
+									shortcutsOn
+								}),
 								u$1(CurrentView, {})
 							]
 						}),
@@ -20930,7 +20966,7 @@ var LockrotReport = (function(exports) {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.16";
+	var version = "0.14.0-rc.17";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");
