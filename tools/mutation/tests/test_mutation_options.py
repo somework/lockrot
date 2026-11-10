@@ -41,6 +41,22 @@ class MutationOptionsTest(unittest.TestCase):
                 self.assertIn(PIN, text)
                 self.assertNotRegex(text, r'(?m)^\s*(- )?run: composer install')
 
+    def test_the_coverage_run_excludes_the_groups_that_every_mutant_run_excludes(self):
+        (call,) = [line for line in read('.github', 'actions', 'mutation-coverage', 'action.yml').splitlines() if 'vendor/bin/phpunit' in line]
+        options = re.search(r'"testFrameworkOptions": "([^"]+)"', read('infection.json5')).group(1)
+
+        self.assertEqual(re.findall(r'--exclude-group=\S+', options), re.findall(r'--exclude-group=\S+', call))
+
+    def test_a_shard_runs_when_the_renderer_manifest_is_the_only_failing_test(self):
+        # Until the renderer is vendored again, RendererManifestTest fails on a new contract bundle.
+        # Its group keeps it out of the coverage run, so that the shards still run on the pull request.
+        test = read('tests', 'Unit', 'Output', 'RendererManifestTest.php')
+        options = re.search(r'"testFrameworkOptions": "([^"]+)"', read('infection.json5')).group(1)
+
+        self.assertIn("#[Group('renderer-manifest')]", test)
+        self.assertIn('@group renderer-manifest', test)
+        self.assertIn('--exclude-group=renderer-manifest', options)
+
     def test_infection_is_one_exact_release(self):
         self.assertRegex(read('.github', 'actions', 'mutation-shard', 'action.yml'), r'composer global require "infection/infection:\d+\.\d+\.\d+"')
 

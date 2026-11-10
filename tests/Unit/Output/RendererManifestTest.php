@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Output;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Tests\Support\Contract\ContractBundle;
 use Lockrot\Verdict\ScoreModel;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,7 +16,13 @@ use PHPUnit\Framework\TestCase;
  * release's build provenance when it brings the two in. This test keeps them honest afterwards: a
  * hand edit to the page, or a page copied in without its manifest, fails here rather than shipping
  * inside a signed PHAR under another release's name.
+ *
+ * The mutation coverage run excludes the group: this test fails on a new contract bundle until the
+ * renderer is vendored again, and the mutation shards must still run on that pull request.
+ *
+ * @group renderer-manifest
  */
+#[Group('renderer-manifest')]
 final class RendererManifestTest extends TestCase
 {
     private const DIR = __DIR__.'/../../../resources/report';
