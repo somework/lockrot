@@ -1658,6 +1658,16 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::INSTALLS_NO_RELEASE, 'installs' => '1.0.0'], $outcome->check()->jsonSerialize());
     }
 
+    /** Ruling R17-1 reads a move's package only: the target fix solve resolves, though it installs dev-main. */
+    public function testATargetFixSolveThatInstallsADevVersionResolves(): void
+    {
+        $remote = self::devRemote(['acme/mid' => '^1.0'], ['acme/mid' => '^1.0']) + ['acme/mid' => [['version' => '1.0.0']]];
+        $solver = new ComposerSolver(self::devRoot(), LockFile::fromArray(['packages' => self::devLock('acme/mid')])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote));
+        $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::never());
+
+        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => null], $checker->solveAt(['acme/lib'])->check()->jsonSerialize());
+    }
+
     /** No form installs a newest release that does not parse: the form that installs the highest release wins. */
     public function testANewestReleaseThatDoesNotParseLetsTheHighestReleaseWin(): void
     {
