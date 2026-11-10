@@ -390,9 +390,12 @@ maintainer.
       an X.0 release before its day, so add an X.0 date only after that release. Check the file
       before you record `docs/example-run.md`.
 
-    - Refresh `resources/monorepo-parents.json` with `bin/refresh-monorepo-parents`. It rereads the
-      `replace` list of each listed monorepo from Packagist. Commit the file when the diff adds a
-      split package. A package that the file does not list cannot be dated from its parent.
+    - In an `X.Y.0` release, refresh `resources/monorepo-parents.json` with
+      `bin/refresh-monorepo-parents`. It rereads the `replace` list of each listed monorepo from
+      Packagist. If the diff adds a split package, commit the file. Then add a line under
+      `### Verdict changes` in the CHANGELOG section, because a change to this file is a
+      [verdict change](docs/compatibility.md#verdict-changes) that only a minor release can
+      ship. lockrot cannot date a package that the file does not list from its parent.
 
     - Re-record `docs/example-run.md` after the version bump. Build the PHAR from the release
       branch, so that it prints the new version ([The PHAR](#the-phar)):
