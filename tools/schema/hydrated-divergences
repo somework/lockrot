@@ -10,6 +10,7 @@ declare(strict_types=1);
 //   tools/schema/hydrated-divergences                       reads the recordings of tests/fixtures/contract/
 //   tools/schema/hydrated-divergences --cases <cases.json>  hydrates each case of a projected cases.json, such as
 //                                                           one that project_fixtures.py writes outside the repository
+//                                                           (a case that the repository's cases.json lacks goes to stderr)
 require __DIR__.'/../../vendor/autoload.php';
 
 use Lockrot\Tests\Integration\HydratedCasesMatchTheModelTest;
@@ -74,6 +75,14 @@ function hydrated(string $file): iterable
             $case['clock'] = JsonPath::stringAt(JsonPath::decodeFile($document), ['generated_at']);
         } elseif (!\array_key_exists('clock', $case)) {
             fwrite(STDERR, JsonPath::stringAt($case, ['id'])."\tnot hydrated: the tree of the cases has no document of the case\n");
+
+            continue;
+        }
+        try {
+            // The SARIF and annotation lines read the lock of the case in the repository's cases.json.
+            CaseHydrator::case(JsonPath::stringAt($case, ['id']));
+        } catch (\InvalidArgumentException $e) {
+            fwrite(STDERR, JsonPath::stringAt($case, ['id'])."\tnot hydrated: the repository's cases.json has no such case\n");
 
             continue;
         }
