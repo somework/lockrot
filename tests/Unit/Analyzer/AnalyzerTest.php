@@ -12,7 +12,6 @@ use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Clock;
-use Lockrot\Composer\ComposerHttpClient;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
@@ -723,28 +722,53 @@ final class AnalyzerTest extends TestCase
     }
 
 
-    public function testActivityRequestsThatTheBudgetStoppedBeforeTheyStartedReadAsTheBudgetCause(): void
+    /**
+     * A request that the budget kept from starting reads the budget cause. One that started and
+     * failed reads fetch_failed, and its host stays in the unreachable note.
+     */
+    public function testOnlyActivityRequestsThatNeverStartedReadTheBudgetCause(): void
     {
-        $stopped = new class () implements HttpClientInterface {
+        $answers = new class () implements HttpClientInterface {
             public function fetchAll(array $urls, array $headers = []): array
             {
                 $out = [];
                 foreach ($urls as $url) {
-                    $out[$url] = HttpResult::failure($url, ComposerHttpClient::BUDGET_SPENT, new \DateTimeImmutable('2026-09-14T06:00:00+00:00'));
+                    $error = strpos($url, 'vendor/stopped') !== false ? HttpResult::BUDGET_SPENT : 'curl error 7: connection refused';
+                    $out[$url] = HttpResult::failure($url, $error, new \DateTimeImmutable('2026-09-14T06:00:00+00:00'));
                 }
 
                 return $out;
             }
         };
-        $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/pkg', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'vendor/stopped', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'vendor/failed', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+        ]]);
+        $loader = $this->loader([
+            'vendor/stopped' => $this->metadataNamed('vendor/stopped', 'https://github.com/vendor/stopped'),
+            'vendor/failed' => $this->metadataNamed('vendor/failed', 'https://github.com/vendor/failed'),
+        ]);
 
-        $report = $this->analyzer($this->loader(['vendor/pkg' => $this->ancient()]), $stopped, true, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
+        $report = $this->analyzer($loader, $answers, true, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
 
-        $notes = implode("\n", $report->notes());
-        self::assertStringNotContainsString('unreachable', $notes);
-        self::assertContains('repository activity not checked: install-time budget exhausted', $report->notes());
-        $s10 = array_values(array_filter($report->findings()[0]->signals(), static fn ($s): bool => $s->id() === 'S10'));
-        self::assertStringContainsString('the install-time budget ran out', $s10[0]->summary());
+        $notes = [];
+        foreach ($report->runNotes() as $note) {
+            $notes[$note->code()] = $note;
+        }
+        self::assertArrayHasKey(RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED, $notes);
+        self::assertArrayHasKey(RunNote::REPOSITORY_ACTIVITY_UNREACHABLE, $notes);
+        self::assertStringContainsString('vendor/failed', json_encode($notes[RunNote::REPOSITORY_ACTIVITY_UNREACHABLE]->data(), \JSON_UNESCAPED_SLASHES) ?: '');
+        self::assertStringNotContainsString('vendor/stopped', json_encode($notes[RunNote::REPOSITORY_ACTIVITY_UNREACHABLE]->data(), \JSON_UNESCAPED_SLASHES) ?: '');
+        $reasons = [];
+        foreach ($report->findings() as $finding) {
+            foreach ($finding->signals() as $signal) {
+                if ($signal->id() === 'S10') {
+                    $reasons[$finding->package()] = json_encode(JsonPath::decoded($signal->data())) ?: '';
+                }
+            }
+        }
+        self::assertStringContainsString('"install_time_budget"', $reasons['vendor/stopped']);
+        self::assertStringContainsString('"fetch_failed"', $reasons['vendor/failed']);
     }
 
     public function testAllowlistAccessorReturnsConstructorValue(): void

@@ -9,7 +9,6 @@ use Lockrot\Allowlist\Allowlist;
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Allowlist\UncheckedAcceptance;
 use Lockrot\Clock;
-use Lockrot\Composer\ComposerHttpClient;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
 use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
@@ -27,6 +26,7 @@ use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
+use Lockrot\Data\Http\HttpResult;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataFailure;
@@ -505,7 +505,7 @@ final class Analyzer
             return $skipped === ActivityFetchPlan::BUDGET ? NotCheckedRule::RATE_BUDGET : NotCheckedRule::NO_TOKEN;
         }
 
-        if (($batch->failedOn($repo->forge())[$repo->key()] ?? null) === ComposerHttpClient::BUDGET_SPENT) {
+        if (($batch->failedOn($repo->forge())[$repo->key()] ?? null) === HttpResult::BUDGET_SPENT) {
             return NotCheckedRule::BUDGET;
         }
 
@@ -546,7 +546,7 @@ final class Analyzer
             $limited = [];
             $unreachable = [];
             foreach ($batch->failedOn($forge) as $key => $message) {
-                if ($message === ComposerHttpClient::BUDGET_SPENT) {
+                if ($message === HttpResult::BUDGET_SPENT) {
                     $budgetStopped = true;
                 } elseif ($batch->rateLimited($repoByKey[$key]->host())) {
                     $limited[] = [$repoByKey[$key], $message];

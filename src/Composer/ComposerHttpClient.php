@@ -31,8 +31,8 @@ use Lockrot\Deadline;
  */
 final class ComposerHttpClient implements HttpClientInterface
 {
-    /** The error of a request that the install-time budget stopped before it began: no host failed, so the cause is the budget. */
-    public const BUDGET_SPENT = 'install-time budget spent';
+    /** The error of a request that had started when the install-time budget stopped its next hop: a host did answer, and the rest of the chain is missing. */
+    public const BUDGET_SPENT_AFTER_START = 'install-time budget spent after the request started';
 
     public const DEFAULT_TIMEOUT = 10;
     /** Composer's own cap on the hops of one request. */
@@ -173,15 +173,22 @@ final class ComposerHttpClient implements HttpClientInterface
         $results = [];
         /** @var array<string, string> $redirects url => the URL on another origin that a redirect named */
         $redirects = [];
-        /** @var array<string, string> $stopped the URLs whose request, redirect hop or retry the install-time budget stopped */
+        /** @var array<string, string> $stopped the URLs whose request the install-time budget kept from starting */
         $stopped = [];
+        /** @var array<string, true> $asked the URLs whose start the callable below has seen: a later ask is a hop or a retry */
+        $asked = [];
         // Composer's curl downloader asks this before each request, hop and retry starts.
-        // Requests above its limit wait in a queue.
-        $budgetEnded = function (string $url) use (&$stopped): bool {
+        // Requests above its limit wait in a queue. A hop or a retry of a started request keeps the
+        // failure of that request.
+        $budgetEnded = function (string $url) use (&$stopped, &$asked): bool {
+            $started = isset($asked[$url]);
+            $asked[$url] = true;
             if (!$this->deadline->isPast()) {
                 return false;
             }
-            $stopped[$url] = $url;
+            if (!$started) {
+                $stopped[$url] = $url;
+            }
 
             return true;
         };
@@ -224,9 +231,9 @@ final class ComposerHttpClient implements HttpClientInterface
         // again to that target without lockrot's credentials.
         $starts = [];
         foreach ($redirects as $url => $target) {
-            $starts[] = function (\Closure $done) use ($url, $target, $headers, &$results, &$stopped, $budgetEnded): void {
+            $starts[] = function (\Closure $done) use ($url, $target, $headers, &$results, $budgetEnded): void {
                 if ($this->deadline->isPast()) {
-                    $stopped[$url] = $url;
+                    $results[$url] = HttpResult::failure($url, self::BUDGET_SPENT_AFTER_START, $this->clock->now());
                     $done();
 
                     return;
@@ -250,7 +257,7 @@ final class ComposerHttpClient implements HttpClientInterface
             $this->run($starts);
         }
         foreach ($stopped as $url) {
-            $results[$url] = HttpResult::failure($url, self::BUDGET_SPENT, $this->clock->now());
+            $results[$url] = HttpResult::failure($url, HttpResult::BUDGET_SPENT, $this->clock->now());
         }
         foreach ($urls as $url) {
             if (!isset($results[$url])) {
@@ -351,7 +358,7 @@ final class ComposerHttpClient implements HttpClientInterface
         for ($hop = 0; $hop <= self::MAX_REDIRECTS && $target !== ''; ++$hop) {
             // Each request blocks until it ends, so it takes only what the install-time budget has left.
             if ($this->deadline->isPast()) {
-                $results[$url] = HttpResult::failure($url, self::BUDGET_SPENT, $this->clock->now());
+                $results[$url] = HttpResult::failure($url, $hop === 0 ? HttpResult::BUDGET_SPENT : self::BUDGET_SPENT_AFTER_START, $this->clock->now());
 
                 return;
             }

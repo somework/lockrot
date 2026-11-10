@@ -18,7 +18,7 @@ do, what each gap does to findings, and what to do about it.
 | [`advisories_disabled_by_policy`](#advisories_disabled_by_policy) | Composer's policy turns off Composer's advisory blocking | no | None: lockrot still checks advisories | Nothing for lockrot. Composer does not block an affected version in an update (`composer update`, `require` or `remove`) of this project |
 | [`advisories_unavailable`](#advisories_unavailable) | A Composer repository's advisory request failed | yes when unreachable, no for any other error the repository raised, such as an answer lockrot could not read | That repository's advisories are missing | Rerun. For any other error, check the repository that `composer_repository` names |
 | [`advisories_not_checked`](#advisories_not_checked) | Advisories were not looked up, or only partly | no | The packages that the lookup missed carry S10 `advisories`, and their advisories add no points | `offline`: run online. `install_time_budget`: raise the [budget](install-time.md#time-budget). `composer_json_invalid`: fix composer.json until `composer validate` passes |
-| [`repository_activity_not_checked`](#repository_activity_not_checked) | No repository host was asked | no | S10 `install_time_budget` | Raise the [budget](install-time.md#time-budget), or run `composer lockrot` |
+| [`repository_activity_not_checked`](#repository_activity_not_checked) | lockrot did not ask some or all repository hosts | no | S10 `install_time_budget` | Raise the [budget](install-time.md#time-budget), or run `composer lockrot` |
 | [`repository_activity_anonymous_cap`](#repository_activity_anonymous_cap) | Without credentials, only some packages were asked about | no | S10 `no_token`, `anonymous_budget` | Set a token ([credentials](internals.md#repository-hosts-and-credentials)) |
 | [`repository_activity_rate_limited`](#repository_activity_rate_limited) | A host answered "too many requests" | yes | S10 `rate_limit` | Rerun, or add credentials for the host ([credentials](internals.md#repository-hosts-and-credentials)) |
 | [`repository_activity_unreachable`](#repository_activity_unreachable) | A host did not answer | yes | S10 `fetch_failed` | Rerun |
@@ -186,8 +186,10 @@ Tokens and credentials for each host are in
 
 ### Repository activity not checked {#repository_activity_not_checked}
 
-lockrot asked no repository host: the metadata, monorepo-parent and advisory lookups used the
-whole install-time budget.
+lockrot did not ask some or all repository hosts, because the install-time budget ended before a
+request started. Either the metadata, monorepo-parent and advisory lookups used the whole budget, or
+the budget ended while the activity requests were queued. A request that had started and was stopped
+at a retry or a redirect is a failed request, not part of this note.
 
 - `data`: `reason`, which is `install_time_budget`.
 - Findings: S10 `install_time_budget`.
