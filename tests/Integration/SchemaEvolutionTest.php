@@ -359,8 +359,7 @@ final class SchemaEvolutionTest extends TestCase
         self::assertSame(self::BASELINE, JsonPath::stringAt(self::decode($version, 'report.json'), ['baseline', 'path']), 'the report was compared against it');
 
         if (JsonPath::intAt($baseline, ['lockrot', 'schema']) !== 1) {
-            $this->expectNotToPerformAssertions();
-            BaselineFile::resolve(self::DIR.$version, self::BASELINE, '0.14.0')->read();
+            self::assertInstanceOf(Baseline::class, BaselineFile::resolve(self::DIR.$version, self::BASELINE, '0.14.0')->read());
 
             return;
         }
