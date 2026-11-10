@@ -30,7 +30,8 @@ only gain values and a field's type only widens.
   same number.
 
 - **The `-1` files** (report-1, explain-1, baseline-1 and config-1) stay published at their URLs
-  and do not change. lockrot 0.13 and earlier wrote them.
+  and do not change. lockrot 0.13 and earlier wrote report-1, explain-1 and baseline-1, and read
+  config-1.
 
 ## The documents say which schema they follow
 
