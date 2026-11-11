@@ -43,6 +43,8 @@ final class SourceEntryUsageErrorTest extends TestCase
         yield 'an unknown option beside --help of the lockrot command' => [['lockrot', '-h', '--nope'], 'lockrot: The "--nope" option does not exist.'];
         yield 'an unknown option beside -h of list' => [['list', '-h', '--nope'], 'lockrot: The "--nope" option does not exist.'];
         yield 'help for an unknown command with an extra argument' => [['help', 'nope', 'extra'], 'lockrot: Command "nope" is not defined.'];
+        yield 'help for the lockrot command with an unknown option' => [['help', 'lockrot', '--nope'], 'lockrot: The "--nope" option does not exist.'];
+        yield 'help for list with an option of the lockrot command' => [['help', 'list', '--fail-on=high'], 'lockrot: The "--fail-on" option does not exist.'];
     }
 
     /** @return iterable<string, array{list<string>}> */
@@ -57,6 +59,11 @@ final class SourceEntryUsageErrorTest extends TestCase
         yield 'help with a verbosity option' => [['help', 'list', '-vvv']];
         yield 'help with a value option' => [['help', '--format=json', 'list']];
         yield 'help with a working directory' => [['help', '-d', '.', 'list']];
+        yield 'the short help option beside an option of the default command' => [['--format=json', '-h']];
+        yield 'the help option beside an option of the default command' => [['--fail-on=high', '--help']];
+        yield 'the help option beside a working directory and an option of the default command' => [['-d', '.', '--target-php=8.4', '--help']];
+        yield 'help for the lockrot command with one of its options' => [['help', 'lockrot', '--fail-on=high']];
+        yield 'the help option of the lockrot command with one of its options' => [['lockrot', '--format=json', '--help']];
     }
 
     /**
