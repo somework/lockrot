@@ -2,8 +2,8 @@
     "sha256": {
         "resources/lockrot-baseline-2.schema.json": "b534ef575d0dbf8d4842ec1918c71f2aa066d1a74103fe17f8375d7e19e3677f",
         "resources/lockrot-config-2.schema.json": "1569f7f3ee14a0d3339aee691995b1d18fa7069e4fd7997775524c8c3e0c2c65",
-        "resources/lockrot-explain-2.schema.json": "ae9701d2b31d0a17b9577a871de4f84032c950618df7a1218db7d0afd90eb32c",
-        "resources/lockrot-report-2.schema.json": "84830840aefcb6c41bc43a02d6b9807462a184935ff41e253fc70d0226a1755c",
+        "resources/lockrot-explain-2.schema.json": "9aaa4de52c0b4f94d948dcc3c6f97999d4159a62fd5dc18f7ff8a178f3c1910d",
+        "resources/lockrot-report-2.schema.json": "e140516346143ae99cc426559c615ad5cc460ac19550a617d11b224333874596",
         "types/lockrot-report-2.d.ts": "602dd7ca0b6af38c412ab3f62450c86d590fde245883e28584801411f4d20408",
         "types/lockrot-report-2.known.d.ts": "abae4083dee11bd2f0e47d7a7ef9997d3bd17f94174f8ade39241455031c18cd"
     }

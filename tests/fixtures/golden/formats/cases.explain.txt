@@ -1863,6 +1863,99 @@ repository metadata
    * 2.x      2.1.1         2023-06-02   >=8.0
      1.x      1.0.2         2022-01-11   >=7.3
 
+== case S2-parent-prerelease-undated‡
+akaunting/laravel-debugbar-collector 2.1.1 — medium: stale
+  direct requirement (composer.json require)
+
+age       installed  2.1.1     2023-06-02   3.3 years ago                 dated by akaunting/monorepo
+          2.x        2.1.1     2023-06-02   3.3 years ago                 past release-warn-years 3; dated by akaunting/monorepo
+          newest               not read (undated releases)
+          last push            2023-06-02   3.3 years ago                 past push-warn-years 3
+          libyears 0.0 behind the newest stable release
+repository GitHub github.com/akaunting/laravel-debugbar-collector: last push 2023-06-02 · fetched 2026-09-14
+
+score     8 = stale 8     medium from 8
+  maintenance  stale 8 (lead)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        —
+
+flags
+  stale        S4 · last push 2023-06-02 (3.3 years ago); liveness read from pushes only
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  S2 (undated releases)
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 2.x      2.1.1         2023-06-02   >=8.0
+     1.x      1.0.2         2022-01-11   >=7.3
+branch 2.x dated by akaunting/monorepo, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
+
+== case date-tag-above‡
+prestashop/ps_contactinfo v3.3.2 — medium: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v3.3.2    2023-03-09   3.6 years ago
+          3.x        v3.3.3    2025-01-22   1.7 years ago                 below release-warn-years 3
+          newest     20200101  2025-06-01   1.3 years ago                 below release-warn-years 3
+          last push            2026-08-31   0.1 years ago                 below push-warn-years 3
+          libyears 1.9 behind the newest stable release
+repository GitHub github.com/PrestaShop/ps_contactinfo: last push 2026-08-31 · fetched 2026-09-14
+
+score     8 = vulnerable 8 [medium advisory]     medium from 8
+  security     vulnerable 8 (medium advisory CVE-2025-24027)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        composer update prestashop/ps_contactinfo (gets v3.3.3) — clears the advisory
+          clears PKSA-53np-yyc5-xg1m
+
+flags
+  vulnerable   S9 · 1 advisory: 1 medium — all fixed on 3.x; advisory: CVE-2025-24027 ps_contactinfo has a potential XSS due to usage of the nofilter tag in template · lookup complete
+    medium     CVE-2025-24027  ps_contactinfo has a potential XSS due to usage of the nofilter tag in template
+               PKSA-53np-yyc5-xg1m · reported 2025-01-22 · 8 points · fix: composer update to 3.x from v3.3.3
+  feeds        packagist.org: 1 on record, 1 affects v3.3.2
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 3.x      v3.3.3        2025-01-22   >=5.4      1 of 1 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
+     2.x      v2.0.1        2017-02-01   >=5.4      0 of 1
+
+== case date-tag-snapshot‡
+matomo/searchengine-and-social-list dev-master — high: pinned · stale
+  direct requirement (composer.json require)
+
+age       installed  dev-masternot read (a branch snapshot has no release branch)
+          its branch           not read (a branch snapshot has no release branch)
+          newest     3.14.0    2023-01-20   3.7 years ago                 past release-warn-years 3
+          last push            2026-09-23   less than three weeks ago     below push-warn-years 3
+          libyears not measured: a branch snapshot has no release branch
+repository GitHub github.com/matomo-org/searchengine-and-social-list: last push 2026-09-23 · fetched 2026-09-14
+
+score     18 = pinned 16 + stale 2 [¼ of 8]     high from 16
+  maintenance  pinned 16 (lead) · stale 2 (¼ of 8)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require a tag — the newest is 3.14.0 (2023-01-20), older than your snapshot (2026-07-15); review, or replace; stale stays
+          clears pinned
+
+flags
+  pinned       S6 · pinned to branch snapshot dev-master
+  stale        S2 · last release 2023-01-20 (3.7 years ago)
+  feeds        packagist.org: none on record
+  accepted     none
+  not checked  S8 (a branch snapshot has no release branch)
+
+repository metadata
+     branch   highest tag   released     php        fixes
+     3.x      3.14.0        2023-01-20   —
+     1.x      1.4.4         2018-05-25   —
+
 == case S2-parent-shared-installed‡
 akaunting/laravel-debugbar-collector 2.1.1 — medium: stale
   direct requirement (composer.json require)
@@ -8181,6 +8274,68 @@ flags
 repository metadata
      branch   highest tag   released     php        fixes
    * 6.x      v6.4.41       2026-07-02   >=8.1      1 of 1 · upgrade (lowest fix); held by symfony/routing v6.4.41, its own release; after it: 0, ok; Composer's solver refuses it
+
+== case mc-root-alias‡
+symfony/routing v6.4.28 — high: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v6.4.28   2025-10-31   0.9 years ago
+          6.x        v6.4.41   2026-07-01   0.3 years ago                 below release-warn-years 3
+          newest     v6.4.41   2026-07-01   0.3 years ago                 below release-warn-years 3
+          last push            2026-09-29   less than three weeks ago     below push-warn-years 3
+          libyears 0.7 behind the newest stable release
+repository GitHub github.com/symfony/routing: last push 2026-09-29 · fetched 2026-09-14
+
+score     16 = vulnerable 16 [high advisory]     high from 16
+  security     vulnerable 16 (high advisory CVE-2026-48784)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        composer update 'symfony/routing:^6.4.41' (gets v6.4.41) — clears the advisory; Composer's solver checked it against the lock
+          clears PKSA-bf7t-jnpz-492k
+
+flags
+  vulnerable   S9 high · 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization · lookup complete
+    high       CVE-2026-48784  UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization
+               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 16 points · fix: composer update to 6.x from v6.4.41
+  feeds        packagist.org: 4 on record, 1 affects v6.4.28
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 6.x      v6.4.41       2026-07-01   >=8.1      1 of 1 · composer update (lowest fix); after it: 0, ok; Composer's solver resolves it
+
+== case mc-non-dev-solve‡
+symfony/routing v6.4.28 — high: vulnerable
+  direct requirement (composer.json require)
+
+age       installed  v6.4.28   2025-10-31   0.9 years ago
+          6.x        v6.4.41   2026-07-01   0.3 years ago                 below release-warn-years 3
+          newest     v6.4.41   2026-07-01   0.3 years ago                 below release-warn-years 3
+          last push            2026-09-29   less than three weeks ago     below push-warn-years 3
+          libyears 0.7 behind the newest stable release
+repository GitHub github.com/symfony/routing: last push 2026-09-29 · fetched 2026-09-14
+
+score     16 = vulnerable 16 [high advisory]     high from 16
+  security     vulnerable 16 (high advisory CVE-2026-48784)
+  reach        direct requirement: maintenance not halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        require symfony/routing ^6.4.41, which removes it from require-dev — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires >=6.4.0,<6.4.41); Composer's solver checked it against the lock
+          clears PKSA-bf7t-jnpz-492k
+
+flags
+  vulnerable   S9 high · 1 advisory: 1 high — all fixed on 6.x (upgrade); advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization · lookup complete
+    high       CVE-2026-48784  UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization
+               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 16 points · fix: upgrade to 6.x from v6.4.41
+  feeds        packagist.org: 4 on record, 1 affects v6.4.28
+  accepted     none
+  not checked  nothing
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 6.x      v6.4.41       2026-07-01   >=8.1      1 of 1 · upgrade (lowest fix); held by composer.json; after it: 0, ok; Composer's solver resolves it
 
 == case mc-php-newest‡
 typo3/html-sanitizer v2.2.0 — high: vulnerable

@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "prestashop/ps_contactinfo v3.3.2 \u2014 finding medium (8 = vulnerable 8 [medium advisory]) \u2014 vulnerable: 1 advisory: 1 medium \u2014 all fixed on 3.x; advisory: CVE-2025-24027 ps_contactinfo has a potential XSS due to usage of the nofilter tag in template. Do: composer update prestashop/ps_contactinfo (gets v3.3.3) \u2014 clears the advisory.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "minor",
+        "fingerprint": "109d993bb167e377a458c261716862ad1765524e305948235db0e3c03c81577b",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

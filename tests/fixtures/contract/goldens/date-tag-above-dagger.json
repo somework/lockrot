@@ -1,0 +1,23 @@
+{
+    "score_text": "8 = vulnerable 8 [medium advisory]",
+    "next_step_text": "composer update prestashop/ps_contactinfo (gets v3.3.3) — clears the advisory",
+    "gate_line": null,
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v3.3.2 released 2023-03-09 (3.6 years ago); 3.x last released v3.3.3 2025-01-22 (1.7 years ago); newest release 20200101 2025-06-01 (1.3 years ago); last push 2026-08-31 (0.1 years ago)",
+    "explain_age": [
+        "installed  v3.3.2    2023-03-09   3.6 years ago",
+        "3.x        v3.3.3    2025-01-22   1.7 years ago                 below release-warn-years 3",
+        "newest     20200101  2025-06-01   1.3 years ago                 below release-warn-years 3",
+        "last push            2026-08-31   0.1 years ago                 below push-warn-years 3",
+        "libyears 1.9 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer update prestashop/ps_contactinfo",
+        "composer why-not prestashop/ps_contactinfo v3.3.3 --locked"
+    ],
+    "commands_cmd": [
+        "composer update prestashop/ps_contactinfo",
+        "composer why-not prestashop/ps_contactinfo v3.3.3 --locked"
+    ]
+}

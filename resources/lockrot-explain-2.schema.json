@@ -3533,7 +3533,7 @@
                             },
                             "allOf": [
                                 {
-                                    "description": "A run whose blocking an environment variable turned off blocks no advisory.",
+                                    "description": "`blocks_advisories` is false when `blocking_disabled_by` is not empty, whether an environment variable or a composer.json `config` key turned the blocking off.",
                                     "anyOf": [
                                         {
                                             "properties": {
@@ -11902,7 +11902,7 @@
             ],
             "properties": {
                 "reaches_fail_on": {
-                    "description": "Whether the finding reaches some value of `run.gates[]`, reading the score and the flags before the baseline (0.13's meaning).",
+                    "description": "Whether the finding reaches some value of `run.gates[]` before the baseline: a grade value reads the score, a flag value the counted flags, a `vulnerable` or `vulnerable-*` value the counted advisories, and `unchecked` an S10 entry, so a finding with score 0 can reach `unchecked`.",
                     "type": "boolean"
                 },
                 "fails": {

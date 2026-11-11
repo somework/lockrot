@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/pinned",
+        "description": "matomo/searchengine-and-social-list dev-master \u2014 finding high (18 = pinned 16 + stale 2 [\u00bc of 8]) \u2014 pinned: pinned to branch snapshot dev-master. Do: require a tag \u2014 the newest is 3.14.0 (2023-01-20), older than your snapshot (2026-07-15); review, or replace; stale stays.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "1fe6395d3cc65ac9f27afe1ced389ce4360347f131aad5a5313f59b07bf700bf",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "matomo/searchengine-and-social-list dev-master \u2014 finding high (18 = pinned 16 + stale 2 [\u00bc of 8]) \u2014 stale: last release 2023-01-20 (3.7 years ago). Do: require a tag \u2014 the newest is 3.14.0 (2023-01-20), older than your snapshot (2026-07-15); review, or replace; stale stays.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "f95607b995621f8021b13daf9634b1f235cc2c17275659879d0c6f8c14c40923",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

@@ -1,0 +1,5 @@
+::error file=composer.lock,line=4,title=lockrot%3A high — pinned · stale::matomo/searchengine-and-social-list dev-master: 18 = pinned 16 + stale 2 [¼ of 8]. Do: require a tag — the newest is 3.14.0 (2023-01-20), older than your snapshot (2026-07-15); review, or replace; stale stays. pinned: pinned to branch snapshot dev-master. stale: last release 2023-01-20 (3.7 years ago).
+flags: pinned 1 · stale 1 · 1 package carries more than one
+depth: every flagged package is named in composer.json · direct 1
+php: the lock installs on PHP 7.2 to 8.5
+gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)
