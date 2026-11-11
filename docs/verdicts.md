@@ -1441,8 +1441,9 @@ furthest behind phpdocumentor/reflection-common 2.2.0 at 5.4
 
 For each package, lockrot takes the years from the installed version's release to the package's
 highest stable tag. A pre-release never ends libyears, dated or not. A date version such as
-`20200101` belongs to no branch, so it never ends libyears either: the highest other stable tag
-does. When the installed version is
+`20200101` belongs to no branch, so it does not end libyears while a stable tag on a branch
+exists: the highest of those does. If no stable tag is on a branch, the highest stable tag ends
+libyears. When the installed version is
 the highest stable tag, or a pre-release above it, the package is 0 behind, also when its own date
 is untrusted. A lower tag with a later date does not count. S2 reads pre-releases, so this date is
 not always the one that S2 reads. It counts years of 365.25 days, never below zero, and sums them
