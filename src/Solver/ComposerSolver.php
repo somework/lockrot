@@ -179,7 +179,8 @@ final class ComposerSolver
         if ($answer instanceof SolverProblemsException) {
             return $this->refused($answer, $pool, $set, $composerRequest, $composerRequest, $root, $request, $loaded);
         }
-        $nonDev = $this->nonDevAnswer($root, $policy, $answer, $requires, $temporary);
+        // As Installer::extractDevPackages(): no second solve for a root without require-dev.
+        $nonDev = $root->getDevRequires() === [] ? null : $this->nonDevAnswer($root, $policy, $answer, $requires, $temporary);
         if ($nonDev !== null) {
             return $this->refused($nonDev[3], $nonDev[2], $nonDev[0], $nonDev[1], $composerRequest, $root, $request, $loaded);
         }
@@ -223,7 +224,7 @@ final class ComposerSolver
     /**
      * Composer's second solve of an update, as Installer::extractDevPackages() runs it: the packages
      * of the first answer alone, and the root's non-dev requirements. Composer stops the update
-     * when it refuses. Composer skips it for a root without require-dev, which it always resolves.
+     * when it refuses.
      *
      * @param array<string, ConstraintInterface> $requires  the root requirements of the first solve
      * @param array<string, ConstraintInterface> $temporary
