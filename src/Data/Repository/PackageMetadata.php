@@ -209,7 +209,7 @@ final class PackageMetadata
         // Dated or not, unlike $commitByVersion: the shared-commit tags are read from it.
         $commitOfTag = [];
         $newestPreRelease = null;
-        /** @var array<string, array{0: BasePackage, 1: ?\DateTimeImmutable, 2: ?string}> $stable by normalized version: the release, its date, its php */
+        /** @var array<array-key, array{0: BasePackage, 1: ?\DateTimeImmutable, 2: ?string}> $stable by normalized version: the release, its date, its php. PHP makes an all-digit key, such as the date version 20200101, an integer: cast each key that a loop reads. */
         $stable = [];
 
         foreach ($versions as $version) {
@@ -404,8 +404,8 @@ final class PackageMetadata
      * else per release.
      *
      * @param list<BasePackage>                                                     $versions
-     * @param array<string, array{0: BasePackage, 1: ?\DateTimeImmutable, 2: ?string}> $stable
-     * @param array<string, true>                                                   $sharedCommit
+     * @param array<array-key, array{0: BasePackage, 1: ?\DateTimeImmutable, 2: ?string}> $stable
+     * @param array<string, true>                                                      $sharedCommit
      */
     private function keepReleases(array $versions, array $stable, array $sharedCommit, \DateTimeImmutable $now, string $installedVersion): void
     {
@@ -416,7 +416,7 @@ final class PackageMetadata
         }
         $newest = null;
         foreach ($stable as $normalized => [$version, $at]) {
-            if (($at === null || $at <= $now) && ($newest === null || Comparator::greaterThan($normalized, $newest->getVersion()))) {
+            if (($at === null || $at <= $now) && ($newest === null || Comparator::greaterThan((string) $normalized, $newest->getVersion()))) {
                 $newest = $version;
             }
         }
@@ -440,6 +440,7 @@ final class PackageMetadata
         $snapshot = VersionParser::parseStability($installed) === 'dev';
         $above = [];
         foreach ($stable as $normalized => $release) {
+            $normalized = (string) $normalized;
             if ($snapshot || Comparator::greaterThan($normalized, $installed)) {
                 $above[] = $this->stableRelease($normalized, $release, $sharedCommit);
             }
@@ -771,7 +772,7 @@ final class PackageMetadata
      * The newest stable tag by trusted date (ruling R13-A). A highest tag with no date, or with a
      * shared commit's date, is the last release with no date.
      *
-     * @param array<string, array{0: BasePackage, 1: ?\DateTimeImmutable, 2: ?string}> $stable       by normalized version
+     * @param array<array-key, array{0: BasePackage, 1: ?\DateTimeImmutable, 2: ?string}> $stable       by normalized version
      * @param array<string, string>                                                    $commitOfTag  by normalized version
      * @param array<string, int>                                                       $tagsOnCommit by commit
      *

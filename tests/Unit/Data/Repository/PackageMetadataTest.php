@@ -6,6 +6,8 @@ namespace Lockrot\Tests\Unit\Data\Repository;
 
 use Composer\Package\CompletePackage;
 use Composer\Package\Loader\ArrayLoader;
+use Composer\Semver\Comparator;
+use Composer\Semver\VersionParser;
 use Lockrot\Clock;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
@@ -149,6 +151,106 @@ final class PackageMetadataTest extends TestCase
 
         self::assertNull($meta->installedRequires());
         self::assertSame(['1.2.0', '1.2.1', 'v2.0.0', '2.1.0'], self::versions($meta->releasesAbove() ?? []));
+    }
+
+    /** A date tag is all digits, and PHP makes such an array key an integer. Ruling R17-1d: Composer's comparator puts it above 3.x. */
+    public function testFinding34ADateTagAboveTheInstalledReleaseIsAReleaseAboveIt(): void
+    {
+        $versions = [
+            $this->release(['version' => '3.1.0', 'time' => '2024-01-01T00:00:00+00:00']),
+            $this->release(['version' => '3.2.0', 'time' => '2024-06-01T00:00:00+00:00']),
+            $this->release(['version' => '20200101', 'time' => '2020-01-01T00:00:00+00:00', 'require' => ['php' => '>=7.0']]),
+        ];
+
+        $meta = PackageMetadata::fromPackages('a/b', $versions, new \DateTimeImmutable(self::NOW), '3.1.0');
+
+        self::assertSame(['3.2.0', '20200101'], self::versions($meta->releasesAbove() ?? []));
+        self::assertSame('3.2.0', $meta->lastStableVersion(), 'the newest stable tag by trusted date (ruling R13-A)');
+        self::assertSame('20200101', $meta->newestStable() === null ? null : $meta->newestStable()->normalized());
+    }
+
+    public function testFinding34ADateTagBelowTheInstalledDateReleaseIsNoReleaseAboveIt(): void
+    {
+        $versions = [
+            $this->release(['version' => '20200101', 'time' => '2020-01-01T00:00:00+00:00']),
+            $this->release(['version' => 'v20210101', 'time' => '2021-01-01T00:00:00+00:00', 'require' => ['c/d' => '^1']]),
+            $this->release(['version' => '20220101', 'time' => '2022-01-01T00:00:00+00:00']),
+        ];
+
+        $meta = PackageMetadata::fromPackages('a/b', $versions, new \DateTimeImmutable(self::NOW), 'v20210101');
+
+        self::assertSame(['20220101'], self::versions($meta->releasesAbove() ?? []));
+        self::assertSame(['c/d'], $meta->installedRequires());
+        self::assertSame([], self::versions(PackageMetadata::fromPackages('a/b', $versions, new \DateTimeImmutable(self::NOW), '20220101')->releasesAbove() ?? []));
+    }
+
+    public function testFinding34ABranchSnapshotKeepsADateTagAmongTheReleasesAboveIt(): void
+    {
+        $versions = [
+            $this->release(['version' => '1.0.0', 'time' => '2019-01-01T00:00:00+00:00']),
+            $this->release(['version' => '20200101', 'time' => '2020-01-01T00:00:00+00:00']),
+            $this->release(['version' => 'dev-main', 'time' => '2026-01-01T00:00:00+00:00']),
+        ];
+
+        $meta = PackageMetadata::fromPackages('a/b', $versions, new \DateTimeImmutable(self::NOW), 'dev-main');
+
+        self::assertSame(['1.0.0', '20200101'], self::versions($meta->releasesAbove() ?? []));
+    }
+
+    /**
+     * Random tag sets with a fixed seed: semver, date tags with and without `v`, pre-releases and
+     * branches. Each load with an installed version must keep exactly the stable tags above it.
+     */
+    public function testFinding34NoGeneratedTagSetBreaksTheReleaseScan(): void
+    {
+        mt_srand(34);
+        $parser = new VersionParser();
+        for ($run = 0; $run < 500; ++$run) {
+            $tags = [];
+            for ($i = mt_rand(1, 8); $i > 0; --$i) {
+                $tags[] = self::generatedTag();
+            }
+            $versions = [];
+            foreach ($tags as $tag) {
+                $versions[] = $this->release(['version' => $tag, 'time' => \sprintf('20%02d-01-01T00:00:00+00:00', mt_rand(10, 26)), 'require' => ['php' => '>=7.4']]);
+            }
+            $installed = mt_rand(0, 4) === 0 ? 'dev-main' : $tags[mt_rand(0, \count($tags) - 1)];
+            $normalizedInstalled = $parser->normalize($installed);
+            $expected = [];
+            foreach ($tags as $tag) {
+                $normalized = $parser->normalize($tag);
+                if (VersionParser::parseStability($normalized) === 'stable' && !isset($expected[$normalized])
+                    && (VersionParser::parseStability($normalizedInstalled) === 'dev' || Comparator::greaterThan($normalized, $normalizedInstalled))) {
+                    $expected[$normalized] = true;
+                }
+            }
+
+            $meta = PackageMetadata::fromPackages('a/b', $versions, new \DateTimeImmutable(self::NOW), $installed);
+
+            $kept = array_map(static fn (StableRelease $release): string => $release->normalized(), $meta->releasesAbove() ?? []);
+            sort($kept, \SORT_STRING);
+            $want = array_map('strval', array_keys($expected));
+            sort($want, \SORT_STRING);
+            self::assertSame($want, $kept, 'tags '.implode(', ', $tags).', installed '.$installed);
+        }
+    }
+
+    private static function generatedTag(): string
+    {
+        switch (mt_rand(0, 5)) {
+            case 0:
+                return \sprintf('%d.%d.%d', mt_rand(0, 4), mt_rand(0, 3), mt_rand(0, 3));
+            case 1:
+                return \sprintf('v%d.%d.%d', mt_rand(0, 4), mt_rand(0, 3), mt_rand(0, 3));
+            case 2:
+                return \sprintf('20%02d%02d%02d', mt_rand(10, 26), mt_rand(1, 12), mt_rand(1, 28));
+            case 3:
+                return \sprintf('v20%02d%02d01', mt_rand(10, 26), mt_rand(1, 12));
+            case 4:
+                return \sprintf('%d.%d.0-%s%d', mt_rand(0, 4), mt_rand(0, 3), ['alpha', 'beta', 'RC'][mt_rand(0, 2)], mt_rand(1, 3));
+            default:
+                return ['dev-main', '2.x-dev', 'dev-feature'][mt_rand(0, 2)];
+        }
     }
 
     /** A tag on a commit that three or more stable tags share has no trusted date of its own. */
