@@ -296,6 +296,9 @@ final class LockrotConfigTest extends TestCase
         yield 'a distribution build' => ['8.1.2-1ubuntu2.14'];
         yield 'a fourth part' => ['8.4.1.0'];
         yield 'a trailing newline' => ["8.4\n"];
+        yield 'a v prefix' => ['v8.4'];
+        yield 'a leading space' => [' 8.4'];
+        yield 'a word' => ['x'];
     }
 
     /** @dataProvider targetPhpsWithTrailingText */
@@ -356,7 +359,7 @@ final class LockrotConfigTest extends TestCase
     public function testAConfigTargetPhpThatIsNoVersionIsRefusedUnderEverySource(array $env, array $cli): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('target-php must look like "8.4"; got "banana"');
+        $this->expectExceptionMessage('extra.lockrot.target-php takes a major, a minor or a patch version, such as "8.4" or "8.4.2", with nothing before or after it; got "banana"');
         LockrotConfig::fromSources(['target-php' => 'banana'], $env, $cli, '8.5.10', null);
     }
 

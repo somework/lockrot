@@ -273,7 +273,6 @@ final class LockrotConfig
         }
         $fromConfig = $extra['target-php'] ?? null;
         if (\is_string($fromConfig) && $fromConfig !== '') {
-            self::refuseNoVersion($fromConfig);
             if (!self::isTargetPhpValue($fromConfig)) {
                 throw new ConfigException(\sprintf(self::TARGET_PHP_VALUE, 'extra.lockrot.target-php', $fromConfig));
             }
