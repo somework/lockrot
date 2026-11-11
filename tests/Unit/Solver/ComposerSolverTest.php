@@ -281,6 +281,26 @@ final class ComposerSolverTest extends TestCase
         self::assertSame(['dev-main'], array_map(static fn (Holder $hold): ?string => $hold->version(), $kept));
     }
 
+    /**
+     * Composer's update solves again over the require links alone (Installer::extractDevPackages())
+     * and stops when that solve refuses: require-dev admits 1.6.0, require does not.
+     */
+    public function testAnUpdateThatOnlyTheRequireDevConstraintAdmitsIsRefusedByTheNonDevSolve(): void
+    {
+        $solver = self::solver(
+            ['require' => ['foo/foo' => '<1.5', 'php' => '>=8.1'], 'require-dev' => ['foo/foo' => '^1.0']],
+            [['name' => 'foo/foo', 'version' => '1.4.0']],
+            ['foo/foo' => [['version' => '1.4.0'], ['version' => '1.6.0']]]
+        );
+
+        $solution = $solver->solve(SolveRequest::update(['foo/foo' => '^1.6.0']));
+
+        self::assertFalse($solution->resolves());
+        self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require', 'target' => null, 'constraint' => '<1.5']], self::rows($solution->holds()));
+        self::assertStringStartsWith("Unable to find a compatible set of packages based on your non-dev requirements alone.\nProblem 1\n", (string) $solution->problem());
+        self::assertTrue($solver->solve(SolveRequest::update(['foo/foo' => '~1.4.0']))->resolves(), 'a release that require admits passes the second solve');
+    }
+
     /** A root requirement holds a move only through a requirement that it leaves no candidate. */
     public function testARefusalNamesNoRootRequirementOfARequirementThatKeepsACandidate(): void
     {
