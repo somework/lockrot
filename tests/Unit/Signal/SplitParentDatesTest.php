@@ -91,6 +91,87 @@ final class SplitParentDatesTest extends TestCase
         self::assertSame([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S2]], $causes);
     }
 
+    /**
+     * Ruling R17-D1: an undated pre-release above the highest stable tag is an unresolved date, also
+     * when the parent dates the split's highest stable branch. Without the pre-release, S2 reads the
+     * parent date.
+     */
+    public function testAnUndatedPreReleaseAboveAParentDatedHighestBranchLeavesS2Unknown(): void
+    {
+        $now = '2026-09-14T00:00:00+00:00';
+        $stable = [['v13.30.0', 'c1330', null], ['v13.31.0', 'c1331', null]];
+        $parent = self::metadata('acme/mono', [
+            ['v13.30.0', 'm1330', '2021-01-01T00:00:00+00:00'],
+            ['v13.31.0', 'm1331', '2021-02-01T00:00:00+00:00'],
+        ], $now, null, ['acme/split' => 'self.version']);
+        $package = FactsBuilder::package(['name' => 'acme/split', 'version' => 'v13.30.0', 'time' => '2021-01-01T00:00:00+00:00']);
+        $activity = FactsBuilder::activity(false, '2026-09-01T00:00:00+00:00');
+        $withPreRelease = self::metadata('acme/split', array_merge($stable, [['v14.0.0-beta1', 'c14b1', null]]), $now, 'v13.30.0');
+
+        foreach ([$withPreRelease->datedBy($parent), $withPreRelease] as $metadata) {
+            $facts = new PackageFacts($package, $metadata, $activity);
+            [$levels, $causes] = self::signals($facts, $now);
+
+            self::assertArrayNotHasKey(Signal::S2, $levels);
+            self::assertSame([NotCheckedRule::CAUSE_TAG_UNDATED => [Signal::S2]], $causes);
+            self::assertSame(AgeMeasure::UNDATED_RELEASES, (new AgeMeasure(Clock::fixed($now), new Thresholds()))->release($facts)->unmeasured());
+        }
+        [$levels, , $dates] = self::signals(new PackageFacts($package, self::metadata('acme/split', $stable, $now, 'v13.30.0')->datedBy($parent), $activity), $now);
+        self::assertSame(Signal::LEVEL_HIGH, $levels[Signal::S2] ?? null);
+        self::assertSame(['2021-02-01', 'acme/mono'], $dates[Signal::S2] ?? null);
+    }
+
+    /** Ruling R17-D1: the highest row's own date does not replace an undated pre-release that sits on a shared commit above it. */
+    public function testAnUndatedPreReleaseOnASharedCommitAboveADatedHighestRowLeavesS2Unknown(): void
+    {
+        $now = '2026-09-14T00:00:00+00:00';
+        $split = self::metadata('acme/split', [
+            ['v13.29.0', 'c-shared', '2020-01-01T00:00:00+00:00'],
+            ['v13.29.1', 'c-shared', '2020-01-01T00:00:00+00:00'],
+            ['v13.29.2', 'c-shared', '2020-01-01T00:00:00+00:00'],
+            ['v13.31.0', 'c1331', '2021-02-01T00:00:00+00:00'],
+            ['v14.0.0-beta1', 'c-shared', null],
+        ], $now, 'v13.31.0');
+        $parent = self::metadata('acme/mono', [['v13.29.0', 'm1329', '2019-12-01T00:00:00+00:00']], $now, null, ['acme/split' => 'self.version']);
+        $package = FactsBuilder::package(['name' => 'acme/split', 'version' => 'v13.31.0', 'time' => '2021-02-01T00:00:00+00:00']);
+
+        foreach ([$split->datedBy($parent), $split] as $metadata) {
+            [$levels, $causes] = self::signals(new PackageFacts($package, $metadata, FactsBuilder::activity(false, '2026-09-01T00:00:00+00:00')), $now);
+
+            self::assertArrayNotHasKey(Signal::S2, $levels);
+            self::assertSame([NotCheckedRule::CAUSE_SHARED_COMMIT => [Signal::S2]], $causes);
+        }
+    }
+
+    /**
+     * Rulings R16-26 and R17-D1: v14.0.0-beta1 has a date, a shared commit's lower bound, so it is not
+     * undated. That bound is older than the RC below it, so S2 reads the RC.
+     */
+    public function testADatedPreReleaseOnASharedCommitAboveANewerDatedPreReleaseDoesNotBlockTheParentDatedReading(): void
+    {
+        $now = '2026-09-14T00:00:00+00:00';
+        $split = self::metadata('acme/split', [
+            ['v13.29.0', 'c-shared', '2021-03-01T00:00:00+00:00'],
+            ['v13.29.1', 'c-shared', '2021-03-01T00:00:00+00:00'],
+            ['v13.29.2', 'c-shared', '2021-03-01T00:00:00+00:00'],
+            ['v13.30.0', 'c1330', null],
+            ['v13.31.0', 'c1331', null],
+            ['v13.32.0-RC1', 'c-rc', '2021-05-01T00:00:00+00:00'],
+            ['v14.0.0-beta1', 'c-shared', '2021-03-01T00:00:00+00:00'],
+        ], $now, 'v13.30.0');
+        $parent = self::metadata('acme/mono', [
+            ['v13.30.0', 'm1330', '2021-01-01T00:00:00+00:00'],
+            ['v13.31.0', 'm1331', '2021-02-01T00:00:00+00:00'],
+        ], $now, null, ['acme/split' => 'self.version']);
+        $package = FactsBuilder::package(['name' => 'acme/split', 'version' => 'v13.30.0', 'time' => '2021-01-01T00:00:00+00:00']);
+
+        [$levels, $causes, $dates] = self::signals(new PackageFacts($package, $split->datedBy($parent), FactsBuilder::activity(false, '2026-09-01T00:00:00+00:00')), $now);
+
+        self::assertSame(Signal::LEVEL_HIGH, $levels[Signal::S2] ?? null);
+        self::assertSame(['2021-05-01', null], $dates[Signal::S2] ?? null);
+        self::assertSame([], $causes);
+    }
+
     /** @return iterable<string, array{bool, array<string, string>, string, array{string, string}}> */
     public static function provideSplitsWhoseInstalledSharedTagTheParentDates(): iterable
     {

@@ -784,7 +784,8 @@ composer.json requires, and solves it against the lock. The solver loads the ver
 package that the solve needs from the project's Composer repositories. A file that the run
 already fetched comes from Composer's cache, so only a package that the run did not read costs a
 request. With `--offline`, only Composer's cache answers. JSON writes the answer as the move's
-`check`.
+`check`. When the root has `require-dev`, a solve that resolves runs a second solve over the
+`require` links alone, as `composer update` does. If that solve refuses, the move is `refused`.
 
 | `check.result` | What it says | The steps in `commands[]` |
 |---|---|---|
@@ -1439,7 +1440,10 @@ furthest behind phpdocumentor/reflection-common 2.2.0 at 5.4
 ```
 
 For each package, lockrot takes the years from the installed version's release to the package's
-highest stable tag. A pre-release never ends libyears, dated or not. When the installed version is
+highest stable tag. A pre-release never ends libyears, dated or not. A date version such as
+`20200101` belongs to no branch, so it does not end libyears while a stable tag on a branch
+exists: the highest of those does. If no stable tag is on a branch, the highest stable tag ends
+libyears. When the installed version is
 the highest stable tag, or a pre-release above it, the package is 0 behind, also when its own date
 is untrusted. A lower tag with a later date does not count. S2 reads pre-releases, so this date is
 not always the one that S2 reads. It counts years of 365.25 days, never below zero, and sums them
@@ -1465,16 +1469,17 @@ applies:
 | `branch_snapshot` | The installed version is a branch (`dev-main`, `2.x-dev`): it has a commit date, not a release date, and `pinned` already says what there is to say |
 | `shared_commit`, `parent_split`, `undated` | The installed release is not the highest stable tag and has no date lockrot trusts: its commit carries other tags, a parent dates the newest release of its split, or the lock entry has no `time`. The same ids as `age.installed_unmeasured` |
 | `no_stable_release` | The package has no tagged release |
-| `undated_releases` | The package has tagged releases, and no release above the installed one has a trusted date. `age.release_unmeasured` uses the same id when the highest stable tag has no trusted date, also when older tags have one |
+| `undated_releases` | The package has tagged releases, and no branch has a newest dated stable release above the installed one. A shared commit's date counts as a date. `age.release_unmeasured` uses the same id when the highest stable tag has no trusted date, also when older tags have one |
 
 The keys are an [open set](schema.md#open-sets): read one you do not know as another way a package
 went unmeasured ([compatibility.md](compatibility.md#open-sets)).
 
-- **Lower bounds.** When the highest stable tag has no trusted date, lockrot measures the package
-  to the newest stable release above the installed version that has a trusted date. That release
-  can be on a higher branch or on the installed branch. A tag's commit is never younger than the
-  release it names, so the value is a lower bound: `libyears_at_least` is true, and the root counts
-  such findings in `at_least_count`. The line then reads `at least`.
+- **Lower bounds.** If the highest stable tag has no trusted date, lockrot reads another end. It
+  takes the newest date of a stable release on a branch above the installed version, from the
+  Composer repository. That date can be a shared commit's, and the release can be on a higher branch or on
+  the installed branch. A tag's commit is never younger than the release it names, so the value is
+  a lower bound: `libyears_at_least` is true, and the root counts such findings in
+  `at_least_count`. The line then reads `at least`.
 
 - **Ahead of the highest stable tag.** A package locked on a pre-release above it counts as zero.
   A package locked on a tag that the repository does not list counts as zero too.

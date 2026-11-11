@@ -32,18 +32,19 @@ final class UncoveredAdvisories implements \JsonSerializable
     /**
      * The project `ignore[]` entries that match findings with counted advisories, in report order.
      *
-     * @param list<Finding> $findings
+     * @param list<Finding>                     $findings
+     * @param array<string, ?AllowlistEntry>    $projectEntries package name => the project entry that names it, null for none
      *
      * @return list<self>
      */
-    public static function of(array $findings): array
+    public static function of(array $findings, array $projectEntries): array
     {
         usort($findings, [Report::class, 'compareGraded']);
         $out = [];
         foreach ($findings as $finding) {
-            $entry = $finding->details()->entry();
+            $entry = $projectEntries[$finding->package()] ?? null;
             $advisories = array_map(static fn (CountedAdvisory $advisory): string => $advisory->id(), $finding->flags()->advisories());
-            if ($entry === null || $entry->by() !== AllowlistEntry::BY_PROJECT || $advisories === []) {
+            if ($entry === null || $advisories === []) {
                 continue;
             }
             usort($advisories, 'strcmp');

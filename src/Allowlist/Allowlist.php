@@ -27,16 +27,42 @@ final class Allowlist
         $this->finishedTypes = $finishedTypes;
     }
 
+    /**
+     * A name entry wins, unless it accepts only some flags and the package has a finished type: the
+     * type entry accepts every maintenance flag, so the narrower name entry would add nothing but a
+     * loss.
+     */
     public function match(LockedPackage $package, ?PackageMetadata $metadata, \DateTimeImmutable $now): ?AllowlistEntry
     {
-        foreach ($this->entries as $entry) {
-            if (!$entry->isExpired($now) && $entry->matches($package->name(), $package->version())) {
-                return $entry;
-            }
+        $byName = $this->byName($package, $now);
+        if ($byName !== null && $byName->acceptsAll()) {
+            return $byName;
         }
         foreach ([$package->type(), $metadata !== null ? $metadata->type() : null] as $type) {
             if ($type !== null && \in_array($type, $this->finishedTypes, true)) {
                 return AllowlistEntry::forType($type);
+            }
+        }
+
+        return $byName;
+    }
+
+    /**
+     * The project entry that names the package, also where {@see match()} returns the type entry:
+     * the first matching entry decides, so a built-in entry hides a project entry.
+     */
+    public function projectEntry(LockedPackage $package, \DateTimeImmutable $now): ?AllowlistEntry
+    {
+        $entry = $this->byName($package, $now);
+
+        return $entry !== null && $entry->by() === AllowlistEntry::BY_PROJECT ? $entry : null;
+    }
+
+    private function byName(LockedPackage $package, \DateTimeImmutable $now): ?AllowlistEntry
+    {
+        foreach ($this->entries as $entry) {
+            if (!$entry->isExpired($now) && $entry->matches($package->name(), $package->version())) {
+                return $entry;
             }
         }
 

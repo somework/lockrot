@@ -261,6 +261,16 @@
             "argv": [
                 "composer",
                 "require",
+                "matomo/searchengine-and-social-list:^3.14.0"
+            ],
+            "posix": "composer require 'matomo/searchengine-and-social-list:^3.14.0'",
+            "cmd": "composer require \"matomo/searchengine-and-social-list:^3.14.0\"",
+            "powershell": "composer --% require \"matomo/searchengine-and-social-list:^3.14.0\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
                 "pagerfanta/twig:^4.9"
             ],
             "posix": "composer require 'pagerfanta/twig:^4.9'",
@@ -434,6 +444,17 @@
             "posix": "composer require 'symfony/routing:^6.4.40'",
             "cmd": "composer require \"symfony/routing:^6.4.40\"",
             "powershell": "composer --% require \"symfony/routing:^6.4.40\""
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "symfony/routing:^6.4.41",
+                "--no-interaction"
+            ],
+            "posix": "composer require 'symfony/routing:^6.4.41' --no-interaction",
+            "cmd": "composer require \"symfony/routing:^6.4.41\" --no-interaction",
+            "powershell": "composer --% require \"symfony/routing:^6.4.41\" --no-interaction"
         },
         {
             "argv": [
@@ -748,6 +769,16 @@
             "posix": "composer update phpoffice/phpspreadsheet",
             "cmd": "composer update phpoffice/phpspreadsheet",
             "powershell": "composer --% update phpoffice/phpspreadsheet"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "prestashop/ps_contactinfo"
+            ],
+            "posix": "composer update prestashop/ps_contactinfo",
+            "cmd": "composer update prestashop/ps_contactinfo",
+            "powershell": "composer --% update prestashop/ps_contactinfo"
         },
         {
             "argv": [
@@ -1253,6 +1284,18 @@
             "argv": [
                 "composer",
                 "why-not",
+                "matomo/searchengine-and-social-list",
+                "3.14.0",
+                "--locked"
+            ],
+            "posix": "composer why-not matomo/searchengine-and-social-list 3.14.0 --locked",
+            "cmd": "composer why-not matomo/searchengine-and-social-list 3.14.0 --locked",
+            "powershell": "composer --% why-not matomo/searchengine-and-social-list 3.14.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
                 "moneyphp/money",
                 "v4.9.0",
                 "--locked"
@@ -1308,6 +1351,18 @@
             "posix": "composer why-not phpoffice/phpspreadsheet 1.30.7 --locked",
             "cmd": "composer why-not phpoffice/phpspreadsheet 1.30.7 --locked",
             "powershell": "composer --% why-not phpoffice/phpspreadsheet 1.30.7 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "prestashop/ps_contactinfo",
+                "v3.3.3",
+                "--locked"
+            ],
+            "posix": "composer why-not prestashop/ps_contactinfo v3.3.3 --locked",
+            "cmd": "composer why-not prestashop/ps_contactinfo v3.3.3 --locked",
+            "powershell": "composer --% why-not prestashop/ps_contactinfo v3.3.3 --locked"
         },
         {
             "argv": [

@@ -1,0 +1,23 @@
+{
+    "score_text": "18 = pinned 16 + stale 2 [¼ of 8]",
+    "next_step_text": "require a tag — the newest is 3.14.0 (2023-01-20), older than your snapshot (2026-07-15); review, or replace; stale stays",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: newest release 3.14.0 2023-01-20 (3.7 years ago); last push 2026-09-23 (less than three weeks ago)",
+    "explain_age": [
+        "installed  dev-masternot read (a branch snapshot has no release branch)",
+        "its branch           not read (a branch snapshot has no release branch)",
+        "newest     3.14.0    2023-01-20   3.7 years ago                 past release-warn-years 3",
+        "last push            2026-09-23   less than three weeks ago     below push-warn-years 3",
+        "libyears not measured: a branch snapshot has no release branch"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer require 'matomo/searchengine-and-social-list:^3.14.0'",
+        "composer why-not matomo/searchengine-and-social-list 3.14.0 --locked"
+    ],
+    "commands_cmd": [
+        "composer require \"matomo/searchengine-and-social-list:^3.14.0\"",
+        "composer why-not matomo/searchengine-and-social-list 3.14.0 --locked"
+    ]
+}

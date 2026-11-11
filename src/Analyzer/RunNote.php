@@ -118,6 +118,12 @@ final class RunNote
         RepoRef::BITBUCKET => 'Bitbucket credentials not set: repository activity checked for %d candidate %s, %d %s skipped (add bitbucket.org credentials to auth.json to check all)',
     ];
 
+    /** The GitHub sentence when {@see \Lockrot\Data\Forge\Tokens::withheld()} holds GITHUB_TOKEN: the variable that works is LOCKROT_GITHUB_TOKEN alone. */
+    private const GITHUB_WITHHELD_CAP_TEXT = 'GITHUB_TOKEN withheld: lockrot does not send it to github.com, because GITHUB_SERVER_URL or GH_HOST does not name github.com alone. Repository activity checked for %d candidate %s, %d %s skipped (set LOCKROT_GITHUB_TOKEN to a github.com token to check all)';
+
+    /** The GitHub sentence on a runner whose issuer variables name another host and that has no GitHub token at all. */
+    private const GITHUB_FOREIGN_RUNNER_CAP_TEXT = 'GitHub token not set: repository activity checked for %d candidate %s, %d %s skipped (set LOCKROT_GITHUB_TOKEN to a github.com token to check all)';
+
     private string $code;
     private string $text;
     private ?string $docsUrl;
@@ -290,8 +296,8 @@ final class RunNote
         return self::of(self::REPOSITORY_ACTIVITY_NOT_CHECKED, 'repository activity not checked: install-time budget exhausted', false, ['reason' => NotCheckedRule::BUDGET]);
     }
 
-    /** The text counts both kinds of skipped package together. The data keeps them apart, as the two S10 reasons do. */
-    public static function repositoryActivityAnonymousCap(string $forge, int $checked, int $skippedNoToken, int $skippedBudget): self
+    /** The text counts both kinds of skipped package together. The data keeps them apart, as the two S10 reasons do. The two bool arguments pick the GitHub text and no other forge reads them: GITHUB_TOKEN withheld, else an issuer that names another host. */
+    public static function repositoryActivityAnonymousCap(string $forge, int $checked, int $skippedNoToken, int $skippedBudget, bool $githubTokenWithheld = false, bool $githubIssuerNamesAnotherHost = false): self
     {
         if (!isset(self::ANONYMOUS_CAP_TEXT[$forge])) {
             throw new \InvalidArgumentException(\sprintf('%s has no anonymous cap.', $forge));
@@ -300,10 +306,22 @@ final class RunNote
 
         return self::of(
             self::REPOSITORY_ACTIVITY_ANONYMOUS_CAP,
-            \sprintf(self::ANONYMOUS_CAP_TEXT[$forge], $checked, $checked === 1 ? 'package' : 'packages', $skipped, $skipped === 1 ? 'package' : 'packages'),
+            \sprintf(self::capText($forge, $githubTokenWithheld, $githubIssuerNamesAnotherHost), $checked, $checked === 1 ? 'package' : 'packages', $skipped, $skipped === 1 ? 'package' : 'packages'),
             false,
             ['forge_id' => $forge, 'checked' => $checked, 'skipped_no_token' => $skippedNoToken, 'skipped_budget' => $skippedBudget]
         );
+    }
+
+    private static function capText(string $forge, bool $githubTokenWithheld, bool $githubIssuerNamesAnotherHost): string
+    {
+        if ($forge !== RepoRef::GITHUB) {
+            return self::ANONYMOUS_CAP_TEXT[$forge];
+        }
+        if ($githubTokenWithheld) {
+            return self::GITHUB_WITHHELD_CAP_TEXT;
+        }
+
+        return $githubIssuerNamesAnotherHost ? self::GITHUB_FOREIGN_RUNNER_CAP_TEXT : self::ANONYMOUS_CAP_TEXT[$forge];
     }
 
     /**

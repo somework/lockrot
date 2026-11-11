@@ -24,6 +24,34 @@ final class LockLineIndexTest extends TestCase
         self::assertOnItsNameLine('phpunit/phpunit');
     }
 
+    public function testARootKeyWithAnEscapedQuoteEndsThePackagesSection(): void
+    {
+        $lock = <<<'JSON'
+            {
+                "packages": [
+                    {
+                        "name": "a/b"
+                    }
+                ],
+                "x\"y": [
+                    {
+                        "name": "a/b"
+                    }
+                ],
+                "packages-dev": []
+            }
+            JSON;
+        self::assertNotNull(json_decode($lock));
+        self::assertSame(4, LockLineIndex::fromString($lock)->lineOf('a/b'));
+    }
+
+    public function testAnEmptyRootKeyEndsThePackagesSection(): void
+    {
+        $lock = "{\n    \"packages\": [\n        {\n            \"name\": \"a/b\"\n        }\n    ],\n    \"\": [\n        {\n            \"name\": \"a/b\"\n        }\n    ]\n}";
+        self::assertNotNull(json_decode($lock));
+        self::assertSame(4, LockLineIndex::fromString($lock)->lineOf('a/b'));
+    }
+
     private static function assertOnItsNameLine(string $package): void
     {
         $line = LockLineIndex::fromFile(self::LARAVEL_LOCK)->lineOf($package);

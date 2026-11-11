@@ -28,6 +28,8 @@ final class LockrotConfig
 
     /** The refusal of a value that {@see isTargetPhpValue()} does not take: the setting, then the value. */
     private const TARGET_PHP_VALUE = '%s takes a major, a minor or a patch version, such as "8.4" or "8.4.2", with nothing before or after it; got "%s"';
+    /** The config-2 schema refuses a patch in `extra.lockrot.target-php`. */
+    private const TARGET_PHP_CONFIG_VALUE = 'extra.lockrot.target-php takes a major or a minor version, such as "8.4", with nothing before or after it; got "%s"';
     /** A day after every GA date of the release data: its clock lists every minor that the data dates. */
     private const AFTER_EVERY_GA = '9999-12-31T00:00:00+00:00';
     /** The refusal of a target minor that is no PHP minor: the setting, the minor, the known minors, the newest one, then the value. */
@@ -273,7 +275,9 @@ final class LockrotConfig
         }
         $fromConfig = $extra['target-php'] ?? null;
         if (\is_string($fromConfig) && $fromConfig !== '') {
-            self::refuseNoVersion($fromConfig);
+            if (!self::isTargetPhpValue($fromConfig)) {
+                throw new ConfigException(\sprintf(self::TARGET_PHP_CONFIG_VALUE, $fromConfig));
+            }
             self::refuseUnknownMinor('extra.lockrot.target-php', $fromConfig);
         }
         [$target, $source] = self::pickWithSource([
@@ -322,15 +326,22 @@ final class LockrotConfig
 
     /**
      * Composer accepts `v8.4.1` in `config.platform.php`. A value that it refuses sets no target,
-     * and the move check reports it (ruling R8-37).
+     * and the move check reports it (ruling R8-37). Composer's comparator reads an integer segment
+     * without its leading zeros, so `8.04.1` is 8.4.1 and names the minor 8.4.
      */
     private static function asComposerReads(string $platformPhp): ?string
     {
         try {
-            return (new VersionParser())->normalize($platformPhp);
+            $normalized = (new VersionParser())->normalize($platformPhp);
         } catch (\UnexpectedValueException $e) {
             return null;
         }
+
+        return preg_replace_callback(
+            '{^\d+(?:\.\d+)*}',
+            static fn (array $run): string => implode('.', array_map(static fn (string $segment): string => ltrim($segment, '0') ?: '0', explode('.', $run[0]))),
+            $normalized
+        ) ?? $normalized;
     }
 
     /** The running PHP can carry a suffix after the version, such as a distribution build's. */

@@ -119,6 +119,7 @@ $application = new class () extends \Composer\Console\Application {
      * Only primary names: aliases (`rot`, `selfupdate`) travel with their command. `list` stays: its
      * output is how a user finds `self-update`.
      */
+    public const DEFAULT_COMMAND = 'lockrot';
     private const KEEP = ['lockrot', 'self-update', 'help', 'list', 'completion', '_complete'];
 
     /** @var bool */
@@ -287,19 +288,51 @@ $application = new class () extends \Composer\Console\Application {
         } catch (\Symfony\Component\Console\Exception\ExceptionInterface $e) {
             // Symfony's doRun() reads the command name from a half-bound input too.
         }
+        // `--help` and `-h` route to `help`, which prints help for input that no command can bind.
+        $helpAsked = $input->hasParameterOption(['--help', '-h'], true);
         $name = $this->getCommandName($probe);
         if ($name === null) {
-            return null;
+            return $helpAsked ? $this->unreadableInput($this->find(self::DEFAULT_COMMAND), $input) : null;
         }
         try {
             $command = $this->find($name);
             $subject = $this->subjectOf($command, $input);
-            if ($subject !== null && $command->getName() === 'help') {
-                $this->find($subject);
+            if ($command->getName() === 'help') {
+                return $this->unreadableInput($command, $input, $subject === null ? null : $this->find($subject));
             } elseif ($subject !== null && $command->getName() === 'list') {
                 $this->findNamespace($subject);
             }
+            if ($helpAsked) {
+                return $this->unreadableInput($command, $input);
+            }
         } catch (\Symfony\Component\Console\Exception\CommandNotFoundException $e) {
+            return $e->getMessage();
+        }
+
+        return null;
+    }
+
+    /**
+     * `help` ignores validation errors, so Symfony prints help for input that the command cannot bind: the reason, else null.
+     * `help <name>` also reads the options of the command that it names.
+     */
+    private function unreadableInput(\Symfony\Component\Console\Command\Command $command, \Symfony\Component\Console\Input\InputInterface $input, ?\Symfony\Component\Console\Command\Command $subject = null): ?string
+    {
+        $probe = clone $input;
+        $command->mergeApplicationDefinition();
+        $definition = $command->getDefinition();
+        if ($subject !== null) {
+            $subject->mergeApplicationDefinition();
+            $definition = new \Symfony\Component\Console\Input\InputDefinition(array_merge(array_values($definition->getArguments()), array_values($definition->getOptions())));
+            foreach ($subject->getDefinition()->getOptions() as $option) {
+                if (!$definition->hasOption($option->getName())) {
+                    $definition->addOption($option);
+                }
+            }
+        }
+        try {
+            $probe->bind($definition);
+        } catch (\Symfony\Component\Console\Exception\ExceptionInterface $e) {
             return $e->getMessage();
         }
 
@@ -367,5 +400,5 @@ $application->setName('lockrot');
 $application->setVersion(\Lockrot\Version::STRING);
 // `lockrot` runs when no command is named, so `lockrot.phar -d project` works, and `self-update`,
 // `list` and `help` stay reachable by name.
-$application->setDefaultCommand('lockrot', false);
+$application->setDefaultCommand($application::DEFAULT_COMMAND, false);
 exit($application->run());

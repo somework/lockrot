@@ -19,8 +19,11 @@ use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
 use Composer\Package\CompleteAliasPackage;
 use Composer\Package\CompletePackage;
+use Composer\Package\Dumper\ArrayDumper;
 use Composer\Package\Link;
+use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\Loader\RootPackageLoader;
+use Composer\Package\RootAliasPackage;
 use Composer\Package\RootPackageInterface;
 use Composer\Package\Version\VersionParser;
 use Composer\Repository\ArrayRepository;
@@ -50,6 +53,8 @@ final class ComposerSolver
     public const IGNORED_PLATFORM = ['ext-*', 'lib-*', ...PhpWindow::HOST_FEATURES];
     /** The package types that Composer's Installer leaves out of an update's pool: https://github.com/composer/composer/blob/2.10.3/src/Composer/Installer.php */
     private const IGNORED_TYPES = ['php-ext', 'php-ext-zend'];
+    /** The error line that Composer prints above the problem of its second solve. */
+    private const NON_DEV_REFUSED = 'Unable to find a compatible set of packages based on your non-dev requirements alone.';
 
     private RootPackageInterface $root;
     private LockArrayRepository $locked;
@@ -172,16 +177,12 @@ final class ComposerSolver
         [$set, $composerRequest, $built, $fixedRoot, $loaded, $feed] = $this->pool($root, $requires, $temporary, $request);
         [$pool, $answer] = $this->answer($policy, $composerRequest, $built, $fixedRoot, $preferred);
         if ($answer instanceof SolverProblemsException) {
-            $locked = [];
-            foreach ($this->locked->getPackages() as $package) {
-                $locked[$package->getName()] = $package->getVersion();
-            }
-            $holds = ProblemHolds::of($answer, $pool, $root, $request->moved(), $request->rootChanges(), $locked);
-            $setsPhp = $this->setsPhp;
-            // A shadowed name has loaded versions, so the refusal never wants it, yet its hidden releases can change the answer.
-            $shadowed = array_intersect($this->failures($loaded->asked()), [VersionSource::SHADOWED]);
-
-            return Solution::refused($holds->holds(), static fn (): string => self::problemText($answer->getPrettyString($set, $composerRequest, $pool, false), $setsPhp), $this->failures($holds->wanted()) + $shadowed + $this->unreachedLockedOnly($composerRequest, $holds));
+            return $this->refused($answer, $pool, $set, $composerRequest, $composerRequest, $root, $request, $loaded);
+        }
+        // As Installer::extractDevPackages(): no second solve for a root without require-dev.
+        $nonDev = $root->getDevRequires() === [] ? null : $this->nonDevAnswer($root, $policy, $answer, $requires, $temporary);
+        if ($nonDev !== null) {
+            return $this->refused($nonDev[3], $nonDev[2], $nonDev[0], $nonDev[1], $composerRequest, $root, $request, $loaded);
         }
 
         // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
@@ -191,6 +192,72 @@ final class ComposerSolver
         $kept = array_map(static fn (BasePackage $package): string => $package->getName(), $lockPackages);
 
         return Solution::resolved(self::installs($answer), self::updatedFrom($answer), $this->withoutMetUnreached($this->failures($loaded->asked()), $built, $answer), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)), $kept);
+    }
+
+    /**
+     * @param Request $refusing the request that Composer refused: the update's own, or the one of its second solve
+     * @param Request $update   the update's own request, which names the locked packages
+     */
+    private function refused(SolverProblemsException $answer, Pool $pool, RepositorySet $set, Request $refusing, Request $update, RootPackageInterface $root, SolveRequest $request, LoadedVersions $loaded): Solution
+    {
+        $nonDev = $refusing !== $update;
+        $locked = [];
+        foreach ($this->locked->getPackages() as $package) {
+            if (!$package instanceof AliasPackage) {
+                $locked[$package->getName()] = $package->getVersion();
+            }
+        }
+        $holds = ProblemHolds::of($answer, $pool, $root, $request->moved(), $request->rootChanges(), $locked);
+        $setsPhp = $this->setsPhp;
+        // A shadowed name has loaded versions, so the refusal never wants it, yet its hidden releases can change the answer.
+        $shadowed = array_intersect($this->failures($loaded->asked()), [VersionSource::SHADOWED]);
+        $problem = static fn (): string => self::problemText($answer->getPrettyString($set, $refusing, $pool, false, $nonDev), $setsPhp);
+        if ($nonDev) {
+            // Composer's problem text reads the numbers that a pool gives its packages, and a later pool renumbers the platform ones: read it now.
+            $text = self::NON_DEV_REFUSED."\n".$problem();
+            $problem = static fn (): string => $text;
+        }
+
+        return Solution::refused($holds->holds(), $problem, $this->failures($holds->wanted()) + $shadowed + $this->unreachedLockedOnly($update, $holds));
+    }
+
+    /**
+     * Composer's second solve of an update, as Installer::extractDevPackages() runs it: the packages
+     * of the first answer alone, and the root's non-dev requirements. Composer stops the update
+     * when it refuses.
+     *
+     * @param array<string, ConstraintInterface> $requires  the root requirements of the first solve
+     * @param array<string, ConstraintInterface> $temporary
+     *
+     * @return array{0: RepositorySet, 1: Request, 2: Pool, 3: SolverProblemsException}|null null when the solve resolves
+     */
+    private function nonDevAnswer(RootPackageInterface $root, DefaultPolicy $policy, LockTransaction $answer, array $requires, array $temporary): ?array
+    {
+        $result = new ArrayRepository();
+        $loader = new ArrayLoader();
+        $dumper = new ArrayDumper();
+        foreach ($answer->getNewLockPackages(false) as $package) {
+            $result->addPackage($loader->load($dumper->dump($package)));
+        }
+        $set = $this->repositorySet($root, $requires, $temporary);
+        /** @var BasePackage&RootPackageInterface $fixedRoot */
+        $fixedRoot = clone $root;
+        $fixedRoot->setRequires([]);
+        $set->addRepository(new RootPackageRepository($fixedRoot));
+        $set->addRepository($this->platform);
+        $set->addRepository($result);
+        $request = $this->request($fixedRoot, null);
+        foreach ($root->getRequires() as $name => $link) {
+            $request->requireName($name, $link->getConstraint());
+        }
+        $pool = $set->createPoolWithAllPackages();
+        try {
+            (new Solver($policy, $pool, new NullIO()))->solve($request, $this->filter);
+        } catch (SolverProblemsException $e) {
+            return [$set, $request, $pool, $e];
+        }
+
+        return null;
     }
 
     /**
@@ -379,9 +446,7 @@ final class ComposerSolver
      */
     private function pool(RootPackageInterface $root, array $requires, array $temporary, SolveRequest $request): array
     {
-        $flags = $root->getStabilityFlags();
-        $flags[$root->getName()] = BasePackage::$stabilities[VersionParser::parseStability($root->getVersion())];
-        $set = new RepositorySet($root->getMinimumStability(), $flags, $root->getAliases(), $root->getReferences(), $requires, $temporary);
+        $set = $this->repositorySet($root, $requires, $temporary);
         // A package takes one repository, so each pass gets its own copy of the root. Each
         // RootPackageInterface class of composer/composer 2.10 extends BasePackage:
         // https://github.com/composer/composer/tree/2.10.3/src/Composer/Package
@@ -396,15 +461,7 @@ final class ComposerSolver
         $set->addRepository($loaded);
         $set->addRepository($this->locked);
 
-        $composerRequest = new Request($this->locked);
-        $composerRequest->fixPackage($fixedRoot);
-        $provided = $root->getProvides();
-        foreach ($this->platform->getPackages() as $package) {
-            $provider = $provided[$package->getName()] ?? null;
-            if ($provider === null || !$provider->getConstraint()->matches(new Constraint('=', $package->getVersion()))) {
-                $composerRequest->fixPackage($package);
-            }
-        }
+        $composerRequest = $this->request($fixedRoot, $this->locked);
         foreach ($requires as $name => $constraint) {
             $composerRequest->requireName($name, $constraint);
         }
@@ -430,6 +487,38 @@ final class ComposerSolver
         }
 
         return [$set, $composerRequest, $pool, $fixedRoot, $loaded, $feed];
+    }
+
+    /**
+     * @param array<string, ConstraintInterface> $requires
+     * @param array<string, ConstraintInterface> $temporary
+     */
+    private function repositorySet(RootPackageInterface $root, array $requires, array $temporary): RepositorySet
+    {
+        $flags = $root->getStabilityFlags();
+        $flags[$root->getName()] = BasePackage::$stabilities[VersionParser::parseStability($root->getVersion())];
+
+        return new RepositorySet($root->getMinimumStability(), $flags, $root->getAliases(), $root->getReferences(), $requires, $temporary);
+    }
+
+    /** As Installer::createRequest() builds it: the root and the platform fixed. */
+    private function request(BasePackage $fixedRoot, ?LockArrayRepository $locked): Request
+    {
+        $request = new Request($locked);
+        $request->fixPackage($fixedRoot);
+        // The alias of a branch-aliased root requires the package that it aliases.
+        if ($fixedRoot instanceof RootAliasPackage) {
+            $request->fixPackage($fixedRoot->getAliasOf());
+        }
+        $provided = $fixedRoot->getProvides();
+        foreach ($this->platform->getPackages() as $package) {
+            $provider = $provided[$package->getName()] ?? null;
+            if ($provider === null || !$provider->getConstraint()->matches(new Constraint('=', $package->getVersion()))) {
+                $request->fixPackage($package);
+            }
+        }
+
+        return $request;
     }
 
     /**

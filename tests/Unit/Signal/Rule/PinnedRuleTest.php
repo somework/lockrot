@@ -242,6 +242,19 @@ final class PinnedRuleTest extends TestCase
         self::assertNull(JsonPath::decoded($signal->data())['snapshot_time']);
     }
 
+    /** S6 `no_stable_release` reads "no tagged release": a pre-release tag is a tag, though it is not a stable release. */
+    public function testAPackageWithPreReleaseTagsOnlyIsNotPinned(): void
+    {
+        $loader = new ArrayLoader();
+        $metadata = PackageMetadata::fromPackages('vendor/pkg', [
+            $loader->load(['name' => 'vendor/pkg', 'version' => '1.0.0-beta1', 'time' => '2020-01-01T00:00:00+00:00']),
+            $loader->load(['name' => 'vendor/pkg', 'version' => '1.0.0-beta2', 'time' => '2020-06-01T00:00:00+00:00']),
+        ], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), '1.0.0-beta1');
+
+        self::assertFalse($metadata->hasStableRelease());
+        self::assertNull((new PinnedRule())->evaluate(F::facts(F::package(['version' => '1.0.0-beta1', 'time' => '2020-01-01T00:00:00+00:00']), $metadata)));
+    }
+
     public function testTaggedPackageIsNull(): void
     {
         self::assertNull((new PinnedRule())->evaluate(F::facts(F::package(), F::metadata([['1.0.0', '2020-01-01']]))));

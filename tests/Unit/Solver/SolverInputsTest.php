@@ -11,6 +11,7 @@ use Composer\DependencyResolver\Request;
 use Composer\Package\BasePackage;
 use Composer\Package\CompletePackage;
 use Composer\Package\Loader\ArrayLoader;
+use Composer\Package\RootAliasPackage;
 use Composer\Package\RootPackage;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\VersionParser;
@@ -35,6 +36,18 @@ final class SolverInputsTest extends TestCase
             self::inputs(['pool' => [$first, $lib], 'unacceptable' => [], 'fixed' => [$first, $php], 'locked' => [$locked], 'requires' => ['acme/lib' => self::constraint('^1.0')]], $first),
             self::inputs(['pool' => [$second, $lib], 'unacceptable' => [], 'fixed' => [$second, $php], 'locked' => [$locked], 'requires' => ['acme/lib' => self::constraint('^1.0')]], $second)
         );
+    }
+
+    /** Each copy of a branch-aliased root clones the package that it aliases. */
+    public function testTwoCopiesOfABranchAliasedRootWithTheSamePoolAndRequestGiveTheSameInputs(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => 'dev-main', 'extra' => ['branch-alias' => ['dev-main' => '2.x-dev']]], RootPackage::class);
+        self::assertInstanceOf(RootAliasPackage::class, $root);
+        $first = clone $root;
+        $second = clone $root;
+        $spec = static fn (RootAliasPackage $copy): array => ['pool' => [$copy, $copy->getAliasOf()], 'unacceptable' => [], 'fixed' => [$copy, $copy->getAliasOf()], 'locked' => [], 'requires' => []];
+
+        self::assertSame(self::inputs($spec($first), $first), self::inputs($spec($second), $second));
     }
 
     /** A constraint keeps the bounds that it computed once read: they are no input of the solver. */

@@ -3,7 +3,7 @@ description: Runs MoveCheckComposerOracleTest once on each composer/composer ver
 runs:
   using: composite
   steps:
-    - uses: shivammathur/setup-php@v2
+    - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
       with: {php-version: '8.4', coverage: none}
     # The cases name the versions, so a re-recording of the answers moves the pins with them.
     # display_errors=stderr keeps the refusal of tests/Support/ComposerOracle.php in the log, out of $versions.

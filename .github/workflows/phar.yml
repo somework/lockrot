@@ -28,7 +28,7 @@ jobs:
     steps:
       # Full history and tags: the self-update verification reads the previous release's key from its
       # tag, and the main check reads origin/main.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with: {fetch-depth: 0}
       # CONTRIBUTING, "Cutting a release": the tag goes on the commit that the release pull request
       # merged into main. A tag on another commit would publish a signed archive that main never built.
@@ -70,7 +70,7 @@ jobs:
           done
       # Composer is part of the reproducible-build recipe: it writes vendor/composer/*.php from its own
       # source. A rebuilder uses the version that this file pins at the tag.
-      - uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with: {php-version: '8.4', tools: 'composer:2.10.3'}
       - run: composer install --no-interaction
       - run: build/build-phar.sh
@@ -155,9 +155,9 @@ jobs:
           build/selfupdate-signature.php describe build/phar/composer.json build/previous-selfupdate-key.pub | cmp - build/lockrot.phar.meta.json
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest
       - if: env.SIGN == 'true'
-        uses: actions/attest-build-provenance@v4
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with: {subject-path: build/lockrot.phar}
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with: {name: lockrot.phar, path: 'build/lockrot.phar*'}
   # The phar job builds on PHP 8.4, and the archive must run on the floor of the plugin. This job runs
   # it once on PHP 7.4, before the release job publishes it.
@@ -167,10 +167,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with: {php-version: '7.4'}
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with: {name: lockrot.phar, path: build}
       - run: php build/lockrot.phar --version
       - run: php build/lockrot.phar -d tests/fixtures/skeletons/laravel --format=json --target-php=8.4 --offline > /dev/null
@@ -186,14 +186,14 @@ jobs:
     permissions:
       contents: write # release assets
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v8
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with: {name: lockrot.phar, path: build}
       - name: The release notes come from the CHANGELOG section of the tag
         run: python3 tools/release/release_notes.py "${GITHUB_REF_NAME#v}" > "$RUNNER_TEMP/notes.md"
       # The TypeScript contract of report-2 ships as release assets only: types/ is export-ignored, so
       # the PHAR and the Composer dist do not carry it.
-      - uses: softprops/action-gh-release@v3
+      - uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           body_path: ${{ runner.temp }}/notes.md
           # A moved d.ts file fails the release instead of a release without types.

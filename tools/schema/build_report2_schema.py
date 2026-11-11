@@ -842,7 +842,8 @@ defs['gateFact'] = obj("A fact whose record is `error` for one gate value (§6.2
     'id': d('The flag id, the advisory id or the signal id.', {'type': 'string', 'minLength': 1}),
 })
 defs['findingGate'] = obj("Where the finding stands against the gate values (§6.1, §6.2, §6.4). Text formats render the gate basis line (`GateText`) from `basis`.", {
-    'reaches_fail_on': d("Whether the finding reaches some value of `run.gates[]`, reading the score and the flags before the baseline (0.13's meaning, §6.1).", {'type': 'boolean'}),
+    'reaches_fail_on': d("Whether the finding reaches some value of `run.gates[]` before the baseline (§6.1): a grade value reads the score, a flag value the counted flags, "
+                         "a `vulnerable` or `vulnerable-*` value the counted advisories, and `unchecked` an S10 entry, so a finding with score 0 can reach `unchecked`.", {'type': 'boolean'}),
     'fails': d('Whether it fails the run: it reaches a value, `exempt_by` is null and the root `gate.fail_on_applied` is true; a grade value reads the gate score.', {'type': 'boolean'}),
     'exempt_by': nul("What keeps a reaching finding from failing: `baseline` when the finding reaches a value and the baseline is why it fails none. "
                      "A grade value does not fail while the gate score stays below it. A flag value does not fail while the baseline entry covers each "
@@ -1473,7 +1474,7 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
                                                                    "itself, so no move is checked (the `moves_not_checked` note). Closed.")),
         'reason': nul("Why the baseline was not checked; null unless `baseline` is `not_checked`. An open set, with the values of `check.reason` that a whole run can have.",
                       {'type': 'string', 'pattern': SNAKE, 'x-known-values': BASELINE_CHECK_REASONS}),
-    }, allOf=[{'description': 'A run whose blocking an environment variable turned off blocks no advisory.',
+    }, allOf=[{'description': '`blocks_advisories` is false when `blocking_disabled_by` is not empty, whether an environment variable or a composer.json `config` key turned the blocking off.',
                'anyOf': [{'properties': {'blocking_disabled_by': {'maxItems': 0}}},
                          {'properties': {'blocks_advisories': {'enum': [False]}}}]},
               {'description': '`reason` is set exactly on a `baseline` of `not_checked`.',

@@ -207,6 +207,32 @@ final class LockrotConfigTest extends TestCase
     }
 
     /**
+     * Composer's comparator reads `8.04.1` as 8.4.1, so the target is the minor 8.4 and no second,
+     * adjacent minor 8.04 reaches the PHP window.
+     *
+     * @dataProvider platformPhpsWithALeadingZeroSegment
+     */
+    #[DataProvider('platformPhpsWithALeadingZeroSegment')]
+    public function testAPlatformPhpWithALeadingZeroSegmentReadsAsComposerReadsIt(string $platformPhp, string $minor): void
+    {
+        self::assertSame($minor, LockrotConfig::fromSources([], [], [], '8.5.10', $platformPhp)->targetPhp());
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function platformPhpsWithALeadingZeroSegment(): iterable
+    {
+        yield 'a zero in the minor' => ['8.04.1', '8.4'];
+        yield 'a zero in the major' => ['08.4.1', '8.4'];
+        yield 'a zero minor stays' => ['8.0.1', '8.0'];
+        yield 'a double zero minor' => ['8.00.1', '8.0'];
+        yield 'a patch suffix' => ['8.04.1-p1', '8.4'];
+        yield 'a stability suffix' => ['8.04.1-RC1', '8.4'];
+        yield 'a beta suffix' => ['8.04.1-beta', '8.4'];
+        yield 'a dev suffix' => ['08.04-dev', '8.4'];
+        yield 'a dev branch' => ['8.04.x-dev', '8.4'];
+    }
+
+    /**
      * Ruling R8-37: Composer refuses such a `config.platform.php`, so the run continues at the
      * running PHP and the move check reads `platform_config_invalid`.
      *
@@ -270,6 +296,18 @@ final class LockrotConfigTest extends TestCase
         yield 'a distribution build' => ['8.1.2-1ubuntu2.14'];
         yield 'a fourth part' => ['8.4.1.0'];
         yield 'a trailing newline' => ["8.4\n"];
+        yield 'a v prefix' => ['v8.4'];
+        yield 'a leading space' => [' 8.4'];
+        yield 'a word' => ['x'];
+    }
+
+    /** @dataProvider targetPhpsWithTrailingText */
+    #[DataProvider('targetPhpsWithTrailingText')]
+    public function testAConfigTargetPhpWithTextAfterTheVersionIsRefusedLikeTheOption(string $value): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('extra.lockrot.target-php takes a major or a minor version, such as "8.4", with nothing before or after it; got "'.$value.'"');
+        LockrotConfig::fromSources(['target-php' => $value], [], ['target-php' => '8.4'], '8.5.10', null);
     }
 
     /**
@@ -306,7 +344,6 @@ final class LockrotConfigTest extends TestCase
         yield 'the config key at 6.0' => [['target-php' => '6.0'], [], [], 'extra.lockrot.target-php', '6.0', '6.0'];
         yield 'the config key at 7.5 under an option that wins' => [['target-php' => '7.5'], [], ['target-php' => '8.4'], 'extra.lockrot.target-php', '7.5', '7.5'];
         yield 'the config key at 7.5 under a variable that wins' => [['target-php' => '7.5'], ['LOCKROT_TARGET_PHP' => '8.4'], [], 'extra.lockrot.target-php', '7.5', '7.5'];
-        yield 'a config key with a suffix under an option that wins' => [['target-php' => '7.5.x'], [], ['target-php' => '8.4'], 'extra.lockrot.target-php', '7.5', '7.5.x'];
     }
 
     /**
@@ -322,7 +359,7 @@ final class LockrotConfigTest extends TestCase
     public function testAConfigTargetPhpThatIsNoVersionIsRefusedUnderEverySource(array $env, array $cli): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('target-php must look like "8.4"; got "banana"');
+        $this->expectExceptionMessage('extra.lockrot.target-php takes a major or a minor version, such as "8.4", with nothing before or after it; got "banana"');
         LockrotConfig::fromSources(['target-php' => 'banana'], $env, $cli, '8.5.10', null);
     }
 

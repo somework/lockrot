@@ -1,0 +1,21 @@
+{
+    "score_text": "16 = vulnerable 16 [high advisory]",
+    "next_step_text": "require symfony/routing ^6.4.41, which removes it from require-dev — clears the advisory; 6.x needs php >=8.1, which require.php allows; the target php 8.4 runs it; held by composer.json (requires >=6.4.0,<6.4.41); Composer's solver checked it against the lock",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-01 (0.3 years ago), its newest release; last push 2026-09-29 (less than three weeks ago)",
+    "explain_age": [
+        "installed  v6.4.28   2025-10-31   0.9 years ago",
+        "6.x        v6.4.41   2026-07-01   0.3 years ago                 below release-warn-years 3",
+        "newest     v6.4.41   2026-07-01   0.3 years ago                 below release-warn-years 3",
+        "last push            2026-09-29   less than three weeks ago     below push-warn-years 3",
+        "libyears 0.7 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer require 'symfony/routing:^6.4.41' --no-interaction"
+    ],
+    "commands_cmd": [
+        "composer require \"symfony/routing:^6.4.41\" --no-interaction"
+    ]
+}

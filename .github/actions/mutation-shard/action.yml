@@ -16,7 +16,7 @@ runs:
     # pcntl: a mutant's test that never ends is stopped by an alarm (tests/Support/MutantTestTimeLimit.php).
     # No coverage driver: Infection reads the coverage of the mutation-coverage job, and a loaded
     # pcov slows every mutant process. Measurements: https://github.com/somework/lockrot/pull/113
-    - uses: shivammathur/setup-php@v2
+    - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
       with: {php-version: '8.4', coverage: none, extensions: pcntl}
     # The gate compares a set of mutants with tests/infection-equivalents.md, so the set must follow
     # from the commit. composer.lock is not committed, so composer install takes the newest
@@ -41,7 +41,7 @@ runs:
     # --only-covering-test-cases: a mutant runs only the test methods that cover its line. A test that
     # never runs the line cannot kill the mutant. Without the option, a surviving mutant runs every
     # slow method of each class that covers it. Measurements: https://github.com/somework/lockrot/pull/65
-    - uses: actions/download-artifact@v8
+    - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
       with: {name: mutation-coverage, path: build/coverage}
     # ulimit caps each process of the mutation steps. A mutant that loops without end then dies
     # in a fatal error that Infection counts, not in an OOM that kills the runner. The memory_limit

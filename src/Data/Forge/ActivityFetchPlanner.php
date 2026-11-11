@@ -77,7 +77,9 @@ final class ActivityFetchPlanner
             $skippedNoToken,
             $skippedBudget,
             array_values(array_filter(RepoRef::FORGES, static fn (string $forge): bool => isset($capped[$forge]))),
-            $skippedPackages
+            $skippedPackages,
+            $this->auth->githubTokenWithheld(),
+            $this->auth->githubIssuerNamesAnotherHost()
         );
     }
 }

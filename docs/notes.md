@@ -195,7 +195,7 @@ at a retry or a redirect is a failed request, not part of this note.
 - Findings: S10 `install_time_budget`.
 - `sets_network_failures`: no.
 
-### Anonymous cap {#repository_activity_anonymous_cap}
+### <a name="repository_activity_anonymous_cap"></a>Anonymous cap {#repository_activity_anonymous_cap}
 
 Without a GitHub token or Bitbucket credentials, lockrot asks only about packages already stale on
 release age (S2 and no S1), and only up to a budget of them
@@ -207,6 +207,9 @@ release age (S2 and no S1), and only up to a budget of them
   skipped counts as one number.
 - Findings: S10 `no_token` on the non-candidates, `anonymous_budget` on the candidates beyond the
   budget.
+- The GitHub sentence names `LOCKROT_GITHUB_TOKEN` alone when `GITHUB_SERVER_URL` or `GH_HOST`
+  does not name github.com alone. lockrot does not send `GITHUB_TOKEN` to github.com from that
+  runner. If you set `GITHUB_TOKEN` there, the sentence starts "GITHUB_TOKEN withheld".
 - `sets_network_failures`: no.
 
 ### Rate limited {#repository_activity_rate_limited}

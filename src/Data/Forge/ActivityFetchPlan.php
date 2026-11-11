@@ -24,6 +24,8 @@ final class ActivityFetchPlan
     private array $cappedForges;
     /** @var array<string, string> */
     private array $skippedPackages;
+    private bool $githubTokenWithheld;
+    private bool $githubIssuerNamesAnotherHost;
 
     /**
      * @param list<RepoRef>      $repos           unique repositories, ordered by package name
@@ -32,9 +34,13 @@ final class ActivityFetchPlan
      * @param array<string, int> $skippedBudget   host => candidates that the anonymous budget could not fit
      * @param list<string>       $cappedForges    hosts planned anonymously under a cap with at least one repository
      * @param array<string, string> $skippedPackages package name => why its repository was not asked about ({@see self::NO_TOKEN}, {@see self::BUDGET})
+     * @param bool $githubIssuerNamesAnotherHost {@see Tokens::githubIssuerNamesAnotherHost()}
+     * @param bool $githubTokenWithheld lockrot withheld `GITHUB_TOKEN` from github.com ({@see Tokens::withheld()})
      */
-    public function __construct(array $repos, array $checkedPackages, array $skippedNoToken, array $skippedBudget, array $cappedForges, array $skippedPackages = [])
+    public function __construct(array $repos, array $checkedPackages, array $skippedNoToken, array $skippedBudget, array $cappedForges, array $skippedPackages, bool $githubTokenWithheld, bool $githubIssuerNamesAnotherHost)
     {
+        $this->githubIssuerNamesAnotherHost = $githubIssuerNamesAnotherHost;
+        $this->githubTokenWithheld = $githubTokenWithheld;
         $this->repos = $repos;
         $this->checkedPackages = $checkedPackages;
         $this->skippedNoToken = $skippedNoToken;
@@ -52,6 +58,16 @@ final class ActivityFetchPlan
     public function skippedPackages(): array
     {
         return $this->skippedPackages;
+    }
+
+    public function githubIssuerNamesAnotherHost(): bool
+    {
+        return $this->githubIssuerNamesAnotherHost;
+    }
+
+    public function githubTokenWithheld(): bool
+    {
+        return $this->githubTokenWithheld;
     }
 
     /** @return list<RepoRef> */

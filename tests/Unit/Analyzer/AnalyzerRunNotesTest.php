@@ -201,6 +201,39 @@ final class AnalyzerRunNotesTest extends TestCase
         self::assertSame([NotCheckedRule::RATE_BUDGET => 2, NotCheckedRule::NO_TOKEN => 1], $reasons);
     }
 
+    public function testTheAnonymousCapNamesTheWithheldGithubTokenOnAForeignRunnerHost(): void
+    {
+        $packages = [];
+        $metadata = [];
+        foreach (['vendor/one', 'vendor/two', 'vendor/three'] as $name) {
+            $packages[] = self::locked($name);
+            $metadata[$name] = self::metadata($name, 'https://github.com/'.$name.'.git');
+        }
+        $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'runner-token', 'GITHUB_SERVER_URL' => 'https://ghe.example'], null);
+        self::assertArrayHasKey('GITHUB_TOKEN', $tokens->withheld());
+
+        $analysis = $this->analyze($packages, new MetadataBatch($metadata, [], []), $this->http([]), false, null, false, false, ['gitlab.com'], 1, $tokens);
+        $cap = $analysis->report()->runNotes()[0];
+
+        self::assertSame('GITHUB_TOKEN withheld: lockrot does not send it to github.com, because GITHUB_SERVER_URL or GH_HOST does not name github.com alone. Repository activity checked for 1 candidate package, 2 packages skipped (set LOCKROT_GITHUB_TOKEN to a github.com token to check all)', $cap->text());
+        self::assertSame('repository_activity_anonymous_cap', $cap->code());
+    }
+
+    public function testTheAnonymousCapSaysTheTokenIsNotSetOnAForeignRunnerHostWithoutAnyGithubToken(): void
+    {
+        $packages = [self::locked('vendor/one'), self::locked('vendor/two')];
+        $metadata = [];
+        foreach (['vendor/one', 'vendor/two'] as $name) {
+            $metadata[$name] = self::metadata($name, 'https://github.com/'.$name.'.git');
+        }
+        $tokens = Tokens::fromEnvironment(['GITHUB_SERVER_URL' => 'https://ghe.example'], null);
+        self::assertSame([], $tokens->withheld());
+
+        $analysis = $this->analyze($packages, new MetadataBatch($metadata, [], []), $this->http([]), false, null, false, false, ['gitlab.com'], 1, $tokens);
+
+        self::assertSame('GitHub token not set: repository activity checked for 1 candidate package, 1 package skipped (set LOCKROT_GITHUB_TOKEN to a github.com token to check all)', $analysis->report()->runNotes()[0]->text());
+    }
+
     /** Every package whose repository was never asked carries the reason of the note, not only the first. */
     public function testAnExhaustedBudgetSaysTheActivityWasNotChecked(): void
     {
@@ -243,10 +276,10 @@ final class AnalyzerRunNotesTest extends TestCase
      * @param list<array<string, mixed>> $packages
      * @param list<string>               $gitlabDomains
      */
-    private function analyze(array $packages, MetadataBatch $metadata, HttpClientInterface $http, bool $token, ?AdvisoryBatch $advisories = null, bool $pastDeadline = false, bool $offline = false, array $gitlabDomains = ['gitlab.com'], int $anonymousBudget = ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET): Analysis
+    private function analyze(array $packages, MetadataBatch $metadata, HttpClientInterface $http, bool $token, ?AdvisoryBatch $advisories = null, bool $pastDeadline = false, bool $offline = false, array $gitlabDomains = ['gitlab.com'], int $anonymousBudget = ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, ?Tokens $tokens = null): Analysis
     {
         $clock = Clock::fixed(F::NOW);
-        $auth = ForgeAuth::withTokens(new Tokens($token ? 't' : null, null));
+        $auth = ForgeAuth::withTokens($tokens ?? new Tokens($token ? 't' : null, null));
         $analyzer = new Analyzer(
             self::loader($metadata),
             new ActivityClient($http, $auth),

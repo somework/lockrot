@@ -272,7 +272,7 @@ final class PharTest extends TestCase
         $invoked = $this->runPhar(['cs']);
 
         self::assertStringNotContainsString("\n  cs ", $listed->getOutput());
-        self::assertNotSame(0, $invoked->getExitCode());
+        self::assertSame(2, $invoked->getExitCode());
         self::assertStringContainsString('Command "cs" is not defined', $invoked->getOutput().$invoked->getErrorOutput());
     }
 
@@ -473,8 +473,8 @@ final class PharTest extends TestCase
 
     /**
      * A command line the PHAR's own commands cannot read is exit 2 and one `lockrot:` line, whether
-     * the command is named or left to the default. An unknown command name is not lockrot's to
-     * answer: that stays Symfony's exit 1 ({@see testAProjectScriptIsNotAReachableCommand()}).
+     * the command is named or left to the default. An unknown command name is exit 2 too, as every
+     * usage error of bin/lockrot is (W17-X2, {@see testAProjectScriptIsNotAReachableCommand()}).
      */
     public function testAnUnreadableCommandLineIsExitTwoWithOneLockrotLine(): void
     {
