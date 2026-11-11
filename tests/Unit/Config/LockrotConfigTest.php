@@ -207,6 +207,27 @@ final class LockrotConfigTest extends TestCase
     }
 
     /**
+     * Composer's comparator reads `8.04.1` as 8.4.1, so the target is the minor 8.4 and no second,
+     * adjacent minor 8.04 reaches the PHP window.
+     *
+     * @dataProvider platformPhpsWithALeadingZeroSegment
+     */
+    #[DataProvider('platformPhpsWithALeadingZeroSegment')]
+    public function testAPlatformPhpWithALeadingZeroSegmentReadsAsComposerReadsIt(string $platformPhp, string $minor): void
+    {
+        self::assertSame($minor, LockrotConfig::fromSources([], [], [], '8.5.10', $platformPhp)->targetPhp());
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function platformPhpsWithALeadingZeroSegment(): iterable
+    {
+        yield 'a zero in the minor' => ['8.04.1', '8.4'];
+        yield 'a zero in the major' => ['08.4.1', '8.4'];
+        yield 'a zero minor stays' => ['8.0.1', '8.0'];
+        yield 'a double zero minor' => ['8.00.1', '8.0'];
+    }
+
+    /**
      * Ruling R8-37: Composer refuses such a `config.platform.php`, so the run continues at the
      * running PHP and the move check reads `platform_config_invalid`.
      *

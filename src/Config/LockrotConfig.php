@@ -322,15 +322,20 @@ final class LockrotConfig
 
     /**
      * Composer accepts `v8.4.1` in `config.platform.php`. A value that it refuses sets no target,
-     * and the move check reports it (ruling R8-37).
+     * and the move check reports it (ruling R8-37). Composer's comparator reads an integer segment
+     * without its leading zeros, so `8.04.1` is 8.4.1 and names the minor 8.4.
      */
     private static function asComposerReads(string $platformPhp): ?string
     {
         try {
-            return (new VersionParser())->normalize($platformPhp);
+            $normalized = (new VersionParser())->normalize($platformPhp);
         } catch (\UnexpectedValueException $e) {
             return null;
         }
+
+        return preg_match('{^\d+(\.\d+)*$}D', $normalized) === 1
+            ? implode('.', array_map(static fn (string $segment): string => ltrim($segment, '0') ?: '0', explode('.', $normalized)))
+            : $normalized;
     }
 
     /** The running PHP can carry a suffix after the version, such as a distribution build's. */
