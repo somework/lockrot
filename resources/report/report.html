@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-GP5xYx09cfIxboeXRjPQT2Tzw7XGLQ0rDvnVnurBLEk='; style-src 'sha256-SWTsi+CFU/JCtQg7mfOadc/mQ5ihdWR2FzbfECLqZ68='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-PpAURTARy1ptrd0PkStfwktWLM/th1BkJ4oaPenCqUk='; style-src 'sha256-Oh4u3I1PT198yKllDzlKmVO8E7XAt0flhbWCH6nUswM='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -182,6 +182,9 @@
 }
 [hidden] {
   display: none !important;
+}
+:where(span, a, b, i, em, strong, code, small, abbr, time, mark, kbd, label) {
+  unicode-bidi: isolate;
 }
 
 html {
@@ -7998,6 +8001,16 @@ var LockrotReport = (function(exports) {
 	//#region src/schema.ts
 	var READS_SCHEMAS = [2];
 	//#endregion
+	//#region src/model/visibleControls.ts
+	var HIDDEN = /[\p{Bidi_Control}\p{Default_Ignorable_Code_Point}]/gu;
+	var visibleControls = (text) => text.replace(HIDDEN, (ch) => `\\u{${(ch.codePointAt(0) ?? 0).toString(16).toUpperCase()}}`);
+	function visibleData(value) {
+		if (typeof value === "string") return visibleControls(value);
+		if (Array.isArray(value)) return value.map(visibleData);
+		if (typeof value !== "object" || value === null) return value;
+		return Object.fromEntries(Object.entries(value).map(([key, item]) => [visibleControls(key), visibleData(item)]));
+	}
+	//#endregion
 	//#region src/model/normalize.ts
 	var NOT_A_REPORT_MESSAGE = "This does not look like a lockrot report. Expected either the html bundle ({report, details}) or a --format=json document (with 'lockrot' and 'findings').";
 	var NO_GENERATED_AT_MESSAGE = "This report has no readable 'generated_at' date, so ages and the timeline cannot be shown.";
@@ -8013,7 +8026,7 @@ var LockrotReport = (function(exports) {
 			error: {
 				kind: "report-1",
 				message: REPORT1_MESSAGE,
-				version: typeof lockrot.version === "string" ? lockrot.version : null
+				version: typeof lockrot.version === "string" ? visibleControls(lockrot.version) : null
 			}
 		};
 		const missing = REPORT2_KEYS.filter((key) => !(key in shape.reportSource));
@@ -8023,8 +8036,8 @@ var LockrotReport = (function(exports) {
 		return {
 			ok: true,
 			model: {
-				report: shape.reportSource,
-				details: isRecord(shape.detailsSource) ? shape.detailsSource : {},
+				report: visibleData(shape.reportSource),
+				details: visibleData(isRecord(shape.detailsSource) ? shape.detailsSource : {}),
 				schema,
 				newerSchema: schema > Math.max(...READS_SCHEMAS)
 			}
@@ -8800,6 +8813,7 @@ var LockrotReport = (function(exports) {
 	var flagClaim = (id) => Object.hasOwn(FLAG_CLAIMS, id) ? wordFor(FLAG_CLAIMS, id) : "A flag this page does not know.";
 	var skipLinkLabel = (lists) => lists ? "Skip to the list" : "Skip to the content";
 	var ROW_HINT = "Press Enter on a row to open its package.";
+	var openedBesideList = (pkg) => `${pkg} opened beside the list`;
 	var MOVE_KIND_WORDS = [
 		["replace", "replace"],
 		["find-alternative", "find an alternative"],
@@ -9430,12 +9444,25 @@ var LockrotReport = (function(exports) {
 	}
 	function lockPlatformClause(fix, target, answers) {
 		const records = `the lock records ${joinAnd([...new Set(fix.lock_platform.map((l) => reqWords(l)))])}, which composer.json does not have`;
-		const command = fix.command === null ? "" : commandLine(fix.command, "posix");
-		if (fix.check === "resolves") return `${records}: ${answers && fix.platform_step ? `set config.platform.php to your PHP ${target} release, then ` : ""}${command} rewrites it`;
+		if (fix.check === "resolves") {
+			const stepped = answers && fix.platform_step;
+			const step = stepped ? `set config.platform.php to your PHP ${target} release, then ` : "";
+			const command = fix.command === null ? null : commandLine(fix.command, "posix");
+			if (command !== null) return `${records}: ${step}${command} rewrites it`;
+			if (!answers) return `${records}, and that update rewrites it`;
+			const rewrites = `resolves the update that rewrites it${unprintedTail(fix)}`;
+			if (stepped) return `${records}: ${step}Composer's solver ${rewrites}`;
+			return `${records}, and Composer's solver at PHP ${target} ${rewrites}`;
+		}
 		if (!answers) return records;
 		if (fix.check === "refused") return `${records}, and Composer's solver at PHP ${target} refuses the update that rewrites it${fix.held_by.length === 0 ? "" : `: ${joinAnd(fix.held_by.map((h) => holdWords(h, fix)))}`}`;
 		return `${records}, and the update that rewrites it is not checked (${reasonWords(fix)})`;
 	}
+	var unprintedTail = (fix) => fix.command === null ? "" : ", and its command holds characters the page does not print";
+	var resolvesWords = (lead, fix) => {
+		const command = fix.command === null ? null : commandLine(fix.command, "posix");
+		return command === null ? `${lead} resolves this update${unprintedTail(fix)}` : `${lead} resolves this update: ${command}`;
+	};
 	var reasonWords = (fix) => fix.reason === null ? "the run checked no move" : plain(checkReasonRich(fix.reason));
 	function fixClauses(fix, target, named) {
 		if (fix.lock_platform.length === 0) return answerClauses(fix, target, named);
@@ -9451,9 +9478,8 @@ var LockrotReport = (function(exports) {
 			return [`your target, ${named}, is excluded, and only a change to ${links} can admit it`];
 		}
 		const solver = `Composer's solver at PHP ${target}`;
-		const command = fix.command === null ? null : commandLine(fix.command, "posix");
 		switch (fix.check) {
-			case "resolves": return [packagesClause(fix, target), fix.platform_step ? `set config.platform.php to your PHP ${target} release, then Composer's solver resolves this update: ${command ?? ""}` : `${solver} resolves this update: ${command ?? ""}`];
+			case "resolves": return [packagesClause(fix, target), resolvesWords(fix.platform_step ? `set config.platform.php to your PHP ${target} release, then Composer's solver` : solver, fix)];
 			case "refused": {
 				const their = packageNames(fix).length === 1 ? "its" : "their";
 				const holds = fix.held_by.length === 0 ? "" : `: ${joinAnd(fix.held_by.map((h) => holdWords(h, fix)))}`;
@@ -10098,18 +10124,19 @@ var LockrotReport = (function(exports) {
 			step: step === null ? null : [ownStep(step, holder?.direct ?? true, where), stoppedCheckWords(step.check)].filter((w) => w !== null).join(" · ")
 		};
 	}
-	function foldWord(held, run, own) {
+	function foldWord(held, run, own, ownWord) {
 		if (held.source === "root") return "in composer.json";
-		if (held.package === own) return "of its own releases";
+		if (held.package === own) return ownWord;
 		const holder = held.holder ?? null;
 		if (holder === null) return "at a release other than its locked one";
 		if (isGradedHolder(held, run)) return `graded ${holder.verdict}`;
 		return holder.flag_ids.length === 0 ? "with nothing flagged" : holder.verdict;
 	}
 	function foldWords(rest, run, own) {
+		const ownWord = new Set(rest.filter((held) => held.package === own).map((held) => held.version)).size > 1 ? "through its own releases" : "through its own release";
 		const counts = new Map();
 		for (const held of rest) {
-			const word = foldWord(held, run, own);
+			const word = foldWord(held, run, own, ownWord);
 			counts.set(word, (counts.get(word) ?? 0) + 1);
 		}
 		if (counts.size === 1 && counts.has("with nothing flagged")) return `${rest.length} more, nothing flagged in them`;
@@ -10578,8 +10605,9 @@ var LockrotReport = (function(exports) {
 	function blockedWords(step, run) {
 		if (step.source === "pinned") return `no tag runs on ${run.target_php}`;
 		const requires = step.php_check?.requires ?? null;
-		const subject = phpSubject(step) ?? "a fixing release";
-		return requires === null ? `${subject} does not run on ${run.target_php}` : `${subject} needs php ${requires}; target ${run.target_php} runs no ${step.fix_kind === null ? "newer" : "fixing"} release`;
+		const kind = step.fix_kind === null ? "newer" : "fixing";
+		const subject = phpSubject(step) ?? `a ${kind} release`;
+		return requires === null ? `${subject} does not run on ${run.target_php}` : `${subject} needs php ${requires}; target ${run.target_php} runs no ${kind} release`;
 	}
 	function kindWords(f, step, run) {
 		const where = f.direct ? "require" : "move to";
@@ -12682,7 +12710,7 @@ var LockrotReport = (function(exports) {
 			if (key === "q" || key === "pkg" || isFilterGroup(key)) listKey = true;
 			let value;
 			try {
-				value = decodeURIComponent(piece.slice(i + 1));
+				value = visibleControls(decodeURIComponent(piece.slice(i + 1)));
 			} catch {
 				continue;
 			}
@@ -17035,32 +17063,6 @@ var LockrotReport = (function(exports) {
 			children: mark
 		});
 	}
-	//#endregion
-	//#region src/ui/ledger/CleanMark.tsx
-	function CleanMark({ size }) {
-		return u$1("svg", {
-			className: "clean-mark",
-			width: size,
-			height: size,
-			viewBox: "0 0 30 30",
-			"aria-hidden": "true",
-			children: [u$1("circle", {
-				cx: "15",
-				cy: "15",
-				r: "13.5",
-				fill: "none",
-				stroke: "currentColor",
-				"stroke-width": "2"
-			}), u$1("path", {
-				d: "M9 15.5l4 4 8-8.5",
-				fill: "none",
-				stroke: "currentColor",
-				"stroke-width": "2.4",
-				"stroke-linecap": "round",
-				"stroke-linejoin": "round"
-			})]
-		});
-	}
 	var FIRST_WORDS = {
 		head: "Ready to run",
 		noteAll: "checked commands no other package holds, in lockrot's rank order",
@@ -17296,6 +17298,32 @@ var LockrotReport = (function(exports) {
 			sub: [`over ${plural(libyears.measured, "package", "packages")}`, `${decimal(libyears.direct_requirements ?? 0, 2)} from direct requirements`].join(SEPARATOR),
 			unmeasured: tail
 		};
+	}
+	//#endregion
+	//#region src/ui/ledger/CleanMark.tsx
+	function CleanMark({ size }) {
+		return u$1("svg", {
+			className: "clean-mark",
+			width: size,
+			height: size,
+			viewBox: "0 0 30 30",
+			"aria-hidden": "true",
+			children: [u$1("circle", {
+				cx: "15",
+				cy: "15",
+				r: "13.5",
+				fill: "none",
+				stroke: "currentColor",
+				"stroke-width": "2"
+			}), u$1("path", {
+				d: "M9 15.5l4 4 8-8.5",
+				fill: "none",
+				stroke: "currentColor",
+				"stroke-width": "2.4",
+				"stroke-linecap": "round",
+				"stroke-linejoin": "round"
+			})]
+		});
 	}
 	//#endregion
 	//#region src/ui/ledger/Waffle.tsx
@@ -18208,7 +18236,7 @@ var LockrotReport = (function(exports) {
 			})]
 		});
 	}
-	function NoAdvisories2({ marked }) {
+	function NoAdvisories2() {
 		const { report } = useReport2();
 		const line = noAdvisoryLine(report);
 		const mark = advisoryCheckMark(report);
@@ -18223,7 +18251,7 @@ var LockrotReport = (function(exports) {
 			className: "empty al-empty",
 			children: u$1("p", {
 				className: `al-answer al-clean ${toneClass("none")}`,
-				children: [marked && u$1(CleanMark, { size: 20 }), u$1("span", { children: line })]
+				children: u$1("span", { children: line })
 			})
 		});
 	}
@@ -18295,7 +18323,7 @@ var LockrotReport = (function(exports) {
 			children: [!printed && u$1("div", {
 				className: "al-lead",
 				children: u$1(SecurityBlock, { report })
-			}), u$1(NoAdvisories2, { marked: printed })]
+			}), u$1(NoAdvisories2, {})]
 		});
 		const pairs = advisoryPairs2(applyFilters2(report, state, "advisories"), state.filters);
 		const unfiltered = advisoryPairs2(population2(report, "advisories"), EMPTY_FILTERS).length;
@@ -20655,6 +20683,7 @@ var LockrotReport = (function(exports) {
 		}, [model]));
 		const [anchoredDispatch, keepRowInPlace] = useRowAnchor(rawDispatch, state.pkg);
 		const openedByReader = A(false);
+		const [openNote, setOpenNote] = d("");
 		const dispatch = q((action) => {
 			if (action.type === "select" && action.pkg !== null) openedByReader.current = true;
 			if (action.type === "focus" && action.pkg !== void 0) openedByReader.current = true;
@@ -20748,6 +20777,7 @@ var LockrotReport = (function(exports) {
 			focusRequest.current = null;
 			const opened = openedByReader.current;
 			openedByReader.current = false;
+			setOpenNote(opened && !sheet && state.pkg !== null ? openedBesideList(state.pkg) : "");
 			const active = document.activeElement;
 			if (active instanceof HTMLElement && state.pkg !== null && active.getAttribute("data-pkg") === state.pkg) lastRow.current = {
 				pkg: state.pkg,
@@ -20865,43 +20895,51 @@ var LockrotReport = (function(exports) {
 					className: "print-doc",
 					ref: printHost
 				}),
-				u$1("main", { children: [state.view === "findings" && u$1("div", {
-					className: "ledger-band",
-					inert: sheet,
-					children: u$1(FindingsStrip, {})
-				}), u$1("div", {
-					className: shellClass,
-					children: [
-						filterable && !railFolded && u$1(RailSlot, {
-							folded: false,
-							inert: sheet
-						}),
-						u$1("div", {
-							className: "shell-main",
-							id: panelId,
-							role: "tabpanel",
-							"aria-labelledby": tabId(idBase, state.view),
-							tabIndex: -1,
-							inert: sheet,
-							children: [
-								filterable && railFolded && u$1(RailSlot, {
-									folded: true,
-									inert: sheet
-								}),
-								state.view !== "overview" && u$1(SearchBar, {
-									inputRef: search,
-									shortcutsOn
-								}),
-								u$1(CurrentView, {})
-							]
-						}),
-						state.pkg !== null && u$1("div", {
-							ref: detailScrollRef,
-							className: wide ? "shell-detail is-side" : "shell-detail is-sheet",
-							children: u$1(Detail2, { onClose: closeDetail })
-						})
-					]
-				})] }),
+				u$1("main", { children: [
+					state.view === "findings" && u$1("div", {
+						className: "ledger-band",
+						inert: sheet,
+						children: u$1(FindingsStrip, {})
+					}),
+					u$1("div", {
+						className: shellClass,
+						children: [
+							filterable && !railFolded && u$1(RailSlot, {
+								folded: false,
+								inert: sheet
+							}),
+							u$1("div", {
+								className: "shell-main",
+								id: panelId,
+								role: "tabpanel",
+								"aria-labelledby": tabId(idBase, state.view),
+								tabIndex: -1,
+								inert: sheet,
+								children: [
+									filterable && railFolded && u$1(RailSlot, {
+										folded: true,
+										inert: sheet
+									}),
+									state.view !== "overview" && u$1(SearchBar, {
+										inputRef: search,
+										shortcutsOn
+									}),
+									u$1(CurrentView, {})
+								]
+							}),
+							state.pkg !== null && u$1("div", {
+								ref: detailScrollRef,
+								className: wide ? "shell-detail is-side" : "shell-detail is-sheet",
+								children: u$1(Detail2, { onClose: closeDetail })
+							})
+						]
+					}),
+					u$1("span", {
+						className: "open-note vh",
+						"aria-live": "polite",
+						children: openNote
+					})
+				] }),
 				u$1(Footer, { inert: sheet }),
 				u$1(Glossary, {
 					open: glossaryOpen,
@@ -21019,7 +21057,7 @@ var LockrotReport = (function(exports) {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.18";
+	var version = "0.14.0-rc.19";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");
