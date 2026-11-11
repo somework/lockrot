@@ -414,12 +414,14 @@ maintainer.
       lists, the keys of `RELEASED_SCHEMAS` and the directories under `schemas/` match exactly. If
       a schema differs from the previous release's, add the version to `RECORDING_PENDING`.
 
-    - The five SARIF goldens embed `Version::STRING` as the driver version. After the version bump,
-      rewrite them before you take any pin: run `LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit
-      --filter ChangedGoldensTest` for the four fixture goldens, and `LOCKROT_REWRITE_GOLDEN=1
-      vendor/bin/phpunit --filter SarifFormatterTest::testTheCompositeRendersAsItsGolden` for
-      `composite.sarif.sarif`. Each run fails once on purpose after it writes. Check that only the
-      driver `version` line changed, then run both tests again without the variable.
+    - The SARIF goldens under `tests/fixtures/golden/formats` embed `Version::STRING` as the driver
+      version. After the version bump, rewrite them before you take any pin.
+      1. Run `LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit --filter ChangedGoldensTest`.
+      2. Run `LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit --filter
+         SarifFormatterTest::testTheCompositeRendersAsItsGolden`.
+      3. Each run fails once after it writes. Check that only the driver `version` line changed.
+      4. Run `SarifFormatterTest` again without the variable. `ChangedGoldensTest` passes after the
+         pins of the next item.
 
     - Pin the sha256 of each formatter golden in `ChangedGoldensTest::RELEASED`, set
       `RELEASED_AT` to the new version, and empty `CHANGED`. From `FIRST_RELEASE` on,

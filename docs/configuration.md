@@ -123,7 +123,7 @@ line instead ([install-time.md](install-time.md#never-fails-the-install)).
   Integer keys take JSON integers: `3`, not `"3"`.
 - `format` accepts only the values its [key row](#extralockrot-keys) lists.
 - One run names each refusal of `fail-on`, of `ignore[].flags` and of an `accept-unchecked[]`
-  `repository` (a user name or a password) first. Then it names each schema error of the values
+  `repository` that is not one of the [`repository` forms](#accept-unchecked) first. Then it names each schema error of the values
   that those checks did not refuse. A check of an `ignore[]` entry after the
   schema, such as a date in `expires` that does not exist, stops at the first refusal.
 - An empty `--fail-on=`, `--baseline=` or `--target-php=` is an error, never a fall-back to the next source.
@@ -320,7 +320,7 @@ Packages of Composer type `metapackage` or `symfony-pack` count as finished too.
 addition to the built-in list, see
 [Contributing a finished package](https://github.com/somework/lockrot/blob/main/CONTRIBUTING.md#contributing-a-finished-package).
 
-### Your own entries {#your-own-entries}
+### <a name="your-own-entries"></a>Your own entries {#your-own-entries}
 
 To accept a dependency of your own, add it to `extra.lockrot.ignore`. lockrot reads these entries
 after the built-in list, so a package that the built-in list matches keeps the built-in entry:

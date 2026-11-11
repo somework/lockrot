@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Verdict changes
 
+- **Config:** an `ignore` entry that lists only some `flags` of a `metapackage` or `symfony-pack`
+  package keeps the `type` entry, so the other maintenance flags of that package stay accepted.
+  ([Your own entries](docs/configuration.md#your-own-entries))
 - **All formats:** a monorepo parent's date of a tag that shares its commit is the release date of
   that tag for S2, S5 and S8. S10 `release_dates` names no cause that the parent resolved, so
   `stale` and `left-behind` can fire on such a split.
@@ -538,14 +541,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   X.Y.0 release opens with a link to its upgrade page.
 - **All formats:** a tag move reads the php of the highest tag, and adds old-promise only when that
   tag declares `require.php`. ([The move](docs/verdicts.md#move))
-- **Docs:** the report-2 migration table marks `.priority` as changed in meaning: it is the grade, so
-  a query on `"critical"` can match a package with only a counted advisory. The upgrade page limits
-  the baseline exit `2` to jobs whose input or key names the file.
-  ([Migrating from report-1](docs/schema.md#migrating-from-report-1))
-- **Docs:** `gate.reaches_fail_on` states what each kind of `fail-on` value reads, a score-0 finding
-  with S10 included. Libyears name the shared-commit lower bound. `accept-unchecked` documents the
-  refusal order, the query match and the scopes of an unknown origin.
-  ([The gate](docs/schema.md#the-gate), [accept-unchecked](docs/configuration.md#accept-unchecked))
 
 ### Deprecated
 
@@ -613,8 +608,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   else its constraint. A move with none of them writes no clause, not an empty name.
   ([The move](docs/verdicts.md#move))
 - **CLI:** the PHAR and `vendor/bin/lockrot` exit `2` with a `lockrot:` line on an unknown command,
-  a `--working-dir` that does not exist, and a bad argument or option to `help` or `list`, not `1`. In plugin
-  mode, Composer still exits `1` for them. ([Exit codes](docs/ci.md#exit-codes))
+  a `--working-dir` that does not exist, and a bad argument or option to `help`, `list` or `--help`,
+  not `1`. In plugin mode, Composer still exits `1` for them. ([Exit codes](docs/ci.md#exit-codes))
 - **CLI:** `--explain` prints the footnote "so S8 does not measure the branch" only when S8 did
   not measure the installed branch because of its undated releases.
   ([Explaining one package](docs/configuration.md#explaining-one-package))
@@ -654,11 +649,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `file://server/share/proj/` for one on a UNC share. It read `file:////` and `file:///server/…`.
 - **All formats:** the anonymous cap note counts one package in the singular ("1 candidate package").
 - **All formats:** on a runner whose `GITHUB_SERVER_URL` or `GH_HOST` names another host, the
-  GitHub anonymous cap note names only `LOCKROT_GITHUB_TOKEN` as the fix. When lockrot withheld
+  anonymous cap note for GitHub names only `LOCKROT_GITHUB_TOKEN` as the fix. When lockrot withheld
   `GITHUB_TOKEN`, the note says so. ([Anonymous cap](docs/notes.md#repository_activity_anonymous_cap))
-- **Config:** an `ignore` entry that lists only some `flags` of a `metapackage` or `symfony-pack`
-  package keeps the `type` entry, so the other maintenance flags of that package stay accepted.
-  ([Your own entries](docs/configuration.md#your-own-entries))
 - **sarif, gitlab, github:** the line of a package stays on its lock entry when a root key of the
   lock holds an escaped quote.
 - **All formats:** `age.release`, `branches[].newest_dated` and S8's `newest_branch` and
