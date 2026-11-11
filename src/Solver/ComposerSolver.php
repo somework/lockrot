@@ -175,7 +175,9 @@ final class ComposerSolver
         if ($answer instanceof SolverProblemsException) {
             $locked = [];
             foreach ($this->locked->getPackages() as $package) {
-                $locked[$package->getName()] = $package->getVersion();
+                if (!$package instanceof AliasPackage) {
+                    $locked[$package->getName()] = $package->getVersion();
+                }
             }
             $holds = ProblemHolds::of($answer, $pool, $root, $request->moved(), $request->rootChanges(), $locked);
             $setsPhp = $this->setsPhp;

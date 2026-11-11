@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Solver;
 use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Config;
 use Composer\DependencyResolver\PolicyRemovalReason;
+use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
@@ -252,6 +253,32 @@ final class ComposerSolverTest extends TestCase
         }
 
         self::assertSame(['1.4.1' => true], $marked);
+    }
+
+    /**
+     * The lock lists the root alias of `dev-main as 1.0.0` beside the locked dev-main. The hold
+     * names the locked dev-main, and it wins over a tagged release of the holder with the same link.
+     */
+    public function testARefusalMarksTheHoldOfARootAliasedPackageAtItsLockedBranch(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0', 'acme/h' => 'dev-main as 1.0.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackage::class, $root);
+        $alias = ['package' => 'acme/h', 'version' => 'dev-main', 'alias' => '1.0.0', 'alias_normalized' => '1.0.0.0'];
+        $root->setAliases([$alias]);
+        $root->setStabilityFlags(['acme/h' => BasePackage::STABILITY_DEV]);
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/h', 'version' => 'dev-main', 'require' => ['acme/lib' => '^1.0']]], 'aliases' => [$alias]]);
+        $source = new ArrayVersionSource([
+            'acme/lib' => [['version' => '1.0.0'], ['version' => '2.0.0']],
+            'acme/h' => [['version' => 'dev-main', 'require' => ['acme/lib' => '^1.0']], ['version' => '1.0.0', 'require' => ['acme/lib' => '^1.0']]],
+        ]);
+        $solver = new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source);
+
+        $holds = array_values(array_filter($solver->solve(SolveRequest::update(['acme/lib' => '^2.0'])->withTransitive(SolveRequest::WITH_ALL_DEPENDENCIES))->holds(), static fn (Holder $hold): bool => $hold->package() === 'acme/h'));
+        $tagged = new Holder(Holder::PACKAGE, 'acme/h', '1.0.0', Holder::REQUIRE, '^1.0');
+        $kept = array_values(array_filter(Holder::distinct(array_merge([$tagged], $holds)), static fn (Holder $hold): bool => $hold->package() === 'acme/h'));
+
+        self::assertSame([['dev-main', true]], array_map(static fn (Holder $hold): array => [$hold->version(), $hold->isLocked()], $holds));
+        self::assertSame(['dev-main'], array_map(static fn (Holder $hold): ?string => $hold->version(), $kept));
     }
 
     /** A root requirement holds a move only through a requirement that it leaves no candidate. */
