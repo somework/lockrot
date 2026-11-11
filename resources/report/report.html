@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-C2RamrpJeYAy35fBSI+BtrOt6dVn7t8VBUAZCkusHqM='; style-src 'sha256-a0x+0KRkDhePmoM5CQGsUr/8YD3qWYKJVNmgfNN7FJc='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-GP5xYx09cfIxboeXRjPQT2Tzw7XGLQ0rDvnVnurBLEk='; style-src 'sha256-SWTsi+CFU/JCtQg7mfOadc/mQ5ihdWR2FzbfECLqZ68='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -3596,7 +3596,7 @@ button.pill {
   padding: 0 var(--fl-pad-r) 9px var(--fl-pad-l);
   border-bottom: 1px solid var(--border-strong);
 }
-.fgroup-head h2 {
+.fgroup-head h3 {
   margin: 0;
   font-family: var(--cond);
   font-size: var(--text-s);
@@ -7442,7 +7442,7 @@ a.ov-ex-row:hover {
   .advisory-square,
   .swatch,
   .pill,
-  .fgroup-head h2,
+  .fgroup-head h3,
   .lead-chips .count,
   .ov-grade {
     print-color-adjust: exact;
@@ -8515,7 +8515,8 @@ var LockrotReport = (function(exports) {
 		["pass_cap", "Composer refused each move before it"],
 		["solver_error", "Composer's solver failed on it"],
 		["advisory_lookup_incomplete", "the advisory lookup did not cover a package in the result"],
-		["lock_disabled", "config.lock is false, so Composer ignores composer.lock"]
+		["lock_disabled", "config.lock is false, so Composer ignores composer.lock"],
+		["installs_no_release", "Composer's solver does not reach the release"]
 	];
 	function checkReasonRich(reason) {
 		const words = CHECK_REASON_WORDS.find(([id]) => id === reason)?.[1];
@@ -9368,7 +9369,7 @@ var LockrotReport = (function(exports) {
 		const window = run.php_window;
 		if (window === null) return [];
 		const known = targetMinor(window);
-		const solvesApart = overrideOutsideTarget(run) !== null && run.move_check !== null && run.move_check.reason !== "lock_disabled";
+		const solvesApart = overrideOutsideTarget(run) !== null && run.move_check !== null && run.move_check.baseline !== "not_checked";
 		return [
 			...window.with_dev === null ? [{
 				key: "PHP window",
@@ -9752,6 +9753,7 @@ var LockrotReport = (function(exports) {
 	}
 	//#endregion
 	//#region src/domain/moveCards.ts
+	var phpSubject = (move) => move.to_branch ?? move.latest?.version ?? move.version ?? move.constraint;
 	var RESOLVED_KINDS = [
 		"require",
 		"raise-php",
@@ -9866,7 +9868,7 @@ var LockrotReport = (function(exports) {
 					const nor = installed.target_runs === false ? `, nor does the version you have (${finding.version}, php ${phpConstraintWord(installed.requires ?? "")})` : "";
 					return [requires ? `Its newest tag, ${latest}, needs php ${phpConstraintWord(requires)}, which your target, ${run.target_php}, does not run${nor}: replace it` : `Its newest tag, ${latest}, does not run on your target, ${run.target_php}${nor}: replace it`];
 				}
-				return [requires ? `${move.to_branch ?? ""} fixes it but needs php ${phpConstraintWord(requires)}, which your target, ${run.target_php}, does not run` : `${move.to_branch ?? ""} fixes it, but your target, ${run.target_php}, does not run it`];
+				return [requires ? `${phpSubject(move) ?? "A fixing release"} fixes it but needs php ${phpConstraintWord(requires)}, which your target, ${run.target_php}, does not run` : `${phpSubject(move) ?? "A fixing release"} fixes it, but your target, ${run.target_php}, does not run it`];
 			}
 			case "test": return [move.latest?.is_installed ? `${latest} is its newest release: test it on PHP ${run.target_php}, or replace it` : `Test it on PHP ${run.target_php}`];
 			case "no-tag": return ["It has no tagged release to move to: review the snapshot, or replace it"];
@@ -9932,7 +9934,7 @@ var LockrotReport = (function(exports) {
 					note(["The packages that hold it may need to move too"]);
 					break;
 				case "crosses_major": {
-					const solved = move.check?.result === "resolves" || move.check?.result === "refused";
+					const solved = move.check?.result === "resolves" || move.check?.result === "refused" || move.check?.reason === "installs_no_release";
 					note([`${newLineWords(move.to_branch)} brings its own requirements${solved ? "" : ", which lockrot does not solve"}`]);
 					break;
 				}
@@ -10001,8 +10003,9 @@ var LockrotReport = (function(exports) {
 			answer: "no",
 			text: installed
 		});
+		const subject = phpSubject(move);
 		return {
-			head: php?.requires ? [`${move.to_branch ?? move.latest?.version ?? ""} needs php `, { code: phpConstraintWord(php.requires) }] : null,
+			head: php?.requires && subject !== null ? [`${subject} needs php `, { code: phpConstraintWord(php.requires) }] : null,
 			lines
 		};
 	}
@@ -10023,11 +10026,13 @@ var LockrotReport = (function(exports) {
 		switch (check.result) {
 			case "resolves": return ["checked with Composer"];
 			case "refused": return ["Composer refuses the move"];
-			default: return [
-				`${RESOLVES_CAVEAT} (not checked: `,
-				...check.reason === "baseline_refused" ? [run.php_window?.target.inside === false ? BASELINE_REFUSED_CARD_WORDS.outside : BASELINE_REFUSED_CARD_WORDS.other] : checkReasonRich(check.reason ?? ""),
-				")"
-			];
+			default:
+				if (check.reason === "installs_no_release") return checkReasonRich(check.reason);
+				return [
+					`${RESOLVES_CAVEAT} (not checked: `,
+					...check.reason === "baseline_refused" ? [run.php_window?.target.inside === false ? BASELINE_REFUSED_CARD_WORDS.outside : BASELINE_REFUSED_CARD_WORDS.other] : checkReasonRich(check.reason ?? ""),
+					")"
+				];
 		}
 	}
 	function moveAfter(finding, move, run) {
@@ -10573,7 +10578,8 @@ var LockrotReport = (function(exports) {
 	function blockedWords(step, run) {
 		if (step.source === "pinned") return `no tag runs on ${run.target_php}`;
 		const requires = step.php_check?.requires ?? null;
-		return requires === null ? `${step.to_branch ?? ""} does not run on ${run.target_php}` : `${step.to_branch ?? ""} needs php ${requires}; target ${run.target_php} runs no ${step.fix_kind === null ? "newer" : "fixing"} release`;
+		const subject = phpSubject(step) ?? "a fixing release";
+		return requires === null ? `${subject} does not run on ${run.target_php}` : `${subject} needs php ${requires}; target ${run.target_php} runs no ${step.fix_kind === null ? "newer" : "fixing"} release`;
 	}
 	function kindWords(f, step, run) {
 		const where = f.direct ? "require" : "move to";
@@ -10772,7 +10778,7 @@ var LockrotReport = (function(exports) {
 	function sharePhrase(part, total) {
 		if (total <= 0 || part <= 0) return "0%";
 		if (part >= total) return "100%";
-		const pct = Math.round(part / total * 100);
+		const pct = Math.round(100 * part / total);
 		if (pct === 0) return "under 1%";
 		if (pct === 100) return "over 99%";
 		return `${pct}%`;
@@ -11918,6 +11924,8 @@ var LockrotReport = (function(exports) {
 		copy: "Copy",
 		copied: "Copied",
 		copyByHand: "Select it and copy",
+		copiesCommand: "the command for {owner}",
+		copiesCommands: "the commands for {owner}",
 		shell: "Shell",
 		shellFor: "Shell: {shell}",
 		verdict: "Verdict",
@@ -12008,6 +12016,12 @@ var LockrotReport = (function(exports) {
 			hidden: true,
 			children: ROW_HINT
 		});
+	}
+	var RowHintContext = X(null);
+	function useRowDescription(...own) {
+		const hint = x(RowHintContext);
+		const ids = [...own, ...hint === null ? [] : [hint]].filter((id) => id !== "");
+		return ids.length === 0 ? void 0 : ids.join(" ");
 	}
 	function headLabel(head, note) {
 		return note === null ? head : `${head}, ${note}`;
@@ -12548,7 +12562,7 @@ var LockrotReport = (function(exports) {
 						printable && u$1("button", {
 							type: "button",
 							className: "d2-btn d2-copy-btn",
-							"aria-label": owner === void 0 ? void 0 : `${LABELS[status]} ${owner}`,
+							"aria-label": owner === void 0 ? void 0 : `${LABELS[status]} ${(argvs.length === 1 ? DETAIL_WORDS.copiesCommand : DETAIL_WORDS.copiesCommands).replace("{owner}", owner)}`,
 							onClick: copy,
 							children: LABELS[status]
 						}),
@@ -12614,6 +12628,112 @@ var LockrotReport = (function(exports) {
 		});
 	}
 	//#endregion
+	//#region src/state/hash.ts
+	var FILTER_GROUP_SET = new Set(FILTER_GROUPS);
+	var VIEW_SET = new Set(VIEWS);
+	function isFilterGroup(key) {
+		return FILTER_GROUP_SET.has(key);
+	}
+	function serializeHash(state) {
+		const parts = [];
+		if (state.q.trim() !== "") parts.push("q=" + encodeURIComponent(state.q));
+		for (const group of FILTER_GROUPS) {
+			const on = state.filters[group];
+			if (on.length > 0) parts.push(group + "=" + encodeURIComponent(on.join(",")));
+		}
+		if (state.pkg) parts.push("pkg=" + encodeURIComponent(state.pkg));
+		if (state.view === "run" && state.section !== null) parts.push("section=" + encodeURIComponent(state.section));
+		if (state.view !== "overview" || parts.length > 0) parts.unshift("view=" + state.view);
+		return parts.join("&");
+	}
+	function linkState(target) {
+		return {
+			...INITIAL_STATE,
+			view: target.view,
+			q: target.q ?? "",
+			pkg: target.pkg ?? null,
+			filters: {
+				...EMPTY_FILTERS,
+				...target.filters
+			},
+			section: target.view === "run" ? target.section ?? null : null
+		};
+	}
+	var linkHref = (target) => "#" + serializeHash(linkState(target));
+	function addFilterKey(filters, group, key) {
+		const current = filters[group];
+		return current.includes(key) ? filters : {
+			...filters,
+			[group]: [...current, key]
+		};
+	}
+	function parseHash(fragment, base) {
+		const h = fragment.startsWith("#") ? fragment.slice(1) : fragment;
+		let view = null;
+		let listKey = false;
+		let q = base.q;
+		let pkg = base.pkg;
+		let filters = base.filters;
+		let section = null;
+		for (const piece of h === "" ? [] : h.split("&")) {
+			const i = piece.indexOf("=");
+			if (i < 0) continue;
+			const key = piece.slice(0, i);
+			if (key === "q" || key === "pkg" || isFilterGroup(key)) listKey = true;
+			let value;
+			try {
+				value = decodeURIComponent(piece.slice(i + 1));
+			} catch {
+				continue;
+			}
+			if (key === "view") {
+				if (VIEW_SET.has(value)) view = value;
+				continue;
+			}
+			if (key === "q") {
+				q = value;
+				continue;
+			}
+			if (key === "section") {
+				section = value;
+				continue;
+			}
+			if (key === "pkg") {
+				pkg = value.trim() === "" ? null : value;
+				continue;
+			}
+			if (isFilterGroup(key)) {
+				for (const part of value.split(",")) if (part !== "") filters = addFilterKey(filters, key, part);
+			}
+		}
+		const opened = view ?? (listKey ? "findings" : "overview");
+		return {
+			...base,
+			view: opened,
+			q,
+			pkg,
+			filters,
+			section: opened === "run" ? section : null
+		};
+	}
+	var HashSync = class {
+		disabled = false;
+		writeHash(state, win) {
+			if (this.disabled) return;
+			const h = serializeHash(state);
+			if (h === (win.location.hash.startsWith("#") ? win.location.hash.slice(1) : win.location.hash)) return;
+			try {
+				const url = h ? "#" + h : win.location.pathname + win.location.search;
+				win.history.replaceState(null, "", url);
+			} catch {
+				this.disabled = true;
+			}
+		}
+	};
+	//#endregion
+	//#region src/ui/plainClick.ts
+	var isPlainClick = (event) => event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+	//#endregion
 	//#region src/ui/report/jumpInDetail.ts
 	function jumpInDetail(target) {
 		const scroller = target.closest(".shell-detail");
@@ -12637,6 +12757,21 @@ var LockrotReport = (function(exports) {
 			target.focus({ preventScroll: true });
 		});
 	}
+	function JumpLink({ to, className = "lnk", label, onJump, children }) {
+		const { state } = useReport();
+		return u$1("a", {
+			className,
+			href: "#" + serializeHash(state),
+			"data-jump": to,
+			"aria-label": label,
+			onClick: (event) => {
+				if (!isPlainClick(event)) return;
+				onJump?.();
+				jumpTo(event, to);
+			},
+			children
+		});
+	}
 	function RichText({ rich, jumps = {} }) {
 		return u$1(S, { children: rich.map((piece, i) => {
 			if (typeof piece === "string") return piece;
@@ -12649,12 +12784,9 @@ var LockrotReport = (function(exports) {
 			}, i);
 			const target = jumps[piece.jump];
 			if (target === void 0) return (piece.lead ?? "") + piece.text;
-			const link = u$1("a", {
+			const link = u$1(JumpLink, {
+				to: target,
 				className: piece.lead === void 0 ? "lnk d3-count-link" : "lnk",
-				href: `#${target}`,
-				onClick: (event) => {
-					jumpTo(event, target);
-				},
 				children: piece.text
 			}, i);
 			return piece.lead === void 0 ? link : u$1("span", {
@@ -13301,8 +13433,12 @@ var LockrotReport = (function(exports) {
 		const { dispatch } = useReport();
 		return u$1("a", {
 			className: "score-model-link",
-			href: `#${SCORE_SECTION_ID}`,
+			href: linkHref({
+				view: "run",
+				section: SCORE_SECTION_ID
+			}),
 			onClick: (event) => {
+				if (!isPlainClick(event)) return;
 				event.preventDefault();
 				dispatch({
 					type: "view",
@@ -13555,12 +13691,10 @@ var LockrotReport = (function(exports) {
 					})] }),
 					sameAs !== null && u$1("span", {
 						className: "d3-adv-same",
-						children: [SECURITY_WORDS.sameAs, u$1("a", {
-							className: "lnk",
-							href: `#${rowId(sameAs.at)}`,
-							onClick: (event) => {
+						children: [SECURITY_WORDS.sameAs, u$1(JumpLink, {
+							to: rowId(sameAs.at),
+							onJump: () => {
 								reveal(sameAs.at);
-								jumpTo(event, rowId(sameAs.at));
 							},
 							children: sameAs.id
 						})]
@@ -13644,13 +13778,12 @@ var LockrotReport = (function(exports) {
 								" ",
 								u$1("b", { children: count })
 							] });
-							return u$1("li", { children: group < 0 ? body : u$1("a", {
+							return u$1("li", { children: group < 0 ? body : u$1(JumpLink, {
+								to: groupId(group),
 								className: "lnk d3-sev-jump",
-								href: `#${groupId(group)}`,
-								"aria-label": showGroupName(count, severity),
-								onClick: (event) => {
+								label: showGroupName(count, severity),
+								onJump: () => {
 									openGroup(group);
-									jumpTo(event, groupId(group));
 								},
 								children: body
 							}) }, severity);
@@ -14099,12 +14232,8 @@ var LockrotReport = (function(exports) {
 				}),
 				inline?.jump != null && jumps.branches !== void 0 && u$1("p", {
 					className: "d3-verdict-jump d3-jump",
-					children: u$1("a", {
-						className: "lnk",
-						href: `#${jumps.branches}`,
-						onClick: (event) => {
-							if (jumps.branches !== void 0) jumpTo(event, jumps.branches);
-						},
+					children: u$1(JumpLink, {
+						to: jumps.branches,
 						children: inline.jump
 					})
 				}),
@@ -15164,13 +15293,14 @@ var LockrotReport = (function(exports) {
 	function FindingRow2({ finding, run, axis, hideAccepted, gateQuiet }) {
 		const { state, dispatch, cursor } = useReport();
 		const spoken = `${g()}-spoken`;
+		const described = useRowDescription(spoken);
 		const accepted = maintenanceAccepted(finding);
 		return u$1("div", {
 			role: "row",
 			className: `frow f2-row ${toneClass(gradeTone(finding.verdict))}`,
 			"data-pkg": finding.package,
 			"aria-label": finding.package,
-			"aria-describedby": spoken,
+			"aria-describedby": described,
 			"aria-current": state.pkg === finding.package ? "true" : void 0,
 			tabIndex: rowTabIndex(finding.package, cursor),
 			...openInteractions(finding.package, dispatch),
@@ -15372,7 +15502,7 @@ var LockrotReport = (function(exports) {
 						majors
 					].filter((part) => part !== null).join(", "),
 					children: [
-						u$1("h2", {
+						u$1("h3", {
 							"aria-label": verdict,
 							children: verdict
 						}),
@@ -15460,7 +15590,7 @@ var LockrotReport = (function(exports) {
 					className: "ov-link f2-strip-back",
 					href: "#",
 					onClick: (event) => {
-						if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+						if (!isPlainClick(event)) return;
 						event.preventDefault();
 						dispatch({
 							type: "view",
@@ -15479,6 +15609,7 @@ var LockrotReport = (function(exports) {
 			]
 		});
 	}
+	var FINDINGS_TAB = "Findings";
 	function FindingsView2() {
 		const { state } = useReport();
 		const { report } = useReport2();
@@ -15490,28 +15621,38 @@ var LockrotReport = (function(exports) {
 		return u$1("section", {
 			className: "f2",
 			"data-surface": "findings",
-			children: [u$1(Notes$1, { report }), rows.length === 0 ? u$1(EmptyState, { reason: population2(report, "findings").length === 0 ? "clean" : "filtered" }) : u$1(S, { children: [
-				platform !== null && u$1("p", {
-					className: "f2-platform",
-					children: platform
+			children: [
+				!printed && u$1("h2", {
+					className: "vh",
+					children: FINDINGS_TAB
 				}),
-				u$1("div", {
-					className: "fledger f2-ledger",
-					role: "table",
-					"aria-label": "Findings",
-					"aria-describedby": hintId,
-					children: [!printed && u$1(ColumnHead, {
-						run: report.run,
-						axis,
-						onScreen: true
-					}), byGrade(rows).map((group) => u$1(Group$1, {
-						verdict: group.verdict,
-						findings: group.findings,
-						axis
-					}, group.verdict))]
-				}),
-				u$1(RowHint, { id: hintId })
-			] })]
+				u$1(Notes$1, { report }),
+				rows.length === 0 ? u$1(EmptyState, { reason: population2(report, "findings").length === 0 ? "clean" : "filtered" }) : u$1(S, { children: [
+					platform !== null && u$1("p", {
+						className: "f2-platform",
+						children: platform
+					}),
+					u$1("div", {
+						className: "fledger f2-ledger",
+						role: "grid",
+						"aria-readonly": "true",
+						"aria-label": FINDINGS_TAB,
+						children: [!printed && u$1(ColumnHead, {
+							run: report.run,
+							axis,
+							onScreen: true
+						}), u$1(RowHintContext.Provider, {
+							value: hintId,
+							children: byGrade(rows).map((group) => u$1(Group$1, {
+								verdict: group.verdict,
+								findings: group.findings,
+								axis
+							}, group.verdict))
+						})]
+					}),
+					u$1(RowHint, { id: hintId })
+				] })
+			]
 		});
 	}
 	//#endregion
@@ -17183,109 +17324,6 @@ var LockrotReport = (function(exports) {
 		});
 	}
 	//#endregion
-	//#region src/state/hash.ts
-	var FILTER_GROUP_SET = new Set(FILTER_GROUPS);
-	var VIEW_SET = new Set(VIEWS);
-	function isFilterGroup(key) {
-		return FILTER_GROUP_SET.has(key);
-	}
-	function serializeHash(state) {
-		const parts = [];
-		if (state.q.trim() !== "") parts.push("q=" + encodeURIComponent(state.q));
-		for (const group of FILTER_GROUPS) {
-			const on = state.filters[group];
-			if (on.length > 0) parts.push(group + "=" + encodeURIComponent(on.join(",")));
-		}
-		if (state.pkg) parts.push("pkg=" + encodeURIComponent(state.pkg));
-		if (state.view === "run" && state.section !== null) parts.push("section=" + encodeURIComponent(state.section));
-		if (state.view !== "overview" || parts.length > 0) parts.unshift("view=" + state.view);
-		return parts.join("&");
-	}
-	function linkState(target) {
-		return {
-			...INITIAL_STATE,
-			view: target.view,
-			q: target.q ?? "",
-			pkg: target.pkg ?? null,
-			filters: {
-				...EMPTY_FILTERS,
-				...target.filters
-			},
-			section: target.view === "run" ? target.section ?? null : null
-		};
-	}
-	var linkHref = (target) => "#" + serializeHash(linkState(target));
-	function addFilterKey(filters, group, key) {
-		const current = filters[group];
-		return current.includes(key) ? filters : {
-			...filters,
-			[group]: [...current, key]
-		};
-	}
-	function parseHash(fragment, base) {
-		const h = fragment.startsWith("#") ? fragment.slice(1) : fragment;
-		let view = null;
-		let listKey = false;
-		let q = base.q;
-		let pkg = base.pkg;
-		let filters = base.filters;
-		let section = null;
-		for (const piece of h === "" ? [] : h.split("&")) {
-			const i = piece.indexOf("=");
-			if (i < 0) continue;
-			const key = piece.slice(0, i);
-			if (key === "q" || key === "pkg" || isFilterGroup(key)) listKey = true;
-			let value;
-			try {
-				value = decodeURIComponent(piece.slice(i + 1));
-			} catch {
-				continue;
-			}
-			if (key === "view") {
-				if (VIEW_SET.has(value)) view = value;
-				continue;
-			}
-			if (key === "q") {
-				q = value;
-				continue;
-			}
-			if (key === "section") {
-				section = value;
-				continue;
-			}
-			if (key === "pkg") {
-				pkg = value.trim() === "" ? null : value;
-				continue;
-			}
-			if (isFilterGroup(key)) {
-				for (const part of value.split(",")) if (part !== "") filters = addFilterKey(filters, key, part);
-			}
-		}
-		const opened = view ?? (listKey ? "findings" : "overview");
-		return {
-			...base,
-			view: opened,
-			q,
-			pkg,
-			filters,
-			section: opened === "run" ? section : null
-		};
-	}
-	var HashSync = class {
-		disabled = false;
-		writeHash(state, win) {
-			if (this.disabled) return;
-			const h = serializeHash(state);
-			if (h === (win.location.hash.startsWith("#") ? win.location.hash.slice(1) : win.location.hash)) return;
-			try {
-				const url = h ? "#" + h : win.location.pathname + win.location.search;
-				win.history.replaceState(null, "", url);
-			} catch {
-				this.disabled = true;
-			}
-		}
-	};
-	//#endregion
 	//#region src/ui/report/TabLink.tsx
 	function TabLink({ target, className, label, children }) {
 		const { dispatch } = useReport();
@@ -17294,7 +17332,7 @@ var LockrotReport = (function(exports) {
 			href: linkHref(target),
 			"aria-label": label,
 			onClick: (event) => {
-				if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+				if (!isPlainClick(event)) return;
 				event.preventDefault();
 				const next = linkState(target);
 				dispatch({
@@ -18034,11 +18072,13 @@ var LockrotReport = (function(exports) {
 		const php = advisoryFixPhp(row.fix);
 		const held = heldByLine(row.fix.held_by, run, finding.package);
 		const inner = innerTabIndex(finding.package, cursor, first);
+		const described = useRowDescription();
 		return u$1("div", {
 			role: "row",
 			tabIndex: rowTabIndex(finding.package, cursor, first),
 			"aria-current": state.pkg === finding.package ? "true" : void 0,
 			"aria-label": advisoryRowLabel2(pair),
+			"aria-describedby": described,
 			"data-pkg": finding.package,
 			className: `adv ${toneClass(gradeTone(advisoryBand(run, row.severity)))}`,
 			...openInteractions(finding.package, dispatch),
@@ -18289,14 +18329,17 @@ var LockrotReport = (function(exports) {
 				u$1(RowHint, { id: hintId }),
 				u$1("div", {
 					className: "aledger no-axis",
-					role: "table",
+					role: "grid",
+					"aria-readonly": "true",
 					"aria-label": "Advisories",
-					"aria-describedby": hintId,
-					children: [u$1(AdvisoryHead, {}), groups.map((group) => u$1(Group, {
-						group,
-						run,
-						first
-					}, group.finding.package))]
+					children: [u$1(AdvisoryHead, {}), u$1(RowHintContext.Provider, {
+						value: hintId,
+						children: groups.map((group) => u$1(Group, {
+							group,
+							run,
+							first
+						}, group.finding.package))
+					})]
 				})
 			] })]
 		});
@@ -18809,12 +18852,14 @@ var LockrotReport = (function(exports) {
 		const { state, dispatch, cursor } = useReport();
 		const run = report.run;
 		const id = g();
+		const graded = run.graded_verdicts.some((verdict) => verdict === finding.verdict);
+		const described = useRowDescription(scoreHead, `${id}-score`, `${id}-verdict`);
 		return u$1("tr", {
 			role: "row",
-			className: run.graded_verdicts.some((verdict) => verdict === finding.verdict) ? `p2-row ${toneClass(gradeTone(finding.verdict))}` : "p2-row is-ungraded",
+			className: graded ? `p2-row ${toneClass(gradeTone(finding.verdict))}` : "p2-row is-ungraded",
 			"data-pkg": finding.package,
 			"aria-label": finding.package,
-			"aria-describedby": `${scoreHead} ${id}-score ${id}-verdict`,
+			"aria-describedby": described,
 			"aria-current": state.pkg === finding.package ? "true" : void 0,
 			tabIndex: rowTabIndex(finding.package, cursor),
 			...openInteractions(finding.package, dispatch),
@@ -18966,9 +19011,9 @@ var LockrotReport = (function(exports) {
 					} : {},
 					children: u$1("table", {
 						className: showData ? "p2-table has-data" : "p2-table",
-						role: "table",
+						role: "grid",
+						"aria-readonly": "true",
 						"aria-label": "All packages",
-						"aria-describedby": hintId,
 						children: [u$1("thead", {
 							role: "rowgroup",
 							children: u$1("tr", {
@@ -19005,13 +19050,16 @@ var LockrotReport = (function(exports) {
 							})
 						}), u$1("tbody", {
 							role: "rowgroup",
-							children: rows.map((finding) => u$1(PackageRow, {
-								finding,
-								report,
-								hideAccepted,
-								showData,
-								scoreHead
-							}, finding.package))
+							children: u$1(RowHintContext.Provider, {
+								value: hintId,
+								children: rows.map((finding) => u$1(PackageRow, {
+									finding,
+									report,
+									hideAccepted,
+									showData,
+									scoreHead
+								}, finding.package))
+							})
 						})]
 					})
 				})
@@ -19039,12 +19087,13 @@ var LockrotReport = (function(exports) {
 	function ChildRow2({ finding, depth, note, report, first }) {
 		const { state, dispatch, cursor } = useReport();
 		const id = g();
+		const described = useRowDescription(`${id}-said`);
 		return u$1("li", {
 			className: `r2-kid ${toneClass(gradeTone(finding.verdict))}`,
 			style: { "--depth": String(depth) },
 			"data-pkg": finding.package,
 			"aria-label": finding.package,
-			"aria-describedby": `${id}-said`,
+			"aria-describedby": described,
 			"aria-current": state.pkg === finding.package ? "true" : void 0,
 			tabIndex: rowTabIndex(finding.package, cursor, first),
 			...openInteractions(finding.package, dispatch),
@@ -19102,11 +19151,11 @@ var LockrotReport = (function(exports) {
 		const id = g();
 		const kidsId = `${id}-kids`;
 		const facts = radiusRowFacts(report, row);
-		const described = [
+		const described = useRowDescription(...[
 			...row.self === null ? [] : [`${id}-self`],
 			...facts.count === null ? [] : [`${id}-count`],
 			...facts.mix === null && facts.note === null ? [] : [`${id}-mix`]
-		].join(" ");
+		]);
 		const toggle = (event) => {
 			event.stopPropagation();
 			dispatch({
@@ -19287,8 +19336,10 @@ var LockrotReport = (function(exports) {
 				layout.lead.length > 0 && u$1("ul", {
 					className: "r2-list",
 					"aria-label": RADIUS_WORDS.list,
-					"aria-describedby": hintId,
-					children: rows(layout.lead, 1)
+					children: u$1(RowHintContext.Provider, {
+						value: hintId,
+						children: rows(layout.lead, 1)
+					})
 				}),
 				layout.singles.length > 0 && u$1(Fold, {
 					id: "fold:singles",
@@ -19296,8 +19347,10 @@ var LockrotReport = (function(exports) {
 					head: RADIUS_WORDS.singles(layout.singles.length),
 					children: u$1("ul", {
 						className: "r2-list",
-						"aria-describedby": hintId,
-						children: rows(layout.singles, layout.lead.length + 1)
+						children: u$1(RowHintContext.Provider, {
+							value: hintId,
+							children: rows(layout.singles, layout.lead.length + 1)
+						})
 					})
 				}),
 				layout.unlisted.length > 0 && u$1("p", {
@@ -20966,7 +21019,7 @@ var LockrotReport = (function(exports) {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.17";
+	var version = "0.14.0-rc.18";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");

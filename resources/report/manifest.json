@@ -1,23 +1,23 @@
 {
   "name": "lockrot-report",
-  "version": "0.14.0-rc.17",
+  "version": "0.14.0-rc.18",
   "schema": {
     "report": [
       2
     ]
   },
   "contract": {
-    "bundle_sha256": "919b84765435927f20049547a9936e305695a522c51475abb6ef0bbf72eddbe2",
+    "bundle_sha256": "e18144c709c386472296b038abeae365e1c0961e6e3709f6a9a21b5431fb73e9",
     "score_text_grammar": 1,
     "text_grammar": 1
   },
   "files": {
-    "report.html": "e43a2ca902b08e6a340f2a95f87d5bfac73665fddd1b603e89069b04d2c77fff",
-    "lockrot-report.js": "0b645a9aba49798032df97c1488f81b6b3ade9d567eedf150540190a4bac1ea3",
-    "lockrot-report.css": "6b4c7ed0a4640e178f9a83390901ac52bffc603dea59828954d9a07cd37b1497"
+    "report.html": "67cc5fdcc865849ec00a53dfbba8e200b22f51dfd4ebb595199dd8e1c3c637e5",
+    "lockrot-report.js": "18fe71631d3d71f2316e87974633d04f64f3c3b5c62d0d2b0ef9d59eeac12c49",
+    "lockrot-report.css": "4964ec8be08553f242b5083b99f39a75cfe64398a17564761736df1022ea67af"
   },
   "csp": {
-    "script": "sha256-C2RamrpJeYAy35fBSI+BtrOt6dVn7t8VBUAZCkusHqM=",
-    "style": "sha256-a0x+0KRkDhePmoM5CQGsUr/8YD3qWYKJVNmgfNN7FJc="
+    "script": "sha256-GP5xYx09cfIxboeXRjPQT2Tzw7XGLQ0rDvnVnurBLEk=",
+    "style": "sha256-SWTsi+CFU/JCtQg7mfOadc/mQ5ihdWR2FzbfECLqZ68="
   }
 }
