@@ -304,19 +304,14 @@ final class SolverChecker implements MoveChecker
     }
 
     /**
-     * Whether $solution installs a higher release of $package than $than. A solve that installs a
-     * release is higher than one that keeps or drops the package. False when a release does not parse.
+     * Whether $solution installs a higher release of $package than $than. Both solves must install a
+     * release of $package. False when a release does not parse.
      */
     private static function installsHigher(Solution $solution, Solution $than, string $package): bool
     {
-        $installs = $solution->installs()[$package] ?? null;
-        $thanInstalls = $than->installs()[$package] ?? null;
-        if ($installs === null || $thanInstalls === null) {
-            return $installs !== null;
-        }
         $parser = new VersionParser();
         try {
-            return Comparator::greaterThan($parser->normalize($installs), $parser->normalize($thanInstalls));
+            return Comparator::greaterThan($parser->normalize($solution->installs()[$package]), $parser->normalize($than->installs()[$package]));
         } catch (\UnexpectedValueException $e) {
             return false;
         }
