@@ -37,6 +37,29 @@ final class SourceEntryUsageErrorTest extends TestCase
         yield 'a -d that does not exist, before the command' => [['-d', '{dir}/missing', 'lockrot'], 'lockrot: --working-dir names a directory that does not exist: {dir}/missing'];
         yield 'help for an unknown command' => [['help', 'nope'], 'lockrot: Command "nope" is not defined.'];
         yield 'list of an unknown namespace' => [['list', 'nosuch'], 'lockrot: There are no commands defined in the "nosuch" namespace.'];
+        yield 'help for an unknown command with an extra argument' => [['help', 'nope', 'extra'], 'lockrot: Command "nope" is not defined.'];
+    }
+
+    /** @return iterable<string, array{list<string>}> */
+    public static function validHelpAndList(): iterable
+    {
+        yield 'help for a command' => [['help', 'list']];
+        yield 'help for the lockrot command' => [['help', 'lockrot']];
+        yield 'list with an option and no namespace' => [['list', '--raw']];
+    }
+
+    /**
+     * @dataProvider validHelpAndList
+     *
+     * @param list<string> $arguments
+     */
+    #[DataProvider('validHelpAndList')]
+    public function testHelpAndListOfAKnownNameExitZero(array $arguments): void
+    {
+        $process = $this->lockrot($arguments);
+
+        self::assertSame(0, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
+        self::assertNotSame('', $process->getOutput());
     }
 
     /**

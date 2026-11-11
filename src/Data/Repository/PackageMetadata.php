@@ -256,7 +256,7 @@ final class PackageMetadata
                 // normalized strings only: the loader never parses `version`.
                 $normalized = $version->getVersion();
                 $branch = ReleaseBranch::of($normalized);
-                // A stable tag with no release branch, such as the date version 20200101, still counts for S6.
+                // A stable tag with no release branch, such as the date version 20200101, is a stable release.
                 if ($branch === null && VersionParser::parseStability($normalized) === 'stable') {
                     $stable[$normalized] ??= [$version, $releaseDate, self::phpOf($version)];
                 }

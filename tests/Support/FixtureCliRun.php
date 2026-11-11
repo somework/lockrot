@@ -187,7 +187,6 @@ final class FixtureCliRun
         }
     }
 
-    /** The project's composer.json, each mirrored repository URL replaced by the URL that serves it. */
     /**
      * The lock for the project copy. A mirror URL in the copy's composer.json changes Composer's
      * content hash, so a lock in sync with the project takes the copy's hash. Else the run reads
@@ -204,6 +203,7 @@ final class FixtureCliRun
         return json_encode($data, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE)."\n";
     }
 
+    /** The project's composer.json, each mirrored repository URL replaced by the URL that serves it. */
     private function manifest(string $path): string
     {
         $contents = (string) file_get_contents($path);

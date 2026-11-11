@@ -202,7 +202,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Signal/PhpFloor.php` CastInt `foreach ([$point, $major.'.'.$minor.'.'.((int) $patch + 1)] as $candidate) {` — `startPoint()` writes the patch as digits, and PHP adds a digit string as the integer it spells. The cast is for the type.
 - `src/Signal/Rule/LeftBehindRule.php` LessThanOrEqualTo `if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $ownAt) {` — a higher branch released at the instant of the installed branch cannot be alive while the installed branch is old enough for S8.
 - `src/Signal/Rule/NotCheckedRule.php` ArrayItemRemoval `$unchecked[] = new Check('advisories', $advisories, [Signal::S9], $partial ? [self::CAUSE_PARTIAL => [Signal::S9]] : []);` — `summaryOf()` reads only the key of the partial cause, and `jsonSerialize()` omits the causes.
-- `src/Signal/Rule/NotCheckedRule.php` UnwrapArrayValues `return 'release metadata not checked ('.$cause.'), so '.ListWords::of(array_values(array_diff($entry->blocks(), [Signal::S11]))).' could not be read';` — S11 is the last entry of `metadataBlocks()`, so `array_diff()` keeps the keys of a list.
+- `src/Signal/Rule/NotCheckedRule.php` UnwrapArrayValues `return 'release metadata not checked ('.$cause.'), so '.ListWords::of(array_values(array_diff($entry->blocks(), [Signal::S11]))).' could not be read';` — `ListWords::of()` reads its words with `array_pop()` and `implode()`, which ignore the keys.
 
 ## src/Solver
 

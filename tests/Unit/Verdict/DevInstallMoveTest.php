@@ -60,7 +60,7 @@ final class DevInstallMoveTest extends TestCase
     public static function remoteCommits(): iterable
     {
         yield 'the lock holds the newest commit, so Composer keeps dev-main' => ['aaaa'];
-        yield 'the remote holds a newer commit, so Composer installs dev-main' => ['bbbb'];
+        yield 'the remote holds a newer commit of dev-main' => ['bbbb'];
     }
 
     /**

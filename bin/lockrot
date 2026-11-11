@@ -318,7 +318,7 @@ $application = new class () extends \Composer\Console\Application {
         try {
             $probe->bind($command->getDefinition());
         } catch (\Symfony\Component\Console\Exception\ExceptionInterface $e) {
-            return null;
+            // `help` ignores validation errors and reads its name from a half-bound input too.
         }
         $subject = $probe->hasArgument($argument) ? $probe->getArgument($argument) : null;
 
