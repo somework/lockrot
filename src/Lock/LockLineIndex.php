@@ -67,7 +67,7 @@ final class LockLineIndex
                 return self::empty();
             }
 
-            if ($depth === 1 && preg_match('/^\s*"((?:[^"\\\\]|\\\\.)+)"\s*:/', $line, $key) === 1) {
+            if ($depth === 1 && preg_match('/^\s*"((?:[^"\\\\]|\\\\.)*)"\s*:/', $line, $key) === 1) {
                 $section = json_decode('"'.$key[1].'"');
                 if (\in_array($section, self::PACKAGE_SECTIONS, true)) {
                     $sections[$section] = [];
