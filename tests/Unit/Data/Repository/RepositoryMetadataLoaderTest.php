@@ -792,8 +792,8 @@ final class RepositoryMetadataLoaderTest extends TestCase
             $offline = (new RepositoryMetadataLoader([$repository], Clock::fixed(self::FIXED), true))->load(self::names([$name]))->failed();
             $online = (new RepositoryMetadataLoader([$repository], Clock::fixed(self::FIXED)))->load(self::names([$name]))->failed();
 
-            self::assertSame(MetadataFailure::OFFLINE, MetadataFailure::reason($offline[$name] ?? null));
-            self::assertSame(MetadataFailure::FETCH_FAILED, MetadataFailure::reason($online[$name] ?? null));
+            self::assertSame(MetadataFailure::OFFLINE, MetadataFailure::reason($offline[$name] ?? ''));
+            self::assertSame(MetadataFailure::FETCH_FAILED, MetadataFailure::reason($online[$name] ?? ''));
         } finally {
             $server->stop();
         }

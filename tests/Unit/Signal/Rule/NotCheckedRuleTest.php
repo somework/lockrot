@@ -443,11 +443,15 @@ final class NotCheckedRuleTest extends TestCase
     public function testS5IsNamedOnlyWhenAllFourConditionsHold(array $override, string $target): void
     {
         $ruleFor = static fn (string $php): NotCheckedRule => new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), $php));
-        $facts = static fn (array $o): PackageFacts => (new PackageFacts(F::package($o + ['fromComposerRepository' => false, 'php' => '>=5.6']), null, null, []))
-            ->withActivityLookup(ActivityLookup::notRead(ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, LocatedRepository::none(null)));
+        self::assertSame([Signal::S2, Signal::S5, Signal::S8], $ruleFor('8.4')->metadataBlocks(self::notFromComposerRepository([]), false), 'all four hold');
+        self::assertSame([Signal::S2, Signal::S8], $ruleFor($target)->metadataBlocks(self::notFromComposerRepository($override), false));
+    }
 
-        self::assertSame([Signal::S2, Signal::S5, Signal::S8], $ruleFor('8.4')->metadataBlocks($facts([]), false), 'all four hold');
-        self::assertSame([Signal::S2, Signal::S8], $ruleFor($target)->metadataBlocks($facts($override), false));
+    /** @param array<string, mixed> $o */
+    private static function notFromComposerRepository(array $o): PackageFacts
+    {
+        return (new PackageFacts(F::package($o + ['fromComposerRepository' => false, 'php' => '>=5.6']), null, null, []))
+            ->withActivityLookup(ActivityLookup::notRead(ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, LocatedRepository::none(null)));
     }
 
     /** @return iterable<string, array{?string}> */

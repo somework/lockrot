@@ -37,6 +37,8 @@ final class ProjectConfigTest extends TestCase
      * @param array<string, mixed> $manifest
      * @param array<string, mixed> $lockExtra
      * @param list<string|array<string, mixed>> $locked a name, or the lock entry itself
+     *
+     * @return list<string>|null
      */
     private static function outOfSync(array $manifest, array $lockExtra, array $locked, bool $includeDev = false, bool $writeManifest = true): ?array
     {
