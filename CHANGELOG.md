@@ -534,6 +534,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   X.Y.0 release opens with a link to its upgrade page.
 - **All formats:** a tag move reads the php of the highest tag, and adds old-promise only when that
   tag declares `require.php`. ([The move](docs/verdicts.md#move))
+- **Docs:** the report-2 migration table marks `.priority` as changed in meaning: it is the grade, so
+  a query on `"critical"` can match a package with only a counted advisory. The upgrade page limits
+  the baseline exit `2` to jobs whose input or key names the file.
+  ([Migrating from report-1](docs/schema.md#migrating-from-report-1))
+- **Docs:** `gate.reaches_fail_on` states what each kind of `fail-on` value reads, a score-0 finding
+  with S10 included. Libyears name the shared-commit lower bound. `accept-unchecked` documents the
+  refusal order, the query match and the scopes of an unknown origin.
+  ([The gate](docs/schema.md#the-gate), [accept-unchecked](docs/configuration.md#accept-unchecked))
 
 ### Deprecated
 
