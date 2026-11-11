@@ -90,12 +90,37 @@ final class HoldScanTest extends TestCase
         self::assertSame([], self::rows($scan->of($target, null)));
     }
 
-    /** A branch alias loads before the dev version that it aliases, and the alias version is the one that a requirement reads. */
-    public function testARequirementThatTheBranchAliasOfALockedDevVersionMeetsHoldsNothing(): void
+    /**
+     * Composer meets a link with the locked dev version or with its branch alias.
+     *
+     * @dataProvider branchOrAliasConstraints
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('branchOrAliasConstraints')]
+    public function testARequirementThatALockedDevVersionOrItsBranchAliasMeetsHoldsNothing(string $constraint): void
+    {
+        $scan = self::scan(['require' => ['acme/dep' => '^1.0@dev']], [['name' => 'acme/dep', 'version' => 'dev-main', 'extra' => ['branch-alias' => ['dev-main' => '2.x-dev']]]]);
+
+        self::assertSame([], self::rows($scan->of(self::target(['require' => ['acme/dep' => $constraint]]), null)));
+    }
+
+    /**
+     * @dataProvider branchOrAliasConstraints
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('branchOrAliasConstraints')]
+    public function testAConflictThatALockedDevVersionOrItsBranchAliasMatchesHoldsTheMove(string $constraint): void
     {
         $scan = self::scan([], [['name' => 'acme/dep', 'version' => 'dev-main', 'extra' => ['branch-alias' => ['dev-main' => '2.x-dev']]]]);
 
-        self::assertSame([], self::rows($scan->of(self::target(['require' => ['acme/dep' => '^2.0@dev']]), null)));
+        self::assertSame([
+            ['source' => 'package', 'package' => 'acme/lib', 'version' => '1.1.0', 'link' => 'conflict', 'target' => 'acme/dep', 'constraint' => $constraint],
+        ], self::rows($scan->of(self::target(['conflict' => ['acme/dep' => $constraint]]), null)));
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function branchOrAliasConstraints(): iterable
+    {
+        yield 'the branch name' => ['dev-main'];
+        yield 'the branch alias' => ['^2.0@dev'];
     }
 
     /**
