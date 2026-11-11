@@ -38,6 +38,12 @@ final class ForgeAuth
         $this->authorizeBitbucket = $authorizeBitbucket;
     }
 
+    /** Whether {@see Tokens} holds a `GITHUB_TOKEN` that it did not send to github.com. */
+    public function githubTokenWithheld(): bool
+    {
+        return isset($this->tokens->withheld()[Tokens::ENV_GITHUB]);
+    }
+
     public static function anonymous(): self
     {
         return new self(Tokens::none(), static fn (string $host): bool => false, static fn (): bool => false);

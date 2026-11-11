@@ -51,6 +51,15 @@ final class ActivityFetchPlannerTest extends TestCase
         self::assertSame([], $plan->cappedForges());
     }
 
+    public function testThePlanRecordsAGithubTokenThatTokensWithheld(): void
+    {
+        $withheld = Tokens::fromEnvironment(['GITHUB_TOKEN' => 't', 'GITHUB_SERVER_URL' => 'https://ghe.example'], null);
+        $repos = ['a/a' => self::gh('o/a')];
+
+        self::assertTrue((new ActivityFetchPlanner(ForgeAuth::withTokens($withheld)))->select($repos, ['a/a' => true])->githubTokenWithheld());
+        self::assertFalse((new ActivityFetchPlanner(ForgeAuth::anonymous()))->select($repos, ['a/a' => true])->githubTokenWithheld());
+    }
+
     public function testWithoutATokenGithubFetchesOnlyCandidatesWithinTheBudget(): void
     {
         $planner = new ActivityFetchPlanner(ForgeAuth::anonymous(), 1);

@@ -540,7 +540,7 @@ final class Analyzer
         $notes = [];
         $budgetStopped = false;
         foreach ($plan->cappedForges() as $forge) {
-            $notes[] = RunNote::repositoryActivityAnonymousCap($forge, $plan->checkedPackages($forge), $plan->skippedNoToken($forge), $plan->skippedBudget($forge));
+            $notes[] = RunNote::repositoryActivityAnonymousCap($forge, $plan->checkedPackages($forge), $plan->skippedNoToken($forge), $plan->skippedBudget($forge), $plan->githubTokenWithheld());
         }
         foreach (RepoRef::FORGES as $forge) {
             $limited = [];
