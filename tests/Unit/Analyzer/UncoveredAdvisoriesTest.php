@@ -29,7 +29,7 @@ final class UncoveredAdvisoriesTest extends TestCase
             self::finding('a/no-entry', null, [['D', 'critical'], ['E', 'critical']]),
         ];
 
-        self::assertSame([['package' => 'd/project', 'pattern' => 'd/*', 'advisories' => ['A', 'B']]], JsonPath::decoded(UncoveredAdvisories::of($findings)));
+        self::assertSame([['package' => 'd/project', 'pattern' => 'd/*', 'advisories' => ['A', 'B']]], JsonPath::decoded(UncoveredAdvisories::of($findings, self::entriesOf($findings))));
     }
 
     public function testTheEntriesComeInReportOrder(): void
@@ -37,7 +37,23 @@ final class UncoveredAdvisoriesTest extends TestCase
         $project = static fn (string $package): AllowlistEntry => new AllowlistEntry($package, null, 'kept', null, AllowlistEntry::BY_PROJECT);
         $findings = [self::finding('a/low', $project('a/low'), [['L', 'low']]), self::finding('z/critical', $project('z/critical'), [['C', 'critical']])];
 
-        self::assertSame(['z/critical', 'a/low'], array_map(static fn (UncoveredAdvisories $entry): string => $entry->package(), UncoveredAdvisories::of($findings)));
+        self::assertSame(['z/critical', 'a/low'], array_map(static fn (UncoveredAdvisories $entry): string => $entry->package(), UncoveredAdvisories::of($findings, self::entriesOf($findings))));
+    }
+
+    /**
+     * @param list<Finding> $findings
+     *
+     * @return array<string, ?AllowlistEntry>
+     */
+    private static function entriesOf(array $findings): array
+    {
+        $entries = [];
+        foreach ($findings as $finding) {
+            $entry = $finding->details()->entry();
+            $entries[$finding->package()] = $entry !== null && $entry->by() === AllowlistEntry::BY_PROJECT ? $entry : null;
+        }
+
+        return $entries;
     }
 
     /** @param list<array{0: string, 1: string}> $advisories id and severity */

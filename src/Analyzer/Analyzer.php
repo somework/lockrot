@@ -257,8 +257,10 @@ final class Analyzer
         $window = PhpWindow::of($lock, $project, $targetMinor, PhpReleaseDates::load()->minors($this->clock), $solvePhp, $configured, $checker === null ? null : $checker->configuredPhp64bit());
         $findings = [];
         $factsByPackage = [];
+        $projectEntries = [];
         $notInRepository = 0;
         foreach ($packages as $package) {
+            $projectEntries[$package->name()] = $this->allowlist->projectEntry($package, $now);
             $meta = $metadata[$package->name()] ?? null;
             $entry = $allowlisted[$package->name()];
             $facts = (new PackageFacts($package, $meta, null, $advisories->for($package->name()), null, $abandonedIgnore[$package->name()], $advisories->coverage()->for($package->name()), isset($batch->failed()[$package->name()])))
@@ -286,7 +288,7 @@ final class Analyzer
         if ($notInRepository > 0) {
             $notes[] = RunNote::notFromComposerRepository($notInRepository, $advisories->coverage()->scope() === AdvisoryCoverage::SCOPE_ALL);
         }
-        $uncovered = UncoveredAdvisories::of($findings);
+        $uncovered = UncoveredAdvisories::of($findings, $projectEntries);
         $notes = array_merge($notes, $uncovered === [] ? [] : [RunNote::ignoreDoesNotCoverAdvisories($uncovered)], $this->abandonedNotes($findings));
         if ($baseline !== null && $baseline->check()->isRefused() && $checks !== null) {
             $notes[] = RunNote::movesNotChecked((string) $checks->checker()->platformPhp(), (string) $baseline->problem());

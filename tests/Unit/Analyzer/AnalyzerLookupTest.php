@@ -145,9 +145,9 @@ final class AnalyzerLookupTest extends TestCase
         };
     }
 
-    private static function metadata(bool $abandoned, string $releasedAt): PackageMetadata
+    private static function metadata(bool $abandoned, string $releasedAt, string $type = 'library'): PackageMetadata
     {
-        return new PackageMetadata('vendor/pkg', $abandoned, null, true, new \DateTimeImmutable($releasedAt), '1.0.0', 1, 'https://github.com/vendor/pkg.git', 'library', new \DateTimeImmutable(F::NOW));
+        return new PackageMetadata('vendor/pkg', $abandoned, null, true, new \DateTimeImmutable($releasedAt), '1.0.0', 1, 'https://github.com/vendor/pkg.git', $type, new \DateTimeImmutable(F::NOW));
     }
 
     private static function finding(Report $report): Finding
@@ -271,6 +271,40 @@ final class AnalyzerLookupTest extends TestCase
 
         self::assertCount(1, $notes);
         self::assertSame(['z/old', 'a/new'], JsonPath::column(JsonPath::decoded($notes[0]->data()), ['entries'], 'package'));
+    }
+
+    /**
+     * A partial `ignore[]` entry on a pack with counted advisories: the type entry accepts the
+     * maintenance flags, and the note still names the project entry.
+     *
+     * @return list<mixed> the packages that the note names
+     */
+    private function ignoreNoteEntries(string $lockType, ?string $metadataType, ?\DateTimeImmutable $expires): array
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/pkg', 'version' => '1.0.0', 'type' => $lockType, 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $metadata = ['vendor/pkg' => self::metadata(false, '2015-01-01T00:00:00+00:00', $metadataType ?? 'library')];
+        $allowlist = new Allowlist([new AllowlistEntry('vendor/pkg', null, 'kept', $expires, AllowlistEntry::BY_PROJECT, ['stale'])]);
+        $advisories = new AdvisoryBatch(['vendor/pkg' => [new Advisory('PKSA-pack', null, 'Title', null, 'high', null, (new VersionParser())->parseConstraints('<2.0.0'))]]);
+
+        $report = self::analyzer(self::loader($metadata), self::http([], new \ArrayObject()), true, $allowlist, null, self::advisories($advisories))->analyze($lock, ProjectConfig::empty(), false);
+        $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::IGNORE_DOES_NOT_COVER_ADVISORIES));
+
+        return $notes === [] ? [] : JsonPath::column(JsonPath::decoded($notes[0]->data()), ['entries'], 'package');
+    }
+
+    public function testAPartialProjectEntryOnAPackStillAppearsInTheIgnoreNote(): void
+    {
+        self::assertSame(['vendor/pkg'], $this->ignoreNoteEntries('symfony-pack', null, null));
+    }
+
+    public function testAPartialProjectEntryOnAPackWhoseTypeOnlyTheMetadataKnowsStillAppearsInTheNote(): void
+    {
+        self::assertSame(['vendor/pkg'], $this->ignoreNoteEntries('library', 'metapackage', null));
+    }
+
+    public function testAnExpiredPartialProjectEntryOnAPackWritesNoNote(): void
+    {
+        self::assertSame([], $this->ignoreNoteEntries('symfony-pack', null, new \DateTimeImmutable('2020-01-01')));
     }
 
     /** @return iterable<string, array{array<string, mixed>, bool, ?string}> the config, whether the package is marked, and the note that the run writes */
