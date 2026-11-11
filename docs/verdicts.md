@@ -1465,15 +1465,15 @@ applies:
 | `branch_snapshot` | The installed version is a branch (`dev-main`, `2.x-dev`): it has a commit date, not a release date, and `pinned` already says what there is to say |
 | `shared_commit`, `parent_split`, `undated` | The installed release is not the highest stable tag and has no date lockrot trusts: its commit carries other tags, a parent dates the newest release of its split, or the lock entry has no `time`. The same ids as `age.installed_unmeasured` |
 | `no_stable_release` | The package has no tagged release |
-| `undated_releases` | The package has tagged releases, and no release above the installed one has a trusted date. `age.release_unmeasured` uses the same id when the highest stable tag has no trusted date, also when older tags have one |
+| `undated_releases` | The package has tagged releases, and no stable release above the installed one has a Packagist date, a shared commit's date included. `age.release_unmeasured` uses the same id when the highest stable tag has no trusted date, also when older tags have one |
 
 The keys are an [open set](schema.md#open-sets): read one you do not know as another way a package
 went unmeasured ([compatibility.md](compatibility.md#open-sets)).
 
 - **Lower bounds.** When the highest stable tag has no trusted date, lockrot measures the package
-  to the newest stable release above the installed version that has a trusted date. That release
-  can be on a higher branch or on the installed branch. A tag's commit is never younger than the
-  release it names, so the value is a lower bound: `libyears_at_least` is true, and the root counts
+  to the newest Packagist time of a stable release above the installed version. That time can be
+  a shared commit's, and the release can be on a higher branch or on the installed branch. A tag's
+  commit is never younger than the release it names, so the value is a lower bound: `libyears_at_least` is true, and the root counts
   such findings in `at_least_count`. The line then reads `at least`.
 
 - **Ahead of the highest stable tag.** A package locked on a pre-release above it counts as zero.
