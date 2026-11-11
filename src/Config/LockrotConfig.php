@@ -28,6 +28,8 @@ final class LockrotConfig
 
     /** The refusal of a value that {@see isTargetPhpValue()} does not take: the setting, then the value. */
     private const TARGET_PHP_VALUE = '%s takes a major, a minor or a patch version, such as "8.4" or "8.4.2", with nothing before or after it; got "%s"';
+    /** The config-2 schema refuses a patch in `extra.lockrot.target-php`. */
+    private const TARGET_PHP_CONFIG_VALUE = 'extra.lockrot.target-php takes a major or a minor version, such as "8.4", with nothing before or after it; got "%s"';
     /** A day after every GA date of the release data: its clock lists every minor that the data dates. */
     private const AFTER_EVERY_GA = '9999-12-31T00:00:00+00:00';
     /** The refusal of a target minor that is no PHP minor: the setting, the minor, the known minors, the newest one, then the value. */
@@ -274,7 +276,7 @@ final class LockrotConfig
         $fromConfig = $extra['target-php'] ?? null;
         if (\is_string($fromConfig) && $fromConfig !== '') {
             if (!self::isTargetPhpValue($fromConfig)) {
-                throw new ConfigException(\sprintf(self::TARGET_PHP_VALUE, 'extra.lockrot.target-php', $fromConfig));
+                throw new ConfigException(\sprintf(self::TARGET_PHP_CONFIG_VALUE, $fromConfig));
             }
             self::refuseUnknownMinor('extra.lockrot.target-php', $fromConfig);
         }

@@ -306,7 +306,7 @@ final class LockrotConfigTest extends TestCase
     public function testAConfigTargetPhpWithTextAfterTheVersionIsRefusedLikeTheOption(string $value): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('extra.lockrot.target-php takes a major, a minor or a patch version, such as "8.4" or "8.4.2", with nothing before or after it; got "'.$value.'"');
+        $this->expectExceptionMessage('extra.lockrot.target-php takes a major or a minor version, such as "8.4", with nothing before or after it; got "'.$value.'"');
         LockrotConfig::fromSources(['target-php' => $value], [], ['target-php' => '8.4'], '8.5.10', null);
     }
 
@@ -359,7 +359,7 @@ final class LockrotConfigTest extends TestCase
     public function testAConfigTargetPhpThatIsNoVersionIsRefusedUnderEverySource(array $env, array $cli): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('extra.lockrot.target-php takes a major, a minor or a patch version, such as "8.4" or "8.4.2", with nothing before or after it; got "banana"');
+        $this->expectExceptionMessage('extra.lockrot.target-php takes a major or a minor version, such as "8.4", with nothing before or after it; got "banana"');
         LockrotConfig::fromSources(['target-php' => 'banana'], $env, $cli, '8.5.10', null);
     }
 
