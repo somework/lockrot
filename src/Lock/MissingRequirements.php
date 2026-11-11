@@ -66,7 +66,7 @@ final class MissingRequirements
                 }
             }
         }
-        $names = array_values($missing);
+        $names = $missing;
         sort($names);
 
         return $names;

@@ -237,6 +237,8 @@ final class FindingDetailsTest extends TestCase
      * (ruling R2-1), and `gets` describes that release. Without one, `gets` is null.
      *
      * @param ?array{version: string, requires: string, clears: list<mixed>} $expected
+     *
+     * @dataProvider checksOfACappedGets
      */
     #[DataProvider('checksOfACappedGets')]
     public function testACheckedSolveOutranksTheCapsOfEveryRelease(?MoveCheck $check, ?array $expected): void

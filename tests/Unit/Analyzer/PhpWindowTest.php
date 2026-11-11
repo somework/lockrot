@@ -193,6 +193,8 @@ final class PhpWindowTest extends TestCase
     /**
      * @param array<string, mixed>  $lock
      * @param ?array<string, mixed> $composer
+     *
+     * @dataProvider selfVersionRootLinks
      */
     #[DataProvider('selfVersionRootLinks')]
     public function testARootPhpLinkAtSelfVersionIsTheRootVersionAndLeavesNoMinor(array $lock, ?array $composer): void

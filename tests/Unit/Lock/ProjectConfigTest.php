@@ -85,6 +85,20 @@ final class ProjectConfigTest extends TestCase
         self::assertSame(['acme/gone'], self::outOfSync($manifest, ['content-hash' => 'deadbeef'], [$bundle]));
     }
 
+    public function testARequirementThatTheRootProvidesIsNeverMissing(): void
+    {
+        $manifest = ['require' => ['psr/log-implementation' => '*', 'acme/gone' => '*'], 'provide' => ['psr/log-implementation' => '1.0']];
+
+        self::assertSame(['acme/gone'], self::outOfSync($manifest, ['content-hash' => 'deadbeef'], []));
+    }
+
+    public function testARequirementOnTheRootsOwnNameIsNeverMissing(): void
+    {
+        $manifest = ['name' => 'acme/app', 'require' => ['acme/app' => '*', 'acme/gone' => '*']];
+
+        self::assertSame(['acme/gone'], self::outOfSync($manifest, ['content-hash' => 'deadbeef'], []));
+    }
+
     public function testASelfVersionRequirementIsNeverMissing(): void
     {
         $manifest = ['require' => ['acme/sub' => 'self.version', 'acme/gone' => '*']];

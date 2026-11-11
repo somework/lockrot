@@ -539,6 +539,7 @@ final class FixFinderTest extends TestCase
         yield 'a hold that names the package in another case excludes the newest' => ['^1.2', $require('^2.0', 'A/B'), '1.1.0'];
         yield 'a hold on another package caps nothing' => ['^1.2', $require('^2.0', 'acme/rt-kernel'), '1.2.0'];
         yield 'a hold whose link admits the newest leaves it' => ['^1.2', $require('^1.0'), '1.2.0'];
+        yield 'a hold whose constraint does not parse caps nothing' => ['^1.2', $require('not a constraint'), '1.2.0'];
         yield 'a conflict that matches the newest excludes it' => ['^1.2', new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::CONFLICT, '>=1.2'), '1.1.0'];
         yield 'a root hold is a link of the lock already, so the refusal adds nothing' => ['^1.2', new Holder(Holder::ROOT, null, null, Holder::ROOT_REQUIRE, '^2.0'), '1.2.0'];
         yield 'a hold that excludes every release above the installed one leaves no version' => ['^1.1', $require('^2.0'), null];
@@ -578,6 +579,19 @@ final class FixFinderTest extends TestCase
         $own = new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::REQUIRE, '^2.0', 'a/b');
 
         $gets = $finder->withRefused(RefusedMoves::none()->with('^1.2', [$other, $own]))->find($facts)->gets();
+
+        self::assertNotNull($gets);
+        self::assertSame('1.1.0', $gets->version());
+    }
+
+    public function testAHoldWhoseConstraintDoesNotParseLeavesTheHoldAfterIt(): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4'], ['1.2.0', '>=7.4']], ['A' => '<1.1.0']);
+        $finder = new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::fromArray(['require' => ['a/b' => '^1.0']])));
+        $unparsed = new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::REQUIRE, 'not a constraint', 'a/b');
+        $own = new Holder(Holder::PACKAGE, 'd/d', '1.0.0', Holder::REQUIRE, '^2.0', 'a/b');
+
+        $gets = $finder->withRefused(RefusedMoves::none()->with('^1.2', [$unparsed, $own]))->find($facts)->gets();
 
         self::assertNotNull($gets);
         self::assertSame('1.1.0', $gets->version());

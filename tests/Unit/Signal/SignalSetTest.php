@@ -8,6 +8,7 @@ use Lockrot\Clock;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
+use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
 use Lockrot\Signal\SignalSet;
@@ -45,6 +46,14 @@ final class SignalSetTest extends TestCase
         $signals = $set->evaluate(FactsBuilder::facts(FactsBuilder::package()));
 
         self::assertSame([Signal::S1, Signal::S3, Signal::S6], array_map(static fn (Signal $s): string => $s->id(), $signals));
+    }
+
+    public function testTheDefaultSetNamesItsS10Rule(): void
+    {
+        $set = SignalSet::default(Clock::fixed('2026-10-01T00:00:00+00:00'), new Thresholds(), '8.4', PhpReleaseDates::load());
+
+        self::assertInstanceOf(NotCheckedRule::class, $set->notChecked());
+        self::assertNull((new SignalSet([]))->notChecked());
     }
 
     public function testTheDefaultSetKeepsTheTargetAndTheProjectPhpForTheFixKinds(): void
