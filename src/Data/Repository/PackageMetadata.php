@@ -603,7 +603,12 @@ final class PackageMetadata
         $releaseReadingVersion = $this->releaseReadingVersion;
         $releaseReadingDatedBy = $this->releaseReadingDatedBy;
         $readingSharesItsCommit = $this->lastStableSharesItsCommit;
-        if (\in_array($highestBranch, $datedBranches, true)) {
+        // Ruling R17-D1: the parent dates stable tags only, so an undated pre-release above them keeps S2 unknown.
+        // A dated pre-release on a shared commit is not undated: it can only block a newer reading (ruling R16-26).
+        $undatedPreRelease = $releaseReadingAt === null && $releaseReadingVersion !== null
+            && VersionParser::parseStability($releaseReadingVersion) !== 'stable'
+            && ($this->newestPreRelease === null || $this->newestPreRelease[1] !== $releaseReadingVersion);
+        if (!$undatedPreRelease && \in_array($highestBranch, $datedBranches, true)) {
             $releaseReadingAt = $lastStableReleaseAt;
             $releaseReadingVersion = $lastStableVersion;
             $releaseReadingDatedBy = $lastStableDatedBy;
@@ -611,7 +616,7 @@ final class PackageMetadata
         $highest = $byBranch[$highestBranch] ?? null;
         // Read the highest row's own date only when a shared commit hid it. An undated highest tag, a
         // pre-release included, keeps the reading unknown.
-        if ($releaseReadingAt === null && $this->lastStableSharesItsCommit && $highest !== null && $highest['highest']['at'] !== null) {
+        if (!$undatedPreRelease && $releaseReadingAt === null && $this->lastStableSharesItsCommit && $highest !== null && $highest['highest']['at'] !== null) {
             $releaseReadingAt = $highest['highest']['at'];
             $releaseReadingVersion = $highest['highest']['pretty'];
             // A parent-dated row dates its highest tag too, or the walk below reads the row's newer parent date.
