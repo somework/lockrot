@@ -122,8 +122,9 @@ line instead ([install-time.md](install-time.md#never-fails-the-install)).
   ([`config-2.json`](https://lockrot.dev/schema/config-2.json), see [schema.md](schema.md)).
   Integer keys take JSON integers: `3`, not `"3"`.
 - `format` accepts only the values its [key row](#extralockrot-keys) lists.
-- One run names each refusal of `fail-on` and of `ignore[].flags` first. Then it names each schema
-  error of the values that those checks did not refuse. A check of an `ignore[]` entry after the
+- One run names each refusal of `fail-on`, of `ignore[].flags` and of an `accept-unchecked[]`
+  `repository` (a user name or a password) first. Then it names each schema error of the values
+  that those checks did not refuse. A check of an `ignore[]` entry after the
   schema, such as a date in `expires` that does not exist, stops at the first refusal.
 - An empty `--fail-on=`, `--baseline=` or `--target-php=` is an error, never a fall-back to the next source.
 - When Composer refuses composer.json, lockrot reads release metadata and the abandoned ignore list
@@ -409,7 +410,7 @@ names, for one of three reasons:
 |---|---|---|
 | `host_not_supported` | The repository is on a host that lockrot cannot ask, such as a Forgejo, Gitea or Subversion host | `host`, `repository` or `package` |
 | `no_feed` | No configured Composer repository publishes advisories, such as a mirror without a feed | `repository` (the Composer repository) or `package` |
-| `not_from_composer_repository` | The package is installed from vcs, or from an origin that lockrot cannot tell | `host`, `repository` (its vcs URL) or `package`. For an unknown origin, by `package` |
+| `not_from_composer_repository` | The package is installed from vcs, or from an origin that lockrot cannot tell | `host`, `repository` (its vcs URL) or `package`. For an unknown origin, by `package`, and by `host` or `repository` too when the lock gives a source URL |
 
 Every other reason stays S10, whatever the list says: `offline`, `rate_limit`, `lookup_failed`,
 `install_time_budget`, `undated_releases`, `releases_unknown` and the rest. A rerun with a token
@@ -424,7 +425,8 @@ on every run ([What `--fail-on=unchecked` fails on](ci.md#what-unchecked-fails-o
   `https://deploy:secret@…` and `ssh://git@…` are errors, because a user name can be a token. Write
   an ssh source as `ssh://host:2222/path`. A URL without a scheme is the scp form, which names its
   user (`git@host:path`). lockrot compares the host and port without case, then the path, without
-  the scheme, a trailing `/` and `.git`. A port with leading zeros (`:0443`) or the default port of
+  the scheme, a trailing `/` and `.git`. A query and a fragment stay significant, so
+  `https://github.com/acme/fork?x` does not match `https://github.com/acme/fork`. A port with leading zeros (`:0443`) or the default port of
   the scheme (`https://host:443`, `ssh://host:22`) matches the same host and URL without it. The
   scp form `git@host:path` matches too. The default ports are 80 for http, 443 for https, 22 for
   ssh and 9418 for git. A package installed from a `file://` URL is accepted only by `package`.
