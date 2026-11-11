@@ -120,6 +120,9 @@ final class PackageMetadata
     private ?string $newestPhp = null;
     private bool $highestBranchDatedByParent = false;
 
+    /** Whether the highest non-dev tag is a pre-release with no `time`: ruling R17-D1 keeps the S2 reading unknown. */
+    private bool $highestTagIsUndatedPreRelease = false;
+
     /**
      * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string}> $latestStableByBranch
      * @param list<string>                                                                                                                                                   $replaces
@@ -391,6 +394,8 @@ final class PackageMetadata
         $metadata->newestVersion = $newestVersion;
         $metadata->newestAt = $newestAt;
         $metadata->hasTag = $hasTag;
+        $metadata->highestTagIsUndatedPreRelease = $highestStable !== null && $highestStable->getReleaseDate() === null
+            && VersionParser::parseStability($highestStable->getVersion()) !== 'stable';
         if ($installedVersion !== null) {
             $metadata->keepReleases($versions, $stable, $sharedCommitVersions, $dataDate, $installedVersion);
         }
@@ -604,10 +609,8 @@ final class PackageMetadata
         $releaseReadingDatedBy = $this->releaseReadingDatedBy;
         $readingSharesItsCommit = $this->lastStableSharesItsCommit;
         // Ruling R17-D1: the parent dates stable tags only, so an undated pre-release above them keeps S2 unknown.
-        // A dated pre-release on a shared commit is not undated: it can only block a newer reading (ruling R16-26).
-        $undatedPreRelease = $releaseReadingAt === null && $releaseReadingVersion !== null
-            && VersionParser::parseStability($releaseReadingVersion) !== 'stable'
-            && ($this->newestPreRelease === null || $this->newestPreRelease[1] !== $releaseReadingVersion);
+        // A pre-release with a shared commit's date has a date: it blocks only a newer reading (ruling R16-26).
+        $undatedPreRelease = $this->highestTagIsUndatedPreRelease;
         if (!$undatedPreRelease && \in_array($highestBranch, $datedBranches, true)) {
             $releaseReadingAt = $lastStableReleaseAt;
             $releaseReadingVersion = $lastStableVersion;
@@ -684,6 +687,7 @@ final class PackageMetadata
         $dated->newestAt = $newestAt;
         $dated->newestPhp = $newestPhp;
         $dated->hasTag = $this->hasTag;
+        $dated->highestTagIsUndatedPreRelease = $this->highestTagIsUndatedPreRelease;
         $dated->highestBranchDatedByParent = \in_array($highestBranch, $datedBranches, true);
         $dated->releasesAbove = $this->releasesAbove === null ? null : array_map(
             static fn (StableRelease $release): StableRelease => $release->sharedCommit() ? $release->withDate($parent->releaseDateOf($release->normalized())) : $release,

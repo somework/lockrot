@@ -143,6 +143,35 @@ final class SplitParentDatesTest extends TestCase
         }
     }
 
+    /**
+     * Rulings R16-26 and R17-D1: v14.0.0-beta1 has a date, a shared commit's lower bound, so it is not
+     * undated. That bound is older than the RC below it, so S2 reads the RC.
+     */
+    public function testADatedPreReleaseOnASharedCommitAboveANewerDatedPreReleaseDoesNotBlockTheParentDatedReading(): void
+    {
+        $now = '2026-09-14T00:00:00+00:00';
+        $split = self::metadata('acme/split', [
+            ['v13.29.0', 'c-shared', '2021-03-01T00:00:00+00:00'],
+            ['v13.29.1', 'c-shared', '2021-03-01T00:00:00+00:00'],
+            ['v13.29.2', 'c-shared', '2021-03-01T00:00:00+00:00'],
+            ['v13.30.0', 'c1330', null],
+            ['v13.31.0', 'c1331', null],
+            ['v13.32.0-RC1', 'c-rc', '2021-05-01T00:00:00+00:00'],
+            ['v14.0.0-beta1', 'c-shared', '2021-03-01T00:00:00+00:00'],
+        ], $now, 'v13.30.0');
+        $parent = self::metadata('acme/mono', [
+            ['v13.30.0', 'm1330', '2021-01-01T00:00:00+00:00'],
+            ['v13.31.0', 'm1331', '2021-02-01T00:00:00+00:00'],
+        ], $now, null, ['acme/split' => 'self.version']);
+        $package = FactsBuilder::package(['name' => 'acme/split', 'version' => 'v13.30.0', 'time' => '2021-01-01T00:00:00+00:00']);
+
+        [$levels, $causes, $dates] = self::signals(new PackageFacts($package, $split->datedBy($parent), FactsBuilder::activity(false, '2026-09-01T00:00:00+00:00')), $now);
+
+        self::assertSame(Signal::LEVEL_HIGH, $levels[Signal::S2] ?? null);
+        self::assertSame(['2021-05-01', null], $dates[Signal::S2] ?? null);
+        self::assertSame([], $causes);
+    }
+
     /** @return iterable<string, array{bool, array<string, string>, string, array{string, string}}> */
     public static function provideSplitsWhoseInstalledSharedTagTheParentDates(): iterable
     {
