@@ -14,10 +14,10 @@ namespace Lockrot\Data\Repository;
  */
 final class RepositoryUrl
 {
-    /** What a report quotes in place of a message PCRE could not finish reading. */
     /** A byte outside every well-formed UTF-8 sequence (RFC 3629): the valid sequences are skipped. */
     private const INVALID_UTF8 = '{(?:[\x00-\x7F]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})(*SKIP)(*FAIL)|[\x80-\xFF]}';
 
+    /** What a report quotes in place of a message PCRE could not finish reading. */
     public const WITHHELD = '(withheld: lockrot could not redact this message)';
 
     /** Where a URL starts in a text: a scheme and `://`, or `:\/\/` as JSON escapes it. */
