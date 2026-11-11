@@ -282,14 +282,18 @@ $application = new class () extends \Composer\Console\Application {
         }
 
         $probe = clone $input;
+        $unbound = null;
         try {
             $probe->bind($this->getDefinition());
         } catch (\Symfony\Component\Console\Exception\ExceptionInterface $e) {
             // Symfony's doRun() reads the command name from a half-bound input too.
+            $unbound = $e->getMessage();
         }
+        // `--help` and `-h` route to `help`, which prints help for input that no command can bind.
+        $helpAsked = $input->hasParameterOption(['--help', '-h'], true);
         $name = $this->getCommandName($probe);
         if ($name === null) {
-            return null;
+            return $helpAsked ? $unbound : null;
         }
         try {
             $command = $this->find($name);
@@ -299,9 +303,12 @@ $application = new class () extends \Composer\Console\Application {
                     $this->find($subject);
                 }
 
-                return $this->helpInputError($command, $input);
+                return $this->unreadableInput($command, $input);
             } elseif ($subject !== null && $command->getName() === 'list') {
                 $this->findNamespace($subject);
+            }
+            if ($helpAsked) {
+                return $this->unreadableInput($command, $input);
             }
         } catch (\Symfony\Component\Console\Exception\CommandNotFoundException $e) {
             return $e->getMessage();
@@ -310,14 +317,13 @@ $application = new class () extends \Composer\Console\Application {
         return null;
     }
 
-    /** `help` sets ignoreValidationErrors, so Symfony prints help for input that it cannot bind: the reason, else null. */
-    private function helpInputError(\Symfony\Component\Console\Command\Command $help, \Symfony\Component\Console\Input\InputInterface $input): ?string
+    /** `help` ignores validation errors, so Symfony prints help for input that the command cannot bind: the reason, else null. */
+    private function unreadableInput(\Symfony\Component\Console\Command\Command $command, \Symfony\Component\Console\Input\InputInterface $input): ?string
     {
         $probe = clone $input;
-        $help->mergeApplicationDefinition();
+        $command->mergeApplicationDefinition();
         try {
-            $probe->bind($help->getDefinition());
-            $probe->validate();
+            $probe->bind($command->getDefinition());
         } catch (\Symfony\Component\Console\Exception\ExceptionInterface $e) {
             return $e->getMessage();
         }

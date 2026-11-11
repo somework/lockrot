@@ -39,6 +39,9 @@ final class SourceEntryUsageErrorTest extends TestCase
         yield 'list of an unknown namespace' => [['list', 'nosuch'], 'lockrot: There are no commands defined in the "nosuch" namespace.'];
         yield 'help with an unknown option' => [['help', '--nope'], 'lockrot: The "--nope" option does not exist.'];
         yield 'help for a command with an extra argument' => [['help', 'list', 'extra'], 'lockrot: Too many arguments to "help" command, expected arguments "command_name".'];
+        yield 'an unknown option beside -h' => [['-h', '--nope'], 'lockrot: The "--nope" option does not exist.'];
+        yield 'an unknown option beside --help of the lockrot command' => [['lockrot', '-h', '--nope'], 'lockrot: The "--nope" option does not exist.'];
+        yield 'an unknown option beside -h of list' => [['list', '-h', '--nope'], 'lockrot: The "--nope" option does not exist.'];
         yield 'help for an unknown command with an extra argument' => [['help', 'nope', 'extra'], 'lockrot: Command "nope" is not defined.'];
     }
 
@@ -48,6 +51,12 @@ final class SourceEntryUsageErrorTest extends TestCase
         yield 'help for a command' => [['help', 'list']];
         yield 'help for the lockrot command' => [['help', 'lockrot']];
         yield 'list with an option and no namespace' => [['list', '--raw']];
+        yield 'the short help option' => [['-h']];
+        yield 'help with the short help option' => [['help', '-h']];
+        yield 'list with the short help option' => [['list', '-h']];
+        yield 'help with a verbosity option' => [['help', 'list', '-vvv']];
+        yield 'help with a value option' => [['help', '--format=json', 'list']];
+        yield 'help with a working directory' => [['help', '-d', '.', 'list']];
     }
 
     /**
