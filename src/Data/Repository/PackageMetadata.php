@@ -975,10 +975,10 @@ final class PackageMetadata
     }
 
     /**
-     * The newest release date of a non-dev version, pre-releases included, or the parent's date of
-     * the highest branch ({@see datedBy()}). A newest date on a line below the highest stable line
-     * gives way to that line's newest date. Null when the highest tag has no trusted date, or when
-     * the date is that of a commit its tags share.
+     * The newest trusted date of a stable tag, or the parent's date of the highest branch
+     * ({@see datedBy()}). A pre-release never counts (ruling W17-X1). A newest date on a line below
+     * the highest stable line gives way to that line's newest date. Null when the highest stable tag
+     * has no trusted date, or when the date is that of a commit its tags share.
      */
     public function lastStableReleaseAt(): ?\DateTimeImmutable
     {
@@ -1039,9 +1039,10 @@ final class PackageMetadata
     }
 
     /**
-     * The tag that {@see lastStableReleaseAt()} dates. With no trusted date, the highest non-dev tag
-     * when that one has none, else the newest-dated tag. Never a tag on a line below the highest
-     * stable line. Null only when no non-dev tag exists.
+     * The stable tag that {@see lastStableReleaseAt()} dates. With no trusted date, the highest
+     * stable tag when that one has none, else the newest-dated stable tag. Never a pre-release
+     * (ruling W17-X1), and never a tag on a line below the highest stable line. Null only when no
+     * stable tag exists (ruling R17-X1a).
      */
     public function lastStableVersion(): ?string
     {
