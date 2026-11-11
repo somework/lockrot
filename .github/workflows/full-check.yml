@@ -25,7 +25,7 @@ jobs:
     outputs:
       shards: ${{ steps.subset.outputs.shards }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: subset
         env: {REF: '${{ github.ref_name }}'}
         # An assignment, not `echo "shards=$(...)"`: bash -e stops on the script's failure only there.
@@ -38,7 +38,7 @@ jobs:
     needs: subset
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/mutation-coverage
   mutation:
     needs: [subset, mutation-coverage]
@@ -66,7 +66,7 @@ jobs:
         run: echo "The branch name leaves this shard out of the full check, so it mutates nothing." >> "$GITHUB_STEP_SUMMARY"
       # The release rehearsal diffs the commit against main: it needs the history down to the merge base.
       - if: contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with: {fetch-depth: 0}
       - if: contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)
         uses: ./.github/actions/mutation-shard
@@ -86,13 +86,13 @@ jobs:
           status=0; python3 tools/mutation/pr_gate.py --paths "$FILTER" --changed "$base" build/infection.json tests/infection-equivalents.md > rehearsal.md || status=$?
           cat rehearsal.md >> "$GITHUB_STEP_SUMMARY"; cat rehearsal.md; exit $status
       - if: always() && contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with: {name: 'infection (${{ matrix.shard.name }})', path: 'build/infection*.*', if-no-files-found: ignore}
   # ci.yml's move-check-oracle job gives its reason.
   move-check-oracle:
     runs-on: ubuntu-latest
     steps:
       # composer update runs package code, and no later step needs the token.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with: {persist-credentials: false}
       - uses: ./.github/actions/move-check-oracle
