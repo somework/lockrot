@@ -597,6 +597,18 @@ final class FixFinderTest extends TestCase
         self::assertSame('1.1.0', $gets->version());
     }
 
+    public function testAReleaseThatARefusalCapsDoesNotHideAHigherFreeRelease(): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4'], ['1.2.0', '>=7.4']], ['A' => '<1.1.0']);
+        $finder = (new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::empty())))
+            ->withRefused(RefusedMoves::none()->with('~1.1.0', [new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::REQUIRE, '^2.0')]));
+
+        $gets = $finder->find($facts)->gets();
+
+        self::assertNotNull($gets);
+        self::assertSame(['1.2.0', false], [$gets->version(), $gets->isCapped()]);
+    }
+
     /** `at()` knows every release above the installed one, not only the lowest. */
     public function testGetsAtAMiddleReleaseGivesThatReleasesOwnFacts(): void
     {

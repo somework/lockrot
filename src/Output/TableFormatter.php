@@ -231,17 +231,14 @@ final class TableFormatter implements FormatterInterface
         return $lines;
     }
 
-    /** Commands the footer names: one thing to copy, so each stays on one line and can overflow. */
-    private const COMMANDS = ['composer audit'];
-
     /**
-     * @param list<string> $commands more commands that $text names, before the neutraliser
+     * @param list<string> $commands the commands that $text names, before the neutraliser: each stays on one line
      *
      * @return list<string>
      */
     private static function wrapKeepingCommands(string $text, int $wrap, array $commands = []): array
     {
-        $commands = array_merge(self::COMMANDS, array_map([TerminalText::class, 'neutralise'], $commands));
+        $commands = array_map([TerminalText::class, 'neutralise'], $commands);
         $glued = [];
         foreach ($commands as $command) {
             $glued[] = str_replace(' ', "\x1F", $command);
