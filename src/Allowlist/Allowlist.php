@@ -27,12 +27,22 @@ final class Allowlist
         $this->finishedTypes = $finishedTypes;
     }
 
+    /**
+     * A name entry wins, unless it accepts only some flags and the package has a finished type: the
+     * type entry accepts every maintenance flag, so the narrower name entry would add nothing but a
+     * loss.
+     */
     public function match(LockedPackage $package, ?PackageMetadata $metadata, \DateTimeImmutable $now): ?AllowlistEntry
     {
+        $byName = null;
         foreach ($this->entries as $entry) {
             if (!$entry->isExpired($now) && $entry->matches($package->name(), $package->version())) {
-                return $entry;
+                $byName = $entry;
+                break;
             }
+        }
+        if ($byName !== null && $byName->acceptsAll()) {
+            return $byName;
         }
         foreach ([$package->type(), $metadata !== null ? $metadata->type() : null] as $type) {
             if ($type !== null && \in_array($type, $this->finishedTypes, true)) {
@@ -40,7 +50,7 @@ final class Allowlist
             }
         }
 
-        return null;
+        return $byName;
     }
 
     /** A type that both sides list stays twice: {@see match()} only asks `in_array()`. */

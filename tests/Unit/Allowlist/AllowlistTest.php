@@ -59,6 +59,35 @@ final class AllowlistTest extends TestCase
         self::assertNull($list->match(F::package(), F::metadata([['1.0.0', '2020-01-01']]), $this->now));
     }
 
+    /** A partial project entry only narrows what it adds: the type entry still accepts every other flag. */
+    public function testAPartialProjectEntryOnAFinishedTypeKeepsTheTypeAcceptance(): void
+    {
+        $partial = new AllowlistEntry('acme/app-pack', null, 'r', null, AllowlistEntry::BY_PROJECT, ['stale']);
+        $list = new Allowlist([$partial]);
+
+        $entry = $list->match(F::package(['name' => 'acme/app-pack', 'type' => 'symfony-pack']), null, $this->now);
+
+        self::assertNotNull($entry);
+        self::assertSame(AllowlistEntry::BY_TYPE, $entry->by());
+        self::assertTrue($entry->acceptsAll());
+        self::assertTrue($entry->accepts('old-promise'));
+    }
+
+    public function testAPartialProjectEntryOnAnOrdinaryPackageStaysTheEntry(): void
+    {
+        $partial = new AllowlistEntry('acme/lib', null, 'r', null, AllowlistEntry::BY_PROJECT, ['stale']);
+        $list = new Allowlist([$partial]);
+
+        self::assertSame($partial, $list->match(F::package(['name' => 'acme/lib', 'type' => 'library']), null, $this->now));
+    }
+
+    public function testAProjectEntryForEveryFlagOnAFinishedTypeStaysTheEntry(): void
+    {
+        $all = new AllowlistEntry('acme/app-pack', null, 'r', null, AllowlistEntry::BY_PROJECT);
+
+        self::assertSame($all, (new Allowlist([$all]))->match(F::package(['name' => 'acme/app-pack', 'type' => 'symfony-pack']), null, $this->now));
+    }
+
     public function testAnEntryWritesWhoAcceptedAndWhoseWordsTheReasonIs(): void
     {
         $project = new AllowlistEntry('tubalmartin/cssmin', null, 'a single-file minifier, finished', new \DateTimeImmutable('2027-03-31T23:59:59+00:00'), AllowlistEntry::BY_PROJECT, ['stale']);
