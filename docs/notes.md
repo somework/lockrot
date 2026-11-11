@@ -207,6 +207,9 @@ release age (S2 and no S1), and only up to a budget of them
   skipped counts as one number.
 - Findings: S10 `no_token` on the non-candidates, `anonymous_budget` on the candidates beyond the
   budget.
+- The GitHub sentence names `LOCKROT_GITHUB_TOKEN` alone when `GITHUB_SERVER_URL` or `GH_HOST`
+  does not name github.com alone, because lockrot does not send `GITHUB_TOKEN` to github.com from
+  that runner. If you set `GITHUB_TOKEN` there, the sentence starts "GITHUB_TOKEN withheld".
 - `sets_network_failures`: no.
 
 ### Rate limited {#repository_activity_rate_limited}

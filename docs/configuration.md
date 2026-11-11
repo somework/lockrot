@@ -355,6 +355,8 @@ after the built-in list, so a package that the built-in list matches keeps the b
   shape, such as `"flags": "stale"`, is exit `2`.
 - A finding's `allowlist` says who accepted its flags: `builtin`, `project` or `type`, with the
   reason and the flags the entry lists.
+- A package of Composer type `metapackage` or `symfony-pack` keeps its `type` entry when your entry
+  lists only some `flags`, because the `type` entry accepts every maintenance flag.
 
 ### Composer's abandoned ignore list {#composer-abandoned-ignore}
 

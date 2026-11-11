@@ -13,8 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that tag for S2, S5 and S8. S10 `release_dates` names no cause that the parent resolved, so
   `stale` and `left-behind` can fire on such a split.
   ([Dates from the monorepo](docs/verdicts.md#dates-from-the-monorepo))
-- **All formats:** a newest pre-release on a commit that three or more stable tags share keeps S2
-  unknown, with an S10 `release_dates` entry, also when a monorepo parent is present.
+- **All formats:** a newest pre-release with no date, or on a commit that three or more stable tags
+  share, keeps S2 unknown, with an S10 `release_dates` entry, also when a monorepo parent is present.
   ([Dates from the monorepo](docs/verdicts.md#dates-from-the-monorepo))
 - **All formats:** libyears end at the highest stable tag. A pre-release never ends libyears,
   dated or not, so a package whose newest tag is a pre-release reads fewer libyears (roots/wp-config
@@ -274,6 +274,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** the move check gives the answers of the Composer that runs lockrot. On Composer
   2.11, advisory blocking skips a root alias such as `dev-main as 1.0.0`. It checks a numeric branch
   such as `1.x-dev`. The move check does not apply the cooldown policy of Composer 2.11.
+  ([The move check](docs/verdicts.md#the-move-check))
+- **All formats:** the move check solves as `composer update` does for a root that
+  `extra.branch-alias` aliases, and for a name in both `require` and `require-dev`: a move that only
+  the `require-dev` constraint admits reads refused, as Composer's second solve over `require` does.
   ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** the move check runs no Composer plugin. In a project with symfony/flex,
   `extra.symfony.require` or `SYMFONY_REQUIRE` limits Composer's `symfony/*` versions, so a move
@@ -609,7 +613,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   else its constraint. A move with none of them writes no clause, not an empty name.
   ([The move](docs/verdicts.md#move))
 - **CLI:** the PHAR and `vendor/bin/lockrot` exit `2` with a `lockrot:` line on an unknown command,
-  a `--working-dir` that does not exist, and a bad argument to `help` or `list`, not `1`. In plugin
+  a `--working-dir` that does not exist, and a bad argument or option to `help` or `list`, not `1`. In plugin
   mode, Composer still exits `1` for them. ([Exit codes](docs/ci.md#exit-codes))
 - **CLI:** `--explain` prints the footnote "so S8 does not measure the branch" only when S8 did
   not measure the installed branch because of its undated releases.
@@ -618,8 +622,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `COMPOSER_POLICY_ADVISORIES_BLOCK=1` turns the blocking on again after `policy.advisories: false`,
   so the note agrees with `run.move_check.blocks_advisories`.
   ([advisories_disabled_by_policy](docs/notes.md#advisories_disabled_by_policy))
-- **Config:** an `extra.lockrot.target-php` that is no version, or that names a PHP minor that
-  lockrot does not know, exits `2` also when `--target-php` or `LOCKROT_TARGET_PHP` overrides it.
+- **Config:** an `extra.lockrot.target-php` that is no version, that has text before or after the
+  version (a trailing newline included), or that names a PHP minor that lockrot does not know,
+  exits `2` also when `--target-php` or `LOCKROT_TARGET_PHP` overrides it.
   ([Validation](docs/configuration.md#validation))
 - **CLI:** beside a `composer.json`, a `composer.lock` that is not valid JSON or whose root is not
   a JSON object exits `2` with the `lockrot:` message of the lock, not with a Composer type error or
@@ -648,6 +653,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **sarif:** `originalUriBaseIds.%SRCROOT%.uri` is `file:///` for a project in `/` and
   `file://server/share/proj/` for one on a UNC share. It read `file:////` and `file:///server/…`.
 - **All formats:** the anonymous cap note counts one package in the singular ("1 candidate package").
+- **All formats:** on a runner whose `GITHUB_SERVER_URL` or `GH_HOST` names another host, the
+  GitHub anonymous cap note names only `LOCKROT_GITHUB_TOKEN` as the fix. When lockrot withheld
+  `GITHUB_TOKEN`, the note says so. ([Anonymous cap](docs/notes.md#repository_activity_anonymous_cap))
+- **Config:** an `ignore` entry that lists only some `flags` of a `metapackage` or `symfony-pack`
+  package keeps the `type` entry, so the other maintenance flags of that package stay accepted.
+  ([Your own entries](docs/configuration.md#your-own-entries))
+- **sarif, gitlab, github:** the line of a package stays on its lock entry when a root key of the
+  lock holds an escaped quote.
 - **All formats:** `age.release`, `branches[].newest_dated` and S8's `newest_branch` and
   `reachable_branch` name the higher version or branch when two releases share a date. A Composer
   repository that lists its versions in ascending order gave the lower one.
