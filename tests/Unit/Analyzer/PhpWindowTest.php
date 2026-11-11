@@ -347,7 +347,7 @@ final class PhpWindowTest extends TestCase
     /** @return iterable<string, array{string}> */
     public static function composerPlatformForms(): iterable
     {
-        foreach (['v8.4.1', '8.4.1-p1', '8.4.1-pl1', '8.4.1-stable', '8.4.1.0'] as $form) {
+        foreach (['v8.4.1', '8.4.1-p1', '8.4.1-pl1', '8.4.1-stable', '8.4.1.0', '8.04.1', '8.4.01', '08.04.01', '8.04.1-p1'] as $form) {
             yield $form => [$form];
         }
     }

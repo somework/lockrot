@@ -225,6 +225,11 @@ final class LockrotConfigTest extends TestCase
         yield 'a zero in the major' => ['08.4.1', '8.4'];
         yield 'a zero minor stays' => ['8.0.1', '8.0'];
         yield 'a double zero minor' => ['8.00.1', '8.0'];
+        yield 'a patch suffix' => ['8.04.1-p1', '8.4'];
+        yield 'a stability suffix' => ['8.04.1-RC1', '8.4'];
+        yield 'a beta suffix' => ['8.04.1-beta', '8.4'];
+        yield 'a dev suffix' => ['08.04-dev', '8.4'];
+        yield 'a dev branch' => ['8.04.x-dev', '8.4'];
     }
 
     /**

@@ -191,10 +191,10 @@ final class PhpWindow implements \JsonSerializable
         return (new VersionParser())->normalize($php);
     }
 
-    /** The `X.Y.Z` release of a stable platform php: `v8.4.1` and `8.4.1-p1` give 8.4.1. */
+    /** The `X.Y.Z` release of a stable platform php: `v8.4.1` and `8.4.1-p1` give 8.4.1, and `8.04.1` gives 8.4.1. */
     private static function releaseOf(string $php): string
     {
-        return implode('.', \array_slice(explode('.', self::normalized($php)), 0, 3));
+        return implode('.', array_map(static fn (string $segment): string => ltrim($segment, '0') ?: '0', \array_slice(explode('.', self::normalized($php)), 0, 3)));
     }
 
     /**

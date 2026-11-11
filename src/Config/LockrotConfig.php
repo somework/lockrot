@@ -336,9 +336,12 @@ final class LockrotConfig
             return null;
         }
 
-        return preg_match('{^\d+(\.\d+)*$}D', $normalized) === 1
-            ? implode('.', array_map(static fn (string $segment): string => ltrim($segment, '0') ?: '0', explode('.', $normalized)))
-            : $normalized;
+        return preg_replace_callback(
+            '{^\d+(?:\.\d+)*}',
+            static fn (array $run): string => implode('.', array_map(static fn (string $segment): string => ltrim($segment, '0') ?: '0', explode('.', $run[0]))),
+            $normalized,
+            1
+        ) ?? $normalized;
     }
 
     /** The running PHP can carry a suffix after the version, such as a distribution build's. */
