@@ -24,7 +24,7 @@ advisories: 2 packages asked · packagist.org answered (6 on record for 1 packag
 moves: not checked, because Composer's solver refuses the lock itself (see the moves_not_checked note)
 php: the lock installs on PHP 8.1 to 8.5
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
-Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with --format=json for
 details.
 note: moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move:
 typo3/html-sanitizer v2.2.0 requires acme/san-tokens ^2.0.

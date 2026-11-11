@@ -594,7 +594,7 @@
       "copy_summary": [
         "lockrot report for akaunting/akaunting · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
         "37 of 183 packages flagged (20%): 3 graded critical, 22 high, 7 medium, 5 low. Flags: abandoned 16, left-behind 7, old-promise 3, stale 10, vulnerable 4.",
-        "All 37 in production · 14 required directly, 23 pulled in · 12 security advisories on 4 packages (severity: 3 high, 6 medium, 3 low) · fix by package: 2 composer update, 2 php floor raise · 97.8 libyears behind."
+        "All 37 in production · 14 required directly, 23 pulled in · 12 security advisories on 4 packages (severity: 3 high, 6 medium, 3 low) · fix by package: 2 composer update, 2 php floor raise · 96.2 libyears behind."
       ],
       "grade_line": "Project grade: critical · 3 critical findings · 25 of 183 packages high or worse",
       "figure_line": "37 of 183 packages flagged · 126 ok · 20 finished",
@@ -836,10 +836,10 @@
         "sentence": "23 of 37 flagged packages are named by no line of composer.json; the deepest, hoa/event, hoa/stream, hoa/ustring and 1 more, sit 3 hops from the nearest line."
       },
       "libyears": {
-        "figure": "97.81",
+        "figure": "96.16",
         "bound": "",
-        "sub": "over 180 packages · 50.38 from direct requirements",
-        "unmeasured": "Not measured: 3, dated only by a commit its tags share",
+        "sub": "over 181 packages · 50.38 from direct requirements",
+        "unmeasured": "Not measured: 2, dated only by a commit its tags share",
         "top": [
           [
             "mnsami/composer-custom-directory-installer 2.0.0",
@@ -1783,7 +1783,7 @@
       "copy_summary": [
         "lockrot report for wallabag/wallabag · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
         "111 of 210 packages flagged (53%): 15 graded critical, 69 high, 22 medium, 5 low. Flags: abandoned 27, silent 10, pinned 1, left-behind 55, old-promise 18, stale 10, capped 2, vulnerable 19.",
-        "All 111 in production · 61 required directly, 50 pulled in · 60 security advisories on 19 packages (severity: 1 critical, 17 high, 27 medium, 2 unrated, 13 low) · fix by package: 17 composer update, 2 php floor raise · at least 406.6 libyears behind."
+        "All 111 in production · 61 required directly, 50 pulled in · 60 security advisories on 19 packages (severity: 1 critical, 17 high, 27 medium, 2 unrated, 13 low) · fix by package: 17 composer update, 2 php floor raise · at least 402.9 libyears behind."
       ],
       "grade_line": "Project grade: critical · 15 critical findings · 84 of 210 packages high or worse",
       "figure_line": "111 of 210 packages flagged · 80 ok · 19 finished",
@@ -2036,9 +2036,9 @@
         "sentence": "50 of 111 flagged packages are named by no line of composer.json; the deepest, hoa/ustring and hoa/zformat, sit 4 hops from the nearest line."
       },
       "libyears": {
-        "figure": "406.59",
+        "figure": "402.91",
         "bound": "at least",
-        "sub": "over 204 packages · 225.38 from direct requirements",
+        "sub": "over 204 packages · 225.13 from direct requirements",
         "unmeasured": "Not measured: 1, a branch snapshot with no release branch · 5, dated only by a commit its tags share",
         "top": [
           [
@@ -2067,11 +2067,6 @@
             "v3.4.0 (2026-02-04)"
           ],
           [
-            "smalot/pdfparser v1.1.0",
-            "5.1",
-            "v2.13.0-beta1 (2026-09-25)"
-          ],
-          [
             "symfony/monolog-bridge v5.2.12",
             "5.1",
             "v6.4.45 (2026-08-30)"
@@ -2080,6 +2075,11 @@
             "symfony/security-csrf v5.2.12",
             "4.9",
             "v8.1.0 (2026-05-29)"
+          ],
+          [
+            "symfony/serializer v5.3.12",
+            "4.8",
+            "v8.1.8 (2026-09-28)"
           ]
         ],
         "heading": "Furthest behind, top 8",
@@ -5764,8 +5764,8 @@
       "libyears": {
         "figure": "64.63",
         "bound": "",
-        "sub": "over 48 packages · 36.71 from direct requirements",
-        "unmeasured": "Not measured: 3, a branch snapshot with no release branch · 4, dated only by a commit its tags share",
+        "sub": "over 50 packages · 36.71 from direct requirements",
+        "unmeasured": "Not measured: 3, a branch snapshot with no release branch · 2, dated only by a commit its tags share",
         "top": [
           [
             "php-di/invoker 2.0.0",
@@ -6860,7 +6860,7 @@
       "copy_summary": [
         "lockrot report for pimcore/skeleton · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high,unchecked",
         "Nothing flagged in 1 package.",
-        "No security advisory."
+        "No security advisory · 0.0 libyears behind."
       ],
       "grade_line": "Project grade: nothing flagged",
       "figure_line": "0 of 1 package flagged · 1 ok · 0 finished",
@@ -6911,13 +6911,13 @@
         "sentence": null
       },
       "libyears": {
-        "figure": null,
+        "figure": "0.00",
         "bound": "",
-        "sub": "no package measured",
-        "unmeasured": "Not measured: 1, dated only by a commit its tags share",
+        "sub": "over 1 package · 0.00 from direct requirements",
+        "unmeasured": null,
         "top": [],
         "heading": null,
-        "none": null
+        "none": "Every measured package rounds to 0.0 libyears."
       },
       "radius_lead": [
         "Nothing is flagged."
@@ -9114,7 +9114,7 @@
       "copy_summary": [
         "lockrot report for wallabag/wallabag · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 7.4 · this run fails · --fail-on=high",
         "111 of 210 packages flagged (53%): 16 graded critical, 67 high, 23 medium, 5 low. Flags: abandoned 27, silent 10, pinned 1, left-behind 55, old-promise 8, stale 10, capped 2, vulnerable 19.",
-        "All 111 in production · 61 required directly, 50 pulled in · 60 security advisories on 19 packages (severity: 1 critical, 17 high, 27 medium, 2 unrated, 13 low) · fix by package: 17 composer update, 2 blocked · at least 406.6 libyears behind."
+        "All 111 in production · 61 required directly, 50 pulled in · 60 security advisories on 19 packages (severity: 1 critical, 17 high, 27 medium, 2 unrated, 13 low) · fix by package: 17 composer update, 2 blocked · at least 402.9 libyears behind."
       ],
       "grade_line": "Project grade: critical · 16 critical findings · 83 of 210 packages high or worse",
       "figure_line": "111 of 210 packages flagged · 80 ok · 19 finished",
@@ -9367,9 +9367,9 @@
         "sentence": "50 of 111 flagged packages are named by no line of composer.json; the deepest, hoa/ustring and hoa/zformat, sit 4 hops from the nearest line."
       },
       "libyears": {
-        "figure": "406.59",
+        "figure": "402.91",
         "bound": "at least",
-        "sub": "over 204 packages · 225.38 from direct requirements",
+        "sub": "over 204 packages · 225.13 from direct requirements",
         "unmeasured": "Not measured: 1, a branch snapshot with no release branch · 5, dated only by a commit its tags share",
         "top": [
           [
@@ -9398,11 +9398,6 @@
             "v3.4.0 (2026-02-04)"
           ],
           [
-            "smalot/pdfparser v1.1.0",
-            "5.1",
-            "v2.13.0-beta1 (2026-09-25)"
-          ],
-          [
             "symfony/monolog-bridge v5.2.12",
             "5.1",
             "v6.4.45 (2026-08-30)"
@@ -9411,6 +9406,11 @@
             "symfony/security-csrf v5.2.12",
             "4.9",
             "v8.1.0 (2026-05-29)"
+          ],
+          [
+            "symfony/serializer v5.3.12",
+            "4.8",
+            "v8.1.8 (2026-09-28)"
           ]
         ],
         "heading": "Furthest behind, top 8",
@@ -11044,7 +11044,7 @@
       "copy_summary": [
         "lockrot report for djaiss/monica · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run passes · --fail-on=high",
         "4 of 25 packages flagged (16%): 2 graded medium, 2 low. Flags: old-promise 1, stale 1, capped 2.",
-        "All 4 in production · 1 required directly, 3 pulled in · no security advisory · 36.3 libyears behind."
+        "All 4 in production · 1 required directly, 3 pulled in · no security advisory · 31.2 libyears behind."
       ],
       "grade_line": "Project grade: medium · 2 medium findings · 0 of 25 packages high or worse",
       "figure_line": "4 of 25 packages flagged · 13 ok · 8 finished",
@@ -11210,9 +11210,9 @@
         "sentence": "3 of 4 flagged packages are named by no line of composer.json; the deepest, nette/schema, sits 3 hops from the nearest line."
       },
       "libyears": {
-        "figure": "36.34",
+        "figure": "31.23",
         "bound": "",
-        "sub": "over 22 packages · 8.87 from direct requirements",
+        "sub": "over 22 packages · 7.57 from direct requirements",
         "unmeasured": "Not measured: 3, undated releases",
         "top": [
           [
@@ -11236,24 +11236,24 @@
             "2.4.1 (2026-06-15)"
           ],
           [
-            "nette/schema v1.3.2",
-            "2.7",
-            "v1.3.6 (2026-08-16)"
-          ],
-          [
             "doctrine/lexer 3.0.1",
             "2.7",
             "3.0.3 (2026-10-01)"
           ],
           [
-            "moneyphp/money v4.7.1",
-            "2.2",
-            "v4.9.0 (2026-05-04)"
-          ],
-          [
             "fruitcake/php-cors v1.3.0",
             "2.1",
             "v1.4.0 (2025-12-03)"
+          ],
+          [
+            "nette/schema v1.3.2",
+            "1.9",
+            "v1.3.6 (2026-08-16)"
+          ],
+          [
+            "doctrine/inflector 2.0.10",
+            "1.5",
+            "2.1.0 (2025-08-10)"
           ]
         ],
         "heading": "Furthest behind, top 8",
@@ -11369,7 +11369,7 @@
       "copy_summary": [
         "lockrot report for djaiss/monica · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.5 · this run passes · --fail-on=high",
         "4 of 25 packages flagged (16%): 2 graded medium, 2 low. Flags: old-promise 1, stale 1, capped 2.",
-        "All 4 in production · 1 required directly, 3 pulled in · no security advisory · 36.3 libyears behind."
+        "All 4 in production · 1 required directly, 3 pulled in · no security advisory · 31.2 libyears behind."
       ],
       "grade_line": "Project grade: medium · 2 medium findings · 0 of 25 packages high or worse",
       "figure_line": "4 of 25 packages flagged · 13 ok · 8 finished",
@@ -11535,9 +11535,9 @@
         "sentence": "3 of 4 flagged packages are named by no line of composer.json; the deepest, nette/schema, sits 3 hops from the nearest line."
       },
       "libyears": {
-        "figure": "36.34",
+        "figure": "31.23",
         "bound": "",
-        "sub": "over 22 packages · 8.87 from direct requirements",
+        "sub": "over 22 packages · 7.57 from direct requirements",
         "unmeasured": "Not measured: 3, undated releases",
         "top": [
           [
@@ -11561,24 +11561,24 @@
             "2.4.1 (2026-06-15)"
           ],
           [
-            "nette/schema v1.3.2",
-            "2.7",
-            "v1.3.6 (2026-08-16)"
-          ],
-          [
             "doctrine/lexer 3.0.1",
             "2.7",
             "3.0.3 (2026-10-01)"
           ],
           [
-            "moneyphp/money v4.7.1",
-            "2.2",
-            "v4.9.0 (2026-05-04)"
-          ],
-          [
             "fruitcake/php-cors v1.3.0",
             "2.1",
             "v1.4.0 (2025-12-03)"
+          ],
+          [
+            "nette/schema v1.3.2",
+            "1.9",
+            "v1.3.6 (2026-08-16)"
+          ],
+          [
+            "doctrine/inflector 2.0.10",
+            "1.5",
+            "2.1.0 (2025-08-10)"
           ]
         ],
         "heading": "Furthest behind, top 8",
@@ -11696,7 +11696,7 @@
       "copy_summary": [
         "lockrot report for djaiss/monica · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.5 · this run passes · --fail-on=high",
         "4 of 25 packages flagged (16%): 2 graded medium, 2 low. Flags: old-promise 1, stale 1, capped 2.",
-        "All 4 in production · 1 required directly, 3 pulled in · no security advisory · 36.3 libyears behind."
+        "All 4 in production · 1 required directly, 3 pulled in · no security advisory · 31.2 libyears behind."
       ],
       "grade_line": "Project grade: medium · 2 medium findings · 0 of 25 packages high or worse",
       "figure_line": "4 of 25 packages flagged · 13 ok · 8 finished",
@@ -11862,9 +11862,9 @@
         "sentence": "3 of 4 flagged packages are named by no line of composer.json; the deepest, nette/schema, sits 3 hops from the nearest line."
       },
       "libyears": {
-        "figure": "36.34",
+        "figure": "31.23",
         "bound": "",
-        "sub": "over 22 packages · 8.87 from direct requirements",
+        "sub": "over 22 packages · 7.57 from direct requirements",
         "unmeasured": "Not measured: 3, undated releases",
         "top": [
           [
@@ -11888,24 +11888,24 @@
             "2.4.1 (2026-06-15)"
           ],
           [
-            "nette/schema v1.3.2",
-            "2.7",
-            "v1.3.6 (2026-08-16)"
-          ],
-          [
             "doctrine/lexer 3.0.1",
             "2.7",
             "3.0.3 (2026-10-01)"
           ],
           [
-            "moneyphp/money v4.7.1",
-            "2.2",
-            "v4.9.0 (2026-05-04)"
-          ],
-          [
             "fruitcake/php-cors v1.3.0",
             "2.1",
             "v1.4.0 (2025-12-03)"
+          ],
+          [
+            "nette/schema v1.3.2",
+            "1.9",
+            "v1.3.6 (2026-08-16)"
+          ],
+          [
+            "doctrine/inflector 2.0.10",
+            "1.5",
+            "2.1.0 (2025-08-10)"
           ]
         ],
         "heading": "Furthest behind, top 8",
@@ -12023,7 +12023,7 @@
       "copy_summary": [
         "lockrot report for mautic/mautic · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.2 · this run fails · --fail-on=high",
         "25 of 188 packages flagged (13%): 6 graded high, 11 medium, 8 low. Flags: abandoned 2, silent 2, pinned 1, left-behind 10, old-promise 5, stale 8, capped 1, vulnerable 1.",
-        "All 25 in production · 2 required directly, 23 pulled in · 1 security advisory on 1 package (severity: 1 low) · fix by package: 1 composer update · 156.4 libyears behind."
+        "All 25 in production · 2 required directly, 23 pulled in · 1 security advisory on 1 package (severity: 1 low) · fix by package: 1 composer update · 154.7 libyears behind."
       ],
       "grade_line": "Project grade: high · 6 high findings · 6 of 188 packages high or worse",
       "figure_line": "25 of 188 packages flagged · 138 ok · 25 finished",
@@ -12230,10 +12230,10 @@
         "sentence": "23 of 25 flagged packages are named by no line of composer.json; the deepest, brick/math, doctrine/cache, intervention/image and 11 more, sit 2 hops from the nearest line."
       },
       "libyears": {
-        "figure": "156.35",
+        "figure": "154.70",
         "bound": "",
-        "sub": "over 182 packages · 2.86 from direct requirements",
-        "unmeasured": "Not measured: 1, not from a Composer repository · 5, dated only by a commit its tags share",
+        "sub": "over 184 packages · 2.86 from direct requirements",
+        "unmeasured": "Not measured: 1, not from a Composer repository · 3, dated only by a commit its tags share",
         "top": [
           [
             "ip2location/ip2location-php 7.2.5",
@@ -13048,7 +13048,7 @@
       "copy_summary": [
         "lockrot report for wallabag/wallabag · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 7.4 · this run fails · --fail-on=high",
         "110 of 210 packages flagged (52%): 16 graded critical, 67 high, 22 medium, 5 low. Flags: abandoned 27, silent 10, pinned 1, left-behind 55, old-promise 8, stale 10, capped 1, vulnerable 19.",
-        "All 110 in production · 60 required directly, 50 pulled in · 60 security advisories on 19 packages (severity: 1 critical, 17 high, 27 medium, 2 unrated, 13 low) · fix by package: 17 composer update, 2 blocked · at least 406.6 libyears behind."
+        "All 110 in production · 60 required directly, 50 pulled in · 60 security advisories on 19 packages (severity: 1 critical, 17 high, 27 medium, 2 unrated, 13 low) · fix by package: 17 composer update, 2 blocked · at least 402.9 libyears behind."
       ],
       "grade_line": "Project grade: critical · 16 critical findings · 83 of 210 packages high or worse",
       "figure_line": "110 of 210 packages flagged · 80 ok · 20 finished",
@@ -13301,9 +13301,9 @@
         "sentence": "50 of 110 flagged packages are named by no line of composer.json; the deepest, hoa/ustring and hoa/zformat, sit 4 hops from the nearest line."
       },
       "libyears": {
-        "figure": "406.59",
+        "figure": "402.91",
         "bound": "at least",
-        "sub": "over 204 packages · 225.38 from direct requirements",
+        "sub": "over 204 packages · 225.13 from direct requirements",
         "unmeasured": "Not measured: 1, a branch snapshot with no release branch · 5, dated only by a commit its tags share",
         "top": [
           [
@@ -13332,11 +13332,6 @@
             "v3.4.0 (2026-02-04)"
           ],
           [
-            "smalot/pdfparser v1.1.0",
-            "5.1",
-            "v2.13.0-beta1 (2026-09-25)"
-          ],
-          [
             "symfony/monolog-bridge v5.2.12",
             "5.1",
             "v6.4.45 (2026-08-30)"
@@ -13345,6 +13340,11 @@
             "symfony/security-csrf v5.2.12",
             "4.9",
             "v8.1.0 (2026-05-29)"
+          ],
+          [
+            "symfony/serializer v5.3.12",
+            "4.8",
+            "v8.1.8 (2026-09-28)"
           ]
         ],
         "heading": "Furthest behind, top 8",
@@ -14965,7 +14965,7 @@
       "copy_summary": [
         "lockrot report for djaiss/monica · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.5 · this run passes · --fail-on=high",
         "4 of 25 packages flagged (16%): 2 graded medium, 2 low. Flags: old-promise 1, stale 1, capped 2.",
-        "All 4 in production · 1 required directly, 3 pulled in · no security advisory · 36.3 libyears behind."
+        "All 4 in production · 1 required directly, 3 pulled in · no security advisory · 31.2 libyears behind."
       ],
       "grade_line": "Project grade: medium · 2 medium findings · 0 of 25 packages high or worse",
       "figure_line": "4 of 25 packages flagged · 13 ok · 8 finished",
@@ -15131,9 +15131,9 @@
         "sentence": "3 of 4 flagged packages are named by no line of composer.json; the deepest, nette/schema, sits 3 hops from the nearest line."
       },
       "libyears": {
-        "figure": "36.34",
+        "figure": "31.23",
         "bound": "",
-        "sub": "over 22 packages · 8.87 from direct requirements",
+        "sub": "over 22 packages · 7.57 from direct requirements",
         "unmeasured": "Not measured: 3, undated releases",
         "top": [
           [
@@ -15157,24 +15157,24 @@
             "2.4.1 (2026-06-15)"
           ],
           [
-            "nette/schema v1.3.2",
-            "2.7",
-            "v1.3.6 (2026-08-16)"
-          ],
-          [
             "doctrine/lexer 3.0.1",
             "2.7",
             "3.0.3 (2026-10-01)"
           ],
           [
-            "moneyphp/money v4.7.1",
-            "2.2",
-            "v4.9.0 (2026-05-04)"
-          ],
-          [
             "fruitcake/php-cors v1.3.0",
             "2.1",
             "v1.4.0 (2025-12-03)"
+          ],
+          [
+            "nette/schema v1.3.2",
+            "1.9",
+            "v1.3.6 (2026-08-16)"
+          ],
+          [
+            "doctrine/inflector 2.0.10",
+            "1.5",
+            "2.1.0 (2025-08-10)"
           ]
         ],
         "heading": "Furthest behind, top 8",
@@ -15294,7 +15294,7 @@
       "copy_summary": [
         "lockrot report for djaiss/monica · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
         "6 of 35 packages flagged (17%): 1 graded high, 2 medium, 3 low. Flags: old-promise 1, stale 1, capped 2, vulnerable 2.",
-        "All 6 in production · 1 required directly, 5 pulled in · 6 security advisories on 2 packages (severity: 2 high, 2 medium, 2 low) · fix by package: 2 composer update · 45.2 libyears behind."
+        "All 6 in production · 1 required directly, 5 pulled in · 6 security advisories on 2 packages (severity: 2 high, 2 medium, 2 low) · fix by package: 2 composer update · 40.1 libyears behind."
       ],
       "grade_line": "Project grade: high · 1 high finding · 1 of 35 packages high or worse",
       "figure_line": "6 of 35 packages flagged · 21 ok · 8 finished",
@@ -15517,9 +15517,9 @@
         "sentence": "5 of 6 flagged packages are named by no line of composer.json; the deepest, nette/schema, sits 3 hops from the nearest line."
       },
       "libyears": {
-        "figure": "45.20",
+        "figure": "40.09",
         "bound": "",
-        "sub": "over 26 packages · 12.42 from direct requirements",
+        "sub": "over 26 packages · 11.12 from direct requirements",
         "unmeasured": "Not measured: 9, undated releases",
         "top": [
           [
@@ -15548,11 +15548,6 @@
             "v7.2.1 (2026-09-28)"
           ],
           [
-            "nette/schema v1.3.2",
-            "2.7",
-            "v1.3.6 (2026-08-16)"
-          ],
-          [
             "doctrine/lexer 3.0.1",
             "2.7",
             "3.0.3 (2026-10-01)"
@@ -15561,6 +15556,11 @@
             "phpseclib/phpseclib 3.0.46",
             "2.5",
             "4.0.1 (2026-08-26)"
+          ],
+          [
+            "socialiteproviders/microsoft-azure 5.2.0",
+            "2.4",
+            "5.2.1 (2026-08-23)"
           ]
         ],
         "heading": "Furthest behind, top 8",
@@ -16091,8 +16091,8 @@
       "libyears": {
         "figure": "78.37",
         "bound": "",
-        "sub": "over 163 packages · 30.01 from direct requirements",
-        "unmeasured": "Not measured: 1, not from a Composer repository · 3, dated only by a commit its tags share",
+        "sub": "over 164 packages · 30.01 from direct requirements",
+        "unmeasured": "Not measured: 1, not from a Composer repository · 2, dated only by a commit its tags share",
         "top": [
           [
             "pragmarx/google2fa-qrcode v1.0.3",
@@ -16644,7 +16644,7 @@
       "copy_summary": [
         "lockrot report for drunomics/lupus-nuxtjs-drupal-stack-example · data as of 2026-10-22 · lockrot 0.14.0 · score model 1 · target PHP 8.3 · this run fails · --fail-on=high",
         "55 of 97 packages flagged (57%): 2 graded critical, 18 high, 30 medium, 5 low. Flags: abandoned 5, silent 1, left-behind 38, old-promise 8, stale 1, capped 4, vulnerable 16.",
-        "All 55 in production · 4 required directly, 51 pulled in · 122 security advisories on 16 packages (severity: 4 critical, 18 high, 40 medium, 43 unrated, 17 low) · fix by package: 1 composer update, 15 upgrade · at least 354.6 libyears behind."
+        "All 55 in production · 4 required directly, 51 pulled in · 122 security advisories on 16 packages (severity: 4 critical, 18 high, 40 medium, 43 unrated, 17 low) · fix by package: 1 composer update, 15 upgrade · at least 358.1 libyears behind."
       ],
       "grade_line": "Project grade: critical · 2 critical findings · 20 of 97 packages high or worse",
       "figure_line": "55 of 97 packages flagged · 29 ok · 13 finished",
@@ -16895,9 +16895,9 @@
         "sentence": "51 of 55 flagged packages are named by no line of composer.json; the deepest, consolidation/log, consolidation/self-update, dflydev/dot-access-data and 2 more, sit 2 hops from the nearest line."
       },
       "libyears": {
-        "figure": "354.57",
+        "figure": "358.05",
         "bound": "at least",
-        "sub": "over 82 packages · 11.90 from direct requirements",
+        "sub": "over 82 packages · 11.92 from direct requirements",
         "unmeasured": "Not measured: 4, dated only by a commit its tags share · 11, no date",
         "top": [
           [
@@ -17968,7 +17968,7 @@
       "copy_summary": [
         "lockrot report for wallabag/wallabag · data as of 2026-10-14 · lockrot 0.14.0 · score model 1 · target PHP 8.4 · this run fails · --fail-on=high",
         "113 of 210 packages flagged (54%): 15 graded critical, 69 high, 23 medium, 6 low. Flags: abandoned 27, silent 10, pinned 1, left-behind 54, old-promise 18, stale 12, capped 2, vulnerable 20.",
-        "All 113 in production · 61 required directly, 52 pulled in · 64 security advisories on 20 packages (severity: 1 critical, 17 high, 30 medium, 3 unrated, 13 low) · fix by package: 8 composer update, 9 upgrade, 2 php floor raise, 1 no fix · at least 385.4 libyears behind."
+        "All 113 in production · 61 required directly, 52 pulled in · 64 security advisories on 20 packages (severity: 1 critical, 17 high, 30 medium, 3 unrated, 13 low) · fix by package: 8 composer update, 9 upgrade, 2 php floor raise, 1 no fix · at least 385.5 libyears behind."
       ],
       "grade_line": "Project grade: critical · 15 critical findings · 84 of 210 packages high or worse · 46 graded findings known to the baseline",
       "figure_line": "113 of 210 packages flagged · 78 ok · 19 finished",
@@ -18227,9 +18227,9 @@
         "sentence": "51 of 113 flagged packages are named by no line of composer.json; the deepest, hoa/ustring and hoa/zformat, sit 4 hops from the nearest line. 1 more is named only in require-dev, which this run did not walk (pass --dev)."
       },
       "libyears": {
-        "figure": "385.35",
+        "figure": "385.46",
         "bound": "at least",
-        "sub": "over 204 packages · 219.95 from direct requirements",
+        "sub": "over 204 packages · 220.06 from direct requirements",
         "unmeasured": "Not measured: 1, a branch snapshot with no release branch · 5, dated only by a commit its tags share",
         "top": [
           [
@@ -21151,8 +21151,8 @@
       "libyears": {
         "figure": "78.37",
         "bound": "",
-        "sub": "over 163 packages · 30.01 from direct requirements",
-        "unmeasured": "Not measured: 1, not from a Composer repository · 3, dated only by a commit its tags share",
+        "sub": "over 164 packages · 30.01 from direct requirements",
+        "unmeasured": "Not measured: 1, not from a Composer repository · 2, dated only by a commit its tags share",
         "top": [
           [
             "pragmarx/google2fa-qrcode v1.0.3",
@@ -22222,7 +22222,7 @@
       "copy_summary": [
         "lockrot report for drunomics/lupus-nuxtjs-drupal-stack-example · data as of 2026-10-22 · lockrot 0.14.0 · score model 1 · target PHP 8.3 · this run fails · --fail-on=high",
         "55 of 97 packages flagged (57%): 2 graded critical, 18 high, 30 medium, 5 low. Flags: abandoned 5, silent 1, left-behind 38, old-promise 8, stale 1, capped 4, vulnerable 16.",
-        "All 55 in production · 4 required directly, 51 pulled in · 122 security advisories on 16 packages (severity: 4 critical, 18 high, 40 medium, 43 unrated, 17 low) · fix by package: 1 composer update, 15 upgrade · at least 354.6 libyears behind."
+        "All 55 in production · 4 required directly, 51 pulled in · 122 security advisories on 16 packages (severity: 4 critical, 18 high, 40 medium, 43 unrated, 17 low) · fix by package: 1 composer update, 15 upgrade · at least 358.1 libyears behind."
       ],
       "grade_line": "Project grade: critical · 2 critical findings · 20 of 97 packages high or worse",
       "figure_line": "55 of 97 packages flagged · 29 ok · 13 finished",
@@ -22473,9 +22473,9 @@
         "sentence": "51 of 55 flagged packages are named by no line of composer.json; the deepest, consolidation/log, consolidation/self-update, dflydev/dot-access-data and 2 more, sit 2 hops from the nearest line."
       },
       "libyears": {
-        "figure": "354.57",
+        "figure": "358.05",
         "bound": "at least",
-        "sub": "over 82 packages · 11.90 from direct requirements",
+        "sub": "over 82 packages · 11.92 from direct requirements",
         "unmeasured": "Not measured: 4, dated only by a commit its tags share · 11, no date",
         "top": [
           [

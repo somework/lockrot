@@ -2269,16 +2269,16 @@
   ]
  },
  "libyears": {
-  "total": 156.35,
+  "total": 154.7,
   "direct_requirements": 2.86,
-  "measured": 182,
+  "measured": 184,
   "at_least_count": 0,
   "unmeasured": {
    "not_from_composer_repository": 1,
    "unavailable": 0,
    "not_found": 0,
    "branch_snapshot": 0,
-   "shared_commit": 5,
+   "shared_commit": 3,
    "parent_split": 0,
    "undated": 0,
    "no_stable_release": 0,
@@ -10375,7 +10375,7 @@
    "evidence": "",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:39:56+00:00",
-   "libyears": 0.22,
+   "libyears": 0.21,
    "age": {
     "installed": {
      "at": "2026-07-12T06:11:13+00:00",
@@ -13534,7 +13534,7 @@
    "evidence": "",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:39:56+00:00",
-   "libyears": 0.81,
+   "libyears": 0.82,
    "age": {
     "installed": {
      "at": "2025-11-29T14:03:56+00:00",
@@ -15441,9 +15441,9 @@
    "libyears": 1.65,
    "age": {
     "installed": {
-     "at": "2024-11-21T14:02:44+00:00",
-     "years": 1.9,
-     "dated_by": null
+     "at": "2025-01-31T10:04:17+00:00",
+     "years": 1.7,
+     "dated_by": "laravel/framework"
     },
     "installed_unmeasured": null,
     "release": {
@@ -15573,9 +15573,9 @@
    "libyears": 1.66,
    "age": {
     "installed": {
-     "at": "2024-11-21T14:02:44+00:00",
-     "years": 1.9,
-     "dated_by": null
+     "at": "2025-01-31T10:04:17+00:00",
+     "years": 1.7,
+     "dated_by": "laravel/framework"
     },
     "installed_unmeasured": null,
     "release": {
@@ -15705,9 +15705,9 @@
    "libyears": 1.65,
    "age": {
     "installed": {
-     "at": "2024-11-21T14:02:44+00:00",
-     "years": 1.9,
-     "dated_by": null
+     "at": "2025-01-31T10:04:17+00:00",
+     "years": 1.7,
+     "dated_by": "laravel/framework"
     },
     "installed_unmeasured": null,
     "release": {
@@ -15837,9 +15837,9 @@
    "libyears": 1.66,
    "age": {
     "installed": {
-     "at": "2023-06-05T12:46:42+00:00",
-     "years": 3.3,
-     "dated_by": null
+     "at": "2025-01-31T10:04:17+00:00",
+     "years": 1.7,
+     "dated_by": "laravel/framework"
     },
     "installed_unmeasured": null,
     "release": {
@@ -19386,7 +19386,7 @@
    "evidence": "",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:39:56+00:00",
-   "libyears": 1.84,
+   "libyears": 0.19,
    "age": {
     "installed": {
      "at": "2024-01-04T18:49:48+00:00",
@@ -27056,7 +27056,7 @@
    "replacement": null,
    "replacement_url": null,
    "note": null,
-   "libyears_unmeasured": "shared_commit",
+   "libyears_unmeasured": null,
    "libyears_at_least": false,
    "direct": false,
    "dev": false,
@@ -27076,7 +27076,7 @@
    "evidence": "",
    "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
    "data_date": "2026-10-01T17:39:56+00:00",
-   "libyears": null,
+   "libyears": 0,
    "age": {
     "installed": null,
     "installed_unmeasured": "shared_commit",
@@ -28071,7 +28071,7 @@
    "replacement": null,
    "replacement_url": null,
    "note": null,
-   "libyears_unmeasured": "shared_commit",
+   "libyears_unmeasured": null,
    "libyears_at_least": false,
    "direct": false,
    "dev": false,
@@ -28091,7 +28091,7 @@
    "evidence": "",
    "allowlist_reason": "polyfills for older PHP versions; intentionally frozen once the target PHP is covered",
    "data_date": "2026-10-01T17:39:56+00:00",
-   "libyears": null,
+   "libyears": 0,
    "age": {
     "installed": null,
     "installed_unmeasured": "shared_commit",

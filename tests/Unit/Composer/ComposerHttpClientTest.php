@@ -479,8 +479,8 @@ final class ComposerHttpClientTest extends TestCase
 
         self::assertSame([$urls[0], $urls[1]], array_column($downloader->requests, 'url'), 'each request takes 3s of a 5s budget');
         self::assertSame([['timeout' => 5], ['timeout' => 2]], array_map(static fn (array $request): array => array_intersect_key((array) $request['options']['http'], ['timeout' => true]), $downloader->requests));
-        self::assertSame([0, null, 'install-time budget spent'], self::summarize($results)[$urls[2]]);
-        self::assertSame([0, null, 'install-time budget spent'], self::summarize($results)[$urls[3]], 'every request after the budget');
+        self::assertSame([0, null, HttpResult::BUDGET_SPENT], self::summarize($results)[$urls[2]]);
+        self::assertSame([0, null, HttpResult::BUDGET_SPENT], self::summarize($results)[$urls[3]], 'every request after the budget');
     }
     /**
      * Composer replays a request's headers to the target of each redirect, so lockrot's token must
@@ -519,8 +519,31 @@ final class ComposerHttpClientTest extends TestCase
 
         $results = $client->fetchAll([$url], self::HEADERS);
 
-        self::assertSame([$url => [0, null, 'install-time budget spent']], self::summarize($results));
+        self::assertSame([$url => [0, null, ComposerHttpClient::BUDGET_SPENT_AFTER_START]], self::summarize($results), 'the request had started, so the budget is not the cause of its failure');
         self::assertSame([$url], array_column($downloader->requests, 'url'), 'no request to the target after the budget');
+    }
+
+    /**
+     * Only a request that never started reads {@see HttpResult::BUDGET_SPENT}. Composer drops the
+     * failure that a blocked retry follows, so a started request reads the budget after its start.
+     */
+    public function testARequestThatTheBudgetStopsOnItsRetryReadsBudgetSpentAfterStart(): void
+    {
+        $started = 'https://api.github.com/repos/vendor/one';
+        $queued = 'https://api.github.com/repos/vendor/two';
+        $held = new \stdClass();
+        // The budget ends after the first request has been asked, so the second one never starts.
+        $now = static function () use ($held): float {
+            return ($held->downloader ?? null) instanceof ScriptedDownloader && $held->downloader->asked >= 2 ? 6.0 : 0.0;
+        };
+        [$client, $downloader] = self::clientWith([$started => new TransportException('curl error 7: connection refused'), $queued => [200, 'body']], Deadline::inSeconds(5.0, $now), 1);
+        $downloader->retried[$started] = true;
+        $held->downloader = $downloader;
+
+        $results = self::summarize($client->fetchAll([$started, $queued], self::HEADERS));
+
+        self::assertSame([0, null, ComposerHttpClient::BUDGET_SPENT_AFTER_START], $results[$started], 'a retry after the budget names the budget, not a blocked URL');
+        self::assertSame([0, null, HttpResult::BUDGET_SPENT], $results[$queued]);
     }
 
     /** The downloader queues requests above its limit, so a request can start after the budget although add() came before it. */
@@ -536,7 +559,7 @@ final class ComposerHttpClientTest extends TestCase
 
         $results = $client->fetchAll([$url], self::HEADERS);
 
-        self::assertSame([$url => [0, null, 'install-time budget spent']], self::summarize($results));
+        self::assertSame([$url => [0, null, HttpResult::BUDGET_SPENT]], self::summarize($results));
         self::assertSame([], $downloader->started, 'no request starts after the budget');
     }
 
@@ -589,7 +612,7 @@ final class ComposerHttpClientTest extends TestCase
 
         $results = $client->fetchAll($urls);
 
-        self::assertSame(array_fill_keys($urls, [0, null, 'install-time budget spent']), self::summarize($results));
+        self::assertSame(array_fill_keys($urls, [0, null, HttpResult::BUDGET_SPENT]), self::summarize($results));
         self::assertSame([], $downloader->requests);
     }
 
@@ -622,7 +645,7 @@ final class ComposerHttpClientTest extends TestCase
         $results = $client->fetchAll($urls, self::HEADERS);
 
         self::assertSame(1, $downloader->holding, 'the budget ends inside the first request');
-        self::assertSame(array_fill_keys($urls, [0, null, 'install-time budget spent']), self::summarize($results));
+        self::assertSame(array_fill_keys($urls, [0, null, HttpResult::BUDGET_SPENT]), self::summarize($results));
     }
 
     public function testAFetchAfterOneThatThrewStartsItsRequests(): void
@@ -698,7 +721,7 @@ final class ComposerHttpClientTest extends TestCase
 
         $results = $client->fetchAll([$url], self::HEADERS);
 
-        self::assertSame([$url => [0, null, 'install-time budget spent']], self::summarize($results));
+        self::assertSame([$url => [0, null, ComposerHttpClient::BUDGET_SPENT_AFTER_START]], self::summarize($results), 'the request started, so the budget stopped it after its start');
         self::assertSame([$url], $downloader->started, 'the target does not start after the budget');
     }
 
@@ -719,7 +742,7 @@ final class ComposerHttpClientTest extends TestCase
 
         $results = $client->fetchAll([$first, $second], self::HEADERS);
 
-        self::assertSame([$first => [0, null, 'install-time budget spent'], $second => [0, null, 'install-time budget spent']], self::summarize($results));
+        self::assertSame([$first => [0, null, ComposerHttpClient::BUDGET_SPENT_AFTER_START], $second => [0, null, ComposerHttpClient::BUDGET_SPENT_AFTER_START]], self::summarize($results));
     }
 
     /** Composer asks before each hop too, so a chain that reaches the budget stops at its next hop. */
@@ -736,7 +759,7 @@ final class ComposerHttpClientTest extends TestCase
 
         $results = $client->fetchAll([$url], self::HEADERS);
 
-        self::assertSame([$url => [0, null, 'install-time budget spent']], self::summarize($results));
+        self::assertSame([$url => [0, null, ComposerHttpClient::BUDGET_SPENT_AFTER_START]], self::summarize($results));
         self::assertSame([], $downloader->followed, 'the hop after the budget is not followed');
     }
 
@@ -800,6 +823,8 @@ final class ComposerHttpClientTest extends TestCase
  */
 final class ScriptedDownloader extends HttpDownloader
 {
+    /** @var array<string, true> the URLs whose failure it retries, asking `prevent_url_access_callable` again as CurlDownloader does */
+    public array $retried = [];
     /** @var list<array{url: string, options: array<string, mixed>}> the requests add() saw, in order */
     public array $requests = [];
     /** @var list<array{url: string, header: mixed}> the redirect targets that a request reached, with the headers it replayed */
@@ -917,7 +942,8 @@ final class ScriptedDownloader extends HttpDownloader
             $answer = $this->script[$answer] ?? null;
         }
         if ($answer instanceof \Throwable) {
-            $deferred->reject($answer);
+            $retryRefused = isset($this->retried[$url]) && $this->refuses($refuse, $url);
+            $deferred->reject($retryRefused ? new TransportException('Access to "'.$url.'" is blocked.') : $answer);
         } elseif (\is_array($answer)) {
             $deferred->resolve(new Response(['url' => $url], $answer[0], [], $answer[1]));
         } else {

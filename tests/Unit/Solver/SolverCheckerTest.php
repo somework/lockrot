@@ -1427,7 +1427,7 @@ final class SolverCheckerTest extends TestCase
 
         $outcome = $checker->check(MoveQuery::update('acme/lib', '^2.0.0', '2.0.0', null, '2.0.0'));
 
-        self::assertNull($outcome->installs(), (string) $outcome->installs());
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::INSTALLS_NO_RELEASE, 'installs' => null], $outcome->check()->jsonSerialize(), 'a dropped package keeps no locked version');
     }
 
     /**
@@ -1589,8 +1589,8 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'resolves', 'form' => 'with-dependencies', 'reason' => null, 'installs' => '5.3.9'], $outcome->check()->jsonSerialize());
     }
 
-    /** No form installs a release of the package: the inline form stays, the first on the tie. */
-    public function testWhenNoFormInstallsTheMovedPackageTheInlineFormStays(): void
+    /** Ruling R17-1: every form keeps the locked 5.2.2, so no form installs a release, and the move names no dev version. */
+    public function testWhenNoFormInstallsTheMovedPackageTheMoveIsNotChecked(): void
     {
         $remote = self::webauthnRemote(false);
         $remote['web-auth/webauthn-lib'] = [
@@ -1601,7 +1601,71 @@ final class SolverCheckerTest extends TestCase
 
         $outcome = $checker->check(MoveQuery::update('web-auth/webauthn-lib', '^5.2.0', '5.2.0', null, '5.4.0'));
 
-        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => null], $outcome->check()->jsonSerialize());
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::INSTALLS_NO_RELEASE, 'installs' => '5.2.2'], $outcome->check()->jsonSerialize());
+    }
+
+    /** Ruling R17-1: the listed form installs dev-main, and `-w` frees acme/dep, whose blocked 1.0.0 dev-main needs, so it installs the release 1.0.9. */
+    public function testAReleaseOfAWiderFormWinsOverADevVersionOfTheListedForm(): void
+    {
+        $remote = self::devRemote(['acme/dep' => '1.0.0'], ['acme/dep' => '^1.0']) + ['acme/dep' => [['version' => '1.0.0'], ['version' => '1.0.1']]];
+        $solver = new ComposerSolver(self::devRoot(), LockFile::fromArray(['packages' => self::devLock('acme/dep')])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote));
+        $checker = new SolverChecker($solver, [], '8.4.99', true, Deadline::never(), self::blocking(['acme/dep' => '1.0.0']));
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.0.9', '1.0.9', null, '1.0.9'));
+
+        self::assertSame(['result' => 'resolves', 'form' => 'with-dependencies', 'reason' => null, 'installs' => '1.0.9'], $outcome->check()->jsonSerialize());
+    }
+
+    /**
+     * Ruling R17-1: the listed form installs dev-main. `-w` and `-W` free acme/mid, whose only
+     * release 2.0.0 needs acme/virtual: offline, they stop, and the stop gives the move's reason.
+     * Else Composer refuses them, and the move installs no release.
+     *
+     * @return iterable<string, array{array<string, string>, string, ?string}>
+     */
+    public static function devThenWider(): iterable
+    {
+        yield 'the wider forms stop' => [['acme/virtual' => VersionSource::OFFLINE], MoveCheck::OFFLINE, null];
+        yield 'Composer refuses the wider forms' => [[], MoveCheck::INSTALLS_NO_RELEASE, 'dev-main'];
+    }
+
+    /**
+     * @param array<string, string> $failures
+     *
+     * @dataProvider devThenWider
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('devThenWider')]
+    public function testADevVersionOfTheListedFormNeverReplacesAStopOfAWiderForm(array $failures, string $reason, ?string $installs): void
+    {
+        $remote = self::devRemote(['acme/mid' => '^1.0'], ['acme/mid' => '^2.0']) + ['acme/mid' => [['version' => '2.0.0', 'require' => ['acme/virtual' => '^1.0']]]];
+        $solver = new ComposerSolver(self::devRoot(), LockFile::fromArray(['packages' => self::devLock('acme/mid')])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote, $failures));
+        $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::never());
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.0.9', '1.0.9', null, '1.0.9'));
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => $reason, 'installs' => $installs], $outcome->check()->jsonSerialize());
+    }
+
+    /** Ruling R17-1: the listed form keeps the locked 1.0.0, and `-w` installs dev-main: the move names the listed form's version. */
+    public function testAMoveThatInstallsNoReleaseNamesTheVersionOfTheFirstFormThatResolves(): void
+    {
+        $remote = self::devRemote(['acme/mid' => '^2.0'], ['acme/mid' => '^2.0']) + ['acme/mid' => [['version' => '1.0.0'], ['version' => '2.0.0']]];
+        $solver = new ComposerSolver(self::devRoot(), LockFile::fromArray(['packages' => self::devLock('acme/mid')])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote));
+        $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::never());
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.0', '1.0.0', null, '1.0.9'));
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => MoveCheck::INSTALLS_NO_RELEASE, 'installs' => '1.0.0'], $outcome->check()->jsonSerialize());
+    }
+
+    /** Ruling R17-1 reads a move's package only: the target fix solve resolves, though it installs dev-main. */
+    public function testATargetFixSolveThatInstallsADevVersionResolves(): void
+    {
+        $remote = self::devRemote(['acme/mid' => '^1.0'], ['acme/mid' => '^1.0']) + ['acme/mid' => [['version' => '1.0.0']]];
+        $solver = new ComposerSolver(self::devRoot(), LockFile::fromArray(['packages' => self::devLock('acme/mid')])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource($remote));
+        $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::never());
+
+        self::assertSame(['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => null], $checker->solveAt(['acme/lib'])->check()->jsonSerialize());
     }
 
     /** No form installs a newest release that does not parse: the form that installs the highest release wins. */
@@ -1765,6 +1829,42 @@ final class SolverCheckerTest extends TestCase
         }
 
         return new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static fn (array $names, bool $complete): array => array_intersect_key($records, array_flip($names)));
+    }
+
+    /** A root that requires acme/lib ^1.0 at minimum-stability dev, without prefer-stable. */
+    private static function devRoot(): RootPackageInterface
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackage::class, $root);
+        $root->setMinimumStability('dev');
+        $root->setPreferStable(false);
+
+        return $root;
+    }
+
+    /** @return list<array<string, mixed>> acme/lib 1.0.0, which requires $dependency ^1.0, and $dependency 1.0.0 */
+    private static function devLock(string $dependency): array
+    {
+        return [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => [$dependency => '^1.0']], ['name' => $dependency, 'version' => '1.0.0']];
+    }
+
+    /**
+     * acme/lib 1.0.0, 1.0.9 and dev-main, whose branch alias 1.x-dev lies in `^1.0`.
+     *
+     * @param array<string, string> $devRequires     what dev-main requires
+     * @param array<string, string> $releaseRequires what 1.0.9 requires
+     *
+     * @return array<string, list<array<string, mixed>>>
+     */
+    private static function devRemote(array $devRequires, array $releaseRequires): array
+    {
+        $dependency = array_keys($releaseRequires)[0];
+
+        return ['acme/lib' => [
+            ['version' => '1.0.0', 'require' => [$dependency => '^1.0']],
+            ['version' => '1.0.9', 'require' => $releaseRequires],
+            ['version' => 'dev-main', 'require' => $devRequires, 'source' => ['type' => 'git', 'url' => 'https://example.org/lib.git', 'reference' => 'bbbb'], 'extra' => ['branch-alias' => ['dev-main' => '1.x-dev']]],
+        ]];
     }
 
     /**

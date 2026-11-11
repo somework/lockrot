@@ -288,7 +288,7 @@ run.
 
 ## Working offline
 
-`--offline` makes no network request. It sets `COMPOSER_DISABLE_NETWORK=1` for the run.
+`--offline` makes no network request. It sets `COMPOSER_DISABLE_NETWORK=1` for the run. A set `COMPOSER_DISABLE_NETWORK` also reads as `--offline` ([Options](configuration.md#cli-options)).
 
 - Repository metadata comes from Composer's cache. lockrot reports a package that is missing from
   it as unavailable ([Metadata unavailable](notes.md#metadata_unavailable)), not as absent from the

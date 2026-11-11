@@ -9,6 +9,7 @@ use Composer\Factory;
 use Composer\IO\IOInterface;
 use Composer\Util\Platform;
 use Lockrot\Clock;
+use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\HttpClientInterface;
@@ -203,9 +204,7 @@ final class SelfUpdateCommand extends BaseCommand
      */
     private static function networkDisabled(): bool
     {
-        $disabled = Platform::getEnv('COMPOSER_DISABLE_NETWORK');
-
-        return $disabled !== false && $disabled !== '' && $disabled !== '0';
+        return LockrotConfig::isNetworkDisabledBy(Platform::getEnv('COMPOSER_DISABLE_NETWORK'));
     }
 
     /**

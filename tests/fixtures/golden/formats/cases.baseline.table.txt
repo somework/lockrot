@@ -458,11 +458,14 @@ low (7)
       age: installed 2.2.4 released 2022-03-05 (4.6 years ago); last push 2026-09-25 (less than three weeks ago)
       checks missing: S2 (undated releases)
 
-not flagged (5)
+not flagged (6)
   drupal/core 10.6.18  direct  ·  unknown
       0
       pulls in 3 flagged packages: guzzlehttp/guzzle (vulnerable), pear/console_getopt (silent), pear/pear_exception
       (stale)
+  php-tuf/php-tuf 1.0.3  direct  ·  unknown
+      0
+      checks missing: S2, S3, S4, S5, S8 (not from a Composer repository)
   bower-asset/jquery 3.7.1  via yiisoft/yii2, yiisoft/yii2-bootstrap5 and yiisoft/yii2-symfonymailer  ·  unknown
       0
       checks missing: S2, S3, S4, S8 (origin unknown)
@@ -476,28 +479,28 @@ not flagged (5)
       gate 0 = min(0, 2 × 0) (the new facts bound it); new: 0
       checks missing: S2 (undated releases)
 
-60 packages checked · 55 flagged: critical 11 · high 21 · medium 16 · low 7
+61 packages checked · 55 flagged: critical 11 · high 21 · medium 16 · low 7
 flags: abandoned 7 · silent 1 · pinned 5 · left-behind 18 · old-promise 13 · stale 8 · capped 7 ·
 vulnerable 19 · 20 packages carry more than one
-depth: 22 of 55 flagged packages are named by no line of composer.json · direct 32 · 1 hop 15 · 2 hops 4 ·
-4 hops 1 · unreached 3 ·
+depth: 22 of 55 flagged packages are named by no line of composer.json · direct 32 · 1 hop 15 · 2 hops 3 ·
+3 hops 1 · 4 hops 1 · unreached 3 ·
 deepest: robrichards/xmlseclibs, 4 hops (mautic/core-lib › lightsaml/sp-bundle › lightsaml/symfony-bridge › lightsaml/lightsaml › robrichards/xmlseclibs) ·
 1 more is named only in require-dev, which this run did not walk (pass --dev)
 security: 19 vulnerable packages · 88 advisories: 3 critical, 29 high, 40 medium, 3 unrated, 13 low ·
 packages-dev not checked (pass --dev)
 fix, by package: composer update 7 · upgrade 4 · php floor raise 6 · fix unknown 1 · no fix 1
 update now: composer update phpoffice/phpspreadsheet robrichards/xmlseclibs symfony/http-foundation league/commonmark typo3/html-sanitizer symfony/yaml symfony/polyfill-intl-idn
-libyears: at least 134.3 behind across 50 of 60 packages · 77.1 from direct requirements ·
+libyears: at least 126.7 behind across 51 of 61 packages · 69.5 from direct requirements ·
 furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: mautic/core-lib 7 · guzzlehttp/guzzle 2 · laravel/framework 2 · akaunting/laravel-apexcharts 1 ·
 friendsofsymfony/user-bundle 1 · … and 8 more
-advisories: 60 packages asked · packagist.org answered (291 on record for 24 packages)
+advisories: 61 packages asked · packagist.org answered (291 on record for 24 packages)
 php: the lock installs on no PHP, so your target, 8.4, is excluded; the update of the 11 packages that exclude it is not
 checked (the run checked no move)
 baseline: 3 known · 49 new · 4 worsened · 0 stale (lockrot-baseline.json)
 gate: fails · --fail-on=high,unchecked ·
-33 findings fail it (high 31, unchecked 4); 2 reach it and the baseline exempts them · target php 8.4 (--target-php)
-Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+34 findings fail it (high 31, unchecked 5); 2 reach it and the baseline exempts them · target php 8.4 (--target-php)
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with --format=json for
 details.
 note: the baseline was written for php 8.5 (the PHP running lockrot) and this run targets php 8.4 (--target-php): fix
 changes against the baseline are not compared

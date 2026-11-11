@@ -33,6 +33,34 @@ final class RunNoteTest extends TestCase
         $gitlab = new RepoRef(RepoRef::GITLAB, 'gitlab.com', 'x/y');
         $bitbucket = new RepoRef(RepoRef::BITBUCKET, 'bitbucket.org', 'workspace/one');
 
+        yield 'lock out of sync, one name' => [
+            static fn (): RunNote => RunNote::lockOutOfSync(['psr/container']),
+            'lock_out_of_sync',
+            'lock: the lock file does not match composer.json (psr/container is required but not locked): run composer update',
+            false,
+            ['missing' => ['psr/container']],
+        ];
+        yield 'lock out of sync, two names' => [
+            static fn (): RunNote => RunNote::lockOutOfSync(['psr/container', 'psr/log']),
+            'lock_out_of_sync',
+            'lock: the lock file does not match composer.json (psr/container and psr/log are required but not locked): run composer update',
+            false,
+            ['missing' => ['psr/container', 'psr/log']],
+        ];
+        yield 'lock out of sync, three names' => [
+            static fn (): RunNote => RunNote::lockOutOfSync(['a/a', 'b/b', 'c/c']),
+            'lock_out_of_sync',
+            'lock: the lock file does not match composer.json (a/a, b/b and c/c are required but not locked): run composer update',
+            false,
+            ['missing' => ['a/a', 'b/b', 'c/c']],
+        ];
+        yield 'lock out of sync, a changed constraint' => [
+            static fn (): RunNote => RunNote::lockOutOfSync([]),
+            'lock_out_of_sync',
+            'lock: the lock file does not match composer.json: run composer update',
+            false,
+            ['missing' => []],
+        ];
         yield 'offline' => [static fn (): RunNote => RunNote::offline(), 'offline', "offline: repository metadata served from Composer's cache", false, []];
         yield 'metadata, one reason' => [
             static fn (): RunNote => RunNote::metadataUnavailable(['vendor/a' => 'HTTP 503']),
@@ -433,6 +461,7 @@ final class RunNoteTest extends TestCase
     {
         self::assertSame([
             'package_name_invalid',
+            'lock_out_of_sync',
             'offline',
             'metadata_unavailable',
             'monorepo_parent_unavailable',

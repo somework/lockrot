@@ -355,6 +355,14 @@ final class LockrotCommandTest extends TestCase
         }
     }
 
+    /** The gate line says why the job failed, so a size cap must never read as able to cut it. */
+    public function testTheMarkdownMaxBytesHelpNamesTheGateLineAsKept(): void
+    {
+        $description = $this->command()->getDefinition()->getOption('markdown-max-bytes')->getDescription();
+
+        self::assertStringContainsString('The heading, the `gate:` line, the table head', $description);
+    }
+
     /**
      * `composer list` shows the description: it names every flag, `vulnerable` included, because
      * every counted advisory scores. `--all` adds the findings that have no grade.
@@ -2094,6 +2102,27 @@ final class LockrotCommandTest extends TestCase
         } finally {
             $this->restoreGlobalEnv('COMPOSER_DISABLE_NETWORK', $previousNetwork);
             $this->restoreGlobalEnv('COMPOSER_ROOT_VERSION', $previousRootVersion);
+        }
+    }
+
+    /** The variable alone, as `composer --no-network` sets it, makes the run offline: the same setting and the same note as --offline. */
+    public function testComposerDisableNetworkWithoutTheFlagReadsAsOffline(): void
+    {
+        chdir(__DIR__.'/../../fixtures/skeletons/laravel');
+        $previous = Platform::getEnv('COMPOSER_DISABLE_NETWORK');
+        Platform::putEnv('COMPOSER_DISABLE_NETWORK', '1');
+        try {
+            $observed = $this->observeDuringRun(['--target-php' => '8.4'], $this->loader());
+            chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+            [, $stdout] = $this->runRecordingWriteOptions(['--format' => 'json', '--target-php' => '8.4'], $this->loader());
+
+            self::assertTrue($observed['offline']);
+            $json = json_decode($stdout, true);
+            self::assertIsArray($json, $stdout);
+            $codes = array_column(JsonPath::arrayAt($json, ['note_details']), 'code');
+            self::assertContains('offline', $codes);
+        } finally {
+            $this->restoreGlobalEnv('COMPOSER_DISABLE_NETWORK', $previous);
         }
     }
 

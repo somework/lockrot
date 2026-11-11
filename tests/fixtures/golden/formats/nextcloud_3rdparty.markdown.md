@@ -24,4 +24,4 @@ php: the lock installs on PHP 8.3 to 8.5; Composer solves at 8.3.0 from config.p
 
 - note: Repository activity not checked for 3 packages on hosts lockrot cannot ask: codeberg.org (3). A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host.
 
-<sub>94 packages checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>94 packages checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

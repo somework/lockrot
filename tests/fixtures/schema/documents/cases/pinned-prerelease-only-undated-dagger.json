@@ -1282,7 +1282,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "require a tag — the newest is v1.0.0-beta1"
+    "text": "require a tag — the newest is v1.0.0-beta1, a pre-release"
    },
    "security": {
     "status": "clear",
@@ -1374,9 +1374,9 @@
      "data": {
       "version": "dev-master",
       "reason": "branch_snapshot",
-      "has_stable_release": true,
+      "has_stable_release": false,
       "last_stable_release": null,
-      "last_stable_version": "v1.0.0-beta1",
+      "last_stable_version": null,
       "last_stable_dated_by": null,
       "snapshot_time": "2018-06-01T00:00:00+00:00",
       "tag_relation": null

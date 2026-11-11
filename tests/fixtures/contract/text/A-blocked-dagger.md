@@ -13,4 +13,4 @@ libyears: 2.0 behind across the one package · 2.0 from direct requirements · f
 advisories: 1 package asked · packagist.org answered (26 on record for 1 package)\
 php: the lock installs on PHP 7.2 to 8.5
 
-<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

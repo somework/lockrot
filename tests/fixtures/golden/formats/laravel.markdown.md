@@ -9,9 +9,9 @@
 flags: stale 1\
 depth: 1 of 1 flagged package is named by no line of composer.json · 2 hops 1 · deepest: `league/config`, 2 hops (`laravel/framework` › `league/commonmark` › `league/config`)\
 security: no vulnerable package · advisories not checked\
-libyears: 0.5 behind across 73 of 76 packages · 0.0 from direct requirements · furthest behind `brick/math` 0.18.0 at 0.3\
+libyears: 0.5 behind across all 76 packages · 0.0 from direct requirements · furthest behind `brick/math` 0.18.0 at 0.3\
 pulled in by: `laravel/framework` 1 · `laravel/tinker` 1\
 advisories: 0 packages asked, 76 not asked\
 php: the lock installs on PHP 8.4 to 8.5
 
-<sub>76 packages checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>76 packages checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

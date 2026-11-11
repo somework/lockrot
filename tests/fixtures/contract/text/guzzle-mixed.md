@@ -15,4 +15,4 @@ php: the lock installs on PHP 7.1 to 7.4; your target, 8.4, is excluded: require
 
 - note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
 
-<sub>7 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>7 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

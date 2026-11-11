@@ -1055,16 +1055,16 @@
   "deepest": []
  },
  "libyears": {
-  "total": null,
-  "direct_requirements": null,
-  "measured": 0,
+  "total": 0,
+  "direct_requirements": 0,
+  "measured": 1,
   "at_least_count": 0,
   "unmeasured": {
    "not_from_composer_repository": 0,
    "unavailable": 0,
    "not_found": 0,
    "branch_snapshot": 0,
-   "shared_commit": 1,
+   "shared_commit": 0,
    "parent_split": 0,
    "undated": 0,
    "no_stable_release": 0,
@@ -1222,7 +1222,7 @@
    "replacement": null,
    "replacement_url": null,
    "note": null,
-   "libyears_unmeasured": "shared_commit",
+   "libyears_unmeasured": null,
    "libyears_at_least": false,
    "direct": false,
    "dev": false,
@@ -1264,7 +1264,7 @@
    "evidence": "",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:40:21+00:00",
-   "libyears": null,
+   "libyears": 0,
    "age": {
     "installed": null,
     "installed_unmeasured": "shared_commit",

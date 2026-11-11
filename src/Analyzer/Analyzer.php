@@ -26,6 +26,7 @@ use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
+use Lockrot\Data\Http\HttpResult;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataFailure;
@@ -201,6 +202,10 @@ final class Analyzer
         $graph = DependencyGraph::fromLock($lock, $project, $includeDev);
         $now = $this->clock->now();
         $notes = $lock->skippedNames() === [] ? [] : [RunNote::packageNameInvalid($lock->skippedNames())];
+        $missing = $project->lockOutOfSync($lock, $includeDev);
+        if ($missing !== null) {
+            $notes[] = RunNote::lockOutOfSync($missing);
+        }
         if ($this->offline) {
             $notes[] = RunNote::offline();
         }
@@ -500,6 +505,10 @@ final class Analyzer
             return $skipped === ActivityFetchPlan::BUDGET ? NotCheckedRule::RATE_BUDGET : NotCheckedRule::NO_TOKEN;
         }
 
+        if (($batch->failedOn($repo->forge())[$repo->key()] ?? null) === HttpResult::BUDGET_SPENT) {
+            return NotCheckedRule::BUDGET;
+        }
+
         return $batch->rateLimited($repo->host()) ? NotCheckedRule::RATE_LIMIT : NotCheckedRule::FETCH_FAILED;
     }
 
@@ -529,6 +538,7 @@ final class Analyzer
             $repoByKey[$repo->key()] = $repo;
         }
         $notes = [];
+        $budgetStopped = false;
         foreach ($plan->cappedForges() as $forge) {
             $notes[] = RunNote::repositoryActivityAnonymousCap($forge, $plan->checkedPackages($forge), $plan->skippedNoToken($forge), $plan->skippedBudget($forge));
         }
@@ -536,7 +546,9 @@ final class Analyzer
             $limited = [];
             $unreachable = [];
             foreach ($batch->failedOn($forge) as $key => $message) {
-                if ($batch->rateLimited($repoByKey[$key]->host())) {
+                if ($message === HttpResult::BUDGET_SPENT) {
+                    $budgetStopped = true;
+                } elseif ($batch->rateLimited($repoByKey[$key]->host())) {
                     $limited[] = [$repoByKey[$key], $message];
                 } else {
                     $unreachable[] = [$repoByKey[$key], $message];
@@ -552,6 +564,9 @@ final class Analyzer
             if ($notFound !== []) {
                 $notes[] = RunNote::repositoryActivityNotFound($forge, $notFound);
             }
+        }
+        if ($budgetStopped) {
+            $notes[] = RunNote::repositoryActivityNotChecked();
         }
 
         return [$batch, $notes];
@@ -649,7 +664,7 @@ final class Analyzer
         return $finding
             ->withComposerJson($composerJsonRead, $graph->namedIn($package->name()))
             ->withFlags($flags, $facts->metadataStatus() === PackageFacts::METADATA_READ)
-            ->withDetails(FindingDetails::of($facts, $entry, $floor, $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts), $accepted, $droppedDates));
+            ->withDetails(FindingDetails::of($facts, $entry, $floor, $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts), $accepted, $droppedDates, $signalSet->notChecked()));
     }
 
     /**

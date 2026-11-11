@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Data\Repository;
 
+use Composer\Downloader\TransportException;
 use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
 use Composer\Repository\ComposerRepository;
@@ -222,8 +223,13 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
             } catch (\RuntimeException|ParsingException|RepositorySecurityException|\LogicException $e) {
                 // ComposerRepository::fetchFile() refuses an answer with these, none of them a RuntimeException.
                 // A ParsingException is an answer that does not parse: a proxy page instead of the file.
+                // Composer cancels a request with 499 when the network is disabled, and an offline run
+                // that lacks the root packages.json in the cache gets that, not a cached answer.
+                $reason = $this->offline && $e instanceof TransportException && $e->getStatusCode() === 499
+                    ? MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON
+                    : RepositoryUrl::inText($e->getMessage());
                 foreach ($chunk as $name) {
-                    $failed[$name] = RepositoryUrl::inText($e->getMessage());
+                    $failed[$name] = $reason;
                 }
                 continue;
             }

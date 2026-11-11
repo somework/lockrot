@@ -16,4 +16,4 @@ php: the lock installs on PHP 7.2 to 8.5
 
 **Update now:** `composer update symfony/polyfill-intl-idn`
 
-<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

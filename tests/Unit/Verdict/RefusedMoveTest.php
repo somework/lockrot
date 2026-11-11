@@ -31,6 +31,32 @@ final class RefusedMoveTest extends TestCase
         self::assertSame('v2.3.2', JsonPath::stringAt($finding, ['security', 'gets', 'version']), 'a refusal leaves gets at the newest release (SPEC §5.6 ruling R2-1)');
     }
 
+    /** @return iterable<string, array{?string, string, ?string}> */
+    public static function packageHolds(): iterable
+    {
+        yield 'a hold on the package whose link does not admit v2.3.2 leaves no release to get' => [null, '^3.0', null];
+        yield 'a hold on the package whose link admits v2.3.2 leaves gets at it' => [null, '^2.0', 'v2.3.2'];
+        yield 'a hold on another package leaves gets at v2.3.2' => ['masterminds/html5', '^3.0', 'v2.3.2'];
+    }
+
+    /**
+     * Ruling R17-13a: the package hold of the refusal is a lock link for `gets` when its link names
+     * the package. The installed row's `newest` keeps what the lock's links allow (ruling R3-2).
+     *
+     * @dataProvider packageHolds
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('packageHolds')]
+    public function testThePackageHoldOfARefusalIsALockLinkForGets(?string $target, string $constraint, ?string $gets): void
+    {
+        $hold = ['source' => 'package', 'package' => 'acme/consumer', 'version' => '1.0.0', 'link' => 'require', 'target' => $target, 'constraint' => $constraint];
+        $finding = self::finding(self::document(['result' => 'refused', 'form' => null, 'reason' => null, 'holds' => [$hold]]));
+
+        $found = JsonPath::arrayAt($finding, ['security'])['gets'] ?? null;
+
+        self::assertSame($gets, \is_array($found) ? $found['version'] : null);
+        self::assertSame('v2.3.2', JsonPath::stringAt($finding, ['security', 'installed_branch_fixes', 'newest']));
+    }
+
     public function testTheTextOfAMoveThatComposerRefusesWithNoHoldNamesTheRefusal(): void
     {
         $case = CaseHydrator::case('move-check‡');

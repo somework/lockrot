@@ -15,6 +15,7 @@ use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Score\IfApplied;
 use Lockrot\Security\BranchFixes;
 use Lockrot\Security\Fix;
+use Lockrot\Security\Gets;
 use Lockrot\Security\Holder;
 use Lockrot\Security\PackageFixes;
 use Lockrot\Security\Severity;
@@ -85,29 +86,36 @@ final class FindingDetails
         $this->fixes = $fixes;
     }
 
+    /** A lookup that some feed answered, or that counted an advisory, is partial, whether or not the feed counted one. */
+    public static function isPartialLookup(PackageFacts $facts): bool
+    {
+        $coverage = $facts->advisoryCoverage();
+
+        return ($coverage !== null && $coverage->records() !== null) || $facts->advisories() !== [];
+    }
+
     /**
      * @param list<IgnoredAdvisory> $ignored the advisories Composer's audit ignore lists keep out of S9
      * @param list<Signal>          $signals         the finding's signals: S10 tells a gap from a skip
      * @param ?string               $metadataFailure what the repository that lists the package answered instead of its metadata
      * @param list<AcceptedCheck>     $accepted        the S10 entries that `accept-unchecked` accepted: each one is a skip
      * @param ?Check                  $droppedDates    the `release_dates` gap that the S10 filter dropped, a skip
+     * @param ?NotCheckedRule         $notChecked      decides the signals that unread release metadata blocks, as S10 does
      */
-    public static function of(PackageFacts $facts, ?AllowlistEntry $entry, PhpFloor $floor, array $ignored, array $signals, ?string $metadataFailure, Age $age, array $accepted = [], ?Check $droppedDates = null): self
+    public static function of(PackageFacts $facts, ?AllowlistEntry $entry, PhpFloor $floor, array $ignored, array $signals, ?string $metadataFailure, Age $age, array $accepted = [], ?Check $droppedDates = null, ?NotCheckedRule $notChecked = null): self
     {
         $package = $facts->package();
         $status = $facts->metadataStatus();
         $coverage = $facts->advisoryCoverage();
         $reason = $coverage === null ? AdvisoryCoverage::NO_FEED : $coverage->reason();
         $requires = $package->requirePhp();
-        // A lookup that some feed answered is partial, whether or not that feed counted an advisory.
-        $answered = $coverage !== null && $coverage->records() !== null;
-        $check = $reason === null ? 'complete' : ($answered || $facts->advisories() !== [] ? 'partial' : 'not_run');
+        $check = $reason === null ? 'complete' : (self::isPartialLookup($facts) ? 'partial' : 'not_run');
 
         $details = new self(
             $status,
             $status === PackageFacts::METADATA_UNAVAILABLE && $metadataFailure !== null ? MetadataFailure::reason($metadataFailure) : null,
             $status === PackageFacts::METADATA_UNAVAILABLE ? $metadataFailure : null,
-            self::skippedChecks($facts, $signals, $reason, $accepted, $droppedDates),
+            self::skippedChecks($facts, $signals, $reason, $accepted, $droppedDates, $notChecked),
             ['requires' => $requires, 'target_runs' => $requires === null ? null : $floor->admitsTarget($requires), 'project_allows' => $requires === null ? null : $floor->allowsProject($requires)],
             $entry,
             $check,
@@ -192,7 +200,7 @@ final class FindingDetails
      *
      * @return list<Check>
      */
-    private static function skippedChecks(PackageFacts $facts, array $signals, ?string $advisoryReason, array $accepted, ?Check $droppedDates): array
+    private static function skippedChecks(PackageFacts $facts, array $signals, ?string $advisoryReason, array $accepted, ?Check $droppedDates, ?NotCheckedRule $notChecked): array
     {
         $inS10 = [];
         $capped = false;
@@ -223,7 +231,7 @@ final class FindingDetails
             $skipped[] = $acceptedSkips['release_metadata'];
         } elseif ($facts->metadataStatus() !== PackageFacts::METADATA_READ) {
             if (!\in_array('release_metadata', $inS10, true)) {
-                $skipped[] = new Check('release_metadata', $facts->metadataStatus(), $capped ? [Signal::S2, Signal::S8, Signal::S11] : [Signal::S2, Signal::S8]);
+                $skipped[] = new Check('release_metadata', $facts->metadataStatus(), $notChecked !== null ? $notChecked->metadataBlocks($facts, $capped) : ($capped ? [Signal::S2, Signal::S8, Signal::S11] : [Signal::S2, Signal::S8]));
             }
         } elseif (ReleaseBranch::of($facts->package()->version()) === null) {
             $skipped[] = new Check('release_branch', 'branch_snapshot', [Signal::S8]);
@@ -311,6 +319,7 @@ final class FindingDetails
         }
         $gets = $this->fixes === null ? null : $this->fixes->gets();
         $installed = $this->installedBranchFixes($rows, $branch);
+        $gets = $gets === null ? null : $this->namedGets($gets, $installed);
 
         return $out + [
             'worst' => self::worst($standing->counts()),
@@ -321,7 +330,7 @@ final class FindingDetails
             'installed_branch_fixes' => $installed === null ? null : $this->rowFixes($installed),
             'move_in' => $this->moves()->moveIn(),
             'gets' => $gets === null ? null : [
-                'version' => $this->getsVersion($gets->version(), $installed),
+                'version' => $gets->version(),
                 'php_check' => $gets->phpCheck(),
                 'clears' => array_map(static fn (string $id): array => ['kind' => 'advisory', 'id' => $id, 'basis' => 'outside_range'], self::inS9Order($gets->clears(), $rows)),
                 'clears_all' => $gets->clearsAll(),
@@ -330,12 +339,23 @@ final class FindingDetails
         ];
     }
 
-    /** The release that the installed branch's checked move installs, when it is not the release `composer update` targets. */
-    private function getsVersion(?string $version, ?BranchFixes $installed): ?string
+    /**
+     * The Gets of the release that `gets` names: the release that the installed branch's checked
+     * move installs, when it is not the release `composer update` targets. A resolving solve also
+     * outranks the refusals that cap every release (ruling R2-1). Null when they cap every release
+     * and no solve resolves.
+     */
+    private function namedGets(Gets $gets, ?BranchFixes $installed): ?Gets
     {
         $check = $installed === null ? null : $this->moves()->rowCheck($installed->branch());
+        if ($gets->isCapped()) {
+            $installs = $check !== null && $check->isResolved() ? $check->installs() : null;
 
-        return ($check === null ? null : $check->installsBelow($version) ?? $check->installsAbove($version)) ?? $version;
+            return $installs === null ? null : $gets->at($installs);
+        }
+        $other = $check === null ? null : $check->installsBelow($gets->version()) ?? $check->installsAbove($gets->version());
+
+        return $other === null ? $gets : $gets->at($other);
     }
 
     /**

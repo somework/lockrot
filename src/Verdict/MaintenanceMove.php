@@ -83,20 +83,22 @@ final class MaintenanceMove
         if ($own !== null) {
             return self::tag($own, self::highestTag($own, $snapshotTime));
         }
-        $version = $s6 === null ? null : $s6->lastStableVersion();
+        $version = $context->newestTagVersion();
         if ($s6 === null || $version === null) {
             return MoveDraft::of(Move::NO_TAG, FlagSet::PINNED);
         }
         // A snapshot with no line of its own is on the highest stable line, so the move never goes
-        // down a line. With no branch row, the target is the release that S6 names.
+        // down a line. With no branch row, the target is the newest tag, a pre-release included (I18b).
         $branch = $context->rows()[0] ?? null;
         if ($branch !== null) {
             // The newest dated tag can be a backport below its branch's highest tag: the move requires the highest tag.
             return self::tag($branch, self::highestTag($branch, $snapshotTime));
         }
 
-        $latest = new Latest($version, $s6->lastStableRelease(), false, $s6->tagRelation(), $snapshotTime);
-        $kind = PhpCheck::of($context->lastStablePhp(), $context->floor())->targetRuns() === false ? Move::BLOCKED : Move::TAG;
+        $released = $context->newestTagReleasedAt();
+        $relation = $released === null || $snapshotTime === null ? null : self::relation($released, new \DateTimeImmutable($snapshotTime));
+        $latest = new Latest($version, $released === null ? null : $released->format(\DATE_ATOM), false, $relation, $snapshotTime);
+        $kind = PhpCheck::of($context->newestTagPhp(), $context->floor())->targetRuns() === false ? Move::BLOCKED : Move::TAG;
 
         return MoveDraft::of($kind, FlagSet::PINNED)->withLatest($latest, null);
     }
@@ -166,9 +168,11 @@ final class MaintenanceMove
             }
         }
         $installedVersion = $context->subject()->version();
-        $newestVersion = $context->lastStableVersion();
+        $newestVersion = $context->newestTagVersion();
         if ($newestVersion !== null && self::isAboveVersion($newestVersion, $installedVersion)) {
-            return MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE)->withLatest(new Latest($newestVersion, $context->lastStableReleased(), false, null, null), null);
+            $released = $context->newestTagReleasedAt();
+
+            return MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE)->withLatest(new Latest($newestVersion, $released === null ? null : $released->format(\DATE_ATOM), false, null, null), null);
         }
         $highest = $context->rows()[0] ?? null;
         if ($highest !== null && self::isAboveVersion($highest->highest(), $installedVersion)) {

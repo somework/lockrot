@@ -1623,7 +1623,7 @@
           ],
           "properties": {
             "result": {
-              "description": "`resolves`: the solver installs the move in `form`; `refused`: no form installs it, and `held_by` names the holds; `not_checked`: lockrot did not ask, `reason` says why. Closed.",
+              "description": "`resolves`: the solver installs the move in `form`; `refused`: no form installs it, and `held_by` names the holds; `not_checked`: lockrot did not ask, or every solve installs no release of the package, `reason` says why. Closed.",
               "type": "string",
               "enum": [
                 "resolves",
@@ -1648,7 +1648,7 @@
               ]
             },
             "reason": {
-              "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `advisory_lookup_incomplete` (the advisory lookup did not cover a package of the result), `lock_disabled` (`config.lock` is false, so Composer ignores composer.lock), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), `platform_config_invalid` (a `config.platform` entry of the merged config fails the validation of Composer's platform repository: php set to false in any letter case, a value that is neither a string nor false, a name that is no platform package, or a version string that Composer cannot normalize, such as `^8.2` or an ext-* value `^1.0`), `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note). An open set.",
+              "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `advisory_lookup_incomplete` (the advisory lookup did not cover a package of the result), `lock_disabled` (`config.lock` is false, so Composer ignores composer.lock), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), `platform_config_invalid` (a `config.platform` entry of the merged config fails the validation of Composer's platform repository: php set to false in any letter case, a value that is neither a string nor false, a name that is no platform package, or a version string that Composer cannot normalize, such as `^8.2` or an ext-* value `^1.0`), `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note), `installs_no_release` (each form that resolves keeps the locked release, installs a dev version of the package, a branch alias included, or removes it, so no form reaches a release: the move's text names what the solver installs). An open set.",
               "oneOf": [
                 {
                   "type": "string",
@@ -1666,7 +1666,8 @@
                     "pass_cap",
                     "solver_error",
                     "advisory_lookup_incomplete",
-                    "lock_disabled"
+                    "lock_disabled",
+                    "installs_no_release"
                   ]
                 },
                 {
@@ -1675,7 +1676,7 @@
               ]
             },
             "installs": {
-              "description": "The release of the moved package that the resolving form installs, as its repository lists it. Null unless `result` is `resolves`, and null when the check was recorded without it.",
+              "description": "The release of the moved package that the resolving form installs, as its repository lists it. Null unless `result` is `resolves`, and null when the check was recorded without it. On `not_checked` with `installs_no_release`, the version that the first resolving form installs or keeps: a dev version, or the locked release. Null when that form removes the package from the lock.",
               "type": [
                 "string",
                 "null"
@@ -1685,7 +1686,7 @@
           },
           "allOf": [
             {
-              "description": "`form` is set exactly on `resolves`, `reason` exactly on `not_checked`, and `installs` only on `resolves`.",
+              "description": "`form` is set exactly on `resolves`, `reason` exactly on `not_checked`, and `installs` only on `resolves` and on `installs_no_release`.",
               "anyOf": [
                 {
                   "properties": {
@@ -1731,10 +1732,38 @@
                       "type": "null"
                     },
                     "reason": {
-                      "type": "string"
+                      "type": "string",
+                      "not": {
+                        "enum": [
+                          "installs_no_release"
+                        ]
+                      }
                     },
                     "installs": {
                       "type": "null"
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "result": {
+                      "enum": [
+                        "not_checked"
+                      ]
+                    },
+                    "form": {
+                      "type": "null"
+                    },
+                    "reason": {
+                      "enum": [
+                        "installs_no_release"
+                      ]
+                    },
+                    "installs": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     }
                   }
                 }
@@ -9081,7 +9110,7 @@
       ],
       "properties": {
         "check": {
-          "description": "S10's check id: `repository_activity` (S3, S4), `release_dates` (S2, S5, S8: a release that the signal reads has no trusted date, because the lock gives the installed release no time, its tag shares a commit with other tags, or the tag carries no date), `advisories` (S9: the advisory lookup did not complete), `releases` (S9's fix part: releases could not be read), `release_metadata` (S2, S8: a package from a vcs or an unknown origin, whose release metadata no Composer repository serves). An open set.",
+          "description": "S10's check id: `repository_activity` (S3, S4), `release_dates` (S2, S5, S8: a release that the signal reads has no trusted date, because the lock gives the installed release no time, its tag shares a commit with other tags, or the tag carries no date), `advisories` (S9: the advisory lookup did not complete), `releases` (S9's fix part: releases could not be read), `release_metadata` (S2 and S8, with S5 when S5 could fire and S11 when S11 fired: a package from a vcs or an unknown origin, whose release metadata no Composer repository serves). An open set.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*$",
           "x-known-values": [
@@ -9133,7 +9162,7 @@
       ],
       "properties": {
         "check": {
-          "description": "`repository_activity` (blocks S3, S4), `release_metadata` (S2, S8), `advisories` (S9), `release_branch` (S8 on a branch snapshot, which has no release branch), `repository_archived` (S3: the host's answer did not carry the archived flag, as an anonymous GitLab answer does not), `release_dates` (S2, S5, S8: the S10 `release_dates` gap of a package with S1 or a package that an allowlist entry accepts whole, which the S10 filter drops). An open set.",
+          "description": "`repository_activity` (blocks S3, S4), `release_metadata` (S2 and S8, with S5 when S5 could fire and S11 when S11 fired), `advisories` (S9), `release_branch` (S8 on a branch snapshot, which has no release branch), `repository_archived` (S3: the host's answer did not carry the archived flag, as an anonymous GitLab answer does not), `release_dates` (S2, S5, S8: the S10 `release_dates` gap of a package with S1 or a package that an allowlist entry accepts whole, which the S10 filter drops). An open set.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*$",
           "x-known-values": [
@@ -9264,7 +9293,7 @@
       },
       "allOf": [
         {
-          "description": "The check fixes what it blocks: `repository_activity` S3 and S4, `release_metadata` S2 and S8, `advisories` S9. A check that this schema does not list is not constrained.",
+          "description": "The check fixes what it blocks: `repository_activity` S3 and S4, `release_metadata` S2 and S8, with S5 when S5 could fire and S11 when S11 fired, in signal order, `advisories` S9. A check that this schema does not list is not constrained.",
           "anyOf": [
             {
               "properties": {
@@ -9295,6 +9324,22 @@
                     [
                       "S2",
                       "S8"
+                    ],
+                    [
+                      "S2",
+                      "S5",
+                      "S8"
+                    ],
+                    [
+                      "S2",
+                      "S8",
+                      "S11"
+                    ],
+                    [
+                      "S2",
+                      "S5",
+                      "S8",
+                      "S11"
                     ]
                   ]
                 }
@@ -9589,7 +9634,7 @@
       ],
       "properties": {
         "status": {
-          "description": "Closed. `read` exactly when `maintenance_judged` is true. A package installed from vcs, path or an archive is `not_from_composer_repository` whatever its verdict. Its `release_metadata` entry (S2, S8 not run) is in `checks_skipped[]` for a path, artifact or package origin. It is in `checks_missing[]` for vcs and unknown origins, unless the S10 filter moved it to `checks_skipped[]`.",
+          "description": "Closed. `read` exactly when `maintenance_judged` is true. A package installed from vcs, path or an archive is `not_from_composer_repository` whatever its verdict. Its `release_metadata` entry (S2 and S8 not run) is in `checks_skipped[]` for a path, artifact or package origin. It is in `checks_missing[]` for vcs and unknown origins, unless the S10 filter moved it to `checks_skipped[]`.",
           "type": "string",
           "enum": [
             "read",
@@ -10734,7 +10779,7 @@
           ]
         },
         "has_stable_release": {
-          "description": "Whether the repository lists any tagged version; null when no metadata was loaded.",
+          "description": "Whether the repository lists a stable tag. A pre-release does not count. Null when no metadata was loaded.",
           "type": [
             "boolean",
             "null"
@@ -10752,7 +10797,7 @@
           ]
         },
         "last_stable_version": {
-          "description": "The newest tagged release, a pre-release included. That is the highest tag when it has no trusted date, else the newest by date, a lower tag on a shared commit included. Null only when no tag exists or no metadata was loaded.",
+          "description": "The newest stable tag, never a pre-release. That is the highest stable tag when it has no trusted date, else the newest stable tag by date, a lower tag on a shared commit included. Null when no stable tag exists or no metadata was loaded.",
           "type": [
             "string",
             "null"
@@ -10950,7 +10995,7 @@
           "$ref": "#/definitions/years"
         },
         "newest_release_at_least": {
-          "description": "True when `newest_version` is the newest branch's highest tag and that tag has no trusted release date: `newest_release` is then the date of a commit its tags share, a lower bound, and `newest_years` an upper bound. False when S8 quotes a lower tag with its own date. The summary reads \"(on or after {date}, the date of a commit its tags share)\".",
+          "description": "True when `newest_version` is the newest branch's highest tag and that tag has no trusted release date, or a lower tag that only a commit shared with other tags dates: `newest_release` is then the date of a commit its tags share, a lower bound, and `newest_years` an upper bound. False when S8 quotes a lower tag with its own date. The summary reads \"(on or after {date}, the date of a commit its tags share)\".",
           "type": "boolean"
         },
         "floor_php": {
@@ -11056,7 +11101,7 @@
           ]
         },
         "reachable_release_at_least": {
-          "description": "True when `reachable_version` is the reachable branch's highest tag and that tag has no trusted release date: `reachable_release` is then the date of a commit its tags share, a lower bound, and `reachable_years` an upper bound. False when S8 quotes a lower tag with its own date. Null with `reachable_branch`.",
+          "description": "True when `reachable_version` is the reachable branch's highest tag and that tag has no trusted release date, or a lower tag that only a commit shared with other tags dates: `reachable_release` is then the date of a commit its tags share, a lower bound, and `reachable_years` an upper bound. False when S8 quotes a lower tag with its own date. Null with `reachable_branch`.",
           "type": [
             "boolean",
             "null"
@@ -21654,7 +21699,7 @@
               ],
               "properties": {
                 "composer": {
-                  "description": "The version of the running Composer, on every `baseline` and every `reason`, also when nothing solved.",
+                  "description": "The version of the running Composer, on every `baseline` and every `reason`, also when the move check solves nothing. The type admits null, but `composer lockrot` never writes null here: both of its move checkers report the version.",
                   "type": [
                     "string",
                     "null"
@@ -22915,7 +22960,8 @@
             "pass_cap",
             "solver_error",
             "advisory_lookup_incomplete",
-            "lock_disabled"
+            "lock_disabled",
+            "installs_no_release"
           ]
         },
         "packages": {
@@ -23440,6 +23486,23 @@
         }
       }
     },
+    "noteLockOutOfSync": {
+      "description": "`lock_out_of_sync`: the lock's `content-hash` differs from the hash of composer.json, as Composer's lock freshness check reads it (the legacy `hash` key too). lockrot reads the lock as it is. No note without composer.json or without a hash in the lock.",
+      "type": "object",
+      "required": [
+        "missing"
+      ],
+      "properties": {
+        "missing": {
+          "description": "The root requirements that the lock holds no package for, sorted: `require`, and `require-dev` when the run reads dev packages. Platform requirements are never in it. It can be empty: a changed constraint changes the hash too.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/packageName"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
     "notePackageNameInvalid": {
       "description": "`package_name_invalid`: lock entries whose name is no Composer package name. lockrot skips them, so they have no finding and no command names them. The text names none of them.",
       "type": "object",
@@ -23521,7 +23584,8 @@
         "update_now_not_checked",
         "move_check_failed",
         "package_name_invalid",
-        "command_argument_unsafe"
+        "command_argument_unsafe",
+        "lock_out_of_sync"
       ]
     },
     "noteDetail": {
@@ -23887,6 +23951,18 @@
           }
         },
         {
+          "properties": {
+            "code": {
+              "enum": [
+                "lock_out_of_sync"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteLockOutOfSync"
+            }
+          }
+        },
+        {
           "description": "A note whose code this schema does not list, from a later release or not from lockrot: its data is any object.",
           "not": {
             "properties": {
@@ -23918,7 +23994,8 @@
                   "update_now_not_checked",
                   "move_check_failed",
                   "package_name_invalid",
-                  "command_argument_unsafe"
+                  "command_argument_unsafe",
+                  "lock_out_of_sync"
                 ]
               }
             }

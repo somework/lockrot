@@ -112,6 +112,23 @@ final class NotCheckedRuleTest extends TestCase
         self::assertStringStartsWith('release metadata not checked (lockrot cannot tell which repository serves it), so S2 and S8 could not be read', $capped->summary());
     }
 
+    /** S5 reads the lock `time` when no metadata exists, so only a missing `time` leaves it unread. */
+    public function testUnreadMetadataBlocksS5ExactlyWhenS5CannotJudge(): void
+    {
+        $rule = new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
+        $facts = static fn (?string $time): PackageFacts => (new PackageFacts(F::package(['fromComposerRepository' => false, 'php' => '>=5.6', 'time' => $time]), null, null, []))
+            ->withActivityLookup(ActivityLookup::notRead(ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, LocatedRepository::none(null)));
+
+        $undated = $rule->evaluate($facts(null));
+        $dated = $rule->evaluate($facts('2019-01-01T00:00:00+00:00'));
+
+        self::assertNotNull($undated);
+        self::assertNotNull($dated);
+        self::assertSame([Signal::S2, Signal::S5, Signal::S8], JsonPath::arrayAt(JsonPath::decoded($undated->data()), ['unchecked', 0, 'blocks']));
+        self::assertSame([Signal::S2, Signal::S8], JsonPath::arrayAt(JsonPath::decoded($dated->data()), ['unchecked', 0, 'blocks']));
+        self::assertStringStartsWith('release metadata not checked (lockrot cannot tell which repository serves it), so S2, S5 and S8 could not be read', $undated->summary());
+    }
+
     /** @return iterable<string, array{LockedPackage, string}> */
     public static function originWords(): iterable
     {
@@ -371,6 +388,70 @@ final class NotCheckedRuleTest extends TestCase
         self::assertNotNull($s10);
         self::assertEquals(new NotCheckedData([new Check('advisories', $reason, [Signal::S9])]), $s10->data());
         self::assertSame('security advisories not checked ('.$cause.'), so S9 could not be read', $s10->summary());
+    }
+
+    /** A feed that answered makes `security.check` partial, so S9 can fire and the words say "incomplete". */
+    public function testAFailedLookupAfterAFeedAnsweredSaysS9MayBeIncomplete(): void
+    {
+        $facts = new PackageFacts(F::package(), self::dated(), F::activity(false, '2026-09-01T00:00:00+00:00'), [], null, null, new AdvisoryNameCoverage([], 2, 'lookup_failed'));
+
+        $s10 = $this->rule()->evaluate($facts);
+
+        self::assertNotNull($s10);
+        self::assertSame([['check' => 'advisories', 'reason' => 'lookup_failed', 'blocks' => [Signal::S9]]], JsonPath::decoded($s10->data())['unchecked']);
+        self::assertSame('security advisories not checked in full (a Composer repository did not return them), so S9 may be incomplete', $s10->summary());
+    }
+
+    /** @return iterable<string, array{string, ?int, string}> */
+    public static function advisoryWordsByCheck(): iterable
+    {
+        yield 'budget, a feed answered' => ['install_time_budget', 2, 'security advisories not checked in full (the install-time budget ran out), so S9 may be incomplete'];
+        yield 'budget, no feed answered' => ['install_time_budget', null, 'security advisories not checked (the install-time budget ran out), so S9 could not be read'];
+        yield 'lookup failed, no feed answered' => ['lookup_failed', null, 'security advisories not checked (an advisory repository failed), so S9 could not be read'];
+        yield 'offline is never partial' => ['offline', 2, 'security advisories not checked (the run is offline), so S9 could not be read'];
+    }
+
+    /** @dataProvider advisoryWordsByCheck */
+    #[DataProvider('advisoryWordsByCheck')]
+    public function testTheAdvisoryWordsFollowSecurityCheck(string $reason, ?int $records, string $words): void
+    {
+        $facts = new PackageFacts(F::package(), self::dated(), F::activity(false, '2026-09-01T00:00:00+00:00'), [], null, null, new AdvisoryNameCoverage([], $records, $reason));
+
+        $s10 = $this->rule()->evaluate($facts);
+
+        self::assertNotNull($s10);
+        self::assertSame($words, $s10->summary());
+        self::assertSame([['check' => 'advisories', 'reason' => $reason, 'blocks' => [Signal::S9]]], JsonPath::decoded($s10->data())['unchecked']);
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, string}> each condition of S5 alone, off */
+    public static function s5Conditions(): iterable
+    {
+        yield 'the lock entry has a time' => [['time' => '2019-01-01T00:00:00+00:00'], '8.4'];
+        yield 'the release is a branch snapshot' => [['version' => 'dev-master'], '8.4'];
+        yield 'require.php is not set' => [['php' => null], '8.4'];
+        yield 'require.php is not open-ended for the target' => [['php' => '^5.6 || ^7.0 || ^8.0'], '8.4'];
+        yield 'the target major has no known GA' => [[], '9.0'];
+    }
+
+    /**
+     * @param array<string, mixed> $override
+     *
+     * @dataProvider s5Conditions
+     */
+    #[DataProvider('s5Conditions')]
+    public function testS5IsNamedOnlyWhenAllFourConditionsHold(array $override, string $target): void
+    {
+        $ruleFor = static fn (string $php): NotCheckedRule => new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), $php));
+        self::assertSame([Signal::S2, Signal::S5, Signal::S8], $ruleFor('8.4')->metadataBlocks(self::notFromComposerRepository([]), false), 'all four hold');
+        self::assertSame([Signal::S2, Signal::S8], $ruleFor($target)->metadataBlocks(self::notFromComposerRepository($override), false));
+    }
+
+    /** @param array<string, mixed> $o */
+    private static function notFromComposerRepository(array $o): PackageFacts
+    {
+        return (new PackageFacts(F::package($o + ['fromComposerRepository' => false, 'php' => '>=5.6']), null, null, []))
+            ->withActivityLookup(ActivityLookup::notRead(ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, LocatedRepository::none(null)));
     }
 
     /** @return iterable<string, array{?string}> */

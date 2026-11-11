@@ -321,18 +321,7 @@
     "check": null
    },
    "move_in": "next_step",
-   "gets": {
-    "version": "v4.4.44",
-    "php_check": {
-     "requires": ">=7.1.3",
-     "project_allows": null,
-     "target_runs": true,
-     "raise_to": null,
-     "raise_size": null
-    },
-    "clears": [],
-    "clears_all": false
-   },
+   "gets": null,
    "partial": null
   },
   "checks_missing": [],

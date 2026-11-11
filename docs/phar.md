@@ -311,9 +311,9 @@ The exit `2` causes include:
 - a run outside the PHAR (a plugin install updates with `composer update somework/lockrot`)
 - a command line it cannot read (`self-update --nope`, `--check=yes`)
 
-A mistyped command name (`php lockrot.phar self-updte`) is not a `self-update` error: it exits `1`
-as any unknown command does ([exit `1` that is not lockrot's](ci.md#exit-1-not-from-lockrot)). A
-unique prefix such as `self-up` runs `self-update`.
+A mistyped command name (`php lockrot.phar self-updte`) is not a `self-update` error: it exits `2`
+as any unknown command does ([exit codes](ci.md#exit-codes)). A unique prefix such as `self-up`
+runs `self-update`.
 
 ### Reinstalling by hand
 

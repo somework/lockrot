@@ -76,6 +76,9 @@ final class Libyears
         if ($package->isBranchSnapshot()) {
             return LibyearsMeasurement::unmeasured(self::BRANCH_SNAPSHOT);
         }
+        if ($metadata->isAtOrAboveTheHighestStableTag($package->version())) {
+            return LibyearsMeasurement::of(0.0);
+        }
         $release = InstalledRelease::of($package, $metadata);
         $installed = $release->at();
         if ($installed === null) {
@@ -84,12 +87,9 @@ final class Libyears
         if (!$metadata->hasStableRelease()) {
             return LibyearsMeasurement::unmeasured(self::NO_STABLE_RELEASE);
         }
-        $newest = $metadata->newestReleaseByVersionAt();
+        $newest = $metadata->highestStableTagAt();
         if ($newest !== null) {
             return LibyearsMeasurement::of(self::yearsBetween($installed, $newest));
-        }
-        if ($metadata->newestReleaseByVersionSharesItsCommit()) {
-            return LibyearsMeasurement::unmeasured(self::UNDATED_RELEASES);
         }
         $above = self::newestTrustedDateAbove($metadata, $package->version());
 

@@ -315,16 +315,17 @@ final class MaintenanceMoveTest extends TestCase
         self::assertSame([Move::TAG, '13.x', 'v13.0.0', '2026-01-11T00:00:00+00:00'], [$draft->kind(), self::branch($draft), $latest->version(), $latest->released()]);
     }
 
-    /** With no branch row of S6's newest tag, the tag move reads S6, and the snapshot is never that tag. */
-    public function testASnapshotWithNoBranchRowOfItsNewestTagTargetsTheTagThatS6Names(): void
+    /** Rulings W17-X1 and R17-X1a: with pre-release tags only, S6 names no tag, and the tag move targets the newest pre-release. */
+    public function testASnapshotWithPreReleaseTagsOnlyTargetsTheNewestPreRelease(): void
     {
         $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => 'dev-master', 'notification-url' => 'https://packagist.org/downloads/']]]);
         $locked = $lock->find('a/b');
         self::assertNotNull($locked);
-        $facts = new PackageFacts($locked, PackageMetadata::fromPackages('a/b', [], new \DateTimeImmutable(self::NOW), 'dev-master'), null, []);
+        $beta = (new ArrayLoader())->load(['name' => 'a/b', 'version' => 'v1.0.0-beta1', 'time' => '2025-06-01T00:00:00+00:00', 'require' => ['php' => '>=7.2']]);
+        $facts = new PackageFacts($locked, PackageMetadata::fromPackages('a/b', [$beta], new \DateTimeImmutable(self::NOW), 'dev-master'), null, []);
         $floor = new PhpFloor('8.4');
-        $s6 = new Signal(Signal::LEVEL_WARN, 'pinned', SignalDataStub::of(Signal::S6, ['version' => 'dev-master', 'reason' => 'branch_snapshot', 'has_stable_release' => true,
-            'last_stable_release' => '2025-06-01T00:00:00+00:00', 'last_stable_version' => 'v1.4.9', 'last_stable_dated_by' => null, 'snapshot_time' => '2024-01-01T00:00:00+00:00', 'tag_relation' => 'newer']));
+        $s6 = new Signal(Signal::LEVEL_WARN, 'pinned', SignalDataStub::of(Signal::S6, ['version' => 'dev-master', 'reason' => 'branch_snapshot', 'has_stable_release' => false,
+            'last_stable_release' => null, 'last_stable_version' => null, 'last_stable_dated_by' => null, 'snapshot_time' => '2024-01-01T00:00:00+00:00', 'tag_relation' => null]));
         $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('dev-master')->withSignals([$s6])->build();
         $context = new MoveContext($finding, new MoveSubject('a/b', 'dev-master', true, [], '8.4', null), $facts->metadata(), BranchRow::all($facts, $floor, Clock::fixed(self::NOW)), null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true);
 
@@ -332,7 +333,31 @@ final class MaintenanceMoveTest extends TestCase
         $latest = $draft->latest();
 
         self::assertNotNull($latest);
-        self::assertSame([Move::TAG, 'v1.4.9', '2025-06-01T00:00:00+00:00', 'newer', false], [$draft->kind(), $latest->version(), $latest->released(), $latest->relation(), $latest->isInstalled()]);
+        self::assertSame([Move::TAG, 'v1.0.0-beta1', '2025-06-01T00:00:00+00:00', 'newer', false], [$draft->kind(), $latest->version(), $latest->released(), $latest->relation(), $latest->isInstalled()]);
+    }
+
+    /** Ruling W17-X1 reads S6 from stable tags only. The test move still names the newest tag, a pre-release included. */
+    public function testAnOldPromiseTestMoveNamesANewerPreReleaseAsTheNewestRelease(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'time' => '2018-08-10T00:00:00+00:00', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $locked = $lock->find('a/b');
+        self::assertNotNull($locked);
+        $packages = [];
+        foreach (['1.0.0' => '2018-08-10T00:00:00+00:00', 'v2.0.0-beta.1' => '2026-03-21T00:00:00+00:00'] as $version => $time) {
+            $release = (new ArrayLoader())->load(['name' => 'a/b', 'version' => $version, 'time' => $time, 'require' => ['php' => '>=5.6']]);
+            self::assertInstanceOf(BasePackage::class, $release);
+            $packages[] = $release;
+        }
+        $facts = new PackageFacts($locked, PackageMetadata::fromPackages('a/b', $packages, new \DateTimeImmutable(self::NOW), '1.0.0'), null, []);
+        $floor = new PhpFloor('8.4');
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->build();
+        $context = new MoveContext($finding, new MoveSubject('a/b', '1.0.0', true, [], '8.4', null), $facts->metadata(), BranchRow::all($facts, $floor, Clock::fixed(self::NOW)), null, new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::empty())), $floor, new \DateTimeImmutable(self::NOW), 2, null, [], [], true);
+
+        $draft = MaintenanceMove::draft($context, FlagSet::OLD_PROMISE);
+        $latest = $draft->latest();
+
+        self::assertNotNull($latest);
+        self::assertSame([Move::TEST, 'v2.0.0-beta.1', '2026-03-21T00:00:00+00:00', false], [$draft->kind(), $latest->version(), $latest->released(), $latest->isInstalled()]);
     }
 
     /** @return iterable<string, array{string, string, ?string, string, string}> */

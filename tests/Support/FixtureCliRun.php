@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support;
 
+use Composer\Package\Locker;
 use Lockrot\Data\Forge\GitHubApi;
 use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Http\CachingHttpClient;
@@ -163,8 +164,9 @@ final class FixtureCliRun
                 'config' => ['secure-http' => false, 'cache-dir' => $home.'/cache'],
                 'repositories' => ['packagist.org' => false, 'fixture' => ['type' => 'composer', 'url' => $this->server->url()]],
             ], \JSON_UNESCAPED_SLASHES));
-            file_put_contents($project.'/composer.json', $this->manifest($projectDir.'/composer.json'));
-            copy($projectDir.'/composer.lock', $project.'/composer.lock');
+            $manifest = $this->manifest($projectDir.'/composer.json');
+            file_put_contents($project.'/composer.json', $manifest);
+            file_put_contents($project.'/composer.lock', self::lockForManifest((string) file_get_contents($projectDir.'/composer.lock'), (string) file_get_contents($projectDir.'/composer.json'), $manifest));
             foreach ($files as $name => $source) {
                 if (!is_dir(\dirname($project.'/'.$name))) {
                     mkdir(\dirname($project.'/'.$name), 0777, true);
@@ -183,6 +185,22 @@ final class FixtureCliRun
             self::removeTree($home);
             self::removeTree($project);
         }
+    }
+
+    /**
+     * The lock for the project copy. A mirror URL in the copy's composer.json changes Composer's
+     * content hash, so a lock in sync with the project takes the copy's hash. Else the run reads
+     * `lock_out_of_sync`, which the project does not have. A lock out of sync stays as it is.
+     */
+    public static function lockForManifest(string $lock, string $manifest, string $copyManifest): string
+    {
+        $data = json_decode($lock, true);
+        if ($manifest === $copyManifest || !\is_array($data) || ($data['content-hash'] ?? null) !== Locker::getContentHash($manifest)) {
+            return $lock;
+        }
+        $data['content-hash'] = Locker::getContentHash($copyManifest);
+
+        return json_encode($data, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE)."\n";
     }
 
     /** The project's composer.json, each mirrored repository URL replaced by the URL that serves it. */

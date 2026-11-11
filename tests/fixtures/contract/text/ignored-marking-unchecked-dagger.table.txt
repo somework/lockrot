@@ -17,7 +17,7 @@ furthest behind symfony/debug v3.4.47 at 1.8
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
 php: the lock installs on PHP 7.2 to 8.5
 <fg=red>gate: fails · --fail-on=high,unchecked · 1 finding fails it (high 1, unchecked 1) · target php 8.4 (--target-php)</fg=red>
-Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with --format=json for
 details.
 note: GitHub API rate limit reached; repository activity missing for 1 repositories
 note: Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package:

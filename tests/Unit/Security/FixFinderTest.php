@@ -524,8 +524,146 @@ final class FixFinderTest extends TestCase
     }
 
     /**
-     * A conflict of the lock holds 1.3.0. The refusal of `^1.2` lowers neither the newest release of the
-     * branch nor `gets`: no solve installs 1.1.0 (SPEC §5.3, ruling R2-1).
+     * Ruling R17-13a: a package hold of a refusal that admits a release counts as a lock link for
+     * `gets`, when the hold's link names the package and does not admit that release. A link names
+     * the package with no target, with the package's name, or with a name that the package replaces.
+     *
+     * @return iterable<string, array{0: string, 1: Holder, 2: ?string}>
+     */
+    public static function packageHoldsOfARefusal(): iterable
+    {
+        $require = static fn (string $constraint, ?string $target = null): Holder => new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::REQUIRE, $constraint, $target);
+        yield 'a hold on the package that excludes the newest leaves the release below it' => ['^1.2', $require('^2.0'), '1.1.0'];
+        yield 'a hold on the package by its name excludes the newest' => ['^1.2', $require('^2.0', 'a/b'), '1.1.0'];
+        yield 'a hold on a name that the package replaces excludes the newest' => ['^1.2', $require('^2.0', 'a/legacy'), '1.1.0'];
+        yield 'a hold that names the package in another case excludes the newest' => ['^1.2', $require('^2.0', 'A/B'), '1.1.0'];
+        yield 'a hold on another package caps nothing' => ['^1.2', $require('^2.0', 'acme/rt-kernel'), '1.2.0'];
+        yield 'a hold whose link admits the newest leaves it' => ['^1.2', $require('^1.0'), '1.2.0'];
+        yield 'a hold whose constraint does not parse caps nothing' => ['^1.2', $require('not a constraint'), '1.2.0'];
+        yield 'a conflict that matches the newest excludes it' => ['^1.2', new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::CONFLICT, '>=1.2'), '1.1.0'];
+        yield 'a root hold is a link of the lock already, so the refusal adds nothing' => ['^1.2', new Holder(Holder::ROOT, null, null, Holder::ROOT_REQUIRE, '^2.0'), '1.2.0'];
+        yield 'a hold that excludes every release above the installed one leaves no version' => ['^1.1', $require('^2.0'), null];
+        // Ruling R17-Q4: Composer's same-name rule conflicts on every version of a replaced name.
+        yield 'a replace hold caps every release, also the one that its self.version names' => ['^1.1', new Holder(Holder::PACKAGE, 'c/c', '1.2.0', Holder::REPLACE, 'self.version', 'a/b'), null];
+    }
+
+    /**
+     * @dataProvider packageHoldsOfARefusal
+     */
+    #[DataProvider('packageHoldsOfARefusal')]
+    public function testThePackageHoldOfARefusalCapsGetsAsALockLink(string $refused, Holder $hold, ?string $gets): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0', 'replace' => ['a/legacy' => 'self.version']], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4'], ['1.2.0', '>=7.4']], ['A' => '<1.1.0']);
+        $finder = new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::fromArray(['require' => ['a/b' => '^1.0']])));
+
+        $held = $finder->withRefused(RefusedMoves::none()->with($refused, [$hold]))->find($facts);
+        $free = $finder->find($facts);
+
+        self::assertNotNull($held->gets());
+        self::assertSame($gets, $held->gets()->version());
+        $installed = $held->installedBranch();
+        self::assertNotNull($installed);
+        self::assertNotNull($free->installedBranch());
+        self::assertSame(
+            [$free->installedBranch()->newest(), $free->forAdvisory('A')->newest()],
+            [$installed->newest(), $held->forAdvisory('A')->newest()],
+            'installed_branch_fixes.newest and the S9 fix newest keep what the links allow (ruling R3-2)'
+        );
+    }
+
+    public function testAHoldOnAnotherPackageLeavesTheHoldOnThePackageAfterIt(): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4'], ['1.2.0', '>=7.4']], ['A' => '<1.1.0']);
+        $finder = new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::fromArray(['require' => ['a/b' => '^1.0']])));
+        $other = new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::REQUIRE, '^2.0', 'acme/rt-kernel');
+        $own = new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::REQUIRE, '^2.0', 'a/b');
+
+        $gets = $finder->withRefused(RefusedMoves::none()->with('^1.2', [$other, $own]))->find($facts)->gets();
+
+        self::assertNotNull($gets);
+        self::assertSame('1.1.0', $gets->version());
+    }
+
+    public function testAHoldWhoseConstraintDoesNotParseLeavesTheHoldAfterIt(): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4'], ['1.2.0', '>=7.4']], ['A' => '<1.1.0']);
+        $finder = new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::fromArray(['require' => ['a/b' => '^1.0']])));
+        $unparsed = new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::REQUIRE, 'not a constraint', 'a/b');
+        $own = new Holder(Holder::PACKAGE, 'd/d', '1.0.0', Holder::REQUIRE, '^2.0', 'a/b');
+
+        $gets = $finder->withRefused(RefusedMoves::none()->with('^1.2', [$unparsed, $own]))->find($facts)->gets();
+
+        self::assertNotNull($gets);
+        self::assertSame('1.1.0', $gets->version());
+    }
+
+    public function testAReleaseThatARefusalCapsDoesNotHideAHigherFreeRelease(): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4'], ['1.2.0', '>=7.4']], ['A' => '<1.1.0']);
+        $finder = (new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::empty())))
+            ->withRefused(RefusedMoves::none()->with('~1.1.0', [new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::REQUIRE, '^2.0')]));
+
+        $gets = $finder->find($facts)->gets();
+
+        self::assertNotNull($gets);
+        self::assertSame(['1.2.0', false], [$gets->version(), $gets->isCapped()]);
+    }
+
+    /** `at()` knows every release above the installed one, not only the lowest. */
+    public function testGetsAtAMiddleReleaseGivesThatReleasesOwnFacts(): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4'], ['1.2.0', '>=8.0'], ['1.3.0', '>=8.1']], ['A' => '<1.1.0']);
+        $gets = (new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::empty())))->find($facts)->gets();
+        self::assertNotNull($gets);
+
+        self::assertSame(['1.3.0', '>=8.0'], [$gets->version(), $gets->at('1.2.0')->phpCheck()->requires()]);
+    }
+
+    /**
+     * With every release capped by a refusal, `gets` names no version, and the target runs its php
+     * check: only a checked solve names a release then (ruling R2-1, FindingDetails).
+     */
+    public function testAGetsThatEveryRefusalCapsNamesNoVersionAndTheTargetRunsIt(): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4'], ['1.2.0', '>=7.4']], ['A' => '<1.1.0']);
+        $finder = (new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::empty())))
+            ->withRefused(RefusedMoves::none()->with('^1.1', [new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::REQUIRE, '^2.0')]));
+
+        $gets = $finder->find($facts)->gets();
+
+        self::assertNotNull($gets);
+        self::assertSame([true, null], [$gets->isCapped(), $gets->version()]);
+        $lower = $gets->at('1.1.0');
+        self::assertSame(['1.1.0', '>=7.4', ['A'], true], [$lower->version(), $lower->phpCheck()->requires(), $lower->clears(), $lower->clearsAll()]);
+    }
+
+    /** `at()` gives the facts of each release above the installed one, and a release that the scan does not know keeps the picked facts. */
+    public function testGetsAtAReleaseGivesThatReleasesOwnFacts(): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4 <8.5'], ['1.2.0', '>=8.1']], ['A' => '<1.1.0']);
+        $gets = (new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::empty())))->find($facts)->gets();
+        self::assertNotNull($gets);
+
+        self::assertSame(['1.2.0', false, '>=7.4 <8.5'], [$gets->version(), $gets->isCapped(), $gets->at('v1.1.0')->phpCheck()->requires()]);
+        self::assertSame(['9.0.0', '>=8.1'], [$gets->at('9.0.0')->version(), $gets->at('9.0.0')->phpCheck()->requires()]);
+    }
+
+    /** The php check of `gets` reads the php of the release that `gets` names, not the branch's newest. */
+    public function testThePhpCheckOfGetsReadsTheReleaseThatItNames(): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4 <8.5'], ['1.2.0', '>=8.1']], ['A' => '<1.1.0']);
+        $finder = (new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::empty())))
+            ->withRefused(RefusedMoves::none()->with('^1.2', [new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::REQUIRE, '^2.0')]));
+
+        $gets = $finder->find($facts)->gets();
+
+        self::assertNotNull($gets);
+        self::assertSame(['1.1.0', '>=7.4 <8.5'], [$gets->version(), $gets->phpCheck()->requires()]);
+    }
+
+    /**
+     * A conflict of the lock holds 1.3.0. The refusal of `^1.2` that names a root hold lowers neither
+     * the newest release of the branch nor `gets`: no solve installs 1.1.0 (SPEC §5.3, ruling R2-1).
      */
     public function testTheNewestOfTheInstalledBranchAndGetsAreWhatTheLinksAllowWhateverTheSolverRefuses(): void
     {

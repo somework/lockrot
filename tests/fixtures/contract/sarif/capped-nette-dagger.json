@@ -67,11 +67,12 @@
                         "baseline_status": null,
                         "error_by": [],
                         "chain": [
-                            "pragmarx/google2fa-laravel",
+                            "laravel/framework",
+                            "league/commonmark",
                             "league/config",
                             "nette/schema"
                         ],
-                        "depth": 2,
+                        "depth": 3,
                         "direct_dependents": [
                             "laravel/framework",
                             "pragmarx/google2fa-laravel"

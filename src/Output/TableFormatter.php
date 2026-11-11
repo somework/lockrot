@@ -197,7 +197,7 @@ final class TableFormatter implements FormatterInterface
         foreach (self::wrapBetweenItems(RunGateText::render($gate, $this->context->runOf($report)), $wrap) as $line) {
             $lines[] = $gate->fails() ? \sprintf('<fg=red>%s</fg=red>', $line) : $line;
         }
-        foreach (self::wrapKeepingCommands(RunFooter::dataAsOf($report).'. Run composer lockrot --format=json for details.', $wrap) as $line) {
+        foreach (self::wrapKeepingCommands(RunFooter::dataAsOf($report).'. Run lockrot with --format=json for details.', $wrap) as $line) {
             $lines[] = $line;
         }
         $notes = $report->notes();
@@ -231,17 +231,14 @@ final class TableFormatter implements FormatterInterface
         return $lines;
     }
 
-    /** Commands the footer names: one thing to copy, so each stays on one line and can overflow. */
-    private const COMMANDS = ['composer lockrot --format=json', 'composer audit'];
-
     /**
-     * @param list<string> $commands more commands that $text names, before the neutraliser
+     * @param list<string> $commands the commands that $text names, before the neutraliser: each stays on one line
      *
      * @return list<string>
      */
     private static function wrapKeepingCommands(string $text, int $wrap, array $commands = []): array
     {
-        $commands = array_merge(self::COMMANDS, array_map([TerminalText::class, 'neutralise'], $commands));
+        $commands = array_map([TerminalText::class, 'neutralise'], $commands);
         $glued = [];
         foreach ($commands as $command) {
             $glued[] = str_replace(' ', "\x1F", $command);

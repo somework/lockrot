@@ -90,7 +90,7 @@ final class LockrotConfig
             $failOn,
             $targetPhp,
             $includeDev,
-            ($cli['offline'] ?? null) === true,
+            ($cli['offline'] ?? null) === true || self::isNetworkDisabledBy($env['COMPOSER_DISABLE_NETWORK'] ?? null),
             ($cli['strict-network'] ?? null) === true,
             $format,
             self::resolveBaseline($extra, $cli),
@@ -126,6 +126,18 @@ final class LockrotConfig
         }
 
         return $value;
+    }
+
+    /**
+     * Composer's own reading of COMPOSER_DISABLE_NETWORK, `(bool)` of the value as HttpDownloader
+     * takes it: any value but empty or `0`, `prime` included, turns the network off, so the run
+     * reads as `--offline`.
+     *
+     * @param mixed $value the value of COMPOSER_DISABLE_NETWORK, false or null when it is not set
+     */
+    public static function isNetworkDisabledBy($value): bool
+    {
+        return \is_string($value) && $value !== '' && $value !== '0';
     }
 
     /**

@@ -121,7 +121,7 @@
 flags: abandoned 27 · silent 10 · pinned 1 · left-behind 54 · old-promise 18 · stale 12 · capped 2 · vulnerable 20 · 30 packages carry more than one\
 depth: 51 of 113 flagged packages are named by no line of composer.json · direct 61 · 1 hop 31 · 2 hops 14 · 3 hops 5 · 4 hops 2 · deepest: `hoa/ustring` and `hoa/zformat`, 4 hops (`kphoen/rulerz` › `hoa/ruler` › `hoa/compiler` › `hoa/regex` › `hoa/ustring`) · 1 more is named only in require-dev, which this run did not walk (pass --dev)\
 security: 20 vulnerable packages · 64 advisories: 1 critical, 17 high, 30 medium, 3 unrated, 13 low\
-libyears: at least 385.4 behind across 204 of 210 packages · 220.0 from direct requirements · furthest behind `willdurand/jsonp-callback-validator` v1.1.0 at 8.0\
+libyears: at least 385.5 behind across 204 of 210 packages · 220.1 from direct requirements · furthest behind `willdurand/jsonp-callback-validator` v1.1.0 at 8.0\
 pulled in by: `kphoen/rulerz-bundle` 15 · `kphoen/rulerz` 14 · `wallabag/phpepub` 5 · `nelmio/api-doc-bundle` 3 · `pagerfanta/doctrine-orm-adapter` 3 · … and 31 more\
 advisories: 210 packages asked · composer repo (http\://127.0.0.1) answered (193 on record for 49 packages)\
 moves: not checked, because Composer's solver refuses the lock itself (see the moves\_not\_checked note)\
@@ -131,4 +131,4 @@ baseline: 48 known · 61 new · 6 worsened · 2 stale (lockrot-baseline.json)
 - note: moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code 4.7.1 requires php \>=7.4, \<8.2.
 - note: baseline lists 2 packages no longer in composer.lock: behat/transliterator, true/punycode
 
-<sub>210 packages checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>210 packages checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

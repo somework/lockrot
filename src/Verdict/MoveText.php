@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+use Composer\Semver\VersionParser;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Security\Holder;
 use Lockrot\Solver\MoveCheck;
@@ -80,7 +81,7 @@ final class MoveText
         if ($through !== '' && \in_array(Move::TRANSITIVE, $move->composerMovesBecause(), true)) {
             $text .= '; '.$through;
         }
-        $parts[] = [$text.self::checked($move->check()).self::movesWith($move).($move->unsafeArgument() === null ? '' : self::NO_COMMAND), false];
+        $parts[] = [$text.self::checked($move).self::movesWith($move).($move->unsafeArgument() === null ? '' : self::NO_COMMAND), false];
         $step = $move->commands() === [] ? '' : self::platformStep($subject->targetPhp(), $subject->platformOverride(), $subject->isBaselineRefused());
 
         return self::joined(array_merge([[$step, false]], $step === '' ? $parts : self::sentenceStart($parts)));
@@ -153,10 +154,14 @@ final class MoveText
     }
 
     /** D10: what Composer's solver said about the move, or why lockrot did not ask it. */
-    private static function checked(?MoveCheck $check): string
+    private static function checked(Move $move): string
     {
+        $check = $move->check();
         if ($check === null) {
             return '';
+        }
+        if ($check->installsNoReleaseOfIt()) {
+            return self::noRelease($check->installs(), $move);
         }
         switch ($check->result()) {
             case MoveCheck::RESOLVES:
@@ -166,6 +171,19 @@ final class MoveText
             default:
                 return '; not checked with Composer\'s solver ('.MoveCheck::reasonWords((string) $check->reason()).'), so it holds only if Composer resolves it';
         }
+    }
+
+    /** Ruling R17-1: what the first resolving form gives in place of the move's newest: a dev version, the locked version, or no entry when the solve removes the package. */
+    private static function noRelease(?string $installs, Move $move): string
+    {
+        $newest = $move->newest() ?? $move->version();
+        if ($installs === null) {
+            return "; Composer's solver removes ".$move->subject()->package().' from the lock, not '.$newest.', so this command does not reach it';
+        }
+
+        return MoveCheck::isRelease($installs) || $installs === $move->subject()->version()
+            ? "; Composer's solver keeps ".$installs.', not '.$newest.', so this command does not reach it'
+            : "; Composer's solver installs ".$installs.', a dev version, not '.$newest.', so this command does not reach a release';
     }
 
     /** ", with an update of h/x (to 2.1.0)", one entry per holder that the joint request moves. */
@@ -199,7 +217,7 @@ final class MoveText
             return [
                 [self::raise($move), false],
                 [$command ?? 'update it with Composer', $command !== null],
-                [($below === '' ? ' (gets '.$gets.')' : $below).self::clears($move).self::adds($move), false],
+                [($below !== '' ? $below : ($check !== null && $check->installsNoReleaseOfIt() ? '' : ' (gets '.$gets.')')).self::clears($move).self::adds($move), false],
             ];
         }
 
@@ -285,11 +303,17 @@ final class MoveText
             $text = self::raise($move).'move it to a tag — '.$word.' is '.$version.($via === '' ? '' : ', through '.$via);
         }
         $released = $latest === null ? null : $latest->released();
-        $text .= ($released === null ? '' : ' ('.substr($released, 0, 10).')').self::below($move, $version);
+        $text .= ($released === null ? '' : ' ('.substr($released, 0, 10).')').self::preRelease($version).self::below($move, $version);
         if ($latest !== null && $latest->relation() === 'older') {
             $text .= ', older than your snapshot ('.substr((string) $latest->snapshotTime(), 0, 10).'); review, or replace';
         }
         return $text.self::phpClause($move, $subject).self::adds($move);
+    }
+
+    /** Ruling R17-X1a: a pinned move with no stable tag targets a pre-release. */
+    private static function preRelease(string $version): string
+    {
+        return $version !== '' && VersionParser::parseStability($version) !== 'stable' ? ', a pre-release' : '';
     }
 
     private static function requirement(Move $move, MoveSubject $subject): string
@@ -379,7 +403,12 @@ final class MoveText
             return '';
         }
         $latest = $move->latest();
-        $text = '; '.($move->toBranch() ?? ($latest === null ? '' : $latest->version())).' needs php '.$requires;
+        // Ruling W17-X3a: the first of to_branch, latest.version, version and constraint.
+        $phpSubject = $move->toBranch() ?? ($latest === null ? null : $latest->version()) ?? $move->version() ?? $move->constraint();
+        if ($phpSubject === null) {
+            return '';
+        }
+        $text = '; '.$phpSubject.' needs php '.$requires;
         if ($check->projectAllows() === true) {
             $text .= ', which require.php allows';
         } elseif ($check->raiseSize() !== null) {
@@ -538,7 +567,7 @@ final class MoveText
                 return 'the packages that hold it may need to move too';
             case Move::CROSSES_MAJOR:
                 $check = $move->check();
-                $solved = $check !== null && $check->result() !== MoveCheck::NOT_CHECKED;
+                $solved = $check !== null && ($check->result() !== MoveCheck::NOT_CHECKED || $check->installsNoReleaseOfIt());
 
                 return (strpos((string) $move->toBranch(), '0.') === 0 ? 'a new 0.x line (Composer treats 0.x minors as breaking)' : 'a new major').' brings its own requirements'.($solved ? '' : ', which lockrot does not solve');
             case Move::TRANSITIVE:

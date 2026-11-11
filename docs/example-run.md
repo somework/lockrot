@@ -477,7 +477,7 @@ advisories: 200 packages asked · packagist.org answered (184 on record for 50 p
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked
 php: the lock installs on PHP 8.2 to 8.4; lcobucci/clock excludes 8.5
 gate: off · --fail-on=none (default) · target php 8.4 (--target-php)
-Data as of 2026-10-26 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-26 (package repositories, repository hosts) · score model 1. Run lockrot with --format=json for
 details.
 ```
 
@@ -2000,7 +2000,7 @@ advisories: 20 packages asked · packagist.org answered (25 on record for 3 pack
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked
 php: without require-dev the lock installs on PHP 8.2 to 8.5, and with require-dev on PHP 8.4 to 8.5
 gate: off · --fail-on=none (default) · target php 8.4 (--target-php)
-Data as of 2026-10-26 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-26 (package repositories, repository hosts) · score model 1. Run lockrot with --format=json for
 details.
 ```
 

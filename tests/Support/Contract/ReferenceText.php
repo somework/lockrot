@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Support\Contract;
 
 use Composer\Semver\Comparator;
+use Composer\Semver\VersionParser;
 use Lockrot\Tests\Support\ScoreLineFromJson;
 use Lockrot\Verdict\ShellCommand;
 
@@ -103,7 +104,7 @@ final class ReferenceText
         // After the platform step a clause in words starts a sentence, and a command keeps its case.
         $text = $step === '' || strpos($text, 'composer ') === 0 ? $text : ucfirst($text);
 
-        return $step.$text.self::checked(Fields::nullableObject($move, 'check')).self::movesWith($move).self::noCommand($move, $kind);
+        return $step.$text.self::checked($move, $package, Fields::string($in, 'version')).self::movesWith($move).self::noCommand($move, $kind);
     }
 
     /**
@@ -150,11 +151,24 @@ final class ReferenceText
         return 'First set config.platform.php to your PHP '.$target.' release: Composer\'s config sets '.$override.'.'.$refused.' ';
     }
 
-    /** @param array<mixed, mixed>|null $check */
-    private static function checked(?array $check): string
+    /** @param array<mixed, mixed> $move */
+    private static function checked(array $move, string $package, string $version): string
     {
+        $check = Fields::nullableObject($move, 'check');
         if ($check === null) {
             return '';
+        }
+        if (($check['reason'] ?? null) === 'installs_no_release') {
+            $latest = Fields::nullableObject($move, 'latest');
+            $newest = Fields::string($move, 'kind') === 'tag' && $latest !== null ? Fields::string($latest, 'version') : Fields::string($move, 'newest');
+            $installs = Fields::nullableString($check, 'installs');
+            if ($installs === null) {
+                return "; Composer's solver removes ".$package.' from the lock, not '.$newest.', so this command does not reach it';
+            }
+
+            return VersionParser::parseStability($installs) === 'dev' && $installs !== $version
+                ? "; Composer's solver installs ".$installs.', a dev version, not '.$newest.', so this command does not reach a release'
+                : "; Composer's solver keeps ".$installs.', not '.$newest.', so this command does not reach it';
         }
         switch (Fields::string($check, 'result')) {
             case 'resolves':
@@ -460,7 +474,9 @@ final class ReferenceText
 
                 $below = self::below($move, Fields::string($move, 'newest'));
 
-                return $raise.self::update($move).($below === '' ? ' (gets '.Fields::string($move, 'newest').')' : $below).self::clears($move).self::adds($move);
+                $gets = (Fields::nullableObject($move, 'check')['reason'] ?? null) === 'installs_no_release' ? '' : ' (gets '.Fields::string($move, 'newest').')';
+
+                return $raise.self::update($move).($below === '' ? $gets : $below).self::clears($move).self::adds($move);
             case 'require':
             case 'raise-php':
                 $raise = self::raise($move, $check);
@@ -523,6 +539,9 @@ final class ReferenceText
         if (\is_string($latest['released'] ?? null)) {
             $text .= ' ('.substr($latest['released'], 0, 10).')';
         }
+        if (VersionParser::parseStability(Fields::string($latest, 'version')) !== 'stable') {
+            $text .= ', a pre-release';
+        }
         $text .= self::below($move, Fields::string($latest, 'version'));
         if (($latest['relation'] ?? null) === 'older') {
             $text .= ', older than your snapshot ('.substr(Fields::string($latest, 'snapshot_time'), 0, 10).'); review, or replace';
@@ -556,7 +575,12 @@ final class ReferenceText
      */
     private static function php(array $move, array $check, array $run): string
     {
-        $text = '; '.Fields::string($move, 'to_branch').' needs php '.Fields::string($check, 'requires');
+        $latest = Fields::nullableObject($move, 'latest');
+        $subject = Fields::nullableString($move, 'to_branch') ?? ($latest === null ? null : Fields::nullableString($latest, 'version')) ?? Fields::nullableString($move, 'version') ?? Fields::nullableString($move, 'constraint');
+        if ($subject === null) {
+            return '';
+        }
+        $text = '; '.$subject.' needs php '.Fields::string($check, 'requires');
         if (($check['project_allows'] ?? null) === true) {
             return $text.', which require.php allows';
         }
@@ -697,7 +721,7 @@ final class ReferenceText
     private static function below(array $move, ?string $newest): string
     {
         $check = Fields::nullableObject($move, 'check');
-        $installs = $check === null ? null : Fields::nullableString($check, 'installs');
+        $installs = $check === null || ($check['reason'] ?? null) === 'installs_no_release' ? null : Fields::nullableString($check, 'installs');
         if ($newest === null || $installs === null || !Comparator::lessThan(ltrim($installs, 'vV'), ltrim($newest, 'vV'))) {
             return '';
         }

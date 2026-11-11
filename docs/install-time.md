@@ -107,6 +107,7 @@ timeout, and Composer can retry a failed transfer. With curl, the timeout of one
 An advisory that a repository publishes in its metadata takes that timeout too. A request to a
 repository's advisory API times out after 10 seconds
 ([Composer 2.10.0](https://github.com/composer/composer/blob/2.10.0/src/Composer/Repository/ComposerRepository.php)).
+A repository-activity request that the budget stops before it starts sends no request. Its package reads S10 with the cause `install_time_budget`, and the run adds the note `repository_activity_not_checked`. A request that had started and that the budget stops at a retry or a redirect reads S10 `fetch_failed`, and the run note gives the spent budget as its error.
 A move-check solve that has started runs to its end, past the budget. The budget stops only a solve
 that has not started.
 With a warm cache, Composer sends fewer requests. `composer lockrot` has no budget.
@@ -132,8 +133,8 @@ grade can read milder than the one `composer lockrot` gives for the same package
 | A package's metadata | The package carries `libyears_unmeasured` `unavailable`. It reads `unknown` when nothing else counts, such as a counted advisory or the lock's abandoned marking. When nothing is graded, the [could-not-be-checked header](#never-silent-about-a-package-it-could-not-check) counts it | [`metadata_unavailable`](notes.md#metadata_unavailable), a network failure |
 | The advisory check | The advisories that the lookup did not reach add nothing to the score, and the findings carry S10 `install_time_budget` | [`advisories_not_checked`](notes.md#advisories_not_checked) |
 | A monorepo parent's metadata | Split packages whose own tags have no trusted date stay unmeasured and carry S10 `undated_releases` ([dates from the monorepo](verdicts.md#dates-from-the-monorepo)) | None |
-| The repository activity check, before it began | lockrot does not read S3 and S4. Findings carry S10 `install_time_budget` | [`repository_activity_not_checked`](notes.md#repository_activity_not_checked) |
-| The repository activity check, part way | Each request that is still running stops at the timeout it got when it started. Those that time out have no activity, and their findings carry S10 `fetch_failed` | [`repository_activity_unreachable`](notes.md#repository_activity_unreachable), a network failure |
+| The repository activity check, before a request began | lockrot does not read S3 and S4. Findings carry S10 `install_time_budget` | [`repository_activity_not_checked`](notes.md#repository_activity_not_checked) |
+| The repository activity check, part way | Each request that is still running stops at the timeout it got when it started. Those that time out, and those whose retry or redirect the budget stops, have no activity, and their findings carry S10 `fetch_failed` | [`repository_activity_unreachable`](notes.md#repository_activity_unreachable), a network failure |
 
 `composer require` and `composer update` reuse the metadata that Composer fetched in the same
 process, so they rarely run out. A `composer install` with a cold cache on a large lock (a fresh

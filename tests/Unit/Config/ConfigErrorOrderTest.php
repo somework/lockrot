@@ -24,6 +24,7 @@ final class ConfigErrorOrderTest extends TestCase
         yield 'an unknown value' => [['fail-on' => 'high,dead'], 'unknown value "dead"'];
         yield 'an unknown value in a list' => [['fail-on' => ['high', 'dead']], 'extra.lockrot.fail-on: unknown value "dead"'];
         yield 'ignore[].flags naming vulnerable' => [['ignore' => [['package' => 'a/b', 'reason' => 'r', 'flags' => ['vulnerable']]]], "accept advisories in Composer's audit policy"];
+        yield 'accept-unchecked repository with userinfo' => [['accept-unchecked' => [['check' => 'advisories', 'repository' => 'https://u@h.org/x', 'reason' => 'r']]], 'extra.lockrot.accept-unchecked[0] "repository" must be a URL with a scheme and no user name or password'];
     }
 
     /**

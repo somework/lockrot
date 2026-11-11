@@ -8,6 +8,7 @@ use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\Intervals;
+use Composer\Semver\VersionParser;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Data\Repository\StableRelease;
@@ -101,11 +102,12 @@ final class FixFinder
             $fixes[$id] = $range === null ? Fix::unknown(Fix::AFFECTED_RANGE_UNKNOWN) : $this->fixOf($range, $byBranch, $own, $branchNewest, $installedBranch);
         }
         $move = self::move($rows, \count($advisories));
+        $gets = $this->gets($package->name(), array_merge([$package->name()], array_keys($package->replaces())), $onInstalled, $ranged, \count($advisories));
 
         return new PackageFixes(
             $fixes,
             $rows,
-            $this->gets($package->name(), $onInstalled, $ranged, \count($advisories)),
+            $gets === null ? null : $gets->withReleases($this->releaseGets($candidates, $ranged, \count($advisories))),
             $move,
             self::partial($onInstalled, $ranged, \count($advisories)),
             $allowed
@@ -304,18 +306,29 @@ final class FixFinder
     /**
      * `composer update <package>` installs the highest release on the installed branch that the
      * lock's links allow and the target runs, whatever `require.php` says. With none that the target
-     * runs, the highest one that the links allow says why. A refusal of the move check does not lower
-     * it: only the release that a solve installs does ({@see \Lockrot\Verdict\FindingDetails}, SPEC §5.6 ruling R2).
+     * runs, the highest one that the links allow says why. A package hold of a refusal that admits a
+     * release is a lock link of that release (ruling R17-13a). When such holds exclude every release
+     * that the links allow, the Gets is capped ({@see Gets::capped()}), and null when the target
+     * cannot run the highest such release. A solve that installs another release names that release
+     * ({@see \Lockrot\Verdict\FindingDetails}, SPEC §5.6 ruling R2).
      *
+     * @param list<string>                       $names       the package's name and each name that it replaces
      * @param list<Candidate>                    $onInstalled ascending
      * @param array<string, ConstraintInterface> $ranged
      */
-    private function gets(string $package, array $onInstalled, array $ranged, int $of): ?Gets
+    private function gets(string $package, array $names, array $onInstalled, array $ranged, int $of): ?Gets
     {
         $release = null;
         $blocked = null;
+        $capped = null;
         foreach ($onInstalled as $candidate) {
-            if ($this->links->excluding($package, $candidate->release()->normalized()) !== []) {
+            $normalized = $candidate->release()->normalized();
+            if ($this->links->excluding($package, $normalized) !== []) {
+                continue;
+            }
+            if ($this->refusalExcludes($normalized, $names)) {
+                $capped = $candidate;
+
                 continue;
             }
             if ($this->floor->admitsTarget($candidate->release()->php()) === false) {
@@ -326,7 +339,9 @@ final class FixFinder
         }
         $release ??= $blocked;
         if ($release === null) {
-            return null;
+            $check = $capped === null ? null : PhpCheck::of($capped->php(), $this->floor);
+
+            return $check === null || $check->targetRuns() === false ? null : Gets::capped($check);
         }
         $check = PhpCheck::of($release->php(), $this->floor);
         if ($check->targetRuns() === false) {
@@ -335,6 +350,61 @@ final class FixFinder
         $clears = self::cleared($release, $ranged);
 
         return new Gets($release->release()->pretty(), $check, $clears, \count($clears) === $of);
+    }
+
+    /**
+     * What `composer update` gets at each release: a solve can install a release other than the one
+     * that {@see gets()} picks.
+     *
+     * @param list<Candidate>                    $candidates
+     * @param array<string, ConstraintInterface> $ranged
+     *
+     * @return array<string, Gets> by normalized version
+     */
+    private function releaseGets(array $candidates, array $ranged, int $of): array
+    {
+        $releases = [];
+        foreach ($candidates as $candidate) {
+            $clears = self::cleared($candidate, $ranged);
+            $releases[$candidate->release()->normalized()] = new Gets($candidate->release()->pretty(), PhpCheck::of($candidate->php(), $this->floor), $clears, \count($clears) === $of);
+        }
+
+        return $releases;
+    }
+
+    /**
+     * Whether a package hold of a refusal that admits the release excludes it. The hold counts only
+     * when its link names the package: no target, or one of $names. Its constraint is read against
+     * the release, as a lock link on the package is: a conflict excludes what it matches, a replace
+     * excludes every release, `self.version` admits only the holder's own version. A root hold is a link that
+     * {@see LinkIndex} already reads.
+     *
+     * @param list<string> $names the package's name and each name that it replaces
+     */
+    private function refusalExcludes(string $normalized, array $names): bool
+    {
+        $release = new Constraint('==', $normalized);
+        $parser = new VersionParser();
+        foreach ($this->refused->holding($normalized) as $holder) {
+            $target = $holder->target();
+            if ($holder->source() !== Holder::PACKAGE || ($target !== null && !\in_array(strtolower($target), $names, true))) {
+                continue;
+            }
+            // Composer's same-name rule makes a replace conflict with every version of the name.
+            if ($holder->link() === Holder::REPLACE) {
+                return true;
+            }
+            try {
+                $constraint = $holder->constraint() === 'self.version' ? new Constraint('==', $parser->normalize((string) $holder->version())) : $parser->parseConstraints($holder->constraint());
+            } catch (\UnexpectedValueException $e) {
+                continue;
+            }
+            if ($holder->link() === Holder::CONFLICT ? $constraint->matches($release) : !$constraint->matches($release)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

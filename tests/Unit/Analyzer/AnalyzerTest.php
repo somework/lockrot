@@ -722,6 +722,71 @@ final class AnalyzerTest extends TestCase
     }
 
 
+    /**
+     * A request that the budget kept from starting reads the budget cause. One that started and
+     * failed reads fetch_failed, and its host stays in the unreachable note.
+     */
+    public function testOnlyActivityRequestsThatNeverStartedReadTheBudgetCause(): void
+    {
+        $answers = new class () implements HttpClientInterface {
+            public function fetchAll(array $urls, array $headers = []): array
+            {
+                $out = [];
+                foreach ($urls as $url) {
+                    $error = strpos($url, 'vendor/stopped') !== false ? HttpResult::BUDGET_SPENT : 'curl error 7: connection refused';
+                    $out[$url] = HttpResult::failure($url, $error, new \DateTimeImmutable('2026-09-14T06:00:00+00:00'));
+                }
+
+                return $out;
+            }
+        };
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'vendor/stopped', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'vendor/failed', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+        ]]);
+        $loader = $this->loader([
+            'vendor/stopped' => $this->metadataNamed('vendor/stopped', 'https://github.com/vendor/stopped'),
+            'vendor/failed' => $this->metadataNamed('vendor/failed', 'https://github.com/vendor/failed'),
+        ]);
+
+        $report = $this->analyzer($loader, $answers, true, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
+
+        $notes = [];
+        foreach ($report->runNotes() as $note) {
+            $notes[$note->code()] = $note;
+        }
+        self::assertArrayHasKey(RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED, $notes);
+        self::assertArrayHasKey(RunNote::REPOSITORY_ACTIVITY_UNREACHABLE, $notes);
+        self::assertStringContainsString('vendor/failed', json_encode($notes[RunNote::REPOSITORY_ACTIVITY_UNREACHABLE]->data(), \JSON_UNESCAPED_SLASHES) ?: '');
+        self::assertStringNotContainsString('vendor/stopped', json_encode($notes[RunNote::REPOSITORY_ACTIVITY_UNREACHABLE]->data(), \JSON_UNESCAPED_SLASHES) ?: '');
+        $reasons = [];
+        foreach ($report->findings() as $finding) {
+            foreach ($finding->signals() as $signal) {
+                if ($signal->id() === 'S10') {
+                    $reasons[$finding->package()] = json_encode(JsonPath::decoded($signal->data())) ?: '';
+                }
+            }
+        }
+        self::assertStringContainsString('"install_time_budget"', $reasons['vendor/stopped']);
+        self::assertStringContainsString('"fetch_failed"', $reasons['vendor/failed']);
+    }
+
+    public function testAStaleLockGivesTheLockOutOfSyncNote(): void
+    {
+        $dir = sys_get_temp_dir().'/lockrot-stale-'.bin2hex(random_bytes(4));
+        mkdir($dir);
+        file_put_contents($dir.'/composer.json', '{"require":{"vendor/pkg":"^1.0","vendor/new":"^1.0"}}');
+        $lock = LockFile::fromArray(['content-hash' => 'deadbeef', 'packages' => [['name' => 'vendor/pkg', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+
+        $report = $this->analyzer($this->loader(['vendor/pkg' => $this->ancient()]), $this->http([]), true, new Allowlist([]))->analyze($lock, ProjectConfig::fromFile($dir.'/composer.json'), false);
+        unlink($dir.'/composer.json');
+        rmdir($dir);
+
+        $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::LOCK_OUT_OF_SYNC));
+        self::assertCount(1, $notes);
+        self::assertSame(['missing' => ['vendor/new']], $notes[0]->data());
+    }
+
     public function testAllowlistAccessorReturnsConstructorValue(): void
     {
         $allowlist = new Allowlist([new AllowlistEntry('vendor/*', null, 'complete', null, 'builtin')]);

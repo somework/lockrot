@@ -83,6 +83,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Composer/ComposerHttpClient.php` CastString `$scheme = (string) parse_url($base, \PHP_URL_SCHEME);` — the base is a URL that lockrot requested, so it has a scheme.
 - `src/Composer/ComposerHttpClient.php` CastString `return (string) preg_replace('{^([^:]+://[^/?#]+).*$}', '$1', $base).$location;` — the pattern is a literal, so `preg_replace()` never returns null.
 - `src/Composer/ComposerHttpClient.php` CastString `return (string) preg_replace('{^(.+/)[^/?]*(?:\?.*)?$}', '${1}', $base).$location;` — the pattern is a literal, so `preg_replace()` never returns null.
+- `src/Composer/ComposerHttpClient.php` TrueValue `$asked[$url] = true;` — a set. Only `isset()` reads it.
 - `src/Composer/InstallTimeSummary.php` UnwrapArrayValues `$repositories = array_values($composer->getRepositoryManager()->getRepositories());` — the repository manager only appends and prepends, so its array is already a list.
 - `src/Composer/InstallTimeSummary.php` TrueValue, Foreach_ `foreach ($lock->packages(true) as $package) {` — these names reach `BaselineComparison::compare()` for the stale list only, and the install-time summary prints no stale list.
 - `src/Composer/LockrotCommand.php` Throw_ `throw $this->bootstrapError;` — the statements after it read the same manifest and throw the same exception, so the exit code and the message stay the same.
@@ -121,8 +122,8 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Data/Repository/PackageMetadata.php` ReturnRemoval `return false;` — in needsParentDates(): a branch snapshot has no stable tag on its branch, so the checks after the return also give false.
 - `src/Data/Repository/PackageMetadata.php` GreaterThan `$unresolved = $unresolved === null || $row['at'] > $unresolved ? $row['at'] : $unresolved;` — on two equal dates both operands of the ternary are the same instant.
 - `src/Data/Repository/PackageMetadata.php` IncrementInteger and DecrementInteger `$newestPreRelease[3] = $commit !== null && ($tagsOnCommit[$commit] ?? 0) >= self::SHARED_COMMIT_TAGS;` — the default applies to a commit that no stable tag holds, and every default below `SHARED_COMMIT_TAGS` reads it as not shared.
-- `src/Data/Repository/PackageMetadata.php` IncrementInteger and DecrementInteger `$highestPreRelease[3] = $commit !== null && ($tagsOnCommit[$commit] ?? 0) >= self::SHARED_COMMIT_TAGS;` — the default applies to a commit that no stable tag holds, and every default below `SHARED_COMMIT_TAGS` reads it as not shared.
 - `src/Data/Repository/PackageMetadata.php` DecrementInteger `$unresolved = $this->newestPreRelease !== null && $this->newestPreRelease[3] ? $this->newestPreRelease[0] : null;` — with the version string in place of the shared flag, an own pre-release is unresolved at its date too. The walk then reads it at that date, so it never is newer than the reading.
+- `src/Data/Repository/PackageMetadata.php` FalseValue `return [null, null, null, false];` — with no stable tag the normalized version is null, so `onTheHighestLine()` returns before it reads the flag.
 - `src/Data/Repository/ReleaseBranch.php` PregMatchRemoveCaret `if (preg_match('/^(\d+)\.(\d+)\.(\d+)\./', $normalized, $m) !== 1) {` — a normalised stable version starts with its major digits, so the anchor changes no match.
 - `src/Data/Repository/RepositoryMetadataLoader.php` ReturnRemoval `return new MetadataBatch($pass1->metadata(), $pass1->stillRemaining(), $failed);` — pass 2 after a spent deadline starts no chunk and marks the same names, so the batch is the same.
 - `src/Data/Repository/RepositoryMetadataLoader.php` TrueValue `return new ChunkPassResult($metadata, $failed, $stillRemaining, $needDev, true);` — pass 2 after a spent deadline starts no chunk and marks the same names, so the batch is the same.
@@ -157,6 +158,8 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Lock/ConfiguredRepositories.php` CastString `$host = (string) preg_replace('{:\d+$}', '', strtolower($parts[0]));` — the pattern is a literal, so `preg_replace()` never returns null.
 - `src/Lock/ConfiguredRepositories.php` CastString `$path = (string) preg_replace('{\.git$}', '', trim(strtolower($parts[1]), '/'));` — the pattern is a literal, so `preg_replace()` never returns null.
 - `src/Lock/LockFile.php` NotCovered x8 `throw new ConfigException($refusal.'loader returned '.\get_class($loaded).' instead of a CompletePackage');` — unreachable code. `ArrayLoader::load()` with its default class returns a `CompletePackage` or an alias of one, and the method unwraps the alias before the check.
+- `src/Lock/MissingRequirements.php` CastString `$out[(string) $target] = $constraint;` — PHP turns a numeric string key into an int again, so the cast never changes the key.
+- `src/Lock/ProjectConfig.php` ReturnRemoval `return null;` — in lockOutOfSync(): with no manifest, `Locker::getContentHash()` and `md5()` get null and throw a `TypeError`, and the `catch` returns null.
 
 ## src/Output
 
@@ -200,6 +203,8 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Signal/PhpFloor.php` ReturnRemoval `return null;` — in parse(): composer/semver reads null as `""` and throws, and the `catch` returns the same value.
 - `src/Signal/PhpFloor.php` CastInt `foreach ([$point, $major.'.'.$minor.'.'.((int) $patch + 1)] as $candidate) {` — `startPoint()` writes the patch as digits, and PHP adds a digit string as the integer it spells. The cast is for the type.
 - `src/Signal/Rule/LeftBehindRule.php` LessThanOrEqualTo `if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $ownAt) {` — a higher branch released at the instant of the installed branch cannot be alive while the installed branch is old enough for S8.
+- `src/Signal/Rule/NotCheckedRule.php` ArrayItemRemoval `$unchecked[] = new Check('advisories', $advisories, [Signal::S9], $partial ? [self::CAUSE_PARTIAL => [Signal::S9]] : []);` — `summaryOf()` reads only the key of the partial cause, and `jsonSerialize()` omits the causes.
+- `src/Signal/Rule/NotCheckedRule.php` UnwrapArrayValues `return 'release metadata not checked ('.$cause.'), so '.ListWords::of(array_values(array_diff($entry->blocks(), [Signal::S11]))).' could not be read';` — `ListWords::of()` reads its words with `array_pop()` and `implode()`, which ignore the keys.
 
 ## src/Solver
 
@@ -224,5 +229,5 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 ## src/Verdict
 
 - `src/Verdict/FindingDetails.php` CastString `$skipped[] = new Check('advisories', (string) $advisoryReason, [Signal::S9]);` — the `in_array()` guard admits two strings only.
-- `src/Verdict/FindingDetails.php` Coalesce `return ($check === null ? null : $check->installsBelow($version) ?? $check->installsAbove($version)) ?? $version;` — a release is below or above the version, never both, so at most one side is not null.
+- `src/Verdict/FindingDetails.php` Coalesce `$other = $check === null ? null : $check->installsBelow($gets->version()) ?? $check->installsAbove($gets->version());` — a release is below or above the version, never both, so at most one side is not null.
 - `src/Verdict/MoveText.php` Assignment `$text .= self::leaves($move).self::unverified($move);` — `$text` is the empty string before this line, so `=` writes the same text.

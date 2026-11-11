@@ -20,13 +20,14 @@ use Lockrot\Output\FormatContext;
 final class LockFile
 {
     /** Composer's package name pattern (composer-schema.json, `name`). */
-    private const NAME = '{^[a-z0-9](?:[_.-]?[a-z0-9]+)*/[a-z0-9](?:(?:[_.]|-{1,2})?[a-z0-9]+)*$}D';
+    private const NAME = '{^[a-z0-9](?:[_.-]?[a-z0-9]++)*+/[a-z0-9](?:(?:[_.]|-{1,2})?[a-z0-9]++)*+$}D';
 
     /** @var array<string, LockedPackage> */
     private array $packages;
     /** @var list<string> */
     private array $skipped = [];
     private ?string $contentHash;
+    private ?string $legacyHash = null;
     private LockArrayRepository $locked;
     /** @var list<string> the names of the `packages-dev` entries, valid or not */
     private array $devNames = [];
@@ -52,7 +53,8 @@ final class LockFile
     }
 
     /**
-     * A lock loads only when Composer can install it and it keeps lockrot's own rules. `packages` is
+     * A lock loads when it keeps lockrot's own rules, though Composer could refuse to install it: a
+     * root requirement that it does not hold is a run note, not a refusal. `packages` is
      * a list, `packages-dev` is null or a list, and each `name` is a string. No name is
      * listed twice, case ignored, because a finding needs one entry per package. A platform map
      * follows Composer: the later of two keys that differ in case wins.
@@ -107,6 +109,8 @@ final class LockFile
         }
         $hash = $lock['content-hash'] ?? null;
         $file = new self($packages, \is_string($hash) ? $hash : null, $locked);
+        $legacy = $lock['hash'] ?? null;
+        $file->legacyHash = \is_string($legacy) ? $legacy : null;
         $file->skipped = $skipped;
         $file->devNames = $devNames;
         $file->platform = self::stringValues($lock['platform'] ?? null);
@@ -340,6 +344,7 @@ final class LockFile
         }
 
         $file = new self($merged, $this->contentHash, $this->locked);
+        $file->legacyHash = $this->legacyHash;
         $file->skipped = $skipped;
         $file->devNames = $this->devNames;
         $file->platform = $this->platform;
@@ -381,6 +386,12 @@ final class LockFile
     public function contentHash(): ?string
     {
         return $this->contentHash;
+    }
+
+    /** The `hash` key of a lock that Composer wrote before it wrote `content-hash`: the MD5 of composer.json. */
+    public function legacyHash(): ?string
+    {
+        return $this->legacyHash;
     }
 
     /** Whether the {@see lockedRepository()} entry of this name is in `packages-dev`. */

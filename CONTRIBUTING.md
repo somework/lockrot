@@ -240,6 +240,8 @@ GITHUB_TOKEN=$(gh auth token) bin/record-schema-evolution <version> <YYYY-MM-DD>
 The script verifies the release PHAR before it runs it and refuses a version that is already
 recorded. Then add the version to every per-version constant in `SchemaEvolutionTest`. The
 docblock of each constant says where its value comes from.
+`testTheBaselineAnOlderReleaseWroteIsRefused` needs no change: it expects a refusal for a recorded
+baseline-1 file and a successful read for a recorded baseline-2 file.
 
 ## Curated data
 
@@ -283,6 +285,11 @@ The archive's dependencies are locked in `build/phar/composer.lock`, which is co
 
 - To bump `composer/composer` or another dependency of the archive, run `composer update` in
   `build/phar/` and commit the lock.
+
+`.github/workflows/phar-audit.yml` runs `composer audit --locked` on that lock when it changes and
+every week. Dependabot does not watch `build/phar/`, so this audit reports an advisory against a
+bundled dependency. On a red run, update the named package in `build/phar/`. Commit the lock.
+Release the fix.
 
 ### Rebuilding a release
 
@@ -382,6 +389,13 @@ maintainer.
       correct it. lockrot counts a minor such as 8.6 from its GA day on. S5 reads the GA date of
       an X.0 release before its day, so add an X.0 date only after that release. Check the file
       before you record `docs/example-run.md`.
+
+    - In an `X.Y.0` release, refresh `resources/monorepo-parents.json` with
+      `bin/refresh-monorepo-parents`. It rereads the `replace` list of each listed monorepo from
+      Packagist. If the diff adds a split package, commit the file. Then add a line under
+      `### Verdict changes` in the CHANGELOG section, because a change to this file is a
+      [verdict change](docs/compatibility.md#verdict-changes) that only a minor release can
+      ship. lockrot cannot date a package that the file does not list from its parent.
 
     - Re-record `docs/example-run.md` after the version bump. Build the PHAR from the release
       branch, so that it prints the new version ([The PHAR](#the-phar)):
@@ -524,8 +538,17 @@ maintainer.
 5. When a schema file changes, `.github/workflows/schemas.yml` asks lockrot.dev to publish it.
    Approve the `schemas` environment of the lockrot.dev run, then check that each new schema URL
    answers (`curl -fsI https://lockrot.dev/schema/<document>-<number>.json`).
-6. When the `ci.yml` push run of the squash commit on `main` passes, tag the commit `vX.Y.Z` and
-   push the tag. If the tag day changed after the merge, tag the commit of the date pull request
+6. When the `ci.yml` push run of the squash commit on `main` passes, tag the commit `vX.Y.Z` with
+   `git tag -a`. Before you push the tag, check that its day is the day of the `## [X.Y.Z]`
+   heading:
+
+    ```bash
+    python3 tools/release/tag_day.py X.Y.Z "$(git for-each-ref refs/tags/vX.Y.Z --format='%(taggerdate:short)')"
+    ```
+
+    If the check fails, delete the local tag, fix the date first, and tag again. Push the tag only
+    when the check passes, because the tag ruleset forbids moving or deleting a pushed `v*` tag.
+    `phar.yml` repeats the check as a warning. Then push the tag. If the tag day changed after the merge, tag the commit of the date pull request
    instead, when its `ci.yml` push run passes. `.github/workflows/phar.yml` refuses these tags:
 
     - a tag that is not on `main`, or whose `ci.yml` push run on `main` did not pass
@@ -548,6 +571,20 @@ maintainer.
        and publishes its schemas.
     2. When the deploy passes, re-run the failed `phar.yml` job (`gh run rerun <run id> --failed`).
        It then publishes the release and asks lockrot.dev to rebuild.
+
+    The step that asks lockrot.dev to rebuild is `continue-on-error`, so a failed request leaves
+    the release green. Before step 7, check that the site serves what the release notes link to:
+
+    ```bash
+    gh run list --repo somework/lockrot.dev --workflow deploy.yml --limit 1
+    curl -fsI https://lockrot.dev/changes/X.Y/
+    curl -fs https://lockrot.dev/baseline/ | grep -c 'moving-from-a-baseline-1-file'
+    ```
+
+    The deploy run must be green and newer than the tag. The first `curl` applies to an `X.Y.0`
+    release with an upgrade page. The `grep` must not print `0` when the release refuses a
+    baseline-1 file. If a check fails, run `gh workflow run deploy.yml --repo somework/lockrot.dev`
+    and check again.
 7. When the published release changes what lockrot writes (a schema differs from the previous
    release's), record it and pin the hashes ([Recording a release](#recording-a-release)). Then
    remove the version from `RECORDING_PENDING`. `SchemaEvolutionTest` fails when a release whose

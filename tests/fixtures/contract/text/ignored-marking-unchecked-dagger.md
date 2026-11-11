@@ -15,4 +15,4 @@ php: the lock installs on PHP 7.2 to 8.5
 - note: GitHub API rate limit reached; repository activity missing for 1 repositories
 - note: Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count.
 
-<sub>3 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>3 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

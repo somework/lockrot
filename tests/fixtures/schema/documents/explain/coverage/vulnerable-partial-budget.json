@@ -746,7 +746,7 @@
    {
     "id": "S10",
     "level": "info",
-    "summary": "security advisories not checked (the install-time budget ran out), so S9 could not be read",
+    "summary": "security advisories not checked in full (the install-time budget ran out), so S9 may be incomplete",
     "data": {
      "unchecked": [
       {

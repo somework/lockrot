@@ -146,6 +146,8 @@ lockrot/capped warning 25: ezyang/htmlpurifier v4.17.0 — finding low, 4 = capp
 lockrot/capped warning 25: nette/schema v1.3.2 — finding low, 4 = capped 8 ÷ 2 transitive — capped: requires php 8.1 - 8.4: it stops at 8.4, so the newest PHP, 8.5, is excluded. Do: composer update nette/schema (gets v1.3.6) — clears capped.
 lockrot/capped error 25: ocramius/proxy-manager 2.2.4 — finding low, 4 = capped 8 ÷ 2 transitive — capped: requires php ^7.2.0: it stops at 7.4, so the newest PHP, 8.5, is excluded. Do: no move: no release above 2.2.4 admits PHP 8.5.
 lockrot/unknown note: drupal/core 10.6.18 — finding unknown, 0
+lockrot/unknown note: php-tuf/php-tuf 1.0.3 — finding unknown, 0
+lockrot/unchecked error: php-tuf/php-tuf 1.0.3: release metadata not checked (not installed from a Composer repository), so S2, S5 and S8 could not be read; repository activity not checked (not installed from a Composer repository), so S3 and S4 could not be read. checks missing: S2, S3, S4, S5, S8 (not from a Composer repository).
 lockrot/unknown note: bower-asset/jquery 3.7.1 — finding unknown, 0
 lockrot/unchecked error: bower-asset/jquery 3.7.1: release metadata not checked (lockrot cannot tell which repository serves it), so S2 and S8 could not be read; repository activity not checked (lockrot cannot tell which repository serves it), so S3 and S4 could not be read. checks missing: S2, S3, S4, S8 (origin unknown).
 lockrot/finished note: akaunting/laravel-version 1.0.4 — finding finished, 0 (stale accepted)

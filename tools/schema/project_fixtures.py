@@ -482,7 +482,9 @@ def inputs_of(case):
         if name != f['package'] and name not in lock:
             root_require.setdefault(name, '*')
             requires_it = (through.get(name) or {}).get('installed_requires') is not False or len(chain) < 3
-            entry(name).setdefault('require', {})[f['package'] if requires_it else chain[-2]] = '*'
+            # A link below chain[1] gives the package a shorter chain than the model's. chain[1] ties it, and the walk takes
+            # chain[0] first, because chain[0] comes first in the root's require.
+            entry(name).setdefault('require', {})[f['package'] if requires_it else chain[1]] = '*'
     moves = [m for m in [f.get('next_step')] if m] + [m for m in ((f.get('next_step') or {}).get('also') or [])]
     held = ([h for a in advisories for h in a['fix']['held_by']] + [h for m in moves for h in m['held_by']]
             + [h for r in rows for h in ((r.get('fixes') or {}).get('held_by') or [])])
@@ -527,6 +529,11 @@ def inputs_of(case):
                 for r in (run.get('advisory_lookup') or {}).get('repositories') or [] if r['outcome'] == 'failed']
     if failures:
         inputs['run']['advisory_failures'] = failures
+    # The hydrator builds the packagist answer from the package records: an answered feed beside it keeps its own records.
+    answers = [{k: r[k] for k in ('composer_repository', 'records')}
+               for r in f['security'].get('feeds') or [] if r['answer'] == 'answered' and r['registry'] != 'packagist.org']
+    if answers:
+        inputs['run']['advisory_answers'] = answers
     s7 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S7'), None) or {}
     below = {p['package']: p['chain'] for p in s7.get('packages', [])}
     related = case.get('related') or {}
@@ -574,14 +581,20 @@ def inputs_of(case):
     if checks:
         inputs['checks'] = checks
         inputs['move_check'] = move_check_of(run['move_check'], world, run.get('php_window'))
+    if run_inputs.get('_parent') is not None and 'parent' not in inputs:
+        # A monorepo parent that dates no shared tag of the split: lockrot still reads the split's own dates beside it (R15-28d).
+        inputs['parent'] = run_inputs['_parent']
     if run_inputs.get('_php_lock') is not None:
         inputs['php_lock'] = run_inputs['_php_lock']
     if run_inputs.get('_config_platform_php') is not None:
         inputs['config_platform_php'] = run_inputs['_config_platform_php']
     act = f.get('activity') or {}
-    if f['origin']['kind'] == 'vcs' and act.get('host') and inputs['root'] is not None:
+    repositories = list(run_inputs.get('_root_repositories') or [])
+    if f['origin']['kind'] == 'vcs' and act.get('host'):
         # The project's vcs repository serves the package: lockrot names its origin from it.
-        inputs['root']['repositories'] = [{'type': 'vcs', 'url': 'https://%s/%s.git' % (act['host'], act['repo'])}]
+        repositories.append({'type': 'vcs', 'url': 'https://%s/%s.git' % (act['host'], act['repo'])})
+    if repositories and inputs['root'] is not None:
+        inputs['root']['repositories'] = repositories
     return inputs
 
 
@@ -610,11 +623,13 @@ def world_releases(world, releases):
 
 
 def run_releases(given, releases):
-    """The package's releases, with the time and the php that each `{version, time, php}` of $given sets. A version that
-    the projection lacks joins it. The run inputs' `_releases` use this form."""
+    """The package's releases, with the time and the php that each `{version, time, php, shared_commit?}` of $given sets,
+    and its shared-commit mark when it has one. A version that the projection lacks joins it. The run inputs' `_releases`
+    use this form."""
     by_version = {r['version']: r for r in releases}
     for g in given:
-        by_version[g['version']] = dict(by_version.get(g['version'], {}), version=g['version'], time=g.get('time'), php=g.get('php'))
+        by_version[g['version']] = dict(by_version.get(g['version'], {}), version=g['version'], time=g.get('time'), php=g.get('php'),
+                                        **({'shared_commit': True} if g.get('shared_commit') else {}))
     return sorted(by_version.values(), key=lambda r: r['version'])
 
 

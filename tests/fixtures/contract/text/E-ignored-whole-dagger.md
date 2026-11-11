@@ -17,4 +17,4 @@ php: the lock installs on PHP 7.2 to 7.4; your target, 8.4, is excluded: require
 
 - note: extra.lockrot.ignore\[\] accepts maintenance flags only, not advisories: symfony/yaml (ignore\[\] symfony/\*): 3 counted advisories; accept them in Composer's audit policy if that is the decision
 
-<sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

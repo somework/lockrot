@@ -15,4 +15,4 @@ advisories: 2 packages asked · packagist.org answered (6 on record for 1 packag
 moves: checked with the solver of Composer 2.10.3 against the lock, with advisory blocking turned off by `config.audit.block-insecure`; ext-\*, lib-\*, php-debug, php-ipv6 and php-zts requirements not checked\
 php: the lock installs on PHP 8.1 to 8.5
 
-<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

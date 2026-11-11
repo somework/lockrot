@@ -663,6 +663,16 @@
             "argv": [
                 "composer",
                 "update",
+                "guzzlehttp/psr7"
+            ],
+            "posix": "composer update guzzlehttp/psr7",
+            "cmd": "composer update guzzlehttp/psr7",
+            "powershell": "composer --% update guzzlehttp/psr7"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
                 "guzzlehttp/psr7:^2.12.3"
             ],
             "posix": "composer update 'guzzlehttp/psr7:^2.12.3'",
@@ -1070,6 +1080,18 @@
             "posix": "composer why-not guzzlehttp/guzzle 8.2.0 --locked",
             "cmd": "composer why-not guzzlehttp/guzzle 8.2.0 --locked",
             "powershell": "composer --% why-not guzzlehttp/guzzle 8.2.0 --locked"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "guzzlehttp/psr7",
+                "2.12.3",
+                "--locked"
+            ],
+            "posix": "composer why-not guzzlehttp/psr7 2.12.3 --locked",
+            "cmd": "composer why-not guzzlehttp/psr7 2.12.3 --locked",
+            "powershell": "composer --% why-not guzzlehttp/psr7 2.12.3 --locked"
         },
         {
             "argv": [

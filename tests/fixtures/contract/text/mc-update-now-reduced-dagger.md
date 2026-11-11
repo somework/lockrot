@@ -20,4 +20,4 @@ php: the lock installs on PHP 8.1 to 8.5
 
 - note: update now: the command leaves out symfony/yaml and typo3/html-sanitizer, because Composer's solver refuses them together with the others: typo3/html-sanitizer v2.3.2 requires acme/un-x ^2.0.
 
-<sub>3 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>3 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>

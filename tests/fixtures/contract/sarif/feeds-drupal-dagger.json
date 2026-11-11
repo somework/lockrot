@@ -1366,6 +1366,15 @@
                     "other_repositories": 0,
                     "repositories": [
                         {
+                            "composer_repository": "composer repo (https://packages.drupal.org/8)",
+                            "registry": "packages.drupal.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 0,
+                            "records": 0
+                        },
+                        {
                             "composer_repository": "composer repo (https://repo.packagist.org)",
                             "registry": "packagist.org",
                             "outcome": "answered",

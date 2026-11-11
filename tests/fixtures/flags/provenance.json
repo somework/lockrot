@@ -1,12 +1,12 @@
 {
  "pr": "7d",
  "source": {
-  "cases.json": "8fc0880c11fa9b313954bb9ccdb83d7b92ab9dfee50ebb08476021dc477884cb",
+  "cases.json": "2380bb83684cc5bd9e44db642d16c8d8b97efa838f642d8ccaa50154d6a58eaf",
   "model_run_date": "2026-11-10"
  },
  "suite": "every case and the composite pass the report-2 field reference (I21) with 0 violations",
  "page_goldens": {
-  "sha256": "2073f4161534229025ab6790a19e32ad16f4a420c3be0de961794dd0fcd8e584",
+  "sha256": "4f6ec57e8f9f1ddd02644efeaa9493b527c426f2e2de99229c2241ff191cbd31",
   "rendered": "the model's goldens"
  },
  "dropped": [],

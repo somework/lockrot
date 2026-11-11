@@ -23,6 +23,7 @@ use Lockrot\Verdict\ListWords;
 final class RunNote
 {
     public const PACKAGE_NAME_INVALID = 'package_name_invalid';
+    public const LOCK_OUT_OF_SYNC = 'lock_out_of_sync';
     public const OFFLINE = 'offline';
     public const METADATA_UNAVAILABLE = 'metadata_unavailable';
     public const MONOREPO_PARENT_UNAVAILABLE = 'monorepo_parent_unavailable';
@@ -55,6 +56,7 @@ final class RunNote
      */
     public const CODES = [
         self::PACKAGE_NAME_INVALID,
+        self::LOCK_OUT_OF_SYNC,
         self::OFFLINE,
         self::METADATA_UNAVAILABLE,
         self::MONOREPO_PARENT_UNAVAILABLE,
@@ -167,6 +169,20 @@ final class RunNote
         }
 
         return self::of(self::COMMAND_ARGUMENT_UNSAFE, \sprintf('lockrot prints no command for %d %s: a release name holds |, < or >, which cmd.exe and PowerShell run or redirect', \count($moves), \count($moves) === 1 ? 'move' : 'moves'), false, ['moves' => $moves]);
+    }
+
+    /**
+     * @param list<string> $missing the root requirements that the lock does not hold, sorted; empty
+     *                              when only a constraint or another manifest key changed
+     */
+    public static function lockOutOfSync(array $missing): self
+    {
+        $text = 'lock: the lock file does not match composer.json';
+        if ($missing !== []) {
+            $text .= \sprintf(' (%s %s required but not locked)', ListWords::of($missing), \count($missing) === 1 ? 'is' : 'are');
+        }
+
+        return self::of(self::LOCK_OUT_OF_SYNC, $text.': run composer update', false, ['missing' => $missing]);
     }
 
     public static function offline(): self

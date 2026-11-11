@@ -8,6 +8,8 @@ use Composer\Downloader\TransportException;
 use Composer\Json\JsonFile;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
+use Composer\Package\Locker;
+use Composer\Repository\PlatformRepository;
 use Composer\Semver\VersionParser;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Allowlist\AllowlistEntry;
@@ -377,9 +379,11 @@ final class CaseHydrator
         $packages = self::packages($inputs);
         $package = (string) array_key_first($packages);
         $activity = $packages[$package]['activity'];
-        $lock = LockFile::fromArray(self::lockData(self::entries($inputs, $packages), $packages, $inputs));
+        $lockData = self::lockData(self::entries($inputs, $packages), $packages, $inputs);
         $root = self::root($inputs, $packages);
-        $project = $root === null ? ProjectConfig::empty() : ProjectConfig::fromArray($root);
+        $unlocked = $root === null ? null : self::unlockedRoot($root, $lockData);
+        $project = $root === null ? ProjectConfig::empty() : ($unlocked === null ? ProjectConfig::fromArray($root) : self::manifest($root));
+        $lock = LockFile::fromArray($unlocked === null ? $lockData : $lockData + ['content-hash' => Locker::getContentHash(JsonFile::encode($unlocked))]);
         $clock = self::clock($case);
         if ($lock->find($package) === null) {
             throw new \InvalidArgumentException('the lock has no '.$package);
@@ -428,7 +432,7 @@ final class CaseHydrator
             SignalSet::default($clock, new Thresholds(), $targetPhp, PhpReleaseDates::load(), $projectPhp, $lock->platform()['php'] ?? null),
             $clock,
             ($activity['reason'] ?? null) === NotCheckedRule::OFFLINE,
-            self::advisoryLoader($packages, self::advisories(\is_array($inputs['other_advisories'] ?? null) ? $inputs['other_advisories'] : []), \is_string($run['advisories_unchecked'] ?? null) ? $run['advisories_unchecked'] : null, self::advisoryFailures($run)),
+            self::advisoryLoader($packages, self::advisories(\is_array($inputs['other_advisories'] ?? null) ? $inputs['other_advisories'] : []), \is_string($run['advisories_unchecked'] ?? null) ? $run['advisories_unchecked'] : null, self::advisoryFailures($run), self::advisoryAnswers($run)),
             null,
             self::abandonedIgnore(\is_array($inputs['abandoned_ignore'] ?? null) ? $inputs['abandoned_ignore'] : null)
         );
@@ -600,6 +604,52 @@ final class CaseHydrator
     }
 
     /**
+     * The root as the lock was written for it, when the root requires a package that the lock does
+     * not hold: that require came after the lock (case lock-out-of-sync‡). Null when the lock
+     * holds every package that the root requires, so the lock has no content-hash to compare.
+     *
+     * @param array<string, mixed>              $root
+     * @param array{packages: list<array<mixed, mixed>>, packages-dev?: list<array<mixed, mixed>>} $lock
+     *
+     * @return array<string, mixed>|null
+     */
+    private static function unlockedRoot(array $root, array $lock): ?array
+    {
+        $locked = array_map('strtolower', array_filter(array_column(array_merge($lock['packages'], $lock['packages-dev'] ?? []), 'name'), 'is_string'));
+        $before = $root;
+        foreach (['require', 'require-dev'] as $section) {
+            $links = \is_array($root[$section] ?? null) ? $root[$section] : [];
+            $before[$section] = array_filter($links, static fn ($name): bool => PlatformRepository::isPlatformPackage((string) $name) || \in_array(strtolower((string) $name), $locked, true), \ARRAY_FILTER_USE_KEY);
+            if ($before[$section] === [] && !isset($root[$section])) {
+                unset($before[$section]);
+            }
+        }
+
+        return $before === $root ? null : $before;
+    }
+
+    /**
+     * The project that reads $root as its composer.json, so that lockrot compares the lock's
+     * content-hash with it.
+     *
+     * @param array<string, mixed> $root
+     */
+    private static function manifest(array $root): ProjectConfig
+    {
+        $path = tempnam(sys_get_temp_dir(), 'lockrot-case-root');
+        if ($path === false) {
+            throw new \RuntimeException('no temporary file for the case root');
+        }
+        try {
+            file_put_contents($path, JsonFile::encode($root));
+
+            return ProjectConfig::fromFile($path);
+        } finally {
+            unlink($path);
+        }
+    }
+
+    /**
      * @param array<string, array<mixed, mixed>>                                                          $entries  by name
      * @param array<string, array{abandoned: array<mixed, mixed>|null, activity: array<mixed, mixed>|null}> $packages S1's marking (`by` the repository or the lock, and the replacement) and the repository of each package that has facts
      *
@@ -716,10 +766,12 @@ final class CaseHydrator
               + ($marking !== null && ($marking['by'] ?? null) === 'repository' ? ['abandoned' => $marking['replacement'] ?? true] : [])
               + ($registry !== null ? ['notification-url' => $registry] : []);
             if (($release['shared_commit'] ?? false) === true) {
-                // Two more spellings of the release on its commit reach PackageMetadata::SHARED_COMMIT_TAGS.
-                $data['source'] = ['type' => 'git', 'url' => $source ?? 'https://github.com/'.$package.'.git', 'reference' => 'shared-'.$version];
+                // The shared-commit releases of one date sit on one commit, as a subtree split tags them. Only stable
+                // tags count towards PackageMetadata::SHARED_COMMIT_TAGS, so a pre-release needs stable tags of its date.
+                $data['source'] = ['type' => 'git', 'url' => $source ?? 'https://github.com/'.$package.'.git', 'reference' => 'shared-'.(\is_string($release['time'] ?? null) ? $release['time'] : $version)];
                 $bare = ltrim($version, 'v');
-                foreach (['v' === $version[0] ? $bare : 'v'.$bare, $bare.'.0'] as $alias) {
+                // Two more spellings of a stable release on its commit reach SHARED_COMMIT_TAGS alone.
+                foreach (VersionParser::parseStability($version) === 'stable' ? ['v' === $version[0] ? $bare : 'v'.$bare, $bare.'.0'] : [] as $alias) {
                     $aliases[] = (new ArrayLoader())->load(['version' => $alias] + $data);
                 }
             }
@@ -922,6 +974,22 @@ final class CaseHydrator
     }
 
     /**
+     * @param array<mixed, mixed> $run
+     *
+     * @return array<string, int> the records of the case package in each answered repository beside packagist, by repository
+     */
+    private static function advisoryAnswers(array $run): array
+    {
+        $answers = [];
+        foreach (\is_array($run['advisory_answers'] ?? null) ? $run['advisory_answers'] : [] as $answer) {
+            self::assertArray($answer);
+            $answers[JsonPath::stringAt($answer, ['composer_repository'])] = JsonPath::intAt($answer, ['records']);
+        }
+
+        return $answers;
+    }
+
+    /**
      * Each package's counted advisories, the ignored ones and the feeds' records: `records` counts
      * every advisory of the name on any version, else the advisories given count.
      *
@@ -929,11 +997,13 @@ final class CaseHydrator
      * @param list<Advisory>                                                                                 $others    those on other versions of the case's package
      * @param ?string                                                                                        $unchecked why the lookup did not complete, null when it answered. Packagist answers a `lookup_failed` lookup, because another repository failed
      * @param list<array{composer_repository: string, reason: string, message: ?string}>                   $failures  the repositories that failed beside the answered packagist one, as the model's run lists them
+     * @param array<string, int>                                                                             $answers   the case package's records in each answered repository beside packagist, which packagist does not hold
      */
-    private static function advisoryLoader(array $packages, array $others, ?string $unchecked, array $failures): AdvisoryLoaderInterface
+    private static function advisoryLoader(array $packages, array $others, ?string $unchecked, array $failures, array $answers = []): AdvisoryLoaderInterface
     {
         $repository = 'composer repo (https://repo.packagist.org)';
-        $answers = $unchecked === null || $unchecked === AdvisoryCoverage::LOOKUP_FAILED;
+        $answered = $unchecked === null || $unchecked === AdvisoryCoverage::LOOKUP_FAILED;
+        $own = $answers;
         $failedFeeds = array_map(static fn (array $failure): AdvisoryFeed => AdvisoryFeed::failed($failure['composer_repository'], $failure['message']), $failures);
         $counted = [];
         $ignored = [];
@@ -945,15 +1015,25 @@ final class CaseHydrator
             $all = array_merge($facts['advisories'], $others);
             $others = [];
             $records = $facts['records'] ?? \count(array_unique(array_map(static fn (Advisory $advisory): string => $advisory->id(), $all)));
-            $total += $records;
-            $withRecords += $records === 0 ? 0 : 1;
-            $names[$name] = new AdvisoryNameCoverage($answers ? array_merge($failedFeeds, [AdvisoryFeed::answered($repository, $records)]) : [], $answers ? $records : null, $unchecked);
+            $answeredFeeds = [];
+            foreach (array_keys($answers) as $other) {
+                $answeredFeeds[] = AdvisoryFeed::answered($other, $own[$other] ?? 0);
+            }
+            $packagist = $records - array_sum($own);
+            $own = [];
+            $total += $packagist;
+            $withRecords += $packagist === 0 ? 0 : 1;
+            $names[$name] = new AdvisoryNameCoverage($answered ? array_merge($failedFeeds, $answeredFeeds, [AdvisoryFeed::answered($repository, $packagist)]) : [], $answered ? $records : null, $unchecked);
             $counted += $facts['advisories'] === [] ? [] : [$name => $facts['advisories']];
             $ignored += $facts['ignored'] === [] ? [] : [$name => $facts['ignored']];
             $every += $all === [] ? [] : [$name => $all];
         }
         $failed = array_map(static fn (array $failure): AdvisoryRepository => AdvisoryRepository::of($failure['composer_repository'], AdvisoryRepository::FAILED, $failure['reason'], $failure['message']), $failures);
-        $repositories = array_merge($failed, [$answers ? AdvisoryRepository::of($repository, AdvisoryRepository::ANSWERED)->withRecords($total, $withRecords) : AdvisoryRepository::of($repository, AdvisoryRepository::NOT_ASKED, $unchecked)]);
+        $besides = [];
+        foreach ($answers as $other => $count) {
+            $besides[] = AdvisoryRepository::of($other, AdvisoryRepository::ANSWERED)->withRecords($count, $count === 0 ? 0 : 1);
+        }
+        $repositories = array_merge($failed, $besides, [$answered ? AdvisoryRepository::of($repository, AdvisoryRepository::ANSWERED)->withRecords($total, $withRecords) : AdvisoryRepository::of($repository, AdvisoryRepository::NOT_ASKED, $unchecked)]);
         $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, $repositories, 0, $names);
         $notes = array_map(static fn (array $failure): RunNote => RunNote::advisoriesUnavailable(
             $failure['composer_repository'],

@@ -944,6 +944,7 @@ final class JsonSchemaConformanceTest extends TestCase
             RunNote::updateNowNotChecked('install_time_budget', ['acme/a', 'acme/b']),
             RunNote::moveCheckFailed('Seld\\JsonLint\\ParsingException', 'does not contain valid JSON'),
             RunNote::commandArgumentUnsafe([['package' => 'typo3/html-sanitizer', 'version' => 'v2.3.2+x|calc']]),
+            RunNote::lockOutOfSync(['acme/feature-flags', 'acme/metrics']),
             // Last, so that the indexes of the vocabularies below stay those of the analyser's order.
             RunNote::packageNameInvalid(['--with-all-dependencies']),
         ];
@@ -986,6 +987,7 @@ final class JsonSchemaConformanceTest extends TestCase
             'a disabling value that is a number' => [['note_details', 4, 'data', 'value'], 0],
             'sets_network_failures as a word' => [['note_details', 0, 'sets_network_failures'], 'no'],
             'a docs_url that is a number' => [['note_details', 0, 'docs_url'], 1],
+            'a lock note whose missing is one name' => [['note_details', 26, 'data', 'missing'], 'acme/metrics'],
             'a note without its data' => [['note_details', 0], ['code' => 'offline', 'text' => 'x', 'docs_url' => null, 'sets_network_failures' => false]],
         ] as $what => [$path, $value]) {
             self::assertNotSame([], $this->errors(Schemas::REPORT, self::changed($decoded, $path, $value), false), $what);

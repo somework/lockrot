@@ -2,7 +2,7 @@
     "_readme": [
         "A hand-built lock: each entry is one kind of origin, or one URL lockrot must not write out."
     ],
-    "content-hash": "origins-fixture",
+    "content-hash": "0200801cd7a7ab67fa8fa931511ac790",
     "packages": [
         {
             "name": "acme/from-packagist",

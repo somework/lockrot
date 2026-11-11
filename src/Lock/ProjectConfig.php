@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Lockrot\Lock;
 
+use Composer\Package\Locker;
 use Composer\Repository\PlatformRepository;
 use Lockrot\Allowlist\ProjectIgnoreList;
+use Lockrot\Allowlist\UncheckedAcceptanceEntry;
 use Lockrot\Config\ConfigSchema;
 use Lockrot\Config\UnknownKeys;
 use Lockrot\Exception\ConfigException;
@@ -40,6 +42,8 @@ final class ProjectConfig
     /** @var array<string, array<string, string>> `require` or `require-dev` => lowercased name => the key as written */
     private array $keys = [];
     private bool $read = true;
+    /** The bytes of composer.json, for the freshness test of the lock; null when the config did not come from a file. */
+    private ?string $manifestContents = null;
 
     /**
      * @param list<string> $requires
@@ -76,7 +80,13 @@ final class ProjectConfig
             return self::empty();
         }
 
-        return self::fromArray(JsonReader::readObject($path));
+        $config = self::fromArray(JsonReader::readObject($path));
+        $contents = file_get_contents($path);
+        if ($contents !== false) {
+            $config->manifestContents = $contents;
+        }
+
+        return $config;
     }
 
     /** @param array<string, mixed> $json */
@@ -173,6 +183,16 @@ final class ProjectConfig
                 $schemaInput['ignore'] = $rows;
             }
         }
+        $accepted = \is_array($lockrotExtra['accept-unchecked'] ?? null) ? $lockrotExtra['accept-unchecked'] : [];
+        foreach ($accepted as $index => $row) {
+            $refusal = \is_int($index) ? UncheckedAcceptanceEntry::repositoryRefusal($index, $row) : null;
+            if ($refusal !== null && \is_array($row)) {
+                $refusals[] = $refusal;
+                // The schema reads a placeholder in its place, so that its regex does not speak too.
+                $accepted[$index] = ['repository' => 'x://h'] + $row;
+                $schemaInput['accept-unchecked'] = $accepted;
+            }
+        }
         try {
             ConfigSchema::validate($schemaInput);
         } catch (ConfigException $e) {
@@ -225,6 +245,33 @@ final class ProjectConfig
         }
 
         return $keys;
+    }
+
+    /**
+     * The root requirements that the lock lacks, when the lock is not fresh against composer.json;
+     * null when it is fresh, or when there is no way to tell: no file, or a lock with no hash. The
+     * test is Composer's own ({@see Locker::isFresh()}), and the list can be empty, because a
+     * changed constraint changes the hash too.
+     *
+     * @return list<string>|null
+     */
+    public function lockOutOfSync(LockFile $lock, bool $includeDev): ?array
+    {
+        if ($this->manifestContents === null) {
+            return null;
+        }
+        $hash = $lock->contentHash() ?? '';
+        $legacy = $lock->legacyHash() ?? '';
+        if ($hash === '' && $legacy === '') {
+            return null;
+        }
+        try {
+            $fresh = $hash !== '' ? Locker::getContentHash($this->manifestContents) === $hash : md5($this->manifestContents) === $legacy;
+
+            return $fresh ? null : MissingRequirements::of($this->manifestContents, $lock, $includeDev);
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     public function isRead(): bool

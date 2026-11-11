@@ -219,7 +219,7 @@ defs['factBaseline'] = nul("A fact's state against the baseline entry (§6.4 \"P
 # holders and php checks
 MOVE_CHECK_REASONS = ['baseline_refused', 'unloaded_name', 'offline', 'install_time_budget', 'not_from_composer_repository', 'no_composer_json',
                       'composer_json_invalid', 'platform_config_invalid', 'no_release_read', 'pass_cap', 'solver_error', 'advisory_lookup_incomplete',
-                      'lock_disabled']
+                      'lock_disabled', 'installs_no_release']
 # The reasons that leave the baseline itself unchecked: the budget, a run that cannot solve at all, or a solve that Composer failed on.
 BASELINE_CHECK_REASONS = ['unloaded_name', 'offline', 'install_time_budget', 'no_composer_json', 'composer_json_invalid', 'platform_config_invalid', 'solver_error',
                           'lock_disabled']
@@ -230,7 +230,7 @@ defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether the mov
                          "Null on a kind that runs no Composer request, and in a run that checks no move."),
     obj('The check of one move.', {
         'result': closed(['resolves', 'refused', 'not_checked'], ("`resolves`: the solver installs the move in `form`; `refused`: no form installs it, and "
-                                                                 "`held_by` names the holds; `not_checked`: lockrot did not ask, `reason` says why. Closed (§8.2).")),
+                                                                 "`held_by` names the holds; `not_checked`: lockrot did not ask, or every solve installs no release of the package, `reason` says why. Closed (§8.2).")),
         'form': nul(("The first form that resolves: `inline` (`composer update vendor/pkg:^1.2`, or `composer require` for a root requirement), "
                      "`with-dependencies` (adds `--with-dependencies`) or `with-all-dependencies` (adds `--with-all-dependencies`); null unless `result` is `resolves`. Closed."),
                     closed(['inline', 'with-dependencies', 'with-all-dependencies'])),
@@ -242,14 +242,17 @@ defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether the mov
                        "false in any letter case, a value that is neither a string nor false, a name that is no platform package, or a version string that Composer "
                        "cannot normalize, such as `^8.2` or an ext-* value `^1.0`), `no_release_read` (no release of the row was read, so the move names no version), "
                        "`pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: "
-                       "the `move_check_failed` note). An open set (§8.2)."),
+                       "the `move_check_failed` note), `installs_no_release` (each form that resolves keeps the locked release, installs a dev version of the package, "
+                       "a branch alias included, or removes it, so no form reaches a release: the move's text names what the solver installs). An open set (§8.2)."),
                       {'type': 'string', 'pattern': SNAKE, 'x-known-values': MOVE_CHECK_REASONS}),
         'installs': nul(("The release of the moved package that the resolving form installs, as its repository lists it. "
-                         "Null unless `result` is `resolves`, and null when the check was recorded without it."), {'type': 'string', 'minLength': 1}),
-    }, allOf=[{'description': '`form` is set exactly on `resolves`, `reason` exactly on `not_checked`, and `installs` only on `resolves`.',
+                         "Null unless `result` is `resolves`, and null when the check was recorded without it. On `not_checked` with `installs_no_release`, "
+                         "the version that the first resolving form installs or keeps: a dev version, or the locked release. Null when that form removes the package from the lock."), {'type': 'string', 'minLength': 1}),
+    }, allOf=[{'description': '`form` is set exactly on `resolves`, `reason` exactly on `not_checked`, and `installs` only on `resolves` and on `installs_no_release`.',
                'anyOf': [{'properties': {'result': {'enum': ['resolves']}, 'form': {'type': 'string'}, 'reason': {'type': 'null'}}},
                          {'properties': {'result': {'enum': ['refused']}, 'form': {'type': 'null'}, 'reason': {'type': 'null'}, 'installs': {'type': 'null'}}},
-                         {'properties': {'result': {'enum': ['not_checked']}, 'form': {'type': 'null'}, 'reason': {'type': 'string'}, 'installs': {'type': 'null'}}}]}]))
+                         {'properties': {'result': {'enum': ['not_checked']}, 'form': {'type': 'null'}, 'reason': {'type': 'string', 'not': {'enum': ['installs_no_release']}}, 'installs': {'type': 'null'}}},
+                         {'properties': {'result': {'enum': ['not_checked']}, 'form': {'type': 'null'}, 'reason': {'enum': ['installs_no_release']}, 'installs': {'type': ['string', 'null']}}}]}]))
 HOLDER_MOVE = obj("The holder's own move, `{kind, to_branch, constraint, check}` of its `next_step`, so a sentence writes \"its own move, require ^4.4.51\" without reading another finding (§5.3, round 2).", {
     'kind': open_set(['replace', 'find-alternative', 'tag', 'require', 'update', 'raise-php', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix'],
                      "The holder's `next_step.kind` (an open set, as `next_step.kind`).", HYPHEN),
@@ -738,7 +741,7 @@ defs['checkMissing'] = obj("A check that did not run and raised S10 (S10's `unch
     'check': open_set(['repository_activity', 'release_dates', 'advisories', 'releases', 'release_metadata'], ("S10's check id: `repository_activity` (S3, S4), `release_dates` (S2, S5, S8: "
                       "a release that the signal reads has no trusted date, because the lock gives the installed release no time, its tag shares a commit with other tags, "
                       "or the tag carries no date), `advisories` (S9: the advisory lookup did not complete), `releases` (S9's fix part: releases could not be read), "
-                      "`release_metadata` (S2, S8: a package from a vcs or an unknown origin, whose release metadata no Composer repository serves). An open set.")),
+                      "`release_metadata` (S2 and S8, with S5 when S5 could fire and S11 when S11 fired: a package from a vcs or an unknown origin, whose release metadata no Composer repository serves). An open set.")),
     'reason': open_set(['no_token', 'anonymous_budget', 'install_time_budget', 'rate_limit', 'fetch_failed', 'offline', 'undated_releases', 'releases_unknown',
                         'lookup_failed', 'host_not_supported', 'no_feed', 'not_from_composer_repository', 'composer_json_invalid'],
                        ('Why it did not run (§2.3, §7.9 page vocabulary): `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4). '
@@ -750,7 +753,7 @@ defs['checkMissing'] = obj("A check that did not run and raised S10 (S10's `unch
 })
 defs['checkSkipped'] = obj("A check lockrot chose not to run (§2.3): a decision, not a gap; it raises no S10 and reaches no `unchecked` gate.", {
     'check': open_set(['repository_activity', 'release_metadata', 'advisories', 'release_branch', 'repository_archived', 'release_dates'], ("`repository_activity` (blocks S3, S4), "
-                      "`release_metadata` (S2, S8), `advisories` (S9), `release_branch` (S8 on a branch snapshot, which has no release branch, attack round 1), `repository_archived` "
+                      "`release_metadata` (S2 and S8, with S5 when S5 could fire and S11 when S11 fired), `advisories` (S9), `release_branch` (S8 on a branch snapshot, which has no release branch, attack round 1), `repository_archived` "
                       "(S3: the host's answer did not carry the archived flag, as an anonymous GitLab answer does not), `release_dates` (S2, S5, S8: the S10 `release_dates` gap "
                       "of a package with S1 or a package that an allowlist entry accepts whole, which the S10 filter drops). An open set.")),
     'reason': open_set(['allowlisted', 'no_repository', 'not_from_composer_repository', 'offline', 'rate_limit', 'fetch_failed', 'anonymous_budget', 'install_time_budget',
@@ -798,7 +801,7 @@ defs['allowlist'] = nul("The allowlist entry that accepts maintenance flags of t
     }))
 defs['metadata'] = obj("How the repository metadata went (§7.6, revision 3): `note` stays as its rendering.", {
     'status': closed(['read', 'not_from_composer_repository', 'unavailable', 'not_found'], ("Closed (§8.2). `read` exactly when `maintenance_judged` is true (schema round). A package installed from vcs, path or an archive is "
-                     "`not_from_composer_repository` whatever its verdict. Its `release_metadata` entry (S2, S8 not run) is in `checks_skipped[]` for a path, artifact "
+                     "`not_from_composer_repository` whatever its verdict. Its `release_metadata` entry (S2 and S8 not run) is in `checks_skipped[]` for a path, artifact "
                      "or package origin. It is in `checks_missing[]` for vcs and unknown origins, unless the S10 filter moved it to `checks_skipped[]`.")),
     'reason': nul('Why it did not come (`MetadataFailure::REASONS`, the open set of report-1\'s run notes); null when read.', ref('metadataFailureReason')),
     'message': nul("Foreign text — a repository's, a host's or Composer's own words, redacted as report-1's notes redact them. Not contract. Null when read.", {'type': 'string'}),
@@ -899,10 +902,10 @@ for k in ('target_php', 'php_constraint'):
 defs['s6'] = sig_data('S6 (§2.1): pinned to a branch snapshot, or no tagged release.', {
     'version': d('The installed version.', {'type': 'string'}),
     'reason': open_set(['branch_snapshot', 'no_stable_release'], "Which of S6's cases fired. An open set (report-1)."),
-    'has_stable_release': nul('Whether the repository lists any tagged version; null when no metadata was loaded.', {'type': 'boolean'}),
+    'has_stable_release': nul('Whether the repository lists a stable tag. A pre-release does not count. Null when no metadata was loaded.', {'type': 'boolean'}),
     'last_stable_release': nul('The trusted date of `last_stable_version`. Null when lockrot trusts no date for it.', ref('dateTime')),
-    'last_stable_version': nul(("The newest tagged release, a pre-release included. That is the highest tag when it has no trusted date, else the newest by date, "
-                                "a lower tag on a shared commit included. Null only when no tag exists or no metadata was loaded."), {'type': 'string'}),
+    'last_stable_version': nul(("The newest stable tag, never a pre-release. That is the highest stable tag when it has no trusted date, else the newest "
+                                "stable tag by date, a lower tag on a shared commit included. Null when no stable tag exists or no metadata was loaded."), {'type': 'string'}),
     'last_stable_dated_by': ref('datedBy'),
     'snapshot_time': nul("For `branch_snapshot`, the lock's `time`; else null.", ref('dateTime')),
     'tag_relation': nul("How the newest tag relates to the snapshot (`older newer same`; revision 3), open (§8.2); null when there is no tag or no snapshot time.",
@@ -930,8 +933,8 @@ defs['s8'] = sig_data("S8 (§2.1): the installed release branch stopped while a 
     'newest_php': nul("The newest branch's php requirement; null when it requires none.", {'type': 'string'}),
     'newest_within_reach': d('Whether its php admits the project floor and the target.', {'type': 'boolean'}),
     'newest_years': d('Age of `newest_release` on the run clock (round 2).', ref('years')),
-    'newest_release_at_least': d(("True when `newest_version` is the newest branch's highest tag and that tag has no trusted release date: `newest_release` is then "
-                                  "the date of a commit its tags share, a lower bound, and `newest_years` an upper bound. False when S8 quotes a lower tag with its "
+    'newest_release_at_least': d(("True when `newest_version` is the newest branch's highest tag and that tag has no trusted release date, or a lower tag that only "
+                                  "a commit shared with other tags dates: `newest_release` is then the date of a commit its tags share, a lower bound, and `newest_years` an upper bound. False when S8 quotes a lower tag with its "
                                   "own date. The summary reads \"(on or after {date}, the date of a commit its tags share)\"."),
                                  {'type': 'boolean'}),
     'floor_php': nul('What holds the newest branch back; null when within reach.', {'type': 'string'}),
@@ -945,8 +948,8 @@ defs['s8'] = sig_data("S8 (§2.1): the installed release branch stopped while a 
         'target': nul('null: no php declared.', {'type': 'boolean'}),
     })),
     'reachable_years': nul('Age of `reachable_release` on the run clock (round 2); null with `reachable_branch`.', ref('years')),
-    'reachable_release_at_least': nul(("True when `reachable_version` is the reachable branch's highest tag and that tag has no trusted release date: `reachable_release` "
-                                       "is then the date of a commit its tags share, a lower bound, and `reachable_years` an upper bound. False when S8 quotes a lower tag "
+    'reachable_release_at_least': nul(("True when `reachable_version` is the reachable branch's highest tag and that tag has no trusted release date, or a lower tag "
+                                       "that only a commit shared with other tags dates: `reachable_release` is then the date of a commit its tags share, a lower bound, and `reachable_years` an upper bound. False when S8 quotes a lower tag "
                                        "with its own date. Null with `reachable_branch`."), {'type': 'boolean'}),
     'suggested_constraint': nul('A caret constraint following the reachable branch; null when there is none.', {'type': 'string'}),
     'dated_by': ref('datedBy'),
@@ -1457,7 +1460,7 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
     'score_model': ref('scoreModel'),
     'advisory_lookup': ref('advisoryLookup'),
     'move_check': nul("How Composer's solver checked the run's moves (§5.6). `composer lockrot` always writes it. A run that checks no move says why in `baseline` and `reason`. Null means a report built without the move check, such as the contract fixtures.", obj('The move check of the run.', {
-        'composer': nul('The version of the running Composer, on every `baseline` and every `reason`, also when nothing solved.', {'type': 'string', 'minLength': 1}),
+        'composer': nul('The version of the running Composer, on every `baseline` and every `reason`, also when the move check solves nothing. The type admits null, but `composer lockrot` never writes null here: both of its move checkers report the version.', {'type': 'string', 'minLength': 1}),
         'blocks_advisories': d('Whether the solve removed the versions that an advisory affects, as Composer does in an update.', {'type': 'boolean'}),
         'blocking_disabled_by': arr("The switches that turn off the advisory blocking of the running Composer, in this order: " + ', '.join('`%s`' % n for n in BLOCKING_SWITCHES) + ". "
                                     "A switch is listed when it holds a value that turns the blocking off and no switch that Composer reads after it turns the blocking on again. "
@@ -1537,12 +1540,12 @@ NOTE_CODES = ['offline', 'metadata_unavailable', 'monorepo_parent_unavailable', 
               'baseline_fix_model_differs', 'ignore_does_not_cover_advisories', 'advisories_disabled_by_policy',
               'abandoned_markings_ignored', 'abandoned_not_audited_by_composer', 'abandoned_ignore_unreadable', 'repository_activity_host_not_supported',
               'moves_not_checked', 'update_now_reduced', 'update_now_refused', 'update_now_not_checked', 'move_check_failed', 'package_name_invalid',
-              'command_argument_unsafe']
+              'command_argument_unsafe', 'lock_out_of_sync']
 NOTE_DEFS = {c: 'note' + ''.join(w.capitalize() for w in c.split('_')) for c in NOTE_CODES}
 for c in NOTE_CODES:
     if c in ('advisories_disabled_by_policy', 'repository_activity_host_not_supported', 'abandoned_markings_ignored', 'abandoned_not_audited_by_composer',
              'abandoned_ignore_unreadable', 'baseline_target_differs', 'baseline_fix_model_differs', 'ignore_does_not_cover_advisories',
-             'moves_not_checked', 'update_now_reduced', 'update_now_refused', 'update_now_not_checked', 'move_check_failed', 'package_name_invalid',
+             'moves_not_checked', 'update_now_reduced', 'update_now_refused', 'update_now_not_checked', 'move_check_failed', 'lock_out_of_sync', 'package_name_invalid',
              'command_argument_unsafe'):
         continue
     defs[NOTE_DEFS[c]] = copy.deepcopy(R1['definitions'][NOTE_DEFS[c]])
@@ -1694,6 +1697,11 @@ defs['noteMoveCheckFailed'] = obj(("`move_check_failed`: Composer's solver faile
                                    "reads `not_checked` with `reason` `solver_error`. The note names the run's first such failure."), {
     'class': d("The exception's class, as PHP names it. Foreign text, not contract.", {'type': 'string', 'minLength': 1}),
     'message': d("The exception's message. Foreign text, not contract.", {'type': 'string'}),
+})
+defs['noteLockOutOfSync'] = obj(("`lock_out_of_sync`: the lock's `content-hash` differs from the hash of composer.json, as Composer's lock freshness check "
+                                 "reads it (the legacy `hash` key too). lockrot reads the lock as it is. No note without composer.json or without a hash in the lock."), {
+    'missing': arr(("The root requirements that the lock holds no package for, sorted: `require`, and `require-dev` when the run reads dev packages. "
+                    "Platform requirements are never in it. It can be empty: a changed constraint changes the hash too."), ref('packageName'), uniqueItems=True),
 })
 defs['notePackageNameInvalid'] = obj(("`package_name_invalid`: lock entries whose name is no Composer package name. lockrot skips them, so they have no finding "
                                       "and no command names them. The text names none of them."), {
@@ -2058,10 +2066,10 @@ def add_relations_activity(defs):
     relate(defs['finding'], '`unchecked_accepted` is empty exactly when no `checks_skipped[]` entry has the reason `accepted_by_config`.',
            [P(unchecked_accepted=BO.EMPTY, checks_skipped=NONE(P(reason=E('accepted_by_config')))),
             P(unchecked_accepted=BO.MIN1, checks_skipped=CONTAINS(P(reason=E('accepted_by_config'))))])
-    relate(defs['uncheckedAccepted'], ['The check fixes what it blocks: `repository_activity` S3 and S4, `release_metadata` S2 and S8, `advisories` S9. A check that this schema does not list is not constrained.',
+    relate(defs['uncheckedAccepted'], ['The check fixes what it blocks: `repository_activity` S3 and S4, `release_metadata` S2 and S8, with S5 when S5 could fire and S11 when S11 fired, in signal order, `advisories` S9. A check that this schema does not list is not constrained.',
                                        'The reason fits the check: `host_not_supported` on `repository_activity`, `no_feed` on `advisories`, `not_from_composer_repository` on `release_metadata` '
                                        'or `repository_activity`. A reason that this schema does not list is not constrained.'],
-           [P(check=E('repository_activity'), blocks=E(['S3', 'S4'])), P(check=E('release_metadata'), blocks=E(['S2', 'S8'])), P(check=E('advisories'), blocks=E(['S9'])),
+           [P(check=E('repository_activity'), blocks=E(['S3', 'S4'])), P(check=E('release_metadata'), blocks=E(['S2', 'S8'], ['S2', 'S5', 'S8'], ['S2', 'S8', 'S11'], ['S2', 'S5', 'S8', 'S11'])), P(check=E('advisories'), blocks=E(['S9'])),
             P(check=NOT('repository_activity', 'release_metadata', 'advisories'))],
            [P(reason=E('host_not_supported'), check=E('repository_activity')), P(reason=E('no_feed'), check=E('advisories')),
             P(reason=E('not_from_composer_repository'), check=E('release_metadata', 'repository_activity')),

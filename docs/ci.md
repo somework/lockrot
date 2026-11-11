@@ -85,8 +85,8 @@ stack trace to the second. Other text comes from these sources:
       2.10 or newer, …` on stderr.
     - A non-CLI SAPI with `register_argc_argv` on prints `lockrot cannot run safely on a non-CLI
       SAPI …` on stdout.
-- The console application, which exits `1` before a command runs: an unknown command
-  (`Command "…" is not defined.`) or a `--working-dir` that does not exist.
+- In plugin mode, Composer's application, which exits `1` before `lockrot` runs: an unknown
+  command (`Command "…" is not defined.`) or a `--working-dir` that does not exist.
 
 Do not match `^lockrot:` to tell these cases apart.
 
@@ -118,6 +118,10 @@ Do not match `^lockrot:` to tell these cases apart.
   of one kind in `--fail-on`, `none` beside another value, and `vulnerable-low`.
 - A command line lockrot cannot read: an unknown option, an option without its value, a value given
   to a flag, an argument too many. lockrot checks it before it reads any file.
+- In the PHAR and `vendor/bin/lockrot`, an unknown command or a `--working-dir` that does not
+  exist. An option value after a space before the command name is an unknown command:
+  `lockrot.phar --output json:r.json` stops at `There are no commands defined in the "json"
+  namespace`. Join the value with `=`: `--output=json:r.json`.
 - `--fail-on`, `--baseline` or `--target-php` given twice, also with the same value
   ([configuration.md](configuration.md#cli-options)).
 - A baseline lockrot cannot read, a baseline-1 file included, and a baseline of another score model
@@ -153,14 +157,14 @@ Other exit paths:
 
 ### When exit `1` does not come from lockrot {#exit-1-not-from-lockrot}
 
-Composer or Symfony can stop before lockrot runs, with their own exit `1`:
+In plugin mode, Composer can stop before lockrot runs, with its own exit `1`. The PHAR and
+`vendor/bin/lockrot` exit `2` for these usage errors:
 
 | Symptom | Cause | Fix |
 |---|---|---|
 | Exit `1` with a report and a `gate: fails` line, or under `--generate-baseline` with a `lockrot: baseline written` line | lockrot's own exit `1`: a finding failed `--fail-on`, or `--strict-network`. Under `--generate-baseline`, only `--strict-network` gives it | Read the `gate:` line. This exit is the gate at work |
-| Exit `1`, Composer's error box or Symfony's message, no `lockrot:` line | An unknown command: `composer lokrot`, `php lockrot.phar nope` | Fix the command name |
+| Exit `1`, Composer's error box or Symfony's message, no `lockrot:` line | An unknown command (`composer lokrot`) or a `--working-dir` that does not exist | Fix the command name or the directory |
 | Exit `1`, `Command "lockrot" is not defined`, after a `lockrot: Composer <version> is older than 2.10` line | The plugin runs on a Composer older than 2.10, so it adds no `lockrot` command | Upgrade Composer to 2.10 or later, or run the [PHAR](phar.md) |
-| Exit `1`, `There are no commands defined in the "json" namespace` | `php lockrot.phar --output json:r.json`: before the command name, Symfony reads a value after a space as the command | Join the value with `=`: `--output=json:r.json` |
 | Exit `1`, Composer's error box about `composer.json`, in plugin mode | Composer cannot parse or validate `composer.json` | Fix the file. The PHAR reads the file itself and exits `2` for it |
 
 ## <a name="reading-the-gate-line"></a>Reading the gate line {#reading-the-gate-line}
@@ -180,10 +184,13 @@ gate: fails · --fail-on=high · 42 findings fail it · target php 8.4 (--target
   counted apart: `1 reaches it and the baseline exempts it`.
 - `--strict-network: a lookup failed` when `--strict-network` tripped.
 - One clause per gap of packages whose advisories lockrot did not check (`unchecked`):
-  `advisories not applied to 6 packages: not checked (offline)`. A grade or `vulnerable` value
-  cannot fail on those advisories, and the clause says so. A vulnerable finding whose lookup was
-  partial gets no clause: it shows as `security.check` `partial` with its run note. That note
-  sets whether `--strict-network` fails ([Run notes](notes.md)).
+  `advisories not applied to 6 packages: not checked (offline)`. In a check run, lockrot writes
+  the clause only when the list holds a grade or `vulnerable` value, which are the values that
+  read advisories. When the list holds no grade or `vulnerable` value, the line has no clause and
+  `gate.not_applied` is `[]`. A grade or `vulnerable` value cannot fail on those advisories, and
+  the clause says so. A vulnerable finding whose lookup was partial gets no clause: it shows as
+  `security.check` `partial` with its run note. That note sets whether `--strict-network` fails
+  ([Run notes](notes.md)).
 - Last, the target PHP and its source. `(the running PHP)` says that nothing pinned it.
 
 The JSON report writes the line as `gate.text` and the gate data as fields: `gate.failing_by`
@@ -247,8 +254,9 @@ one in [`extra.lockrot.accept-unchecked`](configuration.md#accept-unchecked), wi
   run wrote then shows as fixed in code scanning and in the merge-request widget, not as
   accepted. The json report holds what was accepted: `unchecked_accepted[]` on each finding and
   `packages_unchecked_accepted` at the root.
-- An accepted `no_feed` still leaves the advisories unchecked: the `gate:` line counts the package
-  in its `advisories not applied` clause.
+- An accepted `no_feed` still leaves the advisories unchecked. When the list holds a grade or
+  `vulnerable` value, the `gate:` line counts the package in its `advisories not applied` clause.
+  With `--fail-on=unchecked` alone, the line has no clause.
 
 A path package, an artifact or an inline `package` entry is a skip, not S10. To fail on such a
 package anyway, check its skips with jq:
@@ -461,7 +469,7 @@ steps:
 | `locations` | The package's line in the analysed lock |
 | `partialFingerprints` | `lockrot/package`: the package name, so a result keeps its identity when its line moves. An advisory result adds `lockrot/advisory` |
 | `suppressions` | On a result whose fact the baseline covers |
-| `properties` | `package`, `version`, `verdict` (the grade), `priority`, `lead`, `score_total`, `score_text`, `score_model_id`, `flag_ids`, `direct`, `dev`, `data_date`, `baseline_status` (`known`, `new`, `worsened` or null), `error_by` (the failing values). The first result of a finding also holds `chain`, `depth`, `direct_dependents`, `signal_ids` and `age`. A maintenance result adds `term`, a copy of the flag's `score.terms[]` entry. An advisory result adds `advisory` (its id), `cve` (null when it has none), `severity`, `fix` (the object of the S9 row), `points` (the severity points times the multiplier, before halving) and `deciding` (true on the advisory that the security term names). The deciding advisory result also adds `term`, the security term |
+| `properties` | `package`, `version`, `verdict` (the grade), `priority`, `lead`, `score_total`, `score_text`, `score_model_id`, `flag_ids`, `direct`, `dev`, `data_date`, `baseline_status` (`known`, `new`, `worsened` or null), `error_by` (the failing values). The first result of a finding also holds `chain`, `depth`, `direct_dependents`, `signal_ids` and `age`. When a maintenance result comes first, the first advisory result holds them too. Read these once per finding, not once per result. A maintenance result adds `term`, a copy of the flag's `score.terms[]` entry. An advisory result adds `advisory` (its id), `cve` (null when it has none), `severity`, `fix` (the object of the S9 row), `points` (the severity points times the multiplier, before halving) and `deciding` (true on the advisory that the security term names). The deciding advisory result also adds `term`, the security term |
 | `runs[0].properties` | `lockrot_schema`, `text_grammar`, `score_text_grammar`, `score_model_id`, `fix_model` and `advisory_lookup` |
 | `invocations[].toolExecutionNotifications` | The report's notes, a warning per advisory repository that failed, and a note per advisory repository that lockrot did not ask |
 

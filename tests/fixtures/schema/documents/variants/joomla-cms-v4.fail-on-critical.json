@@ -1767,10 +1767,10 @@
   ]
  },
  "libyears": {
-  "total": 260.16,
-  "direct_requirements": 163.34,
+  "total": 259.55,
+  "direct_requirements": 162.73,
   "measured": 86,
-  "at_least_count": 0,
+  "at_least_count": 2,
   "unmeasured": {
    "not_from_composer_repository": 1,
    "unavailable": 0,
@@ -8759,7 +8759,7 @@
    "evidence": "left-behind: branch 2.x last released 2023-06-05 (3.3 years ago); 3.x released 3.0.3 (2026-04-19), needs php ^8.1.0 above the project's php ^7.2.5; no releasing branch within reach",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:41:33+00:00",
-   "libyears": 2.87,
+   "libyears": 2.86,
    "age": {
     "installed": {
      "at": "2023-06-05T20:11:14+00:00",
@@ -9047,7 +9047,7 @@
    "evidence": "left-behind: branch 2.x last released 2023-03-02 (3.6 years ago); 3.x released 3.0.3 (2026-09-04), needs php ^8.1.0 above the project's php ^7.2.5; no releasing branch within reach",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:41:33+00:00",
-   "libyears": 3.51,
+   "libyears": 3.48,
    "age": {
     "installed": {
      "at": "2023-03-02T14:13:06+00:00",
@@ -19489,7 +19489,7 @@
    "evidence": "",
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:41:33+00:00",
-   "libyears": 0.87,
+   "libyears": 0.3,
    "age": {
     "installed": {
      "at": "2025-04-06T13:54:39+00:00",
@@ -21186,7 +21186,7 @@
    "replacement_url": null,
    "note": null,
    "libyears_unmeasured": null,
-   "libyears_at_least": false,
+   "libyears_at_least": true,
    "direct": true,
    "dev": false,
    "reach": "direct",
@@ -23672,7 +23672,7 @@
    "replacement_url": null,
    "note": null,
    "libyears_unmeasured": null,
-   "libyears_at_least": false,
+   "libyears_at_least": true,
    "direct": false,
    "dev": false,
    "reach": "transitive",

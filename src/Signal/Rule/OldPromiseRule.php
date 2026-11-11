@@ -70,11 +70,7 @@ final class OldPromiseRule implements SignalRule
     public function missesATrustedDate(PackageFacts $facts): bool
     {
         $package = $facts->package();
-        $metadata = $facts->metadata();
-        if ($metadata === null) {
-            return false;
-        }
-        $installed = InstalledRelease::of($package, $metadata);
+        $installed = InstalledRelease::of($package, $facts->metadata());
         $constraint = $package->requirePhp();
         $ga = $this->dates->gaDate($this->targetMajor);
         if ($installed->isDated() || $package->isBranchSnapshot() || $constraint === null || $ga === null) {

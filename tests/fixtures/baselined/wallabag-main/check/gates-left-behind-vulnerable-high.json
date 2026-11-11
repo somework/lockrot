@@ -1313,16 +1313,16 @@
         ]
     },
     "libyears": {
-        "total": 260.9,
-        "direct_requirements": 132.4,
-        "measured": 265,
+        "total": 260.8,
+        "direct_requirements": 132.3,
+        "measured": 266,
         "at_least_count": 3,
         "unmeasured": {
             "not_from_composer_repository": 0,
             "unavailable": 0,
             "not_found": 0,
             "branch_snapshot": 4,
-            "shared_commit": 2,
+            "shared_commit": 1,
             "parent_split": 0,
             "undated": 0,
             "no_stable_release": 0,
@@ -43692,7 +43692,7 @@
             "evidence": "",
             "allowlist_reason": null,
             "data_date": "2026-10-14T00:00:00+00:00",
-            "libyears": 0.1,
+            "libyears": 0,
             "age": {
                 "installed": {
                     "at": "2025-12-02T14:45:16+00:00",
@@ -54453,7 +54453,7 @@
             "replacement": null,
             "replacement_url": null,
             "note": null,
-            "libyears_unmeasured": "shared_commit",
+            "libyears_unmeasured": null,
             "libyears_at_least": false,
             "direct": false,
             "dev": false,
@@ -54531,7 +54531,7 @@
             "evidence": "",
             "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
             "data_date": "2026-10-14T00:00:00+00:00",
-            "libyears": null,
+            "libyears": 0,
             "age": {
                 "installed": null,
                 "installed_unmeasured": "shared_commit",

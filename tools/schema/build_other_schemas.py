@@ -304,9 +304,9 @@ def explain_metadata():
     for k in ['abandoned', 'replacement', 'releases_listed', 'has_stable_release', 'last_stable_release', 'last_stable_version', 'type', 'data_date']:
         rows['properties'][k].setdefault('description', {
             'abandoned': 'Whether the registry marks it abandoned.', 'replacement': 'The registry\'s replacement, as written; null when none.',
-            'releases_listed': 'How many releases the registry lists.', 'has_stable_release': 'Whether it lists a tagged release.',
-            'last_stable_release': 'The trusted date of `last_stable_version`, a pre-release included. Null when lockrot trusts none.',
-            'last_stable_version': 'The newest tagged release, a pre-release included. Null only when no tag exists.',
+            'releases_listed': 'How many releases the registry lists.', 'has_stable_release': 'Whether it lists a stable tag. A pre-release does not count.',
+            'last_stable_release': 'The trusted date of `last_stable_version`. Null when lockrot trusts none.',
+            'last_stable_version': 'The newest stable tag, never a pre-release. Null when no stable tag exists.',
             'type': 'The package type the registry lists.', 'data_date': 'When this metadata was fetched or cached.'}[k])
     for k, v in row['properties'].items():
         v.setdefault('description', {'installed': 'Whether the installed version is on this branch.', 'newest_dated': 'The branch\'s newest dated stable release.',
@@ -909,7 +909,7 @@ def accept_unchecked_schema():
         'description': 'One accepted check.',
         'type': 'object',
         'properties': {
-            'check': closed('The check that lockrot did not run: `repository_activity` (S3 and S4), `release_metadata` (S2 and S8) or `advisories` (S9). '
+            'check': closed('The check that lockrot did not run: `repository_activity` (S3 and S4), `release_metadata` (S2 and S8, with S5 when S5 could fire and S11 when S11 fired) or `advisories` (S9). '
                             'For a package outside every Composer repository, an accepted `release_metadata` also accepts the unknown fix of each counted advisory, '
                             'because the fix scan reads the same releases. Its score can then be lower than with the releases read.', ACCEPT_CHECKS),
             'expires': {'description': 'A real calendar date (`YYYY-MM-DD`). The entry accepts through 23:59:59 UTC that day, as an `ignore[]` entry does. lockrot rejects a date '

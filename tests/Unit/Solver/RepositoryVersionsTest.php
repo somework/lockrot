@@ -23,6 +23,7 @@ use Lockrot\Solver\RepositoryVersions;
 use Lockrot\Solver\VersionSource;
 use Lockrot\Tests\Support\ConfiguredRepository;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\NetworkCancelledException;
 use Lockrot\Tests\Support\RecordingComposerRepository;
 use PHPUnit\Framework\TestCase;
 use Seld\JsonLint\ParsingException;
@@ -57,6 +58,28 @@ final class RepositoryVersionsTest extends TestCase
 
         self::assertSame([], $versions->versions('acme/lib'));
         self::assertSame(VersionSource::FAILED, $versions->failure('acme/lib'));
+    }
+
+    public function testOfflineACancelledRequestReadsOfflineAndOnlineItReadsFailed(): void
+    {
+        $repository = new class () extends ComposerRepository {
+            public function __construct()
+            {
+            }
+
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
+            {
+                throw new NetworkCancelledException();
+            }
+        };
+
+        $offline = new RepositoryVersions([$repository], [], true, Deadline::never());
+        $online = new RepositoryVersions([$repository], [], false, Deadline::never());
+
+        self::assertSame([], $offline->versions('acme/lib'));
+        self::assertSame(VersionSource::OFFLINE, $offline->failure('acme/lib'));
+        self::assertSame([], $online->versions('acme/lib'));
+        self::assertSame(VersionSource::FAILED, $online->failure('acme/lib'));
     }
 
     /** Composer stops on the same answer, so the error stops the solve, and a later ask reads the name as failed. */

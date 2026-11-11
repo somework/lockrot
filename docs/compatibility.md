@@ -244,7 +244,8 @@ The `github`, `sarif` and `gitlab` columns of
     - In a check or `--generate-baseline` run, `0` and `1` follow the report's `gate.fails`, with
       its causes in `gate.tripped_by`. A run that then cannot write an `--output` file or the
       baseline exits `2` instead.
-    - An exit `1` from Composer or Symfony before lockrot runs is not lockrot's
+    - The PHAR and `vendor/bin/lockrot` exit `2` on an unknown command or a `--working-dir` that
+      does not exist. In plugin mode, Composer exits `1` for them before lockrot runs
       ([ci.md](ci.md#exit-1-not-from-lockrot)).
 - Messages about lockrot itself (a failure, a warning, a deprecation) go to stderr, never into the
   report on stdout. A report's own notes are part of the report.
@@ -346,7 +347,9 @@ verdicts only under these rules:
 A committed baseline does not make an upgrade silent. A package that a release starts to grade is
 `new`. A package whose facts worsen (a higher flag, a new advisory, a higher rating or a lost fix)
 is `worsened`. A `new` finding fails the run when it reaches `--fail-on`. A `worsened` one fails
-when its [gate score](baseline.md#the-gate-score) reaches it. An unchanged lock can cross a
+when its [gate score](baseline.md#the-gate-score) reaches a grade value. A flag value reads the
+flags that the baseline does not cover, `vulnerable` reads the advisories that it does not know,
+and `unchecked` reads the finding's S10. An unchanged lock can cross a
 threshold too, as its packages' releases age ([baseline.md](baseline.md)).
 
 ## Extending lockrot

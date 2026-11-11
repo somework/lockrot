@@ -84,6 +84,25 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
         return new self($check, $scope, $value, $reason, self::expires($at, $row['expires'] ?? null));
     }
 
+    /**
+     * The refusal of an entry's `repository` in lockrot's own words, or null.
+     *
+     * @param mixed $row
+     */
+    public static function repositoryRefusal(int $index, $row): ?ConfigException
+    {
+        if (!\is_array($row) || !\is_string($row['repository'] ?? null)) {
+            return null;
+        }
+        try {
+            self::checkScope(\sprintf('extra.lockrot.accept-unchecked[%d]', $index), '', 'repository', $row['repository']);
+        } catch (ConfigException $e) {
+            return $e;
+        }
+
+        return null;
+    }
+
     private static function checkScope(string $at, string $check, string $scope, string $value): void
     {
         if ($scope === 'host') {

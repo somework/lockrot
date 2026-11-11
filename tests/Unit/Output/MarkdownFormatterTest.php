@@ -122,7 +122,7 @@ final class MarkdownFormatterTest extends TestCase
 
         self::assertStringStartsWith("### lockrot: nothing flagged in 1 package\n\n**gate: off** · ", $out);
         self::assertStringNotContainsString('| Verdict |', $out);
-        self::assertStringEndsWith("<sub>1 package checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>\n", $out);
+        self::assertStringEndsWith("<sub>1 package checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>\n", $out);
     }
 
     public function testAOnePackageRunCountsItsPackageInTheSingular(): void

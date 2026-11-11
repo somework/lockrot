@@ -22,5 +22,5 @@ COMPOSER_NO_BLOCKING and COMPOSER_NO_SECURITY_BLOCKING; ext-*, lib-*, php-debug,
 checked
 php: the lock installs on PHP 8.1 to 8.5
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
-Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with --format=json for
 details.

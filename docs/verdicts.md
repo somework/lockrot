@@ -168,8 +168,8 @@ S6's evidence reads the same whether or not the package ever released. Its `data
 |---|---|
 | `version` | The installed version, as the lock writes it |
 | `reason` | `branch_snapshot` when the installed version is a branch (checked first), `no_stable_release` when it is not and the repository lists no tagged version. An [open set](schema.md#open-sets) |
-| `has_stable_release` | Whether the repository lists any tagged version. A pre-release counts, a branch does not. Null when lockrot loaded no repository metadata for the package (a `vcs` or `path` entry, a package the repository does not list, metadata that did not load) |
-| `last_stable_release`, `last_stable_version` | The newest *dated* tagged release, a pre-release included, which is not always the highest tag. A newest date on a line below the highest stable line gives way to the newest dated release of that line. Both are null with no tagged release or with no metadata. `last_stable_release` is null, and `last_stable_version` set, in two cases that no [monorepo parent](#dates-from-the-monorepo) dates. When the highest tag has no date that lockrot trusts, the version is that tag. When the newest date is a shared commit's on a lower tag of the highest line, the version is that lower tag. A set `last_stable_release` implies a set `last_stable_version` |
+| `has_stable_release` | Whether the repository lists a stable tag. A pre-release and a branch do not count, a tag with build metadata (`v4.0.0+x`) does. Null when lockrot loaded no repository metadata for the package (a `vcs` or `path` entry, a package the repository does not list, metadata that did not load) |
+| `last_stable_release`, `last_stable_version` | The newest *dated* stable tag, which is not always the highest tag. A pre-release never counts. A newest date on a line below the highest stable line gives way to the newest dated release of that line. Both are null with no stable tag or with no metadata. `last_stable_release` is null, and `last_stable_version` set, in two cases that no [monorepo parent](#dates-from-the-monorepo) dates. When the highest tag has no date that lockrot trusts, the version is that tag. When the newest date is a shared commit's on a lower tag of the highest line, the version is that lower tag. A set `last_stable_release` implies a set `last_stable_version` |
 | `last_stable_dated_by` | The monorepo parent that dated that release, else null |
 | `snapshot_time` | For a snapshot, the lock's `time`: the date of the commit the branch pointed at, not a release. Null for `no_stable_release`, and when the lock entry has no `time` |
 | `tag_relation` | How the newest tag compares with the snapshot: `older`, `newer` or `same`, else null. An [open set](schema.md#open-sets) |
@@ -711,13 +711,14 @@ writes the move as `next_step`. Abridged from a recorded run on wallabag's lock:
   That php decides between `tag` and `blocked`, and the `old-promise` and `capped`
   facts of the move read it. The move adds `old-promise` only when that tag declares `require.php`.
   A `blocked` move to a tag names the php of the tag, and a `blocked` move with no tag names the
-  branch's `php`. With only pre-release tags, the move targets the pre-release that S6 names, with
-  `to_branch` null. Its `php_check` reads that pre-release's own `require.php`, and the line names
-  the release where a branch move names its branch.
+  branch's `php`. With only pre-release tags, S6 names no tag, and the move targets the newest
+  pre-release, with `to_branch` null. Its `php_check` reads that pre-release's own `require.php`.
+  The line names the release where a branch move names its branch, and adds `a pre-release`.
 
 - **The release of a test.** `latest` of a `test` move is the first of these that applies:
 
-    1. S6's `last_stable_version`, when it is above the installed version.
+    1. The newest tag, a pre-release included, when it is above the installed version. It is
+       the highest tag when that tag has no trusted date, else the newest tag by date.
     2. The highest stable tag, with its own trusted date or null, when it is above the installed
        version.
     3. The installed release, with `is_installed` true and the date that [S5](#old-promise) reads
@@ -804,10 +805,12 @@ request. With `--offline`, only Composer's cache answers. JSON writes the answer
       Composer installs only one of the two.
 
     A hold of the package's own release reads `<package> <version>, its own release`, then its
-    link. A hold names its holder's verdict only at the holder's locked version, because a
-    verdict grades the installed release. A root hold names the composer.json section that lists
-    the package, and a `require-dev` hold ends its link with " in require-dev". A root requirement
-    that admits the move's release is no hold.
+    link. A graded holder adds `itself <lead>`, its lead flag. A graded holder with no lead flag
+    adds `itself <verdict>: <flags>`. The text adds these words only at the holder's locked
+    version, because a verdict grades the installed release. The JSON `held_by[].holder` is then
+    not null and carries the `verdict`, `lead` and `flag_ids`. A root hold names the composer.json
+    section that lists the package, and a `require-dev` hold ends its link with " in require-dev".
+    A root requirement that admits the move's release is no hold.
 
     The text lists the holds of composer.json first, then the package's own releases, then the
     holds on the package, then the other holds. Within each group, a higher verdict comes first,
@@ -985,6 +988,12 @@ Limits of the check:
 - When lockrot read no release of the move's row, or a requirement has no constraint, it tries no
   move (`check.reason` `no_release_read`). The commands stay, unless Composer's `config.lock` is
   false.
+- A form resolves a move only when its solve installs a release of the moved package. When each
+  form that resolves keeps the locked version, installs a dev version or removes the package, the
+  check reads `not_checked` with `check.reason` `installs_no_release`. A dev version is, for
+  example, a branch alias inside the caret at minimum-stability `dev`. `check.installs` names the
+  version of the first such form, or is null when that form removes the package. The move's text
+  names it beside the newest release, and `if_applied.assumes` holds `composer_resolves`.
 - It stops a chain of refusals after `Analyzer::CHECK_PASSES` passes. A new request after the
   last one is not checked (`check.reason` `pass_cap`).
 - When Composer's solver fails on a request, the move is not checked (`check.reason`
@@ -1361,7 +1370,7 @@ formats print only under `--all`, keeps its verdict and adds the same `checks mi
 | `repository_activity` | `offline` | `--offline` | S3, S4 |
 | `repository_activity` | `host_not_supported` | The repository is on a host that lockrot cannot ask ([host note](notes.md#repository_activity_host_not_supported)) | S3, S4 |
 | `repository_activity` | `not_from_composer_repository` | The package comes from vcs, or from an origin that lockrot cannot tell: lockrot asks no host for it | S3, S4 |
-| `release_metadata` | `not_from_composer_repository` | The same origins: no Composer repository serves its releases | S2, S8. S11 too when S11 fires: a [capped](#capped) package then has `admits_newest` unread |
+| `release_metadata` | `not_from_composer_repository` | The same origins: no Composer repository serves its releases | S2, S8. S11 too when S11 fires: a [capped](#capped) package then has `admits_newest` unread. S5 too when all of these hold: the lock entry has no `time`, the installed release is no branch snapshot, `require.php` is set and open-ended for the target, and the target major's GA is known |
 | `release_dates` | `undated_releases` | A release that S2, S5 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it. The summary gives one clause per cause. One cause is an undated lock entry. Another is an installed tag on a shared commit, or an installed tag of a split whose newest release a parent dates. A release that S2 or S8 reads is a cause when it has no date or the date of a commit that its tags share. That release is the newest stable release, the installed branch's newest release, a higher branch's highest tag, or its newest release on a shared commit | S2 when the newest stable release has no trusted date (an undated highest tag, or a shared-commit date). S5 when the installed release is undated, its lock date is before the GA of the target's major or absent, and the other two [S5 conditions](#old-promise) hold. S8 when the installed branch's release is undated and a higher branch exists. The exception is an installed version above every listed stable release of its branch. S8 also when a higher branch is untrusted and the installed branch has no release for `release-warn-years`, if S8 did not fire. A higher branch is untrusted when its release is undated, or when only a shared commit past `release-warn-years` dates it. Never S8 on a branch snapshot, which has no release branch |
 | `advisories` | `offline`, `install_time_budget`, `lookup_failed`, `no_feed`, `composer_json_invalid` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
 | `releases` | `releases_unknown` | A counted advisory's fix is unknown because the package's release data did not come | S9 |
@@ -1430,9 +1439,10 @@ furthest behind phpdocumentor/reflection-common 2.2.0 at 5.4
 ```
 
 For each package, lockrot takes the years from the installed version's release to the package's
-highest release by version. That is the highest dated pre-release above the highest stable tag,
-else the highest stable tag. A lower tag with a later date does not count, so this date is not
-always the one that S2 reads. It counts years of 365.25 days, never below zero, and sums them
+highest stable tag. A pre-release never ends libyears, dated or not. When the installed version is
+the highest stable tag, or a pre-release above it, the package is 0 behind, also when its own date
+is untrusted. A lower tag with a later date does not count. S2 reads pre-releases, so this date is
+not always the one that S2 reads. It counts years of 365.25 days, never below zero, and sums them
 over the packages the run analysed. The installed version's date is the lock's `time`, or its
 [monorepo parent's](#dates-from-the-monorepo). The number does not read the clock. The package
 furthest behind is the one with the highest value. A tie goes to the package whose name sorts first
@@ -1453,22 +1463,21 @@ applies:
 | `not_from_composer_repository` | lockrot asked for no metadata: a `path`, `vcs`, `artifact` or inline `package` entry, or a `type: composer` repository that advertises no notify URL. The finding's `from_composer_repository` is false |
 | `unavailable`, `not_found` | lockrot asked for metadata and did not get it, or the repository does not list the package. Equal to `metadata.status` |
 | `branch_snapshot` | The installed version is a branch (`dev-main`, `2.x-dev`): it has a commit date, not a release date, and `pinned` already says what there is to say |
-| `shared_commit`, `parent_split`, `undated` | The installed release has no date lockrot trusts: its commit carries other tags, a parent dates the newest release of its split, or the lock entry has no `time`. The same ids as `age.installed_unmeasured` |
+| `shared_commit`, `parent_split`, `undated` | The installed release is not the highest stable tag and has no date lockrot trusts: its commit carries other tags, a parent dates the newest release of its split, or the lock entry has no `time`. The same ids as `age.installed_unmeasured` |
 | `no_stable_release` | The package has no tagged release |
 | `undated_releases` | The package has tagged releases, and no release above the installed one has a trusted date. `age.release_unmeasured` uses the same id when the highest stable tag has no trusted date, also when older tags have one |
 
 The keys are an [open set](schema.md#open-sets): read one you do not know as another way a package
 went unmeasured ([compatibility.md](compatibility.md#open-sets)).
 
-- **Lower bounds.** When that release has no trusted date, lockrot measures the package to the
-  newest release above the installed version that has a trusted date. That release can be on a
-  higher branch or on the installed branch. A tag's commit is never younger than the release it
-  names, so the value is a lower bound: `libyears_at_least` is true, and the root counts such
-  findings in `at_least_count`. The line then reads `at least`. A highest pre-release on a shared
-  commit gets no lower bound: the package is `undated_releases`.
+- **Lower bounds.** When the highest stable tag has no trusted date, lockrot measures the package
+  to the newest stable release above the installed version that has a trusted date. That release
+  can be on a higher branch or on the installed branch. A tag's commit is never younger than the
+  release it names, so the value is a lower bound: `libyears_at_least` is true, and the root counts
+  such findings in `at_least_count`. The line then reads `at least`.
 
-- **Ahead of the newest release.** A package locked on a pre-release above it, or on a tag that
-  the repository does not list, counts as zero.
+- **Ahead of the highest stable tag.** A package locked on a pre-release above it counts as zero.
+  A package locked on a tag that the repository does not list counts as zero too.
 
 What the number is not:
 

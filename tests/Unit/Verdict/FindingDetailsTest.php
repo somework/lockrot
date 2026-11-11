@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Allowlist\AllowlistEntry;
+use Lockrot\Clock;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryFeed;
@@ -14,6 +15,7 @@ use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
+use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\StableRelease;
 use Lockrot\Lock\LockFile;
@@ -24,15 +26,22 @@ use Lockrot\Security\Gets;
 use Lockrot\Security\Holder;
 use Lockrot\Security\PackageFixes;
 use Lockrot\Security\PhpCheck;
+use Lockrot\Signal\ConstraintOpenness;
 use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
+use Lockrot\Signal\Rule\LeftBehindRule;
+use Lockrot\Signal\Rule\NotCheckedRule;
+use Lockrot\Signal\Rule\OldPromiseRule;
 use Lockrot\Signal\Signal;
+use Lockrot\Signal\Thresholds;
+use Lockrot\Solver\MoveCheck;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\FindingDetails;
+use Lockrot\Verdict\Moves;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -68,6 +77,45 @@ final class FindingDetailsTest extends TestCase
         self::assertSame($check, $security['check']);
         self::assertSame($records, $security['records']);
         self::assertSame($feeds, $security['feeds'], 'the feeds as the lookup gave them');
+    }
+
+    /** @return iterable<string, array{PackageFacts}> a package with no lock time and an open `require.php`, whose metadata was not read */
+    public static function unreadMetadata(): iterable
+    {
+        $vcs = F::looked(new PackageFacts(F::package(['fromComposerRepository' => false, 'php' => '>=5.6']), null, null, []), ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY);
+        $path = LockFile::fromArray(['packages' => [['name' => 'vendor/p', 'version' => '1.0.0', 'require' => ['php' => '>=5.6'], 'dist' => ['type' => 'path', 'url' => '../p']]]])->find('vendor/p');
+        self::assertNotNull($path);
+        $unavailable = new PackageFacts(F::package(['php' => '>=5.6']), null, null, [], null, null, null, true);
+
+        yield 'B1 vcs package whose S10 entry a raised S1 dropped' => [$vcs];
+        yield 'B2 path package' => [F::looked(new PackageFacts($path, null, null, []))];
+        yield 'B3 Composer-repository package with unavailable metadata' => [F::looked($unavailable)];
+    }
+
+    /** @dataProvider unreadMetadata */
+    #[DataProvider('unreadMetadata')]
+    public function testTheSkippedMetadataCheckNamesTheSameSignalsAsS10(PackageFacts $facts): void
+    {
+        $details = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null, FindingBuilder::unmeasuredAge(), [], null, self::notChecked());
+
+        $skip = array_values(array_filter($details->skipped(), static fn ($check): bool => $check->check() === 'release_metadata'));
+
+        self::assertCount(1, $skip);
+        self::assertSame([Signal::S2, Signal::S5, Signal::S8], $skip[0]->blocks());
+    }
+
+    public function testTheSkippedMetadataCheckLeavesS5OutWithALockTime(): void
+    {
+        $facts = F::looked(new PackageFacts(F::package(['fromComposerRepository' => false, 'php' => '>=5.6', 'time' => '2019-01-01T00:00:00+00:00']), null, null, []));
+
+        $skip = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null, FindingBuilder::unmeasuredAge(), [], null, self::notChecked())->skipped();
+
+        self::assertSame([Signal::S2, Signal::S8], array_values(array_filter($skip, static fn ($check): bool => $check->check() === 'release_metadata'))[0]->blocks());
+    }
+
+    private static function notChecked(): NotCheckedRule
+    {
+        return new NotCheckedRule(new LeftBehindRule(Clock::fixed('2026-09-01T00:00:00+00:00'), new Thresholds()), null, new OldPromiseRule(new ConstraintOpenness(), PhpReleaseDates::load(), '8.4'));
     }
 
     public function testARunWithoutALookupWritesNoFeedAndNoRecords(): void
@@ -174,6 +222,63 @@ final class FindingDetailsTest extends TestCase
             'clears' => [['kind' => 'advisory', 'id' => 'PKSA-a', 'basis' => 'outside_range']],
             'clears_all' => false,
         ], JsonPath::decoded($security['gets']));
+    }
+
+    /** @return iterable<string, array{?MoveCheck, ?array{version: string, requires: string, clears: list<mixed>}}> */
+    public static function checksOfACappedGets(): iterable
+    {
+        yield 'a resolving solve names the release that it installs, with its own php and clears' => [MoveCheck::resolves(MoveCheck::INLINE, '1.1.0'), ['version' => '1.1.0', 'requires' => '>=7.4 <8.5', 'clears' => []]];
+        yield 'a refused solve leaves no release' => [MoveCheck::refused(), null];
+        yield 'no check leaves no release' => [null, null];
+    }
+
+    /**
+     * When a refusal caps every release, a checked solve that installs a release outranks the caps
+     * (ruling R2-1), and `gets` describes that release. Without one, `gets` is null.
+     *
+     * @param ?array{version: string, requires: string, clears: list<mixed>} $expected
+     *
+     * @dataProvider checksOfACappedGets
+     */
+    #[DataProvider('checksOfACappedGets')]
+    public function testACheckedSolveOutranksTheCapsOfEveryRelease(?MoveCheck $check, ?array $expected): void
+    {
+        $gets = self::getsOf(Gets::capped(self::php('>=8.1'))->withReleases(self::releases()), $check);
+
+        self::assertSame($expected, $gets === null ? null : ['version' => JsonPath::stringAt($gets, ['version']), 'requires' => JsonPath::stringAt($gets, ['php_check', 'requires']), 'clears' => array_column(JsonPath::arrayAt($gets, ['clears']), 'id')]);
+    }
+
+    /** Case mc-split‡: the solve installs 1.1.0 below the newest 1.2.0, so `gets` gives the php and the clears of 1.1.0. */
+    public function testASolveBelowTheNewestDescribesTheReleaseThatItInstalls(): void
+    {
+        $gets = self::getsOf((new Gets('1.2.0', self::php('>=8.1'), ['PKSA-a'], true))->withReleases(self::releases()), MoveCheck::resolves(MoveCheck::INLINE, '1.1.0'));
+
+        self::assertNotNull($gets);
+        self::assertSame(['1.1.0', '>=7.4 <8.5', [], false], [$gets['version'], JsonPath::stringAt($gets, ['php_check', 'requires']), $gets['clears'], $gets['clears_all']]);
+    }
+
+    /** @return array<string, Gets> by normalized version */
+    private static function releases(): array
+    {
+        return ['1.1.0.0' => new Gets('1.1.0', self::php('>=7.4 <8.5'), [], false), '1.2.0.0' => new Gets('1.2.0', self::php('>=8.1'), ['PKSA-a'], true)];
+    }
+
+    private static function php(string $requires): PhpCheck
+    {
+        return PhpCheck::of($requires, new PhpFloor('8.4', '>=7.4'));
+    }
+
+    /** @return ?array<mixed, mixed> the `security.gets` of $gets, with $check as the installed row's check */
+    private static function getsOf(Gets $gets, ?MoveCheck $check): ?array
+    {
+        $branch = new BranchFixes('1.x', true, 0, 1, new Candidate(new StableRelease('1.2.0.0', '1.2.0', null, '>=8.1', false), '1', Fix::UPGRADE, []), '1.2.0', ['PKSA-a']);
+        $details = (new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$branch], $gets, null, null), FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null))
+            ->withMoves(new Moves(null, null, null, null, [], $check === null ? [] : ['1.x' => $check]));
+        $rows = self::rows([['id' => 'PKSA-a', 'severity' => 'medium', 'fix' => ['kind' => 'upgrade', 'on_installed_branch' => true]]]);
+
+        $security = JsonPath::decoded($details->toSecurityArray($rows, '1.x'));
+
+        return \is_array($security['gets'] ?? null) ? $security['gets'] : null;
     }
 
     /** Without the scan, the S9 rows give the branch row: each row on the branch is fixed, each without a kind is not known. */

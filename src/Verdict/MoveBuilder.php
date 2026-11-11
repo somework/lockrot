@@ -54,8 +54,8 @@ final class MoveBuilder
             $php = $kind === Move::BLOCKED ? ($lower !== null ? $lower->php() : ($latest !== null ? $row->highestPhp() : $row->php())) : ($kind === Move::TAG ? $row->highestPhp() : $context->phpAtTarget($row, $lower, $newest));
             $phpCheck = PhpCheck::of($php, $context->floor());
         } elseif ($row === null && $latest !== null && $draft->source() === FlagSet::PINNED) {
-            // With no branch row, the pinned move targets the S6 version: its php is that release's own.
-            $phpCheck = PhpCheck::of($context->lastStablePhp(), $context->floor());
+            // With no branch row, the pinned move targets the newest tag: its php is that release's own.
+            $phpCheck = PhpCheck::of($context->newestTagPhp(), $context->floor());
         }
         $checks = $context->checks();
         $query = $checks === null ? null : self::query($kind, $subject, $constraint, $version, $phpCheck, $newest, $checks);
@@ -113,7 +113,7 @@ final class MoveBuilder
         // A solve below the newest release can clear nothing: the score after such a move is the current total (SPEC I14).
         if ($clears !== [] && \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true)) {
             $resolves = $check !== null && $check->isResolved();
-            $assumes = array_merge([IfApplied::CLEARS_HOLD], !$resolves && ($because !== [] || $heldBy !== []) ? [IfApplied::COMPOSER_RESOLVES] : [], $context->advisoriesComplete() ? [] : [IfApplied::NO_NEW_ADVISORIES]);
+            $assumes = array_merge([IfApplied::CLEARS_HOLD], !$resolves && ($because !== [] || $heldBy !== [] || ($check !== null && $check->installsNoReleaseOfIt())) ? [IfApplied::COMPOSER_RESOLVES] : [], $context->advisoriesComplete() ? [] : [IfApplied::NO_NEW_ADVISORIES]);
             $ifApplied = self::rerun($draft, $clears, $unverified, $adds, $context, $assumes);
         }
         $s2 = $finding->signalData(NoReleaseData::class);

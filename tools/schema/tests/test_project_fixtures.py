@@ -133,6 +133,28 @@ class ACaseWithoutBranchRowsHydratesFromItsRunReleases(unittest.TestCase):
 
         self.assertNotIn('advisory_failures', inputs['run'])
 
+    def test_the_root_repositories_of_the_run_inputs_join_the_root(self):
+        drupal = {'type': 'composer', 'url': 'https://packages.drupal.org/8'}
+
+        inputs = project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN, 'run_inputs': {'_releases': self.RELEASES, '_root_repositories': [drupal]}})
+
+        self.assertEqual([drupal], inputs['root']['repositories'])
+
+    def test_an_answered_feed_beside_packagist_joins_the_run_inputs_with_its_records(self):
+        feeds = [{'composer_repository': 'composer repo (https://packages.drupal.org/8)', 'registry': 'packages.drupal.org', 'answer': 'answered', 'records': 0, 'reason': None},
+                 {'composer_repository': 'composer repo (https://repo.packagist.org)', 'registry': 'packagist.org', 'answer': 'answered', 'records': 26, 'reason': None}]
+        finding = dict(self.FINDING, security=dict(self.FINDING['security'], records=26, feeds=feeds))
+
+        inputs = project_fixtures.inputs_of({'finding': finding, 'run': self.RUN, 'run_inputs': {'_releases': self.RELEASES}})
+
+        self.assertEqual([{'composer_repository': 'composer repo (https://packages.drupal.org/8)', 'records': 0}], inputs['run']['advisory_answers'])
+
+    def test_a_run_with_packagist_alone_names_no_other_answers(self):
+        inputs = project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN, 'run_inputs': {'_releases': self.RELEASES}})
+
+        self.assertNotIn('advisory_answers', inputs['run'])
+        self.assertNotIn('repositories', inputs['root'])
+
     def test_the_run_root_require_replaces_the_projected_constraint(self):
         finding = dict(self.FINDING, direct=True, named_in=['require'])
 
@@ -163,6 +185,21 @@ class ACaseWithoutBranchRowsHydratesFromItsRunReleases(unittest.TestCase):
         inputs = project_fixtures.inputs_of({'finding': finding, 'run': self.RUN, 'run_inputs': {'_releases': given}})
 
         self.assertEqual('2021-08-30T10:00:00+00:00', inputs['lock'][0]['time'])
+
+    def test_a_run_release_on_a_shared_commit_keeps_the_mark(self):
+        given = [{'version': '3.0.0-beta1', 'time': '2023-08-01T00:00:00+00:00', 'php': '>=8.1', 'shared_commit': True},
+                 {'version': '4.7.1', 'time': '2023-08-01T00:00:00+00:00', 'php': '^7.4 || ~8.0.0', 'shared_commit': True}]
+
+        inputs = project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN, 'run_inputs': {'_releases': given}})
+
+        self.assertEqual({'3.0.0-beta1': True, '4.7.1': True}, {r['version']: r.get('shared_commit') for r in inputs['releases']})
+
+    def test_the_run_parent_that_dates_no_shared_tag_joins_the_inputs(self):
+        parent = {'name': 'acme/monorepo', 'releases': [{'version': '4.17.0', 'time': '2025-01-01T00:00:00+00:00'}]}
+
+        inputs = project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN, 'run_inputs': {'_releases': self.RELEASES, '_parent': parent}})
+
+        self.assertEqual(parent, inputs['parent'])
 
     def test_a_case_without_branch_rows_and_without_run_releases_gets_none(self):
         self.assertIsNone(project_fixtures.inputs_of({'finding': self.FINDING, 'run': self.RUN}))
@@ -341,3 +378,37 @@ class ACaseWhoseDesignedRowsMissItsNewestReleaseIsNotHydrated(unittest.TestCase)
         self.assertIsNone(project_fixtures.unhydrated(self.case('2.12.3')))
         self.assertIsNone(project_fixtures.unhydrated(self.case('3.0.0-beta.1')))
         self.assertIsNone(project_fixtures.unhydrated(self.case('3.0.0', world=False)))
+
+
+class ADirectDependentThatDoesNotRequireThePackageKeepsTheModelsChain(unittest.TestCase):
+    """capped-nette‡: a second direct dependent reaches the package through the chain, never by a shorter path."""
+    FINDING = dict(ACaseWithoutBranchRowsHydratesFromItsRunReleases.FINDING, package='nette/schema', version='v1.3.2',
+                   chain=['laravel/framework', 'league/commonmark', 'league/config', 'nette/schema'],
+                   direct_dependents=['laravel/framework', 'pragmarx/google2fa-laravel'],
+                   next_step={'through': [{'package': 'pragmarx/google2fa-laravel', 'installed_version': 'v2.2.0', 'installed_requires': False,
+                                           'newest_requires': False, 'newest_requires_unmeasured': None, 'newest_stable': None}],
+                              'also': [], 'held_by': []})
+
+    @staticmethod
+    def shortest_chain(inputs, target):
+        """The chain by which a breadth-first walk from the root's requirements, in their order, first reaches $target."""
+        links = {e['name']: list((e.get('require') or {}).keys()) for e in inputs['lock']}
+        queue = [[name] for name in inputs['root']['require'] if name in links]
+        seen = {chain[0] for chain in queue}
+        while queue:
+            chain = queue.pop(0)
+            if chain[-1] == target:
+                return chain
+            for name in links.get(chain[-1], []):
+                if name not in seen and name in links:
+                    seen.add(name)
+                    queue.append(chain + [name])
+        return None
+
+    def test_the_hydrated_lock_reaches_the_package_first_by_the_models_chain(self):
+        case = {'finding': self.FINDING, 'run': ACaseWithoutBranchRowsHydratesFromItsRunReleases.RUN,
+                'run_inputs': {'_releases': ACaseWithoutBranchRowsHydratesFromItsRunReleases.RELEASES}}
+
+        inputs = project_fixtures.inputs_of(case)
+
+        self.assertEqual(self.FINDING['chain'], self.shortest_chain(inputs, 'nette/schema'))

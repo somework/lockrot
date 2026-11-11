@@ -183,6 +183,28 @@ final class PhpWindowTest extends TestCase
         self::assertSame('8.2', $window['without_dev']['minors'][0]);
     }
 
+    /** @return iterable<string, array{0: array<string, mixed>, 1: ?array<string, mixed>}> */
+    public static function selfVersionRootLinks(): iterable
+    {
+        yield 'composer.json require' => [['packages' => [], 'packages-dev' => []], ['require' => ['php' => 'self.version']]];
+        yield 'lock platform only' => [['packages' => [], 'packages-dev' => [], 'platform' => ['php' => 'self.version']], []];
+    }
+
+    /**
+     * @param array<string, mixed>  $lock
+     * @param ?array<string, mixed> $composer
+     *
+     * @dataProvider selfVersionRootLinks
+     */
+    #[DataProvider('selfVersionRootLinks')]
+    public function testARootPhpLinkAtSelfVersionIsTheRootVersionAndLeavesNoMinor(array $lock, ?array $composer): void
+    {
+        $set = self::window($lock, $composer)['without_dev'];
+
+        self::assertSame([], $set['minors']);
+        self::assertNotNull($set['closest']);
+    }
+
     public function testTheLockPlatformFillsInOnlyTheNamesThatComposerJsonLacks(): void
     {
         $set = self::window(

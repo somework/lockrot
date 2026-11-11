@@ -18,5 +18,5 @@ php: the lock installs on PHP 8.1, so your target, 8.4, is excluded; the update 
 checked (the run checked no move); the lock records require.php ~8.1.0 || ~8.2.0 || ~8.3.0, which composer.json does not
 have
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)
-Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with --format=json for
 details.

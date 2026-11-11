@@ -1,0 +1,17 @@
+{
+    "score_text": "0",
+    "next_step_text": null,
+    "gate_line": null,
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed 1.0.3, release date not known (no date)",
+    "explain_age": [
+        "installed  1.0.3     not read (no date)",
+        "1.x                  not read (not from a Composer repository)",
+        "newest               not read (not from a Composer repository)",
+        "last push            not read (not from a Composer repository)",
+        "libyears not measured: not from a Composer repository"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": []
+}

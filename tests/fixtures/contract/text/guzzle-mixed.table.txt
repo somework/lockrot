@@ -27,6 +27,6 @@ furthest behind guzzlehttp/guzzle 5.3.4 at 6.9
 advisories: 1 package asked · packagist.org answered (15 on record for 1 package)
 php: the lock installs on PHP 7.1 to 7.4; your target, 8.4, is excluded: require.php allows only ^7.1.3
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
-Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with --format=json for
 details.
 note: 1 package is not from a Composer repository: its release metadata and repository activity were not read

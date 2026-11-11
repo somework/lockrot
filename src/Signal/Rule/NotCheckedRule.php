@@ -14,6 +14,7 @@ use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
+use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\ListWords;
 
 /**
@@ -82,6 +83,15 @@ final class NotCheckedRule implements SignalRule
     /** A highest tag that the signal reads is on a commit that other tags share. */
     public const CAUSE_SHARED_COMMIT = 'shared_commit';
 
+    /** The cause of an `advisories` entry for a partial lookup ({@see FindingDetails::isPartialLookup()}, {@see Check::causes()}). */
+    private const CAUSE_PARTIAL = 'partial';
+
+    /** The words of a partial lookup, for the reasons that can be partial: the offline run never is. */
+    private const PARTIAL_ADVISORY_CAUSES = [
+        AdvisoryCoverage::LOOKUP_FAILED => 'a Composer repository did not return them',
+        self::BUDGET => 'the install-time budget ran out',
+    ];
+
     /** The words of each cause of a `release_dates` entry, one clause per cause. */
     private const DATE_CAUSES = [
         self::CAUSE_LOCK_UNDATED => 'the lock gives the installed release no date',
@@ -118,7 +128,8 @@ final class NotCheckedRule implements SignalRule
         $reason = $facts->activityNotChecked();
         $origin = $facts->package()->origin()->kind();
         if ($reason === self::NOT_FROM_COMPOSER_REPOSITORY && \in_array($origin, self::ORIGIN_GAPS, true)) {
-            $unchecked[] = new Check('release_metadata', $reason, $this->capped !== null && $this->capped->evaluate($facts) !== null ? [Signal::S2, Signal::S8, Signal::S11] : [Signal::S2, Signal::S8]);
+            $blocks = $this->metadataBlocks($facts, $this->capped !== null && $this->capped->evaluate($facts) !== null);
+            $unchecked[] = new Check('release_metadata', $reason, $blocks);
             $unchecked[] = new Check('repository_activity', $reason, [Signal::S3, Signal::S4]);
         } elseif ($reason === self::HOST_NOT_SUPPORTED || isset(self::ACTIVITY_WORDS[$reason ?? ''])) {
             $unchecked[] = new Check('repository_activity', (string) $reason, [Signal::S3, Signal::S4]);
@@ -133,12 +144,36 @@ final class NotCheckedRule implements SignalRule
         $coverage = $facts->advisoryCoverage();
         $advisories = $coverage === null ? null : $coverage->reason();
         if ($advisories !== null && isset(self::ADVISORY_CAUSES[$advisories])) {
-            $unchecked[] = new Check('advisories', $advisories, [Signal::S9]);
+            $partial = isset(self::PARTIAL_ADVISORY_CAUSES[$advisories]) && FindingDetails::isPartialLookup($facts);
+            $unchecked[] = new Check('advisories', $advisories, [Signal::S9], $partial ? [self::CAUSE_PARTIAL => [Signal::S9]] : []);
         }
 
         $host = $reason === self::HOST_NOT_SUPPORTED ? $facts->activityLookup()->where()->host() : null;
 
         return self::signalOf($unchecked, array_map(static fn (Check $entry): string => self::summaryOf($entry, $host, $origin), $unchecked));
+    }
+
+    /**
+     * The signals that unread release metadata blocks, in signal order. S5 joins S2 and S8 when it
+     * has no date to judge from ({@see OldPromiseRule::missesATrustedDate()}). The S10 entry and the
+     * skipped check of a finding both read this list.
+     *
+     * @param bool $capped whether S11 fires, which unread metadata leaves only its `admits_newest` unread
+     *
+     * @return list<string>
+     */
+    public function metadataBlocks(PackageFacts $facts, bool $capped): array
+    {
+        $blocks = [Signal::S2];
+        if ($this->oldPromise !== null && $this->oldPromise->missesATrustedDate($facts)) {
+            $blocks[] = Signal::S5;
+        }
+        $blocks[] = Signal::S8;
+        if ($capped) {
+            $blocks[] = Signal::S11;
+        }
+
+        return $blocks;
     }
 
     /**
@@ -148,7 +183,7 @@ final class NotCheckedRule implements SignalRule
     private function releaseDates(PackageFacts $facts, PackageMetadata $metadata): ?Check
     {
         $blocked = [];
-        if ($metadata->hasStableRelease() && $metadata->releaseReadingAt() === null) {
+        if ($metadata->hasTag() && $metadata->releaseReadingAt() === null) {
             $blocked[] = [$metadata->lastStableSharesItsCommit() ? self::CAUSE_SHARED_COMMIT : self::CAUSE_TAG_UNDATED, Signal::S2];
         }
         if ($this->oldPromise !== null && $this->oldPromise->missesATrustedDate($facts)) {
@@ -292,10 +327,13 @@ final class NotCheckedRule implements SignalRule
             $cause = self::ORIGIN_CAUSE[$origin ?? ''] ?? 'not installed from a Composer repository';
         }
         if ($entry->check() === 'release_metadata') {
-            return 'release metadata not checked ('.$cause.'), so S2 and S8 could not be read';
+            return 'release metadata not checked ('.$cause.'), so '.ListWords::of(array_values(array_diff($entry->blocks(), [Signal::S11]))).' could not be read';
         }
         if ($entry->check() === 'repository_activity') {
             return 'repository activity not checked ('.$cause.'), so S3 and S4 could not be read';
+        }
+        if ($entry->check() === 'advisories' && isset($entry->causes()[self::CAUSE_PARTIAL])) {
+            return 'security advisories not checked in full ('.(self::PARTIAL_ADVISORY_CAUSES[$entry->reason()] ?? $entry->reason()).'), so S9 may be incomplete';
         }
         if ($entry->check() === 'advisories') {
             return 'security advisories not checked ('.(self::ADVISORY_CAUSES[$entry->reason()] ?? $entry->reason()).'), so S9 could not be read';

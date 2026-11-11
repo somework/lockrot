@@ -33,7 +33,7 @@ final class LockFileTest extends TestCase
         $lock = LockFile::fromFile(self::MINI);
         self::assertCount(4, $lock->packages(false));
         self::assertCount(5, $lock->packages(true));
-        self::assertSame('abc123', $lock->contentHash());
+        self::assertSame('aeb7ebbb156e3d3c5f9012d2cc9c8f04', $lock->contentHash(), 'Composer\'s content hash of the fixture\'s composer.json');
     }
 
     public function testPackageFields(): void
@@ -333,7 +333,7 @@ final class LockFileTest extends TestCase
         self::assertNotNull($foundNew);
         self::assertTrue($foundNew->isDev());
         self::assertNotNull($updated->find('vendor/transitive'), 'every other entry is carried over unchanged');
-        self::assertSame('abc123', $updated->contentHash(), 'the content hash is carried over unchanged');
+        self::assertSame('aeb7ebbb156e3d3c5f9012d2cc9c8f04', $updated->contentHash(), 'the content hash is carried over unchanged');
 
         $originalDirect = $lock->find('vendor/direct');
         self::assertNotNull($originalDirect);
@@ -651,5 +651,17 @@ final class LockFileTest extends TestCase
         self::assertNotSame('', $cause->getMessage());
         self::assertSame($prefix.$cause->getMessage(), $thrown->getMessage());
         self::assertSame(0, $thrown->getCode(), 'lockrot carries no exception codes; a run exits on its verdict, not on these');
+    }
+
+    /**
+     * The limits are set when a PHP starts, because a pattern compiled earlier can ignore them at
+     * run time. A name that cannot match must end the scan without hitting the backtrack limit.
+     */
+    public function testACraftedNameIsRefusedWithoutBacktracking(): void
+    {
+        $script = 'require '.var_export(\dirname(__DIR__, 3).'/vendor/autoload.php', true).'; echo (int) '.LockFile::class.'::isComposerName("a/".str_repeat("a", 200)."!"), preg_last_error_msg();';
+        $output = shell_exec(escapeshellarg(\PHP_BINARY).' -d pcre.jit=0 -d pcre.backtrack_limit=1000 -r '.escapeshellarg($script));
+
+        self::assertSame('0No error', $output);
     }
 }

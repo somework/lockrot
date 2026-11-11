@@ -1365,8 +1365,8 @@
             ]
         },
         "libyears": {
-            "total": 385.35,
-            "direct_requirements": 219.95,
+            "total": 385.46,
+            "direct_requirements": 220.06,
             "measured": 204,
             "at_least_count": 5,
             "unmeasured": {
@@ -2426,7 +2426,7 @@
                 "evidence": "vulnerable: 15 advisories: 1 critical, 3 high, 5 medium, 2 unrated, 4 low — all fixed on 3.x (php floor raise); worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
                 "allowlist_reason": null,
                 "data_date": "2026-10-14T00:00:00+00:00",
-                "libyears": 1.52,
+                "libyears": 1.65,
                 "age": {
                     "installed": {
                         "at": "2024-11-07T12:34:41+00:00",
@@ -56047,7 +56047,7 @@
                 "evidence": "",
                 "allowlist_reason": null,
                 "data_date": "2026-10-14T00:00:00+00:00",
-                "libyears": 2.68,
+                "libyears": 2.76,
                 "age": {
                     "installed": {
                         "at": "2023-05-06T11:11:46+00:00",
@@ -56179,7 +56179,7 @@
                 "evidence": "",
                 "allowlist_reason": null,
                 "data_date": "2026-10-14T00:00:00+00:00",
-                "libyears": 1.42,
+                "libyears": 1.32,
                 "age": {
                     "installed": {
                         "at": "2024-08-07T17:34:09+00:00",

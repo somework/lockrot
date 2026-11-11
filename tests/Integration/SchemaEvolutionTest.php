@@ -347,15 +347,22 @@ final class SchemaEvolutionTest extends TestCase
     /**
      * The baseline that an older release wrote is one that a user has committed. lockrot 0.14 reads
      * baseline-2 only, so each recorded baseline-1 file is refused with the message that says what
-     * to do. The recordings stay as they were written.
+     * to do, and a recorded baseline-2 file is read. The recordings stay as they were written.
      *
      * @dataProvider versions
      */
     #[DataProvider('versions')]
     public function testTheBaselineAnOlderReleaseWroteIsRefused(string $version): void
     {
-        $findings = JsonPath::arrayAt(self::decode($version, self::BASELINE), ['findings']);
-        self::assertNotSame([], $findings);
+        $baseline = self::decode($version, self::BASELINE);
+        self::assertNotSame([], JsonPath::arrayAt($baseline, ['findings']));
+        self::assertSame(self::BASELINE, JsonPath::stringAt(self::decode($version, 'report.json'), ['baseline', 'path']), 'the report was compared against it');
+
+        if (JsonPath::intAt($baseline, ['lockrot', 'schema']) !== 1) {
+            self::assertInstanceOf(Baseline::class, BaselineFile::resolve(self::DIR.$version, self::BASELINE, '0.14.0')->read());
+
+            return;
+        }
 
         try {
             BaselineFile::resolve(self::DIR.$version, self::BASELINE, '0.14.0')->read();
@@ -363,7 +370,6 @@ final class SchemaEvolutionTest extends TestCase
         } catch (ConfigException $e) {
             self::assertSame('lockrot 0.14 reads baseline-2 only, and lockrot-schema-evolution-baseline.json is a baseline-1 file. Move it aside to review the findings, then run --generate-baseline: https://lockrot.dev/baseline/#moving-from-a-baseline-1-file', $e->getMessage());
         }
-        self::assertSame(self::BASELINE, JsonPath::stringAt(self::decode($version, 'report.json'), ['baseline', 'path']), 'the report was compared against it');
     }
 
     /**

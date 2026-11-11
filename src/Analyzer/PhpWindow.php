@@ -40,6 +40,9 @@ final class PhpWindow implements \JsonSerializable
     /** Host features: whether Composer's platform holds them depends on the PHP build of the host. */
     public const HOST_FEATURES = ['php-debug', 'php-ipv6', 'php-zts'];
 
+    /** Stands for the root version of a composer.json link, as `Locker::getPlatformRequirements` reads `1.0.0` for the lock `platform`. */
+    private const ROOT_VERSION = '1.0.0';
+
     /** @var Data */
     private array $data;
     private string $targetMinor;
@@ -288,7 +291,7 @@ final class PhpWindow implements \JsonSerializable
                 }
             } elseif (\in_array($req['target'], self::VERSIONED, true)) {
                 try {
-                    $php[] = [$req, $link === null ? $parser->parseConstraints($req['constraint']) : $link->getConstraint()];
+                    $php[] = [$req, $link === null ? $parser->parseConstraints($req['constraint'] === 'self.version' ? self::ROOT_VERSION : $req['constraint']) : $link->getConstraint()];
                 } catch (\UnexpectedValueException $e) {
                     return null;
                 }

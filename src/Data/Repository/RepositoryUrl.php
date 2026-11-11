@@ -15,6 +15,9 @@ namespace Lockrot\Data\Repository;
 final class RepositoryUrl
 {
     /** What a report quotes in place of a message PCRE could not finish reading. */
+    /** A byte outside every well-formed UTF-8 sequence (RFC 3629): the valid sequences are skipped. */
+    private const INVALID_UTF8 = '{(?:[\x00-\x7F]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})(*SKIP)(*FAIL)|[\x80-\xFF]}';
+
     public const WITHHELD = '(withheld: lockrot could not redact this message)';
 
     /** Where a URL starts in a text: a scheme and `://`, or `:\/\/` as JSON escapes it. */
@@ -121,6 +124,8 @@ final class RepositoryUrl
      *
      * The text is scanned, not matched as a whole, so its length costs time and never the redaction.
      * A message that PCRE cannot read is {@see WITHHELD}.
+     * A byte that is not valid UTF-8 (a reason phrase, a body cut inside a character) reads as
+     * U+FFFD, so that every JSON format can encode the report.
      */
     public static function inText(string $text): string
     {
@@ -128,7 +133,7 @@ final class RepositoryUrl
         $remotes = $urls === null ? null : preg_replace(self::REMOTE_USER, '', $urls);
         $paths = $remotes === null ? null : self::pathsIn($remotes);
 
-        return $paths ?? self::WITHHELD;
+        return ($paths === null ? null : preg_replace(self::INVALID_UTF8, "\u{FFFD}", $paths)) ?? self::WITHHELD;
     }
 
     private static function urlsIn(string $text): ?string
