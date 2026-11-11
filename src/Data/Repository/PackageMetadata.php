@@ -106,7 +106,6 @@ final class PackageMetadata
     private ?array $newestRequires = null;
     /** The highest stable release not dated after the run clock: the one {@see $newestRequires} reads. */
     private ?StableRelease $newestStable = null;
-    private ?string $lastStablePhp = null;
     private ?\DateTimeImmutable $releaseReadingAt;
     private ?string $releaseReadingVersion;
     private ?string $releaseReadingDatedBy;
@@ -411,9 +410,6 @@ final class PackageMetadata
     private function keepReleases(array $versions, array $stable, array $sharedCommit, \DateTimeImmutable $now, string $installedVersion): void
     {
         foreach ($versions as $version) {
-            if ($version->getPrettyVersion() === $this->lastStableVersion) {
-                $this->lastStablePhp = self::phpOf($version);
-            }
             if ($version->getPrettyVersion() === $this->newestVersion) {
                 $this->newestPhp = self::phpOf($version);
             }
@@ -585,11 +581,10 @@ final class PackageMetadata
         $lastStableReleaseAt = $this->lastStableReleaseAt;
         $lastStableVersion = $this->lastStableVersion;
         $lastStableDatedBy = $this->lastStableDatedBy;
-        $lastStablePhp = $this->lastStablePhp;
         $highestBranch = self::highestBranch($byBranch);
         $line = $this->highestLineAfterParent($byBranch, $highestBranch, $datedBranches, $this->lastStableVersion);
         if ($line !== null) {
-            [$lastStableReleaseAt, $lastStableVersion, $lastStablePhp, $ownHighestNewest] = $line;
+            [$lastStableReleaseAt, $lastStableVersion, , $ownHighestNewest] = $line;
             $lastStableDatedBy = $ownHighestNewest ? null : $parent->name;
         }
         // The newest tag, a pre-release included, takes the same parent date as the last stable release.
@@ -675,7 +670,6 @@ final class PackageMetadata
         $dated->installedRequires = $this->installedRequires;
         $dated->newestRequires = $this->newestRequires;
         $dated->newestStable = $this->newestStable;
-        $dated->lastStablePhp = $lastStablePhp;
         $dated->releaseReadingAt = $releaseReadingAt;
         $dated->releaseReadingVersion = $releaseReadingVersion;
         $dated->releaseReadingDatedBy = $releaseReadingDatedBy;
@@ -1046,12 +1040,6 @@ final class PackageMetadata
     public function lastStableVersion(): ?string
     {
         return $this->lastStableVersion;
-    }
-
-    /** The `require.php` of {@see lastStableVersion()}, null when it requires none or when the release scan did not run. */
-    public function lastStablePhp(): ?string
-    {
-        return $this->lastStablePhp;
     }
 
     /** Whether a commit that other stable tags share dates the version that `releaseReadingAt()` reads. */

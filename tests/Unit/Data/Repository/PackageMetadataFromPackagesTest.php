@@ -223,6 +223,18 @@ final class PackageMetadataFromPackagesTest extends TestCase
         }
     }
 
+    /** An undated highest tag, on no shared commit, leaves S2 nothing to measure, also when a lower line holds the newest date. */
+    public function testAnUndatedHighestTagIsTheNewestTagWithNoDateAboveANewerLowerLine(): void
+    {
+        $newerLowerLine = $this->load(['name' => 'a/b', 'version' => '1.5.0', 'time' => '2022-01-01T00:00:00+00:00']);
+        $datedOnTheHighestLine = $this->load(['name' => 'a/b', 'version' => '2.1.0', 'time' => '2020-01-01T00:00:00+00:00']);
+        $undatedHighest = $this->load(['name' => 'a/b', 'version' => '2.1.1']);
+
+        $metadata = PackageMetadata::fromPackages('a/b', [$newerLowerLine, $datedOnTheHighestLine, $undatedHighest], new \DateTimeImmutable(self::FIXED));
+
+        self::assertSame(['2.1.1', null], [$metadata->newestTagVersion(), $metadata->newestTagAt()]);
+    }
+
     /**
      * illuminate/macroable 10.x: many stable tags point at one commit, and Packagist dates every one
      * of them by the day the directory last changed, not the day v10.49.0 was cut. A highest
