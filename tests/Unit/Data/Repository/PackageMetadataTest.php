@@ -198,8 +198,8 @@ final class PackageMetadataTest extends TestCase
     }
 
     /**
-     * Random tag sets with a fixed seed: semver, date tags with and without `v`, pre-releases and
-     * branches. Each load with an installed version must keep exactly the stable tags above it.
+     * Random tag sets with a fixed seed: semver, date tags with and without `v`, 6-digit and dotted
+     * date tags, 4- and 5-digit tags, pre-releases and branches. Each load with an installed version must keep exactly the stable tags above it.
      */
     public function testFinding34NoGeneratedTagSetBreaksTheReleaseScan(): void
     {
@@ -237,7 +237,7 @@ final class PackageMetadataTest extends TestCase
 
     private static function generatedTag(): string
     {
-        switch (mt_rand(0, 5)) {
+        switch (mt_rand(0, 8)) {
             case 0:
                 return \sprintf('%d.%d.%d', mt_rand(0, 4), mt_rand(0, 3), mt_rand(0, 3));
             case 1:
@@ -248,6 +248,12 @@ final class PackageMetadataTest extends TestCase
                 return \sprintf('v20%02d%02d01', mt_rand(10, 26), mt_rand(1, 12));
             case 4:
                 return \sprintf('%d.%d.0-%s%d', mt_rand(0, 4), mt_rand(0, 3), ['alpha', 'beta', 'RC'][mt_rand(0, 2)], mt_rand(1, 3));
+            case 5:
+                return \sprintf('20%02d%02d', mt_rand(10, 26), mt_rand(1, 12));
+            case 6:
+                return \sprintf('20%02d.%02d.%02d', mt_rand(10, 26), mt_rand(1, 12), mt_rand(1, 28));
+            case 7:
+                return (string) mt_rand(1000, 99999);
             default:
                 return ['dev-main', '2.x-dev', 'dev-feature'][mt_rand(0, 2)];
         }
