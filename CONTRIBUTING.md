@@ -414,6 +414,13 @@ maintainer.
       lists, the keys of `RELEASED_SCHEMAS` and the directories under `schemas/` match exactly. If
       a schema differs from the previous release's, add the version to `RECORDING_PENDING`.
 
+    - The five SARIF goldens embed `Version::STRING` as the driver version. After the version bump,
+      rewrite them before you take any pin: run `LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit
+      --filter ChangedGoldensTest` for the four fixture goldens, and `LOCKROT_REWRITE_GOLDEN=1
+      vendor/bin/phpunit --filter SarifFormatterTest::testTheCompositeRendersAsItsGolden` for
+      `composite.sarif.sarif`. Each run fails once on purpose after it writes. Check that only the
+      driver `version` line changed, then run both tests again without the variable.
+
     - Pin the sha256 of each formatter golden in `ChangedGoldensTest::RELEASED`, set
       `RELEASED_AT` to the new version, and empty `CHANGED`. From `FIRST_RELEASE` on,
       `ChangedGoldensTest` fails unless `RELEASED_AT` names the newest release that `CHANGELOG.md`
@@ -425,7 +432,8 @@ maintainer.
       branch's commits unreachable from `main`, so a tag must keep the pinned commit reachable.
 
         1. When the contract bundle changes, run `tools/report/record`. Commit it with the version,
-           the dated CHANGELOG heading, the schema copies and the golden pins of this step.
+           the dated CHANGELOG heading, the schema copies, the rewritten SARIF goldens and the
+           golden pins of this step.
         2. Tag that commit `vX.Y.Z-rc.N` and push the tag. The tag keeps the commit reachable for
            the renderer pre-release. `phar.yml` ignores a `-rc.` tag. Packagist lists it as a
            pre-release, which a project on stable minimum-stability does not install.
