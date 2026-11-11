@@ -6,14 +6,20 @@ namespace Lockrot\Tests\Unit\Solver;
 
 use Composer\Composer;
 use Composer\Config;
+use Composer\Factory;
+use Composer\IO\NullIO;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
+use Composer\Package\Loader\RootPackageLoader;
+use Composer\Package\RootAliasPackage;
 use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\AdvisoryProviderInterface;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\PackageRepository;
 use Composer\Repository\PlatformRepository;
+use Composer\Repository\RepositoryFactory;
+use Composer\Util\Filesystem;
 use Composer\Util\Platform;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Deadline;
@@ -27,8 +33,10 @@ use Lockrot\Solver\MoveQuery;
 use Lockrot\Solver\SolverChecker;
 use Lockrot\Tests\Support\ArrayVersionSource;
 use Lockrot\Tests\Support\ConfiguredRepository;
+use Lockrot\Tests\Support\HermeticComposerConfig;
 use Lockrot\Tests\Support\RecordingComposerRepository;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
 final class MoveCheckersTest extends TestCase
 {
@@ -699,6 +707,66 @@ final class MoveCheckersTest extends TestCase
         $check = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
 
         self::assertSame([MoveCheck::RESOLVES, MoveCheck::WITH_ALL_DEPENDENCIES], [$check->result(), $check->form()]);
+    }
+
+    /**
+     * Composer's RootPackageLoader gives a RootAliasPackage when the root's dev version has a
+     * branch alias. Installer::createRequest fixes the root and the package that it aliases.
+     *
+     * @dataProvider branchAliasedRoots
+     *
+     * @param array<string, mixed> $version the composer.json version, or none
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('branchAliasedRoots')]
+    public function testABranchAliasedRootResolvesTheLockAndAMoveAsComposerDoes(array $version, ?string $rootVersion, bool $gitCheckout): void
+    {
+        $directory = sys_get_temp_dir().'/lockrot-root-alias-'.bin2hex(random_bytes(4));
+        mkdir($directory);
+        $previous = Platform::getEnv('COMPOSER_ROOT_VERSION');
+        $rootVersion === null ? Platform::clearEnv('COMPOSER_ROOT_VERSION') : Platform::putEnv('COMPOSER_ROOT_VERSION', $rootVersion);
+        try {
+            if ($gitCheckout) {
+                self::gitCheckoutOfMain($directory);
+            }
+            $config = HermeticComposerConfig::create($directory.'/home');
+            $io = new NullIO();
+            $manager = RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config));
+            $root = (new RootPackageLoader($manager, $config, null, null, $io))->load(['name' => 'x/app', 'require' => ['foo/foo' => '^1.0'], 'extra' => ['branch-alias' => ['dev-main' => '2.x-dev']]] + $version, RootPackage::class, $directory);
+            self::assertInstanceOf(RootAliasPackage::class, $root);
+            $loader = new ArrayLoader();
+            $repository = new RecordingComposerRepository([
+                $loader->load(['name' => 'foo/foo', 'version' => '1.4.0']),
+                $loader->load(['name' => 'foo/foo', 'version' => '1.6.0']),
+            ]);
+            $lock = LockFile::fromArray(['packages' => [['name' => 'foo/foo', 'version' => '1.4.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+
+            $checker = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), $config, [$repository], '8.4', false, Deadline::never());
+            $check = $checker->check(MoveQuery::update('foo/foo', '^1.6', '1.6.0'))->check();
+
+            self::assertSame(MoveCheck::RESOLVES, $checker->baseline()->check()->result(), (string) $checker->baseline()->problem());
+            self::assertSame([MoveCheck::RESOLVES, '1.6.0'], [$check->result(), $check->installs()]);
+        } finally {
+            $previous === false ? Platform::clearEnv('COMPOSER_ROOT_VERSION') : Platform::putEnv('COMPOSER_ROOT_VERSION', $previous);
+            (new Filesystem())->removeDirectory($directory);
+        }
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, ?string, bool}> */
+    public static function branchAliasedRoots(): iterable
+    {
+        yield 'composer.json version' => [['version' => 'dev-main'], null, false];
+        yield 'COMPOSER_ROOT_VERSION' => [[], 'dev-main', false];
+        // Plugin mode: Composer guesses the version of a git checkout from its branch.
+        yield 'git branch' => [[], null, true];
+    }
+
+    private static function gitCheckoutOfMain(string $directory): void
+    {
+        foreach ([['init', '--quiet', '--initial-branch=main'], ['-c', 'core.hooksPath=', '-c', 'user.name=lockrot', '-c', 'user.email=lockrot@example.org', 'commit', '--quiet', '--allow-empty', '--no-gpg-sign', '-m', 'root']] as $arguments) {
+            $process = new Process(array_merge(['git', '-C', $directory], $arguments));
+            $process->run();
+            self::assertTrue($process->isSuccessful(), $process->getErrorOutput());
+        }
     }
 
     /** @param array<string, string> $requires */

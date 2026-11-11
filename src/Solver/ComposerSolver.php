@@ -21,6 +21,7 @@ use Composer\Package\CompleteAliasPackage;
 use Composer\Package\CompletePackage;
 use Composer\Package\Link;
 use Composer\Package\Loader\RootPackageLoader;
+use Composer\Package\RootAliasPackage;
 use Composer\Package\RootPackageInterface;
 use Composer\Package\Version\VersionParser;
 use Composer\Repository\ArrayRepository;
@@ -398,6 +399,10 @@ final class ComposerSolver
 
         $composerRequest = new Request($this->locked);
         $composerRequest->fixPackage($fixedRoot);
+        // As Installer::createRequest() does: the alias of a branch-aliased root requires the package that it aliases.
+        if ($fixedRoot instanceof RootAliasPackage) {
+            $composerRequest->fixPackage($fixedRoot->getAliasOf());
+        }
         $provided = $root->getProvides();
         foreach ($this->platform->getPackages() as $package) {
             $provider = $provided[$package->getName()] ?? null;
