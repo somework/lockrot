@@ -37,6 +37,8 @@ final class SourceEntryUsageErrorTest extends TestCase
         yield 'a -d that does not exist, before the command' => [['-d', '{dir}/missing', 'lockrot'], 'lockrot: --working-dir names a directory that does not exist: {dir}/missing'];
         yield 'help for an unknown command' => [['help', 'nope'], 'lockrot: Command "nope" is not defined.'];
         yield 'list of an unknown namespace' => [['list', 'nosuch'], 'lockrot: There are no commands defined in the "nosuch" namespace.'];
+        yield 'help with an unknown option' => [['help', '--nope'], 'lockrot: The "--nope" option does not exist.'];
+        yield 'help for a command with an extra argument' => [['help', 'list', 'extra'], 'lockrot: Too many arguments to "help" command, expected arguments "command_name".'];
         yield 'help for an unknown command with an extra argument' => [['help', 'nope', 'extra'], 'lockrot: Command "nope" is not defined.'];
     }
 
@@ -85,19 +87,6 @@ final class SourceEntryUsageErrorTest extends TestCase
         self::assertSame(2, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
         self::assertSame('', $process->getOutput());
         self::assertSame('lockrot: The "--nope" option does not exist.'."\n", $process->getErrorOutput());
-    }
-
-    /**
-     * Symfony's HelpCommand ignores a validation error of its own input, so `help` with an unknown
-     * option prints the help. This pins that outcome, not a ruling: whether it is a usage error is open.
-     */
-    public function testHelpWithAnUnknownOptionPrintsHelpAndExitsZero(): void
-    {
-        $process = $this->lockrot(['help', '--nope']);
-
-        self::assertSame(0, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
-        self::assertNotSame('', $process->getOutput());
-        self::assertSame('', $process->getErrorOutput());
     }
 
     /** @param list<string> $arguments */

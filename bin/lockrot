@@ -294,12 +294,31 @@ $application = new class () extends \Composer\Console\Application {
         try {
             $command = $this->find($name);
             $subject = $this->subjectOf($command, $input);
-            if ($subject !== null && $command->getName() === 'help') {
-                $this->find($subject);
+            if ($command->getName() === 'help') {
+                if ($subject !== null) {
+                    $this->find($subject);
+                }
+
+                return $this->helpInputError($command, $input);
             } elseif ($subject !== null && $command->getName() === 'list') {
                 $this->findNamespace($subject);
             }
         } catch (\Symfony\Component\Console\Exception\CommandNotFoundException $e) {
+            return $e->getMessage();
+        }
+
+        return null;
+    }
+
+    /** `help` sets ignoreValidationErrors, so Symfony prints help for input that it cannot bind: the reason, else null. */
+    private function helpInputError(\Symfony\Component\Console\Command\Command $help, \Symfony\Component\Console\Input\InputInterface $input): ?string
+    {
+        $probe = clone $input;
+        $help->mergeApplicationDefinition();
+        try {
+            $probe->bind($help->getDefinition());
+            $probe->validate();
+        } catch (\Symfony\Component\Console\Exception\ExceptionInterface $e) {
             return $e->getMessage();
         }
 
