@@ -77,6 +77,29 @@ final class SourceEntryUsageErrorTest extends TestCase
         self::assertSame(str_replace('{dir}', $this->dir, $line)."\n", $process->getErrorOutput());
     }
 
+    /** A console exception that parent::doRun() throws is exit 2 too, not the gate's exit 1. */
+    public function testAConsoleExceptionFromTheConsoleIsExitTwoWithOneLockrotLine(): void
+    {
+        $process = $this->lockrot(['list', '--nope']);
+
+        self::assertSame(2, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
+        self::assertSame('', $process->getOutput());
+        self::assertSame('lockrot: The "--nope" option does not exist.'."\n", $process->getErrorOutput());
+    }
+
+    /**
+     * Symfony's HelpCommand ignores a validation error of its own input, so `help` with an unknown
+     * option prints the help. This pins that outcome, not a ruling: whether it is a usage error is open.
+     */
+    public function testHelpWithAnUnknownOptionPrintsHelpAndExitsZero(): void
+    {
+        $process = $this->lockrot(['help', '--nope']);
+
+        self::assertSame(0, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
+        self::assertNotSame('', $process->getOutput());
+        self::assertSame('', $process->getErrorOutput());
+    }
+
     /** @param list<string> $arguments */
     private function lockrot(array $arguments): Process
     {
