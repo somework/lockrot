@@ -293,6 +293,15 @@ final class LockrotConfigTest extends TestCase
         yield 'a trailing newline' => ["8.4\n"];
     }
 
+    /** @dataProvider targetPhpsWithTrailingText */
+    #[DataProvider('targetPhpsWithTrailingText')]
+    public function testAConfigTargetPhpWithTextAfterTheVersionIsRefusedLikeTheOption(string $value): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('extra.lockrot.target-php takes a major, a minor or a patch version, such as "8.4" or "8.4.2", with nothing before or after it; got "'.$value.'"');
+        LockrotConfig::fromSources(['target-php' => $value], [], ['target-php' => '8.4'], '8.5.10', null);
+    }
+
     /**
      * Ruling R14-2: a target minor that the PHP release data does not list and that lies below its
      * newest minor sits on no window minor. `6` reads as 6.0, and `7.5.3` as 7.5. The data, not the
@@ -327,7 +336,6 @@ final class LockrotConfigTest extends TestCase
         yield 'the config key at 6.0' => [['target-php' => '6.0'], [], [], 'extra.lockrot.target-php', '6.0', '6.0'];
         yield 'the config key at 7.5 under an option that wins' => [['target-php' => '7.5'], [], ['target-php' => '8.4'], 'extra.lockrot.target-php', '7.5', '7.5'];
         yield 'the config key at 7.5 under a variable that wins' => [['target-php' => '7.5'], ['LOCKROT_TARGET_PHP' => '8.4'], [], 'extra.lockrot.target-php', '7.5', '7.5'];
-        yield 'a config key with a suffix under an option that wins' => [['target-php' => '7.5.x'], [], ['target-php' => '8.4'], 'extra.lockrot.target-php', '7.5', '7.5.x'];
     }
 
     /**
