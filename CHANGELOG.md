@@ -586,7 +586,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CLI:** the check of package names in the lock cannot backtrack on a crafted name, so such a
   lock no longer stalls the run.
 - **Config:** an `accept-unchecked` `repository` entry with a user name or password is refused, with
-  a message that names the rule. ([The allowlist](docs/configuration.md#the-allowlist))
+  a message that names the rule. ([accept-unchecked](docs/configuration.md#accept-unchecked))
 - **json:** a root `php` constraint `self.version` reads as Composer reads it, so `run.php_window`
   is not null for it.
 - **All formats:** when the `release_metadata` check cannot judge S5 (no lock `time`, open
