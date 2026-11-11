@@ -39,6 +39,7 @@ final class Tokens
     private ?string $gitlab;
     /** @var array<string, string> */
     private array $withheld = [];
+    private bool $githubIssuerNamesAnotherHost = false;
 
     public function __construct(?string $github, ?string $gitlab)
     {
@@ -68,6 +69,7 @@ final class Tokens
                 ?? self::issuedBy($env, self::ENV_GITLAB, [self::ENV_CI_SERVER_URL, self::ENV_GITLAB_HOST, self::ENV_GL_HOST, self::ENV_GITLAB_URI], 'gitlab.com', $withheld)
         );
         $tokens->withheld = $withheld;
+        $tokens->githubIssuerNamesAnotherHost = self::issuerRefusal($env, [self::ENV_GITHUB_SERVER_URL, self::ENV_GH_HOST], 'github.com') !== null;
 
         return $tokens;
     }
@@ -83,6 +85,25 @@ final class Tokens
         if ($token === null) {
             return null;
         }
+        $refusal = self::issuerRefusal($env, $issuers, $publicHost);
+        if ($refusal !== null) {
+            $withheld[$name] = $refusal;
+
+            return null;
+        }
+
+        return $token;
+    }
+
+    /**
+     * The issuer test: null when every set issuer names the public host alone, else the host or
+     * authority to show, or {@see READ_TWO_WAYS}.
+     *
+     * @param array<string, mixed> $env
+     * @param list<string>         $issuers
+     */
+    private static function issuerRefusal(array $env, array $issuers, string $publicHost): ?string
+    {
         foreach ($issuers as $issuer) {
             $url = self::value($env, $issuer);
             if ($url === null) {
@@ -95,13 +116,11 @@ final class Tokens
             // A backslash ends the authority for a WHATWG parser and not for parse_url(), so the two disagree on the host.
             if ($host !== $publicHost || self::host($url) !== $publicHost || self::hasBackslashInAuthority($url)) {
                 // The text before the `@` or the backslash can be userinfo, so it is not shown.
-                $withheld[$name] = $host === $publicHost ? self::READ_TWO_WAYS : ($host ?? self::authorityOf($bare));
-
-                return null;
+                return $host === $publicHost ? self::READ_TWO_WAYS : ($host ?? self::authorityOf($bare));
             }
         }
 
-        return $token;
+        return null;
     }
 
     /** Userinfo can hold any character, `/` and `://` included, so everything up to the last `@` goes. */
@@ -154,6 +173,12 @@ final class Tokens
     private static function nonEmpty(?string $value): ?string
     {
         return $value === '' ? null : $value;
+    }
+
+    /** Whether `GITHUB_SERVER_URL` or `GH_HOST` names a host other than github.com alone, whether or not a token is set. */
+    public function githubIssuerNamesAnotherHost(): bool
+    {
+        return $this->githubIssuerNamesAnotherHost;
     }
 
     public function github(): ?string

@@ -44,6 +44,11 @@ final class ForgeAuth
         return isset($this->tokens->withheld()[Tokens::ENV_GITHUB]);
     }
 
+    public function githubIssuerNamesAnotherHost(): bool
+    {
+        return $this->tokens->githubIssuerNamesAnotherHost();
+    }
+
     public static function anonymous(): self
     {
         return new self(Tokens::none(), static fn (string $host): bool => false, static fn (): bool => false);

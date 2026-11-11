@@ -269,4 +269,25 @@ final class TokensTest extends TestCase
         self::assertSame([], Tokens::fromEnvironment(['GITHUB_SERVER_URL' => 'https://ghes.example.com', 'CI_SERVER_URL' => 'https://gitlab.example.com'], null)->withheld());
         self::assertSame([], (new Tokens('a', 'b'))->withheld());
     }
+
+    /**
+     * @dataProvider issuerEnvironments
+     *
+     * @param array<string, string> $env
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('issuerEnvironments')]
+    public function testItSaysWhetherAGithubIssuerNamesAnotherHostWhateverTokenIsSet(array $env, bool $expected): void
+    {
+        self::assertSame($expected, Tokens::fromEnvironment($env, null)->githubIssuerNamesAnotherHost());
+    }
+
+    /** @return iterable<string, array{array<string, string>, bool}> */
+    public static function issuerEnvironments(): iterable
+    {
+        yield 'no issuer variable' => [[], false];
+        yield 'the public host' => [['GITHUB_SERVER_URL' => 'https://github.com'], false];
+        yield 'another host in GITHUB_SERVER_URL, no token' => [['GITHUB_SERVER_URL' => 'https://ghe.example'], true];
+        yield 'another host in GH_HOST, with a token' => [['GH_HOST' => 'ghe.example', 'GITHUB_TOKEN' => 't'], true];
+        yield 'a GitLab issuer says nothing' => [['CI_SERVER_URL' => 'https://gl.example'], false];
+    }
 }

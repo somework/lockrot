@@ -219,6 +219,21 @@ final class AnalyzerRunNotesTest extends TestCase
         self::assertSame('repository_activity_anonymous_cap', $cap->code());
     }
 
+    public function testTheAnonymousCapSaysTheTokenIsNotSetOnAForeignRunnerHostWithoutAnyGithubToken(): void
+    {
+        $packages = [self::locked('vendor/one'), self::locked('vendor/two')];
+        $metadata = [];
+        foreach (['vendor/one', 'vendor/two'] as $name) {
+            $metadata[$name] = self::metadata($name, 'https://github.com/'.$name.'.git');
+        }
+        $tokens = Tokens::fromEnvironment(['GITHUB_SERVER_URL' => 'https://ghe.example'], null);
+        self::assertSame([], $tokens->withheld());
+
+        $analysis = $this->analyze($packages, new MetadataBatch($metadata, [], []), $this->http([]), false, null, false, false, ['gitlab.com'], 1, $tokens);
+
+        self::assertSame('GitHub token not set: repository activity checked for 1 candidate package, 1 package skipped (set LOCKROT_GITHUB_TOKEN to a github.com token to check all)', $analysis->report()->runNotes()[0]->text());
+    }
+
     /** Every package whose repository was never asked carries the reason of the note, not only the first. */
     public function testAnExhaustedBudgetSaysTheActivityWasNotChecked(): void
     {
