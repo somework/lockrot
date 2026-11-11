@@ -37,7 +37,7 @@ final class ActivityFetchPlan
      * @param bool $githubIssuerNamesAnotherHost {@see Tokens::githubIssuerNamesAnotherHost()}
      * @param bool $githubTokenWithheld lockrot withheld `GITHUB_TOKEN` from github.com ({@see Tokens::withheld()})
      */
-    public function __construct(array $repos, array $checkedPackages, array $skippedNoToken, array $skippedBudget, array $cappedForges, array $skippedPackages = [], bool $githubTokenWithheld = false, bool $githubIssuerNamesAnotherHost = false)
+    public function __construct(array $repos, array $checkedPackages, array $skippedNoToken, array $skippedBudget, array $cappedForges, array $skippedPackages, bool $githubTokenWithheld, bool $githubIssuerNamesAnotherHost)
     {
         $this->githubIssuerNamesAnotherHost = $githubIssuerNamesAnotherHost;
         $this->githubTokenWithheld = $githubTokenWithheld;
