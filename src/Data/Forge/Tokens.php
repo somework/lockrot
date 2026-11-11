@@ -69,7 +69,8 @@ final class Tokens
                 ?? self::issuedBy($env, self::ENV_GITLAB, [self::ENV_CI_SERVER_URL, self::ENV_GITLAB_HOST, self::ENV_GL_HOST, self::ENV_GITLAB_URI], 'gitlab.com', $withheld)
         );
         $tokens->withheld = $withheld;
-        $tokens->githubIssuerNamesAnotherHost = self::issuerRefusal($env, [self::ENV_GITHUB_SERVER_URL, self::ENV_GH_HOST], 'github.com') !== null;
+        $githubIssuers = array_map(static fn (string $issuer): ?string => self::value($env, $issuer), [self::ENV_GITHUB_SERVER_URL, self::ENV_GH_HOST]);
+        $tokens->githubIssuerNamesAnotherHost = self::issuerRefusal($githubIssuers, 'github.com') !== null;
 
         return $tokens;
     }
@@ -85,7 +86,7 @@ final class Tokens
         if ($token === null) {
             return null;
         }
-        $refusal = self::issuerRefusal($env, $issuers, $publicHost);
+        $refusal = self::issuerRefusal(array_map(static fn (string $issuer): ?string => self::value($env, $issuer), $issuers), $publicHost);
         if ($refusal !== null) {
             $withheld[$name] = $refusal;
 
@@ -99,13 +100,11 @@ final class Tokens
      * The issuer test: null when every set issuer names the public host alone, else the host or
      * authority to show, or {@see READ_TWO_WAYS}.
      *
-     * @param array<string, mixed> $env
-     * @param list<string>         $issuers
+     * @param list<?string> $issuers the value of each issuer variable, null when it is unset or empty
      */
-    private static function issuerRefusal(array $env, array $issuers, string $publicHost): ?string
+    private static function issuerRefusal(array $issuers, string $publicHost): ?string
     {
-        foreach ($issuers as $issuer) {
-            $url = self::value($env, $issuer);
+        foreach ($issuers as $url) {
             if ($url === null) {
                 continue;
             }
