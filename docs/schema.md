@@ -180,7 +180,7 @@ names what to read for each report-1 field that report-2 removes or redefines.
 | `.verdict == "abandoned"` | `.lead == "abandoned"`: [`lead`](verdicts.md#flags) is report-1's word for the same findings |
 | `.verdict` at or above `left-behind` | `.lead as $l \| ["abandoned","silent","pinned","left-behind"] \| index($l) != null` |
 | a flag anywhere on the finding | `any(.score.terms[]?; .flag == "old-promise")`: a flag counts exactly when a score term names it |
-| `.priority == "critical"` | unchanged (an alias), or `.verdict == "critical"` |
+| `.priority == "critical"` | changed in meaning: `priority` is the grade, not 0.13's priority ladder, so a package with a counted advisory and no maintenance flag can match. No report-2 query keeps the ladder. Read `.verdict == "critical"`, the same value |
 | `.verdict == "ok"` | `.verdict == "ok"`. A package with a counted advisory and no maintenance flag is graded, with `lead` null |
 | `.counts.abandoned`, `.counts["left-behind"]` | `.flags.abandoned.leading`, `.flags["left-behind"].leading`: the `leading` of the same flag. `counts` holds the seven verdicts, so `.counts["left-behind"]` is null |
 | `.counts.ok`, `.counts.finished`, `.counts.unknown` | the same keys. A package with a counted advisory is graded, not `ok`, `finished` or `unknown` |
