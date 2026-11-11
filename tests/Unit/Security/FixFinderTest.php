@@ -536,6 +536,7 @@ final class FixFinderTest extends TestCase
         yield 'a hold on the package that excludes the newest leaves the release below it' => ['^1.2', $require('^2.0'), '1.1.0'];
         yield 'a hold on the package by its name excludes the newest' => ['^1.2', $require('^2.0', 'a/b'), '1.1.0'];
         yield 'a hold on a name that the package replaces excludes the newest' => ['^1.2', $require('^2.0', 'a/legacy'), '1.1.0'];
+        yield 'a hold that names the package in another case excludes the newest' => ['^1.2', $require('^2.0', 'A/B'), '1.1.0'];
         yield 'a hold on another package caps nothing' => ['^1.2', $require('^2.0', 'acme/rt-kernel'), '1.2.0'];
         yield 'a hold whose link admits the newest leaves it' => ['^1.2', $require('^1.0'), '1.2.0'];
         yield 'a conflict that matches the newest excludes it' => ['^1.2', new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::CONFLICT, '>=1.2'), '1.1.0'];
@@ -567,6 +568,29 @@ final class FixFinderTest extends TestCase
             [$installed->newest(), $held->forAdvisory('A')->newest()],
             'installed_branch_fixes.newest and the S9 fix newest keep what the links allow (ruling R3-2)'
         );
+    }
+
+    public function testAHoldOnAnotherPackageLeavesTheHoldOnThePackageAfterIt(): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4'], ['1.2.0', '>=7.4']], ['A' => '<1.1.0']);
+        $finder = new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::fromArray(['require' => ['a/b' => '^1.0']])));
+        $other = new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::REQUIRE, '^2.0', 'acme/rt-kernel');
+        $own = new Holder(Holder::PACKAGE, 'c/c', '1.0.0', Holder::REQUIRE, '^2.0', 'a/b');
+
+        $gets = $finder->withRefused(RefusedMoves::none()->with('^1.2', [$other, $own]))->find($facts)->gets();
+
+        self::assertNotNull($gets);
+        self::assertSame('1.1.0', $gets->version());
+    }
+
+    /** `at()` knows every release above the installed one, not only the lowest. */
+    public function testGetsAtAMiddleReleaseGivesThatReleasesOwnFacts(): void
+    {
+        [$lock, $facts] = $this->facts(['name' => 'a/b', 'version' => '1.0.0'], [['1.0.0', '>=7.4'], ['1.1.0', '>=7.4'], ['1.2.0', '>=8.0'], ['1.3.0', '>=8.1']], ['A' => '<1.1.0']);
+        $gets = (new FixFinder(new PhpFloor('8.4', '>=7.4'), LinkIndex::of($lock, ProjectConfig::empty())))->find($facts)->gets();
+        self::assertNotNull($gets);
+
+        self::assertSame(['1.3.0', '>=8.0'], [$gets->version(), $gets->at('1.2.0')->phpCheck()->requires()]);
     }
 
     /**

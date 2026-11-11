@@ -173,11 +173,10 @@ final class MoveText
         }
     }
 
-    /** Ruling R17-1: what the first resolving form gives in place of the move's newest: a dev version, the locked release, or no entry when the solve removes the package. */
+    /** Ruling R17-1: what the first resolving form gives in place of the move's newest: a dev version, the locked version, or no entry when the solve removes the package. */
     private static function noRelease(?string $installs, Move $move): string
     {
-        $latest = $move->latest();
-        $newest = ($move->kind() === Move::TAG && $latest !== null ? $latest->version() : $move->newest()) ?? $move->version();
+        $newest = $move->newest() ?? $move->version();
         if ($installs === null) {
             return "; Composer's solver removes ".$move->subject()->package().' from the lock, not '.$newest.', so this command does not reach it';
         }

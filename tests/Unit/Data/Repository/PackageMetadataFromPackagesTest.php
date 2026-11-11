@@ -376,6 +376,53 @@ final class PackageMetadataFromPackagesTest extends TestCase
         self::assertEquals(new \DateTimeImmutable('2020-01-01T00:00:00+00:00'), $metadata->highestStableTagAt());
     }
 
+    public function testADateVersionPreReleaseIsNotTheLastStableRelease(): void
+    {
+        $metadata = PackageMetadata::fromPackages('a/b', [
+            $this->load(['name' => 'a/b', 'version' => '20200101', 'time' => '2020-01-01T00:00:00+00:00']),
+            $this->load(['name' => 'a/b', 'version' => '20210101-beta1', 'time' => '2021-01-01T00:00:00+00:00']),
+        ], new \DateTimeImmutable(self::FIXED));
+
+        self::assertSame('20200101', $metadata->lastStableVersion());
+    }
+
+    /** Two date tags of one normalized version: the first listed one is the release, as for a tag on a release branch. */
+    public function testTheFirstListedOfTwoDateTagsOfOneVersionIsTheLastStableRelease(): void
+    {
+        $metadata = PackageMetadata::fromPackages('a/b', [
+            $this->load(['name' => 'a/b', 'version' => '20200101', 'time' => '2020-01-01T00:00:00+00:00']),
+            $this->load(['name' => 'a/b', 'version' => 'v20200101', 'time' => '2020-06-01T00:00:00+00:00']),
+        ], new \DateTimeImmutable(self::FIXED));
+
+        self::assertSame('20200101', $metadata->lastStableVersion());
+        self::assertEquals(new \DateTimeImmutable('2020-01-01T00:00:00+00:00'), $metadata->lastStableReleaseAt());
+    }
+
+    /** A newest date version above every release branch is the last stable release: no branch row stands above it. */
+    public function testADateVersionAboveTheReleaseBranchesIsTheLastStableRelease(): void
+    {
+        $metadata = PackageMetadata::fromPackages('a/b', [
+            $this->load(['name' => 'a/b', 'version' => '1.0.0', 'time' => '2019-01-01T00:00:00+00:00']),
+            $this->load(['name' => 'a/b', 'version' => '20200101', 'time' => '2020-01-01T00:00:00+00:00']),
+        ], new \DateTimeImmutable(self::FIXED));
+
+        self::assertSame('20200101', $metadata->lastStableVersion());
+        self::assertEquals(new \DateTimeImmutable('2020-01-01T00:00:00+00:00'), $metadata->lastStableReleaseAt());
+    }
+
+    /** An undated last stable release asks a parent for dates, also when a dated pre-release gives the S2 reading. */
+    public function testAnUndatedLastStableReleaseNeedsParentDatesBesideADatedPreRelease(): void
+    {
+        $metadata = PackageMetadata::fromPackages('a/b', [
+            $this->load(['name' => 'a/b', 'version' => 'v1.0.0']),
+            $this->load(['name' => 'a/b', 'version' => 'v2.0.0-beta1', 'time' => '2026-01-01T00:00:00+00:00']),
+        ], new \DateTimeImmutable(self::FIXED));
+
+        self::assertNull($metadata->lastStableReleaseAt());
+        self::assertNotNull($metadata->releaseReadingAt());
+        self::assertTrue($metadata->needsParentDates(null));
+    }
+
     /** Ruling O5: libyears end at the highest stable tag. RC1 and RC2 above it end nothing, whatever the listing order. */
     public function testTheLibyearsEndIsTheHighestStableTagWhateverThePreReleasesAboveIt(): void
     {
