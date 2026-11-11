@@ -715,8 +715,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--dry-run`, a require-dev package stays a dev package, and a stale `composer.lock` on disk
   decides nothing.
   ([Under `--dry-run`](docs/install-time.md#a-note-on-the-dry-run-development-flag))
-- **All formats:** S6 `last_stable_version` is set whenever the package has a tag, also when the
-  newest date is a shared commit's. A pinned snapshot with a tag gets a `tag` move, never `no-tag`,
+- **All formats:** S6 `last_stable_version` is set whenever the package has a stable tag, also when
+  the newest date is a shared commit's. A pinned snapshot with a tag gets a `tag` move, never `no-tag`,
   and it targets a stable tag, or the pre-release and its `require.php` when no stable tag exists.
   An old-promise `test` move names a higher tag, else the installed release with the date that S5
   reads. ([Move](docs/verdicts.md#move))
