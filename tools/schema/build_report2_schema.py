@@ -752,16 +752,17 @@ defs['checkMissing'] = obj("A check that did not run and raised S10 (S10's `unch
     'blocks': arr('The signals that could not be read without it.', ref('signalId'), minItems=1, uniqueItems=True),
 })
 defs['checkSkipped'] = obj("A check lockrot chose not to run (§2.3): a decision, not a gap; it raises no S10 and reaches no `unchecked` gate.", {
-    'check': open_set(['repository_activity', 'release_metadata', 'advisories', 'release_branch', 'repository_archived', 'release_dates'], ("`repository_activity` (blocks S3, S4), "
+    'check': open_set(['repository_activity', 'release_metadata', 'advisories', 'release_branch', 'repository_archived', 'repository_push', 'release_dates'], ("`repository_activity` (blocks S3, S4), "
                       "`release_metadata` (S2 and S8, with S5 when S5 could fire and S11 when S11 fired), `advisories` (S9), `release_branch` (S8 on a branch snapshot, which has no release branch, attack round 1), `repository_archived` "
-                      "(S3: the host's answer did not carry the archived flag, as an anonymous GitLab answer does not), `release_dates` (S2, S5, S8: the S10 `release_dates` gap "
+                      "(S3: the host's answer did not carry the archived flag, as an anonymous GitLab answer does not), `repository_push` (S4: the host's answer named no push or "
+                      "commit date, as a GitHub answer without `pushed_at` or an empty GitLab or Bitbucket commit list), `release_dates` (S2, S5, S8: the S10 `release_dates` gap "
                       "of a package with S1 or a package that an allowlist entry accepts whole, which the S10 filter drops). An open set.")),
     'reason': open_set(['allowlisted', 'no_repository', 'not_from_composer_repository', 'offline', 'rate_limit', 'fetch_failed', 'anonymous_budget', 'install_time_budget',
                         'no_token', 'unavailable', 'not_found', 'branch_snapshot', 'host_not_supported', 'repository_not_found', 'unparseable_version',
-                        'accepted_by_config', 'undated_releases'],
+                        'accepted_by_config', 'undated_releases', 'undated'],
                        ('Why (§2.3, §7.9 page vocabulary): `repository_not_found` is the host\'s 404 (an answer, not a gap), `host_not_supported` a host lockrot cannot ask '
                         'on a package whose S10 the filter drops, `undated_releases` the reason of a `release_dates` skip (a release that the blocked signals read has no '
-                        'trusted date), `unparseable_version` an installed version Composer cannot parse, `accepted_by_config` an S10 check that the '
+                        'trusted date), `undated` the reason of a `repository_push` skip (the answer named no push or commit date), `unparseable_version` an installed version Composer cannot parse, `accepted_by_config` an S10 check that the '
                         "project accepted in `extra.lockrot.accept-unchecked`. The `unchecked_accepted[]` entry of the finding with the same check holds the S10 reason and the "
                         'entry. An open set: read an unknown reason as another reason.')),
     'blocks': arr('The signals it left unread.', ref('signalId'), minItems=1, uniqueItems=True),
@@ -1498,7 +1499,8 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
                            "point. Null when the target is inside the window, or below the lowest edge of the set that `target.inside` reads."), ref('targetFix')),
     })),
     'score_rules_used': {'description': ("Rule id → the number of findings on which the rule changed or decided a number (each count's predicate is a field test: "
-                                         "graded findings; score-0 findings for `zero-verdicts`; every finding with a non-empty `score.accepted[]` for `counted`), null only for "
+                                         "graded findings, and for `divide-reach` and `divide-dev` also each score-0 finding whose rerun (`score.accepted[].if_counted.modifiers[]`) the rule halves; "
+                                         "score-0 findings for `zero-verdicts`; every finding with a non-empty `score.accepted[]` for `counted`), null only for "
                                          "`sort`. Keyed by `score_model.rules[].id`; an id absent from it shows no count. Keys follow the rule-id grammar, so a later id validates "
                                          "and a misspelt one (`corroborating_share`) does not; no property list, so it compiles as a TypeScript index signature. `x-known-keys` "
                                          "names model 1's ids, which a strict reader takes as the only keys."),
@@ -2050,6 +2052,7 @@ def add_relations_activity(defs):
     nfcr = P(reason=E('not_from_composer_repository'))
     relate(defs['finding'], ['An activity that was not read has its one `repository_activity` entry in `checks_missing` or `checks_skipped`. A read one has none (C73).',
                              'A read whose answer did not carry the archived flag (`activity.archived` null) has the `repository_archived` entry in `checks_skipped`, and only then.',
+                             'A read whose answer named no push or commit date (`age.push_unmeasured` `undated`) has the `repository_push` entry in `checks_skipped`, and only then.',
                              'S3 fired exactly when `activity.archived` is true.',
                              'S4 fired only on a read activity, with a push reading at a level (C72: the signal quotes its reading).',
                              'A package installed from a Composer repository carries no S10 and no accepted entry with the reason `not_from_composer_repository`.',
@@ -2060,6 +2063,8 @@ def add_relations_activity(defs):
            [P(activity=P(status=E('read'), archived=NULL), checks_skipped=CONTAINS(P(check=E('repository_archived')))),
             P(activity=P(archived={'type': 'boolean'}), checks_skipped=NONE(P(check=E('repository_archived')))),
             P(activity=P(status=NOT('read')), checks_skipped=NONE(P(check=E('repository_archived'))))],
+           [P(activity=P(status=E('read')), age=P(push_unmeasured=E('undated')), checks_skipped=CONTAINS(P(check=E('repository_push')))),
+            P(age=P(push_unmeasured=NOT('undated')), checks_skipped=NONE(P(check=E('repository_push'))))],
            [P(signals=has('S3'), activity=P(archived=E(True))), P(signals=lacks('S3'), activity=P(archived=NOT(True)))],
            [P(signals=lacks('S4')), P(activity=P(status=E('read')), age=P(push=P(level={'type': 'string'})))],
            [P(from_composer_repository=E(False)), P(checks_missing=NONE(nfcr), unchecked_accepted=NONE(nfcr))],

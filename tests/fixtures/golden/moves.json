@@ -7218,6 +7218,84 @@
             "text": "raise require.php to >=8.2, then require laminas/laminas-code ^4.17.0 \u2014 clears capped; 4.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it"
         }
     },
+    "capped-tag-self-version\u2021": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "4.17.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "4.17.0",
+                "released": "2025-11-01T09:38:14+00:00",
+                "is_installed": false,
+                "relation": "newer",
+                "snapshot_time": "2024-06-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": "self.version",
+                "project_allows": null,
+                "target_runs": null,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [
+                {
+                    "kind": "flag",
+                    "id": "capped",
+                    "reason": "no_release_data"
+                }
+            ],
+            "adds": [],
+            "leaves": [],
+            "clears_all": false,
+            "if_applied": {
+                "total": 8,
+                "verdict": "medium",
+                "lead": "capped",
+                "deciding_advisory": null,
+                "at_most": true,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "laminas/laminas-code:^4.17.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "laminas/laminas-code",
+                    "4.17.0",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest is 4.17.0 (2025-11-01); 4.x needs php self.version; not checked: capped"
+        }
+    },
     "capped-tag-unverified\u2021": {
         "next_step": {
             "kind": "tag",
@@ -15194,6 +15272,103 @@
         "move_in": "next_step",
         "partial": null
     },
+    "mc-unreached-non-dev\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "update",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "6.x",
+            "version": "v6.4.41",
+            "newest": "v6.4.41",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-bf7t-jnpz-492k",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "not_checked",
+                "form": null,
+                "reason": "unloaded_name",
+                "installs": null
+            },
+            "moves_with": [],
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "symfony/routing:^6.4.41"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "symfony/routing",
+                    "v6.4.41",
+                    "--locked"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update 'symfony/routing:^6.4.41' (gets v6.4.41) \u2014 clears the advisory; not checked with Composer's solver (a package it needs could not be loaded), so it holds only if Composer resolves it"
+        },
+        "fix_kind": "update",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": "update",
+            "lowest": "v6.4.41",
+            "newest": "v6.4.41",
+            "held_by": [],
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "not_checked",
+                "form": null,
+                "reason": "unloaded_name",
+                "installs": null
+            }
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
     "mc-unreached-vcs\u2021": {
         "next_step": {
             "kind": "update",
@@ -18605,6 +18780,63 @@
         },
         "move_in": "next_step",
         "partial": null
+    },
+    "push-undated\u2021": {
+        "next_step": {
+            "kind": "find-alternative",
+            "source": "abandoned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "abandoned"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "check": null,
+            "moves_with": [],
+            "composer_moves_because": [
+                "transitive"
+            ],
+            "commands": [],
+            "through": [
+                {
+                    "package": "lorisleiva/laravel-search-string",
+                    "installed_version": "v1.3.0",
+                    "installed_requires": false,
+                    "newest_stable": {
+                        "version": "v1.3.0",
+                        "released": "2023-03-11T10:11:33+00:00"
+                    },
+                    "newest_requires": null,
+                    "newest_requires_unmeasured": "through_other_package",
+                    "local": false,
+                    "newest_is_installed": true
+                }
+            ],
+            "also": [],
+            "text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string (hoa/compiler requires it): replace lorisleiva/laravel-search-string"
+        }
     },
     "replace-graded": {
         "next_step": {

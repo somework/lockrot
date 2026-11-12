@@ -44,7 +44,7 @@ final class FindingRelationsTest extends TestCase
         'cases/mc-package-hold-dagger.json', 'cases/mc-pass-cap-dagger.json', 'cases/mc-php-newest-dagger.json', 'cases/mc-raise-php-dagger.json',
         'cases/mc-replan-major-dagger.json', 'cases/mc-root-alias-dagger.json', 'cases/mc-root-hold-dagger.json', 'cases/mc-root-version-dagger.json',
         'cases/mc-split-both-refused-dagger.json', 'cases/mc-split-dagger.json', 'cases/mc-split-maintenance-larger-dagger.json',
-        'cases/mc-split-not-checked-dagger.json', 'cases/mc-unreached-vcs-dagger.json', 'cases/mc-update-now-maintenance-dagger.json', 'cases/mc-update-now-reduced-dagger.json', 'cases/mc-update-now-refused-dagger.json',
+        'cases/mc-split-not-checked-dagger.json', 'cases/mc-unreached-non-dev-dagger.json', 'cases/mc-unreached-vcs-dagger.json', 'cases/mc-update-now-maintenance-dagger.json', 'cases/mc-update-now-reduced-dagger.json', 'cases/mc-update-now-refused-dagger.json',
         'cases/mc-with-all-dagger.json', 'cases/mc-with-deps-dagger.json', 'cases/xmlseclibs.json',
     ];
     private const CASES = __DIR__.'/../fixtures/flags/cases.json';
@@ -53,7 +53,7 @@ final class FindingRelationsTest extends TestCase
     public function testEveryFixtureDocumentHoldsEveryRelation(): void
     {
         $paths = self::documents();
-        self::assertCount(456, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
+        self::assertCount(459, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
         $broken = [];
         foreach (array_merge($paths, [self::COMPOSITE]) as $path) {
             $document = self::read($path);

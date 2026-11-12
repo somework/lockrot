@@ -1341,6 +1341,7 @@
    "advisories",
    "release_branch",
    "repository_archived",
+   "repository_push",
    "release_dates"
   ],
   "open": true,
@@ -1369,7 +1370,8 @@
    "repository_not_found",
    "unparseable_version",
    "accepted_by_config",
-   "undated_releases"
+   "undated_releases",
+   "undated"
   ],
   "open": true,
   "integer": false

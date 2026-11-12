@@ -172,9 +172,9 @@ export type CheckMissingCheck = "repository_activity" | "release_dates" | "advis
 /** open set at #/definitions/checkMissing/properties/reason */
 export type CheckMissingReason = "no_token" | "anonymous_budget" | "install_time_budget" | "rate_limit" | "fetch_failed" | "offline" | "undated_releases" | "releases_unknown" | "lookup_failed" | "host_not_supported" | "no_feed" | "not_from_composer_repository" | "composer_json_invalid" | (string & {});
 /** open set at #/definitions/checkSkipped/properties/check */
-export type CheckSkippedCheck = "repository_activity" | "release_metadata" | "advisories" | "release_branch" | "repository_archived" | "release_dates" | (string & {});
+export type CheckSkippedCheck = "repository_activity" | "release_metadata" | "advisories" | "release_branch" | "repository_archived" | "repository_push" | "release_dates" | (string & {});
 /** open set at #/definitions/checkSkipped/properties/reason */
-export type CheckSkippedReason = "allowlisted" | "no_repository" | "not_from_composer_repository" | "offline" | "rate_limit" | "fetch_failed" | "anonymous_budget" | "install_time_budget" | "no_token" | "unavailable" | "not_found" | "branch_snapshot" | "host_not_supported" | "repository_not_found" | "unparseable_version" | "accepted_by_config" | "undated_releases" | (string & {});
+export type CheckSkippedReason = "allowlisted" | "no_repository" | "not_from_composer_repository" | "offline" | "rate_limit" | "fetch_failed" | "anonymous_budget" | "install_time_budget" | "no_token" | "unavailable" | "not_found" | "branch_snapshot" | "host_not_supported" | "repository_not_found" | "unparseable_version" | "accepted_by_config" | "undated_releases" | "undated" | (string & {});
 /** open set at #/definitions/uncheckedAccepted/properties/check */
 export type UncheckedAcceptedCheck = "repository_activity" | "release_metadata" | "advisories" | (string & {});
 /** open set at #/definitions/uncheckedAccepted/properties/reason */
