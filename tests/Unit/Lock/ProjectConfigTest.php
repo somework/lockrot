@@ -96,6 +96,8 @@ final class ProjectConfigTest extends TestCase
             ['acme/contract'],
         ];
         yield 'a provided name at a version that the link admits' => [['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/x', 'version' => '1.0.0', 'provide' => ['acme/lib' => '1.2.0']]], []];
+        yield 'a name that the root replaces at its own version' => [['version' => '2.1.0', 'require' => ['acme/part' => '^2.0'], 'replace' => ['acme/part' => 'self.version']], [], []];
+        yield 'a name that the root provides below the link' => [['version' => '1.5.0', 'require' => ['acme/part' => '^2.0'], 'provide' => ['acme/part' => 'self.version']], [], ['acme/part']];
     }
 
     /** Composer's own probe: a name that a locked package provides is present, a name that nothing holds is not. */
