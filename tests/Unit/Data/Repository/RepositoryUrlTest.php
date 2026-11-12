@@ -37,14 +37,14 @@ final class RepositoryUrlTest extends TestCase
         yield 'a bare user name' => ['https://user@github.com/vendor/pkg.git', 'https://github.com/vendor/pkg.git'];
         yield 'a password with an @ in it' => ['https://ci:p@ss@git.acme.test/lib.git', 'https://git.acme.test/lib.git'];
         yield 'a token in the query' => ['https://git.acme.test/lib.git?private_token=t0k3n#readme', 'https://git.acme.test/lib.git'];
-        yield 'a question mark in the password is ambiguous' => ['https://igor:pw?x@git.acme.test/lib.git', null];
+        yield 'a question mark in the password is ambiguous' => ['https://igor:pw?x@git.acme.test/lib.git', 'https://(withheld: ambiguous host)'];
         yield 'ssh keeps its host, loses its user' => ['ssh://git@gitlab.internal/team/svc.git', 'ssh://gitlab.internal/team/svc.git'];
         yield 'svn over ssh' => ['svn+ssh://igor@svn.acme.test/repo/trunk', 'svn+ssh://svn.acme.test/repo/trunk'];
         yield 'nothing to strip' => ['https://github.com/vendor/pkg.git', 'https://github.com/vendor/pkg.git'];
         yield 'an @ in the path is not userinfo' => ['https://example.test/~user@home/pkg', 'https://example.test/~user@home/pkg'];
-        yield 'a token with a raw slash is userinfo' => ['https://tok/en@github.com/a/b', null];
-        yield 'a login and a password with a raw slash' => ['https://deploy:1234/5678@gitlab.corp/a/b.git?x=1', null];
-        yield 'a path that reads as another host is not shown as the host' => ['https://a/b@evil.com/x', null];
+        yield 'a token with a raw slash is userinfo' => ['https://tok/en@github.com/a/b', 'https://(withheld: ambiguous host)'];
+        yield 'a login and a password with a raw slash' => ['https://deploy:1234/5678@gitlab.corp/a/b.git?x=1', 'https://(withheld: ambiguous host)'];
+        yield 'a path that reads as another host is not shown as the host' => ['https://a/b@evil.com/x', 'https://(withheld: ambiguous host)'];
         yield 'an @ in the query is not userinfo' => ['https://example.test/pkg?mail=a@b', 'https://example.test/pkg'];
         yield 'an e-mail address in the query is not a second host' => ['https://github.com/a/b?ref=user@example.com', 'https://github.com/a/b'];
         yield 'an scp-style remote loses its user' => ['git@github.com:vendor/pkg.git', 'github.com:vendor/pkg.git'];
@@ -333,7 +333,7 @@ final class RepositoryUrlTest extends TestCase
     #[DataProvider('ambiguousHosts')]
     public function testAUrlWhoseHostIsAmbiguousIsWithheldEverywhere(string $url): void
     {
-        self::assertNull(RepositoryUrl::shown($url));
+        self::assertSame('https://(withheld: ambiguous host)', RepositoryUrl::shown($url));
         self::assertNull(RepositoryUrl::linkable($url));
         self::assertSame('fail https://(withheld: ambiguous host) now', RepositoryUrl::inText('fail '.$url.' now'));
     }

@@ -75,11 +75,10 @@ final class RepositoryUrl
     /**
      * The repository as a report can print it. A URL loses its userinfo, query and fragment
      * (`https://user:token@host/path?x=1` reads `https://host/path`), and a remote loses its user.
-     * A path or a `file://` URL reads by its last segment (`.../lib`). Null for anything else.
-     * Redact the URL, do not drop it: the host is what a reader checks.
-     *
-     * The userinfo runs to the last `@` before the path, since a hand-written password can hold `?`
-     * and `#`.
+     * A URL whose host is ambiguous reads `<scheme>://`{@see AMBIGUOUS}. A path or a `file://` URL
+     * reads by its last segment (`.../lib`). Null for anything else. Redact the URL, do not drop it:
+     * the host is what a reader checks. The userinfo runs to the last `@` before the path, since a
+     * hand-written password can hold `?` and `#`.
      */
     public static function shown(?string $url): ?string
     {
@@ -91,7 +90,7 @@ final class RepositoryUrl
                 return self::local(substr($url, 7));
             }
 
-            return self::hasAmbiguousHost(substr($url, \strlen($m['scheme']))) ? null : $m['scheme'].$m['rest'];
+            return $m['scheme'].(self::hasAmbiguousHost(substr($url, \strlen($m['scheme']))) ? self::AMBIGUOUS : $m['rest']);
         }
         if (preg_match(self::REMOTE, $url, $m) === 1 && ($m['user'] !== '' || strpos($m['host'], '.') !== false)) {
             return $m['remote'];
