@@ -81,7 +81,9 @@ final class ProjectConfig
         }
 
         $json = JsonReader::readObject($path);
-        self::refuseNumberLinkKeys($json, $path);
+        foreach ([self::REQUIRE, self::REQUIRE_DEV, self::CONFLICT, self::PROVIDE, self::REPLACE] as $field) {
+            self::refuseNumberLinkKeys($json[$field] ?? null, $field, $path);
+        }
         $config = self::fromArray($json);
         $contents = file_get_contents($path);
         if ($contents !== false) {
@@ -96,17 +98,15 @@ final class ProjectConfig
      * each link key of the manifest as a string, whatever its constraint, and stops on a TypeError
      * that quotes a PHP signature and a path.
      *
-     * @param array<string, mixed> $json
+     * @param mixed $links the manifest's link map of $field
      *
      * @throws ConfigException for an integer key of a link section
      */
-    private static function refuseNumberLinkKeys(array $json, string $path): void
+    private static function refuseNumberLinkKeys($links, string $field, string $path): void
     {
-        foreach ([self::REQUIRE, self::REQUIRE_DEV, self::CONFLICT, self::PROVIDE, self::REPLACE] as $field) {
-            foreach (array_keys(\is_array($json[$field] ?? null) ? $json[$field] : []) as $target) {
-                if (\is_int($target)) {
-                    throw new ConfigException(\sprintf('%s: "%s" has the key %d, which is no package name', basename($path), $field, $target));
-                }
+        foreach (array_keys(\is_array($links) ? $links : []) as $target) {
+            if (\is_int($target)) {
+                throw new ConfigException(\sprintf('%s: "%s" has the key %d, which is no package name', basename($path), $field, $target));
             }
         }
     }
