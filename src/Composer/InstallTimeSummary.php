@@ -92,7 +92,7 @@ final class InstallTimeSummary
     /** @param IOInterface::* $verbosity */
     private static function writeWarning(IOInterface $io, string $line, int $verbosity = IOInterface::NORMAL): void
     {
-        $io->writeErrorRaw(TerminalText::warning($line, $io->isDecorated()), true, $verbosity);
+        $io->writeErrorRaw(TerminalText::warning(TerminalText::breakLogCommands($line), $io->isDecorated()), true, $verbosity);
     }
 
     private function run(InstallerEvent $event): void

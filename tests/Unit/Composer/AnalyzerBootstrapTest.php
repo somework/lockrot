@@ -168,6 +168,14 @@ final class AnalyzerBootstrapTest extends TestCase
         self::assertStringContainsString('GITHUB_TOKEN is for ', $stderr);
     }
 
+    /** The runner reads `##[` anywhere in a line as a command: a host ends at `#`, so none reaches the line. */
+    public function testAWithheldIssuerNeverHoldsAWorkflowCommand(): void
+    {
+        $stderr = $this->stderrOf(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => '##[error]forged'], OutputInterface::VERBOSITY_VERBOSE);
+
+        self::assertStringNotContainsString('##[', $stderr);
+    }
+
     /** @param array<string, string> $env */
     private function stderrOf(array $env, int $verbosity): string
     {

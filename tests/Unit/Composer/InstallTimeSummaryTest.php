@@ -852,6 +852,32 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringContainsString('lockrot: 1 of 1 changed package flagged', $io->errors[1]);
     }
 
+    public function testAnUnknownKeyCannotHoldAWorkflowCommand(): void
+    {
+        $this->project(['##[error]forged' => 1]);
+        $io = new RecordingIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        self::assertSame('lockrot: unknown key extra.lockrot.##\\x5Berror]forged ignored', $io->errors[0]);
+    }
+
+    public function testASkippedCheckLineCannotHoldAWorkflowCommandAlsoUnderQuiet(): void
+    {
+        $this->project();
+        $io = new BufferIO('', OutputInterface::VERBOSITY_QUIET);
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+        $factory = static function (): Analyzer {
+            throw new \RuntimeException('##[error]forged');
+        };
+
+        (new InstallTimeSummary($factory))->onPreOperationsExec($event);
+
+        self::assertStringContainsString('lockrot: install-time check skipped: ##\\x5Berror]forged', $io->getOutput());
+        self::assertStringNotContainsString('##[', $io->getOutput());
+    }
+
     /** The warning is about the config, not about what the transaction found: a clean one still says it. */
     public function testAnUnknownKeyIsWarnedAboutWhenNothingIsFlagged(): void
     {
