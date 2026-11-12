@@ -459,6 +459,35 @@ final class CaseHydratorTest extends TestCase
         yield 'a lock that holds every root requirement' => ['mc-baseline-synced-non-dev‡', ['refused', null]];
     }
 
+    /**
+     * The oracle reads the root with `root_extra` and at `env.COMPOSER_ROOT_VERSION`.
+     *
+     * @param array<string, mixed> $root
+     *
+     * @dataProvider rootsThatTheOracleReads
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('rootsThatTheOracleReads')]
+    public function testARefusedBaselineReadsTheRootAsTheOracleDoes(array $root, bool $unchecked): void
+    {
+        $world = $root + [
+            'root' => ['require' => ['acme/virtual' => '^2.0']],
+            'vcs_repos' => ['https://git.example.com/acme/private-lib.git'],
+            'repo' => ['acme/lib' => [['version' => '1.1.0', 'require' => ['acme/private-lib' => '^1.0']]]],
+            'lock' => ['packages' => [], 'packages-dev' => []],
+        ];
+
+        self::assertSame($unchecked, CaseHydrator::leavesARefusedBaselineUnchecked($world));
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, bool}> */
+    public static function rootsThatTheOracleReads(): iterable
+    {
+        yield 'nothing holds the link' => [[], true];
+        yield 'a replace of root_extra' => [['root_extra' => ['replace' => ['acme/virtual' => 'self.version']]], false];
+        yield 'a provide at the root version of env' => [['root_extra' => ['provide' => ['acme/virtual' => 'self.version']], 'env' => ['COMPOSER_ROOT_VERSION' => '2.1.0']], false];
+        yield 'a provide at the default root version' => [['root_extra' => ['provide' => ['acme/virtual' => 'self.version']]], true];
+    }
+
     public function testACaseWithoutInputsIsRefused(): void
     {
         $this->expectException(\InvalidArgumentException::class);

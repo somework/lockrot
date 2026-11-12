@@ -337,14 +337,16 @@ final class CaseHydrator
     /**
      * A non-dev locked package or the root holds a `require` name, and any locked package or the root
      * a `require-dev` name: by its own name or a `replace` at any version, by a `provide` that the
-     * link admits.
+     * link admits. The root is the oracle's: `root` with `root_extra`, at `env.COMPOSER_ROOT_VERSION`.
      *
      * @param array<mixed, mixed> $world a case's `inputs.solver_world.world`
      */
     private static function locksEveryRootRequirement(array $world): bool
     {
         $loader = new ArrayLoader();
-        $root = $loader->load((\is_array($world['root'] ?? null) ? $world['root'] : []) + ['name' => '__root__', 'version' => '1.0.0']);
+        $root = array_replace(\is_array($world['root'] ?? null) ? $world['root'] : [], \is_array($world['root_extra'] ?? null) ? $world['root_extra'] : []);
+        $version = \is_array($world['env'] ?? null) && \is_string($world['env']['COMPOSER_ROOT_VERSION'] ?? null) ? $world['env']['COMPOSER_ROOT_VERSION'] : '1.0.0';
+        $root = $loader->load($root + ['name' => '__root__', 'version' => $version]);
         $lock = \is_array($world['lock'] ?? null) ? $world['lock'] : [];
         $nonDev = [$root];
         foreach (\is_array($lock['packages'] ?? null) ? $lock['packages'] : [] as $entry) {
