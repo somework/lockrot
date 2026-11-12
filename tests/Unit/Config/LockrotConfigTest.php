@@ -257,7 +257,7 @@ final class LockrotConfigTest extends TestCase
     public function testAPlatformPhpThatIsABranchNameIsRefused(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('target-php must look like "8.4"; got "dev-main"');
+        $this->expectExceptionMessage('config.platform.php must look like "8.4"; got "dev-main"');
         LockrotConfig::fromSources([], [], [], '8.5.10', 'dev-main');
     }
 
