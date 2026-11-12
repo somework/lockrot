@@ -116,7 +116,9 @@ jobs:
       # The self-update signature is RSA (PKCS#1 v1.5, SHA-384) over the same bytes, in Composer's
       # `{"sha384": "<base64>"}` format, for Lockrot\SelfUpdate\ReleaseSignatureVerifier. The private
       # key lives in a throw-away directory that the trap removes on every exit. openssl reads the
-      # passphrase from the environment, never from an argument.
+      # passphrase from the environment, never from an argument. This step runs no PHP: the autoloader
+      # of the job loads code from dev dependencies, which must not see the key. The next step wraps
+      # the signature and holds no secret (PharSigningStepsTest).
       - name: Sign the PHAR for self-update
         if: env.SIGN == 'true'
         env:
@@ -127,9 +129,12 @@ jobs:
           trap 'rm -rf "$KEYDIR"' EXIT
           printf '%s\n' "$SELFUPDATE_PRIVATE_KEY" > "$KEYDIR/key.pem"
           openssl dgst -sha384 -sign "$KEYDIR/key.pem" -passin env:SELFUPDATE_PASSPHRASE -out build/lockrot.phar.sig.bin build/lockrot.phar
+          openssl pkey -in "$KEYDIR/key.pem" -passin env:SELFUPDATE_PASSPHRASE -pubout -out build/selfupdate-signer.pub
+      - name: Wrap the self-update signature and describe the release
+        if: env.SIGN == 'true'
+        run: |
           build/selfupdate-signature.php wrap build/lockrot.phar.sig.bin > build/lockrot.phar.sig.json
           rm build/lockrot.phar.sig.bin
-          openssl pkey -in "$KEYDIR/key.pem" -passin env:SELFUPDATE_PASSPHRASE -pubout -out build/selfupdate-signer.pub
           # lockrot.phar.meta.json lets self-update choose a release without a download: the lowest PHP
           # the archive runs on, and the SHA-256 fingerprint of the signing key. The fingerprint comes
           # from the key that signed, not from the committed key file, so a rotation's transition
