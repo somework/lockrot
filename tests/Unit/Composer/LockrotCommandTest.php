@@ -955,6 +955,36 @@ final class LockrotCommandTest extends TestCase
         self::assertStringStartsWith('lockrot: composer.lock entry #0 in packages cannot be loaded: "require" of acme/lib has the key 5, which is no package name', $display);
     }
 
+    /**
+     * Composer's RootPackageLoader validates each link key of the manifest as a string, and an
+     * integer key stops it with a TypeError that quotes a PHP signature and a path.
+     *
+     * @dataProvider linkFields
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('linkFields')]
+    public function testAComposerJsonWithANumberAsALinkKeyIsExit2AndNamesTheField(string $field): void
+    {
+        $dir = $this->tempDir('lockrot-manifest-numberkey-');
+        file_put_contents($dir.'/composer.json', '{"name": "acme/app", "'.$field.'": {"5": "1.0"}}');
+        file_put_contents($dir.'/composer.lock', '{"packages": []}');
+        chdir($dir);
+        $tester = $this->tester();
+
+        self::assertSame(2, $tester->execute([]));
+        $display = $tester->getErrorOutput();
+        self::assertStringStartsWith('lockrot: composer.json: "'.$field.'" has the key 5, which is no package name', $display);
+        self::assertStringNotContainsString('must be of type', $display);
+        self::assertStringNotContainsString('/vendor/', $display);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function linkFields(): iterable
+    {
+        foreach (['require', 'require-dev', 'conflict', 'provide', 'replace'] as $field) {
+            yield $field => [$field];
+        }
+    }
+
     /** `composer rot` is the documented short form, so the alias is part of the command's contract. */
     public function testTheCommandIsAlsoReachableAsRot(): void
     {

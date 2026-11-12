@@ -80,13 +80,35 @@ final class ProjectConfig
             return self::empty();
         }
 
-        $config = self::fromArray(JsonReader::readObject($path));
+        $json = JsonReader::readObject($path);
+        self::refuseNumberLinkKeys($json, $path);
+        $config = self::fromArray($json);
         $contents = file_get_contents($path);
         if ($contents !== false) {
             $config->manifestContents = $contents;
         }
 
         return $config;
+    }
+
+    /**
+     * JSON decoding turns a numeric key into an integer. Composer's RootPackageLoader validates
+     * each link key of the manifest as a string, whatever its constraint, and stops on a TypeError
+     * that quotes a PHP signature and a path.
+     *
+     * @param array<string, mixed> $json
+     *
+     * @throws ConfigException for an integer key of a link section
+     */
+    private static function refuseNumberLinkKeys(array $json, string $path): void
+    {
+        foreach ([self::REQUIRE, self::REQUIRE_DEV, self::CONFLICT, self::PROVIDE, self::REPLACE] as $field) {
+            foreach (array_keys(\is_array($json[$field] ?? null) ? $json[$field] : []) as $target) {
+                if (\is_int($target)) {
+                    throw new ConfigException(\sprintf('%s: "%s" has the key %d, which is no package name', basename($path), $field, $target));
+                }
+            }
+        }
     }
 
     /** @param array<string, mixed> $json */
