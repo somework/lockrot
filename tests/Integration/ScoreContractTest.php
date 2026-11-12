@@ -27,7 +27,7 @@ final class ScoreContractTest extends TestCase
     private const GUARD = '."$schema" == "https://lockrot.dev/schema/report-2.json"';
 
     /** Each check of the order of `checks_skipped[]`: an `accepted_by_config` entry keeps its check's place. */
-    private const SKIP_ORDER = ['repository_activity', 'repository_archived', 'release_metadata', 'release_branch', 'advisories'];
+    private const SKIP_ORDER = ['repository_activity', 'repository_archived', 'repository_push', 'release_metadata', 'release_branch', 'advisories'];
     private const SIGNAL_ORDER = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10'];
 
     /**

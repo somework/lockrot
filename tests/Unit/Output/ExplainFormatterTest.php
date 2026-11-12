@@ -261,6 +261,17 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString("\n  not checked  S3, S4 (no token)\n", self::plain(self::explain($finding)));
     }
 
+    /** A read without the archived flag or a push date skips S3 and S4, each with its reason words. */
+    public function testTheArchivedAndPushSkipsOfAReadReadTheirReasonWords(): void
+    {
+        $finding = (new FindingBuilder())->build();
+        $details = $finding->details();
+        $skipped = [new Check('repository_archived', 'no_token', ['S3']), new Check('repository_push', 'undated', ['S4'])];
+        $finding = $finding->withDetails(new FindingDetails($details->metadataStatus(), null, null, $skipped, $details->installedPhp(), $details->entry(), 'complete', null, [], null, $details->activity(), $details->age(), null, null));
+
+        self::assertStringContainsString("\n  not checked  S3 (no token) · S4 (no date)\n", self::plain(self::explain($finding)));
+    }
+
     /** An accepted check reads its S10 words, then the entry that accepted it. */
     public function testAnAcceptedCheckNamesTheEntryThatAcceptedIt(): void
     {
