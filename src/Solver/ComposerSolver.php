@@ -66,6 +66,7 @@ final class ComposerSolver
     private ?ArrayRepository $lockedOnly = null;
     private bool $setsPhp = false;
     private bool $minimalChanges = false;
+    private bool $locksEveryRootRequirement = false;
     private string $lastInputs = '';
     /** @phpstan-ignore property.onlyWritten (the last built pool keeps the object ids of its packages taken: {@see SolverInputs}) */
     private Pool $lastBuilt;
@@ -129,6 +130,18 @@ final class ComposerSolver
         return $clone;
     }
 
+    /**
+     * A copy for a lock that holds every root requirement: its baseline then fixes each one, so a
+     * refusal of the second solve stands beside a name that the first solve could not load.
+     */
+    public function withEveryRootRequirementLocked(): self
+    {
+        $clone = clone $this;
+        $clone->locksEveryRootRequirement = true;
+
+        return $clone;
+    }
+
     public function root(): RootPackageInterface
     {
         return $this->root;
@@ -184,10 +197,11 @@ final class ComposerSolver
         $nonDev = $root->getDevRequires() === [] ? null : $this->nonDevAnswer($root, $policy, $answer, $requires, $temporary);
         // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
         // The second solve of a move reads that answer, so its refusal proves no more. The baseline
-        // keeps every locked package, so a fuller pool cannot change its refusal.
+        // fixes every locked package, so a fuller pool cannot change its refusal when the lock holds
+        // every root requirement. A root requirement that the lock omits stays free.
         $unloaded = $this->withoutMetUnreached($this->failures($loaded->asked()), $built, $answer);
         if ($nonDev !== null) {
-            return $this->refused($nonDev[3], $nonDev[2], $nonDev[0], $nonDev[1], $composerRequest, $root, $request, $loaded, $request->isBaseline() ? [] : $unloaded);
+            return $this->refused($nonDev[3], $nonDev[2], $nonDev[0], $nonDev[1], $composerRequest, $root, $request, $loaded, $request->isBaseline() && $this->locksEveryRootRequirement ? [] : $unloaded);
         }
 
         // Composer blocks a release by each name that it replaces too.

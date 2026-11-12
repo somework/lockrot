@@ -11,6 +11,7 @@ use Composer\IO\NullIO;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\Loader\RootPackageLoader;
+use Composer\Package\Locker;
 use Composer\Package\RootAliasPackage;
 use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
@@ -538,28 +539,98 @@ final class MoveCheckersTest extends TestCase
     }
 
     /**
-     * The baseline keeps every locked package, so a fuller pool cannot change a refusal of a locked
-     * name (ruling R2-4).
+     * The lock holds every root requirement, so the baseline fixes each one, and a fuller pool
+     * cannot change a refusal of a locked name. The unloaded name comes from a locked package's
+     * requirement that the lock omits. When composer.json cannot be read, lockrot cannot tell
+     * whether the lock holds every root requirement, and the baseline is not checked.
+     *
+     * @dataProvider projectsOfALockThatHoldsEveryRootRequirement
+     *
+     * @param array{string, ?string} $expected the baseline's result and reason
      */
-    public function testABaselineThatTheNonDevSolveRefusesStaysRefusedBesideAnUnloadedName(): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('projectsOfALockThatHoldsEveryRootRequirement')]
+    public function testABaselineThatTheNonDevSolveRefusesStaysRefusedBesideAnUnloadedNameWhenTheLockHoldsEveryRootRequirement(string $project, array $expected): void
     {
-        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'acme/new', 'version' => '1.0.0', 'require' => ['acme/plugin' => '^1.0'], 'notification-url' => 'https://packagist.org/downloads/'],
+        ]]);
         $loader = new ArrayLoader();
         $remote = [
             $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
             $loader->load(['name' => 'acme/lib', 'version' => '1.2.0']),
-            $loader->load(['name' => 'acme/new', 'version' => '1.0.0']),
-            $loader->load(['name' => 'acme/new', 'version' => '1.1.0', 'require' => ['acme/private' => '^1.0']]),
+            $loader->load(['name' => 'acme/plugin', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/plugin', 'version' => '1.1.0', 'require' => ['acme/private' => '^1.0']]),
         ];
-        $root = $loader->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^2.0', 'acme/new' => '^1.0'], 'require-dev' => ['acme/lib' => '^1.0']], RootPackage::class);
-        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $manifest = ['name' => 'acme/app', 'require' => ['acme/lib' => '^2.0', 'acme/new' => '^1.0'], 'require-dev' => ['acme/lib' => '^1.0']];
+        $written = $project === 'unparsable' ? ['require-dev' => ['acme/lib' => '^1.0', 'acme/other' => 'not a constraint']] + $manifest : $manifest;
+        [$root, $config] = self::project($manifest, $written);
         $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
-        $checker = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
+        $checker = MoveCheckers::forProject($root, $lock, $project === 'none' ? ProjectConfig::empty() : $config, new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
 
         $baseline = $checker->baseline();
 
-        self::assertSame([MoveCheck::REFUSED, null], [$baseline->check()->result(), $baseline->check()->reason()]);
-        self::assertStringContainsString('acme/lib ^2.0', (string) $baseline->problem());
+        self::assertSame($expected, [$baseline->check()->result(), $baseline->check()->reason()]);
+        if ($expected[0] === MoveCheck::REFUSED) {
+            self::assertStringContainsString('acme/lib ^2.0', (string) $baseline->problem());
+        }
+    }
+
+    /** @return iterable<string, array{string, array{string, ?string}}> */
+    public static function projectsOfALockThatHoldsEveryRootRequirement(): iterable
+    {
+        yield 'a composer.json that Composer reads' => ['read', [MoveCheck::REFUSED, null]];
+        yield 'no composer.json' => ['none', [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME]];
+        yield 'a composer.json whose links Composer cannot parse' => ['unparsable', [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME]];
+    }
+
+    /**
+     * A root requirement that the lock omits stays free in the baseline, so a fuller pool can change
+     * the first solve that the non-dev solve refuses. The baseline and each move are not checked,
+     * whatever the lock's hash says and whether the run reads dev packages or not. Only a refused
+     * baseline writes the moves_not_checked note, and only a stale hash writes lock_out_of_sync.
+     *
+     * @dataProvider locksThatOmitARootRequirement
+     *
+     * @param array<string, mixed>                 $manifest
+     * @param list<array<string, string>>          $locked   the lock's packages
+     * @param array<string, array<string, string>> $releases name@version => requirements, the releases that the Composer repository serves
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('locksThatOmitARootRequirement')]
+    public function testAnUnloadedNameOfTheFirstSolveLeavesTheBaselineNotCheckedWhenTheLockOmitsARootRequirement(array $manifest, array $locked, array $releases, bool $hash, bool $includeDev): void
+    {
+        [$root, $project, $contents] = self::project($manifest, $manifest);
+        $lock = LockFile::fromArray(['packages' => $locked] + ($hash ? ['content-hash' => Locker::getContentHash($contents)] : []));
+        $loader = new ArrayLoader();
+        $remote = [];
+        foreach ($releases as $release => $requires) {
+            [$name, $version] = explode('@', $release);
+            $remote[] = $loader->load(['name' => $name, 'version' => $version, 'require' => $requires]);
+        }
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
+        $checker = MoveCheckers::forProject($root, $lock, $project, new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
+
+        $baseline = $checker->baseline()->check();
+        $move = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check();
+        $combined = $checker->combined(['acme/lib' => '^1.1'])->check();
+
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, false], [$baseline->result(), $baseline->reason(), $baseline->isRefused()]);
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME], [$move->result(), $move->reason()]);
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME], [$combined->result(), $combined->reason()], 'update now');
+        self::assertNull($project->lockOutOfSync($lock, $includeDev), 'no lock_out_of_sync note');
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, list<array<string, string>>, array<string, array<string, string>>, bool, bool}> */
+    public static function locksThatOmitARootRequirement(): iterable
+    {
+        $lib = ['acme/lib@1.0.0' => [], 'acme/lib@1.1.0' => ['acme/private' => '^1.0']];
+        $both = ['name' => 'acme/app', 'require' => ['acme/lib' => '>=1.1'], 'require-dev' => ['acme/lib' => '^1.0']];
+        yield 'an empty lock with a fresh hash' => [$both, [], $lib, true, true];
+        yield 'an empty lock with no hash' => [$both, [], $lib, false, true];
+        $tool = ['acme/lib@1.0.0' => [], 'acme/lib@2.0.0' => [], 'acme/tool@1.0.0' => [], 'acme/tool@1.1.0' => ['acme/private' => '^1.0']];
+        $devOnly = ['name' => 'acme/app', 'require' => ['acme/lib' => '^2.0'], 'require-dev' => ['acme/lib' => '^1.0', 'acme/tool' => '^1.0']];
+        $locked = [['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']];
+        yield 'a lock that omits a require-dev name, in a run without dev packages' => [$devOnly, $locked, $tool, true, false];
     }
 
     /** @return iterable<string, array{array<string, array<string, string>>, string}> */
@@ -830,6 +901,31 @@ final class MoveCheckersTest extends TestCase
             $process->run();
             self::assertTrue($process->isSuccessful(), $process->getErrorOutput());
         }
+    }
+
+    /**
+     * The root of $manifest, and the project config of a composer.json that holds $written, as a run reads them.
+     *
+     * @param array<string, mixed> $manifest
+     * @param array<string, mixed> $written
+     *
+     * @return array{RootPackageInterface, ProjectConfig, string} the root, the config and the bytes of composer.json
+     */
+    private static function project(array $manifest, array $written): array
+    {
+        $directory = sys_get_temp_dir().'/lockrot-manifest-'.bin2hex(random_bytes(4));
+        mkdir($directory);
+        $contents = (string) json_encode($written);
+        try {
+            file_put_contents($directory.'/composer.json', $contents);
+            $project = ProjectConfig::fromFile($directory.'/composer.json');
+        } finally {
+            (new Filesystem())->removeDirectory($directory);
+        }
+        $root = (new ArrayLoader())->load(['version' => '1.0.0'] + $manifest, RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+
+        return [$root, $project, $contents];
     }
 
     /** @param array<string, string> $requires */

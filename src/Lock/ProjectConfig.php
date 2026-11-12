@@ -274,6 +274,12 @@ final class ProjectConfig
         }
     }
 
+    /** The bytes of composer.json, null when the config did not come from a file. */
+    public function manifest(): ?string
+    {
+        return $this->manifestContents;
+    }
+
     public function isRead(): bool
     {
         return $this->read;

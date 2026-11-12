@@ -16,6 +16,7 @@ use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
+use Lockrot\Lock\MissingRequirements;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\PhpFloor;
 
@@ -68,6 +69,7 @@ final class MoveCheckers
         $solver = (new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], $overrides), $source, $platformNames))->withLockedOnly($notFromComposerRepository);
         $solver = $php === $configured ? $solver : $solver->withPhpSetByLockrot();
         $solver = self::minimalChanges($config) ? $solver->withMinimalChanges() : $solver;
+        $solver = self::locksEveryRootRequirement($project, $lock) ? $solver->withEveryRootRequirementLocked() : $solver;
 
         $blocking = AdvisoryBlocking::fromConfig($config);
         $lookup = new RepositoryAdvisoryLoader($repositories, $offline, $deadline);
@@ -75,6 +77,24 @@ final class MoveCheckers
         $keptOut = $advisoryScope === AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES ? $notFromComposerRepository : [];
 
         return new SolverChecker($solver, $notFromComposerRepository, $php, $blocking->blocks(), $deadline, new PoolAdvisories($blocking, static fn (array $names, bool $complete): ?array => $lookup->records($names, $complete), $keptOut), $configured, $overrides['php-64bit'] ?? null);
+    }
+
+    /**
+     * Whether the lock holds each `require` and `require-dev` name of composer.json, whatever its
+     * hash says and whether the run reads dev packages or not. False when Composer cannot read
+     * composer.json, or there is none: then nothing proves it.
+     */
+    private static function locksEveryRootRequirement(ProjectConfig $project, LockFile $lock): bool
+    {
+        $manifest = $project->manifest();
+        if ($manifest === null) {
+            return false;
+        }
+        try {
+            return MissingRequirements::of($manifest, $lock, true) === [];
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     /** `config.platform.php` of Composer's merged config: null when it is unset or `false`. */
