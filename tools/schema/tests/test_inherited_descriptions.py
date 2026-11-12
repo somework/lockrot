@@ -24,7 +24,7 @@ PAIR = re.compile(r'`([a-z][a-z0-9_.]*)` `([a-z][a-z0-9_-]*)`')
 TOKEN = re.compile(r'`([a-z][a-z0-9_]*)`')
 # Ids that a description of a closed or known set names and that are no value or field of schema 2:
 # Composer's severity word, a PHP function, and two report-1 field names.
-NOT_SCHEMA_IDS = {'moderate', 'strcmp', 'previous_verdict', 'flagged_verdicts'}
+NOT_SCHEMA_IDS = {'moderate', 'strcmp', 'previous_verdict', 'flagged_verdicts', 'pushed_at'}
 
 
 def load(*path):
