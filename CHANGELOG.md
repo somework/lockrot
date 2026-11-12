@@ -756,6 +756,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CLI:** a run exits `2` with a message that names the `composer.lock` field when the field has
   the wrong type, or when a link map such as `require` holds a numeric package name. The message
   holds no PHP error text and no absolute path.
+- **CLI:** a run exits `2` with a message that names composer.json and the field when a link map
+  such as `require` in composer.json holds a numeric package name. The message holds no PHP error
+  text and no absolute path.
+- **All formats:** a release that a repository serves with a numeric package name in a link map no
+  longer puts PHP error text or an absolute path into the `move_check_failed` note.
 - **CLI:** a run on a `composer.lock` that is not a regular file exits `2` with
   `composer.lock exists and is not a regular file`.
 - **All formats:** the capped fact stays unverified when the target release's `php` is
