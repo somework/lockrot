@@ -481,8 +481,13 @@ maintainer.
 
            A renderer tag that the gate refuses has no release, and the renderer's tag ruleset
            keeps it, so that renderer version is lost.
-        6. In lockrot-report, run `node scripts/contract.mjs repin <V>`. Set the version in
-           `CHANGELOG.md`. Run `npm version X.Y.Z --no-git-tag-version`, which sets `version` in
+        6. In lockrot-report, first squash-merge the renderer's release branch (`release/X.Y.0`)
+           into the renderer's `main`, and reconcile its `CHANGELOG.md` with the one on `main`.
+           Start the commit of this step from that merge. On a `main` that lacks the release
+           branch, `repin` changes other files under `contract/`, V does not vendor the same
+           bundle, and the tag has no release. Then run `node scripts/contract.mjs repin <V>`.
+           Set the version in `CHANGELOG.md`. Run `npm version X.Y.Z --no-git-tag-version`, which
+           sets `version` in
            `package.json` and both `version` fields of `package-lock.json` (the root and
            `packages[""]`). Commit only the version and the pin.
            The renderer's `release.yml` refuses a tag when `package-lock.json` names a version
