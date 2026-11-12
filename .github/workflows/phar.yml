@@ -29,7 +29,7 @@ jobs:
       # Full history and tags: the self-update verification reads the previous release's key from its
       # tag, and the main check reads origin/main.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with: {fetch-depth: 0}
+        with: {fetch-depth: 0, persist-credentials: false}
       # CONTRIBUTING, "Cutting a release": the tag goes on the commit that the release pull request
       # merged into main. A tag on another commit would publish a signed archive that main never built.
       - name: The tagged commit is on main
@@ -192,6 +192,7 @@ jobs:
       contents: write # release assets
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with: {name: lockrot.phar, path: build}
       - name: The release notes come from the CHANGELOG section of the tag
