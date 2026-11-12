@@ -419,6 +419,21 @@ final class CaseHydratorTest extends TestCase
         self::assertSame([[], ['lock: the lock file does not match composer.json (acme/feature-flags is not locked at a version that composer.json allows): run composer update']], [$notes($hashless), $notes($stale)]);
     }
 
+    /** A stale world whose lock holds every root name, one at a version that the root does not admit. */
+    public function testAStaleSolverWorldNamesALockedNameAtAVersionThatTheRootDoesNotAdmit(): void
+    {
+        $case = CaseHydrator::case('A');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $root = JsonPath::arrayAt($inputs, ['root']);
+        $root['require'] = ['twig/twig' => '^99.0'] + JsonPath::arrayAt($root, ['require']);
+        $inputs['root'] = $root;
+        $inputs['solver_world'] = ['world' => ['root' => $root, 'lock_hash' => 'stale']];
+
+        $notes = array_values(array_filter(JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::report(['inputs' => $inputs] + $case)->toArray()), ['notes']), static fn ($note): bool => \is_string($note) && strpos($note, 'lock: ') === 0));
+
+        self::assertSame(['lock: the lock file does not match composer.json (twig/twig is not locked at a version that composer.json allows): run composer update'], $notes);
+    }
+
     public function testACaseWithoutInputsIsRefused(): void
     {
         $this->expectException(\InvalidArgumentException::class);
