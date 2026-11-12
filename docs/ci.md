@@ -116,6 +116,8 @@ Do not match `^lockrot:` to tell these cases apart.
 - A value the configuration rejects: in `extra.lockrot`, in an environment variable, or on the
   command line ([configuration.md](configuration.md#extralockrot-keys)). That includes two values
   of one kind in `--fail-on`, `none` beside another value, and `vulnerable-low`.
+- A `config.platform.php` that Composer accepts but that is not a version, such as `dev-main`, when
+  no `target-php` source is set. The message names `config.platform.php`.
 - A command line lockrot cannot read: an unknown option, an option without its value, a value given
   to a flag, an argument too many. lockrot checks it before it reads any file.
 - In the PHAR and `vendor/somework/lockrot/bin/lockrot`, an unknown command or a `--working-dir`
