@@ -450,6 +450,32 @@ jobs:
       # lockrot's own header do not meet on the wire. Without the token, the test skips.
       - run: vendor/bin/phpunit --group network
         env: {GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'}
+  # The plugin runs inside the Composer binary of the host, so only a host on the floor minor shows
+  # what the floor does with the plugin loader and the install event. The e2e job above runs the
+  # newest Composer. This job runs PluginTest, install-time-strict included, on the newest release
+  # of the floor minor. A ruleset requires a check by its job name, so a renamed job drops out of the
+  # ruleset.
+  e2e-composer-floor:
+    name: e2e (Composer floor)
+    runs-on: ubuntu-latest
+    env: {LOCKROT_E2E_HOST_COMPOSER: '2.10'}
+    steps:
+      # composer install runs package code, and no later step needs the token.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with: {php-version: '8.4', tools: 'composer:v2'}
+      # Packagist lists every release of composer/composer. The test fails when the binary is not
+      # the minor that LOCKROT_E2E_HOST_COMPOSER names.
+      - name: Install the newest Composer release of the floor minor
+        run: |
+          version=$(curl -fsS --retry 3 https://repo.packagist.org/p2/composer/composer.json | jq -r --arg minor "$LOCKROT_E2E_HOST_COMPOSER" '[.packages["composer/composer"][].version | select(startswith($minor + ".") and test("^[0-9.]+$"))] | sort_by(split(".") | map(tonumber)) | last')
+          if [ -z "$version" ] || [ "$version" = null ]; then echo "::error::no Composer $LOCKROT_E2E_HOST_COMPOSER release found"; exit 1; fi
+          composer self-update "$version"
+          composer --version
+      - run: composer install --no-interaction
+      - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PluginTest
+        env: {GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'}
   # PharTest checks that the PHAR exposes lockrot's two commands and nothing else, and that it never
   # loads the inspected project's classes. phar.yml builds on tags alone, so without this job a
   # regression in bin/lockrot can merge green and show only at release time.
