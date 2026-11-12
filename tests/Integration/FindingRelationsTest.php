@@ -129,6 +129,8 @@ final class FindingRelationsTest extends TestCase
         yield 'A5 a missing activity check beside a read activity' => [['findings', 5, 'checks_missing'], $append(['check' => 'repository_activity', 'reason' => 'offline', 'blocks' => ['S3', 'S4']]), 'C73 A5'];
         yield 'A6 a read activity without its archived bit' => [['findings', 5, 'activity', 'archived'], $to(null), 'C73 A6'];
         yield 'A7 S3 on a repository that is not archived' => [['findings', 8, 'activity', 'archived'], $to(false), 'C73 A7'];
+        yield 'A11 a push skip beside a dated push' => [['findings', 5, 'checks_skipped'], $append(['check' => 'repository_push', 'reason' => 'undated', 'blocks' => ['S4']]), 'C73 A11'];
+        yield 'A11 an undated push without its skip' => [['findings', 5, 'age'], static fn ($age): array => array_merge(\is_array($age) ? $age : [], ['push' => null, 'push_unmeasured' => 'undated']), 'C73 A11'];
         yield 'A8 S4 that does not quote age.push' => [['findings', 5, 'age', 'push', 'at'], $to('2020-01-01T00:00:00+00:00'), 'C73 A8'];
         yield 'A10 a host note without a host' => [['note_details'], $append(['code' => 'repository_activity_host_not_supported', 'data' => ['hosts' => []]]), 'C73 A10'];
         yield 'R1 a feed that no repository is' => [['findings', 0, 'security', 'feeds', 0, 'composer_repository'], $to('other'), 'C75 R1'];

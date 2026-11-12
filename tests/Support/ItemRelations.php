@@ -87,6 +87,14 @@ final class ItemRelations
         if (!$archivedHold) {
             $out[] = 'C73 A6: one repository_archived skip exactly when a read activity has no archived bit';
         }
+        $pushes = array_values(array_filter(self::rows($f, 'checks_skipped'), static fn (array $c): bool => ($c['check'] ?? null) === 'repository_push'));
+        $pushHold = \count($pushes) <= 1 && (($age['push_unmeasured'] ?? null) === 'undated') === (\count($pushes) === 1);
+        foreach ($pushes as $c) {
+            $pushHold = $pushHold && ($c['reason'] ?? null) === 'undated' && ($c['blocks'] ?? null) === ['S4'];
+        }
+        if (!$pushHold) {
+            $out[] = 'C73 A11: one repository_push skip exactly when age.push_unmeasured is undated';
+        }
         $s3 = isset($signals['S3']) ? self::map($signals['S3'], 'data') : null;
         if ($s3 === null ? ($a['archived'] ?? null) === true : ($status !== 'read' || ($a['archived'] ?? null) !== true || self::pick($s3, 'forge', 'host', 'repo') !== self::pick($a, 'forge', 'host', 'repo'))) {
             $out[] = 'C73 A7: S3 exactly when the read activity is archived, on its repository';
