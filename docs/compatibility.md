@@ -27,7 +27,7 @@ patches included. Flags and verdicts change only as [Verdict changes](#verdict-c
 | [Machine output](#documents) | `json`, `sarif`, `gitlab` and `github`, the baseline file, and the `report` embedded in `html` | `table`, `markdown`, the look of `html`, the `--explain` text and the install-time summary |
 | [Inside documents](#documents) | Ids, codes, keys and data fields | Every human-readable sentence: summaries, the score line, the move, the gate line, notes, evidence, messages |
 | [Closed sets](#closed-sets-and-their-order) | The closed sets and their order | Which flags a package gets, and its score and verdict |
-| [Distribution](#distribution) | The PHAR asset names and verification path, lockrot-action's inputs (Semantic Versioning), and `self-update` staying within its major and on a PHP it runs on. The action line that follows 1.x is named at 1.0 | The Docker tag scheme, until 1.0.0-RC1 chooses it |
+| [Distribution](#distribution) | The PHAR asset names and verification path, and `self-update` staying within its major and on a PHP it runs on | The Docker tag scheme, until 1.0.0-RC1 chooses it |
 | [PHP platform](#php-platform) | — | The PHP and Composer floor, until 1.0.0-RC1 chooses the one for 1.x |
 | [PHP code](#what-is-not-contract) | — | The classes under `src/` |
 
@@ -286,8 +286,9 @@ when a finding reaches `fail-on`, are frozen with the rest of the [configuration
   missing, it exits `2` and runs nothing ([install requirements](index.md#install),
   [exit codes](ci.md#exit-codes)).
 - The PHAR's asset names and the [verification path](phar.md#verifying-the-download) are stable.
-- lockrot-action's inputs follow Semantic Versioning. Before 1.0, lockrot promises nothing about
-  the action's major lines. From 1.0, this page names the action line that follows lockrot 1.x.
+- lockrot-action's inputs are not part of this contract. The action's v1 line follows lockrot's
+  minor releases and can carry Breaking entries in a minor release. Its changelog marks each
+  one Breaking and gives migration lines.
 - Unless you give `--allow-major`, `self-update` stays within the running major version. It skips a
   release that needs a newer PHP than the running one. It also skips a release signed with a key
   that the archive does not carry ([which release it installs](phar.md#which-release-it-installs)).
@@ -382,7 +383,7 @@ threshold too, as its packages' releases age ([baseline.md](baseline.md)).
 ## Deprecation
 
 - Nothing in the contract is removed within 1.x.
-- An option, environment variable, configuration key, format name or Action input can be
+- An option, environment variable, configuration key or format name can be
   deprecated in a minor release. From then on it:
     - keeps working unchanged until the next major version
     - prints one line to stderr when you use it
