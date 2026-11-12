@@ -523,6 +523,9 @@ maintainer.
       `main` runs. Remove each required context that no job or such row of `ci.yml` produces: no
       run reports it, so the pull request waits for it with no way to bypass. A context of a
       removed matrix row is stale.
+    - Confirm a green `sweep.yml` run on the head of the release pull request. The `sweep` test
+      group runs in no `ci.yml` job, and a path-filtered workflow cannot be a required check, so
+      no ruleset stops a red sweep.
     - When the release changes the flag set, a schema number or the score model, the lockrot.dev
       change that reads it is merged. The lockrot.dev build stops on a set that it does not know.
     - Before the first final renderer tag, list the renderer's rulesets with
