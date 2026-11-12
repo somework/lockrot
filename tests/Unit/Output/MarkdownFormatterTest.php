@@ -90,7 +90,7 @@ final class MarkdownFormatterTest extends TestCase
             self::assertLessThanOrEqual($budget, \strlen(self::formatter(LockrotConfig::FAIL_ON_NONE, $budget)->format($report)), 'budget '.$budget);
         }
         // 12 of 30 left out: the count has as many digits as the 30 that the cut reserves room for.
-        $cut = self::formatter(LockrotConfig::FAIL_ON_NONE, $full - 1600)->format($report);
+        $cut = self::formatter(LockrotConfig::FAIL_ON_NONE, $full - 2150)->format($report);
 
         self::assertStringContainsString('| … | 12 more findings: see the JSON report', $cut);
         self::assertSame($cut, self::formatter(LockrotConfig::FAIL_ON_NONE, \strlen($cut))->format($report), 'a budget of exactly its size keeps every row');

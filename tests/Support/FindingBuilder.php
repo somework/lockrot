@@ -292,8 +292,16 @@ final class FindingBuilder
             $finding->libyears() !== null ? AgeReading::measured(new \DateTimeImmutable('2026-01-01T00:00:00+00:00'), 0, 0.0, null, null, null, AgeReading::INSTALLED) : AgeReading::unmeasuredBecause($snapshot ? AgeMeasure::BRANCH_SNAPSHOT : AgeMeasure::UNDATED),
             $s2 === null ? AgeReading::unmeasuredBecause($metadataReason ?? AgeMeasure::UNDATED_RELEASES) : $measured($s2->lastRelease(), $s2->years(), $s2->lastVersion(), $s2->datedBy(), $levels[Signal::S2], AgeReading::RELEASE),
             $s8 === null ? AgeReading::unmeasuredBecause($metadataReason ?? ($snapshot ? AgeMeasure::BRANCH_SNAPSHOT : AgeMeasure::NO_BRANCH_ROW)) : $measured($s8->branchLastRelease(), $s8->years(), $s8->branchLastVersion(), $s8->datedBy(), $levels[Signal::S8], AgeReading::RELEASE),
-            $s4 === null ? AgeReading::unmeasuredBecause($activity->reason() ?? AgeMeasure::UNDATED) : $measured($s4->lastPush(), $s4->years(), null, null, $levels[Signal::S4], AgeReading::PUSH)
+            $s4 !== null ? $measured($s4->lastPush(), $s4->years(), null, null, $levels[Signal::S4], AgeReading::PUSH) : self::unsignalledPush($activity)
         );
+    }
+
+    /** A read carries a push that S4 does not quote: fresh, at the read's date, as an analysed read with no S4 gives. */
+    private static function unsignalledPush(ActivityLookup $lookup): AgeReading
+    {
+        $pushedAt = $lookup->activity() === null ? null : $lookup->activity()->pushedAt();
+
+        return $pushedAt === null ? AgeReading::unmeasuredBecause($lookup->reason() ?? AgeMeasure::UNDATED) : AgeReading::measured($pushedAt, 0, 0.0, null, null, null, AgeReading::PUSH);
     }
 
     /**
@@ -332,12 +340,12 @@ final class FindingBuilder
         return ActivityLookup::notRead(ActivityLookup::NO_REPOSITORY, LocatedRepository::none(null));
     }
 
-    /** A read on github.com, as the skips of {@see detailsOf()} imply: archived exactly when S3 fired, pushed when S4 dates it. */
+    /** A read on github.com, as the skips of {@see detailsOf()} imply: archived exactly when S3 fired, pushed when S4 dates it, else at the read. */
     public static function activityOf(Finding $finding): ActivityLookup
     {
         $s4 = $finding->signalData(NoPushData::class);
-        $pushedAt = $s4 === null ? null : new \DateTimeImmutable($s4->lastPush());
-        $read = new RepositoryActivity(new RepoRef(RepoRef::GITHUB, 'github.com', $finding->package()), $finding->signalData(ArchivedData::class) !== null, $pushedAt, $finding->dataDate() ?? new \DateTimeImmutable('2026-09-14T00:00:00+00:00'));
+        $fetchedAt = $finding->dataDate() ?? new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
+        $read = new RepositoryActivity(new RepoRef(RepoRef::GITHUB, 'github.com', $finding->package()), $finding->signalData(ArchivedData::class) !== null, $s4 === null ? $fetchedAt : new \DateTimeImmutable($s4->lastPush()), $fetchedAt);
 
         return ActivityLookup::read($read);
     }
