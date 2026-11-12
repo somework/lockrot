@@ -182,24 +182,27 @@ final class ComposerSolver
         }
         // As Installer::extractDevPackages(): no second solve for a root without require-dev.
         $nonDev = $root->getDevRequires() === [] ? null : $this->nonDevAnswer($root, $policy, $answer, $requires, $temporary);
+        // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
+        // The second solve reads that answer, so its refusal proves no more (ruling R19-38).
+        $unloaded = $this->withoutMetUnreached($this->failures($loaded->asked()), $built, $answer);
         if ($nonDev !== null) {
-            return $this->refused($nonDev[3], $nonDev[2], $nonDev[0], $nonDev[1], $composerRequest, $root, $request, $loaded);
+            return $this->refused($nonDev[3], $nonDev[2], $nonDev[0], $nonDev[1], $composerRequest, $root, $request, $loaded, $unloaded);
         }
 
-        // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
         // Composer blocks a release by each name that it replaces too.
         $lockPackages = $answer->getNewLockPackages(false);
         $held = array_merge([], ...array_map(static fn (BasePackage $package): array => $package->getNames(false), $lockPackages));
         $kept = array_map(static fn (BasePackage $package): string => $package->getName(), $lockPackages);
 
-        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), $this->withoutMetUnreached($this->failures($loaded->asked()), $built, $answer), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)), $kept);
+        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), $unloaded, $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)), $kept);
     }
 
     /**
      * @param Request $refusing the request that Composer refused: the update's own, or the one of its second solve
-     * @param Request $update   the update's own request, which names the locked packages
+     * @param Request               $update    the update's own request, which names the locked packages
+     * @param array<string, string> $firstSolve name => {@see VersionSource} failure, of the first solve whose answer the second solve refuses
      */
-    private function refused(SolverProblemsException $answer, Pool $pool, RepositorySet $set, Request $refusing, Request $update, RootPackageInterface $root, SolveRequest $request, LoadedVersions $loaded): Solution
+    private function refused(SolverProblemsException $answer, Pool $pool, RepositorySet $set, Request $refusing, Request $update, RootPackageInterface $root, SolveRequest $request, LoadedVersions $loaded, array $firstSolve = []): Solution
     {
         $nonDev = $refusing !== $update;
         $locked = [];
@@ -219,7 +222,7 @@ final class ComposerSolver
             $problem = static fn (): string => $text;
         }
 
-        return Solution::refused($holds->holds(), $problem, $this->failures($holds->wanted()) + $shadowed + $this->unreachedLockedOnly($update, $holds));
+        return Solution::refused($holds->holds(), $problem, $this->failures($holds->wanted()) + $shadowed + $this->unreachedLockedOnly($update, $holds) + $firstSolve);
     }
 
     /**
