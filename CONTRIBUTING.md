@@ -564,10 +564,11 @@ maintainer.
     python3 tools/release/tag_day.py X.Y.Z "$(git for-each-ref refs/tags/vX.Y.Z --format='%(taggerdate:short)')"
     ```
 
-    If the check fails, delete the local tag, fix the date first, and tag again. Push the tag only
-    when the check passes, because the tag ruleset forbids moving or deleting a pushed `v*` tag.
-    `phar.yml` repeats the check as a warning. Then push the tag. If the tag day changed after the merge, tag the commit of the date pull request
-   instead, when its `ci.yml` push run passes. `.github/workflows/phar.yml` refuses these tags:
+    If the check fails, delete the local tag and fix the date first. If the tag day changed after
+    the merge, merge a date pull request, and tag the commit of that pull request when its
+    `ci.yml` push run passes. Push the tag only when the check passes, because the tag ruleset
+    forbids moving or deleting a pushed `v*` tag. `phar.yml` repeats the check as a warning. Then
+    push the tag. `.github/workflows/phar.yml` refuses these tags:
 
     - a tag that is not on `main`, or whose `ci.yml` push run on `main` did not pass
     - a tag whose vendored renderer is not an attested release
