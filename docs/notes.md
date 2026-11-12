@@ -364,7 +364,7 @@ install-time budget ran out. The report writes no `update now:` command, and
 - `data`: `reason` (a value of `check.reason`), `packages` (the candidates).
 - `sets_network_failures`: no.
 
-### Move check failed {#move_check_failed}
+### <a name="move_check_failed"></a>Move check failed {#move_check_failed}
 
 Composer's solver failed on a request with an error other than a refusal, such as an answer of a
 repository that does not parse. That move's `check.reason` reads `solver_error`, and the run goes

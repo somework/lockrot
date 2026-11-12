@@ -259,6 +259,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** a repository URL whose host is unclear, such as one whose userinfo holds a raw
   `/`, `?` or `#`, prints as `https://(withheld: ambiguous host)`. It gets no link and no
   repository host, so its userinfo does not reach the report.
+- **Run notes:** the `move_check_failed` note holds no PHP `TypeError` text, which can name an
+  absolute path of the machine. A release that a repository serves with a numeric package name in
+  a link map is solved as Composer solves it. ([Move check failed](docs/notes.md#move_check_failed))
 
 ### Added
 
@@ -760,8 +763,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CLI:** a run exits `2` with a message that names composer.json and the field when a link map
   such as `require` in composer.json holds a numeric package name. The message holds no PHP error
   text and no absolute path.
-- **All formats:** a release that a repository serves with a numeric package name in a link map no
-  longer puts PHP error text or an absolute path into the `move_check_failed` note.
 - **CLI:** a run on a `composer.lock` that is not a regular file exits `2` with
   `composer.lock exists and is not a regular file`.
 - **All formats:** the capped fact stays unverified when the target release's `php` is
