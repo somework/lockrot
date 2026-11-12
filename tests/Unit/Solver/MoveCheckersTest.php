@@ -621,9 +621,9 @@ final class MoveCheckersTest extends TestCase
 
     /**
      * Case `mc-baseline-provide-unmatched‡`: a locked package provides acme/contract 1.0.0, which
-     * meets `require-dev` but not `require`. The non-dev solve refuses the first solve's answer.
-     * The refusal wants acme/contract, which the vcs repository can serve, so the baseline is not
-     * checked whether the lock holds the link or not.
+     * meets `require-dev` but not `require`, so the lock does not hold the `require` link. The
+     * non-dev solve refuses the first solve's answer, and acme/private-lib, which acme/y 1.1.0 needs,
+     * is the one name that the first solve could not load.
      */
     public function testABaselineWhoseRequireOnlyAnUnmatchedProvideMeetsIsNotChecked(): void
     {
@@ -635,7 +635,7 @@ final class MoveCheckersTest extends TestCase
             $x + ['notification-url' => 'https://packagist.org/downloads/'],
         ]]);
         $loader = new ArrayLoader();
-        $remote = [$loader->load($x), $loader->load(['name' => 'acme/y', 'version' => '1.0.0']), $loader->load(['name' => 'acme/y', 'version' => '1.1.0', 'require' => ['acme/private-lib' => '^1.0']])];
+        $remote = [$loader->load($x), $loader->load(['name' => 'acme/contract', 'version' => '1.0.0']), $loader->load(['name' => 'acme/y', 'version' => '1.0.0']), $loader->load(['name' => 'acme/y', 'version' => '1.1.0', 'require' => ['acme/private-lib' => '^1.0']])];
         $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private-lib']);
         $checker = MoveCheckers::forProject($root, $lock, $project, new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
 
