@@ -875,8 +875,8 @@ checked.
   When the lock does not hold a `require` or `require-dev` name of the root, Composer can install
   that name. Then any package that the solve could not load gives the baseline that load reason,
   also when Composer refuses the lock. The lock holds a name when the root or a locked package has
-  it, replaces it, or provides it at a version that the requirement admits. Only a package of
-  `packages` holds a `require` name.
+  it, replaces it, or provides it at a version that the requirement admits. Of the locked
+  packages, only an entry of `packages` holds a `require` name.
 
 Limits of the check:
 
