@@ -268,6 +268,13 @@ final class LockrotConfigTest extends TestCase
         LockrotConfig::fromSources([], [], [], '8.5.10', 'master');
     }
 
+    public function testARunningPhpThatIsNoVersionIsRefusedAsTheTarget(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('target-php must look like "8.4"; got "dev"');
+        LockrotConfig::fromSources([], [], [], 'dev', null);
+    }
+
     public function testAVPrefixedTargetPhpOptionIsStillRefused(): void
     {
         $this->expectException(ConfigException::class);
