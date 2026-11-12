@@ -754,7 +754,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CLI:** a run exits `2` with a message that names `config.platform.php` when that value is a
   branch name, such as `dev-master`. ([Exit codes](docs/ci.md#exit-codes))
 - **CLI:** a run exits `2` with a message that names the `composer.lock` field when the field has
-  the wrong type. The message holds no PHP error text and no absolute path.
+  the wrong type, or when a link map such as `require` holds a numeric package name. The message
+  holds no PHP error text and no absolute path.
 - **CLI:** a run on a `composer.lock` that is not a regular file exits `2` with
   `composer.lock exists and is not a regular file`.
 - **All formats:** the capped fact stays unverified when the target release's `php` is
@@ -766,6 +767,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** an unloaded name in the first solve gives a move `not_checked` with
   `unloaded_name` also when the second solve over the non-dev requirements refuses.
   ([Move](docs/verdicts.md#move))
+- **All formats:** when `composer.lock` omits a `require` or `require-dev` name of composer.json,
+  a package that lockrot could not load gives every move `not_checked` with `unloaded_name`, not
+  `baseline_refused`. ([Move](docs/verdicts.md#move))
 
 ## [0.13.0] - 2026-10-01
 
