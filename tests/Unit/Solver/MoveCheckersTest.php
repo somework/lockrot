@@ -510,7 +510,8 @@ final class MoveCheckersTest extends TestCase
     /**
      * Ruling R19-38: the first solve reads the require-dev constraint, and an unreached name can
      * change its answer. The second solve over `require` refuses that answer, and the move still
-     * reads not_checked with unloaded_name and no hold.
+     * reads not_checked with unloaded_name and no hold. The lock holds every root requirement, so
+     * the baseline's exemption is set, and the move does not take it.
      *
      * @dataProvider unreachedBeforeTheNonDevSolve
      *
@@ -541,19 +542,21 @@ final class MoveCheckersTest extends TestCase
     /**
      * The lock holds every root requirement, so the baseline fixes each one, and a fuller pool
      * cannot change a refusal of a locked name. The unloaded name comes from a locked package's
-     * requirement that the lock omits. When composer.json cannot be read, lockrot cannot tell
-     * whether the lock holds every root requirement, and the baseline is not checked.
+     * requirement that the lock omits. A name that a locked package only provides is held when the
+     * provided version matches the root's link: the baseline cannot install another version of it.
      *
-     * @dataProvider projectsOfALockThatHoldsEveryRootRequirement
+     * @dataProvider locksThatHoldEveryRootRequirement
      *
+     * @param ?string                $provided the version of acme/virtual that acme/new provides, null for no acme/virtual link
      * @param array{string, ?string} $expected the baseline's result and reason
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('projectsOfALockThatHoldsEveryRootRequirement')]
-    public function testABaselineThatTheNonDevSolveRefusesStaysRefusedBesideAnUnloadedNameWhenTheLockHoldsEveryRootRequirement(string $project, array $expected): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('locksThatHoldEveryRootRequirement')]
+    public function testABaselineThatTheNonDevSolveRefusesStaysRefusedBesideAnUnloadedNameWhenTheLockHoldsEveryRootRequirement(?string $provided, array $expected): void
     {
+        $new = ['name' => 'acme/new', 'version' => '1.0.0', 'require' => ['acme/plugin' => '^1.0'], 'notification-url' => 'https://packagist.org/downloads/'];
         $lock = LockFile::fromArray(['packages' => [
             ['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
-            ['name' => 'acme/new', 'version' => '1.0.0', 'require' => ['acme/plugin' => '^1.0'], 'notification-url' => 'https://packagist.org/downloads/'],
+            $provided === null ? $new : $new + ['provide' => ['acme/virtual' => $provided]],
         ]]);
         $loader = new ArrayLoader();
         $remote = [
@@ -562,11 +565,16 @@ final class MoveCheckersTest extends TestCase
             $loader->load(['name' => 'acme/plugin', 'version' => '1.0.0']),
             $loader->load(['name' => 'acme/plugin', 'version' => '1.1.0', 'require' => ['acme/private' => '^1.0']]),
         ];
-        $manifest = ['name' => 'acme/app', 'require' => ['acme/lib' => '^2.0', 'acme/new' => '^1.0'], 'require-dev' => ['acme/lib' => '^1.0']];
-        $written = $project === 'unparsable' ? ['require-dev' => ['acme/lib' => '^1.0', 'acme/other' => 'not a constraint']] + $manifest : $manifest;
-        [$root, $config] = self::project($manifest, $written);
+        $require = ['acme/lib' => '^2.0', 'acme/new' => '^1.0'];
+        $requireDev = ['acme/lib' => '^1.0'];
+        if ($provided !== null) {
+            $require['acme/virtual'] = '^1.0';
+            $requireDev['acme/virtual'] = '*';
+        }
+        $root = $loader->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => $require, 'require-dev' => $requireDev], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
         $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
-        $checker = MoveCheckers::forProject($root, $lock, $project === 'none' ? ProjectConfig::empty() : $config, new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
+        $checker = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
 
         $baseline = $checker->baseline();
 
@@ -576,12 +584,75 @@ final class MoveCheckersTest extends TestCase
         }
     }
 
-    /** @return iterable<string, array{string, array{string, ?string}}> */
-    public static function projectsOfALockThatHoldsEveryRootRequirement(): iterable
+    /** @return iterable<string, array{?string, array{string, ?string}}> */
+    public static function locksThatHoldEveryRootRequirement(): iterable
     {
-        yield 'a composer.json that Composer reads' => ['read', [MoveCheck::REFUSED, null]];
-        yield 'no composer.json' => ['none', [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME]];
-        yield 'a composer.json whose links Composer cannot parse' => ['unparsable', [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME]];
+        yield 'each root requirement locked under its own name' => [null, [MoveCheck::REFUSED, null]];
+        yield 'a provided name at a version that the link admits' => ['1.0.0', [MoveCheck::REFUSED, null]];
+        yield 'a provided name at a version that the link does not admit' => ['0.5.0', [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME]];
+    }
+
+    /**
+     * The root that the solve fixes decides, not composer.json: a provide that does not admit the
+     * link's constraint leaves the name free, and so does a link that a plugin added to the root.
+     *
+     * @dataProvider rootsWhoseRequirementTheLockDoesNotHold
+     *
+     * @param array{require?: array<string, string>, provide?: array<string, string>} $root    the root's links beside its acme/lib requirements
+     * @param list<array<string, mixed>>                                              $locked  the lock's packages
+     * @param array<string, mixed>                                                    $written the composer.json on disk, the root's when empty
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('rootsWhoseRequirementTheLockDoesNotHold')]
+    public function testAnUnloadedNameOfTheFirstSolveLeavesTheBaselineNotCheckedWhenOnlyTheRootSaysWhatIsMissing(array $root, array $locked, array $written): void
+    {
+        $manifest = ['name' => 'acme/app', 'require' => ['acme/lib' => '>=1.1'], 'require-dev' => ['acme/lib' => '^1.0']];
+        $manifest['require'] += $root['require'] ?? [];
+        $manifest['provide'] = $root['provide'] ?? [];
+        [$package, $project] = self::project($manifest, $written === [] ? $manifest : $written);
+        $loader = new ArrayLoader();
+        $remote = [$loader->load(['name' => 'acme/lib', 'version' => '1.0.0']), $loader->load(['name' => 'acme/lib', 'version' => '1.1.0', 'require' => ['acme/private' => '^1.0']])];
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
+        $checker = MoveCheckers::forProject($package, LockFile::fromArray(['packages' => $locked]), $project, new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
+
+        $baseline = $checker->baseline()->check();
+
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME], [$baseline->result(), $baseline->reason()]);
+    }
+
+    /**
+     * Case `mc-baseline-provide-unmatched‡`: a locked package provides acme/contract 1.0.0, which
+     * meets `require-dev` but not `require`. The non-dev solve refuses the first solve's answer.
+     * The refusal wants acme/contract, which the vcs repository can serve, so the baseline is not
+     * checked whether the lock holds the link or not.
+     */
+    public function testABaselineWhoseRequireOnlyAnUnmatchedProvideMeetsIsNotChecked(): void
+    {
+        $manifest = ['name' => 'acme/app', 'require' => ['php' => '^8.1', 'symfony/routing' => '^6.4', 'acme/contract' => '^2.0'], 'require-dev' => ['acme/contract' => '^1.0']];
+        [$root, $project] = self::project($manifest, $manifest);
+        $x = ['name' => 'acme/x', 'version' => '1.0.0', 'require' => ['acme/y' => '^1.0'], 'provide' => ['acme/contract' => '1.0.0']];
+        $lock = LockFile::fromArray(['content-hash' => 'stale', 'packages' => [
+            ['name' => 'symfony/routing', 'version' => 'v6.4.28', 'notification-url' => 'https://packagist.org/downloads/'],
+            $x + ['notification-url' => 'https://packagist.org/downloads/'],
+        ]]);
+        $loader = new ArrayLoader();
+        $remote = [$loader->load($x), $loader->load(['name' => 'acme/y', 'version' => '1.0.0']), $loader->load(['name' => 'acme/y', 'version' => '1.1.0', 'require' => ['acme/private-lib' => '^1.0']])];
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private-lib']);
+        $checker = MoveCheckers::forProject($root, $lock, $project, new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
+
+        $baseline = $checker->baseline()->check();
+        $move = $checker->check(MoveQuery::update('acme/x', '^1.0', '1.0.0'))->check();
+
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, false], [$baseline->result(), $baseline->reason(), $baseline->isRefused()]);
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME], [$move->result(), $move->reason()]);
+    }
+
+    /** @return iterable<string, array{array{require?: array<string, string>, provide?: array<string, string>}, list<array<string, mixed>>, array<string, mixed>}> */
+    public static function rootsWhoseRequirementTheLockDoesNotHold(): iterable
+    {
+        $other = ['name' => 'other/pkg', 'version' => '1.0.0', 'provide' => ['acme/lib' => '0.5.0'], 'notification-url' => 'https://packagist.org/downloads/'];
+        yield 'a locked package that provides the name at another version' => [['require' => ['other/pkg' => '^1.0']], [$other], []];
+        yield 'the root that provides the name at another version' => [['provide' => ['acme/lib' => '0.5.0']], [], []];
+        yield 'a root whose links a plugin added' => [[], [], ['name' => 'acme/app']];
     }
 
     /**
