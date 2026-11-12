@@ -533,6 +533,8 @@ final class MoveCheckersTest extends TestCase
 
         self::assertSame(MoveCheck::RESOLVES, $checker->baseline()->check()->result());
         self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, []], [$outcome->check()->result(), $outcome->check()->reason(), $outcome->holds()]);
+        $combined = $checker->combined(['acme/lib' => '^1.1']);
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, []], [$combined->check()->result(), $combined->check()->reason(), $combined->holds()], 'update now');
     }
 
     /**
