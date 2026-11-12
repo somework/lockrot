@@ -22,6 +22,27 @@ final class LockFile
     /** Composer's package name pattern (composer-schema.json, `name`). */
     private const NAME = '{^[a-z0-9](?:[_.-]?[a-z0-9]++)*+/[a-z0-9](?:(?:[_.]|-{1,2})?[a-z0-9]++)*+$}D';
 
+    /** The fields that the loader types, by the shape that it needs. */
+    private const FIELD_KINDS = [
+        'string' => ['type', 'target-dir', 'installation-source', 'notification-url', 'source.type', 'source.url', 'source.reference', 'dist.type', 'dist.url', 'dist.reference', 'dist.shasum', 'archive.name'],
+        'object' => ['autoload', 'autoload-dev', 'php-ext'],
+        'list' => ['include-path', 'source.mirrors', 'dist.mirrors', 'archive.exclude'],
+        'strings' => ['bin'],
+        'keywords' => ['keywords'],
+        'links' => ['require', 'conflict', 'provide', 'replace', 'require-dev'],
+        'suggest' => ['suggest'],
+    ];
+
+    private const KIND_MESSAGES = [
+        'string' => 'must be a string',
+        'object' => 'must be a JSON object',
+        'list' => 'must be a list',
+        'strings' => 'must be a string or a list of strings',
+        'keywords' => 'must be a list of strings',
+        'links' => 'must be a JSON object',
+        'suggest' => 'must map names to strings',
+    ];
+
     /** @var array<string, LockedPackage> */
     private array $packages;
     /** @var list<string> */
@@ -185,7 +206,8 @@ final class LockFile
 
     /**
      * The fields that Composer's loader hands to a typed setter or a string function: a wrong type
-     * is a TypeError there, and the lock's field is what a user can fix.
+     * is a TypeError there, and the lock's field is what a user can fix. The loader skips a link
+     * map or a keyword list that is not an array, so only an array of the wrong shape is refused.
      *
      * @param array<mixed> $entry
      *
@@ -193,24 +215,48 @@ final class LockFile
      */
     private static function refuseWrongTypes(array $entry, string $refusal): void
     {
-        $values = [];
-        foreach (['type', 'target-dir', 'installation-source', 'notification-url'] as $key) {
-            $values[$key] = $entry[$key] ?? null;
-        }
-        foreach (['source' => ['type', 'url', 'reference'], 'dist' => ['type', 'url', 'reference', 'shasum']] as $section => $keys) {
-            $fields = $entry[$section] ?? null;
-            foreach (\is_array($fields) ? $keys : [] as $key) {
-                $values[$section.'.'.$key] = $fields[$key] ?? null;
+        $fields = $entry;
+        foreach (['source', 'dist', 'archive'] as $section) {
+            $sub = $entry[$section] ?? null;
+            foreach (\is_array($sub) ? $sub : [] as $key => $value) {
+                $fields[$section.'.'.$key] = $value;
             }
         }
-        foreach ($values as $path => $value) {
-            // A reference is cast to a string by the loader, so a number is fine and an array is not.
-            // The loader skips an empty notification-url.
-            $fine = $value === null || \is_string($value) || ($path === 'notification-url' && empty($value)) || (substr($path, -9) === 'reference' && \is_scalar($value));
-            if (!$fine) {
-                throw new ConfigException($refusal.'"'.$path.'" must be a string');
+        foreach (self::FIELD_KINDS as $kind => $paths) {
+            foreach ($paths as $path) {
+                if (isset($fields[$path]) && !self::hasKind($kind, $path, $fields[$path])) {
+                    throw new ConfigException($refusal.'"'.$path.'" '.self::KIND_MESSAGES[$kind]);
+                }
             }
         }
+    }
+
+    /** @param mixed $value */
+    private static function hasKind(string $kind, string $path, $value): bool
+    {
+        switch ($kind) {
+            case 'string':
+                // The loader skips an empty notification-url and archive name.
+                return \is_string($value) || (\in_array($path, ['notification-url', 'archive.name'], true) && empty($value)) || (substr($path, -9) === 'reference' && \is_scalar($value));
+            case 'object':
+                return \is_array($value) && ($value === [] || !JsonReader::isList($value));
+            case 'list':
+                return \is_array($value) && ($value === [] || JsonReader::isList($value));
+            case 'strings':
+                return \is_string($value) || (\is_array($value) && $value !== [] && JsonReader::isList($value) && self::all('is_string', $value)) || $value === [];
+            case 'keywords':
+                return !\is_array($value) || self::all('is_scalar', $value);
+            case 'links':
+                return !\is_array($value) || $value === [] || !JsonReader::isList($value);
+            default:
+                return !\is_array($value) || self::all('is_string', $value);
+        }
+    }
+
+    /** @param array<mixed> $values */
+    private static function all(callable $test, array $values): bool
+    {
+        return array_filter($values, $test) === $values;
     }
 
     /** @param array{platform: mixed, platform-dev: mixed} $platform */
