@@ -943,6 +943,18 @@ final class LockrotCommandTest extends TestCase
         self::assertStringNotContainsString('not found', $display);
     }
 
+    public function testALockWithANumberAsALinkKeyIsExit2AndNamesTheField(): void
+    {
+        $dir = $this->tempDir('lockrot-numberkey-');
+        file_put_contents($dir.'/composer.lock', '{"packages": [{"name": "acme/lib", "version": "1.0.0", "require": {"5": "1.0"}}]}');
+        chdir($dir);
+        $tester = $this->tester();
+
+        self::assertSame(2, $tester->execute([]));
+        $display = $tester->getErrorOutput();
+        self::assertStringStartsWith('lockrot: composer.lock entry #0 in packages cannot be loaded: "require" of acme/lib has the key 5, which is no package name', $display);
+    }
+
     /** `composer rot` is the documented short form, so the alias is part of the command's contract. */
     public function testTheCommandIsAlsoReachableAsRot(): void
     {

@@ -517,6 +517,11 @@ final class LockFileTest extends TestCase
         yield 'number as bin beside a false archive name' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'archive' => ['name' => false], 'bin' => 5]]], 'alt.lock entry #0 in packages cannot be loaded: "bin" must be a string or a list of strings'];
         yield 'source without a url beside a list in keywords' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'source' => ['type' => 'git', 'reference' => 'r'], 'keywords' => [['k']]]]], "alt.lock entry #0 in packages cannot be loaded: Package a/b's source key should be specified"];
         yield 'number as type beside a source that is a string' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'type' => 5, 'source' => 'x']]], 'alt.lock entry #0 in packages cannot be loaded: "type" must be a string'];
+        foreach (['require', 'require-dev', 'conflict', 'provide', 'replace'] as $field) {
+            yield 'number as a key of '.$field => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', $field => ['5' => '1.0']]]], 'alt.lock entry #0 in packages cannot be loaded: "'.$field.'" of a/b has the key 5, which is no package name'];
+            yield 'number as a key of '.$field.' in packages-dev' => [['packages' => [], 'packages-dev' => [['name' => 'a/b', 'version' => '1.0.0', $field => ['c/d' => '^1.0', '-7' => '1.0']]]], 'alt.lock entry #0 in packages-dev cannot be loaded: "'.$field.'" of a/b has the key -7, which is no package name'];
+        }
+        yield 'number as a platform override' => [['packages' => [], 'platform-overrides' => ['5' => '1.0']], 'alt.lock: platform-overrides cannot be loaded: 5 is no platform package'];
         yield 'name in both sections' => [['packages' => [$entry], 'packages-dev' => [['name' => 'a/b', 'version' => '2.0.0']]], 'alt.lock lists a/b twice: entry #0 in packages and entry #0 in packages-dev'];
         yield 'name twice ignoring case' => [['packages' => [['name' => 'other/x', 'version' => '1.0.0'], $entry, ['name' => 'A/B', 'version' => '1.0.0']]], 'alt.lock lists a/b twice: entry #1 in packages and entry #2 in packages'];
         yield 'invalid name twice' => [['packages' => [['name' => '--x', 'version' => '1.0.0'], ['name' => '--x', 'version' => '1.0.0']]], 'alt.lock lists --x twice: entry #0 in packages and entry #1 in packages'];
@@ -554,6 +559,33 @@ final class LockFileTest extends TestCase
             self::assertStringNotContainsString('vendor', $e->getMessage());
             self::assertStringNotContainsString('.php', $e->getMessage());
         }
+    }
+
+    /**
+     * A number as a link key is a TypeError in Composer's typed code, whose message names a PHP
+     * function and a path of the install.
+     *
+     * @dataProvider numberKeys
+     *
+     * @param array<string, mixed> $lock
+     */
+    #[DataProvider('numberKeys')]
+    public function testANumberAsALinkKeyNamesTheFieldAndNeverQuotesPhp(array $lock): void
+    {
+        try {
+            LockFile::fromArray($lock, 'alt.lock');
+            self::fail('the lock loads');
+        } catch (ConfigException $e) {
+            self::assertStringNotContainsString('Argument', $e->getMessage());
+            self::assertStringNotContainsString('.php', $e->getMessage());
+        }
+    }
+
+    /** @return iterable<string, array{array<string, mixed>}> */
+    public static function numberKeys(): iterable
+    {
+        yield 'require' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'require' => ['5' => '1.0']]]]];
+        yield 'platform-overrides' => [['packages' => [], 'platform-overrides' => ['5' => '1.0']]];
     }
 
     /**
@@ -612,6 +644,8 @@ final class LockFileTest extends TestCase
         yield 'map-shaped include-path' => [['include-path' => ['a' => 'x']]];
         yield 'keywords with null' => [['keywords' => [null]]];
         yield 'a top-level key that looks like a dotted field' => [['source.url' => 5, 'dist.type' => []]];
+        // Composer's loader skips a link whose constraint is no string.
+        yield 'a number as a link key without a string constraint' => [['require' => ['5' => ['1.0']], 'replace' => ['6' => null]]];
     }
 
     public function testAFileLockIsNamedByItsFileNameUnlessACallerNamesIt(): void

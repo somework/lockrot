@@ -188,6 +188,7 @@ final class LockFile
             // The message of a TypeError quotes a PHP function and a path of the install.
             throw new ConfigException($refusal.($e instanceof \TypeError ? 'a field has the wrong type' : $e->getMessage()), 0, $e);
         }
+        self::refuseNumberLinkKeys($entry, $loaded->getPrettyName(), $refusal);
         // A package that declares `extra.branch-alias`, or is a `default-branch`, loads as an
         // alias package. Unwrap it, so that the entry's own version, require and source fields
         // are read, and keep the alias version: `composer audit` matches advisories on it.
@@ -203,6 +204,26 @@ final class LockFile
         }
 
         return [$loaded, $forUpdate, $aliasVersions];
+    }
+
+    /**
+     * JSON decoding turns a numeric key into an integer, and Composer's loader keeps it as the key
+     * of a link that it reads: a link with a string constraint. Composer's typed code then fails on
+     * that key with a TypeError.
+     *
+     * @param array<mixed> $entry
+     *
+     * @throws ConfigException for an integer key of a link that the loader reads
+     */
+    private static function refuseNumberLinkKeys(array $entry, string $package, string $refusal): void
+    {
+        foreach (['require', 'require-dev', 'conflict', 'provide', 'replace'] as $field) {
+            foreach (\is_array($entry[$field] ?? null) ? $entry[$field] : [] as $target => $constraint) {
+                if (\is_int($target) && \is_string($constraint)) {
+                    throw new ConfigException(\sprintf('%s"%s" of %s has the key %d, which is no package name', $refusal, $field, $package, $target));
+                }
+            }
+        }
     }
 
     /**
@@ -292,6 +313,12 @@ final class LockFile
     {
         if (!\is_array($overrides)) {
             throw new ConfigException($name.': platform-overrides must be an object');
+        }
+        foreach (array_keys($overrides) as $override) {
+            // JSON decoding turns a numeric key into an integer, a TypeError in PlatformRepository.
+            if (\is_int($override)) {
+                throw new ConfigException(\sprintf('%s: platform-overrides cannot be loaded: %d is no platform package', $name, $override));
+            }
         }
         try {
             // @phpstan-ignore argument.type (the constructor's own value check is the refusal)
