@@ -496,7 +496,7 @@ final class ComposerSolver
         $filter = $this->advisories->blocking()->poolFilter();
         $error = $this->advisories->blocking()->filterError();
         if ($filter === null) {
-            throw new \RuntimeException('Composer\'s advisory pool filter cannot be built: '.($error === null ? 'unknown error' : $error->getMessage()));
+            throw new \RuntimeException('Composer\'s advisory pool filter cannot be built: '.($error === null ? 'unknown error' : Solution::errorText($error)));
         }
         $feed = new PoolAdvisoryFeed($this->advisories);
         try {
@@ -504,7 +504,7 @@ final class ComposerSolver
         } catch (\Error $e) {
             // The filter is Composer's internal API. The `move_check_failed` note names it as the
             // source of a drift, which an \Error from inside Composer does not.
-            throw new \RuntimeException('Composer\'s advisory pool filter failed: '.$e->getMessage());
+            throw new \RuntimeException('Composer\'s advisory pool filter failed: '.Solution::errorText($e));
         }
 
         return [$set, $composerRequest, $pool, $fixedRoot, $loaded, $feed];

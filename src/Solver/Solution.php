@@ -74,16 +74,19 @@ final class Solution
         return new self([], $holds, $problem, $unloaded);
     }
 
-    /**
-     * A solve that Composer failed on with an exception other than a refusal. A TypeError's
-     * message names a PHP signature and an absolute path, which a report does not print.
-     */
+    /** A solve that Composer failed on with an exception other than a refusal. */
     public static function failed(\Throwable $e): self
     {
         $failed = new self([], [], null, []);
-        $failed->error = ['class' => \get_class($e), 'message' => $e instanceof \TypeError ? 'a value has the wrong type' : $e->getMessage()];
+        $failed->error = ['class' => \get_class($e), 'message' => self::errorText($e)];
 
         return $failed;
+    }
+
+    /** A TypeError's message names a PHP signature and an absolute path, which a report does not print. */
+    public static function errorText(\Throwable $e): string
+    {
+        return $e instanceof \TypeError ? 'a value has the wrong type' : $e->getMessage();
     }
 
     public function resolves(): bool

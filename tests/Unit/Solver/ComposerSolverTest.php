@@ -835,6 +835,19 @@ final class ComposerSolverTest extends TestCase
         self::assertTrue($solver->solve(SolveRequest::baseline())->resolves(), 'a solver without advisories runs no filter');
     }
 
+    /** PHP's TypeError text names a signature and an absolute path, and the run note prints the kept message. */
+    public function testATypeErrorInsideTheFilterKeepsNoPhpTextAndNoPath(): void
+    {
+        $solver = self::solver(['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]);
+        $broken = $solver->withAdvisories(new PoolAdvisories(AdvisoryBlocking::everyAdvisory(), static function (array $names, bool $complete): array {
+            throw new \TypeError('Composer\\Advisory\\SecurityAdvisoryPoolFilter::filter(): Argument #2 must be of type array, int given, called in /home/user/vendor/composer/composer/src/Composer/DependencyResolver/PoolBuilder.php on line 12');
+        }));
+        $unbuildable = $solver->withAdvisories(new PoolAdvisories(AdvisoryBlocking::unbuildable(new \TypeError('Composer\\Advisory\\Auditor::__construct(): Argument #1 must be of type string, int given, called in /home/user/a.php on line 1')), static fn (array $names, bool $complete): array => []));
+
+        self::assertSame(['class' => \RuntimeException::class, 'message' => 'Composer\'s advisory pool filter failed: a value has the wrong type'], $broken->solve(SolveRequest::update(['acme/lib' => '^1.1']))->error());
+        self::assertSame(['class' => \RuntimeException::class, 'message' => 'Composer\'s advisory pool filter cannot be built: a value has the wrong type'], $unbuildable->solve(SolveRequest::baseline())->error());
+    }
+
     /** An \Error inside Composer's filter, here from the advisory lookup that the filter asks, is a failed solve with its message. */
     public function testAnErrorInsideTheFilterFailsTheSolve(): void
     {
