@@ -37,7 +37,7 @@ final class RepositoryUrlTest extends TestCase
         yield 'a bare user name' => ['https://user@github.com/vendor/pkg.git', 'https://github.com/vendor/pkg.git'];
         yield 'a password with an @ in it' => ['https://ci:p@ss@git.acme.test/lib.git', 'https://git.acme.test/lib.git'];
         yield 'a token in the query' => ['https://git.acme.test/lib.git?private_token=t0k3n#readme', 'https://git.acme.test/lib.git'];
-        yield 'a question mark in the password' => ['https://igor:pw?x@git.acme.test/lib.git', 'https://git.acme.test/lib.git'];
+        yield 'a question mark in the password is ambiguous' => ['https://igor:pw?x@git.acme.test/lib.git', null];
         yield 'ssh keeps its host, loses its user' => ['ssh://git@gitlab.internal/team/svc.git', 'ssh://gitlab.internal/team/svc.git'];
         yield 'svn over ssh' => ['svn+ssh://igor@svn.acme.test/repo/trunk', 'svn+ssh://svn.acme.test/repo/trunk'];
         yield 'nothing to strip' => ['https://github.com/vendor/pkg.git', 'https://github.com/vendor/pkg.git'];
@@ -182,12 +182,12 @@ final class RepositoryUrlTest extends TestCase
         yield "lockrot's own query" => ['invalid JSON from https://api.bitbucket.org/2.0/repositories/acme/lib/commits?pagelen=1', 'invalid JSON from https://api.bitbucket.org/2.0/repositories/acme/lib/commits'];
         yield 'an e-mail beside a url' => ['{"url":"https://host.example","email":"a@b.example"}', '{"url":"https://host.example","email":"a@b.example"}'];
         yield 'an @ in a path, and mailto' => ['see https://host.example/path@v2/x and mailto:me@x.example', 'see https://host.example/path@v2/x and mailto:me@x.example'];
-        yield 'an @ in a query with no path before it takes the host with it, and leaks nothing' => ['https://host.example?next=a@b', 'https://b'];
+        yield 'an @ after a query with no path before it is ambiguous, and leaks nothing' => ['https://host.example?next=a@b', 'https://(withheld: ambiguous host)'];
         yield 'a second url after a comma' => ['mirrors: https://u:p@h.example/p,https://q:r@h2.example/p', 'mirrors: https://h.example/p,https://h2.example/p'];
         yield 'a second url after a semicolon' => ['https://u:p@h.example/p;https://q:r@h2.example/p', 'https://h.example/p;https://h2.example/p'];
         yield 'a second url with nothing between' => ['https://a:b@h.example/phttps://c:d@h2.example/q', 'https://h.example/phttps://h2.example/q'];
-        yield 'a question mark in the password' => ['from https://igor:pw?x@repo.acme.test/p', 'from https://repo.acme.test/p'];
-        yield 'a hash in the password' => ['from https://igor:pw#x@repo.acme.test/p', 'from https://repo.acme.test/p'];
+        yield 'a question mark in the password is ambiguous' => ['from https://igor:pw?x@repo.acme.test/p', 'from https://(withheld: ambiguous host)'];
+        yield 'a hash in the password is ambiguous' => ['from https://igor:pw#x@repo.acme.test/p', 'from https://(withheld: ambiguous host)'];
         yield 'a url escaped for json' => ['{"url":"https:\\/\\/user:pw@h.example\\/p?token=t"}', '{"url":"https:\\/\\/h.example\\/p"}'];
         yield 'a scheme that starts like file' => ['from files://u:p@h.example/x', 'from files://h.example/x'];
         yield 'a url right after a local one' => ['file:///srv/a/b,https://u:p@h.example/x', 'file://.../b,https://h.example/x'];
@@ -306,6 +306,9 @@ final class RepositoryUrlTest extends TestCase
             'https://tok/en@gitlab-internal/g/p',
             'https://ab@cd/ef@github.com/o/r',
             'https://tok\\en@github.com/o/r',
+            'https://tok?en@github.com/o/r',
+            'https://us#er:pa?ss@github.com/o/r',
+            'https://a:b?c/d@github.com/o/r',
         ] as $url) {
             yield $url => [$url];
         }

@@ -222,7 +222,7 @@ final class RepoLocatorTest extends TestCase
         yield 'a prefix mismatch' => ['https://gitlab.example.com:8443/other/g/p.git', $none, 'gitlab.example.com:8443', null, null];
         yield 'a userinfo with a raw slash names no host' => ['https://tok/en@github.com/o/r', $none, null, null, null];
         yield 'a user and a port-like password with a raw slash name no host' => ['https://deploy:1234/5678@gitlab.corp/g/p.git', $none, null, null, null];
-        foreach (['https://us.er/tok@github.com/o/r', 'https://first.last:pa/ss@git.corp/g/p.git', 'https://me@corp.com:pa/ss@git.corp/g/p', 'https://tok/en@gitlab-internal/g/p', 'https://ab@cd/ef@github.com/o/r', 'https://tok\\en@github.com/o/r'] as $ambiguous) {
+        foreach (['https://us.er/tok@github.com/o/r', 'https://first.last:pa/ss@git.corp/g/p.git', 'https://me@corp.com:pa/ss@git.corp/g/p', 'https://tok/en@gitlab-internal/g/p', 'https://ab@cd/ef@github.com/o/r', 'https://tok\\en@github.com/o/r', 'https://tok?en@github.com/o/r', 'https://us#er:pa?ss@github.com/o/r', 'https://a:b?c/d@github.com/o/r'] as $ambiguous) {
             yield 'an ambiguous host names no host: '.$ambiguous => [$ambiguous, $none, null, null, null];
         }
         yield 'a path that reads as another host names no host' => ['https://a/b@evil.com/x', $none, null, null, null];

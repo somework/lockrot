@@ -99,15 +99,21 @@ final class RepositoryUrl
      * and a client reaches the text before it. A token or password pasted with a raw `/` or `\\`
      * puts an `@` after that point. The URL is ambiguous when an `@` follows the first separator and
      * the text before the separator is not a host with an optional numeric port, has no `.`, or
-     * the label after the last `@` has one. A report withholds such a URL: it may be unclear and
+     * the label after the last `@` has one. A `?` or `#` before the separator with an `@` after it is
+     * ambiguous too. A report withholds such a URL: it may be unclear and
      * never shows the userinfo or either reading as the host.
      */
     public static function hasAmbiguousHost(string $afterScheme): bool
     {
-        $pre = substr($afterScheme, 0, strcspn($afterScheme, '?#'));
-        $separator = strcspn($pre, '/\\');
+        $separator = strcspn($afterScheme, '/\\');
+        $query = strcspn($afterScheme, '?#');
+        // A client ends the authority at `?` or `#`, so a userinfo that holds one hides the host.
+        if ($query < $separator && strpos($afterScheme, '@', $query) !== false) {
+            return true;
+        }
+        $pre = substr($afterScheme, 0, $query);
         $at = strrpos($pre, '@');
-        if ($separator === \strlen($pre) || $at === false || $at < $separator) {
+        if ($separator >= \strlen($pre) || $at === false || $at < $separator) {
             return false;
         }
         $first = substr($pre, 0, $separator);
