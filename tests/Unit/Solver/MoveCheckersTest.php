@@ -647,6 +647,41 @@ final class MoveCheckersTest extends TestCase
         self::assertSame(['acme/contract'], $project->lockOutOfSync($lock, true), 'the lock_out_of_sync note names the name that the provide does not meet');
     }
 
+    /**
+     * JSON decoding turns a numeric link key of a remote release into an integer. Composer's
+     * `update acme/lib:^1.1` refuses a release that requires the name `5`, which no repository
+     * lists, and reads the other link maps. A vcs repository does not change the refusal: Composer's
+     * pool builder asks the repositories after the first one for the name `0`, not `5`.
+     *
+     * @dataProvider numberLinkKeysOfARemoteRelease
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('numberLinkKeysOfARemoteRelease')]
+    public function testARemoteReleaseWithANumberAsALinkKeyIsSolvedAsComposerSolvesIt(string $field, bool $vcs, string $constraint, string $result): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $loader = new ArrayLoader();
+        $remote = [$loader->load(['name' => 'acme/lib', 'version' => '1.0.0']), $loader->load(['name' => 'acme/lib', 'version' => '1.1.0', $field => ['5' => '1.0']])];
+        $repositories = [new RecordingComposerRepository($remote)];
+        if ($vcs) {
+            array_unshift($repositories, new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']));
+        }
+        $checker = MoveCheckers::forProject(self::root(), $lock, ProjectConfig::empty(), new Config(false), $repositories, '8.4', false, Deadline::never());
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', $constraint, '1.1.0'));
+
+        self::assertSame([$result, null], [$outcome->check()->result(), $checker->solverError()]);
+    }
+
+    /** @return iterable<string, array{string, bool, string, string}> */
+    public static function numberLinkKeysOfARemoteRelease(): iterable
+    {
+        yield 'require' => ['require', false, '^1.1', MoveCheck::REFUSED];
+        yield 'conflict' => ['conflict', false, '^1.1', MoveCheck::RESOLVES];
+        yield 'provide' => ['provide', false, '^1.1', MoveCheck::RESOLVES];
+        yield 'replace' => ['replace', false, '^1.1', MoveCheck::RESOLVES];
+        yield 'require beside a vcs repository' => ['require', true, '^1.1', MoveCheck::REFUSED];
+    }
+
     /** @return iterable<string, array{array{require?: array<string, string>, provide?: array<string, string>}, list<array<string, mixed>>, array<string, mixed>}> */
     public static function rootsWhoseRequirementTheLockDoesNotHold(): iterable
     {

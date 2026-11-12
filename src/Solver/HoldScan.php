@@ -43,12 +43,14 @@ final class HoldScan
         $holds = [];
         $version = $target->getPrettyVersion();
         $rootRequires = ComposerSolver::rootLinks($this->root);
-        foreach ($target->getConflicts() as $name => $link) {
+        foreach ($target->getConflicts() as $link) {
+            $name = $link->getTarget();
             if ($this->isLockedIn($name, $link->getConstraint())) {
                 $holds[] = new Holder(Holder::PACKAGE, $target->getName(), $version, Holder::CONFLICT, $link->getPrettyConstraint(), $name);
             }
         }
-        foreach ($target->getRequires() as $name => $link) {
+        foreach ($target->getRequires() as $link) {
+            $name = $link->getTarget();
             if ($name === 'php') {
                 if ($targetPhp !== null && !$link->getConstraint()->matches(new Constraint('==', $targetPhp))) {
                     $holds[] = new Holder(Holder::PACKAGE, $target->getName(), $version, Holder::PLATFORM, $link->getPrettyConstraint(), $name);

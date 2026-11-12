@@ -1288,6 +1288,19 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['class' => \Error::class, 'message' => 'Call to undefined method Composer\\DependencyResolver\\Pool::removed()'], $checker->solverError());
     }
 
+    /** PHP's TypeError text names a signature and an absolute path, and the run note prints the kept message. */
+    public function testATypeErrorOfTheSolveKeepsNoPhpTextAndNoPath(): void
+    {
+        $error = new \TypeError('Composer\\Package\\Loader\\ValidatingArrayLoader::hasPackageNamingError(): Argument #1 ($name) must be of type string, int given, called in /home/user/vendor/composer/composer/src/Composer/Package/Loader/ArrayLoader.php on line 12');
+        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/new-dependency' => '^1.0']]]], [], ['acme/new-dependency' => $error]);
+        $checker = self::checkerWith(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], $source);
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+
+        self::assertSame(MoveCheck::SOLVER_ERROR, $outcome->check()->reason());
+        self::assertSame(['class' => \TypeError::class, 'message' => 'a value in the package metadata has the wrong type'], $checker->solverError());
+    }
+
     /** Ruling R14-1: after an error in a repository's answer stops one solve, a later solve that needs that name reads it as not loaded. */
     public function testALaterSolveThatNeedsANameWhoseLoadRaisedAnErrorIsNotCheckedWithAnUnloadedName(): void
     {

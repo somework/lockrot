@@ -292,7 +292,7 @@ final class ComposerSolver
      */
     private function withoutMetUnreached(array $failures, Pool $pool, LockTransaction $answer): array
     {
-        $unreached = array_keys($failures, VersionSource::UNREACHED, true);
+        $unreached = array_map('strval', array_keys($failures, VersionSource::UNREACHED, true));
         if ($unreached === []) {
             return $failures;
         }
@@ -315,7 +315,8 @@ final class ComposerSolver
                 continue;
             }
             $counted[spl_object_id($package)] = true;
-            foreach ($package->getRequires() as $name => $link) {
+            foreach ($package->getRequires() as $link) {
+                $name = $link->getTarget();
                 $providers = $pool->whatProvides($name, $link->getConstraint());
                 if (!\in_array($name, $unreached, true)) {
                     $queue = array_merge($queue, array_filter($providers, static fn (BasePackage $provider): bool => !isset($installed[self::baseOf($provider)->getName()])));
@@ -341,7 +342,8 @@ final class ComposerSolver
      */
     private function isInstallable(BasePackage $package, Pool $pool, array $unreached): bool
     {
-        foreach ($package->getRequires() as $name => $link) {
+        foreach ($package->getRequires() as $link) {
+            $name = $link->getTarget();
             if (!\in_array($name, $unreached, true) && !$this->filter->isIgnored($name) && $pool->whatProvides($name, $link->getConstraint()) === []) {
                 return false;
             }

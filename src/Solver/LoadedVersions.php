@@ -35,7 +35,7 @@ final class LoadedVersions extends ArrayRepository
      */
     public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = [])
     {
-        foreach ($this->source->versionsOf(array_keys(array_diff_key($packageNameMap, $this->byName))) as $name => $versions) {
+        foreach ($this->source->versionsOf(array_map('strval', array_keys(array_diff_key($packageNameMap, $this->byName)))) as $name => $versions) {
             $this->byName[$name] = $versions;
             foreach ($versions as $package) {
                 $this->packages[] = $package;
@@ -74,9 +74,13 @@ final class LoadedVersions extends ArrayRepository
         return ['namesFound' => array_keys(array_filter($asked)), 'packages' => $result];
     }
 
-    /** @return list<string> the names that the pool builder asked for */
+    /**
+     * A numeric link key of a release reads as an integer key here, as in Composer's pool builder.
+     *
+     * @return list<string> the names that the pool builder asked for
+     */
     public function asked(): array
     {
-        return array_keys($this->byName);
+        return array_map('strval', array_keys($this->byName));
     }
 }
