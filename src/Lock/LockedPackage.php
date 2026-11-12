@@ -81,9 +81,9 @@ final class LockedPackage
         $phpLink = $links['php'] ?? null;
 
         $requires = [];
-        foreach (array_keys($links) as $target) {
-            if (!PlatformRepository::isPlatformPackage($target)) {
-                $requires[] = $target;
+        foreach ($links as $link) {
+            if (!PlatformRepository::isPlatformPackage($link->getTarget())) {
+                $requires[] = $link->getTarget();
             }
         }
 

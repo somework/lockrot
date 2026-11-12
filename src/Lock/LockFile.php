@@ -208,8 +208,8 @@ final class LockFile
 
     /**
      * JSON decoding turns a numeric key into an integer, and Composer's loader keeps it as the key
-     * of a link that it reads: a link with a string constraint. Composer's typed code then fails on
-     * that key with a TypeError.
+     * of a link that it reads: a link with a string constraint. A typed method then fails on that
+     * key with a TypeError, whose message quotes a PHP function and a path.
      *
      * @param array<mixed> $entry
      *
