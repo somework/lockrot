@@ -125,8 +125,8 @@ jobs:
               open('build/covers-nothing-%d.filter' % i, 'w').write('/^(' + '|'.join(map(re.escape, half)) + ')::/')
           PY
             for h in 1 2; do
-              filters[$h]=$(< "build/covers-nothing-$h.filter")
-              list_tests -c "phpunit-ci-$h.xml" --filter "${filters[$h]}" > "build/covers-nothing-$h.txt"
+              filters[h]=$(< "build/covers-nothing-$h.filter")
+              list_tests -c "phpunit-ci-$h.xml" --filter "${filters[h]}" > "build/covers-nothing-$h.txt"
             done
             LC_ALL=C sort build/covers-nothing-1.txt build/covers-nothing-2.txt > build/covers-nothing-union.txt
             echo "covers-nothing tests: unsplit $(wc -l < build/covers-nothing-all.txt), covers-nothing-1 $(wc -l < build/covers-nothing-1.txt), covers-nothing-2 $(wc -l < build/covers-nothing-2.txt)"
@@ -140,9 +140,12 @@ jobs:
           # pipefail makes the subshell exit with PHPUnit's status, not the status of tee or sed.
           pids=()
           for i in "${!runs[@]}"; do
+            # The covers-nothing processes write a JUnit log, which the class timing report below reads.
+            junit=()
+            if [ "${{ matrix.covers_nothing }}" = "true" ] && [ "${names[$i]}" != default ]; then junit=(--log-junit "build/junit-${names[$i]}.xml"); fi
             (
               set -o pipefail
-              vendor/bin/phpunit -c "phpunit-ci-$i.xml" ${filters[$i]:+--filter "${filters[$i]}"} 2>&1 \
+              vendor/bin/phpunit -c "phpunit-ci-$i.xml" "${junit[@]}" ${filters[$i]:+--filter "${filters[$i]}"} 2>&1 \
                 | tee "build/phpunit-${names[$i]}.log" | sed -u "s/^/[${names[$i]}] /"
             ) &
             pids+=($!)
@@ -153,6 +156,25 @@ jobs:
             echo "=== phpunit ${names[$i]}: exit $status"
             if [ "$status" -ne 0 ]; then failed=1; fi
           done
+          # The ten slowest classes of the covers-nothing processes, from their JUnit logs. A missing log
+          # prints nothing: the failed process already fails the step.
+          python3 - <<'PY' | tee -a "${GITHUB_STEP_SUMMARY:-/dev/null}" || true
+          import glob
+          import xml.etree.ElementTree as ET
+          from collections import defaultdict
+          times = defaultdict(float)
+          for path in sorted(glob.glob('build/junit-*.xml')):
+              try:
+                  for case in ET.parse(path).iter('testcase'):
+                      times[case.get('classname') or case.get('class') or '?'] += float(case.get('time') or 0)
+              except (ET.ParseError, OSError, ValueError):
+                  continue
+          if times:
+              print('### Slowest covers-nothing classes (php ${{ matrix.php }})\n')
+              print('| Class | Seconds |\n|---|---|')
+              for name, t in sorted(times.items(), key=lambda kv: -kv[1])[:10]:
+                  print('| `%s` | %.1f |' % (name, t))
+          PY
           if [ "$failed" -ne 0 ]; then exit 1; fi
       # ubuntu-latest generates no comma locale, so the comma-locale tests skip in the step "Run tests
       # with the matrix Composer binary". The 8.5/latest row generates de_DE and fails when they skip.
