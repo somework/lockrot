@@ -34,7 +34,9 @@ final class FindingRelationsTest extends TestCase
     private const WHOLE = ['corpus/', 'variants/', 'coverage/baselined/'];
     /** The case documents that hold a whole report: the composite, and each case whose finding comes with its `parents`. */
     private const WHOLE_CASES = [
-        'cases/commonmark.json', 'cases/composite.json', 'cases/many-dependents.json', 'cases/mc-baseline-refused-dagger.json',
+        'cases/commonmark.json', 'cases/composite.json', 'cases/many-dependents.json', 'cases/mc-baseline-provide-unmatched-dagger.json',
+        'cases/mc-baseline-refused-dagger.json', 'cases/mc-baseline-synced-non-dev-dagger.json', 'cases/mc-baseline-unsynced-dagger.json',
+        'cases/mc-baseline-unsynced-hashless-dagger.json',
         'cases/mc-blocking-off-both-dagger.json', 'cases/mc-blocking-off-dagger.json', 'cases/mc-canonical-package-dagger.json',
         'cases/mc-canonical-vcs-dagger.json', 'cases/mc-canonical-vcs-unmatched-dagger.json', 'cases/mc-composite-dagger.json',
         'cases/mc-dev-update-dagger.json', 'cases/mc-filter-only-dagger.json', 'cases/mc-gets-below-dagger.json', 'cases/mc-gets-next-form-dagger.json',
@@ -53,7 +55,7 @@ final class FindingRelationsTest extends TestCase
     public function testEveryFixtureDocumentHoldsEveryRelation(): void
     {
         $paths = self::documents();
-        self::assertCount(459, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
+        self::assertCount(463, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
         $broken = [];
         foreach (array_merge($paths, [self::COMPOSITE]) as $path) {
             $document = self::read($path);
