@@ -17,7 +17,7 @@ use Lockrot\Verdict\ScoreModel;
 
 /**
  * The single producer of `gate.by[]`: per active value that a finding fails, the facts whose records
- * are `error` (SPEC §6.2, "Record marks follow the fact"). github, gitlab and sarif read their marks
+ * are `error` . github, gitlab and sarif read their marks
  * from it, so no format keeps a second copy of the rule.
  *
  * @internal

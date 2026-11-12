@@ -73,7 +73,7 @@ final class Analyzer
 {
     /**
      * A refusal holds the releases that its constraint admits, so the release scan and the moves of
-     * the package run again with it (SPEC §5.3). The checks are kept, so a pass asks Composer only
+     * the package run again with it. The checks are kept, so a pass asks Composer only
      * the requests that a new move needs. The cap stops a chain of refusals that each name a new move.
      */
     public const CHECK_PASSES = 3;

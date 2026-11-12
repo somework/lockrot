@@ -43,7 +43,7 @@ final class PackageMetadata
     private ?string $abandonedBy;
     private bool $hasStableRelease;
 
-    /** Any tag that is not a dev branch, a pre-release included: S2 and S6 read it (ruling W17-X1). */
+    /** Any tag that is not a dev branch, a pre-release included: S2 and S6 read it. */
     private bool $hasTag;
     private ?\DateTimeImmutable $lastStableReleaseAt;
     private ?string $lastStableVersion;
@@ -120,7 +120,7 @@ final class PackageMetadata
     private ?string $newestPhp = null;
     private bool $highestBranchDatedByParent = false;
 
-    /** Whether the highest non-dev tag is a pre-release with no `time`: ruling R17-D1 keeps the S2 reading unknown. */
+    /** Whether the highest non-dev tag is a pre-release with no `time`: that keeps the S2 reading unknown. */
     private bool $highestTagIsUndatedPreRelease = false;
 
     /**
@@ -320,7 +320,7 @@ final class PackageMetadata
         // The package's age is its highest tag's age. When that tag has no trusted date, an older
         // dated tag is not the last release, and S2 has nothing to measure. S2 never reads a
         // shared commit's date, also when a lower tag than the highest one carries the newest date.
-        // The version stays set while a tag exists: S6 and the moves name it (SPEC I18b).
+        // The version stays set while a tag exists: S6 and the moves name it.
         $highestShared = $highestCommit !== null && isset($tagsOnCommit[$highestCommit]) && $tagsOnCommit[$highestCommit] >= self::SHARED_COMMIT_TAGS;
         $newestShared = $lastStableCommit !== null && isset($tagsOnCommit[$lastStableCommit]) && $tagsOnCommit[$lastStableCommit] >= self::SHARED_COMMIT_TAGS;
         // An undated highest tag stays the cause that S10 names.
@@ -361,8 +361,8 @@ final class PackageMetadata
         // never moves down a line. A highest tag with no trusted date keeps its own reading.
         $highestUndated = $highestStable !== null && ($highestStable->getReleaseDate() === null || $highestShared);
         [$newestAt, $newestVersion] = self::onTheHighestLine($lastStableReleaseAt, $lastStableVersion, $lastStableNormalized, $highestUndated, $byBranch, $newestDatedByBranch, $sharedCommitVersions);
-        // Ruling W17-X1: S6, the moves and the metadata fields read stable tags only, as libyears do
-        // (O5). S2 keeps the reading above, pre-releases included.
+        // S6, the moves and the metadata fields read stable tags only, as libyears do.
+        // S2 keeps the reading above, pre-releases included.
         [$stableAt, $stableVersion, $stableNormalized, $stableUndated] = self::lastStableOf($stable, $commitOfTag, $tagsOnCommit);
         [$lastStableReleaseAt, $lastStableVersion] = self::onTheHighestLine($stableAt, $stableVersion, $stableNormalized, $stableUndated, $byBranch, $newestDatedByBranch, $sharedCommitVersions);
         // A package with dev branches only has no version order: read its first branch, which
@@ -601,15 +601,15 @@ final class PackageMetadata
         if ($newestLine !== null) {
             [$newestAt, $newestVersion, $newestPhp] = $newestLine;
         }
-        // SPEC §8.4.1: S2 reads the newest tag by trusted date over every branch row, so a lower
+        // S2 reads the newest tag by trusted date over every branch row, so a lower
         // branch that the parent dates counts too. A shared commit's date is only a lower bound of
         // its release: a newer one that the parent does not date leaves the age unknown.
         $releaseReadingAt = $this->releaseReadingAt;
         $releaseReadingVersion = $this->releaseReadingVersion;
         $releaseReadingDatedBy = $this->releaseReadingDatedBy;
         $readingSharesItsCommit = $this->lastStableSharesItsCommit;
-        // Ruling R17-D1: the parent dates stable tags only, so an undated pre-release above them keeps S2 unknown.
-        // A pre-release with a shared commit's date has a date: it blocks only a newer reading (ruling R16-26).
+        // The parent dates stable tags only, so an undated pre-release above them keeps S2 unknown.
+        // A pre-release with a shared commit's date has a date: it blocks only a newer reading.
         $undatedPreRelease = $this->highestTagIsUndatedPreRelease;
         if (!$undatedPreRelease && \in_array($highestBranch, $datedBranches, true)) {
             $releaseReadingAt = $lastStableReleaseAt;
@@ -643,7 +643,7 @@ final class PackageMetadata
                     $releaseReadingDatedBy = $datedByParent ? $parent->name : null;
                 }
             }
-            // The branch rows hold stable tags only. S2 counts a dated pre-release too (SPEC §8.4.1).
+            // The branch rows hold stable tags only. S2 counts a dated pre-release too.
             if ($this->newestPreRelease !== null && !$this->newestPreRelease[3] && self::newerTag($this->newestPreRelease[0], $this->newestPreRelease[1], $releaseReadingAt, $releaseReadingVersion)) {
                 [$releaseReadingAt, $releaseReadingVersion] = $this->newestPreRelease;
                 $releaseReadingDatedBy = null;
@@ -700,7 +700,7 @@ final class PackageMetadata
     /**
      * The highest branch row after the parent dated it, when it replaces $version as the package's
      * newest release: the parent dates that row, or names the shared tag $version, or the highest
-     * tag's own date beats the parent's (ruling R16-16h1). Null when $version stays.
+     * tag's own date beats the parent's. Null when $version stays.
      *
      * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string}> $byBranch
      * @param list<string>                                                                                                                                                                             $datedBranches
@@ -778,7 +778,7 @@ final class PackageMetadata
     }
 
     /**
-     * The newest stable tag by trusted date (ruling R13-A). A highest tag with no date, or with a
+     * The newest stable tag by trusted date. A highest tag with no date, or with a
      * shared commit's date, is the last release with no date.
      *
      * @param array<array-key, array{0: BasePackage, 1: ?\DateTimeImmutable, 2: ?string}> $stable       by normalized version
@@ -949,7 +949,7 @@ final class PackageMetadata
         return $this->dataDate;
     }
 
-    /** Whether the package has a stable tag (ruling W17-X1). A tag with build metadata is stable. */
+    /** Whether the package has a stable tag. A tag with build metadata is stable. */
     public function hasStableRelease(): bool
     {
         return $this->hasStableRelease;
@@ -960,7 +960,7 @@ final class PackageMetadata
         return $this->hasTag;
     }
 
-    /** The newest tag by trusted date, a pre-release included (ruling R13-A), null with no tag. */
+    /** The newest tag by trusted date, a pre-release included, null with no tag. */
     public function newestTagVersion(): ?string
     {
         return $this->newestVersion;
@@ -980,7 +980,7 @@ final class PackageMetadata
 
     /**
      * The newest trusted date of a stable tag, or the parent's date of the highest branch
-     * ({@see datedBy()}). A pre-release never counts (ruling W17-X1). A newest date on a line below
+     * ({@see datedBy()}). A pre-release never counts. A newest date on a line below
      * the highest stable line gives way to that line's newest date. Null when the highest stable tag
      * has no trusted date, or when the date is that of a commit its tags share.
      */
@@ -991,8 +991,8 @@ final class PackageMetadata
 
     /**
      * The trusted date of the highest stable tag, the newest end of libyears. A pre-release never
-     * ends libyears, and a lower tag with a later date does not count (rulings R16-16c, R16-16g,
-     * O5). Null when that tag has no trusted date. Without a branch row, {@see lastStableReleaseAt()}.
+     * ends libyears, and a lower tag with a later date does not count.
+     * Null when that tag has no trusted date. Without a branch row, {@see lastStableReleaseAt()}.
      */
     public function highestStableTagAt(): ?\DateTimeImmutable
     {
@@ -1003,7 +1003,7 @@ final class PackageMetadata
 
     /**
      * True when the version is the highest stable tag, or a pre-release above it: libyears end
-     * there (rulings R17-13b, O5). A stable version above that tag is a tag that the repository
+     * there. A stable version above that tag is a tag that the repository
      * does not list, and stays measured.
      */
     public function isAtOrAboveTheHighestStableTag(string $version): bool
@@ -1021,7 +1021,7 @@ final class PackageMetadata
 
     /**
      * The date of the release that S2 judges: the newest trusted date of a non-dev tag, pre-releases
-     * included, also a parent date of a lower branch (SPEC §8.4.1 `age.release`). A tie goes to the
+     * included, also a parent date of a lower branch (`age.release`). A tie goes to the
      * higher version. Null when the highest tag has no trusted date, or when a newer date is a shared
      * commit's.
      */
@@ -1044,9 +1044,9 @@ final class PackageMetadata
 
     /**
      * The stable tag that {@see lastStableReleaseAt()} dates. With no trusted date, the highest
-     * stable tag when that one has none, else the newest-dated stable tag. Never a pre-release
-     * (ruling W17-X1), and never a tag on a line below the highest stable line. Null only when no
-     * stable tag exists (ruling R17-X1a).
+     * stable tag when that one has none, else the newest-dated stable tag. Never a pre-release,
+     * and never a tag on a line below the highest stable line. Null only when no
+     * stable tag exists.
      */
     public function lastStableVersion(): ?string
     {

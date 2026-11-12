@@ -88,7 +88,7 @@ final class MaintenanceMove
             return MoveDraft::of(Move::NO_TAG, FlagSet::PINNED);
         }
         // A snapshot with no line of its own is on the highest stable line, so the move never goes
-        // down a line. With no branch row, the target is the newest tag, a pre-release included (I18b).
+        // down a line. With no branch row, the target is the newest tag, a pre-release included.
         $branch = $context->rows()[0] ?? null;
         if ($branch !== null) {
             // The newest dated tag can be a backport below its branch's highest tag: the move requires the highest tag.

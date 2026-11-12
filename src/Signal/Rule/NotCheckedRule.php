@@ -74,7 +74,7 @@ final class NotCheckedRule implements SignalRule
 
     /** The causes of a `release_dates` entry ({@see Check::causes()}): the installed tag's lock date is a commit that other tags share. */
     public const CAUSE_INSTALLED_SHARED_COMMIT = 'installed_shared_commit';
-    /** The installed tag has its own commit, but a parent dates the split's newest release (ruling R13-31). */
+    /** The installed tag has its own commit, but a parent dates the split's newest release. */
     public const CAUSE_INSTALLED_PARENT_SPLIT = 'installed_parent_split';
     /** The lock entry of the installed release has no `time`. */
     public const CAUSE_LOCK_UNDATED = 'lock_undated';

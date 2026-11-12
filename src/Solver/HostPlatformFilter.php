@@ -10,7 +10,7 @@ use Composer\Filter\PlatformRequirementFilter\PlatformRequirementFilterInterface
 /**
  * Ignores the requirements on {@see ComposerSolver::IGNORED_PLATFORM}, as Composer's
  * `--ignore-platform-req` does, except the names that `config.platform` sets: those are the
- * project's facts, not the facts of the machine that runs lockrot (ruling R6-2).
+ * project's facts, not the facts of the machine that runs lockrot.
  *
  * @internal
  */

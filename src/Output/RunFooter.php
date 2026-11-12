@@ -337,7 +337,7 @@ final class RunFooter
     }
 
     /**
-     * The `target_fix` clause (§7.0): Composer's answer to the update of the listed packages.
+     * The `target_fix` clause: Composer's answer to the update of the listed packages.
      *
      * @param array{packages: list<array{name: ?string, dev: bool}>, command: ?list<string>, check: string, reason: ?string, held_by: list<Holder>, platform_step: bool} $fix
      * @param callable(string): string                                                                                                                          $name

@@ -15,7 +15,7 @@ use Composer\DependencyResolver\Request;
  */
 final class SolveRequest
 {
-    /** A name that no lock holds: its partial update moves nothing (D5's baseline). */
+    /** A name that no lock holds: its partial update moves nothing. */
     public const BASELINE_NAME = 'lockrot/baseline';
 
     public const LISTED = Request::UPDATE_ONLY_LISTED;

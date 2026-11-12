@@ -174,7 +174,7 @@ final class PhpWindow implements \JsonSerializable
     }
 
     /**
-     * Whether the target lies below the lowest edge (SPEC §5.9): the set that `target.inside` reads
+     * Whether the target lies below the lowest edge: the set that `target.inside` reads
      * keeps no window minor of the target, and `target.php` lies below its `lower_edge.php`.
      */
     public function targetBelowLowest(): bool
@@ -443,7 +443,7 @@ final class PhpWindow implements \JsonSerializable
 
     /**
      * Whether a patch of $minor above $point installs the lock: a patch floor or a conflict hole
-     * that holds the point. The minor is then in the window (SPEC §5.9, the later-patch rule).
+     * that holds the point. The minor is then in the window.
      *
      * @param list<PhpLink> $links
      */

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Verdict;
 
 /**
- * The renderings of an argv list (SPEC-0.14.md §5.6). The text formats print the POSIX rendering,
+ * The renderings of an argv list. The text formats print the POSIX rendering,
  * and the html copy menu offers cmd.exe and PowerShell. Each rendering is null for an argv that
  * {@see CommandArgument} refuses: no quoting is safe for it on every shell.
  *

@@ -11,10 +11,10 @@ use Lockrot\Verdict\Move;
 use Lockrot\Verdict\MoveChecks;
 
 /**
- * `security.update_now` and its command (D9). The candidates are the vulnerable findings whose lead
+ * `security.update_now` and its command. The candidates are the vulnerable findings whose lead
  * move is an `update` that clears at least one of their advisories and that Composer's solver
  * resolves inline without a joint request of its holders. A move whose version holds a shell
- * operator is no candidate (SPEC §5.6).
+ * operator is no candidate.
  * The command updates them in one request. When Composer refuses them together, the command leaves
  * out the candidates that the refusal names and asks once more. The members are the names of a
  * command that Composer resolves: with none, `update now` is empty and a run note says why.

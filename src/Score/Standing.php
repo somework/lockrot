@@ -10,7 +10,7 @@ use Lockrot\Verdict\Score;
 use Lockrot\Verdict\ScoreModel;
 
 /**
- * Where one finding stands against the baseline, `finding.baseline` (SPEC §6.4, "Standing"): `new`
+ * Where one finding stands against the baseline, `finding.baseline`: `new`
  * for a graded package without an entry, `worsened` when the entry leaves a counted flag uncovered or
  * does not know a counted advisory, else `known`. A degree change inside one word is never `worsened`.
  *

@@ -528,7 +528,7 @@ final class RunNote
     }
 
     /**
-     * D5: Composer refuses a partial update of a name outside the lock, so it would refuse every
+     * Composer refuses a partial update of a name outside the lock, so it would refuse every
      * move for the same reason. The text names the cause of the first problem, and `data.problem` holds
      * Composer's whole problem text.
      *
@@ -544,7 +544,7 @@ final class RunNote
     }
 
     /**
-     * D9: the members of `security.update_now` that the combined command leaves out, because
+     * The members of `security.update_now` that the combined command leaves out, because
      * Composer refuses them together with the others.
      *
      * @param list<string> $leftOut in report order
@@ -564,7 +564,7 @@ final class RunNote
         ), false, ['left_out' => $leftOut, 'problem' => $problem]);
     }
 
-    /** D9: Composer refuses the members of `security.update_now` together, so the report writes no command. */
+    /** Composer refuses the members of `security.update_now` together, so the report writes no command. */
     public static function updateNowRefused(string $problem): self
     {
         return self::of(self::UPDATE_NOW_REFUSED, \sprintf(
@@ -574,7 +574,7 @@ final class RunNote
     }
 
     /**
-     * D9: Composer's solver did not check the combined update, so `update now` names no package.
+     * Composer's solver did not check the combined update, so `update now` names no package.
      *
      * @param list<string> $packages the candidates, in report order
      */

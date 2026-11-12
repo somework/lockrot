@@ -68,8 +68,8 @@ final class CheckOutcome
      * when the solve installs a release of the package inside $constraint and changes a holder's
      * release (the same tag again is no change, a branch on another commit is one). Advisory blocking
      * skips a dev version, so a dev version of the package or of a holder that had a release keeps
-     * this refusal (R3-1, R17-1), and so does a holder moved below its release, which is no update
-     * (R4-2). A joint refusal gives its own holds. Any other answer keeps this refusal.
+     * this refusal, and so does a holder moved below its release, which is no update.
+     * A joint refusal gives its own holds. Any other answer keeps this refusal.
      *
      * @param list<string> $holders
      */

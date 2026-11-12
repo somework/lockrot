@@ -210,7 +210,7 @@ final class SarifFormatter implements FormatterInterface
             throw new \RuntimeException('Cannot encode report as SARIF: '.json_last_error_msg());
         }
 
-        // SARIF types `rank` as a float (100.0). Every other whole number reads as report-2 writes it (SPEC-0.14.md §8.5.4).
+        // SARIF types `rank` as a float (100.0). Every other whole number reads as report-2 writes it.
         // The pretty print puts the keys of runs[].results[] 20 spaces deep, so a deeper `rank` in a property bag stays whole.
         return TerminalText::breakJsonLogCommands((string) preg_replace('{^( {20}"rank": -?\d+)(,?)$}m', '$1.0$2', $json))."\n";
     }

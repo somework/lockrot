@@ -177,9 +177,8 @@ final class Gate
     }
 
     /**
-     * The advisories a grade or `vulnerable` value could not read, one entry per reason (SPEC §6.2,
-     * "Fail-open, visibly"). A finding that fails `unchecked` on S10 of its advisories fails closed,
-     * so its gap is not listed. A baseline entry that exempts the finding leaves the gap listed.
+     * The advisories a grade or `vulnerable` value could not read, one entry per reason. A finding that fails `unchecked` on S10 of its
+     * advisories fails closed, so its gap is not listed. A baseline entry that exempts the finding leaves the gap listed.
      *
      * @param list<Finding>               $findings
      * @param array<string, GateStanding> $byPackage

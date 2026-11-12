@@ -132,7 +132,7 @@ final class FormatContext
 
     /**
      * The findings that get a record, in the report's order: the graded ones, every one that fails
-     * the gate (I15b), and with `unchecked` active every one with a missing check. Under `--all`,
+     * the gate, and with `unchecked` active every one with a missing check. Under `--all`,
      * every finding.
      *
      * @return list<Finding>
@@ -170,7 +170,7 @@ final class FormatContext
      * The level of the run-level `advisories not checked` record, null when every lookup ran. It is
      * `error` only when a finding fails the `unchecked` value with S10 for its advisories: the gate
      * then fails on that gap. A skip, an accepted gap or a gap that the baseline knows is a
-     * `warning` (SPEC §6.2).
+     * `warning`.
      */
     public function advisoriesNotCheckedLevel(Report $report): ?string
     {

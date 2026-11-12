@@ -347,7 +347,7 @@ final class FindingDetails
     /**
      * The Gets of the release that `gets` names: the release that the installed branch's checked
      * move installs, when it is not the release `composer update` targets. A resolving solve also
-     * outranks the refusals that cap every release (ruling R2-1). Null when they cap every release
+     * outranks the refusals that cap every release. Null when they cap every release
      * and no solve resolves.
      */
     private function namedGets(Gets $gets, ?BranchFixes $installed): ?Gets
@@ -402,7 +402,7 @@ final class FindingDetails
 
     /**
      * The installed branch's `fixes`, null only for a branch snapshot. With no release data the
-     * scan has no branch row, so the S9 rows give it: unread release data gives no fix (SPEC §5.3).
+     * scan has no branch row, so the S9 rows give it: unread release data gives no fix.
      *
      * @param list<AdvisoryRow> $rows
      */
