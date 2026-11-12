@@ -75,13 +75,32 @@ final class RepositoryUrl
             return $url;
         }
         if (preg_match('{^(?<scheme>[A-Za-z][A-Za-z0-9+.-]*://)(?:[^/]*@)?(?<rest>[^?#]*)}', $url, $m) === 1) {
-            return strcasecmp($m['scheme'], 'file://') === 0 ? self::local(substr($url, 7)) : $m['scheme'].$m['rest'];
+            return strcasecmp($m['scheme'], 'file://') === 0 ? self::local(substr($url, 7)) : $m['scheme'].substr($m['rest'], self::slashedUserinfoEnd($m['rest']) ?? 0);
         }
         if (preg_match(self::REMOTE, $url, $m) === 1 && ($m['user'] !== '' || strpos($m['host'], '.') !== false)) {
             return $m['remote'];
         }
 
         return self::isLocalPath($url) ? self::local($url) : null;
+    }
+
+    /**
+     * Where a userinfo that holds a raw `/` ends in the text after `://`, or null when the text has
+     * none. RFC 3986 forbids the `/`, and a token pasted unencoded does it. The text before the
+     * first `/` must not read as a host (no `.`), and the text after the last `@` must (a `.`), so
+     * that `host.example/path@v2/x` stays a path.
+     */
+    public static function slashedUserinfoEnd(string $afterScheme): ?int
+    {
+        $pre = substr($afterScheme, 0, strcspn($afterScheme, '?#'));
+        $slash = strpos($pre, '/');
+        $at = strrpos($pre, '@');
+        if ($slash === false || $at === false || $at < $slash || strpos(substr($pre, 0, $slash), '.') !== false) {
+            return null;
+        }
+        $host = substr($pre, $at + 1, strcspn($pre, '/', $at + 1));
+
+        return strpos($host, '.') === false ? null : $at + 1;
     }
 
     /** Whether a repository or dist URL is a path on the machine, or a `file://` URL. */
@@ -179,6 +198,9 @@ final class RepositoryUrl
         $authority = substr($text, $start, strcspn($text, self::AUTHORITY_END, $start));
         $userinfo = strrpos($authority, '@');
         $host = $userinfo === false ? $start : $start + $userinfo + 1;
+        if ($userinfo === false) {
+            $host += self::slashedUserinfoEnd(substr($text, $start, strcspn($text, self::URL_END, $start, $limit - $start))) ?? 0;
+        }
         $end = self::trimmed($text, $host, $host + strcspn($text, self::URL_END, $host, $limit - $host));
         $kept = substr($text, $host, $end - $host);
 
