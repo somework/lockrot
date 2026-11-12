@@ -136,15 +136,21 @@ jobs:
               exit 1
             fi
           fi
+          # Each process streams its output with its name as a prefix, so the log shows progress while it runs.
+          # pipefail makes the subshell exit with PHPUnit's status, not the status of tee or sed.
           pids=()
           for i in "${!runs[@]}"; do
-            vendor/bin/phpunit -c "phpunit-ci-$i.xml" ${filters[$i]:+--filter "${filters[$i]}"} > "build/phpunit-${names[$i]}.log" 2>&1 &
+            (
+              set -o pipefail
+              vendor/bin/phpunit -c "phpunit-ci-$i.xml" ${filters[$i]:+--filter "${filters[$i]}"} 2>&1 \
+                | tee "build/phpunit-${names[$i]}.log" | sed -u "s/^/[${names[$i]}] /"
+            ) &
             pids+=($!)
           done
           failed=0
           for i in "${!runs[@]}"; do
             status=0; wait "${pids[$i]}" || status=$?
-            echo "=== phpunit ${names[$i]}: exit $status"; cat "build/phpunit-${names[$i]}.log"
+            echo "=== phpunit ${names[$i]}: exit $status"
             if [ "$status" -ne 0 ]; then failed=1; fi
           done
           if [ "$failed" -ne 0 ]; then exit 1; fi
