@@ -100,41 +100,42 @@ jobs:
           # All of them exist before a process starts, so a failed copy leaves no process running.
           for i in "${!runs[@]}"; do groups_config "phpunit-ci-$i.xml" "${runs[$i]}"; done
           # A half takes whole classes: the --filter pattern anchors on the start of "Class::method", so a data
-          # set suffix cannot move a test. The classes go to the halves by test count, largest first.
-          # The step lists the tests of the unsplit group and of each half, and fails unless the halves
-          # together hold exactly the tests of the group, each once.
-          list_tests() {
-            local out
-            out=$(vendor/bin/phpunit "$@" --list-tests) || { echo "::error::phpunit --list-tests failed"; return 1; }
-            grep '^ - ' <<< "$out" | LC_ALL=C sort
-          }
+          # set suffix cannot move a test. The second half's pattern is the negation of the first, so each
+          # test of the group runs in one half: also a test whose name is an error message, as PHPUnit 9.6
+          # names a test with an invalid data provider. The classes go to the halves by test count, largest first.
+          # PHPUnit 9.6 lists every test with its groups, whatever the configuration selects, and 11.5 lists
+          # only the selected tests without their groups.
           filters=("" "" "" "")
           if [ "${{ matrix.covers_nothing }}" = "true" ]; then
-            list_tests -c phpunit-ci-1.xml > build/covers-nothing-all.txt
-            python3 - build/covers-nothing-all.txt <<'PY'
+            out=$(vendor/bin/phpunit -c phpunit-ci-1.xml --list-tests-xml build/covers-nothing.xml 2>&1) || { printf '%s\n' "$out"; echo "::error::phpunit --list-tests-xml failed"; exit 1; }
+            python3 - build/covers-nothing.xml <<'PY'
           import re, sys
+          import xml.etree.ElementTree as ET
           from collections import Counter
-          lines = [l for l in open(sys.argv[1]) if l.startswith(' - ')]
-          counts = Counter(l[3:].split('::', 1)[0] for l in lines)
+          excluded = {'e2e', 'network', 'sweep', 'schema-sweep'}
+          counts = Counter()
+          for element in ET.parse(sys.argv[1]).getroot().iter():
+              if not element.tag.endswith('Class'):
+                  continue
+              for method in element:
+                  groups = method.get('groups')
+                  names = set(groups.split(',')) if groups is not None else set()
+                  if groups is None or ('covers-nothing' in names and not names & excluded):
+                      counts[element.get('name')] += 1
           halves, load = ([], []), [0, 0]
           for name, n in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0])):
               i = 0 if load[0] <= load[1] else 1
               halves[i].append(name)
               load[i] += n
-          for i, half in enumerate(halves, 1):
-              open('build/covers-nothing-%d.filter' % i, 'w').write('/^(' + '|'.join(map(re.escape, half)) + ')::/')
+          if not halves[0] or not halves[1]:
+              sys.exit('::error::the covers-nothing group lists fewer than two classes')
+          print('covers-nothing classes by listed tests: covers-nothing-1 %d in %d classes, covers-nothing-2 %d in %d classes' % (load[0], len(halves[0]), load[1], len(halves[1])))
+          first = '|'.join(map(re.escape, halves[0]))
+          open('build/covers-nothing-1.filter', 'w').write('/^(' + first + ')::/')
+          open('build/covers-nothing-2.filter', 'w').write('/^(?!(' + first + ')::)/')
           PY
-            for h in 1 2; do
-              filters[h]=$(< "build/covers-nothing-$h.filter")
-              list_tests -c "phpunit-ci-$h.xml" --filter "${filters[h]}" > "build/covers-nothing-$h.txt"
-            done
-            LC_ALL=C sort build/covers-nothing-1.txt build/covers-nothing-2.txt > build/covers-nothing-union.txt
-            echo "covers-nothing tests: unsplit $(wc -l < build/covers-nothing-all.txt), covers-nothing-1 $(wc -l < build/covers-nothing-1.txt), covers-nothing-2 $(wc -l < build/covers-nothing-2.txt)"
-            if [ ! -s build/covers-nothing-1.txt ] || [ ! -s build/covers-nothing-2.txt ] || ! cmp -s build/covers-nothing-all.txt build/covers-nothing-union.txt; then
-              echo "::error::the covers-nothing halves are not a partition of the covers-nothing group"
-              diff build/covers-nothing-all.txt build/covers-nothing-union.txt | head -20 || true
-              exit 1
-            fi
+            filters[1]=$(< build/covers-nothing-1.filter)
+            filters[2]=$(< build/covers-nothing-2.filter)
           fi
           # Each process streams its output with its name as a prefix, so the log shows progress while it runs.
           # pipefail makes the subshell exit with PHPUnit's status, not the status of tee or sed.
