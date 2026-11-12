@@ -17,6 +17,9 @@ final class RepositoryUrl
     /** A byte outside every well-formed UTF-8 sequence (RFC 3629): the valid sequences are skipped. */
     private const INVALID_UTF8 = '{(?:[\x00-\x7F]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})(*SKIP)(*FAIL)|[\x80-\xFF]}';
 
+    /** What a report quotes in place of a URL whose host is ambiguous, see {@see slashedUserinfoEnd()}. */
+    public const AMBIGUOUS = '(withheld: ambiguous host)';
+
     /** What a report quotes in place of a message PCRE could not finish reading. */
     public const WITHHELD = '(withheld: lockrot could not redact this message)';
 
@@ -75,7 +78,11 @@ final class RepositoryUrl
             return $url;
         }
         if (preg_match('{^(?<scheme>[A-Za-z][A-Za-z0-9+.-]*://)(?:[^/]*@)?(?<rest>[^?#]*)}', $url, $m) === 1) {
-            return strcasecmp($m['scheme'], 'file://') === 0 ? self::local(substr($url, 7)) : $m['scheme'].substr($m['rest'], self::slashedUserinfoEnd($m['rest']) ?? 0);
+            if (strcasecmp($m['scheme'], 'file://') === 0) {
+                return self::local(substr($url, 7));
+            }
+
+            return self::slashedUserinfoEnd($m['rest']) === null ? $m['scheme'].$m['rest'] : null;
         }
         if (preg_match(self::REMOTE, $url, $m) === 1 && ($m['user'] !== '' || strpos($m['host'], '.') !== false)) {
             return $m['remote'];
@@ -88,7 +95,9 @@ final class RepositoryUrl
      * Where a userinfo that holds a raw `/` ends in the text after `://`, or null when the text has
      * none. RFC 3986 forbids the `/`, and a token pasted unencoded does it. The text before the
      * first `/` must not read as a host (no `.`), and the text after the last `@` must (a `.`), so
-     * that `host.example/path@v2/x` stays a path.
+     * that `host.example/path@v2/x` stays a path. Such a URL is ambiguous: a client reaches the text
+     * before the first `/`, and a report must name neither reading as the host, so it withholds the
+     * URL.
      */
     public static function slashedUserinfoEnd(string $afterScheme): ?int
     {
@@ -198,8 +207,10 @@ final class RepositoryUrl
         $authority = substr($text, $start, strcspn($text, self::AUTHORITY_END, $start));
         $userinfo = strrpos($authority, '@');
         $host = $userinfo === false ? $start : $start + $userinfo + 1;
-        if ($userinfo === false) {
-            $host += self::slashedUserinfoEnd(substr($text, $start, strcspn($text, self::URL_END, $start, $limit - $start))) ?? 0;
+        if ($userinfo === false && self::slashedUserinfoEnd(substr($text, $start, strcspn($text, self::URL_END, $start, $limit - $start))) !== null) {
+            $end = self::trimmed($text, $start, $start + strcspn($text, self::URL_END, $start, $limit - $start));
+
+            return [$scheme.self::AMBIGUOUS, $end];
         }
         $end = self::trimmed($text, $host, $host + strcspn($text, self::URL_END, $host, $limit - $host));
         $kept = substr($text, $host, $end - $host);

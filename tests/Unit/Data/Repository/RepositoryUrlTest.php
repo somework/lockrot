@@ -42,8 +42,9 @@ final class RepositoryUrlTest extends TestCase
         yield 'svn over ssh' => ['svn+ssh://igor@svn.acme.test/repo/trunk', 'svn+ssh://svn.acme.test/repo/trunk'];
         yield 'nothing to strip' => ['https://github.com/vendor/pkg.git', 'https://github.com/vendor/pkg.git'];
         yield 'an @ in the path is not userinfo' => ['https://example.test/~user@home/pkg', 'https://example.test/~user@home/pkg'];
-        yield 'a token with a raw slash is userinfo' => ['https://tok/en@github.com/a/b', 'https://github.com/a/b'];
-        yield 'a login and a password with a raw slash' => ['https://deploy:1234/5678@gitlab.corp/a/b.git?x=1', 'https://gitlab.corp/a/b.git'];
+        yield 'a token with a raw slash is userinfo' => ['https://tok/en@github.com/a/b', null];
+        yield 'a login and a password with a raw slash' => ['https://deploy:1234/5678@gitlab.corp/a/b.git?x=1', null];
+        yield 'a path that reads as another host is not shown as the host' => ['https://a/b@evil.com/x', null];
         yield 'an @ in the query is not userinfo' => ['https://example.test/pkg?mail=a@b', 'https://example.test/pkg'];
         yield 'an scp-style remote loses its user' => ['git@github.com:vendor/pkg.git', 'github.com:vendor/pkg.git'];
         yield 'an scp-style remote with a login' => ['igor@git.client-x.lan:libs/core.git', 'git.client-x.lan:libs/core.git'];
@@ -98,6 +99,7 @@ final class RepositoryUrlTest extends TestCase
         yield 'composer prefixes it' => ['git+https://github.com/vendor/pkg.git', 'https://github.com/vendor/pkg'];
         yield 'an scp-style remote means https' => ['git@github.com:vendor/pkg.git', 'https://github.com/vendor/pkg'];
         yield 'whitespace around it' => ["  https://github.com/vendor/pkg.git\n", 'https://github.com/vendor/pkg'];
+        yield 'a path that reads as another host is no link' => ['https://a/b@evil.com/x', null];
         yield 'script in an attribute' => ['javascript:alert(1)', null];
         yield 'a data url' => ['data:text/html;base64,PHNjcmlwdD4=', null];
         yield 'ssh, which a browser cannot open' => ['ssh://git@github.com/vendor/pkg.git', null];
@@ -129,7 +131,8 @@ final class RepositoryUrlTest extends TestCase
         yield 'what Composer 2.10 leaves of a token' => ['composer repo (https://glp***@repo.example.com)', 'composer repo (https://repo.example.com)'];
         yield 'a password with an @' => ['composer repo (https://ci:p@ss@repo.example.com)', 'composer repo (https://repo.example.com)'];
         yield 'an encoded login' => ['composer repo (https://ci%40corp:p%40ss@repo.example.com/sub)', 'composer repo (https://repo.example.com/sub)'];
-        yield 'a token with a raw slash' => ['fail https://deploy:1234/5678@gitlab.corp/a/b.git', 'fail https://gitlab.corp/a/b.git'];
+        yield 'a token with a raw slash' => ['fail https://deploy:1234/5678@gitlab.corp/a/b.git', 'fail https://(withheld: ambiguous host)'];
+        yield 'a path that reads as another host' => ['fail https://a/b@evil.com/x now', 'fail https://(withheld: ambiguous host) now'];
         yield 'an @ after the url is not userinfo' => ['see https://example.test/pkg and mail a@b', 'see https://example.test/pkg and mail a@b'];
         yield 'a token in the query' => ['composer repo (https://repo.example.com/?token=t0k3n)', 'composer repo (https://repo.example.com/)'];
         yield 'a quoted url' => [
