@@ -1137,12 +1137,12 @@
     },
     "data_date": "2026-10-01T17:41:20+00:00",
     "notes": [
-        "lock: the lock file does not match composer.json (acme/feature-flags and acme/metrics are required but not locked): run composer update"
+        "lock: the lock file does not match composer.json (acme/feature-flags and acme/metrics are not locked at a version that composer.json allows): run composer update"
     ],
     "note_details": [
         {
             "code": "lock_out_of_sync",
-            "text": "lock: the lock file does not match composer.json (acme/feature-flags and acme/metrics are required but not locked): run composer update",
+            "text": "lock: the lock file does not match composer.json (acme/feature-flags and acme/metrics are not locked at a version that composer.json allows): run composer update",
             "docs_url": "https://lockrot.dev/notes/#lock_out_of_sync",
             "sets_network_failures": false,
             "data": {

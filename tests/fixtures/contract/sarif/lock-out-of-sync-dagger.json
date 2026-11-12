@@ -449,7 +449,7 @@
                         {
                             "level": "note",
                             "message": {
-                                "text": "lock: the lock file does not match composer.json (acme/feature-flags and acme/metrics are required but not locked): run composer update"
+                                "text": "lock: the lock file does not match composer.json (acme/feature-flags and acme/metrics are not locked at a version that composer.json allows): run composer update"
                             }
                         }
                     ]

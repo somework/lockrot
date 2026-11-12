@@ -15,6 +15,6 @@ php: the lock installs on PHP 7.4 to 8.5
 
 **Update now:** `composer update guzzlehttp/psr7`
 
-- note: lock: the lock file does not match composer.json (acme/feature-flags and acme/metrics are required but not locked): run composer update
+- note: lock: the lock file does not match composer.json (acme/feature-flags and acme/metrics are not locked at a version that composer.json allows): run composer update
 
 <sub>3 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run lockrot with `--format=json` for details.</sub>
