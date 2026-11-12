@@ -8,6 +8,7 @@ use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
 use Composer\Package\CompletePackage;
 use Composer\Package\Loader\ArrayLoader;
+use Composer\Util\ErrorHandler;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
@@ -506,6 +507,15 @@ final class LockFileTest extends TestCase
         yield 'archive name a number' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'archive' => ['name' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "archive.name" must be a string'];
         yield 'archive exclude a string' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'archive' => ['exclude' => 'x']]]], 'alt.lock entry #0 in packages cannot be loaded: "archive.exclude" must be a list'];
         yield 'number in bin beside a shape that the loader reads' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'bin' => [5], 'archive' => ['exclude' => ''], 'autoload' => ['x'], 'source' => ['type' => 'git', 'url' => 'u', 'reference' => 'r', 'mirrors' => ['k' => 'v']]]]], 'alt.lock entry #0 in packages cannot be loaded: "bin" must be a string or a list of strings'];
+        yield 'number in suggest beside a null keyword' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'keywords' => [null], 'suggest' => ['x/y' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "suggest" must map names to strings'];
+        yield 'number in suggest beside keywords that are a string' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'keywords' => 'x', 'suggest' => ['x/y' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "suggest" must map names to strings'];
+        yield 'number in suggest beside a bin that is a string' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'bin' => 'x', 'suggest' => ['x/y' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "suggest" must map names to strings'];
+        yield 'number in suggest beside a bin that is a list of strings' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'bin' => ['x'], 'suggest' => ['x/y' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "suggest" must map names to strings'];
+        yield 'number as bin' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'bin' => 5]]], 'alt.lock entry #0 in packages cannot be loaded: "bin" must be a string or a list of strings'];
+        yield 'number as dist shasum beside a number as dist reference' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'dist' => ['type' => 'zip', 'url' => 'u', 'reference' => 7, 'shasum' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "dist.shasum" must be a string'];
+        yield 'number as dist url beside a false notification url' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'notification-url' => false, 'dist' => ['type' => 'zip', 'url' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "dist.url" must be a string'];
+        yield 'number as bin beside a false archive name' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'archive' => ['name' => false], 'bin' => 5]]], 'alt.lock entry #0 in packages cannot be loaded: "bin" must be a string or a list of strings'];
+        yield 'source without a url beside a list in keywords' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'source' => ['type' => 'git', 'reference' => 'r'], 'keywords' => [['k']]]]], "alt.lock entry #0 in packages cannot be loaded: Package a/b's source key should be specified"];
         yield 'number as type beside a source that is a string' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'type' => 5, 'source' => 'x']]], 'alt.lock entry #0 in packages cannot be loaded: "type" must be a string'];
         yield 'name in both sections' => [['packages' => [$entry], 'packages-dev' => [['name' => 'a/b', 'version' => '2.0.0']]], 'alt.lock lists a/b twice: entry #0 in packages and entry #0 in packages-dev'];
         yield 'name twice ignoring case' => [['packages' => [['name' => 'other/x', 'version' => '1.0.0'], $entry, ['name' => 'A/B', 'version' => '1.0.0']]], 'alt.lock lists a/b twice: entry #1 in packages and entry #2 in packages'];
@@ -543,6 +553,21 @@ final class LockFileTest extends TestCase
             self::assertStringNotContainsString('Argument', $e->getMessage());
             self::assertStringNotContainsString('vendor', $e->getMessage());
             self::assertStringNotContainsString('.php', $e->getMessage());
+        }
+    }
+
+    public function testAListInKeywordsIsRefusedWhenComposerTurnsTheWarningIntoAnError(): void
+    {
+        $lock = ['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'keywords' => [['k']]]]];
+
+        ErrorHandler::register();
+        try {
+            LockFile::fromArray($lock, 'alt.lock');
+            self::fail('the lock loads');
+        } catch (ConfigException $e) {
+            self::assertSame('alt.lock entry #0 in packages cannot be loaded: "keywords" must be a list of strings', $e->getMessage());
+        } finally {
+            restore_error_handler();
         }
     }
 

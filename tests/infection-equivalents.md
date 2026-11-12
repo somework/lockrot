@@ -159,6 +159,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Lock/ConfiguredRepositories.php` CastString `$host = (string) preg_replace('{:\d+$}', '', strtolower($parts[0]));` — the pattern is a literal, so `preg_replace()` never returns null.
 - `src/Lock/ConfiguredRepositories.php` CastString `$path = (string) preg_replace('{\.git$}', '', trim(strtolower($parts[1]), '/'));` — the pattern is a literal, so `preg_replace()` never returns null.
 - `src/Lock/LockFile.php` NotCovered x8 `throw new ConfigException($refusal.'loader returned '.\get_class($loaded).' instead of a CompletePackage');` — unreachable code. `ArrayLoader::load()` with its default class returns a `CompletePackage` or an alias of one, and the method unwraps the alias before the check.
+- `src/Lock/LockFile.php` LogicalOr `return !\is_array($value) || $value === array_filter($value, 'is_string');` — in hasKind(): `suggest` is the last field that refuseWrongTypes() reads. It reads `suggest` only after a loader error that no other field explains, and every field that the loader types is in `FIELD_KINDS`.
 - `src/Lock/MissingRequirements.php` CastString `$out[(string) $target] = $constraint;` — PHP turns a numeric string key into an int again, so the cast never changes the key.
 - `src/Lock/ProjectConfig.php` ReturnRemoval `return null;` — in lockOutOfSync(): with no manifest, `Locker::getContentHash()` and `md5()` get null and throw a `TypeError`, and the `catch` returns null.
 

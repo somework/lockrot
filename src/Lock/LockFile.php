@@ -245,7 +245,8 @@ final class LockFile
             case 'strings':
                 return \is_string($value) || (\is_array($value) && $value === array_filter($value, 'is_string'));
             case 'keywords':
-                return !\is_array($value) || $value === array_filter($value, 'is_scalar');
+                // The loader casts each keyword with `strval()`: null reads as "", and only an array is an error.
+                return !\is_array($value) || array_filter($value, 'is_array') === [];
             default:
                 return !\is_array($value) || $value === array_filter($value, 'is_string');
         }
