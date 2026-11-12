@@ -30,7 +30,7 @@ final class RepositoryUrl
     private const PATH = '{(?<=^|[\s"\'`(\[\{<=,|:])(?:/(?=[^\s/])|~/|[A-Za-z]:[\\\\/]|\\\\\\\\(?=[^\s\\\\]))}';
 
     /** The user of an scp-style remote in a text, `user@host:path`: the word up to the last such `@`, which can be a token with a `/` or `:`. */
-    private const REMOTE_USER = '{(?<=^|[\s"\'`(\[\{<=,|])(?:(?!:(?://|\\\\/\\\\/))[^\s"\'<>`()\[\]\{\}=,|])+@(?=[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?:(?!//)\S)}';
+    private const REMOTE_USER = '{(?<=^|[\s"\'`(\[\{<=,|])(?![A-Za-z][A-Za-z0-9+.\-]*:(?://|\\\\/\\\\/))[^\s"\'<>`()\[\]\{\}=,|]+@(?=[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?:(?!//)\S)}';
 
     /** What closes what an opening character delimits. PHP quotes a path as `` `path' ``. */
     private const CLOSERS = ['"' => '"', "'" => "'", '`' => "'", '(' => ')', '[' => ']', '{' => '}', '<' => '>'];
@@ -102,7 +102,7 @@ final class RepositoryUrl
      * and a client reaches the text before it. A token or password pasted with a raw `/` or `\\`
      * puts an `@` after that point. The URL is ambiguous when an `@` follows the first separator and
      * the text before the separator is not a host with an optional numeric port, has no `.`, or
-     * the label after the last `@` has one. A `?` or `#` before the separator with an `@` after it is
+     * a label after an `@` past the separator has one. A `?` or `#` before the separator with an `@` after it is
      * ambiguous too. A report withholds such a URL: it may be unclear and
      * never shows the userinfo or either reading as the host.
      */
@@ -115,14 +115,12 @@ final class RepositoryUrl
             return strpos($afterScheme, '@', $query) !== false;
         }
         $pre = substr($afterScheme, 0, $query);
-        $at = strrpos($pre, '@', $separator);
-        if ($at === false) {
+        if (strpos($pre, '@', $separator) === false) {
             return false;
         }
         $first = substr($pre, 0, $separator);
-        $atLabel = substr($pre, $at, strcspn($pre, '/\\', $at));
 
-        return preg_match(self::HOST_WITH_PORT, $first) !== 1 || strpos($first, '.') === false || strpos($atLabel, '.') !== false;
+        return preg_match(self::HOST_WITH_PORT, $first) !== 1 || strpos($first, '.') === false || preg_match('{@[^/\\\\]*\.}', $pre) === 1;
     }
 
     /** Whether a repository or dist URL is a path on the machine, or a `file://` URL. */

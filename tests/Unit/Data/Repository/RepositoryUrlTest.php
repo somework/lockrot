@@ -138,6 +138,10 @@ final class RepositoryUrlTest extends TestCase
         yield 'a path that reads as another host' => ['fail https://a/b@evil.com/x now', 'fail https://(withheld: ambiguous host) now'];
         yield 'a token with a raw slash and a parenthesis' => ['fail https://deploy:1234/56)78@gitlab.corp/a/b now', 'fail https://(withheld: ambiguous host) now'];
         yield 'a token with a raw slash and an apostrophe' => ["fail https://deploy:1234/56'78@gitlab.corp/a/b now", 'fail https://(withheld: ambiguous host) now'];
+        yield 'a host after a parenthesis and a later @ is still ambiguous' => ['fail https://github.com/a@evil.com)x@b now', 'fail https://(withheld: ambiguous host) now'];
+        yield 'a host after an apostrophe and a later @ is still ambiguous' => ["fail https://github.com/a@evil.com'x@b now", 'fail https://(withheld: ambiguous host) now'];
+        yield 'an scp remote whose user holds a scheme after a dash' => ['clone -https://tok@host:1/x failed', 'clone host:1/x failed'];
+        yield 'an scp remote whose password holds :// reads as a url and loses the password' => ['clone user:p://w@host:o/r failed', 'clone user:.../r failed'];
         yield 'an @ and a colon in a url path are no scp remote' => ['see https://example.test/repo@v2:tag now', 'see https://example.test/repo@v2:tag now'];
         yield 'an @ and a colon in a json-escaped url path are no scp remote' => ['see https:\\/\\/example.test\\/repo@v2:tag now', 'see https:\\/\\/example.test\\/repo@v2:tag now'];
         yield 'an @ after the url is not userinfo' => ['see https://example.test/pkg and mail a@b', 'see https://example.test/pkg and mail a@b'];
