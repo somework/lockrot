@@ -100,13 +100,12 @@ final class RepositoryUrl
     }
 
     /**
-     * Whether the text after `://` can name two hosts. RFC 3986 ends the authority at the first `/`,
-     * and a client reaches the text before it. A token or password pasted with a raw `/` or `\\`
-     * puts an `@` after that point. The URL is ambiguous when an `@` follows the first separator and
-     * the text before the separator is not a host with an optional numeric port, has no `.`, or
-     * a label after an `@` past the separator has one. A `?` or `#` before the separator with an `@` after it is
-     * ambiguous too. A report withholds such a URL: it may be unclear and
-     * never shows the userinfo or either reading as the host.
+     * Whether the text after `://` can name two hosts: RFC 3986 ends the authority at the first `/`,
+     * and a token pasted with a raw `/` or `\\` puts an `@` after it. Ambiguous when an `@` follows
+     * the first separator and the text before it is not a host with an optional numeric port, has
+     * no `.`, or a label after an `@` past the separator has one. Also when a `?` or `#` before the
+     * separator has an `@` after it. A report withholds such a URL: it shows neither the userinfo
+     * nor either reading as the host.
      */
     public static function hasAmbiguousHost(string $afterScheme): bool
     {

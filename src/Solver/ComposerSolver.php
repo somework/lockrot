@@ -183,8 +183,8 @@ final class ComposerSolver
         // As Installer::extractDevPackages(): no second solve for a root without require-dev.
         $nonDev = $root->getDevRequires() === [] ? null : $this->nonDevAnswer($root, $policy, $answer, $requires, $temporary);
         // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
-        // The second solve of a move reads that answer, so its refusal proves no more (ruling R19-38). The baseline
-        // keeps every locked package, so a fuller pool cannot change its refusal (ruling R2-4).
+        // The second solve of a move reads that answer, so its refusal proves no more. The baseline
+        // keeps every locked package, so a fuller pool cannot change its refusal.
         $unloaded = $this->withoutMetUnreached($this->failures($loaded->asked()), $built, $answer);
         if ($nonDev !== null) {
             return $this->refused($nonDev[3], $nonDev[2], $nonDev[0], $nonDev[1], $composerRequest, $root, $request, $loaded, $request->isBaseline() ? [] : $unloaded);
