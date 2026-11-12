@@ -124,7 +124,7 @@ final class RepositoryVersions implements VersionSource
                 // A name with versions still to load, such as an admitted name with its tags only, loads again alone.
                 foreach (array_keys($pending) as $name) {
                     if (!\array_key_exists($name, $this->complete)) {
-                        $this->loaded[$name] = $this->loadOne($name);
+                        $this->loaded[$name] = $this->loadOne((string) $name);
                     }
                     unset($left[$name]);
                 }
@@ -180,7 +180,7 @@ final class RepositoryVersions implements VersionSource
                 $listed = array_intersect_key($pending, $answered);
                 if ($stabilities === self::DEV) {
                     foreach (array_keys($tagged) as $name) {
-                        $this->failOfflineWithoutDevFile($name, $result, $repository);
+                        $this->failOfflineWithoutDevFile((string) $name, $result, $repository);
                     }
                 } else {
                     $tagged = array_filter($listed, fn (string $name): bool => $this->admitsDev($name), \ARRAY_FILTER_USE_KEY);

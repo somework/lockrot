@@ -81,7 +81,7 @@ final class Solution
     public static function failed(\Throwable $e): self
     {
         $failed = new self([], [], null, []);
-        $failed->error = ['class' => \get_class($e), 'message' => $e instanceof \TypeError ? 'a value in the package metadata has the wrong type' : $e->getMessage()];
+        $failed->error = ['class' => \get_class($e), 'message' => $e instanceof \TypeError ? 'a value has the wrong type' : $e->getMessage()];
 
         return $failed;
     }

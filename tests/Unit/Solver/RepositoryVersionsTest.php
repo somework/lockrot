@@ -152,6 +152,36 @@ final class RepositoryVersionsTest extends TestCase
         self::assertSame([], $versions->versions('acme/c'));
     }
 
+    /** A release can require the name "5", and PHP turns that array key into an integer. */
+    public function testANumericNameLoadsAloneAfterAFailedBatch(): void
+    {
+        $repository = new class ([self::package('acme/a', '1.0.0')]) extends ComposerRepository {
+            /** @var list<BasePackage> */
+            private array $served;
+
+            /** @param list<BasePackage> $served */
+            public function __construct(array $served)
+            {
+                $this->served = $served;
+            }
+
+            public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = []): array
+            {
+                if (\count($packageNameMap) > 1) {
+                    throw new TransportException('The "https://repo.example.org/p2/acme/a.json" file could not be downloaded');
+                }
+
+                return \array_key_exists('acme/a', $packageNameMap) ? ['namesFound' => ['acme/a'], 'packages' => $this->served] : ['namesFound' => [], 'packages' => []];
+            }
+        };
+        $versions = new RepositoryVersions([$repository], [], false, Deadline::never());
+
+        $versions->versionsOf(['acme/a', '5']);
+
+        self::assertSame(['1.0.0'], self::pretty($versions->versions('acme/a')));
+        self::assertSame([], $versions->versions('5'));
+    }
+
     /** A name that an earlier repository lists in full keeps its versions when a later repository raises an error. */
     public function testAnErrorInALaterRepositoryLeavesANameThatAnEarlierRepositoryCompleted(): void
     {

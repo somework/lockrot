@@ -1298,7 +1298,7 @@ final class SolverCheckerTest extends TestCase
         $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
 
         self::assertSame(MoveCheck::SOLVER_ERROR, $outcome->check()->reason());
-        self::assertSame(['class' => \TypeError::class, 'message' => 'a value in the package metadata has the wrong type'], $checker->solverError());
+        self::assertSame(['class' => \TypeError::class, 'message' => 'a value has the wrong type'], $checker->solverError());
     }
 
     /** Ruling R14-1: after an error in a repository's answer stops one solve, a later solve that needs that name reads it as not loaded. */
