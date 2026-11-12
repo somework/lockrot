@@ -48,11 +48,15 @@ class TheShardScope(unittest.TestCase):
 
     def scope(self, shard_filter):
         output = os.path.join(self.repo, '.output')
-        env = dict(os.environ, EVENT='pull_request', BASE_REF='main', FILTER=shard_filter, GITHUB_OUTPUT=output,
+        env = dict(os.environ, EVENT='pull_request', BASE_REF='main', FILTER=shard_filter, GITHUB_OUTPUT=output, RUNNER_TEMP=self.repo,
                    GITHUB_STEP_SUMMARY=os.path.join(self.repo, '.summary'))
         subprocess.run(['bash', '-e', '-o', 'pipefail', '-c', scope_script()], cwd=self.repo, env=env, check=True, capture_output=True)
         with open(output, encoding='utf-8') as handle:
             return dict(line.split('=', 1) for line in handle.read().splitlines())
+
+    def names(self, scope):
+        with open(scope['files'], encoding='utf-8') as handle:
+            return handle.read().splitlines()
 
     def test_a_changed_member_file_mutates_the_lines_of_its_directory(self):
         self.write('src/Verdict/Mine.php', '<?php\n$a = 1;\n')
@@ -67,7 +71,14 @@ class TheShardScope(unittest.TestCase):
 
         scope = self.scope('src/Verdict/Renamed.php')
 
-        self.assertEqual(['diff', 'src/Verdict/Renamed.php'], [scope['mode'], scope['files']])
+        self.assertEqual('diff', scope['mode'])
+        self.assertEqual(['src/Verdict/Renamed.php'], self.names(scope))
+
+    def test_a_renamed_file_with_a_space_stays_one_name(self):
+        self.git('mv', 'src/Verdict/Mine.php', 'src/Verdict/Has $(id) Space.php')
+        self.commit('rename')
+
+        self.assertEqual(['src/Verdict/Has $(id) Space.php'], self.names(self.scope('src/Verdict')))
 
     def test_a_change_to_another_shards_file_mutates_nothing(self):
         self.write('src/Verdict/Theirs.php', '<?php\n$a = 1;\n')
@@ -82,7 +93,8 @@ class TheShardScope(unittest.TestCase):
 
         scope = self.scope('src/Root.php src/Verdict/Mine.php')
 
-        self.assertEqual(['diff', 'false', 'src/Root.php'], [scope['mode'], scope['diff'], scope['files']])
+        self.assertEqual(['diff', 'false'], [scope['mode'], scope['diff']])
+        self.assertEqual(['src/Root.php'], self.names(scope))
 
 
 if __name__ == '__main__':
