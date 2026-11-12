@@ -253,6 +253,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `lockrot: Composer <version> is older than 2.10 …` line, so a quiet install shows that
   `install-time-strict` does not apply. The `lockrot: install-time check skipped: …` line also
   survives `-q`. This affects installs that run with `-q`. ([Install-time](docs/install-time.md))
+- **Notes:** Composer's solver problem text in the `moves_not_checked`, `update_now_reduced` and
+  `update_now_refused` run notes goes through the same repository URL redaction as the other
+  notes, so a query token or the path of a local `path` repository does not reach the report.
+  ([Moves not checked](docs/notes.md#moves_not_checked))
 
 ### Added
 
@@ -742,6 +746,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   variable turns Composer's policy off, as the advisory notes do.
   ([Abandoned not audited by Composer](docs/notes.md#abandoned_not_audited_by_composer))
 - **sarif, gitlab:** a lock entry written as `"name" : "a/b"` gets its line number.
+- **Install-time, CLI:** a warning that lockrot writes to stderr from the install-time check, the
+  bootstrap or a service breaks the `##[` prefix of a CI runner command, as `composer lockrot`
+  does. A value in `extra.lockrot` can no longer forge a runner command in the job log.
+- **All formats:** a repository URL whose userinfo holds a raw `/` never prints its userinfo, in
+  a finding, a note or `--explain`.
+- **CLI:** a `config.platform.php` that is a branch name, such as `dev-master`, exits `2` with a
+  message that names `config.platform.php`, not `target-php`.
+- **CLI:** a `composer.lock` field of the wrong type exits `2` with a message that names the
+  field, with no PHP error text and no absolute path.
+- **CLI:** a `composer.lock` that is not a regular file reads "exists and is not a regular file".
+- **All formats:** the capped fact stays unverified when the target release's `php` is
+  `self.version`, as for a release with no `php`. ([Capped](docs/verdicts.md#capped))
+- **All formats:** an unloaded name in the first solve gives a move `not_checked` with
+  `unloaded_name` also when the second solve over the non-dev requirements refuses.
+  ([Move](docs/verdicts.md#move))
 
 ## [0.13.0] - 2026-10-01
 
