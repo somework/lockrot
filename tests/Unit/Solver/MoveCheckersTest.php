@@ -593,6 +593,47 @@ final class MoveCheckersTest extends TestCase
     }
 
     /**
+     * A root link with the constraint `self.version` names a package that the lock must hold too:
+     * a root `replace` holds it, else the name stays free and the baseline is not checked.
+     *
+     * @dataProvider selfVersionLinksOfTheRoot
+     *
+     * @param array<string, string>  $replace  the root's `replace`
+     * @param array{string, ?string} $expected the baseline's result and reason
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('selfVersionLinksOfTheRoot')]
+    public function testARootLinkAtSelfVersionNeedsAHolderForTheBaselineToStayRefused(array $replace, array $expected): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'acme/new', 'version' => '1.0.0', 'require' => ['acme/plugin' => '^1.0'], 'notification-url' => 'https://packagist.org/downloads/'],
+        ]]);
+        $loader = new ArrayLoader();
+        $remote = [
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.2.0']),
+            $loader->load(['name' => 'acme/plugin', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/plugin', 'version' => '1.1.0', 'require' => ['acme/private' => '^1.0']]),
+            $loader->load(['name' => 'acme/sub', 'version' => '1.0.0']),
+        ];
+        $root = $loader->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^2.0', 'acme/new' => '^1.0', 'acme/sub' => 'self.version'], 'require-dev' => ['acme/lib' => '^1.0'], 'replace' => $replace], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
+        $checker = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
+
+        $baseline = $checker->baseline()->check();
+
+        self::assertSame($expected, [$baseline->result(), $baseline->reason()]);
+    }
+
+    /** @return iterable<string, array{array<string, string>, array{string, ?string}}> */
+    public static function selfVersionLinksOfTheRoot(): iterable
+    {
+        yield 'a self.version link that nothing holds' => [[], [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME]];
+        yield 'a self.version link that the root replaces' => [['acme/sub' => 'self.version'], [MoveCheck::REFUSED, null]];
+    }
+
+    /**
      * The root that the solve fixes decides, not composer.json: a provide that does not admit the
      * link's constraint leaves the name free, and so does a link that a plugin added to the root.
      *

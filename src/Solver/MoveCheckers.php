@@ -85,7 +85,8 @@ final class MoveCheckers
      * lock's hash says and whether the run reads dev packages or not. A non-dev locked package or the
      * root holds a `require` name, and any locked package or the root a `require-dev` name. A
      * package named so holds it at any version, and so does a `replace`. A `provide` holds it only at
-     * a version that the link admits, else the solve can still install the name itself.
+     * a version that the link admits, else the solve can still install the name itself. A
+     * `self.version` link needs a holder too, unlike in Composer's missing-requirement check.
      */
     private static function locksEveryRootRequirement(RootPackageInterface $root, LockFile $lock): bool
     {
@@ -99,7 +100,7 @@ final class MoveCheckers
         }
         foreach ([[$root->getRequires(), $nonDev], [$root->getDevRequires(), $all]] as [$links, $holders]) {
             foreach ($links as $link) {
-                if (!PlatformRepository::isPlatformPackage($link->getTarget()) && $link->getPrettyConstraint() !== 'self.version' && !self::isHeld($link, $holders)) {
+                if (!PlatformRepository::isPlatformPackage($link->getTarget()) && !self::isHeld($link, $holders)) {
                     return false;
                 }
             }
