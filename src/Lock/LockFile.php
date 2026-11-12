@@ -22,10 +22,13 @@ final class LockFile
     /** Composer's package name pattern (composer-schema.json, `name`). */
     private const NAME = '{^[a-z0-9](?:[_.-]?[a-z0-9]++)*+/[a-z0-9](?:(?:[_.]|-{1,2})?[a-z0-9]++)*+$}D';
 
-    /** The fields that the loader types, by the shape that it needs. */
+    /**
+     * The fields that the loader types, by the shape that it needs. The link fields (`require` …
+     * `replace`) are not here: the loader skips one that is not an array.
+     */
     private const FIELD_KINDS = [
         'string' => ['type', 'target-dir', 'installation-source', 'notification-url', 'source.type', 'source.url', 'source.reference', 'dist.type', 'dist.url', 'dist.reference', 'dist.shasum', 'archive.name'],
-        'object' => ['autoload', 'autoload-dev', 'php-ext', 'require', 'conflict', 'provide', 'replace', 'require-dev'],
+        'object' => ['autoload', 'autoload-dev', 'php-ext'],
         'list' => ['include-path', 'source.mirrors', 'dist.mirrors', 'archive.exclude'],
         'strings' => ['bin'],
         'keywords' => ['keywords'],

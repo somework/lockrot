@@ -556,9 +556,15 @@ final class LockFileTest extends TestCase
         }
     }
 
-    public function testAListInKeywordsIsRefusedWhenComposerTurnsTheWarningIntoAnError(): void
+    /**
+     * @dataProvider listsInKeywords
+     *
+     * @param array<string, mixed> $fields
+     */
+    #[DataProvider('listsInKeywords')]
+    public function testAListInKeywordsIsRefusedWhenComposerTurnsTheWarningIntoAnError(array $fields): void
     {
-        $lock = ['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'keywords' => [['k']]]]];
+        $lock = ['packages' => [['name' => 'a/b', 'version' => '1.0.0'] + $fields]];
 
         ErrorHandler::register();
         try {
@@ -569,6 +575,14 @@ final class LockFileTest extends TestCase
         } finally {
             restore_error_handler();
         }
+    }
+
+    /** @return iterable<string, array{array<string, mixed>}> */
+    public static function listsInKeywords(): iterable
+    {
+        yield 'keywords alone' => [['keywords' => [['k']]]];
+        // The loader skips a link field that is not an array, so only keywords can have failed.
+        yield 'keywords after a string require' => [['require' => 'x', 'keywords' => [[1]]]];
     }
 
     /**
