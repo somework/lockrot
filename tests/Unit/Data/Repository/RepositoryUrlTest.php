@@ -50,6 +50,8 @@ final class RepositoryUrlTest extends TestCase
         yield 'an scp-style remote loses its user' => ['git@github.com:vendor/pkg.git', 'github.com:vendor/pkg.git'];
         yield 'an scp-style remote with a login' => ['igor@git.client-x.lan:libs/core.git', 'git.client-x.lan:libs/core.git'];
         yield 'an scp-style remote on a host without a dot' => ['git@buildbox:libs/core.git', 'buildbox:libs/core.git'];
+        yield 'an scp-style remote whose dotted user holds a token' => ['john.doe:ghp_SECRET@github.com:o/r.git', 'github.com:o/r.git'];
+        yield 'an scp-style remote whose token sits after a host name' => ['git.example.com:SECRET@github.com:o/r', 'github.com:o/r'];
         yield 'an scp-style remote without a user' => ['github.com:vendor/pkg.git', 'github.com:vendor/pkg.git'];
         yield 'a Perforce server' => ['perforce.acme.internal:1666', 'perforce.acme.internal:1666'];
         yield 'a Perforce server over ssl' => ['ssl:perforce.acme.internal:1666', 'ssl:perforce.acme.internal:1666'];

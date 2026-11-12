@@ -66,8 +66,11 @@ final class RepositoryUrl
     /** A home directory itself, whose name is the account's: `/Users/alice`, `/home/alice`, `C:\Users\alice`, `~`. */
     private const HOME = '{(?:^|[\\\\/])(?:Users|home)[\\\\/][^\\\\/]+$|^~$}i';
 
-    /** A remote without a scheme: an scp-style `[user@]host:path`, or a Perforce `[ssl:]host:port`. */
-    private const REMOTE = '{^(?:(?<user>[^@\s/\\\\:]+)@)?(?<remote>(?:(?:ssl|tcp)[46]?:)?(?<host>[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?):(?!//)[^\s\\\\].*)$}';
+    /**
+     * A remote without a scheme: an scp-style `[user@]host:path`, or a Perforce `[ssl:]host:port`.
+     * The user runs to the last `@` before a host, as in {@see REMOTE_USER}: a token can hold a `:`.
+     */
+    private const REMOTE = '{^(?:(?<user>[^\s"\'<>`()\[\]\{\}=,|]+)@)?(?<remote>(?:(?:ssl|tcp)[46]?:)?(?<host>[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?):(?!//)[^\s\\\\].*)$}';
 
     /**
      * The repository as a report can print it. A URL loses its userinfo, query and fragment
