@@ -46,6 +46,7 @@ final class RepositoryUrlTest extends TestCase
         yield 'a login and a password with a raw slash' => ['https://deploy:1234/5678@gitlab.corp/a/b.git?x=1', null];
         yield 'a path that reads as another host is not shown as the host' => ['https://a/b@evil.com/x', null];
         yield 'an @ in the query is not userinfo' => ['https://example.test/pkg?mail=a@b', 'https://example.test/pkg'];
+        yield 'an e-mail address in the query is not a second host' => ['https://github.com/a/b?ref=user@example.com', 'https://github.com/a/b'];
         yield 'an scp-style remote loses its user' => ['git@github.com:vendor/pkg.git', 'github.com:vendor/pkg.git'];
         yield 'an scp-style remote with a login' => ['igor@git.client-x.lan:libs/core.git', 'git.client-x.lan:libs/core.git'];
         yield 'an scp-style remote on a host without a dot' => ['git@buildbox:libs/core.git', 'buildbox:libs/core.git'];
@@ -135,6 +136,10 @@ final class RepositoryUrlTest extends TestCase
         yield 'an scp remote whose user is a login and a password with a slash' => ['clone user:p/w@github.com:o/r.git failed', 'clone github.com:o/r.git failed'];
         yield 'a token with a raw slash' => ['fail https://deploy:1234/5678@gitlab.corp/a/b.git', 'fail https://(withheld: ambiguous host)'];
         yield 'a path that reads as another host' => ['fail https://a/b@evil.com/x now', 'fail https://(withheld: ambiguous host) now'];
+        yield 'a token with a raw slash and a parenthesis' => ['fail https://deploy:1234/56)78@gitlab.corp/a/b now', 'fail https://(withheld: ambiguous host) now'];
+        yield 'a token with a raw slash and an apostrophe' => ["fail https://deploy:1234/56'78@gitlab.corp/a/b now", 'fail https://(withheld: ambiguous host) now'];
+        yield 'an @ and a colon in a url path are no scp remote' => ['see https://example.test/repo@v2:tag now', 'see https://example.test/repo@v2:tag now'];
+        yield 'an @ and a colon in a json-escaped url path are no scp remote' => ['see https:\\/\\/example.test\\/repo@v2:tag now', 'see https:\\/\\/example.test\\/repo@v2:tag now'];
         yield 'an @ after the url is not userinfo' => ['see https://example.test/pkg and mail a@b', 'see https://example.test/pkg and mail a@b'];
         yield 'a token in the query' => ['composer repo (https://repo.example.com/?token=t0k3n)', 'composer repo (https://repo.example.com/)'];
         yield 'a quoted url' => [

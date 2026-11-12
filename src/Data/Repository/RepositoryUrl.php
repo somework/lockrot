@@ -30,7 +30,7 @@ final class RepositoryUrl
     private const PATH = '{(?<=^|[\s"\'`(\[\{<=,|:])(?:/(?=[^\s/])|~/|[A-Za-z]:[\\\\/]|\\\\\\\\(?=[^\s\\\\]))}';
 
     /** The user of an scp-style remote in a text, `user@host:path`: the word up to the last such `@`, which can be a token with a `/` or `:`. */
-    private const REMOTE_USER = '{(?<=^|[\s"\'`(\[\{<=,|])[^\s"\'<>`()\[\]\{\}=,|]+@(?=[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?:(?!//)\S)}';
+    private const REMOTE_USER = '{(?<=^|[\s"\'`(\[\{<=,|])(?:(?!:(?://|\\\\/\\\\/))[^\s"\'<>`()\[\]\{\}=,|])+@(?=[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?:(?!//)\S)}';
 
     /** What closes what an opening character delimits. PHP quotes a path as `` `path' ``. */
     private const CLOSERS = ['"' => '"', "'" => "'", '`' => "'", '(' => ')', '[' => ']', '{' => '}', '<' => '>'];
@@ -46,6 +46,9 @@ final class RepositoryUrl
 
     /** What ends a URL's authority: its path, or a JSON-escaped one, whitespace, a quote, an angle bracket. */
     private const AUTHORITY_END = "/\\\"<> \t\r\n\v\f";
+
+    /** What ends the text that the ambiguity check reads: a password can hold a raw `'` or `)`. */
+    private const TOKEN_END = "\"<>` \t\r\n\v\f";
 
     /** What ends a URL, and a word of a local URL no quote delimits. */
     private const URL_END = "\"'<>`) \t\r\n\v\f";
@@ -108,18 +111,18 @@ final class RepositoryUrl
         $separator = strcspn($afterScheme, '/\\');
         $query = strcspn($afterScheme, '?#');
         // A client ends the authority at `?` or `#`, so a userinfo that holds one hides the host.
-        if ($query < $separator && strpos($afterScheme, '@', $query) !== false) {
-            return true;
+        if ($query < $separator) {
+            return strpos($afterScheme, '@', $query) !== false;
         }
         $pre = substr($afterScheme, 0, $query);
-        $at = strrpos($pre, '@');
-        if ($separator >= \strlen($pre) || $at === false || $at < $separator) {
+        $at = strrpos($pre, '@', $separator);
+        if ($at === false) {
             return false;
         }
         $first = substr($pre, 0, $separator);
-        $label = substr($pre, $at + 1, strcspn($pre, '/\\', $at + 1));
+        $atLabel = substr($pre, $at, strcspn($pre, '/\\', $at));
 
-        return preg_match(self::HOST_WITH_PORT, $first) !== 1 || strpos($first, '.') === false || strpos($label, '.') !== false;
+        return preg_match(self::HOST_WITH_PORT, $first) !== 1 || strpos($first, '.') === false || strpos($atLabel, '.') !== false;
     }
 
     /** Whether a repository or dist URL is a path on the machine, or a `file://` URL. */
@@ -217,7 +220,7 @@ final class RepositoryUrl
         $authority = substr($text, $start, strcspn($text, self::AUTHORITY_END, $start));
         $userinfo = strrpos($authority, '@');
         $host = $userinfo === false ? $start : $start + $userinfo + 1;
-        $whole = self::trimmed($text, $start, $start + strcspn($text, self::URL_END, $start, $limit - $start));
+        $whole = self::trimmed($text, $start, $start + strcspn($text, self::TOKEN_END, $start, $limit - $start));
         if (self::hasAmbiguousHost(substr($text, $start, $whole - $start))) {
             $end = $whole;
 
