@@ -261,6 +261,13 @@ final class LockrotConfigTest extends TestCase
         LockrotConfig::fromSources([], [], [], '8.5.10', 'dev-main');
     }
 
+    public function testTheRefusalOfAPlatformPhpQuotesTheValueAsWritten(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('config.platform.php must look like "8.4"; got "master"');
+        LockrotConfig::fromSources([], [], [], '8.5.10', 'master');
+    }
+
     public function testAVPrefixedTargetPhpOptionIsStillRefused(): void
     {
         $this->expectException(ConfigException::class);
