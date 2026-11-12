@@ -11,7 +11,7 @@ use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveCheckers;
 
 /**
- * `next_step.text`, text grammar 1: rendered from the move object, the package and the run alone.
+ * `next_step.text`: rendered from the move object, the package and the run alone.
  * A renderer that meets an unknown kind prints it.
  *
  * @internal
@@ -403,7 +403,6 @@ final class MoveText
             return '';
         }
         $latest = $move->latest();
-        // The first of to_branch, latest.version, version and constraint.
         $phpSubject = $move->toBranch() ?? ($latest === null ? null : $latest->version()) ?? $move->version() ?? $move->constraint();
         if ($phpSubject === null) {
             return '';

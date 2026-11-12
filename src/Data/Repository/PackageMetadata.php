@@ -120,7 +120,7 @@ final class PackageMetadata
     private ?string $newestPhp = null;
     private bool $highestBranchDatedByParent = false;
 
-    /** Whether the highest non-dev tag is a pre-release with no `time`: that keeps the S2 reading unknown. */
+    /** Whether the highest non-dev tag is a pre-release with no `time`: such a tag keeps the S2 reading unknown. */
     private bool $highestTagIsUndatedPreRelease = false;
 
     /**
@@ -362,7 +362,7 @@ final class PackageMetadata
         $highestUndated = $highestStable !== null && ($highestStable->getReleaseDate() === null || $highestShared);
         [$newestAt, $newestVersion] = self::onTheHighestLine($lastStableReleaseAt, $lastStableVersion, $lastStableNormalized, $highestUndated, $byBranch, $newestDatedByBranch, $sharedCommitVersions);
         // S6, the moves and the metadata fields read stable tags only, as libyears do.
-        // S2 keeps the reading above, pre-releases included.
+        // S2 keeps $newestAt, pre-releases included.
         [$stableAt, $stableVersion, $stableNormalized, $stableUndated] = self::lastStableOf($stable, $commitOfTag, $tagsOnCommit);
         [$lastStableReleaseAt, $lastStableVersion] = self::onTheHighestLine($stableAt, $stableVersion, $stableNormalized, $stableUndated, $byBranch, $newestDatedByBranch, $sharedCommitVersions);
         // A package with dev branches only has no version order: read its first branch, which

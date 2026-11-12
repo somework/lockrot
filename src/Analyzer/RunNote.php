@@ -528,7 +528,7 @@ final class RunNote
     }
 
     /**
-     * Composer refuses a partial update of a name outside the lock, so it would refuse every
+     * Composer refuses a partial update of a name outside the lock, so it refuses every
      * move for the same reason. The text names the cause of the first problem, and `data.problem` holds
      * Composer's whole problem text.
      *

@@ -7,7 +7,7 @@ namespace Lockrot\Score;
 use Lockrot\Verdict\Score;
 
 /**
- * The one score line, text grammar 1, rendered from the score object's fields alone:
+ * The one score line, rendered from the score object's fields alone:
  *
  *     4 = ((left-behind 16 + stale 2 [¼ of 8]) ÷ 2 transitive) ÷ 2 dev (4.5, rounded down)
  *

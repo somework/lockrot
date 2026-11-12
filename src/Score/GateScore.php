@@ -9,8 +9,8 @@ use Lockrot\Verdict\ScoreModel;
 
 /**
  * The gate score under a baseline entry, `finding.gate.basis`: `min(score, 2 × new)`, where `new`
- * is the engine rerun on the uncovered flags and the advisories the baseline does not know. A new fact counts at least at its own level,
- * and old facts lift the gate by one band at most.
+ * is the engine rerun on the uncovered flags and the advisories the baseline does not know. A new
+ * fact counts at least at its own level, and old facts lift the gate by one band at most.
  *
  * @internal
  *

@@ -8,7 +8,7 @@ use Lockrot\Verdict\ScoreModel;
 
 /**
  * Which counted maintenance flags a baseline entry covers: the recorded lead and every flag after it
- * in flag order. It is 0.13's verdict rule written over flags.
+ * in flag order.
  *
  * @internal
  */
