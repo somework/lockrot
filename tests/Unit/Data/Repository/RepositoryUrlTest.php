@@ -294,4 +294,49 @@ final class RepositoryUrlTest extends TestCase
         self::assertStringContainsString("Server says \u{FFFD}rror at https://repo.acme.test/p", RepositoryUrl::inText($phrase));
         self::assertStringEndsWith(str_repeat('a', 189)."\u{FFFD}", RepositoryUrl::inText($cut));
     }
+
+    /** @return iterable<string, array{string}> */
+    public static function ambiguousHosts(): iterable
+    {
+        foreach ([
+            'https://a/b@evil.com/x',
+            'https://us.er/tok@github.com/o/r',
+            'https://first.last:pa/ss@git.corp/g/p.git',
+            'https://me@corp.com:pa/ss@git.corp/g/p',
+            'https://tok/en@gitlab-internal/g/p',
+            'https://ab@cd/ef@github.com/o/r',
+            'https://tok\\en@github.com/o/r',
+        ] as $url) {
+            yield $url => [$url];
+        }
+    }
+
+    /**
+     * @dataProvider ambiguousHosts
+     */
+    #[DataProvider('ambiguousHosts')]
+    public function testAUrlWhoseHostIsAmbiguousIsWithheldEverywhere(string $url): void
+    {
+        self::assertNull(RepositoryUrl::shown($url));
+        self::assertNull(RepositoryUrl::linkable($url));
+        self::assertSame('fail https://(withheld: ambiguous host) now', RepositoryUrl::inText('fail '.$url.' now'));
+    }
+
+    /**
+     * @dataProvider unambiguousPaths
+     */
+    #[DataProvider('unambiguousPaths')]
+    public function testAnAtSignInAPathStaysAPath(string $url): void
+    {
+        self::assertSame($url, RepositoryUrl::shown($url));
+        self::assertSame('fail '.$url.' now', RepositoryUrl::inText('fail '.$url.' now'));
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function unambiguousPaths(): iterable
+    {
+        yield 'npm scope' => ['https://registry.npmjs.org/@babel/core/-/core-7.0.0.tgz'];
+        yield 'a tag' => ['https://github.com/o/r@v2'];
+        yield 'a tilde user' => ['https://example.test/~user@home/pkg'];
+    }
 }

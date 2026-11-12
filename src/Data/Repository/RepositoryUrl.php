@@ -17,7 +17,7 @@ final class RepositoryUrl
     /** A byte outside every well-formed UTF-8 sequence (RFC 3629): the valid sequences are skipped. */
     private const INVALID_UTF8 = '{(?:[\x00-\x7F]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})(*SKIP)(*FAIL)|[\x80-\xFF]}';
 
-    /** What a report quotes in place of a URL whose host is ambiguous, see {@see slashedUserinfoEnd()}. */
+    /** What a report quotes in place of a URL whose host is ambiguous, see {@see hasAmbiguousHost()}. */
     public const AMBIGUOUS = '(withheld: ambiguous host)';
 
     /** What a report quotes in place of a message PCRE could not finish reading. */
@@ -40,6 +40,9 @@ final class RepositoryUrl
      * or a `)` inside a path does not. A line break ends every delimited run.
      */
     private const CLOSING = '{["\')\]\}>](?=[\s:;,.!)\]\}>"\']|$)|[\r\n]}';
+
+    /** A host, a bracketed IPv6 address, or either with a numeric port. */
+    private const HOST_WITH_PORT = '{^(?:[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?|\[[0-9A-Fa-f:.]+\])(?::[0-9]*)?$}D';
 
     /** What ends a URL's authority: its path, or a JSON-escaped one, whitespace, a quote, an angle bracket. */
     private const AUTHORITY_END = "/\\\"<> \t\r\n\v\f";
@@ -82,7 +85,7 @@ final class RepositoryUrl
                 return self::local(substr($url, 7));
             }
 
-            return self::slashedUserinfoEnd($m['rest']) === null ? $m['scheme'].$m['rest'] : null;
+            return self::hasAmbiguousHost(substr($url, \strlen($m['scheme']))) ? null : $m['scheme'].$m['rest'];
         }
         if (preg_match(self::REMOTE, $url, $m) === 1 && ($m['user'] !== '' || strpos($m['host'], '.') !== false)) {
             return $m['remote'];
@@ -92,24 +95,25 @@ final class RepositoryUrl
     }
 
     /**
-     * Where a userinfo that holds a raw `/` ends in the text after `://`, or null when the text has
-     * none. RFC 3986 forbids the `/`, and a token pasted unencoded does it. The text before the
-     * first `/` must not read as a host (no `.`), and the text after the last `@` must (a `.`), so
-     * that `host.example/path@v2/x` stays a path. Such a URL is ambiguous: a client reaches the text
-     * before the first `/`, and a report must name neither reading as the host, so it withholds the
-     * URL.
+     * Whether the text after `://` can name two hosts. RFC 3986 ends the authority at the first `/`,
+     * and a client reaches the text before it. A token or password pasted with a raw `/` or `\\`
+     * puts an `@` after that point. The URL is ambiguous when an `@` follows the first separator and
+     * the text before the separator is not a host with an optional numeric port, has no `.`, or
+     * the label after the last `@` has one. A report withholds such a URL: it may be unclear and
+     * never shows the userinfo or either reading as the host.
      */
-    public static function slashedUserinfoEnd(string $afterScheme): ?int
+    public static function hasAmbiguousHost(string $afterScheme): bool
     {
         $pre = substr($afterScheme, 0, strcspn($afterScheme, '?#'));
-        $slash = strpos($pre, '/');
+        $separator = strcspn($pre, '/\\');
         $at = strrpos($pre, '@');
-        if ($slash === false || $at === false || $at < $slash || strpos(substr($pre, 0, $slash), '.') !== false) {
-            return null;
+        if ($separator === \strlen($pre) || $at === false || $at < $separator) {
+            return false;
         }
-        $host = substr($pre, $at + 1, strcspn($pre, '/', $at + 1));
+        $first = substr($pre, 0, $separator);
+        $label = substr($pre, $at + 1, strcspn($pre, '/\\', $at + 1));
 
-        return strpos($host, '.') === false ? null : $at + 1;
+        return preg_match(self::HOST_WITH_PORT, $first) !== 1 || strpos($first, '.') === false || strpos($label, '.') !== false;
     }
 
     /** Whether a repository or dist URL is a path on the machine, or a `file://` URL. */
@@ -207,8 +211,9 @@ final class RepositoryUrl
         $authority = substr($text, $start, strcspn($text, self::AUTHORITY_END, $start));
         $userinfo = strrpos($authority, '@');
         $host = $userinfo === false ? $start : $start + $userinfo + 1;
-        if ($userinfo === false && self::slashedUserinfoEnd(substr($text, $start, strcspn($text, self::URL_END, $start, $limit - $start))) !== null) {
-            $end = self::trimmed($text, $start, $start + strcspn($text, self::URL_END, $start, $limit - $start));
+        $whole = self::trimmed($text, $start, $start + strcspn($text, self::URL_END, $start, $limit - $start));
+        if (self::hasAmbiguousHost(substr($text, $start, $whole - $start))) {
+            $end = $whole;
 
             return [$scheme.self::AMBIGUOUS, $end];
         }
