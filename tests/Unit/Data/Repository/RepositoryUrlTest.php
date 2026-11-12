@@ -131,6 +131,8 @@ final class RepositoryUrlTest extends TestCase
         yield 'what Composer 2.10 leaves of a token' => ['composer repo (https://glp***@repo.example.com)', 'composer repo (https://repo.example.com)'];
         yield 'a password with an @' => ['composer repo (https://ci:p@ss@repo.example.com)', 'composer repo (https://repo.example.com)'];
         yield 'an encoded login' => ['composer repo (https://ci%40corp:p%40ss@repo.example.com/sub)', 'composer repo (https://repo.example.com/sub)'];
+        yield 'an scp remote whose user holds a slash' => ['clone us.er/tok@github.com:o/r.git failed', 'clone github.com:o/r.git failed'];
+        yield 'an scp remote whose user is a login and a password with a slash' => ['clone user:p/w@github.com:o/r.git failed', 'clone github.com:o/r.git failed'];
         yield 'a token with a raw slash' => ['fail https://deploy:1234/5678@gitlab.corp/a/b.git', 'fail https://(withheld: ambiguous host)'];
         yield 'a path that reads as another host' => ['fail https://a/b@evil.com/x now', 'fail https://(withheld: ambiguous host) now'];
         yield 'an @ after the url is not userinfo' => ['see https://example.test/pkg and mail a@b', 'see https://example.test/pkg and mail a@b'];
@@ -333,6 +335,20 @@ final class RepositoryUrlTest extends TestCase
     {
         self::assertSame($url, RepositoryUrl::shown($url));
         self::assertSame('fail '.$url.' now', RepositoryUrl::inText('fail '.$url.' now'));
+    }
+
+    /** The rule reads syntax, not intent: a host-like first label with a path `@` and a label without a dot is a path. */
+    public function testAHostLikeUrlWithAnAtSignInThePathIsAKnownLimitOfTheSyntaxRule(): void
+    {
+        self::assertSame('https://us.er/tok@gitlab-internal/g/p', RepositoryUrl::shown('https://us.er/tok@gitlab-internal/g/p'));
+    }
+
+    public function testAScopedNpmTarballUrlIsKept(): void
+    {
+        $url = 'https://registry.npmjs.org/@babel/core/-/core-7.0.0.tgz';
+
+        self::assertSame($url, RepositoryUrl::shown($url));
+        self::assertSame($url, RepositoryUrl::linkable($url));
     }
 
     /** @return iterable<string, array{string}> */

@@ -29,8 +29,8 @@ final class RepositoryUrl
     /** Where a path on the machine starts in a text, at a word, a quote or a bracket: Unix, home, drive or share. */
     private const PATH = '{(?<=^|[\s"\'`(\[\{<=,|:])(?:/(?=[^\s/])|~/|[A-Za-z]:[\\\\/]|\\\\\\\\(?=[^\s\\\\]))}';
 
-    /** The user of an scp-style remote in a text, `user@host:path`, which can be a token. */
-    private const REMOTE_USER = '{(?<=^|[\s"\'`(\[\{<=,|])[^\s@/\\\\"\'<>`()\[\]\{\}:=,|]+@(?=[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?:(?!//)\S)}';
+    /** The user of an scp-style remote in a text, `user@host:path`: the word up to the last such `@`, which can be a token with a `/` or `:`. */
+    private const REMOTE_USER = '{(?<=^|[\s"\'`(\[\{<=,|])[^\s"\'<>`()\[\]\{\}=,|]+@(?=[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?:(?!//)\S)}';
 
     /** What closes what an opening character delimits. PHP quotes a path as `` `path' ``. */
     private const CLOSERS = ['"' => '"', "'" => "'", '`' => "'", '(' => ')', '[' => ']', '{' => '}', '<' => '>'];
