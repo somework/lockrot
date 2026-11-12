@@ -308,7 +308,6 @@ final class CoverageTest extends TestCase
                 "a holder's next_step copies the holding finding's own kind, and the finding's own next_step carries every other kind"],
             [self::D.'move/properties/reason/oneOf/0', ['no_higher_release', 'higher_undated'], self::NOT_REACHED.' (a left-behind lead with no higher branch releasing, or none dated)'],
             [self::D.'advisoriesNotCheckedReason', ['lookup_failed'], 'lockrot writes advisories_unavailable for a feed that fails, and RunNote::advisoriesNotChecked() refuses lookup_failed'],
-            [self::D.'pushUnmeasured', ['undated'], self::NOT_REACHED.' (an activity answer that carried no date)'],
             [self::D.'advisoryFeed/properties/registry/oneOf/0', ['wp-packages.org'], 'wp-packages.org has no advisory feed, so feeds[] never names it'],
             [self::D.'headline/anyOf/2/properties/value', ['no_stable_release'], self::NOT_REACHED.' (a pinned package with no stable release ever)'],
             [self::D.'s6/properties/reason', ['no_stable_release'], 'as headline: pinned with no stable release ever'],
