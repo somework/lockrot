@@ -78,6 +78,20 @@ final class CappedMoveTest extends TestCase
         self::assertContains(['kind' => 'flag', 'id' => 'pinned', 'basis' => 'tags_only'], JsonPath::decoded($move->clears()));
     }
 
+    /** Ruling R19-1: Composer keeps `self.version` as a php link, and composer/semver cannot parse it, so capped stays unverified. */
+    public function testATagMoveToAReleaseWhosePhpDoesNotParseLeavesCappedUnverified(): void
+    {
+        [$row, $context] = self::context([[Signal::S6, []], [Signal::S11, []]], ['2.0.0' => 'self.version'], 'dev-main');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::TAG, FlagSet::PINNED)->withLatest(new Latest('2.0.0', '2026-01-01T00:00:00+00:00', false, null, null), $row), [], null, $context);
+
+        self::assertSame([['kind' => 'flag', 'id' => 'pinned', 'basis' => 'tags_only']], JsonPath::decoded($move->clears()));
+        self::assertSame([['kind' => 'flag', 'id' => 'capped', 'reason' => 'no_release_data']], JsonPath::decoded($move->unverified()));
+        self::assertSame([], $move->adds());
+        self::assertSame('require a tag — the newest is 2.0.0 (2026-01-01); 2.x needs php self.version; not checked: capped', $move->text());
+        self::assertSame(['requires' => 'self.version', 'project_allows' => null, 'target_runs' => null, 'raise_to' => null, 'raise_size' => null], JsonPath::decoded($move->phpCheck()));
+    }
+
     /** The tag 2.1.0 stops below the newest PHP: the later-dated backport 2.0.9, which admits it, does not clear that. */
     public function testATagMoveReadsCappedOnTheTagThatItTargets(): void
     {

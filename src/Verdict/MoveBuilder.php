@@ -265,7 +265,7 @@ final class MoveBuilder
 
     /**
      * Whether the release that the move installs admits R: it clears `capped`, and a release that
-     * states no php leaves it unverified.
+     * states no php or a php that does not parse leaves it unverified.
      *
      * @return array{0: list<MoveFact>, 1: list<MoveFact>}
      */

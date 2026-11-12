@@ -118,11 +118,25 @@ final class PhpCapTest extends TestCase
         self::assertNull($cap->stopsAt($requires));
     }
 
-    public function testARequirementThatDoesNotParseIsNotCapped(): void
+    /**
+     * Ruling R19-1: a requirement that does not parse gives no answer, as one that states no php.
+     * Composer keeps `self.version` as the text of a php link.
+     *
+     * @dataProvider unparsed
+     */
+    #[DataProvider('unparsed')]
+    public function testARequirementThatDoesNotParseGivesNoAnswer(string $requires): void
     {
         $cap = new PhpCap(self::KNOWN);
 
-        self::assertSame([false, null], [$cap->stopsBelow('not a constraint'), $cap->stopsAt('not a constraint')]);
+        self::assertSame([null, null, null], [$cap->stopsBelow($requires), $cap->stopsAt($requires), $cap->admitsNewest($requires)]);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function unparsed(): iterable
+    {
+        yield 'self.version' => ['self.version'];
+        yield 'free text' => ['not a constraint'];
     }
 
     /** A requirement that admits no known minor is not capped either. */
