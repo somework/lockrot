@@ -322,6 +322,8 @@ final class RepositoryUrlTest extends TestCase
             'https://tok?en@github.com/o/r',
             'https://us#er:pa?ss@github.com/o/r',
             'https://a:b?c/d@github.com/o/r',
+            'https://deploy:1234/5678?x@gitlab.corp/a/b',
+            'https://deploy:1234/5678#x@gitlab.corp/a/b',
         ] as $url) {
             yield $url => [$url];
         }
@@ -346,6 +348,24 @@ final class RepositoryUrlTest extends TestCase
     {
         self::assertSame($url, RepositoryUrl::shown($url));
         self::assertSame('fail '.$url.' now', RepositoryUrl::inText('fail '.$url.' now'));
+    }
+
+    /**
+     * @dataProvider atSignsInTheQuery
+     */
+    #[DataProvider('atSignsInTheQuery')]
+    public function testAnAtSignInTheQueryOfAClearHostKeepsTheHost(string $url, string $expected): void
+    {
+        self::assertSame($expected, RepositoryUrl::shown($url));
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function atSignsInTheQuery(): iterable
+    {
+        yield 'a dotted host' => ['https://gitlab.corp/a/b?x=a@b', 'https://gitlab.corp/a/b'];
+        yield 'a dotted host with a port' => ['https://gitlab.corp:8443/a/b#x@y', 'https://gitlab.corp:8443/a/b'];
+        yield 'userinfo before the path' => ['https://user:pw@host/p?x=a@b.com', 'https://host/p'];
+        yield 'no at sign' => ['https://deploy:1234/5678?x=1', 'https://deploy:1234/5678'];
     }
 
     /** The rule reads syntax, not intent: a host-like first label with a path `@` and a label without a dot is a path. */

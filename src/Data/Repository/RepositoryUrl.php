@@ -104,8 +104,8 @@ final class RepositoryUrl
      * and a token pasted with a raw `/` or `\\` puts an `@` after it. Ambiguous when an `@` follows
      * the first separator and the text before it is not a host with an optional numeric port, has
      * no `.`, or a label after an `@` past the separator has one. Also when a `?` or `#` before the
-     * separator has an `@` after it. A report withholds such a URL: it shows neither the userinfo
-     * nor either reading as the host.
+     * separator, or after a separator that ends no dotted host, has an `@` after it. A report
+     * withholds such a URL: it shows neither the userinfo nor either reading as the host.
      */
     public static function hasAmbiguousHost(string $afterScheme): bool
     {
@@ -116,12 +116,14 @@ final class RepositoryUrl
             return strpos($afterScheme, '@', $query) !== false;
         }
         $pre = substr($afterScheme, 0, $query);
-        if (strpos($pre, '@', $separator) === false) {
-            return false;
-        }
         $first = substr($pre, 0, $separator);
+        $isHost = preg_match(self::HOST_WITH_PORT, $first) === 1 && strpos($first, '.') !== false;
+        if (strpos($pre, '@', $separator) === false) {
+            // A password with a raw `/` and then a `?` or `#` puts its `@` in the query.
+            return !$isHost && strpos($first, '@') === false && strpos($afterScheme, '@', $query) !== false;
+        }
 
-        return preg_match(self::HOST_WITH_PORT, $first) !== 1 || strpos($first, '.') === false || preg_match('{@[^/\\\\]*\.}', $pre) === 1;
+        return !$isHost || preg_match('{@[^/\\\\]*\.}', $pre) === 1;
     }
 
     /** Whether a repository or dist URL is a path on the machine, or a `file://` URL. */
