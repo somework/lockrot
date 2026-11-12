@@ -438,6 +438,8 @@ final class CaseHydratorTest extends TestCase
      * The oracle answers Composer's refusal, and lockrot reads a refused baseline as not checked when
      * a name stays unloaded and the world's lock does not hold a root requirement.
      *
+     * @param array{string, ?string} $expected
+     *
      * @dataProvider baselinesOfTheSolverWorlds
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('baselinesOfTheSolverWorlds')]

@@ -693,7 +693,7 @@ final class CaseHydrator
      * The project that reads $root as its composer.json, so that lockrot compares the lock's
      * content-hash with it.
      *
-     * @param array<string, mixed> $root
+     * @param array<mixed> $root
      */
     private static function manifest(array $root): ProjectConfig
     {
