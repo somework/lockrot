@@ -930,6 +930,19 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('lockrot does not look in parent directories', $display);
     }
 
+    public function testALockThatIsADirectoryIsExit2AndSaysSo(): void
+    {
+        $dir = $this->tempDir('lockrot-dirlock-');
+        mkdir($dir.'/composer.lock');
+        chdir($dir);
+        $tester = $this->tester();
+
+        self::assertSame(2, $tester->execute([]));
+        $display = $tester->getErrorOutput();
+        self::assertStringStartsWith('lockrot: composer.lock exists and is not a regular file', $display);
+        self::assertStringNotContainsString('not found', $display);
+    }
+
     /** `composer rot` is the documented short form, so the alias is part of the command's contract. */
     public function testTheCommandIsAlsoReachableAsRot(): void
     {
