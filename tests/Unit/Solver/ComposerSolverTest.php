@@ -648,7 +648,8 @@ final class ComposerSolverTest extends TestCase
     /**
      * PHP turns a numeric name into an integer array key, and a newer release that needs the
      * unreached name still counts it. Composer's pool builder renumbers integer keys, so only the
-     * name `0` reaches the version source under its own name.
+     * name `0` reaches the version source under its own name. Composer's `Package::setRequires()`
+     * reads a link map with the key 0 as a list and gives a notice, which PHPUnit 9 turns into an error.
      */
     public function testAResolvedUpdateBelowAReleaseThatNeedsAnUnreachedNumericNameNamesItUnreached(): void
     {
@@ -657,7 +658,12 @@ final class ComposerSolverTest extends TestCase
         $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['0' => '^1.0']]]], ['0' => VersionSource::UNREACHED]);
         $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source);
 
-        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.0']));
+        set_error_handler(static fn (int $level, string $message): bool => strpos($message, 'Package::setRequires must be called with a map') === 0, \E_USER_NOTICE);
+        try {
+            $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.0']));
+        } finally {
+            restore_error_handler();
+        }
 
         self::assertTrue($solution->resolves());
         self::assertSame(['0' => VersionSource::UNREACHED], $solution->unloaded());
