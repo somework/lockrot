@@ -645,6 +645,44 @@ final class ComposerSolverTest extends TestCase
         self::assertEquals(['acme/core' => VersionSource::UNREACHED, 'acme/util' => VersionSource::UNREACHED], $solution->unloaded(), 'the key order is free');
     }
 
+    /**
+     * PHP turns a numeric name into an integer array key, and a newer release that needs the
+     * unreached name still counts it. Composer's pool builder renumbers integer keys, so only the
+     * name `0` reaches the version source under its own name.
+     */
+    public function testAResolvedUpdateBelowAReleaseThatNeedsAnUnreachedNumericNameNamesItUnreached(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['0' => '^1.0']]]], ['0' => VersionSource::UNREACHED]);
+        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source);
+
+        $solution = $solver->solve(SolveRequest::update(['acme/lib' => '^1.0']));
+
+        self::assertTrue($solution->resolves());
+        self::assertSame(['0' => VersionSource::UNREACHED], $solution->unloaded());
+    }
+
+    /** The copy for a lock that holds every root requirement drops the unreached name of the baseline, and the original keeps it. */
+    public function testTheCopyForALockThatHoldsEveryRootRequirementLeavesTheOriginalSolver(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^2.0', 'acme/new' => '^1.0'], 'require-dev' => ['acme/lib' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/new', 'version' => '1.0.0', 'require' => ['acme/plugin' => '^1.0']]]]);
+        $source = new ArrayVersionSource([
+            'acme/lib' => [['version' => '1.0.0'], ['version' => '2.0.0']],
+            'acme/new' => [['version' => '1.0.0', 'require' => ['acme/plugin' => '^1.0']]],
+            'acme/plugin' => [['version' => '1.0.0'], ['version' => '1.1.0', 'require' => ['acme/private' => '^1.0']]],
+        ], ['acme/private' => VersionSource::UNREACHED]);
+        $solver = new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source);
+
+        $locked = $solver->withEveryRootRequirementLocked()->solve(SolveRequest::baseline());
+        $original = $solver->solve(SolveRequest::baseline());
+
+        self::assertSame([false, []], [$locked->resolves(), $locked->unloaded()]);
+        self::assertSame([false, ['acme/private' => VersionSource::UNREACHED]], [$original->resolves(), $original->unloaded()]);
+    }
+
     /** The pool builder finds the vcs-locked name in the locked-only copy, which no constraint of the require admits, so the pool holds no release of it. */
     public function testARefusedRequireThatWantsAnotherReleaseOfAFreedVcsLockedNameNamesItUnreached(): void
     {

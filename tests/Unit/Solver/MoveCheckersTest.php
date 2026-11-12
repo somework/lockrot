@@ -598,12 +598,15 @@ final class MoveCheckersTest extends TestCase
      *
      * @dataProvider selfVersionLinksOfTheRoot
      *
-     * @param array<string, string>  $replace  the root's `replace`
-     * @param array{string, ?string} $expected the baseline's result and reason
+     * @param 'require'|'require-dev' $section  the root section that links acme/sub
+     * @param array<string, string>    $replace  the root's `replace`
+     * @param array{string, ?string}   $expected the baseline's result and reason
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('selfVersionLinksOfTheRoot')]
-    public function testARootLinkAtSelfVersionNeedsAHolderForTheBaselineToStayRefused(array $replace, array $expected): void
+    public function testARootLinkAtSelfVersionNeedsAHolderForTheBaselineToStayRefused(string $section, array $replace, array $expected): void
     {
+        $links = ['require' => ['acme/lib' => '^2.0', 'acme/new' => '^1.0'], 'require-dev' => ['acme/lib' => '^1.0']];
+        $links[$section]['acme/sub'] = 'self.version';
         $lock = LockFile::fromArray(['packages' => [
             ['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
             ['name' => 'acme/new', 'version' => '1.0.0', 'require' => ['acme/plugin' => '^1.0'], 'notification-url' => 'https://packagist.org/downloads/'],
@@ -616,7 +619,7 @@ final class MoveCheckersTest extends TestCase
             $loader->load(['name' => 'acme/plugin', 'version' => '1.1.0', 'require' => ['acme/private' => '^1.0']]),
             $loader->load(['name' => 'acme/sub', 'version' => '1.0.0']),
         ];
-        $root = $loader->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^2.0', 'acme/new' => '^1.0', 'acme/sub' => 'self.version'], 'require-dev' => ['acme/lib' => '^1.0'], 'replace' => $replace], RootPackage::class);
+        $root = $loader->load(['name' => 'acme/app', 'version' => '1.0.0', 'replace' => $replace] + $links, RootPackage::class);
         self::assertInstanceOf(RootPackageInterface::class, $root);
         $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
         $checker = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
@@ -626,11 +629,13 @@ final class MoveCheckersTest extends TestCase
         self::assertSame($expected, [$baseline->result(), $baseline->reason()]);
     }
 
-    /** @return iterable<string, array{array<string, string>, array{string, ?string}}> */
+    /** @return iterable<string, array{'require'|'require-dev', array<string, string>, array{string, ?string}}> */
     public static function selfVersionLinksOfTheRoot(): iterable
     {
-        yield 'a self.version link that nothing holds' => [[], [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME]];
-        yield 'a self.version link that the root replaces' => [['acme/sub' => 'self.version'], [MoveCheck::REFUSED, null]];
+        yield 'a self.version link that nothing holds' => ['require', [], [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME]];
+        yield 'a self.version link that the root replaces' => ['require', ['acme/sub' => 'self.version'], [MoveCheck::REFUSED, null]];
+        yield 'a require-dev link at self.version that nothing holds' => ['require-dev', [], [MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME]];
+        yield 'a require-dev link at self.version that the root replaces' => ['require-dev', ['acme/sub' => 'self.version'], [MoveCheck::REFUSED, null]];
     }
 
     /**
