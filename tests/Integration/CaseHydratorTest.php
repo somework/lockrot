@@ -397,7 +397,7 @@ final class CaseHydratorTest extends TestCase
 
         $notes = static fn (array $case): array => array_values(array_filter(JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::report($case)->toArray()), ['notes']), static fn ($note): bool => \is_string($note) && strpos($note, 'lock: ') === 0));
 
-        self::assertSame([[], ['lock: the lock file does not match composer.json (acme/feature-flags is required but not locked): run composer update']], [$notes($case), $notes($unlocked)]);
+        self::assertSame([[], ['lock: the lock file does not match composer.json (acme/feature-flags is not locked at a version that composer.json allows): run composer update']], [$notes($case), $notes($unlocked)]);
     }
 
     /**
@@ -416,7 +416,7 @@ final class CaseHydratorTest extends TestCase
 
         $notes = static fn (array $inputs): array => array_values(array_filter(JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::report(['inputs' => $inputs] + $case)->toArray()), ['notes']), static fn ($note): bool => \is_string($note) && strpos($note, 'lock: ') === 0));
 
-        self::assertSame([[], ['lock: the lock file does not match composer.json (acme/feature-flags is required but not locked): run composer update']], [$notes($hashless), $notes($stale)]);
+        self::assertSame([[], ['lock: the lock file does not match composer.json (acme/feature-flags is not locked at a version that composer.json allows): run composer update']], [$notes($hashless), $notes($stale)]);
     }
 
     public function testACaseWithoutInputsIsRefused(): void

@@ -185,7 +185,7 @@ final class RunNote
     {
         $text = 'lock: the lock file does not match composer.json';
         if ($missing !== []) {
-            $text .= \sprintf(' (%s %s required but not locked)', ListWords::of($missing), \count($missing) === 1 ? 'is' : 'are');
+            $text .= \sprintf(' (%s %s not locked at a version that composer.json allows)', ListWords::of($missing), \count($missing) === 1 ? 'is' : 'are');
         }
 
         return self::of(self::LOCK_OUT_OF_SYNC, $text.': run composer update', false, ['missing' => $missing]);
