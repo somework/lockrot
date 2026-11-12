@@ -193,17 +193,17 @@ final class LockFile
      */
     private static function refuseWrongTypes(array $entry, string $refusal): void
     {
-        $strings = ['type', 'target-dir', 'installation-source', 'notification-url'];
+        $values = [];
+        foreach (['type', 'target-dir', 'installation-source', 'notification-url'] as $key) {
+            $values[$key] = $entry[$key] ?? null;
+        }
         foreach (['source' => ['type', 'url', 'reference'], 'dist' => ['type', 'url', 'reference', 'shasum']] as $section => $keys) {
-            if (isset($entry[$section]) && \is_array($entry[$section])) {
-                foreach ($keys as $key) {
-                    $strings[] = $section.'.'.$key;
-                }
+            $fields = $entry[$section] ?? null;
+            foreach (\is_array($fields) ? $keys : [] as $key) {
+                $values[$section.'.'.$key] = $fields[$key] ?? null;
             }
         }
-        foreach ($strings as $path) {
-            [$head, $tail] = array_pad(explode('.', $path, 2), 2, null);
-            $value = $tail === null ? ($entry[$head] ?? null) : ($entry[$head][$tail] ?? null);
+        foreach ($values as $path => $value) {
             // A reference is cast to a string by the loader, so a number is fine and an array is not.
             // The loader skips an empty notification-url.
             $fine = $value === null || \is_string($value) || ($path === 'notification-url' && empty($value)) || (substr($path, -9) === 'reference' && \is_scalar($value));
