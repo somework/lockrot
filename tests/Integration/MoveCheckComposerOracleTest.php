@@ -134,6 +134,9 @@ final class MoveCheckComposerOracleTest extends TestCase
                 [$installs, $actualInstalls] = self::installs((string) $key, $answer, $outcome, JsonPath::arrayAt($world, ['lock']));
                 // lockrot reads no hold of a refused baseline: every move is then not checked.
                 $expected[$key] = self::answerOf(JsonPath::stringAt($answer, ['result']), \is_string($answer['form'] ?? null) ? $answer['form'] : null, null, $key === 'baseline' ? [] : JsonPath::arrayAt($answer, ['holds']), $answer['problem'], $withProblem) + ['installs' => $installs];
+                if ($key === 'baseline' && $expected[$key]['result'] === MoveCheck::REFUSED && CaseHydrator::leavesARefusedBaselineUnchecked($world)) {
+                    $expected[$key] = self::answerOf(MoveCheck::NOT_CHECKED, null, MoveCheck::UNLOADED_NAME, [], null, true) + ['installs' => $installs];
+                }
                 $actual[$key] = self::answerOf($outcome->check()->result(), $outcome->check()->form(), $outcome->check()->reason(), array_map(static fn (Holder $hold): array => $hold->jsonSerialize(), $outcome->holds()), $outcome->problem(), $withProblem) + ['installs' => $actualInstalls];
             }
         } finally {

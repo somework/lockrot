@@ -314,14 +314,24 @@ final class CaseHydrator
         // repository serves a name of the lock, or a name that a release needs and no Composer repository lists, records
         // no request of a move: lockrot reads that move as unloaded_name.
         $unloaded = $world !== null && (self::shadowsALockedName($world) || self::needsAnUnlistedName($world));
-        // The oracle records Composer's refusal. lockrot keeps it only when the world's lock holds
-        // every root requirement, else the unloaded name leaves the baseline not checked.
-        if ($world !== null && $unloaded && (($checks['baseline'] ?? [])['result'] ?? null) === MoveCheck::REFUSED && !self::locksEveryRootRequirement($world)) {
+        if ($world !== null && (($checks['baseline'] ?? [])['result'] ?? null) === MoveCheck::REFUSED && self::leavesARefusedBaselineUnchecked($world)) {
             $checks['baseline'] = ['result' => MoveCheck::NOT_CHECKED, 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null, 'holds' => [], 'problem' => null];
         }
         $checker = new RecordedMoveChecker($checks, $run, $world !== null && !$unloaded);
 
         return MoveChecks::of($locked === null ? $checker : $checker->withLocked($locked));
+    }
+
+    /**
+     * The oracle records Composer's refusal of the baseline. The model keeps it only when the world's
+     * lock holds every root requirement, else a name that stays unloaded leaves the baseline
+     * `not_checked` with `unloaded_name`. This reading uses Composer's loader, not lockrot's solver.
+     *
+     * @param array<mixed, mixed> $world a case's `inputs.solver_world.world`
+     */
+    public static function leavesARefusedBaselineUnchecked(array $world): bool
+    {
+        return (self::shadowsALockedName($world) || self::needsAnUnlistedName($world)) && !self::locksEveryRootRequirement($world);
     }
 
     /**
