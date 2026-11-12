@@ -155,9 +155,13 @@ final class LockFile
         if (isset($entry['name']) && !\is_string($entry['name'])) {
             throw new ConfigException($refusal.'"name" must be a string');
         }
+        self::refuseWrongTypes($entry, $refusal);
         try {
             $loaded = $loader->load($entry);
             $forUpdate = $lockLoader->load($entry);
+        } catch (\TypeError $e) {
+            // The message of a TypeError quotes a PHP function and a path of the install.
+            throw new ConfigException($refusal.'a field has the wrong type', 0, $e);
         } catch (\Throwable $e) {
             // ArrayLoader changes no state, so any failure means that the entry cannot be loaded.
             throw new ConfigException($refusal.$e->getMessage(), 0, $e);
@@ -177,6 +181,36 @@ final class LockFile
         }
 
         return [$loaded, $forUpdate, $aliasVersions];
+    }
+
+    /**
+     * The fields that Composer's loader hands to a typed setter or a string function: a wrong type
+     * is a TypeError there, and the lock's field is what a user can fix.
+     *
+     * @param array<mixed> $entry
+     *
+     * @throws ConfigException for a field of the wrong type
+     */
+    private static function refuseWrongTypes(array $entry, string $refusal): void
+    {
+        $strings = ['type', 'target-dir', 'installation-source', 'notification-url'];
+        foreach (['source' => ['type', 'url', 'reference'], 'dist' => ['type', 'url', 'reference', 'shasum']] as $section => $keys) {
+            if (isset($entry[$section]) && \is_array($entry[$section])) {
+                foreach ($keys as $key) {
+                    $strings[] = $section.'.'.$key;
+                }
+            }
+        }
+        foreach ($strings as $path) {
+            [$head, $tail] = array_pad(explode('.', $path, 2), 2, null);
+            $value = $tail === null ? ($entry[$head] ?? null) : ($entry[$head][$tail] ?? null);
+            // A reference is cast to a string by the loader, so a number is fine and an array is not.
+            // The loader skips an empty notification-url.
+            $fine = $value === null || \is_string($value) || ($path === 'notification-url' && empty($value)) || (substr($path, -9) === 'reference' && \is_scalar($value));
+            if (!$fine) {
+                throw new ConfigException($refusal.'"'.$path.'" must be a string');
+            }
+        }
     }
 
     /** @param array{platform: mixed, platform-dev: mixed} $platform */

@@ -492,7 +492,12 @@ final class LockFileTest extends TestCase
         yield 'alias without package' => [['packages' => [$entry], 'aliases' => [['version' => '1.0.0', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases must hold objects with the string package'];
         yield 'a broken alias before a whole one' => [['packages' => [$entry], 'aliases' => ['a/b', ['package' => 'a/b', 'version' => '1.0.0', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases must hold objects with the string package'];
         yield 'number as name' => [['packages' => [['name' => 5, 'version' => '1.0.0']]], 'alt.lock entry #0 in packages cannot be loaded: "name" must be a string'];
-        yield 'number as type' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'type' => 5]]], 'alt.lock entry #0 in packages cannot be loaded: '];
+        yield 'number as type' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'type' => 5]]], 'alt.lock entry #0 in packages cannot be loaded: "type" must be a string'];
+        yield 'number as source url' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 5, 'reference' => 7]]]], 'alt.lock entry #0 in packages cannot be loaded: "source.url" must be a string'];
+        yield 'number as dist url' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'dist' => ['type' => 'zip', 'url' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "dist.url" must be a string'];
+        yield 'number as notification url' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'notification-url' => 5]]], 'alt.lock entry #0 in packages cannot be loaded: "notification-url" must be a string'];
+        yield 'number in bin' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'bin' => [5]]]], 'alt.lock entry #0 in packages cannot be loaded: a field has the wrong type'];
+        yield 'list as source reference' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://x.test/a/b', 'reference' => ['x']]]]], 'alt.lock entry #0 in packages cannot be loaded: "source.reference" must be a string'];
         yield 'name in both sections' => [['packages' => [$entry], 'packages-dev' => [['name' => 'a/b', 'version' => '2.0.0']]], 'alt.lock lists a/b twice: entry #0 in packages and entry #0 in packages-dev'];
         yield 'name twice ignoring case' => [['packages' => [['name' => 'other/x', 'version' => '1.0.0'], $entry, ['name' => 'A/B', 'version' => '1.0.0']]], 'alt.lock lists a/b twice: entry #1 in packages and entry #2 in packages'];
         yield 'invalid name twice' => [['packages' => [['name' => '--x', 'version' => '1.0.0'], ['name' => '--x', 'version' => '1.0.0']]], 'alt.lock lists --x twice: entry #0 in packages and entry #1 in packages'];
@@ -516,6 +521,20 @@ final class LockFileTest extends TestCase
 
         self::assertNotNull($thrown, 'the lock loads');
         self::assertStringStartsWith($message, $thrown->getMessage());
+    }
+
+    public function testAWronglyTypedFieldNamesTheFieldAndNeverQuotesPhp(): void
+    {
+        $lock = ['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 5, 'reference' => 7]]]];
+
+        try {
+            LockFile::fromArray($lock, 'alt.lock');
+            self::fail('the lock loads');
+        } catch (ConfigException $e) {
+            self::assertStringNotContainsString('Argument', $e->getMessage());
+            self::assertStringNotContainsString('vendor', $e->getMessage());
+            self::assertStringNotContainsString('.php', $e->getMessage());
+        }
     }
 
     public function testAFileLockIsNamedByItsFileNameUnlessACallerNamesIt(): void
