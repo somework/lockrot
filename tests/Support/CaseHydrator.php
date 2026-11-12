@@ -381,7 +381,9 @@ final class CaseHydrator
         $activity = $packages[$package]['activity'];
         $lockData = self::lockData(self::entries($inputs, $packages), $packages, $inputs);
         $root = self::root($inputs, $packages);
-        $unlocked = $root === null ? null : self::unlockedRoot($root, $lockData);
+        $world = \is_array($inputs['solver_world'] ?? null) && \is_array($inputs['solver_world']['world'] ?? null) ? $inputs['solver_world']['world'] : null;
+        // A solver world states its lock's hash: `lock_hash` `stale`, or no content-hash without the key.
+        $unlocked = $root === null || ($world !== null && ($world['lock_hash'] ?? null) !== 'stale') ? null : self::unlockedRoot($root, $lockData);
         $project = $root === null ? ProjectConfig::empty() : ($unlocked === null ? ProjectConfig::fromArray($root) : self::manifest($root));
         $lock = LockFile::fromArray($unlocked === null ? $lockData : $lockData + ['content-hash' => Locker::getContentHash(JsonFile::encode($unlocked))]);
         $clock = self::clock($case);

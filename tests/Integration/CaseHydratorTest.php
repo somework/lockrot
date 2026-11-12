@@ -400,6 +400,25 @@ final class CaseHydratorTest extends TestCase
         self::assertSame([[], ['lock: the lock file does not match composer.json (acme/feature-flags is required but not locked): run composer update']], [$notes($case), $notes($unlocked)]);
     }
 
+    /**
+     * A solver world states the lock's hash in `lock_hash`: `stale` writes a hash that differs from
+     * composer.json's, and an absent key writes none, so no lock_out_of_sync note appears.
+     */
+    public function testASolverWorldLockHasAContentHashOnlyWhenTheWorldSetsLockHash(): void
+    {
+        $case = CaseHydrator::case('A');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $root = JsonPath::arrayAt($inputs, ['root']);
+        $root['require'] = JsonPath::arrayAt($root, ['require']) + ['acme/feature-flags' => '^1.0'];
+        $inputs['root'] = $root;
+        $hashless = $inputs + ['solver_world' => ['world' => ['root' => $root]]];
+        $stale = $inputs + ['solver_world' => ['world' => ['root' => $root, 'lock_hash' => 'stale']]];
+
+        $notes = static fn (array $inputs): array => array_values(array_filter(JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::report(['inputs' => $inputs] + $case)->toArray()), ['notes']), static fn ($note): bool => \is_string($note) && strpos($note, 'lock: ') === 0));
+
+        self::assertSame([[], ['lock: the lock file does not match composer.json (acme/feature-flags is required but not locked): run composer update']], [$notes($hashless), $notes($stale)]);
+    }
+
     public function testACaseWithoutInputsIsRefused(): void
     {
         $this->expectException(\InvalidArgumentException::class);

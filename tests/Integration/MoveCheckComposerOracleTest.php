@@ -154,6 +154,9 @@ final class MoveCheckComposerOracleTest extends TestCase
         $root = array_replace(JsonPath::arrayAt($world, ['root']), JsonPath::has($world, ['root_extra']) ? JsonPath::arrayAt($world, ['root_extra']) : []);
         $root['repositories'] = array_merge($before, [['type' => 'composer', 'url' => $server->url()], ['packagist.org' => false]]);
         $lock = ['packages' => self::lockEntries($world, 'packages', $server->url()), 'packages-dev' => self::lockEntries($world, 'packages-dev', $server->url()), 'aliases' => [], 'minimum-stability' => 'stable', 'stability-flags' => [], 'prefer-stable' => false, 'prefer-lowest' => false, 'platform' => ['php' => JsonPath::has($root, ['require', 'php']) ? JsonPath::stringAt($root, ['require', 'php']) : '*'], 'platform-dev' => []];
+        if (JsonPath::has($world, ['lock_hash'])) {
+            $lock['content-hash'] = str_repeat('0', 32);
+        }
         file_put_contents($this->project.'/composer.json', (string) json_encode($root));
         file_put_contents($this->project.'/composer.lock', (string) json_encode($lock));
 
