@@ -481,20 +481,19 @@ maintainer.
 
            A renderer tag that the gate refuses has no release, and the renderer's tag ruleset
            keeps it, so that renderer version is lost.
-        6. In lockrot-report, first squash-merge the renderer's release branch (`release/X.Y.0`)
-           into the renderer's `main`, and reconcile its `CHANGELOG.md` with the one on `main`.
-           Start the commit of this step from that merge. On a `main` that lacks the release
-           branch, `repin` changes other files under `contract/`, V does not vendor the same
-           bundle, and the tag has no release. Then run `node scripts/contract.mjs repin <V>`.
-           Set the version in `CHANGELOG.md`. Run `npm version X.Y.Z --no-git-tag-version`, which
-           sets `version` in
-           `package.json` and both `version` fields of `package-lock.json` (the root and
-           `packages[""]`). Commit only the version and the pin.
+        6. In lockrot-report, squash-merge the renderer's release branch (`release/X.Y.0`) into
+           the renderer's `main`. In that merge, reconcile the branch's `CHANGELOG.md` with the
+           one on `main`. Start the commit of this step from that merge. Without the merge,
+           `repin` changes other files under `contract/`. V then does not vendor the same bundle,
+           and the tag has no release. Then run `node scripts/contract.mjs repin <V>`. Set the
+           version in `CHANGELOG.md`. Run `npm version X.Y.Z --no-git-tag-version`, which sets
+           `version` in `package.json` and both `version` fields of `package-lock.json` (the root
+           and `packages[""]`). Commit only the version and the pin.
            The renderer's `release.yml` refuses a tag when `package-lock.json` names a version
            other than the one in `package.json`. That tag then has no release, and the renderer's
            tag ruleset keeps it on its commit. If the tag run fails at that check, fix
-           `package-lock.json` on the renderer's `main`. Then do this step and step 7 again with
-           the next patch version of the renderer, and vendor that version in step 8. Name that
+           `package-lock.json` on the renderer's `main`. Then do the version-and-pin part of this
+           step and step 7 again with the next patch version of the renderer, and vendor that version in step 8. Name that
            version in the CHANGELOG line that names the vendored renderer.
         7. Merge that commit into the renderer's `main`. Then tag `vX.Y.Z` on `main`.
         8. Run `tools/report/update-renderer vX.Y.Z`, and commit only the files that it writes. This
@@ -524,8 +523,10 @@ maintainer.
       run reports it, so the pull request waits for it with no way to bypass. A context of a
       removed matrix row is stale.
     - Confirm a green `sweep.yml` run on the head of the release pull request. The `sweep` test
-      group runs in no `ci.yml` job, and a path-filtered workflow cannot be a required check, so
-      no ruleset stops a red sweep.
+      group runs in no `ci.yml` job. A required path-filtered workflow blocks each pull request
+      that it skips, so `sweep.yml` is not required, and no ruleset stops a red sweep. When the
+      release pull request changes no path that `sweep.yml` filters, run
+      `gh workflow run sweep.yml --ref <release branch>`.
     - When the release changes the flag set, a schema number or the score model, the lockrot.dev
       change that reads it is merged. The lockrot.dev build stops on a set that it does not know.
     - Before the first final renderer tag, list the renderer's rulesets with
@@ -564,8 +565,8 @@ maintainer.
     python3 tools/release/tag_day.py X.Y.Z "$(git for-each-ref refs/tags/vX.Y.Z --format='%(taggerdate:short)')"
     ```
 
-    If the check fails, delete the local tag and fix the date first. If the tag day changed after
-    the merge, merge a date pull request, and tag the commit of that pull request when its
+    If the check fails, delete the local tag. Then fix the date first. If the tag day changed
+    after the merge, merge a date pull request. Tag the commit of that pull request when its
     `ci.yml` push run passes. Push the tag only when the check passes, because the tag ruleset
     forbids moving or deleting a pushed `v*` tag. `phar.yml` repeats the check as a warning. Then
     push the tag. `.github/workflows/phar.yml` refuses these tags:

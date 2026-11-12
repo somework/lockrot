@@ -141,11 +141,12 @@ process, so they rarely run out. A `composer install` with a cold cache on a lar
 out before lockrot checks every package. Raise the budget for such a lock, or lower it to spend
 less time on the check.
 
-A project-local plugin does not check the install that first installs it, because Composer loads
-plugins from the installed `vendor/` and has none to load yet. That covers every fresh clone and
-every CI job with an empty `vendor/`. Such an install prints no block and `install-time-strict`
-stops nothing. A global install, or a `vendor/` that already holds lockrot, runs the check. To
-gate CI, run `composer lockrot --fail-on=<value>` or the [PHAR](phar.md).
+A project-local plugin does not check the install that first installs it. Composer loads plugins
+from the installed `vendor/`, and an empty `vendor/` holds no plugin. This case covers every fresh
+clone and every CI job with an empty `vendor/`. Such an install prints no block, and
+`install-time-strict` stops nothing. A global plugin runs the check, and so does a project whose
+`vendor/` already holds lockrot. To gate CI, run `composer lockrot --fail-on=<value>` or the
+[PHAR](phar.md).
 
 ## When the install continues and when it stops {#never-fails-the-install}
 

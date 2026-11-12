@@ -159,7 +159,8 @@ lockrot: unknown key extra.lockrot.accept-unchecked[0].expire ignored (did you m
   `--generate-baseline` included, once the configuration has loaded and before lockrot reads the
   lock. The [install-time summary](install-time.md) prints them above its block whenever it runs,
   even when nothing is flagged. `LOCKROT_DISABLE` suppresses them. `-q` silences them and the
-  block. It keeps the `lockrot: install-time check skipped: …` line and the
+  block. It keeps the `lockrot: install-time check skipped: …` line, the
+  `lockrot: install-time-strict stopped the install; …` line and the
   `lockrot: Composer <version> is older than 2.10 …` line
   ([which lines](install-time.md#never-fails-the-install)).
 - **How a key is printed.** As written, with every byte that a terminal can act on escaped (control

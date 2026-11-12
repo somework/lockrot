@@ -435,7 +435,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   same lock. Action: compare these counts on the first run.
   ([Migrating](docs/schema.md#migrating-from-report-1))
 - **Breaking:** **Distribution:** `docs/compatibility.md` no longer promises which lockrot-action
-  major line follows lockrot 1.x. `@v1` runs 0.14 from lockrot-action v1.2.0 on, and with `version:
+  major line follows lockrot 1.x, and no longer promises SemVer for the action's inputs. The
+  action's v1 line follows lockrot's minor releases and can carry Breaking entries, each marked
+  Breaking with migration lines. `@v1` runs 0.14 from lockrot-action v1.2.0 on, and with `version:
   latest` from this tag on. The Docker image's `latest` tag moves with v1.2.0. Action: to stay on
   0.13, set the action's `version: 0.13.0`, or use the image tag `0.13.0`. Before v1.2.0, the
   action writes its job summary from an `--offline` run, which shows no advisory on 0.14: upgrade
