@@ -434,6 +434,29 @@ final class CaseHydratorTest extends TestCase
         self::assertSame(['lock: the lock file does not match composer.json (twig/twig is not locked at a version that composer.json allows): run composer update'], $notes);
     }
 
+    /**
+     * The oracle answers Composer's refusal, and lockrot reads a refused baseline as not checked when
+     * a name stays unloaded and the world's lock does not hold a root requirement.
+     *
+     * @dataProvider baselinesOfTheSolverWorlds
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('baselinesOfTheSolverWorlds')]
+    public function testARefusedBaselineReadsAsLockrotReadsTheWorldsLock(string $id, array $expected): void
+    {
+        $run = JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::report(CaseHydrator::case($id))->toArray()), ['run', 'move_check']);
+
+        self::assertSame($expected, [$run['baseline'] ?? null, $run['reason'] ?? null]);
+    }
+
+    /** @return iterable<string, array{string, array{string, ?string}}> */
+    public static function baselinesOfTheSolverWorlds(): iterable
+    {
+        yield 'a lock that omits a root requirement' => ['mc-baseline-unsynced‡', ['not_checked', 'unloaded_name']];
+        yield 'the same lock with no hash' => ['mc-baseline-unsynced-hashless‡', ['not_checked', 'unloaded_name']];
+        yield 'a provide below the link' => ['mc-baseline-provide-unmatched‡', ['not_checked', 'unloaded_name']];
+        yield 'a lock that holds every root requirement' => ['mc-baseline-synced-non-dev‡', ['refused', null]];
+    }
+
     public function testACaseWithoutInputsIsRefused(): void
     {
         $this->expectException(\InvalidArgumentException::class);
