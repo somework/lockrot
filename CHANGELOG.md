@@ -607,9 +607,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** the `needs php` clause of a move line names the move's branch, else its release,
   else its constraint. A move with none of them writes no clause, not an empty name.
   ([The move](docs/verdicts.md#move))
-- **CLI:** the PHAR and `vendor/bin/lockrot` exit `2` with a `lockrot:` line on an unknown command,
-  a `--working-dir` that does not exist, and a bad argument or option to `help`, `list` or `--help`,
-  not `1`. In plugin mode, Composer still exits `1` for them. ([Exit codes](docs/ci.md#exit-codes))
+- **CLI:** the PHAR and `vendor/somework/lockrot/bin/lockrot` exit `2` with a `lockrot:` line on an
+  unknown command, a `--working-dir` that does not exist, and a bad argument or option to `help`,
+  `list` or `--help`, not `1`. In plugin mode, Composer still exits `1` for them. ([Exit codes](docs/ci.md#exit-codes))
 - **CLI:** `--explain` prints the footnote "so S8 does not measure the branch" only when S8 did
   not measure the installed branch because of its undated releases.
   ([Explaining one package](docs/configuration.md#explaining-one-package))

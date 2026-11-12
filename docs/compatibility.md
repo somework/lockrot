@@ -244,9 +244,9 @@ The `github`, `sarif` and `gitlab` columns of
     - In a check or `--generate-baseline` run, `0` and `1` follow the report's `gate.fails`, with
       its causes in `gate.tripped_by`. A run that then cannot write an `--output` file or the
       baseline exits `2` instead.
-    - The PHAR and `vendor/bin/lockrot` exit `2` on an unknown command or a `--working-dir` that
-      does not exist. In plugin mode, Composer exits `1` for them before lockrot runs
-      ([ci.md](ci.md#exit-1-not-from-lockrot)).
+    - The PHAR and `vendor/somework/lockrot/bin/lockrot` exit `2` on an unknown command or a
+      `--working-dir` that does not exist. In plugin mode, Composer exits `1` for them before
+      lockrot runs ([ci.md](ci.md#exit-1-not-from-lockrot)).
 - Messages about lockrot itself (a failure, a warning, a deprecation) go to stderr, never into the
   report on stdout. A report's own notes are part of the report.
 
