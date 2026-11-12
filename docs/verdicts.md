@@ -1401,6 +1401,7 @@ The skips of `checks_skipped[]`:
 | `repository_activity` | `no_repository` | The package names no repository URL that lockrot can place |
 | `repository_activity` | `repository_not_found` | The host answered 404: an answer, not a gap |
 | `repository_archived` | `no_token`, `fetch_failed` | The host answered, without the archived flag: anonymous GitLab (`no_token`), a failed GitLab project request, or a GitHub answer without the flag (`fetch_failed`). S3 cannot fire |
+| `repository_push` | `undated` | The host answered, but the answer names no push or commit date: a GitHub answer without `pushed_at`, or an empty GitLab or Bitbucket commit list. S4 cannot fire, so `liveness_complete` is false |
 | `release_metadata` | `unavailable`, `not_found` | The metadata did not come. The package reads `unknown` when nothing else counts, and [`--strict-network`](ci.md#exit-codes) fails on the fetch |
 | `release_branch` | `branch_snapshot` | A branch snapshot has no release branch for S8 |
 | `release_dates` | `undated_releases` | The [S1 and allowlist filter](#what-was-not-checked) dropped the S10 `release_dates` entry. The skip keeps that entry's `blocks` |

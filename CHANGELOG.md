@@ -759,6 +759,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `composer.lock exists and is not a regular file`.
 - **All formats:** the capped fact stays unverified when the target release's `php` is
   `self.version`, as for a release with no `php`. ([Capped](docs/verdicts.md#capped))
+- **All formats:** a host answer that names no push or commit date adds the `checks_skipped`
+  entry `repository_push` with the reason `undated`. `liveness_complete` is then false, and a
+  stale total that lockrot decided without S4 reads as a lower bound.
+  ([What was not checked](docs/verdicts.md#what-was-not-checked))
 - **All formats:** an unloaded name in the first solve gives a move `not_checked` with
   `unloaded_name` also when the second solve over the non-dev requirements refuses.
   ([Move](docs/verdicts.md#move))
