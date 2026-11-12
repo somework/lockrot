@@ -644,6 +644,7 @@ final class MoveCheckersTest extends TestCase
 
         self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, false], [$baseline->result(), $baseline->reason(), $baseline->isRefused()]);
         self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME], [$move->result(), $move->reason()]);
+        self::assertSame(['acme/contract'], $project->lockOutOfSync($lock, true), 'the lock_out_of_sync note names the name that the provide does not meet');
     }
 
     /** @return iterable<string, array{array{require?: array<string, string>, provide?: array<string, string>}, list<array<string, mixed>>, array<string, mixed>}> */

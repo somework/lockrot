@@ -18,7 +18,8 @@ use Composer\Repository\RootPackageRepository;
  * {@see \Composer\Package\Locker::getMissingRequirementInfo()} reads them: a `require` link is
  * looked up in the non-dev packages, a `require-dev` link in all of them, and the root package
  * counts too. A name is present when a package or the root has it as its name, in `replace` or in
- * `provide`. A platform link and a `self.version` link are never missing.
+ * `provide`, at a version that the link admits. A platform link and a `self.version` link are
+ * never missing.
  *
  * @internal
  */
@@ -61,7 +62,7 @@ final class MissingRequirements
                 if (PlatformRepository::isPlatformPackage($target) || $link->getPrettyConstraint() === 'self.version') {
                     continue;
                 }
-                if ($installed->findPackagesWithReplacersAndProviders($target) === []) {
+                if ($installed->findPackagesWithReplacersAndProviders($target, $link->getConstraint()) === []) {
                     $missing[$target] = $target;
                 }
             }
