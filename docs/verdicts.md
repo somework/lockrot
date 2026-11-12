@@ -964,7 +964,8 @@ Limits of the check:
   lower release than Composer installs. The move is then not checked, with the load reason
   (`unloaded_name`, `offline` or `install_time_budget`). A refusal that needs such a package reads
   the same. So does a refusal of the second solve over the `require` links, because it reads the
-  first solve's answer. The baseline keeps that refusal, because it keeps every locked package.
+  first solve's answer. The baseline keeps that refusal when the lock holds every `require` and
+  `require-dev` name of composer.json, because it keeps every locked package.
 - A package that no Composer repository lists, while a path, VCS or package repository can serve
   it, is not loaded either. A resolving solve is then not checked only when a release that the
   solve could install requires the package and no loaded package provides it. The solve could
