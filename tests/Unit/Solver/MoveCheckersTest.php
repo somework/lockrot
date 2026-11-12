@@ -535,6 +535,31 @@ final class MoveCheckersTest extends TestCase
         self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, []], [$outcome->check()->result(), $outcome->check()->reason(), $outcome->holds()]);
     }
 
+    /**
+     * The baseline keeps every locked package, so a fuller pool cannot change a refusal of a locked
+     * name (ruling R2-4).
+     */
+    public function testABaselineThatTheNonDevSolveRefusesStaysRefusedBesideAnUnloadedName(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $loader = new ArrayLoader();
+        $remote = [
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.2.0']),
+            $loader->load(['name' => 'acme/new', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/new', 'version' => '1.1.0', 'require' => ['acme/private' => '^1.0']]),
+        ];
+        $root = $loader->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^2.0', 'acme/new' => '^1.0'], 'require-dev' => ['acme/lib' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
+        $checker = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
+
+        $baseline = $checker->baseline();
+
+        self::assertSame([MoveCheck::REFUSED, null], [$baseline->check()->result(), $baseline->check()->reason()]);
+        self::assertStringContainsString('acme/lib ^2.0', (string) $baseline->problem());
+    }
+
     /** @return iterable<string, array{array<string, array<string, string>>, string}> */
     public static function unreachedBeforeTheNonDevSolve(): iterable
     {
