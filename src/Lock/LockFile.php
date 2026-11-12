@@ -25,11 +25,10 @@ final class LockFile
     /** The fields that the loader types, by the shape that it needs. */
     private const FIELD_KINDS = [
         'string' => ['type', 'target-dir', 'installation-source', 'notification-url', 'source.type', 'source.url', 'source.reference', 'dist.type', 'dist.url', 'dist.reference', 'dist.shasum', 'archive.name'],
-        'object' => ['autoload', 'autoload-dev', 'php-ext'],
+        'object' => ['autoload', 'autoload-dev', 'php-ext', 'require', 'conflict', 'provide', 'replace', 'require-dev'],
         'list' => ['include-path', 'source.mirrors', 'dist.mirrors', 'archive.exclude'],
         'strings' => ['bin'],
         'keywords' => ['keywords'],
-        'links' => ['require', 'conflict', 'provide', 'replace', 'require-dev'],
         'suggest' => ['suggest'],
     ];
 
@@ -39,7 +38,6 @@ final class LockFile
         'list' => 'must be a list',
         'strings' => 'must be a string or a list of strings',
         'keywords' => 'must be a list of strings',
-        'links' => 'must be a JSON object',
         'suggest' => 'must map names to strings',
     ];
 
@@ -210,24 +208,30 @@ final class LockFile
      * is what a user can fix. It runs after a failure only, so that no lock which the loader reads
      * is refused.
      *
-     * @param array<mixed> $entry
+     * @param mixed $entry
      *
      * @throws ConfigException for a field of the wrong type
      */
-    private static function refuseWrongTypes(array $entry, string $refusal): void
+    private static function refuseWrongTypes($entry, string $refusal): void
     {
         foreach (self::FIELD_KINDS as $kind => $paths) {
             foreach ($paths as $path) {
-                [$section, $key] = strpos($path, '.') === false ? [null, $path] : explode('.', $path, 2);
-                $holder = $section === null ? $entry : ($entry[$section] ?? null);
-                if (\is_array($holder) && isset($holder[$key]) && !self::hasKind($kind, $path, $holder[$key])) {
+                $value = $entry;
+                foreach (explode('.', $path) as $key) {
+                    $value = \is_array($value) ? $value[$key] ?? null : null;
+                }
+                if ($value !== null && !self::hasKind($kind, $path, $value)) {
                     throw new ConfigException($refusal.'"'.$path.'" '.self::KIND_MESSAGES[$kind]);
                 }
             }
         }
     }
 
-    /** @param mixed $value */
+    /**
+     * A shape that the loader reads is no answer, so that only the field that failed can match.
+     *
+     * @param mixed $value
+     */
     private static function hasKind(string $kind, string $path, $value): bool
     {
         switch ($kind) {
@@ -235,24 +239,16 @@ final class LockFile
                 // The loader skips an empty notification-url and archive name.
                 return \is_string($value) || (\in_array($path, ['notification-url', 'archive.name'], true) && empty($value)) || (substr($path, -9) === 'reference' && \is_scalar($value));
             case 'object':
-                return \is_array($value) && ($value === [] || !JsonReader::isList($value));
             case 'list':
-                return \is_array($value) && ($value === [] || JsonReader::isList($value));
+                // The loader skips an empty archive exclude.
+                return \is_array($value) || ($path === 'archive.exclude' && empty($value));
             case 'strings':
-                return \is_string($value) || (\is_array($value) && $value !== [] && JsonReader::isList($value) && self::all('is_string', $value)) || $value === [];
+                return \is_string($value) || (\is_array($value) && $value === array_filter($value, 'is_string'));
             case 'keywords':
-                return !\is_array($value) || self::all('is_scalar', $value);
-            case 'links':
-                return !\is_array($value) || $value === [] || !JsonReader::isList($value);
+                return !\is_array($value) || $value === array_filter($value, 'is_scalar');
             default:
-                return !\is_array($value) || self::all('is_string', $value);
+                return !\is_array($value) || $value === array_filter($value, 'is_string');
         }
-    }
-
-    /** @param array<mixed> $values */
-    private static function all(callable $test, array $values): bool
-    {
-        return array_filter($values, $test) === $values;
     }
 
     /** @param array{platform: mixed, platform-dev: mixed} $platform */
