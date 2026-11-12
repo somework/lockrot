@@ -35,6 +35,7 @@ use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Lockrot\Analyzer\PhpWindow;
+use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Security\Holder;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 
@@ -593,6 +594,8 @@ final class ComposerSolver
      * Composer's text as its console prints it without colour, and without the version of the platform that runs lockrot: Composer appends it to
      * each override (`actual: 8.5.1`, `same as actual`), and lockrot overrides `php` with the target.
      * When lockrot chose that php, Composer's `; overridden via config.platform` on it goes too.
+     * A report quotes the text, and the repository names in it can carry a token or a local path:
+     * {@see RepositoryUrl::inText()}.
      */
     private static function problemText(string $text, bool $setsPhp): string
     {
@@ -605,7 +608,7 @@ final class ComposerSolver
             $text = preg_replace('/(php(?:-[a-z0-9]+)? version \([^;)]*); overridden via config\.platform(?=[,)])/', '$1', $text) ?? $text;
         }
 
-        return trim((string) preg_replace('/, (?:actual: [^)]*|same as actual)\)/', ')', $text));
+        return RepositoryUrl::inText(trim((string) preg_replace('/, (?:actual: [^)]*|same as actual)\)/', ')', $text)));
     }
 
     /** @return array<string, string> name => the pretty version that the solve installs, for each name it installs or moves to another version */

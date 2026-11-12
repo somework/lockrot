@@ -10,10 +10,12 @@ use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
+use Composer\Repository\ArrayRepository;
 use Composer\Repository\ComposerRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Semver\VersionParser;
 use Composer\Util\Platform;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Security\Holder;
@@ -1156,6 +1158,39 @@ final class SolverCheckerTest extends TestCase
         self::assertContains(['source' => 'package', 'package' => 'acme/a', 'version' => '1.1.0', 'link' => 'conflict', 'target' => null, 'constraint' => '>=1.1'], self::rows($combined->holds()));
     }
 
+    /**
+     * Composer names a lower-priority repository in its problem text, as getRepoName() gives it: a
+     * `?token=` or a path on the machine. The notes that quote the problem show neither.
+     *
+     * @dataProvider privateRepositoryNames
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('privateRepositoryNames')]
+    public function testTheProblemTextOfARefusedSolveShowsNoCredentialOrLocalPathOfARepository(string $repository, string $secret, string $shown): void
+    {
+        $baseline = self::namedRepositoryChecker($repository, ['acme/lib' => '^1.0', 'acme/new' => '^1.0', 'acme/x' => '^2.0'])->baseline();
+        $combined = self::namedRepositoryChecker($repository, ['acme/lib' => '^1.0'])->combined(['acme/lib' => '^1.1.0']);
+
+        self::assertSame([MoveCheck::REFUSED, MoveCheck::REFUSED], [$baseline->check()->result(), $combined->check()->result()]);
+        $notes = [
+            RunNote::movesNotChecked('8.4.99', (string) $baseline->problem()),
+            RunNote::updateNowReduced(['acme/lib'], (string) $combined->problem()),
+            RunNote::updateNowRefused((string) $combined->problem()),
+        ];
+        foreach ($notes as $note) {
+            $problem = $note->data()['problem'];
+            self::assertIsString($problem);
+            self::assertStringContainsString('from '.$shown.' but', $problem, 'the problem still names the repository');
+            self::assertStringNotContainsString($secret, $note->text().$problem, $note->code());
+        }
+    }
+
+    /** @return iterable<string, array{string, string, string}> Composer's repository name, its secret part, the name as a report shows it */
+    public static function privateRepositoryNames(): iterable
+    {
+        yield 'a token in the query' => ['composer repo (https://repo.example.com/?token=s3cr3t)', 's3cr3t', 'composer repo (https://repo.example.com/)'];
+        yield 'an absolute path' => ['path repo (/home/alice/pkgs/*)', '/home/alice', 'path repo (.../*)'];
+    }
+
     /** A plain member of the combined update can keep its locked release, so the outcome names what the solve installs. */
     public function testTheCombinedUpdateCarriesTheReleaseThatTheSolveInstallsOfEachName(): void
     {
@@ -1812,6 +1847,62 @@ final class SolverCheckerTest extends TestCase
     private static function checkerWith(array $requires, array $locked, VersionSource $source, array $conflicts = []): SolverChecker
     {
         $solver = new ComposerSolver(self::root($requires, $conflicts), LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source);
+
+        return new SolverChecker($solver, [], '8.4.99', false, Deadline::never());
+    }
+
+    /**
+     * The lock holds acme/lib 1.0.0 and acme/x 1.0.0, and the solve offers acme/x at its locked
+     * release only. A repository named $repository answers each name with every package it holds,
+     * acme/x 2.0.0 among them, so Composer names it as a lower-priority repository of acme/x.
+     *
+     * @param array<string, string> $requires
+     */
+    private static function namedRepositoryChecker(string $repository, array $requires): SolverChecker
+    {
+        $named = new class ($repository) extends ArrayRepository {
+            private string $name;
+
+            public function __construct(string $name)
+            {
+                parent::__construct();
+                $this->name = $name;
+            }
+
+            public function getRepoName(): string
+            {
+                return $this->name;
+            }
+        };
+        $loader = new ArrayLoader();
+        foreach ([['acme/lib', '1.0.0', ['acme/x' => '^1.0']], ['acme/lib', '1.1.0', ['acme/x' => '^2.0']], ['acme/new', '1.0.0', []], ['acme/x', '2.0.0', []]] as [$name, $version, $require]) {
+            $named->addPackage($loader->load(['name' => $name, 'version' => $version, 'require' => $require]));
+        }
+        $source = new class ($named) implements VersionSource {
+            private ArrayRepository $repository;
+
+            public function __construct(ArrayRepository $repository)
+            {
+                $this->repository = $repository;
+            }
+
+            public function versions(string $name): array
+            {
+                return array_values($this->repository->getPackages());
+            }
+
+            public function versionsOf(array $names): array
+            {
+                return array_fill_keys($names, $this->versions(''));
+            }
+
+            public function failure(string $name): ?string
+            {
+                return null;
+            }
+        };
+        $locked = [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['acme/x' => '^1.0']], ['name' => 'acme/x', 'version' => '1.0.0']];
+        $solver = (new ComposerSolver(self::root($requires), LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source))->withLockedOnly(['acme/x']);
 
         return new SolverChecker($solver, [], '8.4.99', false, Deadline::never());
     }
