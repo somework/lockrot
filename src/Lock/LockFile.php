@@ -176,16 +176,16 @@ final class LockFile
         if (isset($entry['name']) && !\is_string($entry['name'])) {
             throw new ConfigException($refusal.'"name" must be a string');
         }
-        self::refuseWrongTypes($entry, $refusal);
         try {
             $loaded = $loader->load($entry);
             $forUpdate = $lockLoader->load($entry);
-        } catch (\TypeError $e) {
-            // The message of a TypeError quotes a PHP function and a path of the install.
-            throw new ConfigException($refusal.'a field has the wrong type', 0, $e);
         } catch (\Throwable $e) {
             // ArrayLoader changes no state, so any failure means that the entry cannot be loaded.
-            throw new ConfigException($refusal.$e->getMessage(), 0, $e);
+            if ($e instanceof \TypeError || $e instanceof \ErrorException) {
+                self::refuseWrongTypes($entry, $refusal);
+            }
+            // The message of a TypeError quotes a PHP function and a path of the install.
+            throw new ConfigException($refusal.($e instanceof \TypeError ? 'a field has the wrong type' : $e->getMessage()), 0, $e);
         }
         // A package that declares `extra.branch-alias`, or is a `default-branch`, loads as an
         // alias package. Unwrap it, so that the entry's own version, require and source fields
@@ -205,9 +205,10 @@ final class LockFile
     }
 
     /**
-     * The fields that Composer's loader hands to a typed setter or a string function: a wrong type
-     * is a TypeError there, and the lock's field is what a user can fix. The loader skips a link
-     * map or a keyword list that is not an array, so only an array of the wrong shape is refused.
+     * Names the field that made Composer's loader fail. The loader takes the fields that it hands to
+     * a typed setter or a string function: a wrong type is a TypeError there, and the lock's field
+     * is what a user can fix. It runs after a failure only, so that no lock which the loader reads
+     * is refused.
      *
      * @param array<mixed> $entry
      *
@@ -215,16 +216,11 @@ final class LockFile
      */
     private static function refuseWrongTypes(array $entry, string $refusal): void
     {
-        $fields = $entry;
-        foreach (['source', 'dist', 'archive'] as $section) {
-            $sub = $entry[$section] ?? null;
-            foreach (\is_array($sub) ? $sub : [] as $key => $value) {
-                $fields[$section.'.'.$key] = $value;
-            }
-        }
         foreach (self::FIELD_KINDS as $kind => $paths) {
             foreach ($paths as $path) {
-                if (isset($fields[$path]) && !self::hasKind($kind, $path, $fields[$path])) {
+                [$section, $key] = strpos($path, '.') === false ? [null, $path] : explode('.', $path, 2);
+                $holder = $section === null ? $entry : ($entry[$section] ?? null);
+                if (\is_array($holder) && isset($holder[$key]) && !self::hasKind($kind, $path, $holder[$key])) {
                     throw new ConfigException($refusal.'"'.$path.'" '.self::KIND_MESSAGES[$kind]);
                 }
             }
