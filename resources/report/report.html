@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-PpAURTARy1ptrd0PkStfwktWLM/th1BkJ4oaPenCqUk='; style-src 'sha256-Oh4u3I1PT198yKllDzlKmVO8E7XAt0flhbWCH6nUswM='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-/Fm/fqxC732K8XgfMO+UykB0T5DraQEoDQV3RhU43Ok='; style-src 'sha256-piRBjZqzeUuCphk26oX9sBtCAblnm4zn4sYqubk2Too='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -752,6 +752,11 @@ summary:focus-visible::after {
   border-bottom-color: var(--accent);
 }
 .tab:focus-visible {
+  outline-offset: -2px;
+}
+[role="gridcell"]:focus-visible,
+[role="gridcell"] > :focus-visible:not(a, button) {
+  outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
 .tab .n {
@@ -8003,7 +8008,7 @@ var LockrotReport = (function(exports) {
 	//#endregion
 	//#region src/model/visibleControls.ts
 	var HIDDEN = /[\p{Bidi_Control}\p{Default_Ignorable_Code_Point}]/gu;
-	var visibleControls = (text) => text.replace(HIDDEN, (ch) => `\\u{${(ch.codePointAt(0) ?? 0).toString(16).toUpperCase()}}`);
+	var visibleControls = (text) => text.replace(HIDDEN, (ch) => `\\u{${(ch.codePointAt(0) ?? 0).toString(16).toUpperCase().padStart(4, "0")}}`);
 	function visibleData(value) {
 		if (typeof value === "string") return visibleControls(value);
 		if (Array.isArray(value)) return value.map(visibleData);
@@ -8502,6 +8507,7 @@ var LockrotReport = (function(exports) {
 	var SKIPPED_CHECKS = {
 		repository_activity: "its repository activity",
 		repository_archived: "its archived flag",
+		repository_push: "its push date",
 		release_metadata: "its release metadata",
 		advisories: "its advisories",
 		release_branch: "its release branch",
@@ -11074,7 +11080,7 @@ var LockrotReport = (function(exports) {
 		});
 	}
 	function radiusCountPhrase(layout) {
-		return countPhrase(layout.rows.length, layout.exposureCount, "direct requirement", "direct requirements");
+		return countPhrase(layout.rows.length, layout.exposureCount, "direct requirement that pulls in flagged packages", "direct requirements that pull in flagged packages");
 	}
 	function hopsOf(chain, pkg) {
 		return chain.at(-1) === pkg ? chain.slice(0, -1) : chain;
@@ -15152,12 +15158,12 @@ var LockrotReport = (function(exports) {
 		const reading = axis === null ? null : ageReading(finding, run);
 		if (axis === null || reading === null) return u$1("span", {
 			className: "fcell fc-age f2-age is-empty",
-			role: "cell"
+			role: "gridcell"
 		});
 		const label = ageScaleLabel(reading);
 		return u$1("span", {
 			className: "fcell fc-age f2-age",
-			role: "cell",
+			role: "gridcell",
 			"aria-label": label,
 			title: label,
 			children: [
@@ -15203,7 +15209,7 @@ var LockrotReport = (function(exports) {
 		const line = reachLine(finding);
 		return u$1("span", {
 			className: "fcell f2-reach",
-			role: "cell",
+			role: "gridcell",
 			children: [
 				u$1(Label, { text: FINDINGS_HEAD.reach }),
 				u$1("span", {
@@ -15243,7 +15249,7 @@ var LockrotReport = (function(exports) {
 		const command = argv === null ? null : commandWords(argv, "posix");
 		return u$1("span", {
 			className: "fcell f2-next",
-			role: "cell",
+			role: "gridcell",
 			children: [
 				u$1(Label, { text: FINDINGS_HEAD.next }),
 				readyToRun(finding) && u$1("span", {
@@ -15298,7 +15304,7 @@ var LockrotReport = (function(exports) {
 		const slash = finding.package.indexOf("/");
 		return u$1("span", {
 			className: "fcell fc-pkg f2-pkg",
-			role: "cell",
+			role: "gridcell",
 			children: [
 				u$1("span", {
 					className: "pkg-word",
@@ -15335,7 +15341,7 @@ var LockrotReport = (function(exports) {
 			children: [
 				u$1("span", {
 					className: "fcell f2-score",
-					role: "cell",
+					role: "gridcell",
 					children: [
 						u$1(Label, { text: FINDINGS_HEAD.score }),
 						u$1("span", {
@@ -15361,7 +15367,7 @@ var LockrotReport = (function(exports) {
 				u$1(PackageName$1, { finding }),
 				u$1("span", {
 					className: "fcell f2-flags",
-					role: "cell",
+					role: "gridcell",
 					children: [u$1(FlagPills, {
 						finding,
 						run,
@@ -15496,7 +15502,7 @@ var LockrotReport = (function(exports) {
 			role: "row",
 			children: u$1("span", {
 				className: "f2-span-cell",
-				role: "cell",
+				role: "gridcell",
 				"aria-colspan": 6,
 				"aria-label": label,
 				children
@@ -15662,7 +15668,7 @@ var LockrotReport = (function(exports) {
 					}),
 					u$1("div", {
 						className: "fledger f2-ledger",
-						role: "grid",
+						role: "treegrid",
 						"aria-readonly": "true",
 						"aria-label": FINDINGS_TAB,
 						children: [!printed && u$1(ColumnHead, {
@@ -16652,6 +16658,43 @@ var LockrotReport = (function(exports) {
 		const row = index === null ? void 0 : listRows(root)[index];
 		if (row?.getAttribute("data-pkg") === pkg) return row;
 		return findRow(root, pkg);
+	}
+	//#endregion
+	//#region src/ui/sideKeys.ts
+	var STAY = { stay: true };
+	function sideStep(key, target) {
+		if (key !== "ArrowLeft" && key !== "ArrowRight" || target === null) return null;
+		const right = key === "ArrowRight";
+		if (target.getAttribute("role") === "treeitem") return treeStep(target, right);
+		const row = target.closest("[role=\"treegrid\"] [role=\"row\"][data-pkg]");
+		if (row === null) return null;
+		const cell = target.closest("[role=\"gridcell\"]");
+		const cells = [...row.querySelectorAll("[role=\"gridcell\"]")].filter((each) => each === cell || each.hasAttribute("aria-label") || each.textContent.trim() !== "");
+		const at = cell === null ? -1 : cells.indexOf(cell);
+		const next = right ? cells[at + 1] : at === 0 ? row : cells[at - 1];
+		return next === void 0 ? STAY : { focus: next };
+	}
+	function treeStep(item, right) {
+		const expanded = item.getAttribute("aria-expanded");
+		const toggle = item.querySelector(":scope > * > button[aria-expanded]");
+		if (right && expanded === "false" && toggle !== null) return { toggle };
+		if (!right && expanded === "true" && toggle !== null) return { toggle };
+		if (right && expanded === "true") {
+			const child = item.querySelector(":scope > [role=\"group\"] > [role=\"treeitem\"]") ?? drawnBelow(item);
+			return child === null ? STAY : { focus: child };
+		}
+		if (right) return STAY;
+		const parent = drawnUnder(item) ?? item.parentElement?.closest("[role=\"treeitem\"]");
+		return parent === null || parent === void 0 ? STAY : { focus: parent };
+	}
+	function drawnBelow(item) {
+		const next = item.nextElementSibling;
+		return Number(next?.getAttribute("aria-level")) > Number(item.getAttribute("aria-level")) && next instanceof HTMLElement ? next : null;
+	}
+	function drawnUnder(item) {
+		const level = Number(item.getAttribute("aria-level"));
+		for (let prev = item.previousElementSibling; prev !== null; prev = prev.previousElementSibling) if (Number(prev.getAttribute("aria-level")) < level && prev instanceof HTMLElement) return prev;
+		return null;
 	}
 	//#endregion
 	//#region src/ui/NewerSchemaBanner.tsx
@@ -18043,7 +18086,7 @@ var LockrotReport = (function(exports) {
 		const affects = advisoryAffects(range);
 		if (printed && affects?.folded != null) return u$1("span", {
 			className: "ac-aff",
-			role: "cell",
+			role: "gridcell",
 			children: [
 				u$1("span", {
 					className: "ac-lbl",
@@ -18065,7 +18108,7 @@ var LockrotReport = (function(exports) {
 		});
 		return u$1("span", {
 			className: "ac-aff",
-			role: "cell",
+			role: "gridcell",
 			children: [u$1("span", {
 				className: "ac-lbl",
 				"aria-hidden": "true",
@@ -18113,7 +18156,7 @@ var LockrotReport = (function(exports) {
 			children: [
 				u$1("span", {
 					className: "ac-sev",
-					role: "cell",
+					role: "gridcell",
 					"aria-label": countedAs === null ? row.severity : `${row.severity} ${countedAs}`,
 					children: [
 						u$1("span", {
@@ -18130,7 +18173,7 @@ var LockrotReport = (function(exports) {
 				}),
 				u$1("span", {
 					className: "ac-adv",
-					role: "cell",
+					role: "gridcell",
 					children: [u$1("span", {
 						className: "ac-title",
 						children: row.title ?? row.id
@@ -18146,7 +18189,7 @@ var LockrotReport = (function(exports) {
 				}),
 				u$1("span", {
 					className: fix.version === null ? "ac-fix is-none" : "ac-fix",
-					role: "cell",
+					role: "gridcell",
 					children: [
 						fix.version !== null && u$1(S, { children: [
 							u$1("span", {
@@ -18194,7 +18237,7 @@ var LockrotReport = (function(exports) {
 				role: "row",
 				children: u$1("span", {
 					className: "al-span-cell",
-					role: "cell",
+					role: "gridcell",
 					"aria-colspan": ADVISORY_COLUMNS,
 					children: [
 						u$1("h3", { children: [
@@ -18357,7 +18400,7 @@ var LockrotReport = (function(exports) {
 				u$1(RowHint, { id: hintId }),
 				u$1("div", {
 					className: "aledger no-axis",
-					role: "grid",
+					role: "treegrid",
 					"aria-readonly": "true",
 					"aria-label": "Advisories",
 					children: [u$1(AdvisoryHead, {}), u$1(RowHintContext.Provider, {
@@ -18893,12 +18936,12 @@ var LockrotReport = (function(exports) {
 			...openInteractions(finding.package, dispatch),
 			children: [
 				u$1("td", {
-					role: "cell",
+					role: "gridcell",
 					className: "p2-name",
 					children: u$1(PackageName, { name: finding.package })
 				}),
 				u$1("td", {
-					role: "cell",
+					role: "gridcell",
 					className: "num p2-ver",
 					"data-label": label("version"),
 					children: u$1(Version, {
@@ -18907,19 +18950,19 @@ var LockrotReport = (function(exports) {
 					})
 				}),
 				u$1("td", {
-					role: "cell",
+					role: "gridcell",
 					className: "num p2-ly",
 					"data-label": label("libyears"),
 					children: u$1(Measured, { cell: libyearsCell(finding) })
 				}),
 				u$1("td", {
-					role: "cell",
+					role: "gridcell",
 					className: "p2-age",
 					"data-label": label("age"),
 					children: u$1(Measured, { cell: installedAge(finding) })
 				}),
 				u$1("td", {
-					role: "cell",
+					role: "gridcell",
 					className: "p2-verdict",
 					id: `${id}-verdict`,
 					"data-label": label("verdict"),
@@ -18927,14 +18970,14 @@ var LockrotReport = (function(exports) {
 					children: finding.verdict
 				}),
 				u$1("td", {
-					role: "cell",
+					role: "gridcell",
 					className: "num p2-score",
 					id: `${id}-score`,
 					"data-label": label("score"),
 					children: finding.score.total
 				}),
 				u$1("td", {
-					role: "cell",
+					role: "gridcell",
 					className: "p2-flags",
 					"data-label": label("flags"),
 					children: shownPills(finding, run, hideAccepted).length === 0 ? "—" : u$1(FlagPills, {
@@ -18944,19 +18987,19 @@ var LockrotReport = (function(exports) {
 					})
 				}),
 				u$1("td", {
-					role: "cell",
+					role: "gridcell",
 					className: "p2-reach",
 					"data-label": label("reached"),
 					children: reachedWord(finding)
 				}),
 				u$1("td", {
-					role: "cell",
+					role: "gridcell",
 					className: "num p2-sig",
 					"data-label": label("signals"),
 					children: u$1(Signals, { finding })
 				}),
 				showData && u$1("td", {
-					role: "cell",
+					role: "gridcell",
 					className: "num p2-data",
 					"data-label": label("data"),
 					children: dataAsOf(finding)
@@ -19039,7 +19082,7 @@ var LockrotReport = (function(exports) {
 					} : {},
 					children: u$1("table", {
 						className: showData ? "p2-table has-data" : "p2-table",
-						role: "grid",
+						role: "treegrid",
 						"aria-readonly": "true",
 						"aria-label": "All packages",
 						children: [u$1("thead", {
@@ -19112,11 +19155,14 @@ var LockrotReport = (function(exports) {
 			]
 		});
 	}
-	function ChildRow2({ finding, depth, note, report, first }) {
+	function ChildRow2({ finding, depth, parent, note, report, first }) {
 		const { state, dispatch, cursor } = useReport();
 		const id = g();
 		const described = useRowDescription(`${id}-said`);
 		return u$1("li", {
+			role: "treeitem",
+			"aria-level": depth + 2,
+			"aria-expanded": parent ? "true" : void 0,
 			className: `r2-kid ${toneClass(gradeTone(finding.verdict))}`,
 			style: { "--depth": String(depth) },
 			"data-pkg": finding.package,
@@ -19193,6 +19239,8 @@ var LockrotReport = (function(exports) {
 			});
 		};
 		return u$1("li", {
+			role: "treeitem",
+			"aria-expanded": canOpen ? open ? "true" : "false" : void 0,
 			className: open ? "r2-row is-open" : "r2-row",
 			"data-pkg": row.package,
 			"aria-label": row.package,
@@ -19262,12 +19310,14 @@ var LockrotReport = (function(exports) {
 				]
 			}), canOpen && u$1("ul", {
 				className: "r2-kids",
+				role: "group",
 				id: kidsId,
 				hidden: !open,
 				"aria-label": RADIUS_WORDS.listedUnder(row.package),
-				children: open && pulledTree(row).map((node) => u$1(ChildRow2, {
+				children: open && pulledTree(row).map((node, i, nodes) => u$1(ChildRow2, {
 					finding: node.finding,
 					depth: node.depth,
+					parent: (nodes[i + 1]?.depth ?? -1) > node.depth,
 					note: node.via.length > 0 ? RADIUS_WORDS.via(node.via) : null,
 					report,
 					first: first.has(childKey2(row.package, node.finding.package))
@@ -19363,6 +19413,7 @@ var LockrotReport = (function(exports) {
 				(layout.lead.length > 0 || layout.singles.length > 0) && u$1(RowHint, { id: hintId }),
 				layout.lead.length > 0 && u$1("ul", {
 					className: "r2-list",
+					role: "tree",
 					"aria-label": RADIUS_WORDS.list,
 					children: u$1(RowHintContext.Provider, {
 						value: hintId,
@@ -19375,6 +19426,8 @@ var LockrotReport = (function(exports) {
 					head: RADIUS_WORDS.singles(layout.singles.length),
 					children: u$1("ul", {
 						className: "r2-list",
+						role: "tree",
+						"aria-label": RADIUS_WORDS.singles(layout.singles.length),
 						children: u$1(RowHintContext.Provider, {
 							value: hintId,
 							children: rows(layout.singles, layout.lead.length + 1)
@@ -20622,11 +20675,39 @@ var LockrotReport = (function(exports) {
 		const header = document.querySelector(".topbar")?.getBoundingClientRect().bottom ?? 0;
 		return box.height > 0 && box.top >= header && box.bottom <= window.innerHeight;
 	}
+	function applySide(step) {
+		if ("toggle" in step) step.toggle.click();
+		if (!("focus" in step)) return;
+		holdFocus(step.focus);
+		const part = step.focus.firstElementChild;
+		if (document.activeElement !== step.focus && part instanceof HTMLElement) holdFocus(part);
+	}
+	function holdFocus(target) {
+		const added = !target.hasAttribute("tabindex");
+		if (added) target.tabIndex = -1;
+		focusRow(target);
+		if (!added) return;
+		if (document.activeElement !== target) {
+			target.removeAttribute("tabindex");
+			return;
+		}
+		const release = () => {
+			if (document.activeElement === target) target.addEventListener("blur", release, { once: true });
+			else target.removeAttribute("tabindex");
+		};
+		target.addEventListener("blur", release, { once: true });
+	}
 	function useShortcuts(deps) {
 		const latest = A(deps);
 		latest.current = deps;
 		_(() => {
 			const onKeyDown = (event) => {
+				const step = event.ctrlKey || event.metaKey || event.altKey || event.shiftKey ? null : sideStep(event.key, event.target instanceof Element ? event.target : null);
+				if (step !== null) {
+					event.preventDefault();
+					applySide(step);
+					return;
+				}
 				const current = latest.current;
 				const { model, state } = current;
 				const decision = decideKey(keyInputFrom(event, {
@@ -20778,8 +20859,8 @@ var LockrotReport = (function(exports) {
 			const opened = openedByReader.current;
 			openedByReader.current = false;
 			setOpenNote(opened && !sheet && state.pkg !== null ? openedBesideList(state.pkg) : "");
-			const active = document.activeElement;
-			if (active instanceof HTMLElement && state.pkg !== null && active.getAttribute("data-pkg") === state.pkg) lastRow.current = {
+			const active = document.activeElement?.closest("[data-pkg]") ?? null;
+			if (active !== null && state.pkg !== null && active.getAttribute("data-pkg") === state.pkg) lastRow.current = {
 				pkg: state.pkg,
 				index: rowPosition(document, active)
 			};
@@ -20878,7 +20959,7 @@ var LockrotReport = (function(exports) {
 						const panel = document.getElementById(panelId);
 						(panel?.querySelector("[data-pkg][tabindex=\"0\"]") ?? panel)?.focus();
 					},
-					children: skipLinkLabel(filterable)
+					children: skipLinkLabel(state.view === "radius" ? shownExposure(model.report).length > 0 : filterable)
 				}),
 				u$1(NewerSchemaBanner, { inert: sheet }),
 				u$1(Header, {
@@ -21057,7 +21138,7 @@ var LockrotReport = (function(exports) {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.19";
+	var version = "0.14.0-rc.20";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");
