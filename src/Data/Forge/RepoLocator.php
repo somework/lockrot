@@ -131,7 +131,7 @@ final class RepoLocator
     {
         if (strpos($url, '://') !== false) {
             $host = parse_url($url, \PHP_URL_HOST);
-            if (!\is_string($host) || $host === '' || RepositoryUrl::hasAmbiguousHost((string) substr($url, (int) strpos($url, '://') + 3))) {
+            if (!\is_string($host) || $host === '' || RepositoryUrl::hasAmbiguousHost(explode('://', $url, 2)[1])) {
                 return null;
             }
             $port = parse_url($url, \PHP_URL_PORT);

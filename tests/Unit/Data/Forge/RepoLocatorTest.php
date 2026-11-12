@@ -227,6 +227,8 @@ final class RepoLocatorTest extends TestCase
         }
         yield 'a path that reads as another host names no host' => ['https://a/b@evil.com/x', $none, null, null, null];
         yield 'an @ in the path of a host is no userinfo' => ['https://gitlab.corp/g/p@v2/x', $none, 'gitlab.corp', null, null];
+        yield 'an @ in the path of a host with a one-letter label is no userinfo' => ['https://x.org/o@v2/r', $unsupported, 'x.org', null, null];
+        yield 'a second :// in the path does not hide a host after it' => ['https://codeberg.org/o/r://x@evil.com/', $none, null, null, null];
         yield 'an unparsable URL' => ['not a url', $none, null, null, null];
         yield 'a file URL' => ['file:///srv/mirrors/repo.git', $none, null, null, null];
         yield 'null' => [null, $none, null, null, null];
