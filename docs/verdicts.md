@@ -785,7 +785,9 @@ package that the solve needs from the project's Composer repositories. A file th
 already fetched comes from Composer's cache, so only a package that the run did not read costs a
 request. With `--offline`, only Composer's cache answers. JSON writes the answer as the move's
 `check`. When the root has `require-dev`, a solve that resolves runs a second solve over the
-`require` links alone, as `composer update` does. If that solve refuses, the move is `refused`.
+`require` links alone, as `composer update` does. If that solve refuses, the move is `refused`,
+except when the first solve could not load a package that it asked for: the move is then not
+checked.
 
 | `check.result` | What it says | The steps in `commands[]` |
 |---|---|---|
@@ -958,7 +960,8 @@ Limits of the check:
 - When a package that a resolving solve asks for could not be loaded, the solve can resolve at a
   lower release than Composer installs. The move is then not checked, with the load reason
   (`unloaded_name`, `offline` or `install_time_budget`). A refusal that needs such a package reads
-  the same.
+  the same. So does a refusal of the second solve over the `require` links, because it reads the
+  first solve's answer. The baseline keeps that refusal, because it keeps every locked package.
 - A package that no Composer repository lists, while a path, VCS or package repository can serve
   it, is not loaded either. A resolving solve is then not checked only when a release that the
   solve could install requires the package and no loaded package provides it. The solve could
@@ -1398,6 +1401,7 @@ The skips of `checks_skipped[]`:
 | `repository_activity` | `no_repository` | The package names no repository URL that lockrot can place |
 | `repository_activity` | `repository_not_found` | The host answered 404: an answer, not a gap |
 | `repository_archived` | `no_token`, `fetch_failed` | The host answered, without the archived flag: anonymous GitLab (`no_token`), a failed GitLab project request, or a GitHub answer without the flag (`fetch_failed`). S3 cannot fire |
+| `repository_push` | `undated` | The host answered, but the answer names no push or commit date: a GitHub answer without `pushed_at`, or an empty GitLab or Bitbucket commit list. S4 cannot fire, so `liveness_complete` is false |
 | `release_metadata` | `unavailable`, `not_found` | The metadata did not come. The package reads `unknown` when nothing else counts, and [`--strict-network`](ci.md#exit-codes) fails on the fetch |
 | `release_branch` | `branch_snapshot` | A branch snapshot has no release branch for S8 |
 | `release_dates` | `undated_releases` | The [S1 and allowlist filter](#what-was-not-checked) dropped the S10 `release_dates` entry. The skip keeps that entry's `blocks` |

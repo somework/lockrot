@@ -121,6 +121,98 @@ final class AnalyzerActivityTest extends TestCase
         self::assertSame([null, 'host_not_supported'], [JsonPath::arrayAt($byName['vendor/hosted'], ['age'])['push'], JsonPath::arrayAt($byName['vendor/hosted'], ['age'])['push_unmeasured']]);
     }
 
+    /**
+     * A read whose answer names no push or commit date leaves S4 unread: a skip, no S10, and each
+     * total that S4 can raise is a lower bound. A counted advisory gives the score its `without[]` rows.
+     *
+     * @param ?list<int|string> $bound the path of the `at_least` that S4 can raise, null when the score has none
+     *
+     * @dataProvider undatedPushes
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('undatedPushes')]
+    public function testARepositoryAnswerWithNoPushDateSkipsS4(bool $abandoned, bool $staleAccepted, ?array $bound): void
+    {
+        $finding = $this->quietPackage($abandoned, $staleAccepted, '{"archived":false}');
+
+        self::assertSame([null, 'undated'], [JsonPath::arrayAt($finding, ['age'])['push'], JsonPath::arrayAt($finding, ['age'])['push_unmeasured']]);
+        self::assertSame([['check' => 'repository_push', 'reason' => 'undated', 'blocks' => ['S4']]], self::checks($finding, 'repository_push', ['checks_skipped']));
+        self::assertSame([], $finding['checks_missing']);
+        self::assertSame([false], self::livenessComplete($finding));
+        if ($bound !== null) {
+            self::assertTrue(JsonPath::arrayAt($finding, $bound)['at_least']);
+        }
+    }
+
+    /**
+     * The control of {@see testARepositoryAnswerWithNoPushDateSkipsS4()}: a push inside the
+     * thresholds, so S4 is read and quiet.
+     *
+     * @param ?list<int|string> $bound
+     *
+     * @dataProvider undatedPushes
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('undatedPushes')]
+    public function testADatedPushNeedsNoPushEntry(bool $abandoned, bool $staleAccepted, ?array $bound): void
+    {
+        $finding = $this->quietPackage($abandoned, $staleAccepted, self::LIVE);
+
+        self::assertSame([], self::checks($finding, 'repository_push'));
+        self::assertSame([true], self::livenessComplete($finding));
+        if ($bound !== null) {
+            self::assertFalse(JsonPath::arrayAt($finding, $bound)['at_least']);
+        }
+    }
+
+    /** @return iterable<string, array{bool, bool, ?list<int|string>}> */
+    public static function undatedPushes(): iterable
+    {
+        $withoutAbandoned = ['score', 'without', 0];
+        yield 'S1' => [true, false, $withoutAbandoned];
+        yield 'S1, stale accepted' => [true, true, $withoutAbandoned];
+        yield 'no S1' => [false, false, null];
+        yield 'no S1, stale accepted' => [false, true, ['score', 'accepted', 0, 'if_counted']];
+    }
+
+    /**
+     * An empty commit list names no date. The push entry follows the archived entry.
+     *
+     * @param list<array<string, mixed>> $expected the `repository_archived` and `repository_push` skips, in order
+     *
+     * @dataProvider emptyCommitLists
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('emptyCommitLists')]
+    public function testAnEmptyCommitListSkipsS4AfterTheArchivedFlag(string $sourceUrl, string $url, string $body, array $expected): void
+    {
+        $finding = $this->one([self::packagist('vendor/pkg')], ['vendor/pkg' => self::meta('vendor/pkg', $sourceUrl, '2019-01-01T00:00:00+00:00')], [$url => [200, $body]], false);
+
+        self::assertSame(['read', 'undated'], [JsonPath::arrayAt($finding, ['activity'])['status'], JsonPath::arrayAt($finding, ['age'])['push_unmeasured']]);
+        self::assertSame($expected, array_values(array_filter(JsonPath::arrayAt($finding, ['checks_skipped']), static fn ($entry): bool => \is_array($entry) && \in_array($entry['check'], ['repository_archived', 'repository_push'], true))));
+        self::assertSame([], $finding['checks_missing']);
+        self::assertSame([false], self::livenessComplete($finding));
+    }
+
+    /** @return iterable<string, array{string, string, string, list<array<string, mixed>>}> */
+    public static function emptyCommitLists(): iterable
+    {
+        $push = ['check' => 'repository_push', 'reason' => 'undated', 'blocks' => ['S4']];
+        yield 'gitlab' => ['https://gitlab.com/group/pkg.git', self::GL_COMMITS, '[]', [['check' => 'repository_archived', 'reason' => 'no_token', 'blocks' => ['S3']], $push]];
+        yield 'bitbucket' => ['https://bitbucket.org/vendor/pkg.git', 'https://api.bitbucket.org/2.0/repositories/vendor/pkg/commits?pagelen=1', '{"values":[]}', [$push]];
+    }
+
+    /** An activity that was not read keeps its own entry: S4 has no push answer to skip. */
+    public function testAnActivityThatWasNotReadNamesNoPushEntry(): void
+    {
+        $packages = [self::packagist('vendor/pkg'), self::packagist('vendor/hosted')];
+        $metadata = ['vendor/pkg' => self::meta('vendor/pkg', 'https://github.com/vendor/pkg.git'), 'vendor/hosted' => self::meta('vendor/hosted', self::GITEA)];
+
+        $byName = $this->findings($packages, $metadata, [self::GH => [500, '']], true);
+
+        foreach (['vendor/pkg' => 'fetch_failed', 'vendor/hosted' => 'host_not_supported'] as $name => $reason) {
+            self::assertSame([['check' => 'repository_activity', 'reason' => $reason, 'blocks' => ['S3', 'S4']]], $byName[$name]['checks_missing'], $name);
+            self::assertSame([], self::checks($byName[$name], 'repository_push'), $name);
+        }
+    }
+
     /** A flag's headline years and the move's quiet years restate the age reading that they read. */
     public function testTheHeadlineAndTheQuietYearsRestateTheirAgeReading(): void
     {
@@ -475,6 +567,39 @@ final class AnalyzerActivityTest extends TestCase
     private static function meta(string $name, ?string $sourceUrl, string $releasedAt = '2026-08-01T00:00:00+00:00'): PackageMetadata
     {
         return new PackageMetadata($name, false, null, true, new \DateTimeImmutable($releasedAt), '1.0.0', 1, $sourceUrl, 'library', new \DateTimeImmutable(F::NOW));
+    }
+
+    /**
+     * A package with a counted advisory and a last release old enough for S2 at high, read with a GitHub token.
+     *
+     * @return array<mixed, mixed>
+     */
+    private function quietPackage(bool $abandoned, bool $staleAccepted, string $answer): array
+    {
+        $metadata = new PackageMetadata('vendor/pkg', $abandoned, null, true, new \DateTimeImmutable('2019-01-01T00:00:00+00:00'), '1.0.0', 1, 'https://github.com/vendor/pkg.git', 'library', new \DateTimeImmutable(F::NOW));
+        $allowlist = new Allowlist($staleAccepted ? [new AllowlistEntry('vendor/pkg', null, 'kept', null, AllowlistEntry::BY_PROJECT, ['stale'])] : []);
+        $advisories = new AdvisoryBatch(['vendor/pkg' => [new Advisory('PKSA-1', 'CVE-2026-0001', 'A flaw', null, 'high', null)]]);
+        $report = $this->analyzer($this->loader(['vendor/pkg' => $metadata]), $this->http([self::GH => [200, $answer]]), ForgeAuth::withTokens(new Tokens('t', null)), $allowlist, false, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, $advisories)
+            ->analyze(LockFile::fromArray(['packages' => [self::packagist('vendor/pkg')]]), ProjectConfig::fromArray(['name' => 'acme/app', 'require' => ['vendor/pkg' => '^1.0']]), false);
+
+        return JsonPath::decoded($report->findings()[0]->toArray());
+    }
+
+    /**
+     * @param array<mixed, mixed> $finding
+     *
+     * @return list<mixed> each distinct `degree.liveness_complete` of the finding's flags
+     */
+    private static function livenessComplete(array $finding): array
+    {
+        $values = [];
+        foreach (JsonPath::arrayAt($finding, ['flags']) as $flag) {
+            if (\is_array($flag) && \is_array($flag['degree'] ?? null) && \array_key_exists('liveness_complete', $flag['degree'])) {
+                $values[] = $flag['degree']['liveness_complete'];
+            }
+        }
+
+        return array_values(array_unique($values, \SORT_REGULAR));
     }
 
     /**

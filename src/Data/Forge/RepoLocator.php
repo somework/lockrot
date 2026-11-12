@@ -6,6 +6,7 @@ namespace Lockrot\Data\Forge;
 
 use Composer\Config;
 use Lockrot\AsciiCase;
+use Lockrot\Data\Repository\RepositoryUrl;
 
 /**
  * Places a clone URL, or a `support.source` that {@see SupportSource} reduced, on a host that
@@ -130,7 +131,7 @@ final class RepoLocator
     {
         if (strpos($url, '://') !== false) {
             $host = parse_url($url, \PHP_URL_HOST);
-            if (!\is_string($host) || $host === '') {
+            if (!\is_string($host) || $host === '' || RepositoryUrl::hasAmbiguousHost(explode('://', $url, 2)[1])) {
                 return null;
             }
             $port = parse_url($url, \PHP_URL_PORT);

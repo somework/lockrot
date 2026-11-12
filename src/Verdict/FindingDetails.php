@@ -20,6 +20,7 @@ use Lockrot\Security\Holder;
 use Lockrot\Security\PackageFixes;
 use Lockrot\Security\Severity;
 use Lockrot\Signal\AbandonedIgnored;
+use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\NotCheckedData;
@@ -190,10 +191,10 @@ final class FindingDetails
 
     /**
      * The checks that did not run and raise no S10: the repository activity that lockrot did not
-     * read, unless S10 holds it; the archived flag that a read did not carry; the release metadata
-     * that was not read, unless S10 holds it; S8 on a branch snapshot; the release dates gap that
-     * the S10 filter dropped; the advisories of a package the lookup scope or an unparseable
-     * version leaves out.
+     * read, unless S10 holds it; the archived flag or the push date that a read did not carry; the
+     * release metadata that was not read, unless S10 holds it; S8 on a branch snapshot; the release
+     * dates gap that the S10 filter dropped; the advisories of a package the lookup scope or an
+     * unparseable version leaves out.
      *
      * @param list<Signal>        $signals
      * @param list<AcceptedCheck> $accepted
@@ -226,6 +227,10 @@ final class FindingDetails
         }
         if ($lookup->archivedUnread() !== null) {
             $skipped[] = new Check('repository_archived', $lookup->archivedUnread(), [Signal::S3]);
+        }
+        $activity = $lookup->activity();
+        if ($activity !== null && $activity->pushedAt() === null) {
+            $skipped[] = new Check('repository_push', AgeMeasure::UNDATED, [Signal::S4]);
         }
         if (isset($acceptedSkips['release_metadata'])) {
             $skipped[] = $acceptedSkips['release_metadata'];

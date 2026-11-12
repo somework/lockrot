@@ -54,7 +54,9 @@ jobs:
         {"php": "7.4", "composer": "2.10"},
         {"php": "8.5", "composer": "2.10"}]}') }}
     steps:
+      # composer update runs package code, and no later step needs the token.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: ${{ matrix.php }}
@@ -156,6 +158,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with: {php-version: '8.4', coverage: none}
       - run: composer install --no-interaction
@@ -211,6 +214,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with: {php-version: '8.4', coverage: pcov}
       - run: composer install --no-interaction
@@ -230,7 +234,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with: {fetch-depth: "${{ github.event_name == 'pull_request' && '0' || '1' }}"}
+        with: {fetch-depth: "${{ github.event_name == 'pull_request' && '0' || '1' }}", persist-credentials: false}
       - name: Does this run mutate src
         id: scope
         env: {EVENT: '${{ github.event_name }}', BASE_REF: '${{ github.base_ref }}'}
@@ -280,7 +284,7 @@ jobs:
     steps:
       # A pull request is diffed against its base branch: it needs the history down to the merge base.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with: {fetch-depth: "${{ github.event_name == 'pull_request' && '0' || '1' }}"}
+        with: {fetch-depth: "${{ github.event_name == 'pull_request' && '0' || '1' }}", persist-credentials: false}
       # A push mutates the whole tree against the shard's minimum covered MSI. A pull request mutates
       # only its changed lines, where a minimum MSI over few mutants is noise. There,
       # tools/mutation/pr_gate.py fails on an escaped, uncovered, ignored or skipped mutant that
@@ -306,13 +310,14 @@ jobs:
           mine() { while read -r path; do for o in "${own[@]}"; do case "$path" in "$o" | "$o"/*) echo "$path"; break ;; esac; done; done; }
           changed_dirs=""
           if [ ${#dirs[@]} -gt 0 ]; then changed_dirs=$(git diff --name-only --diff-filter=AM "$base" HEAD -- "${dirs[@]}" | grep '\.php$' | mine || true); fi
-          changed_files=""
-          if [ ${#files[@]} -gt 0 ]; then changed_files=$(git diff --name-only --diff-filter=AM "$base" HEAD -- "${files[@]}" | tr '\n' ' '); fi
           # --git-diff-lines reads added and modified files only. A renamed file is mutated whole, by path.
-          renamed=""
-          if [ ${#dirs[@]} -gt 0 ]; then renamed=$(git diff --name-only --diff-filter=R "$base" HEAD -- "${dirs[@]}" | grep '\.php$' | mine | tr '\n' ' ' || true); fi
-          changed_files=$(echo $changed_files $renamed)
-          if [ -z "$changed_dirs" ] && [ -z "$changed_files" ]; then
+          # The names go to a file, one per line, and the steps after this one read that file: a name from
+          # the pull request never becomes shell text, and a name with a space stays one name.
+          list="$RUNNER_TEMP/mutate-files.txt"
+          : > "$list"
+          if [ ${#files[@]} -gt 0 ]; then git diff --name-only --diff-filter=AM "$base" HEAD -- "${files[@]}" >> "$list"; fi
+          if [ ${#dirs[@]} -gt 0 ]; then git diff --name-only --diff-filter=R "$base" HEAD -- "${dirs[@]}" | grep '\.php$' | mine >> "$list" || true; fi
+          if [ -z "$changed_dirs" ] && [ ! -s "$list" ]; then
             echo "mode=none" >> "$GITHUB_OUTPUT"
             echo "This pull request changes no source file of this shard: nothing to mutate." >> "$GITHUB_STEP_SUMMARY"
             exit 0
@@ -321,7 +326,7 @@ jobs:
           echo "base=$base" >> "$GITHUB_OUTPUT"
           echo "dirs=${dirs[*]}" >> "$GITHUB_OUTPUT"
           echo "diff=$([ -n "$changed_dirs" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
-          echo "files=$changed_files" >> "$GITHUB_OUTPUT"
+          echo "files=$([ -s "$list" ] && echo "$list")" >> "$GITHUB_OUTPUT"
       # The action holds the reasons for ulimit and the Infection options that the diff steps share.
       - if: steps.scope.outputs.mode != 'none'
         uses: ./.github/actions/mutation-shard
@@ -332,17 +337,21 @@ jobs:
       # So is a renamed file, which --git-diff-lines does not read.
       - name: Mutate whole the root and renamed files the pull request changes
         if: steps.scope.outputs.mode == 'diff' && steps.scope.outputs.files != ''
+        env: {LIST: '${{ steps.scope.outputs.files }}'}
         run: |
           ulimit -v 4194304
-          $(composer global config bin-dir --absolute)/infection --threads=max --only-covering-test-cases --coverage=build/coverage --skip-initial-tests --with-uncovered --min-msi=0 --min-covered-msi=0 ${{ steps.scope.outputs.files }}
+          mapfile -t paths < "$LIST"
+          $(composer global config bin-dir --absolute)/infection --threads=max --only-covering-test-cases --coverage=build/coverage --skip-initial-tests --with-uncovered --min-msi=0 --min-covered-msi=0 "${paths[@]}"
           if [ -f build/infection.log ]; then mv build/infection.log build/infection-files.log; fi
           if [ -f build/infection.json ]; then mv build/infection.json build/infection-files.json; fi
       - name: Mutate the lines the pull request changes
         if: steps.scope.outputs.mode == 'diff' && steps.scope.outputs.diff == 'true'
+        env: {DIRS: '${{ steps.scope.outputs.dirs }}', BASE: '${{ steps.scope.outputs.base }}'}
         run: |
-          python3 tools/mutation/shard_config.py infection.json5 ${{ steps.scope.outputs.dirs }} > infection.shard.json5
+          read -ra dirs <<< "$DIRS"
+          python3 tools/mutation/shard_config.py infection.json5 "${dirs[@]}" > infection.shard.json5
           ulimit -v 4194304
-          $(composer global config bin-dir --absolute)/infection --configuration=infection.shard.json5 --threads=max --only-covering-test-cases --coverage=build/coverage --skip-initial-tests --git-diff-lines --git-diff-base=${{ steps.scope.outputs.base }} --with-uncovered --min-msi=0 --min-covered-msi=0
+          $(composer global config bin-dir --absolute)/infection --configuration=infection.shard.json5 --threads=max --only-covering-test-cases --coverage=build/coverage --skip-initial-tests --git-diff-lines --git-diff-base="$BASE" --with-uncovered --min-msi=0 --min-covered-msi=0
       # --paths keeps the shard's own mutants: a shard of single files mutates their whole directory's lines.
       - name: Mutants against tests/infection-equivalents.md
         if: steps.scope.outputs.mode == 'diff'
@@ -363,6 +372,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with: {python-version-file: .python-version, cache: pip, cache-dependency-path: docs/requirements.txt}
       - run: pip install -r docs/requirements.txt
@@ -431,6 +441,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with: {php-version: '8.4'}
       - run: composer install --no-interaction
@@ -440,6 +451,32 @@ jobs:
       # lockrot's own header do not meet on the wire. Without the token, the test skips.
       - run: vendor/bin/phpunit --group network
         env: {GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'}
+  # The plugin runs inside the Composer binary of the host, so only a host on the floor minor shows
+  # what the floor does with the plugin loader and the install event. The e2e job above runs the
+  # newest Composer. This job runs PluginTest, install-time-strict included, on the newest release
+  # of the floor minor. A ruleset requires a check by its job name, so a renamed job drops out of the
+  # ruleset.
+  e2e-composer-floor:
+    name: e2e (Composer floor)
+    runs-on: ubuntu-latest
+    env: {LOCKROT_E2E_HOST_COMPOSER: '2.10'}
+    steps:
+      # composer install runs package code, and no later step needs the token.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with: {php-version: '8.4', tools: 'composer:v2'}
+      # Packagist lists every release of composer/composer. The test fails when the binary is not
+      # the minor that LOCKROT_E2E_HOST_COMPOSER names.
+      - name: Install the newest Composer release of the floor minor
+        run: |
+          version=$(curl -fsS --retry 3 https://repo.packagist.org/p2/composer/composer.json | jq -r --arg minor "$LOCKROT_E2E_HOST_COMPOSER" '[.packages["composer/composer"][].version | select(startswith($minor + ".") and test("^[0-9.]+$"))] | sort_by(split(".") | map(tonumber)) | last')
+          if [ -z "$version" ] || [ "$version" = null ]; then echo "::error::no Composer $LOCKROT_E2E_HOST_COMPOSER release found"; exit 1; fi
+          composer self-update "$version"
+          composer --version
+      - run: composer install --no-interaction
+      - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PluginTest
+        env: {GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'}
   # PharTest checks that the PHAR exposes lockrot's two commands and nothing else, and that it never
   # loads the inspected project's classes. phar.yml builds on tags alone, so without this job a
   # regression in bin/lockrot can merge green and show only at release time.
@@ -447,6 +484,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with: {php-version: '8.4', tools: 'composer:2.10.3'}
       - run: composer install --no-interaction

@@ -253,6 +253,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `lockrot: Composer <version> is older than 2.10 …` line, so a quiet install shows that
   `install-time-strict` does not apply. The `lockrot: install-time check skipped: …` line also
   survives `-q`. This affects installs that run with `-q`. ([Install-time](docs/install-time.md))
+- **Run notes:** the `moves_not_checked`, `update_now_reduced` and `update_now_refused` notes
+  redact repository URLs and local paths in Composer's problem text. A query token or the path of
+  a `path` repository does not reach the report. ([Moves not checked](docs/notes.md#moves_not_checked))
+- **All formats:** a repository URL whose host is unclear, such as one whose userinfo holds a raw
+  `/`, `?` or `#`, prints as `https://(withheld: ambiguous host)`. It gets no link and no
+  repository host, so its userinfo does not reach the report.
 
 ### Added
 
@@ -431,7 +437,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   same lock. Action: compare these counts on the first run.
   ([Migrating](docs/schema.md#migrating-from-report-1))
 - **Breaking:** **Distribution:** `docs/compatibility.md` no longer promises which lockrot-action
-  major line follows lockrot 1.x. `@v1` runs 0.14 from lockrot-action v1.2.0 on, and with `version:
+  major line follows lockrot 1.x, and no longer promises SemVer for the action's inputs. The
+  action's v1 line follows lockrot's minor releases and can carry Breaking entries, each marked
+  Breaking with migration lines. `@v1` runs 0.14 from lockrot-action v1.2.0 on, and with `version:
   latest` from this tag on. The Docker image's `latest` tag moves with v1.2.0. Action: to stay on
   0.13, set the action's `version: 0.13.0`, or use the image tag `0.13.0`. Before v1.2.0, the
   action writes its job summary from an `--offline` run, which shows no advisory on 0.14: upgrade
@@ -607,9 +615,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** the `needs php` clause of a move line names the move's branch, else its release,
   else its constraint. A move with none of them writes no clause, not an empty name.
   ([The move](docs/verdicts.md#move))
-- **CLI:** the PHAR and `vendor/bin/lockrot` exit `2` with a `lockrot:` line on an unknown command,
-  a `--working-dir` that does not exist, and a bad argument or option to `help`, `list` or `--help`,
-  not `1`. In plugin mode, Composer still exits `1` for them. ([Exit codes](docs/ci.md#exit-codes))
+- **CLI:** the PHAR and `vendor/somework/lockrot/bin/lockrot` exit `2` with a `lockrot:` line on an
+  unknown command, a `--working-dir` that does not exist, and a bad argument or option to `help`,
+  `list` or `--help`, not `1`. In plugin mode, Composer still exits `1` for them.
+  ([Exit codes](docs/ci.md#exit-codes))
 - **CLI:** `--explain` prints the footnote "so S8 does not measure the branch" only when S8 did
   not measure the installed branch because of its undated releases.
   ([Explaining one package](docs/configuration.md#explaining-one-package))
@@ -742,6 +751,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   variable turns Composer's policy off, as the advisory notes do.
   ([Abandoned not audited by Composer](docs/notes.md#abandoned_not_audited_by_composer))
 - **sarif, gitlab:** a lock entry written as `"name" : "a/b"` gets its line number.
+- **CLI:** a run exits `2` with a message that names `config.platform.php` when that value is a
+  branch name, such as `dev-master`. ([Exit codes](docs/ci.md#exit-codes))
+- **CLI:** a run exits `2` with a message that names the `composer.lock` field when the field has
+  the wrong type. The message holds no PHP error text and no absolute path.
+- **CLI:** a run on a `composer.lock` that is not a regular file exits `2` with
+  `composer.lock exists and is not a regular file`.
+- **All formats:** the capped fact stays unverified when the target release's `php` is
+  `self.version`, as for a release with no `php`. ([Capped](docs/verdicts.md#capped))
+- **All formats:** a host answer that names no push or commit date adds the `checks_skipped`
+  entry `repository_push` with the reason `undated`. `liveness_complete` is then false, and a
+  stale total that lockrot decided without S4 reads as a lower bound.
+  ([What was not checked](docs/verdicts.md#what-was-not-checked))
+- **All formats:** an unloaded name in the first solve gives a move `not_checked` with
+  `unloaded_name` also when the second solve over the non-dev requirements refuses.
+  ([Move](docs/verdicts.md#move))
 
 ## [0.13.0] - 2026-10-01
 

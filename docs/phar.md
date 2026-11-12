@@ -154,7 +154,7 @@ image `ghcr.io/somework/lockrot`. Its README says how to verify the image.
 
 - **Option values.** Give lockrot's own options (`--output`, `--format`, `--fail-on`, …) their
   value with `=` (`--output=json:r.json`). With a space and no command name before it, the PHAR
-  reads the value as a command name and the run exits `1`. `-d <dir>` takes a space.
+  reads the value as a command name and the run exits `2`. `-d <dir>` takes a space.
 
 - **Process setup.** The PHAR sets up its process as `composer` does. It restarts without Xdebug,
   writes PHP errors to stderr, uses the C locale and reads `COMPOSER_MEMORY_LIMIT`. To keep Xdebug,
@@ -387,7 +387,7 @@ project you run Composer in. It reads `extra.lockrot` from each project, not fro
 | `sha256sum -c` reports `FAILED` on a fresh download | A release was published between the two `latest` downloads, or the archive is not the published one | Download both again from a pinned tag (`download/<tag>`). If it still fails, do not run the archive |
 | `self-update` exits `2` saying the directory is not writable | The PHAR sits in a directory you cannot write, such as `/usr/local/bin` | Run it with `sudo`, or [reinstall by hand](#reinstalling-by-hand) |
 | `self-update --check` exits `2` when a newer release exists, on a network that allows only `api.github.com` | `--check` also reads release metadata from `github.com` ([hosts](#keeping-it-updated)) | Allow `github.com` and the host it redirects to, or check on a machine that can reach them |
-| `php lockrot.phar --output json:r.json` exits `1` naming a `json` command | The value after a space is read as a command name | Write it with `=`: `--output=json:r.json` |
+| `php lockrot.phar --output json:r.json` exits `2` naming a `json` command | The value after a space is read as a command name | Write it with `=`: `--output=json:r.json` |
 | `self-update` exits `2` saying the newer releases are signed with a key this archive does not carry | The archive is stranded by a key rotation | [Reinstall by hand](#reinstalling-by-hand) |
 
 ## Related

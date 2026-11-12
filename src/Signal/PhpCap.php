@@ -66,11 +66,12 @@ final class PhpCap
 
     /**
      * S11's test: the requirement's upper bound is finite, it admits nothing at or above R's
-     * {@see PhpFloor::NEWEST_PATCH}, and it admits a known minor. Null for a release that states no php, which is no answer.
+     * {@see PhpFloor::NEWEST_PATCH}, and it admits a known minor. Null for a release that states no
+     * php or a php that does not parse, such as Composer's `self.version`: neither is an answer.
      */
     public function stopsBelow(?string $constraint): ?bool
     {
-        if (!self::states($constraint)) {
+        if (!self::states($constraint) || $this->parse($constraint) === null) {
             return null;
         }
 

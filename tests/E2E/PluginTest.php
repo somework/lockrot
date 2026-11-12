@@ -201,8 +201,34 @@ final class PluginTest extends TestCase
         $require = $this->composer(['require', 'phpzip/phpzip:2.0.8', '--no-interaction', '--no-progress']);
 
         $stderr = $require->getErrorOutput();
-        self::assertNotSame(0, $require->getExitCode(), $stderr);
+        self::assertSame(1, $require->getExitCode(), $stderr);
         self::assertStringContainsString('install-time-strict', $stderr);
+        self::assertStringContainsString('fail-on=old-promise', $stderr);
+        self::assertDirectoryDoesNotExist($this->dir.'/vendor/phpzip');
+    }
+
+    /**
+     * The lock that a stopped `composer require` leaves makes `composer install` stop on the same
+     * finding (docs/install-time.md, "install-time-strict"). The CI job `e2e (Composer floor)` sets
+     * LOCKROT_E2E_HOST_COMPOSER to the minor of the Composer binary that it installed, so a job
+     * that silently runs another Composer fails here.
+     */
+    public function testInstallStopsOnTheLockThatAStoppedRequireLeft(): void
+    {
+        $hostMinor = (string) getenv('LOCKROT_E2E_HOST_COMPOSER');
+        if ($hostMinor !== '') {
+            $version = $this->composer(['--version', '--no-ansi']);
+            self::assertStringContainsString('Composer version '.$hostMinor.'.', $version->getOutput());
+        }
+        $this->createProject(['install-time-strict' => true, 'fail-on' => 'old-promise', 'target-php' => '8.4']);
+        $this->install();
+        $this->composer(['require', 'phpzip/phpzip:2.0.8', '--no-interaction', '--no-progress']);
+
+        $install = $this->composer(['install', '--no-interaction', '--no-progress']);
+
+        $stderr = $install->getErrorOutput();
+        self::assertSame(1, $install->getExitCode(), $stderr);
+        self::assertStringContainsString('lockrot: install-time-strict stopped the install; gate: fails', $stderr);
         self::assertStringContainsString('fail-on=old-promise', $stderr);
         self::assertDirectoryDoesNotExist($this->dir.'/vendor/phpzip');
     }

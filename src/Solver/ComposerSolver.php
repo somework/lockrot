@@ -35,6 +35,7 @@ use Composer\Semver\Comparator;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\ConstraintInterface;
 use Lockrot\Analyzer\PhpWindow;
+use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Security\Holder;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 
@@ -181,24 +182,28 @@ final class ComposerSolver
         }
         // As Installer::extractDevPackages(): no second solve for a root without require-dev.
         $nonDev = $root->getDevRequires() === [] ? null : $this->nonDevAnswer($root, $policy, $answer, $requires, $temporary);
+        // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
+        // The second solve of a move reads that answer, so its refusal proves no more. The baseline
+        // keeps every locked package, so a fuller pool cannot change its refusal.
+        $unloaded = $this->withoutMetUnreached($this->failures($loaded->asked()), $built, $answer);
         if ($nonDev !== null) {
-            return $this->refused($nonDev[3], $nonDev[2], $nonDev[0], $nonDev[1], $composerRequest, $root, $request, $loaded);
+            return $this->refused($nonDev[3], $nonDev[2], $nonDev[0], $nonDev[1], $composerRequest, $root, $request, $loaded, $request->isBaseline() ? [] : $unloaded);
         }
 
-        // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
         // Composer blocks a release by each name that it replaces too.
         $lockPackages = $answer->getNewLockPackages(false);
         $held = array_merge([], ...array_map(static fn (BasePackage $package): array => $package->getNames(false), $lockPackages));
         $kept = array_map(static fn (BasePackage $package): string => $package->getName(), $lockPackages);
 
-        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), $this->withoutMetUnreached($this->failures($loaded->asked()), $built, $answer), $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)), $kept);
+        return Solution::resolved(self::installs($answer), self::updatedFrom($answer), $unloaded, $feed === null ? [] : array_values(array_intersect($feed->unread(), $held)), $kept);
     }
 
     /**
      * @param Request $refusing the request that Composer refused: the update's own, or the one of its second solve
-     * @param Request $update   the update's own request, which names the locked packages
+     * @param Request               $update    the update's own request, which names the locked packages
+     * @param array<string, string> $firstSolve name => {@see VersionSource} failure, of the first solve whose answer the second solve refuses
      */
-    private function refused(SolverProblemsException $answer, Pool $pool, RepositorySet $set, Request $refusing, Request $update, RootPackageInterface $root, SolveRequest $request, LoadedVersions $loaded): Solution
+    private function refused(SolverProblemsException $answer, Pool $pool, RepositorySet $set, Request $refusing, Request $update, RootPackageInterface $root, SolveRequest $request, LoadedVersions $loaded, array $firstSolve = []): Solution
     {
         $nonDev = $refusing !== $update;
         $locked = [];
@@ -218,7 +223,7 @@ final class ComposerSolver
             $problem = static fn (): string => $text;
         }
 
-        return Solution::refused($holds->holds(), $problem, $this->failures($holds->wanted()) + $shadowed + $this->unreachedLockedOnly($update, $holds));
+        return Solution::refused($holds->holds(), $problem, $this->failures($holds->wanted()) + $shadowed + $this->unreachedLockedOnly($update, $holds) + $firstSolve);
     }
 
     /**
@@ -593,6 +598,8 @@ final class ComposerSolver
      * Composer's text as its console prints it without colour, and without the version of the platform that runs lockrot: Composer appends it to
      * each override (`actual: 8.5.1`, `same as actual`), and lockrot overrides `php` with the target.
      * When lockrot chose that php, Composer's `; overridden via config.platform` on it goes too.
+     * A report quotes the text, and the repository names in it can carry a token or a local path:
+     * {@see RepositoryUrl::inText()}.
      */
     private static function problemText(string $text, bool $setsPhp): string
     {
@@ -605,7 +612,7 @@ final class ComposerSolver
             $text = preg_replace('/(php(?:-[a-z0-9]+)? version \([^;)]*); overridden via config\.platform(?=[,)])/', '$1', $text) ?? $text;
         }
 
-        return trim((string) preg_replace('/, (?:actual: [^)]*|same as actual)\)/', ')', $text));
+        return RepositoryUrl::inText(trim((string) preg_replace('/, (?:actual: [^)]*|same as actual)\)/', ')', $text)));
     }
 
     /** @return array<string, string> name => the pretty version that the solve installs, for each name it installs or moves to another version */

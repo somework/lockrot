@@ -158,8 +158,11 @@ lockrot: unknown key extra.lockrot.accept-unchecked[0].expire ignored (did you m
 - **When.** `composer lockrot` and the PHAR print the lines on every run, `--explain` and
   `--generate-baseline` included, once the configuration has loaded and before lockrot reads the
   lock. The [install-time summary](install-time.md) prints them above its block whenever it runs,
-  even when nothing is flagged. `LOCKROT_DISABLE` suppresses them, and `-q` silences them with
-  everything else lockrot prints.
+  even when nothing is flagged. `LOCKROT_DISABLE` suppresses them. `-q` silences them and the
+  block. It keeps the `lockrot: install-time check skipped: …` line, the
+  `lockrot: install-time-strict stopped the install; …` line and the
+  `lockrot: Composer <version> is older than 2.10 …` line
+  ([which lines](install-time.md#never-fails-the-install)).
 - **How a key is printed.** As written, with every byte that a terminal can act on escaped (control
   bytes, invalid UTF-8, bidirectional controls, and a backslash as `\\`), so two keys of up to 255
   bytes never print alike. lockrot cuts a longer key at 255 bytes and ends it in `…`.

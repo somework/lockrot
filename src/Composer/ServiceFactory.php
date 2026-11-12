@@ -150,7 +150,7 @@ final class ServiceFactory
             } catch (\Throwable $e) {
                 // Raw, past Composer's formatter: the transport's message is not console markup
                 // (see TerminalText), and what a terminal obeys in it is shown instead.
-                $line = 'lockrot: Bitbucket OAuth token request failed, continuing without credentials: '.TerminalText::neutralise($e->getMessage());
+                $line = 'lockrot: Bitbucket OAuth token request failed, continuing without credentials: '.TerminalText::breakLogCommands(TerminalText::neutralise($e->getMessage()));
                 $io->writeErrorRaw(TerminalText::warning($line, $io->isDecorated()), true, IOInterface::VERBOSE);
 
                 return false;

@@ -507,6 +507,69 @@ final class MoveCheckersTest extends TestCase
     }
 
     /**
+     * Ruling R19-38: the first solve reads the require-dev constraint, and an unreached name can
+     * change its answer. The second solve over `require` refuses that answer, and the move still
+     * reads not_checked with unloaded_name and no hold.
+     *
+     * @dataProvider unreachedBeforeTheNonDevSolve
+     *
+     * @param array<string, array<string, string>> $releases the releases of acme/lib above 1.0.0, by version, with their requirements
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('unreachedBeforeTheNonDevSolve')]
+    public function testAnUnreachedNameOfTheFirstSolveIsNotCheckedWhenTheNonDevSolveRefuses(array $releases, string $require): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $loader = new ArrayLoader();
+        $remote = [$loader->load(['name' => 'acme/lib', 'version' => '1.0.0'])];
+        foreach ($releases as $version => $requires) {
+            $remote[] = $loader->load(['name' => 'acme/lib', 'version' => $version, 'require' => $requires]);
+        }
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => $require], 'require-dev' => ['acme/lib' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
+        $checker = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'));
+
+        self::assertSame(MoveCheck::RESOLVES, $checker->baseline()->check()->result());
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, []], [$outcome->check()->result(), $outcome->check()->reason(), $outcome->holds()]);
+        $combined = $checker->combined(['acme/lib' => '^1.1']);
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME, []], [$combined->check()->result(), $combined->check()->reason(), $combined->holds()], 'update now');
+    }
+
+    /**
+     * The baseline keeps every locked package, so a fuller pool cannot change a refusal of a locked
+     * name (ruling R2-4).
+     */
+    public function testABaselineThatTheNonDevSolveRefusesStaysRefusedBesideAnUnloadedName(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
+        $loader = new ArrayLoader();
+        $remote = [
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.2.0']),
+            $loader->load(['name' => 'acme/new', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/new', 'version' => '1.1.0', 'require' => ['acme/private' => '^1.0']]),
+        ];
+        $root = $loader->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^2.0', 'acme/new' => '^1.0'], 'require-dev' => ['acme/lib' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
+        $checker = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
+
+        $baseline = $checker->baseline();
+
+        self::assertSame([MoveCheck::REFUSED, null], [$baseline->check()->result(), $baseline->check()->reason()]);
+        self::assertStringContainsString('acme/lib ^2.0', (string) $baseline->problem());
+    }
+
+    /** @return iterable<string, array{array<string, array<string, string>>, string}> */
+    public static function unreachedBeforeTheNonDevSolve(): iterable
+    {
+        yield 'the first solve resolves below a release that needs the name' => [['1.1.0' => [], '1.2.0' => ['acme/private' => '^1.0']], '>=1.0,<1.1'];
+        yield 'the first solve refuses the one release that needs the name' => [['1.1.0' => ['acme/private' => '^1.0']], '>=1.0,<1.1'];
+    }
+
+    /**
      * A package that the solve does not install counts only when a release that the solve could
      * install requires it, directly or through another such package.
      *

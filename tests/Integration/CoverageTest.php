@@ -61,7 +61,7 @@ final class CoverageTest extends TestCase
                 $this->record($name, $schema, $schema, '#', json_decode((string) file_get_contents(substr($path, -3) === '.gz' ? 'compress.zlib://'.$path : $path)));
             }
         }
-        self::assertSame([Schemas::REPORT => 456, Schemas::EXPLAIN => 377, Schemas::BASELINE => 142, Schemas::CONFIG => 79], $counts, 'tests/fixtures/schema/documents/provenance.json');
+        self::assertSame([Schemas::REPORT => 459, Schemas::EXPLAIN => 380, Schemas::BASELINE => 142, Schemas::CONFIG => 79], $counts, 'tests/fixtures/schema/documents/provenance.json');
 
         $shared = [];
         foreach ((array) $schemas[Schemas::EXPLAIN]->definitions as $definition => $node) {
@@ -308,7 +308,6 @@ final class CoverageTest extends TestCase
                 "a holder's next_step copies the holding finding's own kind, and the finding's own next_step carries every other kind"],
             [self::D.'move/properties/reason/oneOf/0', ['no_higher_release', 'higher_undated'], self::NOT_REACHED.' (a left-behind lead with no higher branch releasing, or none dated)'],
             [self::D.'advisoriesNotCheckedReason', ['lookup_failed'], 'lockrot writes advisories_unavailable for a feed that fails, and RunNote::advisoriesNotChecked() refuses lookup_failed'],
-            [self::D.'pushUnmeasured', ['undated'], self::NOT_REACHED.' (an activity answer that carried no date)'],
             [self::D.'advisoryFeed/properties/registry/oneOf/0', ['wp-packages.org'], 'wp-packages.org has no advisory feed, so feeds[] never names it'],
             [self::D.'headline/anyOf/2/properties/value', ['no_stable_release'], self::NOT_REACHED.' (a pinned package with no stable release ever)'],
             [self::D.'s6/properties/reason', ['no_stable_release'], 'as headline: pinned with no stable release ever'],

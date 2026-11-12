@@ -35,7 +35,8 @@ S6 needs no request: it reads a branch-snapshot version in the lock. S5 reads th
 release date ([Dates from the monorepo](verdicts.md#dates-from-the-monorepo)).
 
 Every request, to a repository or a host, goes through Composer's HTTP layer, so Composer's proxy
-and TLS settings apply to both.
+and TLS settings apply to both. A request to a repository host uses Composer's global TLS settings
+only. The `options` of a repository entry, such as its `ssl` context, do not apply to it.
 
 ### Which host is asked {#which-host}
 

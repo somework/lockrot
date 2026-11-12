@@ -57,6 +57,11 @@ final class SolveRequest
         return new self([self::BASELINE_NAME => self::BASELINE_NAME], [], [], self::LISTED);
     }
 
+    public function isBaseline(): bool
+    {
+        return $this->allow === [self::BASELINE_NAME => self::BASELINE_NAME];
+    }
+
     /** @param array<string, string> $inline name => constraint, empty for a name with no inline constraint, each name on the allow list */
     public static function update(array $inline): self
     {

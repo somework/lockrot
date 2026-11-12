@@ -108,6 +108,31 @@ final class PharSigningStepsTest extends TestCase
         self::assertStringContainsString("\ngpgconf --kill all ".$home."\n", "\n".$log, 'the daemons of that GNUPGHOME are stopped');
     }
 
+    public function testOnlyAStepThatRunsNoPhpHoldsTheSelfUpdateKey(): void
+    {
+        $holders = array_filter(self::steps(), static fn (string $step): bool => strpos($step, 'secrets.SELFUPDATE_') !== false);
+        self::assertNotSame([], $holders, 'a step holds the self-update key');
+        foreach ($holders as $step) {
+            self::assertStringContainsString('openssl', $step);
+            self::assertDoesNotMatchRegularExpression('{\bphp\b|\.php\b|vendor|composer|phpunit}i', $step, 'the autoloader runs dev-dependency code, which must not see the key');
+        }
+    }
+
+    /** @return list<string> each step of phar.yml, without its comment lines */
+    private static function steps(): array
+    {
+        $steps = [];
+        foreach (file(self::WORKFLOW, \FILE_IGNORE_NEW_LINES) ?: [] as $line) {
+            if (strpos($line, '      - ') === 0) {
+                $steps[] = $line;
+            } elseif ($steps !== [] && strpos($line, '        ') === 0 && strpos(ltrim($line), '#') !== 0) {
+                $steps[\count($steps) - 1] .= "\n".$line;
+            }
+        }
+
+        return $steps;
+    }
+
     /** The `run:` block of a phar.yml step, read from the workflow file. */
     private static function stepScript(string $step): string
     {

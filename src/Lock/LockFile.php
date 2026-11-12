@@ -22,6 +22,28 @@ final class LockFile
     /** Composer's package name pattern (composer-schema.json, `name`). */
     private const NAME = '{^[a-z0-9](?:[_.-]?[a-z0-9]++)*+/[a-z0-9](?:(?:[_.]|-{1,2})?[a-z0-9]++)*+$}D';
 
+    /**
+     * The fields that the loader types, by the shape that it needs. The link fields (`require` …
+     * `replace`) are not here: the loader skips one that is not an array.
+     */
+    private const FIELD_KINDS = [
+        'string' => ['type', 'target-dir', 'installation-source', 'notification-url', 'source.type', 'source.url', 'source.reference', 'dist.type', 'dist.url', 'dist.reference', 'dist.shasum', 'archive.name'],
+        'object' => ['autoload', 'autoload-dev', 'php-ext'],
+        'list' => ['include-path', 'source.mirrors', 'dist.mirrors', 'archive.exclude'],
+        'strings' => ['bin'],
+        'keywords' => ['keywords'],
+        'suggest' => ['suggest'],
+    ];
+
+    private const KIND_MESSAGES = [
+        'string' => 'must be a string',
+        'object' => 'must be a JSON object',
+        'list' => 'must be a list',
+        'strings' => 'must be a string or a list of strings',
+        'keywords' => 'must be a list of strings',
+        'suggest' => 'must map names to strings',
+    ];
+
     /** @var array<string, LockedPackage> */
     private array $packages;
     /** @var list<string> */
@@ -160,7 +182,11 @@ final class LockFile
             $forUpdate = $lockLoader->load($entry);
         } catch (\Throwable $e) {
             // ArrayLoader changes no state, so any failure means that the entry cannot be loaded.
-            throw new ConfigException($refusal.$e->getMessage(), 0, $e);
+            if ($e instanceof \TypeError || $e instanceof \ErrorException) {
+                self::refuseWrongTypes($entry, $refusal);
+            }
+            // The message of a TypeError quotes a PHP function and a path of the install.
+            throw new ConfigException($refusal.($e instanceof \TypeError ? 'a field has the wrong type' : $e->getMessage()), 0, $e);
         }
         // A package that declares `extra.branch-alias`, or is a `default-branch`, loads as an
         // alias package. Unwrap it, so that the entry's own version, require and source fields
@@ -177,6 +203,56 @@ final class LockFile
         }
 
         return [$loaded, $forUpdate, $aliasVersions];
+    }
+
+    /**
+     * Names the field that made Composer's loader fail. The loader takes the fields that it hands to
+     * a typed setter or a string function: a wrong type is a TypeError there, and the lock's field
+     * is what a user can fix. It runs after a failure only, so that no lock which the loader reads
+     * is refused.
+     *
+     * @param mixed $entry
+     *
+     * @throws ConfigException for a field of the wrong type
+     */
+    private static function refuseWrongTypes($entry, string $refusal): void
+    {
+        foreach (self::FIELD_KINDS as $kind => $paths) {
+            foreach ($paths as $path) {
+                $value = $entry;
+                foreach (explode('.', $path) as $key) {
+                    $value = \is_array($value) ? $value[$key] ?? null : null;
+                }
+                if ($value !== null && !self::hasKind($kind, $path, $value)) {
+                    throw new ConfigException($refusal.'"'.$path.'" '.self::KIND_MESSAGES[$kind]);
+                }
+            }
+        }
+    }
+
+    /**
+     * A shape that the loader reads is no answer, so that only the field that failed can match.
+     *
+     * @param mixed $value
+     */
+    private static function hasKind(string $kind, string $path, $value): bool
+    {
+        switch ($kind) {
+            case 'string':
+                // The loader skips an empty notification-url and archive name.
+                return \is_string($value) || (\in_array($path, ['notification-url', 'archive.name'], true) && empty($value)) || (substr($path, -9) === 'reference' && \is_scalar($value));
+            case 'object':
+            case 'list':
+                // The loader skips an empty archive exclude.
+                return \is_array($value) || ($path === 'archive.exclude' && empty($value));
+            case 'strings':
+                return \is_string($value) || (\is_array($value) && $value === array_filter($value, 'is_string'));
+            case 'keywords':
+                // The loader casts each keyword with `strval()`: null reads as "", and only an array is an error.
+                return !\is_array($value) || array_filter($value, 'is_array') === [];
+            default:
+                return !\is_array($value) || $value === array_filter($value, 'is_string');
+        }
     }
 
     /** @param array{platform: mixed, platform-dev: mixed} $platform */

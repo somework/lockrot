@@ -257,8 +257,22 @@ final class LockrotConfigTest extends TestCase
     public function testAPlatformPhpThatIsABranchNameIsRefused(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('target-php must look like "8.4"; got "dev-main"');
+        $this->expectExceptionMessage('config.platform.php must look like "8.4"; got "dev-main"');
         LockrotConfig::fromSources([], [], [], '8.5.10', 'dev-main');
+    }
+
+    public function testTheRefusalOfAPlatformPhpQuotesTheValueAsWritten(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('config.platform.php must look like "8.4"; got "master"');
+        LockrotConfig::fromSources([], [], [], '8.5.10', 'master');
+    }
+
+    public function testARunningPhpThatIsNoVersionIsRefusedAsTheTarget(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('target-php must look like "8.4"; got "dev"');
+        LockrotConfig::fromSources([], [], [], 'dev', null);
     }
 
     public function testAVPrefixedTargetPhpOptionIsStillRefused(): void

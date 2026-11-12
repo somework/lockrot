@@ -37,14 +37,21 @@ final class RepositoryUrlTest extends TestCase
         yield 'a bare user name' => ['https://user@github.com/vendor/pkg.git', 'https://github.com/vendor/pkg.git'];
         yield 'a password with an @ in it' => ['https://ci:p@ss@git.acme.test/lib.git', 'https://git.acme.test/lib.git'];
         yield 'a token in the query' => ['https://git.acme.test/lib.git?private_token=t0k3n#readme', 'https://git.acme.test/lib.git'];
-        yield 'a question mark in the password' => ['https://igor:pw?x@git.acme.test/lib.git', 'https://git.acme.test/lib.git'];
+        yield 'a question mark in the password is ambiguous' => ['https://igor:pw?x@git.acme.test/lib.git', 'https://(withheld: ambiguous host)'];
         yield 'ssh keeps its host, loses its user' => ['ssh://git@gitlab.internal/team/svc.git', 'ssh://gitlab.internal/team/svc.git'];
         yield 'svn over ssh' => ['svn+ssh://igor@svn.acme.test/repo/trunk', 'svn+ssh://svn.acme.test/repo/trunk'];
         yield 'nothing to strip' => ['https://github.com/vendor/pkg.git', 'https://github.com/vendor/pkg.git'];
         yield 'an @ in the path is not userinfo' => ['https://example.test/~user@home/pkg', 'https://example.test/~user@home/pkg'];
+        yield 'a token with a raw slash is userinfo' => ['https://tok/en@github.com/a/b', 'https://(withheld: ambiguous host)'];
+        yield 'a login and a password with a raw slash' => ['https://deploy:1234/5678@gitlab.corp/a/b.git?x=1', 'https://(withheld: ambiguous host)'];
+        yield 'a path that reads as another host is not shown as the host' => ['https://a/b@evil.com/x', 'https://(withheld: ambiguous host)'];
+        yield 'an @ in the query is not userinfo' => ['https://example.test/pkg?mail=a@b', 'https://example.test/pkg'];
+        yield 'an e-mail address in the query is not a second host' => ['https://github.com/a/b?ref=user@example.com', 'https://github.com/a/b'];
         yield 'an scp-style remote loses its user' => ['git@github.com:vendor/pkg.git', 'github.com:vendor/pkg.git'];
         yield 'an scp-style remote with a login' => ['igor@git.client-x.lan:libs/core.git', 'git.client-x.lan:libs/core.git'];
         yield 'an scp-style remote on a host without a dot' => ['git@buildbox:libs/core.git', 'buildbox:libs/core.git'];
+        yield 'an scp-style remote whose dotted user holds a token' => ['john.doe:ghp_SECRET@github.com:o/r.git', 'github.com:o/r.git'];
+        yield 'an scp-style remote whose token sits after a host name' => ['git.example.com:SECRET@github.com:o/r', 'github.com:o/r'];
         yield 'an scp-style remote without a user' => ['github.com:vendor/pkg.git', 'github.com:vendor/pkg.git'];
         yield 'a Perforce server' => ['perforce.acme.internal:1666', 'perforce.acme.internal:1666'];
         yield 'a Perforce server over ssl' => ['ssl:perforce.acme.internal:1666', 'ssl:perforce.acme.internal:1666'];
@@ -95,6 +102,7 @@ final class RepositoryUrlTest extends TestCase
         yield 'composer prefixes it' => ['git+https://github.com/vendor/pkg.git', 'https://github.com/vendor/pkg'];
         yield 'an scp-style remote means https' => ['git@github.com:vendor/pkg.git', 'https://github.com/vendor/pkg'];
         yield 'whitespace around it' => ["  https://github.com/vendor/pkg.git\n", 'https://github.com/vendor/pkg'];
+        yield 'a path that reads as another host is no link' => ['https://a/b@evil.com/x', null];
         yield 'script in an attribute' => ['javascript:alert(1)', null];
         yield 'a data url' => ['data:text/html;base64,PHNjcmlwdD4=', null];
         yield 'ssh, which a browser cannot open' => ['ssh://git@github.com/vendor/pkg.git', null];
@@ -126,6 +134,19 @@ final class RepositoryUrlTest extends TestCase
         yield 'what Composer 2.10 leaves of a token' => ['composer repo (https://glp***@repo.example.com)', 'composer repo (https://repo.example.com)'];
         yield 'a password with an @' => ['composer repo (https://ci:p@ss@repo.example.com)', 'composer repo (https://repo.example.com)'];
         yield 'an encoded login' => ['composer repo (https://ci%40corp:p%40ss@repo.example.com/sub)', 'composer repo (https://repo.example.com/sub)'];
+        yield 'an scp remote whose user holds a slash' => ['clone us.er/tok@github.com:o/r.git failed', 'clone github.com:o/r.git failed'];
+        yield 'an scp remote whose user is a login and a password with a slash' => ['clone user:p/w@github.com:o/r.git failed', 'clone github.com:o/r.git failed'];
+        yield 'a token with a raw slash' => ['fail https://deploy:1234/5678@gitlab.corp/a/b.git', 'fail https://(withheld: ambiguous host)'];
+        yield 'a path that reads as another host' => ['fail https://a/b@evil.com/x now', 'fail https://(withheld: ambiguous host) now'];
+        yield 'a token with a raw slash and a parenthesis' => ['fail https://deploy:1234/56)78@gitlab.corp/a/b now', 'fail https://(withheld: ambiguous host) now'];
+        yield 'a token with a raw slash and an apostrophe' => ["fail https://deploy:1234/56'78@gitlab.corp/a/b now", 'fail https://(withheld: ambiguous host) now'];
+        yield 'a host after a parenthesis and a later @ is still ambiguous' => ['fail https://github.com/a@evil.com)x@b now', 'fail https://(withheld: ambiguous host) now'];
+        yield 'a host after an apostrophe and a later @ is still ambiguous' => ["fail https://github.com/a@evil.com'x@b now", 'fail https://(withheld: ambiguous host) now'];
+        yield 'an scp remote whose user holds a scheme after a dash' => ['clone -https://tok@host:1/x failed', 'clone host:1/x failed'];
+        yield 'an scp remote whose password holds :// reads as a url and loses the password' => ['clone user:p://w@host:o/r failed', 'clone user:.../r failed'];
+        yield 'an @ and a colon in a url path are no scp remote' => ['see https://example.test/repo@v2:tag now', 'see https://example.test/repo@v2:tag now'];
+        yield 'an @ and a colon in a json-escaped url path are no scp remote' => ['see https:\\/\\/example.test\\/repo@v2:tag now', 'see https:\\/\\/example.test\\/repo@v2:tag now'];
+        yield 'an @ after the url is not userinfo' => ['see https://example.test/pkg and mail a@b', 'see https://example.test/pkg and mail a@b'];
         yield 'a token in the query' => ['composer repo (https://repo.example.com/?token=t0k3n)', 'composer repo (https://repo.example.com/)'];
         yield 'a quoted url' => [
             'The "http://ci-user:s3cr3t@127.0.0.1:8765/p2/acme/boom.json" file could not be downloaded (HTTP/1.1 500 Internal Server Error)',
@@ -174,12 +195,12 @@ final class RepositoryUrlTest extends TestCase
         yield "lockrot's own query" => ['invalid JSON from https://api.bitbucket.org/2.0/repositories/acme/lib/commits?pagelen=1', 'invalid JSON from https://api.bitbucket.org/2.0/repositories/acme/lib/commits'];
         yield 'an e-mail beside a url' => ['{"url":"https://host.example","email":"a@b.example"}', '{"url":"https://host.example","email":"a@b.example"}'];
         yield 'an @ in a path, and mailto' => ['see https://host.example/path@v2/x and mailto:me@x.example', 'see https://host.example/path@v2/x and mailto:me@x.example'];
-        yield 'an @ in a query with no path before it takes the host with it, and leaks nothing' => ['https://host.example?next=a@b', 'https://b'];
+        yield 'an @ after a query with no path before it is ambiguous, and leaks nothing' => ['https://host.example?next=a@b', 'https://(withheld: ambiguous host)'];
         yield 'a second url after a comma' => ['mirrors: https://u:p@h.example/p,https://q:r@h2.example/p', 'mirrors: https://h.example/p,https://h2.example/p'];
         yield 'a second url after a semicolon' => ['https://u:p@h.example/p;https://q:r@h2.example/p', 'https://h.example/p;https://h2.example/p'];
         yield 'a second url with nothing between' => ['https://a:b@h.example/phttps://c:d@h2.example/q', 'https://h.example/phttps://h2.example/q'];
-        yield 'a question mark in the password' => ['from https://igor:pw?x@repo.acme.test/p', 'from https://repo.acme.test/p'];
-        yield 'a hash in the password' => ['from https://igor:pw#x@repo.acme.test/p', 'from https://repo.acme.test/p'];
+        yield 'a question mark in the password is ambiguous' => ['from https://igor:pw?x@repo.acme.test/p', 'from https://(withheld: ambiguous host)'];
+        yield 'a hash in the password is ambiguous' => ['from https://igor:pw#x@repo.acme.test/p', 'from https://(withheld: ambiguous host)'];
         yield 'a url escaped for json' => ['{"url":"https:\\/\\/user:pw@h.example\\/p?token=t"}', '{"url":"https:\\/\\/h.example\\/p"}'];
         yield 'a scheme that starts like file' => ['from files://u:p@h.example/x', 'from files://h.example/x'];
         yield 'a url right after a local one' => ['file:///srv/a/b,https://u:p@h.example/x', 'file://.../b,https://h.example/x'];
@@ -285,5 +306,87 @@ final class RepositoryUrlTest extends TestCase
         }
         self::assertStringContainsString("Server says \u{FFFD}rror at https://repo.acme.test/p", RepositoryUrl::inText($phrase));
         self::assertStringEndsWith(str_repeat('a', 189)."\u{FFFD}", RepositoryUrl::inText($cut));
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function ambiguousHosts(): iterable
+    {
+        foreach ([
+            'https://a/b@evil.com/x',
+            'https://us.er/tok@github.com/o/r',
+            'https://first.last:pa/ss@git.corp/g/p.git',
+            'https://me@corp.com:pa/ss@git.corp/g/p',
+            'https://tok/en@gitlab-internal/g/p',
+            'https://ab@cd/ef@github.com/o/r',
+            'https://tok\\en@github.com/o/r',
+            'https://tok?en@github.com/o/r',
+            'https://us#er:pa?ss@github.com/o/r',
+            'https://a:b?c/d@github.com/o/r',
+            'https://deploy:1234/5678?x@gitlab.corp/a/b',
+            'https://deploy:1234/5678#x@gitlab.corp/a/b',
+        ] as $url) {
+            yield $url => [$url];
+        }
+    }
+
+    /**
+     * @dataProvider ambiguousHosts
+     */
+    #[DataProvider('ambiguousHosts')]
+    public function testAUrlWhoseHostIsAmbiguousIsWithheldEverywhere(string $url): void
+    {
+        self::assertSame('https://(withheld: ambiguous host)', RepositoryUrl::shown($url));
+        self::assertNull(RepositoryUrl::linkable($url));
+        self::assertSame('fail https://(withheld: ambiguous host) now', RepositoryUrl::inText('fail '.$url.' now'));
+    }
+
+    /**
+     * @dataProvider unambiguousPaths
+     */
+    #[DataProvider('unambiguousPaths')]
+    public function testAnAtSignInAPathStaysAPath(string $url): void
+    {
+        self::assertSame($url, RepositoryUrl::shown($url));
+        self::assertSame('fail '.$url.' now', RepositoryUrl::inText('fail '.$url.' now'));
+    }
+
+    /**
+     * @dataProvider atSignsInTheQuery
+     */
+    #[DataProvider('atSignsInTheQuery')]
+    public function testAnAtSignInTheQueryOfAClearHostKeepsTheHost(string $url, string $expected): void
+    {
+        self::assertSame($expected, RepositoryUrl::shown($url));
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function atSignsInTheQuery(): iterable
+    {
+        yield 'a dotted host' => ['https://gitlab.corp/a/b?x=a@b', 'https://gitlab.corp/a/b'];
+        yield 'a dotted host with a port' => ['https://gitlab.corp:8443/a/b#x@y', 'https://gitlab.corp:8443/a/b'];
+        yield 'userinfo before the path' => ['https://user:pw@host/p?x=a@b.com', 'https://host/p'];
+        yield 'no at sign' => ['https://deploy:1234/5678?x=1', 'https://deploy:1234/5678'];
+    }
+
+    /** The rule reads syntax, not intent: a host-like first label with a path `@` and a label without a dot is a path. */
+    public function testAHostLikeUrlWithAnAtSignInThePathIsAKnownLimitOfTheSyntaxRule(): void
+    {
+        self::assertSame('https://us.er/tok@gitlab-internal/g/p', RepositoryUrl::shown('https://us.er/tok@gitlab-internal/g/p'));
+    }
+
+    public function testAScopedNpmTarballUrlIsKept(): void
+    {
+        $url = 'https://registry.npmjs.org/@babel/core/-/core-7.0.0.tgz';
+
+        self::assertSame($url, RepositoryUrl::shown($url));
+        self::assertSame($url, RepositoryUrl::linkable($url));
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function unambiguousPaths(): iterable
+    {
+        yield 'npm scope' => ['https://registry.npmjs.org/@babel/core/-/core-7.0.0.tgz'];
+        yield 'a tag' => ['https://github.com/o/r@v2'];
+        yield 'a tilde user' => ['https://example.test/~user@home/pkg'];
     }
 }

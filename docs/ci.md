@@ -116,12 +116,14 @@ Do not match `^lockrot:` to tell these cases apart.
 - A value the configuration rejects: in `extra.lockrot`, in an environment variable, or on the
   command line ([configuration.md](configuration.md#extralockrot-keys)). That includes two values
   of one kind in `--fail-on`, `none` beside another value, and `vulnerable-low`.
+- A `config.platform.php` that Composer accepts but that is not a version, such as `dev-main`, when
+  no `target-php` source is set. The message names `config.platform.php`.
 - A command line lockrot cannot read: an unknown option, an option without its value, a value given
   to a flag, an argument too many. lockrot checks it before it reads any file.
-- In the PHAR and `vendor/bin/lockrot`, an unknown command or a `--working-dir` that does not
-  exist. An option value after a space before the command name is an unknown command:
-  `lockrot.phar --output json:r.json` stops at `There are no commands defined in the "json"
-  namespace`. Join the value with `=`: `--output=json:r.json`.
+- In the PHAR and `vendor/somework/lockrot/bin/lockrot`, an unknown command or a `--working-dir`
+  that does not exist. An option value after a space before the command name is an unknown
+  command: `lockrot.phar --output json:r.json` stops at `There are no commands defined in the
+  "json" namespace`. Join the value with `=`: `--output=json:r.json`.
 - `--fail-on`, `--baseline` or `--target-php` given twice, also with the same value
   ([configuration.md](configuration.md#cli-options)).
 - A baseline lockrot cannot read, a baseline-1 file included, and a baseline of another score model
@@ -158,7 +160,7 @@ Other exit paths:
 ### When exit `1` does not come from lockrot {#exit-1-not-from-lockrot}
 
 In plugin mode, Composer can stop before lockrot runs, with its own exit `1`. The PHAR and
-`vendor/bin/lockrot` exit `2` for these usage errors:
+`vendor/somework/lockrot/bin/lockrot` exit `2` for these usage errors:
 
 | Symptom | Cause | Fix |
 |---|---|---|

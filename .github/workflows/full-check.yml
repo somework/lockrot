@@ -39,6 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
       - uses: ./.github/actions/mutation-coverage
   mutation:
     needs: [subset, mutation-coverage]
@@ -67,7 +68,7 @@ jobs:
       # The release rehearsal diffs the commit against main: it needs the history down to the merge base.
       - if: contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with: {fetch-depth: 0}
+        with: {fetch-depth: 0, persist-credentials: false}
       - if: contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)
         uses: ./.github/actions/mutation-shard
         with: {filter: '${{ matrix.shard.filter }}', min-msi: '${{ matrix.shard.min_msi }}', full: 'true'}

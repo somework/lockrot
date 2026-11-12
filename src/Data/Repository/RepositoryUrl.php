@@ -17,6 +17,9 @@ final class RepositoryUrl
     /** A byte outside every well-formed UTF-8 sequence (RFC 3629): the valid sequences are skipped. */
     private const INVALID_UTF8 = '{(?:[\x00-\x7F]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})(*SKIP)(*FAIL)|[\x80-\xFF]}';
 
+    /** What a report quotes in place of a URL whose host is ambiguous, see {@see hasAmbiguousHost()}. */
+    public const AMBIGUOUS = '(withheld: ambiguous host)';
+
     /** What a report quotes in place of a message PCRE could not finish reading. */
     public const WITHHELD = '(withheld: lockrot could not redact this message)';
 
@@ -26,8 +29,8 @@ final class RepositoryUrl
     /** Where a path on the machine starts in a text, at a word, a quote or a bracket: Unix, home, drive or share. */
     private const PATH = '{(?<=^|[\s"\'`(\[\{<=,|:])(?:/(?=[^\s/])|~/|[A-Za-z]:[\\\\/]|\\\\\\\\(?=[^\s\\\\]))}';
 
-    /** The user of an scp-style remote in a text, `user@host:path`, which can be a token. */
-    private const REMOTE_USER = '{(?<=^|[\s"\'`(\[\{<=,|])[^\s@/\\\\"\'<>`()\[\]\{\}:=,|]+@(?=[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?:(?!//)\S)}';
+    /** The user of an scp-style remote in a text, `user@host:path`: the word up to the last such `@`, which can be a token with a `/` or `:`. */
+    private const REMOTE_USER = '{(?<=^|[\s"\'`(\[\{<=,|])(?![A-Za-z][A-Za-z0-9+.\-]*:(?://|\\\\/\\\\/))[^\s"\'<>`()\[\]\{\}=,|]+@(?=[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?:(?!//)\S)}';
 
     /** What closes what an opening character delimits. PHP quotes a path as `` `path' ``. */
     private const CLOSERS = ['"' => '"', "'" => "'", '`' => "'", '(' => ')', '[' => ']', '{' => '}', '<' => '>'];
@@ -38,8 +41,14 @@ final class RepositoryUrl
      */
     private const CLOSING = '{["\')\]\}>](?=[\s:;,.!)\]\}>"\']|$)|[\r\n]}';
 
+    /** A host, a bracketed IPv6 address, or either with a numeric port. */
+    private const HOST_WITH_PORT = '{^(?:[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?|\[[0-9A-Fa-f:.]+\])(?::[0-9]*)?$}D';
+
     /** What ends a URL's authority: its path, or a JSON-escaped one, whitespace, a quote, an angle bracket. */
     private const AUTHORITY_END = "/\\\"<> \t\r\n\v\f";
+
+    /** What ends the text that the ambiguity check reads: a password can hold a raw `'` or `)`. */
+    private const TOKEN_END = "\"<>` \t\r\n\v\f";
 
     /** What ends a URL, and a word of a local URL no quote delimits. */
     private const URL_END = "\"'<>`) \t\r\n\v\f";
@@ -57,17 +66,19 @@ final class RepositoryUrl
     /** A home directory itself, whose name is the account's: `/Users/alice`, `/home/alice`, `C:\Users\alice`, `~`. */
     private const HOME = '{(?:^|[\\\\/])(?:Users|home)[\\\\/][^\\\\/]+$|^~$}i';
 
-    /** A remote without a scheme: an scp-style `[user@]host:path`, or a Perforce `[ssl:]host:port`. */
-    private const REMOTE = '{^(?:(?<user>[^@\s/\\\\:]+)@)?(?<remote>(?:(?:ssl|tcp)[46]?:)?(?<host>[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?):(?!//)[^\s\\\\].*)$}';
+    /**
+     * A remote without a scheme: an scp-style `[user@]host:path`, or a Perforce `[ssl:]host:port`.
+     * The user runs to the last `@` before a host, as in {@see REMOTE_USER}: a token can hold a `:`.
+     */
+    private const REMOTE = '{^(?:(?<user>[^\s"\'<>`()\[\]\{\}=,|]+)@)?(?<remote>(?:(?:ssl|tcp)[46]?:)?(?<host>[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?):(?!//)[^\s\\\\].*)$}';
 
     /**
      * The repository as a report can print it. A URL loses its userinfo, query and fragment
      * (`https://user:token@host/path?x=1` reads `https://host/path`), and a remote loses its user.
-     * A path or a `file://` URL reads by its last segment (`.../lib`). Null for anything else.
-     * Redact the URL, do not drop it: the host is what a reader checks.
-     *
-     * The userinfo runs to the last `@` before the path, since a hand-written password can hold `?`
-     * and `#`.
+     * A URL whose host is ambiguous reads `<scheme>://`{@see AMBIGUOUS}. A path or a `file://` URL
+     * reads by its last segment (`.../lib`). Null for anything else. Redact the URL, do not drop it:
+     * the host is what a reader checks. The userinfo runs to the last `@` before the path, since a
+     * hand-written password can hold `?` and `#`.
      */
     public static function shown(?string $url): ?string
     {
@@ -75,13 +86,44 @@ final class RepositoryUrl
             return $url;
         }
         if (preg_match('{^(?<scheme>[A-Za-z][A-Za-z0-9+.-]*://)(?:[^/]*@)?(?<rest>[^?#]*)}', $url, $m) === 1) {
-            return strcasecmp($m['scheme'], 'file://') === 0 ? self::local(substr($url, 7)) : $m['scheme'].$m['rest'];
+            if (strcasecmp($m['scheme'], 'file://') === 0) {
+                return self::local(substr($url, 7));
+            }
+
+            return $m['scheme'].(self::hasAmbiguousHost(substr($url, \strlen($m['scheme']))) ? self::AMBIGUOUS : $m['rest']);
         }
         if (preg_match(self::REMOTE, $url, $m) === 1 && ($m['user'] !== '' || strpos($m['host'], '.') !== false)) {
             return $m['remote'];
         }
 
         return self::isLocalPath($url) ? self::local($url) : null;
+    }
+
+    /**
+     * Whether the text after `://` can name two hosts: RFC 3986 ends the authority at the first `/`,
+     * and a token pasted with a raw `/` or `\\` puts an `@` after it. Ambiguous when an `@` follows
+     * the first separator and the text before it is not a host with an optional numeric port, has
+     * no `.`, or a label after an `@` past the separator has one. Also when a `?` or `#` before the
+     * separator, or after a separator that ends no dotted host, has an `@` after it. A report
+     * withholds such a URL: it shows neither the userinfo nor either reading as the host.
+     */
+    public static function hasAmbiguousHost(string $afterScheme): bool
+    {
+        $separator = strcspn($afterScheme, '/\\');
+        $query = strcspn($afterScheme, '?#');
+        // A client ends the authority at `?` or `#`, so a userinfo that holds one hides the host.
+        if ($query < $separator) {
+            return strpos($afterScheme, '@', $query) !== false;
+        }
+        $pre = substr($afterScheme, 0, $query);
+        $first = substr($pre, 0, $separator);
+        $isHost = preg_match(self::HOST_WITH_PORT, $first) === 1 && strpos($first, '.') !== false;
+        if (strpos($pre, '@', $separator) === false) {
+            // A password with a raw `/` and then a `?` or `#` puts its `@` in the query.
+            return !$isHost && strpos($first, '@') === false && strpos($afterScheme, '@', $query) !== false;
+        }
+
+        return !$isHost || preg_match('{@[^/\\\\]*\.}', $pre) === 1;
     }
 
     /** Whether a repository or dist URL is a path on the machine, or a `file://` URL. */
@@ -179,6 +221,12 @@ final class RepositoryUrl
         $authority = substr($text, $start, strcspn($text, self::AUTHORITY_END, $start));
         $userinfo = strrpos($authority, '@');
         $host = $userinfo === false ? $start : $start + $userinfo + 1;
+        $whole = self::trimmed($text, $start, $start + strcspn($text, self::TOKEN_END, $start, $limit - $start));
+        if (self::hasAmbiguousHost(substr($text, $start, $whole - $start))) {
+            $end = $whole;
+
+            return [$scheme.self::AMBIGUOUS, $end];
+        }
         $end = self::trimmed($text, $host, $host + strcspn($text, self::URL_END, $host, $limit - $host));
         $kept = substr($text, $host, $end - $host);
 

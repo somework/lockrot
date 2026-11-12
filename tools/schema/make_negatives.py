@@ -881,6 +881,10 @@ def _(d): d['gate']['failing_packages'][1] = d['gate']['failing_packages'][0]
 def _(d): del d['gate']['standing']['none']
 @case('38a-standing-known-without-baseline', 'composite', '(root)')
 def _(d): d['gate']['standing']['known'] = 1
+@case('c73-push-undated-without-the-skip', 'push-undated-dagger', 'findings[0]')
+def _(d): d['findings'][0]['checks_skipped'] = []
+@case('c73-push-skip-beside-a-dated-push', 'composite', 'findings[%d]' % DEBUG)
+def _(d): d['findings'][DEBUG]['checks_skipped'].append(dict(check='repository_push', reason='undated', blocks=['S4']))
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)

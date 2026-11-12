@@ -392,6 +392,34 @@ final class ServiceFactoryTest extends TestCase
         );
     }
 
+    public function testARefusalMessageCannotHoldAWorkflowCommand(): void
+    {
+        $config = self::bitbucketConfig();
+        $io = new BufferIO('', OutputInterface::VERBOSITY_VERBOSE);
+        $io->setAuthentication('bitbucket.org', 'key', 'secret');
+
+        self::assertFalse(ServiceFactory::bitbucketAuthorizer($io, $config, Deadline::never(), static function (): HttpDownloader {
+            throw new \RuntimeException('refused ##[error]forged');
+        })());
+
+        self::assertStringContainsString('##\\x5Berror]forged', $io->getOutput());
+        self::assertStringNotContainsString('##[', $io->getOutput());
+    }
+
+    public function testARefusalMessageWithALineFeedStaysOnOneLine(): void
+    {
+        $config = self::bitbucketConfig();
+        $io = new BufferIO('', OutputInterface::VERBOSITY_VERBOSE);
+        $io->setAuthentication('bitbucket.org', 'key', 'secret');
+
+        self::assertFalse(ServiceFactory::bitbucketAuthorizer($io, $config, Deadline::never(), static function (): HttpDownloader {
+            throw new \RuntimeException("refused\n##[error]forged");
+        })());
+
+        self::assertStringContainsString('refused\\n##\\x5Berror]forged', $io->getOutput());
+        self::assertSame(1, substr_count(rtrim($io->getOutput(), "\n"), "\n") + 1, $io->getOutput());
+    }
+
     /** At the default verbosity the failure is silent: an install prints the compact block, not Composer plumbing. */
     public function testARefusedBitbucketExchangeStaysQuietBelowVerbose(): void
     {

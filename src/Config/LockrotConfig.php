@@ -289,6 +289,9 @@ final class LockrotConfig
         if ($source === RunSettings::SOURCE_OPTION && !self::isTargetPhpValue($target)) {
             throw new ConfigException(\sprintf(self::TARGET_PHP_VALUE, '--target-php', $target));
         }
+        if ($source === RunSettings::SOURCE_PLATFORM && !self::looksLikePhpVersion($target)) {
+            throw new ConfigException('config.platform.php must look like "8.4"; got "'.$platformPhp.'"');
+        }
         self::refuseNoVersion($target);
         if ($source === RunSettings::SOURCE_OPTION) {
             self::refuseUnknownMinor('--target-php', $target);

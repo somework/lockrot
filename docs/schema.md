@@ -654,6 +654,9 @@ lockrot redacts what it quotes:
 
 - A URL loses its userinfo, query and fragment, whatever Composer masked of it.
 
+- A URL whose host is unclear is `https://(withheld: ambiguous host)`, with no link and no
+  repository host. An example is a userinfo that holds a raw `/`, `?` or `#`.
+
 - A repository without a scheme loses its user (`git.example.com:lib.git`).
 
 - A `file://` URL and every other path of the machine keep their last segment alone (`.../ca.pem`),

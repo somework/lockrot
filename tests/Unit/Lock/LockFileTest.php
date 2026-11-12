@@ -8,6 +8,7 @@ use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
 use Composer\Package\CompletePackage;
 use Composer\Package\Loader\ArrayLoader;
+use Composer\Util\ErrorHandler;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
@@ -492,7 +493,30 @@ final class LockFileTest extends TestCase
         yield 'alias without package' => [['packages' => [$entry], 'aliases' => [['version' => '1.0.0', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases must hold objects with the string package'];
         yield 'a broken alias before a whole one' => [['packages' => [$entry], 'aliases' => ['a/b', ['package' => 'a/b', 'version' => '1.0.0', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']]], 'alt.lock: aliases must hold objects with the string package'];
         yield 'number as name' => [['packages' => [['name' => 5, 'version' => '1.0.0']]], 'alt.lock entry #0 in packages cannot be loaded: "name" must be a string'];
-        yield 'number as type' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'type' => 5]]], 'alt.lock entry #0 in packages cannot be loaded: '];
+        yield 'number as type' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'type' => 5]]], 'alt.lock entry #0 in packages cannot be loaded: "type" must be a string'];
+        yield 'number as source url' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 5, 'reference' => 7]]]], 'alt.lock entry #0 in packages cannot be loaded: "source.url" must be a string'];
+        yield 'number as dist url' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'dist' => ['type' => 'zip', 'url' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "dist.url" must be a string'];
+        yield 'number as notification url' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'notification-url' => 5]]], 'alt.lock entry #0 in packages cannot be loaded: "notification-url" must be a string'];
+        yield 'number in bin' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'bin' => [5]]]], 'alt.lock entry #0 in packages cannot be loaded: "bin" must be a string or a list of strings'];
+        yield 'autoload as a string' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'autoload' => 'x']]], 'alt.lock entry #0 in packages cannot be loaded: "autoload" must be a JSON object'];
+        yield 'php-ext as a string' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'php-ext' => 'x']]], 'alt.lock entry #0 in packages cannot be loaded: "php-ext" must be a JSON object'];
+        yield 'include-path as a string' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'include-path' => 'x']]], 'alt.lock entry #0 in packages cannot be loaded: "include-path" must be a list'];
+        yield 'suggest value a number' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'suggest' => ['x/y' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "suggest" must map names to strings'];
+        yield 'source mirrors as a string' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'u', 'reference' => 'r', 'mirrors' => 'x']]]], 'alt.lock entry #0 in packages cannot be loaded: "source.mirrors" must be a list'];
+        yield 'dist mirrors as a string' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'dist' => ['type' => 'zip', 'url' => 'u', 'mirrors' => 'x']]]], 'alt.lock entry #0 in packages cannot be loaded: "dist.mirrors" must be a list'];
+        yield 'archive name a number' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'archive' => ['name' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "archive.name" must be a string'];
+        yield 'archive exclude a string' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'archive' => ['exclude' => 'x']]]], 'alt.lock entry #0 in packages cannot be loaded: "archive.exclude" must be a list'];
+        yield 'number in bin beside a shape that the loader reads' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'bin' => [5], 'archive' => ['exclude' => ''], 'autoload' => ['x'], 'source' => ['type' => 'git', 'url' => 'u', 'reference' => 'r', 'mirrors' => ['k' => 'v']]]]], 'alt.lock entry #0 in packages cannot be loaded: "bin" must be a string or a list of strings'];
+        yield 'number in suggest beside a null keyword' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'keywords' => [null], 'suggest' => ['x/y' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "suggest" must map names to strings'];
+        yield 'number in suggest beside keywords that are a string' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'keywords' => 'x', 'suggest' => ['x/y' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "suggest" must map names to strings'];
+        yield 'number in suggest beside a bin that is a string' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'bin' => 'x', 'suggest' => ['x/y' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "suggest" must map names to strings'];
+        yield 'number in suggest beside a bin that is a list of strings' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'bin' => ['x'], 'suggest' => ['x/y' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "suggest" must map names to strings'];
+        yield 'number as bin' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'bin' => 5]]], 'alt.lock entry #0 in packages cannot be loaded: "bin" must be a string or a list of strings'];
+        yield 'number as dist shasum beside a number as dist reference' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'dist' => ['type' => 'zip', 'url' => 'u', 'reference' => 7, 'shasum' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "dist.shasum" must be a string'];
+        yield 'number as dist url beside a false notification url' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'notification-url' => false, 'dist' => ['type' => 'zip', 'url' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "dist.url" must be a string'];
+        yield 'number as bin beside a false archive name' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'archive' => ['name' => false], 'bin' => 5]]], 'alt.lock entry #0 in packages cannot be loaded: "bin" must be a string or a list of strings'];
+        yield 'source without a url beside a list in keywords' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'source' => ['type' => 'git', 'reference' => 'r'], 'keywords' => [['k']]]]], "alt.lock entry #0 in packages cannot be loaded: Package a/b's source key should be specified"];
+        yield 'number as type beside a source that is a string' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'type' => 5, 'source' => 'x']]], 'alt.lock entry #0 in packages cannot be loaded: "type" must be a string'];
         yield 'name in both sections' => [['packages' => [$entry], 'packages-dev' => [['name' => 'a/b', 'version' => '2.0.0']]], 'alt.lock lists a/b twice: entry #0 in packages and entry #0 in packages-dev'];
         yield 'name twice ignoring case' => [['packages' => [['name' => 'other/x', 'version' => '1.0.0'], $entry, ['name' => 'A/B', 'version' => '1.0.0']]], 'alt.lock lists a/b twice: entry #1 in packages and entry #2 in packages'];
         yield 'invalid name twice' => [['packages' => [['name' => '--x', 'version' => '1.0.0'], ['name' => '--x', 'version' => '1.0.0']]], 'alt.lock lists --x twice: entry #0 in packages and entry #1 in packages'];
@@ -516,6 +540,78 @@ final class LockFileTest extends TestCase
 
         self::assertNotNull($thrown, 'the lock loads');
         self::assertStringStartsWith($message, $thrown->getMessage());
+    }
+
+    public function testAWronglyTypedFieldNamesTheFieldAndNeverQuotesPhp(): void
+    {
+        $lock = ['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 5, 'reference' => 7]]]];
+
+        try {
+            LockFile::fromArray($lock, 'alt.lock');
+            self::fail('the lock loads');
+        } catch (ConfigException $e) {
+            self::assertStringNotContainsString('Argument', $e->getMessage());
+            self::assertStringNotContainsString('vendor', $e->getMessage());
+            self::assertStringNotContainsString('.php', $e->getMessage());
+        }
+    }
+
+    /**
+     * @dataProvider listsInKeywords
+     *
+     * @param array<string, mixed> $fields
+     */
+    #[DataProvider('listsInKeywords')]
+    public function testAListInKeywordsIsRefusedWhenComposerTurnsTheWarningIntoAnError(array $fields): void
+    {
+        $lock = ['packages' => [['name' => 'a/b', 'version' => '1.0.0'] + $fields]];
+
+        ErrorHandler::register();
+        try {
+            LockFile::fromArray($lock, 'alt.lock');
+            self::fail('the lock loads');
+        } catch (ConfigException $e) {
+            self::assertSame('alt.lock entry #0 in packages cannot be loaded: "keywords" must be a list of strings', $e->getMessage());
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    /** @return iterable<string, array{array<string, mixed>}> */
+    public static function listsInKeywords(): iterable
+    {
+        yield 'keywords alone' => [['keywords' => [['k']]]];
+        // The loader skips a link field that is not an array, so only keywords can have failed.
+        yield 'keywords after a string require' => [['require' => 'x', 'keywords' => [[1]]]];
+    }
+
+    /**
+     * The field check names the cause of a loader failure only. A lock that Composer's loader reads
+     * stays readable, whatever shape its optional fields have.
+     *
+     * @dataProvider loadableShapes
+     *
+     * @param array<string, mixed> $fields
+     */
+    #[DataProvider('loadableShapes')]
+    public function testAnEntryThatTheLoaderReadsIsNotRefusedForAFieldShape(array $fields): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => 'a/b', 'version' => '1.0.0'] + $fields]], 'alt.lock');
+
+        self::assertNotNull($lock->find('a/b'));
+    }
+
+    /** @return iterable<string, array{array<string, mixed>}> */
+    public static function loadableShapes(): iterable
+    {
+        yield 'empty archive exclude false' => [['archive' => ['exclude' => false]]];
+        yield 'empty archive exclude string' => [['archive' => ['exclude' => '']]];
+        yield 'archive exclude zero string' => [['archive' => ['exclude' => '0']]];
+        yield 'list-shaped autoload' => [['autoload' => ['x']]];
+        yield 'list-shaped php-ext' => [['php-ext' => ['x']]];
+        yield 'map-shaped include-path' => [['include-path' => ['a' => 'x']]];
+        yield 'keywords with null' => [['keywords' => [null]]];
+        yield 'a top-level key that looks like a dotted field' => [['source.url' => 5, 'dist.type' => []]];
     }
 
     public function testAFileLockIsNamedByItsFileNameUnlessACallerNamesIt(): void

@@ -220,6 +220,15 @@ final class RepoLocatorTest extends TestCase
         yield 'another host without a path' => ['https://codeberg.org', $unsupported, 'codeberg.org', null, null];
         yield 'a GitLab web route' => ['https://gitlab.com/g/p/-/tree/main', $none, 'gitlab.com', null, null];
         yield 'a prefix mismatch' => ['https://gitlab.example.com:8443/other/g/p.git', $none, 'gitlab.example.com:8443', null, null];
+        yield 'a userinfo with a raw slash names no host' => ['https://tok/en@github.com/o/r', $none, null, null, null];
+        yield 'a user and a port-like password with a raw slash name no host' => ['https://deploy:1234/5678@gitlab.corp/g/p.git', $none, null, null, null];
+        foreach (['https://us.er/tok@github.com/o/r', 'https://first.last:pa/ss@git.corp/g/p.git', 'https://me@corp.com:pa/ss@git.corp/g/p', 'https://tok/en@gitlab-internal/g/p', 'https://ab@cd/ef@github.com/o/r', 'https://tok\\en@github.com/o/r', 'https://tok?en@github.com/o/r', 'https://us#er:pa?ss@github.com/o/r', 'https://a:b?c/d@github.com/o/r'] as $ambiguous) {
+            yield 'an ambiguous host names no host: '.$ambiguous => [$ambiguous, $none, null, null, null];
+        }
+        yield 'a path that reads as another host names no host' => ['https://a/b@evil.com/x', $none, null, null, null];
+        yield 'an @ in the path of a host is no userinfo' => ['https://gitlab.corp/g/p@v2/x', $none, 'gitlab.corp', null, null];
+        yield 'an @ in the path of a host with a one-letter label is no userinfo' => ['https://x.org/o@v2/r', $unsupported, 'x.org', null, null];
+        yield 'a second :// in the path does not hide a host after it' => ['https://codeberg.org/o/r://x@evil.com/', $none, null, null, null];
         yield 'an unparsable URL' => ['not a url', $none, null, null, null];
         yield 'a file URL' => ['file:///srv/mirrors/repo.git', $none, null, null, null];
         yield 'null' => [null, $none, null, null, null];

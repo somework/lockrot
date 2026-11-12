@@ -257,6 +257,9 @@ final class LockrotCommand extends BaseCommand
             }
             // The lock that Composer reads: alt.lock beside COMPOSER=alt.json.
             $lockPath = Factory::getLockFile($composerFile);
+            if (file_exists($lockPath) && !is_file($lockPath)) {
+                throw new ConfigException(basename($lockPath).' exists and is not a regular file');
+            }
             if (!is_file($lockPath)) {
                 // Unlike `composer`, lockrot never walks up to a parent project (the PHAR hides the
                 // manifest from Composer's preamble, see bin/lockrot), so say where it looked.
