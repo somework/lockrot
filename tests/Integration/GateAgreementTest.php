@@ -44,7 +44,9 @@ use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
@@ -54,14 +56,17 @@ use PHPUnit\Framework\TestCase;
  * together, and the annotation level that the machine formats print.
  *
  * It covers nothing: Infection skips a mutant whose covering tests together outlast its timeout, and
- * this sweep pushes every line of the gate past it. GateTest and ReportTest kill those mutants.
+ * this sweep pushes every line of the gate past it. GateTest and ReportTest kill those mutants. The
+ * group schema-sweep gives this class to the schema-sweep process of ci.yml.
  *
  * @coversNothing
  *
  * @group covers-nothing
+ * @group schema-sweep
  */
 #[CoversNothing]
 #[Group('covers-nothing')]
+#[Group('schema-sweep')]
 final class GateAgreementTest extends TestCase
 {
     use ValidatesJsonSchemas;
@@ -77,6 +82,34 @@ final class GateAgreementTest extends TestCase
 
     private int $checks = 0;
 
+    public function testTheRowsAreEveryFixtureLock(): void
+    {
+        $dirs = ['mini', 'mini-split'];
+        foreach (['apps/', 'skeletons/'] as $group) {
+            foreach (scandir(self::FIXTURES.$group) ?: [] as $entry) {
+                if ($entry[0] !== '.' && is_file(self::FIXTURES.$group.$entry.'/composer.lock')) {
+                    $dirs[] = $group.$entry;
+                }
+            }
+        }
+        sort($dirs);
+
+        self::assertSame($dirs, array_keys(iterator_to_array(self::fixtureLocks())));
+    }
+
+    public function testTheRowsHoldAtLeastTwentyFixtureLocks(): void
+    {
+        self::assertGreaterThanOrEqual(20, \count(iterator_to_array(self::fixtureLocks())), 'the fixture locks');
+    }
+
+    /** @return iterable<string, array{string}> every fixture lock, by its directory below tests/fixtures */
+    public static function fixtureLocks(): iterable
+    {
+        foreach (self::dirs() as $dir) {
+            yield $dir => [$dir];
+        }
+    }
+
     /**
      * Every fixture lock served at once, as BranchFloorAgreementTest serves them, in a process of
      * its own: that much metadata fills Composer's static caches, which stay for every later test of
@@ -88,34 +121,44 @@ final class GateAgreementTest extends TestCase
      *
      * @runInSeparateProcess
      *
+     * @preserveGlobalState disabled
+     *
+     * @dataProvider fixtureLocks
+     *
      * @group runtime-php
      */
     #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[DataProvider('fixtureLocks')]
     #[Group('runtime-php')]
-    public function testEveryDocumentsGateAgreesWithTheExitCodeAndTheAnnotationLevels(): void
+    public function testTheLocksGateAgreesWithTheExitCodeAndTheAnnotationLevels(string $dir): void
     {
-        $dirs = ['mini', 'mini-split'];
-        foreach (['apps', 'skeletons'] as $group) {
-            foreach ((array) glob(self::FIXTURES.$group.'/*/composer.lock') as $lock) {
-                $dirs[] = $group.'/'.basename(\dirname((string) $lock));
-            }
-        }
-        sort($dirs);
-        self::assertGreaterThanOrEqual(20, \count($dirs), 'the fixture locks');
-        $server = FixtureRepositoryServer::fromLockFiles(array_map(static fn (string $dir): string => self::FIXTURES.$dir.'/composer.lock', $dirs));
-        $server->start();
+        $server = self::server();
         try {
-            $loader = new MemoisingMetadataLoader(new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::NOW)));
-            foreach ($dirs as $dir) {
-                $this->agree($this->analyse($loader, $dir), $dir);
-            }
+            $this->agree($this->analyse(self::loader($server), $dir), $dir);
         } finally {
             $server->stop();
         }
 
         self::assertGreaterThan(0, $this->checks);
         self::assertSame([], \array_slice($this->mismatches, 0, 20), \sprintf('%d of %d checks disagree', \count($this->mismatches), $this->checks));
-        foreach ([
+    }
+
+    /**
+     * It stops when the set is complete, because the rows already analyse every lock.
+     *
+     * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
+     *
+     * @group runtime-php
+     */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[Group('runtime-php')]
+    public function testTheFixturesGiveEveryShapeThatTheAgreementReads(): void
+    {
+        $shapes = [
             'finding {"reaches_fail_on":true,"fails":true,"exempt_by":null}',
             'finding {"reaches_fail_on":true,"fails":false,"exempt_by":"baseline"}',
             'finding {"reaches_fail_on":true,"fails":false,"exempt_by":null}',
@@ -125,9 +168,24 @@ final class GateAgreementTest extends TestCase
             'tripped_by ["strict_network"]',
             'tripped_by ["fail_on"]',
             'tripped_by ["strict_network","fail_on"]',
-        ] as $shape) {
+        ];
+        $server = self::server();
+        try {
+            $loader = self::loader($server);
+            foreach (self::dirs() as $dir) {
+                $this->agree($this->analyse($loader, $dir), $dir);
+                if (array_diff($shapes, array_keys($this->seen)) === []) {
+                    break;
+                }
+            }
+        } finally {
+            $server->stop();
+        }
+
+        foreach ($shapes as $shape) {
             self::assertArrayHasKey($shape, $this->seen, 'the fixtures give '.$shape.', or the agreement proves little');
         }
+        self::assertSame([], \array_slice($this->mismatches, 0, 20), \sprintf('%d of %d checks disagree', \count($this->mismatches), $this->checks));
     }
 
     /**
@@ -135,8 +193,11 @@ final class GateAgreementTest extends TestCase
      * format writes the run-level record at `error` beside the failing findings' records.
      *
      * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
      */
     #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function testAnOfflineRunFailsUncheckedWithARunLevelErrorRecord(): void
     {
         $server = FixtureRepositoryServer::fromLockFiles([self::FIXTURES.'mini/composer.lock']);
@@ -424,6 +485,34 @@ final class GateAgreementTest extends TestCase
         }
 
         return new Report($report->findings(), $notes, $report->generatedAt(), $report->packagesChecked(), $report->notFromComposerRepository(), null, $report->activityCacheOldestAt(), $report->includesDev());
+    }
+
+    /** @return list<string> */
+    private static function dirs(): array
+    {
+        $dirs = ['mini', 'mini-split'];
+        foreach (['apps', 'skeletons'] as $group) {
+            foreach ((array) glob(self::FIXTURES.$group.'/*/composer.lock') as $lock) {
+                $dirs[] = $group.'/'.basename(\dirname((string) $lock));
+            }
+        }
+        sort($dirs);
+
+        return $dirs;
+    }
+
+    /** Every fixture lock served at once, whichever lock a test analyses, so each analysis reads the same metadata. */
+    private static function server(): FixtureRepositoryServer
+    {
+        $server = FixtureRepositoryServer::fromLockFiles(array_map(static fn (string $dir): string => self::FIXTURES.$dir.'/composer.lock', self::dirs()));
+        $server->start();
+
+        return $server;
+    }
+
+    private static function loader(FixtureRepositoryServer $server): MetadataLoaderInterface
+    {
+        return new MemoisingMetadataLoader(new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::NOW)));
     }
 
     private function analyse(MetadataLoaderInterface $loader, string $dir, ?AdvisoryLoaderInterface $advisories = null): Report

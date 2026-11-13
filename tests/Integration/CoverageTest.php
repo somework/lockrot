@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Integration;
 use Lockrot\Json\Schemas;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
@@ -96,26 +97,51 @@ final class CoverageTest extends TestCase
         self::assertSame([], array_keys($stale), 'an allowed value that a document carries, or that no schema lists at that pointer: delete its allow entry');
     }
 
+    public function testTheRowsAreEveryExplainBaselineAndConfigDocument(): void
+    {
+        $paths = [];
+        foreach (['explain', 'baseline', 'config'] as $directory) {
+            $files = array_filter(array_merge(glob(self::DOCUMENTS.$directory.'/*') ?: [], glob(self::DOCUMENTS.$directory.'/*/*') ?: []), 'is_file');
+            foreach ($files as $path) {
+                $paths[] = substr($path, \strlen(self::DOCUMENTS));
+            }
+        }
+        sort($paths);
+        $rows = array_keys(iterator_to_array(self::explainBaselineAndConfigDocuments()));
+        sort($rows);
+
+        self::assertSame($paths, $rows);
+    }
+
+    /** @return iterable<string, array{string, string}> the schema and the path of each document, by its path below the documents */
+    public static function explainBaselineAndConfigDocuments(): iterable
+    {
+        foreach ([Schemas::EXPLAIN, Schemas::BASELINE, Schemas::CONFIG] as $name) {
+            foreach (self::SETS[$name] as $pattern) {
+                foreach (glob(self::DOCUMENTS.$pattern) ?: [] as $path) {
+                    yield substr($path, \strlen(self::DOCUMENTS)) => [$name, $path];
+                }
+            }
+        }
+    }
+
     /**
      * The explain-2, baseline-2 and config-2 documents are valid as published, and the baseline-2
      * and config-2 ones against the strict twin unless the name ends in `.open.json`. SchemaRelationsTest
      * validates the report-2 cases. Each corpus-scale report takes seconds to validate, so the model's
      * suite validates those (provenance.json) and this suite reads them for coverage only.
+     *
+     * @dataProvider explainBaselineAndConfigDocuments
      */
-    public function testTheExplainBaselineAndConfigDocumentsAreValid(): void
+    #[DataProvider('explainBaselineAndConfigDocuments')]
+    public function testTheExplainBaselineOrConfigDocumentIsValid(string $name, string $path): void
     {
         $invalid = [];
-        foreach ([Schemas::EXPLAIN, Schemas::BASELINE, Schemas::CONFIG] as $name) {
-            foreach (self::SETS[$name] as $pattern) {
-                foreach (glob(self::DOCUMENTS.$pattern) ?: [] as $path) {
-                    $json = (string) file_get_contents($path);
-                    $strict = $name !== Schemas::EXPLAIN && substr($path, -10) !== '.open.json';
-                    foreach ($strict ? [false, true] : [false] as $twin) {
-                        foreach ($this->errors($name, $json, $twin, 2) as $error) {
-                            $invalid[] = basename($path).($twin ? ' (strict)' : '').' '.$error;
-                        }
-                    }
-                }
+        $json = (string) file_get_contents($path);
+        $strict = $name !== Schemas::EXPLAIN && substr($path, -10) !== '.open.json';
+        foreach ($strict ? [false, true] : [false] as $twin) {
+            foreach ($this->errors($name, $json, $twin, 2) as $error) {
+                $invalid[] = basename($path).($twin ? ' (strict)' : '').' '.$error;
             }
         }
 
