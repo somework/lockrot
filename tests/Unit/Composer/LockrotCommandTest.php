@@ -343,6 +343,29 @@ final class LockrotCommandTest extends TestCase
     }
 
     /**
+     * Keep this test first in the class. A mutant that drops the given factory builds the production
+     * analyzer, which reads the network, and the later tests then each run a full analysis before one
+     * fails. An explanation of a name that the lock does not hold stops before the analysis.
+     */
+    public function testTheCommandBuildsItsAnalyzerWithTheFactoryThatItIsGiven(): void
+    {
+        chdir(__DIR__.'/../../fixtures/apps/wallabag_wallabag');
+        $calls = 0;
+        $loader = $this->emptyLoader();
+        $factory = static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock) use ($loader, &$calls): Analyzer {
+            ++$calls;
+
+            return self::testAnalyzer($loader, $lockrot, $clock);
+        };
+        $tester = new SplitStreamTester($this->buildCommand($factory));
+
+        $code = $tester->execute(['--explain' => 'nobody/nothing', '--target-php' => '8.4']);
+
+        self::assertSame(2, $code);
+        self::assertSame(1, $calls);
+    }
+
+    /**
      * `--help` is where a person looks for the list, so the option's description must name every
      * format that the config accepts.
      */
