@@ -630,6 +630,18 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame([$first => $failure, $second => $failure], self::summarize($results));
     }
 
+    public function testWithOneSlotEachRedirectToAUrlWithUserInfoFails(): void
+    {
+        $first = 'https://api.github.com/repos/vendor/one';
+        $second = 'https://api.github.com/repos/vendor/two';
+        [$client] = self::clientWith([$first => 'https://x:y@objects.example.com/one', $second => 'https://x@objects.example.com/two'], null, 1);
+
+        $results = $client->fetchAll([$first, $second], self::HEADERS);
+
+        $failure = [0, null, 'redirect to a URL with a user name or a password'];
+        self::assertSame([$first => $failure, $second => $failure], self::summarize($results));
+    }
+
     /**
      * Composer's downloader stores the user info of a URL that it adds as the credential of that URL's
      * origin, so a redirect target with user info would replace the user's token for the whole run.

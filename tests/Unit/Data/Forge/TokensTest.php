@@ -206,6 +206,14 @@ final class TokensTest extends TestCase
         self::assertSame(['GITHUB_TOKEN' => $expected], Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => $issuer], null)->withheld());
     }
 
+    public function testAPathWithOneLeadingSlashIsNotShownAsASchemeRelativeHost(): void
+    {
+        $withheld = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => '/ghe.corp'], null)->withheld();
+
+        self::assertSame(['GITHUB_TOKEN'], array_keys($withheld));
+        self::assertStringStartsNotWith('//', $withheld['GITHUB_TOKEN']);
+    }
+
     /** @return iterable<string, array{string, string}> */
     public static function issuersWithWhitespaceOrNoScheme(): iterable
     {

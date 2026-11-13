@@ -175,6 +175,26 @@ final class ProjectConfigTest extends TestCase
         self::assertNull(self::outOfSync($manifest, ['content-hash' => Locker::getContentHash((string) json_encode($manifest))], ['psr/log']));
     }
 
+    public function testACopyWithTheManifestOfAReadFileComparesTheLockWithThatFileAndLeavesTheOriginal(): void
+    {
+        $dir = sys_get_temp_dir().'/lockrot-manifest-'.bin2hex(random_bytes(4));
+        mkdir($dir);
+        $file = $dir.'/composer.json';
+        file_put_contents($file, (string) json_encode(['require' => ['psr/log' => '^3.0']]));
+        try {
+            $read = ProjectConfig::fromFile($file);
+        } finally {
+            unlink($file);
+            rmdir($dir);
+        }
+        $original = ProjectConfig::fromArray(['require' => ['psr/log' => '^3.0']]);
+        $stale = LockFile::fromArray(['content-hash' => 'deadbeef', 'packages' => [['name' => 'psr/log', 'version' => '3.0.0']]]);
+
+        $copy = $original->withManifestOf($read);
+
+        self::assertSame([[], null], [$copy->lockOutOfSync($stale, false), $original->lockOutOfSync($stale, false)]);
+    }
+
     public function testALockOnlyRunGivesNoNote(): void
     {
         self::assertNull(self::outOfSync(['require' => ['psr/log' => '^3.0']], ['content-hash' => 'deadbeef'], [], false, false));

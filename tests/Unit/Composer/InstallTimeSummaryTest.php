@@ -1244,6 +1244,16 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertSame([['foo/foo' => BasePackage::STABILITY_DEV], ['foo/foo' => 'abc']], [$written->getStabilityFlags(), $written->getReferences()]);
     }
 
+    public function testARequireLinkKeepsTheFlagAndTheReferenceOfItsConstraint(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['foo/foo' => 'dev-main#abc']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+
+        $written = InstallTimeSummary::rootAsWritten($root);
+
+        self::assertSame([['foo/foo' => BasePackage::STABILITY_DEV], ['foo/foo' => 'abc']], [$written->getStabilityFlags(), $written->getReferences()]);
+    }
+
     /**
      * `composer require phpzip/phpzip --dry-run` adds the requirement to the root in memory and
      * writes no composer.json. The block reads the manifest that the command would write, so it
