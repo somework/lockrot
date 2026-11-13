@@ -323,9 +323,7 @@ final class JsonSchemaConformanceTest extends TestCase
     }
 
     /**
-     * The per-signal `data` branches are only tested if every signal occurs in the fixtures. S9
-     * needs Composer's advisory API, which the 2.2 LTS does not have. On that LTS the run carries no
-     * advisory and the S9 branch of the schema goes untested.
+     * The per-signal `data` branches are only tested if every signal occurs in the fixtures.
      */
     public function testTheFixturesExerciseEverySignal(): void
     {
