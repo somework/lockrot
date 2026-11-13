@@ -19,6 +19,7 @@ use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\Loader\RootPackageLoader;
 use Composer\Package\Locker;
+use Composer\Package\RootAliasPackage;
 use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryFactory;
@@ -1298,6 +1299,34 @@ final class InstallTimeSummaryTest extends TestCase
 
         self::assertSame(['acme/sib' => 'self.version', 'phpzip/phpzip' => '2.0.8', 'new/pkg' => '^1.0'], $written->constraints(ProjectConfig::REQUIRE));
         self::assertSame([ProjectConfig::REQUIRE => 'Acme/Sib'], $written->listedIn('acme/sib'));
+    }
+
+    /** A root with a branch alias gives its links with the alias version in place of `self.version`. */
+    public function testTheManifestAsWrittenKeepsSelfVersionUnderABranchAlias(): void
+    {
+        $dir = $this->tempDir('lockrot-install-time-');
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/app', 'require' => ['acme/sib' => 'self.version']]));
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => 'dev-main', 'require' => ['acme/sib' => 'self.version']], RootPackage::class);
+        self::assertInstanceOf(RootPackage::class, $root);
+        $aliased = new RootAliasPackage($root, '2.9999999.9999999.9999999-dev', '2.x-dev');
+
+        $written = InstallTimeSummary::withRootRequirements(ProjectConfig::fromFile($dir.'/composer.json'), $dir.'/composer.json', $aliased);
+
+        self::assertSame(['acme/sib' => 'self.version'], $written->constraints(ProjectConfig::REQUIRE));
+    }
+
+    /** Composer's ArrayLoader keeps the last of two keys that differ only in case. */
+    public function testTheManifestAsWrittenKeepsTheLastSpellingOfADuplicateKey(): void
+    {
+        $dir = $this->tempDir('lockrot-install-time-');
+        $require = ['Vendor/A' => '^1.0', 'vendor/a' => '^2.0'];
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/app', 'require' => $require]));
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => $require], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+
+        $written = InstallTimeSummary::withRootRequirements(ProjectConfig::fromFile($dir.'/composer.json'), $dir.'/composer.json', $root);
+
+        self::assertSame([[ProjectConfig::REQUIRE => 'vendor/a'], ['vendor/a' => '^2.0']], [$written->listedIn('vendor/a'), $written->constraints(ProjectConfig::REQUIRE)]);
     }
 
     /** A dry run whose root holds the manifest's links reads composer.json as written, its lock hash included. */

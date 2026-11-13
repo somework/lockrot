@@ -10,6 +10,7 @@ use Composer\Installer\InstallerEvent;
 use Composer\IO\IOInterface;
 use Composer\Package\Link;
 use Composer\Package\Loader\RootPackageLoader;
+use Composer\Package\RootAliasPackage;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryInterface;
 use Lockrot\Analyzer\Analyzer;
@@ -221,12 +222,18 @@ final class InstallTimeSummary
     public static function withRootRequirements(ProjectConfig $project, string $composerFile, RootPackageInterface $root): ProjectConfig
     {
         $json = JsonReader::readObject($composerFile);
-        foreach ([ProjectConfig::REQUIRE => $root->getRequires(), ProjectConfig::REQUIRE_DEV => $root->getDevRequires()] as $section => $links) {
+        $own = self::withOwnLinks($root);
+        foreach ([ProjectConfig::REQUIRE => $own->getRequires(), ProjectConfig::REQUIRE_DEV => $own->getDevRequires()] as $section => $links) {
             $listed = \is_array($json[$section] ?? null) ? $json[$section] : [];
+            // Composer's ArrayLoader keeps the last of two keys that differ only in case.
+            $spelling = [];
+            foreach ($listed as $name => $constraint) {
+                $spelling[strtolower((string) $name)] = $name;
+            }
             $written = [];
             foreach ($listed as $name => $constraint) {
                 $link = $links[strtolower((string) $name)] ?? null;
-                if ($link !== null) {
+                if ($link !== null && $spelling[strtolower((string) $name)] === $name) {
                     $written[$name] = $link->getPrettyConstraint();
                     unset($links[strtolower((string) $name)]);
                 }
@@ -238,6 +245,12 @@ final class InstallTimeSummary
         }
 
         return ProjectConfig::fromArray($json)->withManifestOf($project);
+    }
+
+    /** A root with a branch alias gives its links with the alias version in place of `self.version`. */
+    private static function withOwnLinks(RootPackageInterface $root): RootPackageInterface
+    {
+        return $root instanceof RootAliasPackage ? $root->getAliasOf() : $root;
     }
 
     /**
