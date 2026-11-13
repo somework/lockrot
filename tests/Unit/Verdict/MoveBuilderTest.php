@@ -162,6 +162,17 @@ final class MoveBuilderTest extends TestCase
         self::assertSame([[], '2.0+x|calc'], [$move->commands(), $move->unsafeArgument()]);
     }
 
+    /** A step that the argument rule leaves out still quotes its values, so a pipe in them names the move's unsafe argument. */
+    public function testAConstraintWithAPipeInAStepThatTheArgumentRuleLeavesOutIsTheUnsafeArgument(): void
+    {
+        [$row, $context] = self::checkedOn(self::factsOf([['2.0.0', '2026-01-01', '>=7.4']]), ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]]);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0+x|y;calc'), [], null, $context);
+
+        self::assertSame([[], '2.0+x|y;calc'], [$move->commands(), $move->unsafeArgument()]);
+    }
+
     /** Under `config.lock` false the move has no command for that reason, so the unsafe clause does not apply. */
     public function testAMoveUnderALockThatComposerIgnoresGetsNoUnsafeArgument(): void
     {

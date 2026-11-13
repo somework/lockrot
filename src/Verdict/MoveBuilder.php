@@ -118,7 +118,9 @@ final class MoveBuilder
         }
         $s2 = $finding->signalData(NoReleaseData::class);
 
-        $commands = self::runnable(self::commands($kind, $subject, $constraint, $phpCheck, $latest, $version, $check, $checks, array_column($movesWith, 'package')));
+        $drafted = self::commands($kind, $subject, $constraint, $phpCheck, $latest, $version, $check, $checks, array_column($movesWith, 'package'));
+        // Each step before the last writes composer.json with `--no-update`, so a move prints every step or none.
+        $commands = self::runnable(array_merge(self::runnable($drafted[0]) === $drafted[0] ? $drafted[0] : [], $drafted[1]));
         $move = (new Move(
             $kind,
             $draft->source(),
@@ -144,14 +146,15 @@ final class MoveBuilder
             $commands,
             $subject
         ))->withCheck($check)->withMovesWith($movesWith);
-        $unsafe = self::unsafeArgument($commands, [$version, $constraint === null ? null : ltrim($constraint, '^'), $latest === null ? null : $latest->version()]);
+        $unsafe = self::unsafeArgument(array_merge(...$drafted), [$version, $constraint === null ? null : ltrim($constraint, '^'), $latest === null ? null : $latest->version()]);
 
         return $unsafe === null ? $move : $move->withUnsafeArgument($unsafe);
     }
 
     /**
      * The version, constraint or tag that a step quotes, when it holds a character that a Windows
-     * shell runs or redirects. A value that no step quotes does not count.
+     * shell runs or redirects. A step that the argument rule leaves out counts, and a value that no
+     * step quotes does not.
      *
      * @param list<list<string>> $commands
      * @param list<?string>      $values
@@ -429,21 +432,20 @@ final class MoveBuilder
      *
      * @param list<string> $holders the holders that the joint request moves
      *
-     * @return list<list<string>>
+     * @return array{list<list<string>>, list<list<string>>} the steps, then the `why-not` step, before the argument rule
      */
     private static function commands(string $kind, MoveSubject $subject, ?string $constraint, ?PhpCheck $phpCheck, ?Latest $latest, ?string $version, ?MoveCheck $check, ?MoveChecks $checks, array $holders): array
     {
         // A move with no release read has its own reason, and Composer refuses its step under config.lock false all the same.
         if (($check !== null && $check->reason() === MoveCheck::LOCK_DISABLED) || ($checks !== null && $checks->checker()->baseline()->check()->reason() === MoveCheck::LOCK_DISABLED)) {
-            return [];
+            return [[], []];
         }
         $whyNot = \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true) && $version !== null && ($check === null || !$check->isResolved())
             ? [['composer', 'why-not', $subject->package(), $version, '--locked']]
             : [];
         $steps = $check !== null && $check->isRefused() ? [] : self::steps($kind, $subject, $constraint, $phpCheck, $latest, $version, $check, $checks, $holders);
 
-        // Each step before the last writes composer.json with `--no-update`, so a move prints every step or none.
-        return array_merge(self::runnable($steps) === $steps ? $steps : [], $whyNot);
+        return [$steps, $whyNot];
     }
 
     /**
