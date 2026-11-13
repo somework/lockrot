@@ -17,8 +17,10 @@ use Composer\IO\IOInterface;
 use Composer\Json\JsonFile;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
+use Composer\Package\Loader\RootPackageLoader;
 use Composer\Package\Locker;
 use Composer\Package\RootPackage;
+use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryFactory;
 use Composer\Repository\RepositoryInterface;
 use Composer\Util\Loop;
@@ -43,11 +45,14 @@ use Lockrot\Exception\InstallBlockedException;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
+use Lockrot\Solver\MoveCheck;
+use Lockrot\Solver\MoveCheckers;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\ColdConfigSchema;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\HermeticComposerConfig;
 use Lockrot\Tests\Support\MarkupRefusingFormatter;
+use Lockrot\Tests\Support\RecordingComposerRepository;
 use Lockrot\Tests\Support\RecordingIO;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\ScoreModel;
@@ -1173,6 +1178,45 @@ final class InstallTimeSummaryTest extends TestCase
         $output = $io->getOutput();
         self::assertStringContainsString('lockrot: 1 of 1 changed package flagged', $output, $output);
         self::assertStringContainsString('note: lock: lockrot skips 1 entry whose name is no Composer package name', $output, $output);
+    }
+
+    /**
+     * `composer update foo/foo:dev-main#abc` gives the root a stability flag and a reference that
+     * composer.json does not hold. A later `composer update bar/bar` reloads composer.json, and
+     * Composer refuses it: the locked foo/foo dev-main is below the minimum stability.
+     */
+    public function testTheMoveCheckSolvesWithoutTheInlineFlagsOfAnUpdate(): void
+    {
+        $loader = new ArrayLoader();
+        $root = $loader->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['foo/foo' => '*', 'bar/bar' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $inline = ['foo/foo' => 'dev-main#abc'];
+        $root->setStabilityFlags(RootPackageLoader::extractStabilityFlags($inline, $root->getMinimumStability(), $root->getStabilityFlags()));
+        $root->setReferences(RootPackageLoader::extractReferences($inline, $root->getReferences()));
+        $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
+        $lock = LockFile::fromArray(['packages' => [['name' => 'foo/foo', 'version' => 'dev-main'] + $packagist, ['name' => 'bar/bar', 'version' => '1.0.0'] + $packagist]]);
+        $remote = [$loader->load(['name' => 'foo/foo', 'version' => 'dev-main']), $loader->load(['name' => 'bar/bar', 'version' => '1.0.0']), $loader->load(['name' => 'bar/bar', 'version' => '1.1.0'])];
+
+        $written = InstallTimeSummary::rootAsWritten($root);
+        $baseline = MoveCheckers::forProject($written, $lock, ProjectConfig::empty(), new Config(false), [new RecordingComposerRepository($remote)], '8.4', false, Deadline::never())->baseline()->check();
+
+        self::assertSame(MoveCheck::REFUSED, $baseline->result());
+        self::assertSame([[], []], [$written->getStabilityFlags(), $written->getReferences()]);
+        self::assertSame([['foo/foo' => BasePackage::STABILITY_DEV], ['foo/foo' => 'abc']], [$root->getStabilityFlags(), $root->getReferences()], 'the running command keeps its root');
+    }
+
+    /**
+     * `composer require foo/foo:dev-main#abc --dry-run` puts the link in the root and in no file.
+     * The flag and the reference come from that link, as the written composer.json gives them.
+     */
+    public function testARootLinkKeepsTheFlagAndTheReferenceOfItsConstraint(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require-dev' => ['foo/foo' => 'dev-main#abc']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+
+        $written = InstallTimeSummary::rootAsWritten($root);
+
+        self::assertSame([['foo/foo' => BasePackage::STABILITY_DEV], ['foo/foo' => 'abc']], [$written->getStabilityFlags(), $written->getReferences()]);
     }
 
     public function testInstallTimeBudgetComesFromConfig(): void

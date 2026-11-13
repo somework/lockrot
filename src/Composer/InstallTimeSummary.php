@@ -8,6 +8,9 @@ use Composer\Config;
 use Composer\Factory;
 use Composer\Installer\InstallerEvent;
 use Composer\IO\IOInterface;
+use Composer\Package\Link;
+use Composer\Package\Loader\RootPackageLoader;
+use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryInterface;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
@@ -145,7 +148,8 @@ final class InstallTimeSummary
         $repositories = array_values($composer->getRepositoryManager()->getRepositories());
 
         // The check counts against the same budget: a move that it reaches too late is not checked.
-        $checks = static fn (): MoveChecks => MoveChecks::of(MoveCheckers::forProject($composer->getPackage(), $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), $deadline, $lockrot->advisoryLookup()));
+        $root = self::rootAsWritten($composer->getPackage());
+        $checks = static fn (): MoveChecks => MoveChecks::of(MoveCheckers::forProject($root, $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), $deadline, $lockrot->advisoryLookup()));
         $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $event->getIO(), $config, $repositories, $project, $lockrot, $env, $deadline, $checks, $lock->platform()['php'] ?? null);
 
         $report = $analyzer->analyzePackages($packages, $lock, $project, $includeDev);
@@ -180,6 +184,27 @@ final class InstallTimeSummary
         if ($lockrot->installTimeStrict() && $event->isExecutingOperations() && $gate !== null && $run !== null && $gate->fails()) {
             throw new InstallBlockedException('lockrot: install-time-strict stopped the install; '.RunGateText::render($gate, $run).'; run composer lockrot for details');
         }
+    }
+
+    /**
+     * A copy of the root whose stability flags and references come from its own links, as
+     * RootPackageLoader::load() reads them from composer.json. `composer update name:constraint`
+     * and `--with` add both to the running root only, and a later command does not have them.
+     */
+    public static function rootAsWritten(RootPackageInterface $root): RootPackageInterface
+    {
+        $written = clone $root;
+        $flags = [];
+        $references = [];
+        foreach ([$root->getRequires(), $root->getDevRequires()] as $links) {
+            $constraints = array_map(static fn (Link $link): string => $link->getConstraint()->getPrettyString(), $links);
+            $flags = RootPackageLoader::extractStabilityFlags($constraints, $root->getMinimumStability(), $flags);
+            $references = RootPackageLoader::extractReferences($constraints, $references);
+        }
+        $written->setStabilityFlags($flags);
+        $written->setReferences($references);
+
+        return $written;
     }
 
     /**
