@@ -213,8 +213,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   by hand. ([Command argument unsafe](docs/notes.md#command_argument_unsafe))
 - **CLI:** a repository host's redirect to another origin no longer receives lockrot's
   `Authorization` or `PRIVATE-TOKEN` header. lockrot asks the redirect target again without it. A
-  redirect to a URL that is not http or https, or that has no host, is a failed request, so a
-  `file://` redirect reads no local file. ([Which credentials](docs/internals.md#which-credentials))
+  redirect to a URL that is not http or https, has no host, or holds a user name or a password is
+  a failed request. So a `file://` redirect reads no local file, and a redirect cannot replace
+  Composer's credentials for a host. ([Which credentials](docs/internals.md#which-credentials))
 - **table, github, markdown:** a control character from the lock or a repository prints as an
   escape (`\x1B`), also in `--explain`, in the error lines on stderr, as in the install-time
   summary. So does a character that prints as nothing, such as a zero-width space (`\u{200B}`). A
@@ -755,9 +756,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **sarif, gitlab:** a lock entry written as `"name" : "a/b"` gets its line number.
 - **CLI:** a run exits `2` with a message that names `config.platform.php` when that value is a
   branch name, such as `dev-master`. ([Exit codes](docs/ci.md#exit-codes))
-- **CLI:** a run exits `2` with a message that names the `composer.lock` field when the field has
-  the wrong type, or when a link map such as `require` holds a numeric package name. The message
-  holds no PHP error text and no absolute path.
+- **CLI:** a `composer.lock` field with the wrong type, or a link map such as `require` that holds a
+  numeric package name, exits `2`. The message names the field and the package, and holds no PHP
+  error text and no absolute path.
 - **CLI:** a run exits `2` with a message that names composer.json and the field when a link map
   such as `require` in composer.json holds a numeric package name. The message holds no PHP error
   text and no absolute path.
