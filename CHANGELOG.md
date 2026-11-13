@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a shared commit, does not make the project behind. An installed version that is the highest
   stable tag, or a pre-release above it, is 0 behind, also when its own date is untrusted
   (`shared_commit`, `undated`). ([Libyears](docs/verdicts.md#libyears))
+- **All formats:** a date version such as `20200101` belongs to no branch, so it does not end
+  libyears while a stable tag on a branch exists. If no stable tag is on a branch, the highest
+  stable tag ends libyears. ([Libyears](docs/verdicts.md#libyears))
 - **Breaking:** **All formats:** S6 and the `has_stable_release` and `last_stable_*` fields read
   stable tags only. A tag with build metadata counts, a pre-release does not. S2 still reads
   pre-releases. A snapshot with pre-release tags only moves to the newest one, and its line says
@@ -595,6 +598,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   acts as `--offline`, as in Composer. An uncached package reads `unavailable` (`offline`), not
   `not_found`, and the `--strict-network` exit code can change either way. Action: unset the
   variable for an online run. ([Options](docs/configuration.md#cli-options))
+- **All formats:** a package with a date version among its tags, such as `20200101`, no longer
+  stops the run with a TypeError and exit `2`. ([Libyears](docs/verdicts.md#libyears))
 - **table, markdown:** the footer reads `Run lockrot with --format=json for details.`, because the
   standalone PHAR has no `composer lockrot` command.
 - **json, html, sarif, gitlab, `--explain`:** invalid UTF-8 in a transport or repository message no
