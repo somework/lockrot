@@ -36,6 +36,7 @@ use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
@@ -92,9 +93,12 @@ final class RunNoteAgreementTest extends TestCase
     /**
      * @runInSeparateProcess
      *
+     * @preserveGlobalState disabled
+     *
      * @dataProvider fixtureLocks
      */
     #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     #[DataProvider('fixtureLocks')]
     public function testEveryRunOfTheLockAgreesWithItsDocumentAndItsFindings(string $dir): void
     {
@@ -112,8 +116,11 @@ final class RunNoteAgreementTest extends TestCase
      * The runs stop at the first lock after which every code was given.
      *
      * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
      */
     #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function testTheFixturesGiveEveryCodeThatTheAgreementReads(): void
     {
         $codes = [RunNote::OFFLINE, RunNote::METADATA_UNAVAILABLE, RunNote::ADVISORIES_NOT_CHECKED, RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED, RunNote::REPOSITORY_ACTIVITY_ANONYMOUS_CAP, RunNote::REPOSITORY_ACTIVITY_UNREACHABLE, RunNote::NOT_FROM_COMPOSER_REPOSITORY];

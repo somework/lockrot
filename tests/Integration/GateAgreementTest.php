@@ -46,6 +46,7 @@ use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
@@ -113,11 +114,14 @@ final class GateAgreementTest extends TestCase
      *
      * @runInSeparateProcess
      *
+     * @preserveGlobalState disabled
+     *
      * @dataProvider fixtureLocks
      *
      * @group runtime-php
      */
     #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     #[DataProvider('fixtureLocks')]
     #[Group('runtime-php')]
     public function testTheLocksGateAgreesWithTheExitCodeAndTheAnnotationLevels(string $dir): void
@@ -138,9 +142,12 @@ final class GateAgreementTest extends TestCase
      *
      * @runInSeparateProcess
      *
+     * @preserveGlobalState disabled
+     *
      * @group runtime-php
      */
     #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     #[Group('runtime-php')]
     public function testTheFixturesGiveEveryShapeThatTheAgreementReads(): void
     {
@@ -178,8 +185,11 @@ final class GateAgreementTest extends TestCase
      * format writes the run-level record at `error` beside the failing findings' records.
      *
      * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
      */
     #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function testAnOfflineRunFailsUncheckedWithARunLevelErrorRecord(): void
     {
         $server = FixtureRepositoryServer::fromLockFiles([self::FIXTURES.'mini/composer.lock']);

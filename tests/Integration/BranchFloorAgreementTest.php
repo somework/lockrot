@@ -33,6 +33,7 @@ use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
@@ -99,9 +100,12 @@ final class BranchFloorAgreementTest extends TestCase
      *
      * @runInSeparateProcess
      *
+     * @preserveGlobalState disabled
+     *
      * @dataProvider fixtureLocks
      */
     #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     #[DataProvider('fixtureLocks')]
     public function testEveryBranchRowOfTheLockAgreesWithS8(string $dir): void
     {
@@ -117,8 +121,11 @@ final class BranchFloorAgreementTest extends TestCase
      * The sweep stops at the first lock after which every floor_source and every side was given.
      *
      * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
      */
     #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function testTheFixturesGiveEveryFloorSourceAndEverySide(): void
     {
         $sides = ['project needs_newer', 'project stops_before', 'target needs_newer', 'target stops_before'];
@@ -146,8 +153,11 @@ final class BranchFloorAgreementTest extends TestCase
      * Rows answering both ways went through the schema, not only rows with nothing to say.
      *
      * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
      */
     #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function testWallabagsRowsWithinReachAndHeldBackValidate(): void
     {
         $server = self::server();
