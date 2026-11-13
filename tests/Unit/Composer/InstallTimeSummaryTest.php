@@ -55,6 +55,7 @@ use Lockrot\Tests\Support\MarkupRefusingFormatter;
 use Lockrot\Tests\Support\RecordingComposerRepository;
 use Lockrot\Tests\Support\RecordingIO;
 use Lockrot\Verdict\FailOn;
+use Lockrot\Verdict\MoveChecks;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
@@ -1222,18 +1223,11 @@ final class InstallTimeSummaryTest extends TestCase
         $io = new BufferIO();
         $event = $this->event($io, new Transaction([], [$loader->load(['name' => 'bar/bar', 'version' => '1.0.0'])]), true, false, null, $root);
         $event->getComposer()->getRepositoryManager()->addRepository(new RecordingComposerRepository([$loader->load(['name' => 'foo/foo', 'version' => 'dev-main']), $loader->load(['name' => 'bar/bar', 'version' => '1.0.0']), $loader->load(['name' => 'bar/bar', 'version' => '1.1.0'])]));
-        $checks = null;
-        $factory = $this->analyzerFactory();
-        $capturing = static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline, ?string $requirePhp, ?\Closure $moveChecks) use ($factory, &$checks): Analyzer {
-            $checks = $moveChecks;
 
-            return $factory($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline);
-        };
+        (new InstallTimeSummary(\Closure::fromCallable([$this, 'moveChecksRecordingAnalyzerFactory']), static fn (): float => 0.0))->onPreOperationsExec($event);
 
-        (new InstallTimeSummary($capturing, static fn (): float => 0.0))->onPreOperationsExec($event);
-
-        self::assertInstanceOf(\Closure::class, $checks, $io->getOutput());
-        self::assertSame(MoveCheck::REFUSED, $checks()->checker()->baseline()->check()->result());
+        self::assertNotNull($this->moveChecksAtHandOver, $io->getOutput());
+        self::assertSame(MoveCheck::REFUSED, ($this->moveChecksAtHandOver)()->checker()->baseline()->check()->result());
     }
 
     /**
@@ -1345,6 +1339,9 @@ final class InstallTimeSummaryTest extends TestCase
     /** @var list<string> the target minor of each LockrotConfig that reaches the factory */
     private array $targetsAtHandOver = [];
 
+    /** @var (\Closure(): MoveChecks)|null */
+    private ?\Closure $moveChecksAtHandOver = null;
+
     /** The seconds the deadline has left when the factory gets it, read before the analysis runs. */
     private function remainingAtHandOver(InstallerEvent $event): ?float
     {
@@ -1352,6 +1349,17 @@ final class InstallTimeSummaryTest extends TestCase
         (new InstallTimeSummary(\Closure::fromCallable([$this, 'recordingAnalyzerFactory']), $monotonicNow))->onPreOperationsExec($event);
 
         return $this->remainingAtHandOver;
+    }
+
+    /**
+     * @param list<RepositoryInterface>     $repositories
+     * @param (\Closure(): MoveChecks)|null $moveChecks
+     */
+    private function moveChecksRecordingAnalyzerFactory(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline, ?string $requirePhp, ?\Closure $moveChecks): Analyzer
+    {
+        $this->moveChecksAtHandOver = $moveChecks;
+
+        return ($this->analyzerFactory())($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline);
     }
 
     /** @param list<RepositoryInterface> $repositories */
