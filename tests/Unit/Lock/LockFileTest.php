@@ -581,6 +581,39 @@ final class LockFileTest extends TestCase
         }
     }
 
+    /**
+     * JSON decoding turns a link map whose keys are 0 … n into a list. Composer's loader refuses a
+     * list with a notice, which Composer's error handler turns into an error.
+     *
+     * @dataProvider linkMapsThatDecodeToAList
+     *
+     * @param array<int, string> $links
+     */
+    #[DataProvider('linkMapsThatDecodeToAList')]
+    public function testALinkMapWhoseKeysStartAtZeroNamesTheFieldAndTheKey(string $field, array $links): void
+    {
+        $lock = ['packages' => [['name' => 'a/b', 'version' => '1.0.0', $field => $links]]];
+
+        ErrorHandler::register();
+        try {
+            LockFile::fromArray($lock, 'alt.lock');
+            self::fail('the lock loads');
+        } catch (ConfigException $e) {
+            self::assertSame('alt.lock entry #0 in packages cannot be loaded: "'.$field.'" of a/b has the key 0, which is no package name', $e->getMessage());
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    /** @return iterable<string, array{string, array<int, string>}> */
+    public static function linkMapsThatDecodeToAList(): iterable
+    {
+        foreach (['require', 'require-dev', 'conflict', 'provide', 'replace'] as $field) {
+            yield 'the key 0 alone in '.$field => [$field, ['0' => '^1']];
+            yield 'the keys 0 and 1 in '.$field => [$field, ['^1', '^2']];
+        }
+    }
+
     /** @return iterable<string, array{array<string, mixed>}> */
     public static function numberKeys(): iterable
     {

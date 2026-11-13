@@ -174,8 +174,15 @@ final class LockFile
         }
         // Composer's loader takes the name as given: a number reads as a name on one Composer and
         // is a TypeError on another.
-        if (isset($entry['name']) && !\is_string($entry['name'])) {
+        $name = $entry['name'] ?? null;
+        if ($name !== null && !\is_string($name)) {
             throw new ConfigException($refusal.'"name" must be a string');
+        }
+        // The loader refuses an entry without a name, and it fails on a number link key with a message about its own API.
+        if ($name !== null) {
+            foreach (['require', 'require-dev', 'conflict', 'provide', 'replace'] as $field) {
+                self::refuseNumberLinkKeys($entry[$field] ?? null, $field, $name, $refusal);
+            }
         }
         try {
             $loaded = $loader->load($entry);
@@ -187,9 +194,6 @@ final class LockFile
             }
             // The message of a TypeError quotes a PHP function and a path of the install.
             throw new ConfigException($refusal.($e instanceof \TypeError ? 'a field has the wrong type' : $e->getMessage()), 0, $e);
-        }
-        foreach (['require', 'require-dev', 'conflict', 'provide', 'replace'] as $field) {
-            self::refuseNumberLinkKeys($entry[$field] ?? null, $field, $loaded->getPrettyName(), $refusal);
         }
         // A package that declares `extra.branch-alias`, or is a `default-branch`, loads as an
         // alias package. Unwrap it, so that the entry's own version, require and source fields
@@ -211,7 +215,8 @@ final class LockFile
     /**
      * JSON decoding turns a numeric key into an integer, and Composer's loader keeps it as the key
      * of a link that it reads: a link with a string constraint. A typed method then fails on that
-     * key with a TypeError, whose message quotes a PHP function and a path.
+     * key with a TypeError, whose message quotes a PHP function and a path. A map whose keys are
+     * 0 … n decodes to a list, and the loader refuses a list with a notice about its own API.
      *
      * @param mixed $links the entry's link map of $field
      *
