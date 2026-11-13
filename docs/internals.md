@@ -179,6 +179,10 @@ composer config --global gitlab-token.git.drupalcode.org <token>
 - Without a token, lockrot asks the host for the newest commit only. The answer carries no archived
   flag, so S3 cannot fire, and each such finding carries the skip
   `{check: repository_archived, reason: no_token}`.
+- lockrot asks a GitLab host over https only, also for an `http://` clone URL with Composer's
+  `secure-http` set to `false`. A host that serves its API only over http gives S10 `fetch_failed`
+  and the [Unreachable](notes.md#repository_activity_unreachable) note for each of its packages.
+  Accept its gap with [`accept-unchecked`](configuration.md#accept-unchecked).
 - A Forgejo or Gitea host is not GitLab: `gitlab-domains` cannot make it askable, and Composer's
   `forgejo-domains` does not either. Accept its gap with
   [`accept-unchecked`](configuration.md#accept-unchecked).
