@@ -87,7 +87,7 @@ class MutationOptionsTest(unittest.TestCase):
                     self.assertEqual(1, len(owners), owners)
 
     def test_the_files_of_one_src_directory_share_one_min_msi(self):
-        # A shard cut from another keeps its min_msi, so a split never lowers the floor of a file.
+        # A shard that lists single files cannot give one directory two floors.
         shards = SHARD.findall(read('.github', 'workflows', 'ci.yml'))
         self.assertNotEqual([], shards)
         floors = {}

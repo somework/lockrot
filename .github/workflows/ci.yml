@@ -534,7 +534,7 @@ jobs:
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest
       # The PHAR validates extra.lockrot and the baseline with the justinrainbow/json-schema of
       # build/phar/composer.lock, which the tests rows do not install. This job keeps Xdebug loaded
-      # for PharTest, which checks the archive's restart without it, so this step turns Xdebug off.
+      # for PharTest, which checks the archive's restart without it, so this step disables Xdebug.
       # The test that SPLIT names validates the whole contract bundle, so it runs in a second
       # process beside the rest of the class. Measurements: https://github.com/somework/lockrot/pull/211
       - name: The schema fixtures validate with the PHAR's justinrainbow/json-schema

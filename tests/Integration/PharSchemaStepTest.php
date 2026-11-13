@@ -9,10 +9,9 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The phar job of ci.yml validates the schema fixtures with the justinrainbow/json-schema of the
- * PHAR. Xdebug stays loaded in that job, because PharTest checks the archive's restart without it.
- * So the schema step turns Xdebug off. Its two processes split JsonSchemaConformanceTest with one
- * pattern, so each test of the class runs in exactly one process.
+ * The schema step of the phar job in ci.yml validates the fixtures with the justinrainbow/json-schema
+ * of the PHAR. Its two processes split JsonSchemaConformanceTest with one pattern, so each test of
+ * the class runs in exactly one process, and a failure in either process fails the step.
  *
  * @coversNothing
  *
@@ -25,8 +24,26 @@ final class PharSchemaStepTest extends TestCase
     private const CI = __DIR__.'/../../.github/workflows/ci.yml';
     private const STEP = "The schema fixtures validate with the PHAR's justinrainbow/json-schema";
 
+    public function testBothProcessesLoadTheValidatorOfThePhar(): void
+    {
+        $step = self::step();
+
+        self::assertMatchesRegularExpression("#LOCKROT_JR_VENDOR: '?build/phar/vendor'?[,}\\s]#", $step);
+        self::assertStringContainsString('--bootstrap tests/json-schema-bootstrap.php', $step);
+    }
+
+    public function testAFailureInEitherProcessFailsTheStep(): void
+    {
+        $step = self::step();
+
+        self::assertStringContainsString('set -o pipefail', $step);
+        self::assertStringContainsString('wait "$pid" || failed=1', $step);
+        self::assertStringContainsString('exit "$failed"', $step);
+    }
+
     public function testTheSchemaStepRunsWithXdebugOff(): void
     {
+        // Unquoted, YAML reads off as false, and Xdebug gets the mode "false".
         self::assertMatchesRegularExpression("/XDEBUG_MODE: 'off'/", self::step());
     }
 
@@ -34,7 +51,7 @@ final class PharSchemaStepTest extends TestCase
     {
         $step = self::step();
 
-        if (preg_match('/SPLIT: (\w+)/', $step, $split) !== 1) {
+        if (preg_match("/SPLIT: '?(\\w+)/", $step, $split) !== 1) {
             self::fail('the step names no split pattern in SPLIT');
         }
         self::assertStringContainsString('for part in filter exclude-filter', $step);
