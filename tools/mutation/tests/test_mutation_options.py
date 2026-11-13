@@ -7,7 +7,7 @@ import unittest
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..')
 PIN = ('composer require --dev --no-update "composer/composer:$(jq -r \'.packages[] | select(.name == "composer/composer") '
        '| .version\' build/phar/composer.lock)"')
-SHARD = re.compile(r"^\s+- \{name: (.+?), filter: '([^']+)', min_msi: \d+\}$", re.M)
+SHARD = re.compile(r"^\s+- \{name: (.+?), filter: '([^']+)', min_msi: (\d+)\}$", re.M)
 
 
 def read(*path):
@@ -81,10 +81,27 @@ class MutationOptionsTest(unittest.TestCase):
                 if not name.endswith('.php'):
                     continue
                 path = os.path.relpath(os.path.join(directory, name), ROOT).replace(os.sep, '/')
-                owners = [shard for shard, filter_ in shards
+                owners = [shard for shard, filter_, _ in shards
                           if any(path == p or path.startswith(p + '/') for p in filter_.split())]
                 with self.subTest(path=path):
                     self.assertEqual(1, len(owners), owners)
+
+    def test_the_files_of_one_src_directory_share_one_min_msi(self):
+        # A shard that lists single files cannot give one directory two floors.
+        shards = SHARD.findall(read('.github', 'workflows', 'ci.yml'))
+        self.assertNotEqual([], shards)
+        floors = {}
+        for directory, _, files in os.walk(os.path.join(ROOT, 'src')):
+            for name in files:
+                if not name.endswith('.php'):
+                    continue
+                path = os.path.relpath(os.path.join(directory, name), ROOT).replace(os.sep, '/')
+                for _, filter_, min_msi in shards:
+                    if any(path == p or path.startswith(p + '/') for p in filter_.split()):
+                        floors.setdefault(os.path.dirname(path), {})[path] = min_msi
+        for directory, files in sorted(floors.items()):
+            with self.subTest(directory=directory):
+                self.assertEqual(1, len(set(files.values())), files)
 
 
 if __name__ == '__main__':
