@@ -415,7 +415,8 @@ spaces. Only the Composer options that lockrot writes start with `-`:
   and in the step that raises `php` when `require-dev` lists it
 - `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step
 - `--locked` in a `why-not` step
-- `--lock` as the one argument of an `update` step: `composer update --lock`
+- `--lock` as the one argument of an `update` step, which only `run.php_window.target_fix.command`
+  writes: `composer update --lock`
 
 Every other option comes after the package arguments. The first argument is `composer`, and the
 second is `update`, `require` or `why-not`.
