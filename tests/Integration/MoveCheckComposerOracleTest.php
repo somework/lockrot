@@ -8,6 +8,7 @@ use Composer\Composer;
 use Composer\Factory;
 use Composer\IO\NullIO;
 use Composer\Package\Loader\RootPackageLoader;
+use Composer\Package\Loader\ValidatingArrayLoader;
 use Composer\Repository\RepositoryFactory;
 use Composer\Semver\Semver;
 use Composer\Semver\VersionParser;
@@ -80,6 +81,21 @@ final class MoveCheckComposerOracleTest extends TestCase
         }
     }
 
+    /** @param array<mixed, mixed> $solverWorld */
+    private static function locksANameThatComposerRefuses(array $solverWorld): bool
+    {
+        foreach (['packages', 'packages-dev'] as $section) {
+            $entries = JsonPath::has($solverWorld, ['world', 'lock', $section]) ? JsonPath::arrayAt($solverWorld, ['world', 'lock', $section]) : [];
+            foreach ($entries as $entry) {
+                if (\is_array($entry) && ValidatingArrayLoader::hasPackageNamingError(JsonPath::stringAt($entry, ['name'])) !== null) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     /** @return iterable<string, array{array<mixed, mixed>, string}> */
     public static function worlds(): iterable
     {
@@ -88,6 +104,10 @@ final class MoveCheckComposerOracleTest extends TestCase
             if (\is_array($case) && \is_array($case['solver_world'] ?? null)) {
                 // Under config.lock false lockrot asks Composer nothing (ruling R14-22), so the world records no answer.
                 if (JsonPath::has($case, ['solver_world', 'world', 'config', 'lock']) && JsonPath::boolAt($case, ['solver_world', 'world', 'config', 'lock']) === false) {
+                    continue;
+                }
+                // Composer refuses such a name, so the world carries the answers of another world and the CLI gives none to compare.
+                if (self::locksANameThatComposerRefuses($case['solver_world'])) {
                     continue;
                 }
                 yield JsonPath::stringAt($case, ['id']) => [$case['solver_world'], JsonPath::stringAt($case, ['run', 'move_check', 'composer'])];
