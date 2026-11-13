@@ -13,7 +13,7 @@ final class ArrayVersionSource implements VersionSource
 {
     /** @var array<string, list<array<string, mixed>>> */
     private array $entries;
-    /** @var array<string, string> */
+    /** @var array<array-key, string> */
     private array $failures;
     /** @var array<string, list<BasePackage>> */
     private array $loaded = [];
@@ -26,7 +26,7 @@ final class ArrayVersionSource implements VersionSource
 
     /**
      * @param array<string, list<array<string, mixed>>> $entries  name => its versions, each without `name`
-     * @param array<string, string>                     $failures name => a VersionSource failure
+     * @param array<array-key, string>                  $failures name => a VersionSource failure
      * @param array<string, \Throwable>                 $throws   name => what its load throws
      */
     public function __construct(array $entries, array $failures = [], array $throws = [])

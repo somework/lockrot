@@ -221,7 +221,7 @@ final class MoveContext
 
     /**
      * The `newest` of a require, raise-php or blocked move. On the installed row it is the row's
-     * `fixes.newest`, so the security move and the S9 fix agree (ruling R3-2). A move to $lower reads
+     * `fixes.newest`, so the security move and the S9 fix agree. A move to $lower reads
      * it at $lower: no link in its own `held_by` lowers it. Else the row's newest.
      */
     public function rowTarget(BranchRow $row, ?Candidate $lower = null): string
@@ -256,7 +256,7 @@ final class MoveContext
 
     /**
      * The php of the release that Composer installs at the target for a move from $lower to
-     * $newest (ruling R8-1): $newest when the target runs it, else the `newest` that FixFinder
+     * $newest: $newest when the target runs it, else the `newest` that FixFinder
      * reads at $lower. The branch top when the target runs no such release.
      */
     public function phpAtTarget(BranchRow $row, ?Candidate $lower, ?string $newest): ?string
@@ -287,7 +287,7 @@ final class MoveContext
      * The lowest release on $row that $constraint admits, with its class and holders, and the
      * constraint from it. The advisories on the package's other versions raise it. An advisory whose
      * range holds the branch's newest release reaches every constraint on the branch, so it does
-     * not raise the release (SPEC §5.3).
+     * not raise the release.
      *
      * @return array{0: ?Candidate, 1: string}
      */

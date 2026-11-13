@@ -12,13 +12,15 @@ use Composer\Repository\InstalledRepository;
 use Composer\Repository\LockArrayRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RootPackageRepository;
+use Composer\Semver\VersionParser;
 
 /**
  * The root requirements that a lock does not hold, read as Composer's
  * {@see \Composer\Package\Locker::getMissingRequirementInfo()} reads them: a `require` link is
  * looked up in the non-dev packages, a `require-dev` link in all of them, and the root package
  * counts too. A name is present when a package or the root has it as its name, in `replace` or in
- * `provide`. A platform link and a `self.version` link are never missing.
+ * `provide`, at a version that the link admits. A platform link and a `self.version` link are
+ * never missing.
  *
  * @internal
  */
@@ -36,12 +38,15 @@ final class MissingRequirements
         $parsed = JsonFile::parseJson($manifest, 'composer.json');
         $data = \is_array($parsed) ? $parsed : [];
         $name = isset($data['name']) && \is_string($data['name']) ? $data['name'] : '__root__';
+        // Composer guesses a root without `version` from the VCS checkout, which lockrot does not read.
+        $pretty = isset($data['version']) && \is_string($data['version']) && $data['version'] !== '' ? $data['version'] : '1.0.0';
+        $version = (new VersionParser())->normalize($pretty);
         $loader = new ArrayLoader();
-        $root = new RootPackage($name, '1.0.0', '1.0.0');
-        $root->setRequires(self::byTarget($loader->parseLinks($name, '1.0.0', Link::TYPE_REQUIRE, self::strings($data['require'] ?? null))));
-        $root->setDevRequires(self::byTarget($loader->parseLinks($name, '1.0.0', Link::TYPE_DEV_REQUIRE, self::strings($data['require-dev'] ?? null))));
-        $root->setReplaces(self::byTarget($loader->parseLinks($name, '1.0.0', Link::TYPE_REPLACE, self::strings($data['replace'] ?? null))));
-        $root->setProvides(self::byTarget($loader->parseLinks($name, '1.0.0', Link::TYPE_PROVIDE, self::strings($data['provide'] ?? null))));
+        $root = new RootPackage($name, $version, $pretty);
+        $root->setRequires(self::byTarget($loader->parseLinks($name, $pretty, Link::TYPE_REQUIRE, self::strings($data['require'] ?? null))));
+        $root->setDevRequires(self::byTarget($loader->parseLinks($name, $pretty, Link::TYPE_DEV_REQUIRE, self::strings($data['require-dev'] ?? null))));
+        $root->setReplaces(self::byTarget($loader->parseLinks($name, $pretty, Link::TYPE_REPLACE, self::strings($data['replace'] ?? null))));
+        $root->setProvides(self::byTarget($loader->parseLinks($name, $pretty, Link::TYPE_PROVIDE, self::strings($data['provide'] ?? null))));
         $all = $lock->lockedRepository();
         $nonDev = new LockArrayRepository();
         foreach ($all->getPackages() as $package) {
@@ -61,7 +66,7 @@ final class MissingRequirements
                 if (PlatformRepository::isPlatformPackage($target) || $link->getPrettyConstraint() === 'self.version') {
                     continue;
                 }
-                if ($installed->findPackagesWithReplacersAndProviders($target) === []) {
+                if ($installed->findPackagesWithReplacersAndProviders($target, $link->getConstraint()) === []) {
                     $missing[$target] = $target;
                 }
             }

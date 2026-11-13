@@ -53,6 +53,7 @@ use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\RepositoryVersions;
 use Lockrot\Tests\Support\Contract\CaseRecording;
 use Lockrot\Verdict\FailOn;
@@ -312,9 +313,67 @@ final class CaseHydrator
         // A case with a `solver_world` records every request, so another request fails the test. A world whose vcs
         // repository serves a name of the lock, or a name that a release needs and no Composer repository lists, records
         // no request of a move: lockrot reads that move as unloaded_name.
-        $checker = new RecordedMoveChecker($checks, $run, $world !== null && !self::shadowsALockedName($world) && !self::needsAnUnlistedName($world));
+        $unloaded = $world !== null && (self::shadowsALockedName($world) || self::needsAnUnlistedName($world));
+        if ($world !== null && (($checks['baseline'] ?? [])['result'] ?? null) === MoveCheck::REFUSED && self::leavesARefusedBaselineUnchecked($world)) {
+            $checks['baseline'] = ['result' => MoveCheck::NOT_CHECKED, 'form' => null, 'reason' => MoveCheck::UNLOADED_NAME, 'installs' => null, 'holds' => [], 'problem' => null];
+        }
+        $checker = new RecordedMoveChecker($checks, $run, $world !== null && !$unloaded);
 
         return MoveChecks::of($locked === null ? $checker : $checker->withLocked($locked));
+    }
+
+    /**
+     * The oracle records Composer's refusal of the baseline. The model keeps it only when the world's
+     * lock holds every root requirement, else a name that stays unloaded leaves the baseline
+     * `not_checked` with `unloaded_name`. This reading uses Composer's loader, not lockrot's solver.
+     *
+     * @param array<mixed, mixed> $world a case's `inputs.solver_world.world`
+     */
+    public static function leavesARefusedBaselineUnchecked(array $world): bool
+    {
+        return (self::shadowsALockedName($world) || self::needsAnUnlistedName($world)) && !self::locksEveryRootRequirement($world);
+    }
+
+    /**
+     * A non-dev locked package or the root holds a `require` name, and any locked package or the root
+     * a `require-dev` name: by its own name or a `replace` at any version, by a `provide` that the
+     * link admits. The root is the oracle's: `root` with `root_extra`, at `env.COMPOSER_ROOT_VERSION`.
+     *
+     * @param array<mixed, mixed> $world a case's `inputs.solver_world.world`
+     */
+    private static function locksEveryRootRequirement(array $world): bool
+    {
+        $loader = new ArrayLoader();
+        $root = array_replace(\is_array($world['root'] ?? null) ? $world['root'] : [], \is_array($world['root_extra'] ?? null) ? $world['root_extra'] : []);
+        $version = \is_array($world['env'] ?? null) && \is_string($world['env']['COMPOSER_ROOT_VERSION'] ?? null) ? $world['env']['COMPOSER_ROOT_VERSION'] : '1.0.0';
+        $root = $loader->load($root + ['name' => '__root__', 'version' => $version]);
+        $lock = \is_array($world['lock'] ?? null) ? $world['lock'] : [];
+        $nonDev = [$root];
+        foreach (\is_array($lock['packages'] ?? null) ? $lock['packages'] : [] as $entry) {
+            $nonDev[] = $loader->load(\is_array($entry) ? $entry : []);
+        }
+        $all = $nonDev;
+        foreach (\is_array($lock['packages-dev'] ?? null) ? $lock['packages-dev'] : [] as $entry) {
+            $all[] = $loader->load(\is_array($entry) ? $entry : []);
+        }
+        foreach ([[$root->getRequires(), $nonDev], [$root->getDevRequires(), $all]] as [$links, $holders]) {
+            foreach ($links as $link) {
+                if (PlatformRepository::isPlatformPackage($link->getTarget())) {
+                    continue;
+                }
+                $held = false;
+                foreach ($holders as $holder) {
+                    $provided = $holder->getProvides()[$link->getTarget()] ?? null;
+                    $held = $held || $holder->getName() === $link->getTarget() || isset($holder->getReplaces()[$link->getTarget()])
+                        || ($provided !== null && $provided->getConstraint()->matches($link->getConstraint()));
+                }
+                if (!$held) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /** @param array<mixed, mixed> $world a case's `inputs.solver_world.world` */
@@ -381,8 +440,12 @@ final class CaseHydrator
         $activity = $packages[$package]['activity'];
         $lockData = self::lockData(self::entries($inputs, $packages), $packages, $inputs);
         $root = self::root($inputs, $packages);
-        $unlocked = $root === null ? null : self::unlockedRoot($root, $lockData);
-        $project = $root === null ? ProjectConfig::empty() : ($unlocked === null ? ProjectConfig::fromArray($root) : self::manifest($root));
+        $world = \is_array($inputs['solver_world'] ?? null) && \is_array($inputs['solver_world']['world'] ?? null) ? $inputs['solver_world']['world'] : null;
+        // A solver world states its lock's hash: `lock_hash` `stale`, or no content-hash without the key.
+        // A stale world reads the world's root as composer.json and hashes an empty manifest.
+        $stale = $world !== null && ($world['lock_hash'] ?? null) === 'stale' && \is_array($world['root'] ?? null);
+        $unlocked = $root === null || ($world !== null && !$stale) ? null : ($stale ? [] : self::unlockedRoot($root, $lockData));
+        $project = $root === null ? ProjectConfig::empty() : ($unlocked === null ? ProjectConfig::fromArray($root) : self::manifest($stale ? $world['root'] : $root));
         $lock = LockFile::fromArray($unlocked === null ? $lockData : $lockData + ['content-hash' => Locker::getContentHash(JsonFile::encode($unlocked))]);
         $clock = self::clock($case);
         if ($lock->find($package) === null) {
@@ -632,7 +695,7 @@ final class CaseHydrator
      * The project that reads $root as its composer.json, so that lockrot compares the lock's
      * content-hash with it.
      *
-     * @param array<string, mixed> $root
+     * @param array<mixed> $root
      */
     private static function manifest(array $root): ProjectConfig
     {

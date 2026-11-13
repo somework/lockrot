@@ -28,6 +28,17 @@ final class LockedPackageTest extends TestCase
         self::assertFalse(self::package('1.0.0-beta.2')->isBranchSnapshot());
     }
 
+    /** JSON decoding turns the key "5" into an integer, and the install-time check reads Composer's packages. */
+    public function testAPackageWithANumericRequireKeyListsTheKeyAsAName(): void
+    {
+        $package = (new \Composer\Package\Loader\ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['5' => '1.0', 'php' => '>=7.4']]);
+        self::assertInstanceOf(\Composer\Package\CompletePackage::class, $package);
+
+        $locked = LockedPackage::fromPackage($package, false);
+
+        self::assertSame(['5'], $locked->requires());
+    }
+
     public function testWithRepositoriesLeavesTheEntryItWasCalledOnUnchanged(): void
     {
         $package = self::package('1.0.0');

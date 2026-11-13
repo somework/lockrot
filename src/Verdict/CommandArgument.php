@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Verdict;
 
 /**
- * The command argument rule (SPEC-0.14.md §5.6). An argument comes from the lock or a repository, and
+ * The command argument rule. An argument comes from the lock or a repository, and
  * a reader pastes the command into cmd.exe, PowerShell or a POSIX shell. Every rendering quotes an
  * argument of this set safely. Any other program or subcommand runs what the data names
  * (`composer exec calc`).

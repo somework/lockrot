@@ -51,7 +51,7 @@ final class TargetFix
         if ($checker === null || ($names === [] && $lockPlatform === [])) {
             return $fix;
         }
-        // Ruling T5: no solve runs while the baseline is not checked, so its reason wins over the names'.
+        // No solve runs while the baseline is not checked, so its reason wins over the names'.
         $baseline = $checker->baseline()->check();
         if (!$baseline->isResolved() && !$baseline->isRefused()) {
             return array_replace($fix, ['reason' => $baseline->reason()]);
@@ -81,7 +81,7 @@ final class TargetFix
     }
 
     /**
-     * The root ceiling (rulings F2 and F4): a refusal whose every hold is a root link on php.
+     * The root ceiling: a refusal whose every hold is a root link on php.
      *
      * @param Fix $fix
      */

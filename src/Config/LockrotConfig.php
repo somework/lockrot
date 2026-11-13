@@ -329,7 +329,7 @@ final class LockrotConfig
 
     /**
      * Composer accepts `v8.4.1` in `config.platform.php`. A value that it refuses sets no target,
-     * and the move check reports it (ruling R8-37). Composer's comparator reads an integer segment
+     * and the move check reports it. Composer's comparator reads an integer segment
      * without its leading zeros, so `8.04.1` is 8.4.1 and names the minor 8.4.
      */
     private static function asComposerReads(string $platformPhp): ?string

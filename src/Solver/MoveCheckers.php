@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Lockrot\Solver;
 
 use Composer\Config;
+use Composer\Package\Link;
+use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
 use Composer\Package\Version\VersionParser as ComposerVersionParser;
 use Composer\Repository\PlatformRepository;
@@ -68,6 +70,7 @@ final class MoveCheckers
         $solver = (new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], $overrides), $source, $platformNames))->withLockedOnly($notFromComposerRepository);
         $solver = $php === $configured ? $solver : $solver->withPhpSetByLockrot();
         $solver = self::minimalChanges($config) ? $solver->withMinimalChanges() : $solver;
+        $solver = self::locksEveryRootRequirement($root, $lock) ? $solver->withEveryRootRequirementLocked() : $solver;
 
         $blocking = AdvisoryBlocking::fromConfig($config);
         $lookup = new RepositoryAdvisoryLoader($repositories, $offline, $deadline);
@@ -75,6 +78,49 @@ final class MoveCheckers
         $keptOut = $advisoryScope === AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES ? $notFromComposerRepository : [];
 
         return new SolverChecker($solver, $notFromComposerRepository, $php, $blocking->blocks(), $deadline, new PoolAdvisories($blocking, static fn (array $names, bool $complete): ?array => $lookup->records($names, $complete), $keptOut), $configured, $overrides['php-64bit'] ?? null);
+    }
+
+    /**
+     * Whether the baseline fixes each package link of the root that the solve fixes, whatever the
+     * lock's hash says and whether the run reads dev packages or not. A non-dev locked package or the
+     * root holds a `require` name, and any locked package or the root a `require-dev` name. A
+     * package named so holds it at any version, and so does a `replace`. A `provide` holds it only at
+     * a version that the link admits, else the solve can still install the name itself. A
+     * `self.version` link needs a holder too, unlike in Composer's missing-requirement check.
+     */
+    private static function locksEveryRootRequirement(RootPackageInterface $root, LockFile $lock): bool
+    {
+        $nonDev = [$root];
+        $all = [$root];
+        foreach ($lock->lockedRepository()->getPackages() as $package) {
+            $all[] = $package;
+            if (!$lock->isDevEntry($package->getName())) {
+                $nonDev[] = $package;
+            }
+        }
+        foreach ([[$root->getRequires(), $nonDev], [$root->getDevRequires(), $all]] as [$links, $holders]) {
+            foreach ($links as $link) {
+                if (!PlatformRepository::isPlatformPackage($link->getTarget()) && !self::isHeld($link, $holders)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /** @param list<PackageInterface> $holders */
+    private static function isHeld(Link $link, array $holders): bool
+    {
+        $name = $link->getTarget();
+        foreach ($holders as $holder) {
+            $provided = $holder->getProvides()[$name] ?? null;
+            if ($holder->getName() === $name || isset($holder->getReplaces()[$name]) || ($provided !== null && $provided->getConstraint()->matches($link->getConstraint()))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /** `config.platform.php` of Composer's merged config: null when it is unset or `false`. */

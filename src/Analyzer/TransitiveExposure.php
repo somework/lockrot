@@ -119,8 +119,7 @@ final class TransitiveExposure
     }
 
     /**
-     * Names each package by its counted flags in flag order, `vulnerable` included (SPEC-0.14.md
-     * §2, S7).
+     * Names each package by its counted flags in flag order, `vulnerable` included (S7).
      *
      * @param non-empty-list<ExposedPackage> $packages
      */

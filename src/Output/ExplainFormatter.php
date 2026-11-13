@@ -460,7 +460,7 @@ final class ExplainFormatter
             $cell .= '; held by '.ListWords::of(array_unique($holders));
         }
         if ($after !== null) {
-            // D10: the caveat stays where Composer's solver did not check the move or reached no release of it (R17-Q1).
+            // The caveat stays where Composer's solver did not check the move or reached no release of it.
             $checked = $check !== null && $check->result() !== MoveCheck::NOT_CHECKED;
             $noRelease = $check !== null && $check->installsNoReleaseOfIt();
             $cell .= '; after it: '.($after->atMost() ? 'at most ' : '').$after->total().', '.$after->verdict().($checked ? '' : ', if Composer resolves it');

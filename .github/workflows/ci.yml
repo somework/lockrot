@@ -83,28 +83,61 @@ jobs:
           # Processes side by side shorten the row. Each writes its own log, and the step checks every exit code.
           # A runtime-php test reads the PHP that runs it, so a row without covers-nothing still runs it.
           # On a covers_nothing row, schema-sweep holds the longest covers-nothing class and gets a process of its own.
+          # Keep three processes: a fourth CPU-bound process slows every process on the runner.
+          # https://github.com/somework/lockrot/pull/208
+          names=(default)
           runs=("<exclude>$slow<group>covers-nothing</group></exclude>")
           if [ "${{ matrix.covers_nothing }}" = "true" ]; then
+            names+=(covers-nothing schema-sweep)
             runs+=("<include><group>covers-nothing</group></include><exclude>$slow<group>schema-sweep</group></exclude>")
             runs+=("<include><group>schema-sweep</group></include><exclude>$slow</exclude>")
           else
+            names+=(runtime-php)
             runs+=("<include><group>runtime-php</group></include><exclude>$slow</exclude>")
           fi
           mkdir -p build
           # The copies stay beside the configuration, because PHPUnit resolves its paths from there.
           # All of them exist before a process starts, so a failed copy leaves no process running.
           for i in "${!runs[@]}"; do groups_config "phpunit-ci-$i.xml" "${runs[$i]}"; done
+          # Each process streams its output with its name as a prefix, so the log shows progress while it runs.
+          # pipefail makes the subshell exit with PHPUnit's status, not the status of tee or sed.
           pids=()
           for i in "${!runs[@]}"; do
-            vendor/bin/phpunit -c "phpunit-ci-$i.xml" > "build/phpunit-$i.log" 2>&1 &
+            # The covers-nothing processes write a JUnit log, which the class timing report below reads.
+            junit=()
+            if [ "${{ matrix.covers_nothing }}" = "true" ] && [ "${names[$i]}" != default ]; then junit=(--log-junit "build/junit-${names[$i]}.xml"); fi
+            (
+              set -o pipefail
+              vendor/bin/phpunit -c "phpunit-ci-$i.xml" "${junit[@]}" 2>&1 \
+                | tee "build/phpunit-${names[$i]}.log" | sed -u "s/^/[${names[$i]}] /"
+            ) &
             pids+=($!)
           done
           failed=0
           for i in "${!runs[@]}"; do
             status=0; wait "${pids[$i]}" || status=$?
-            echo "=== phpunit ${runs[$i]}: exit $status"; cat "build/phpunit-$i.log"
+            echo "=== phpunit ${names[$i]}: exit $status"
             if [ "$status" -ne 0 ]; then failed=1; fi
           done
+          # The ten slowest classes of the covers-nothing processes, from their JUnit logs. A missing log
+          # prints nothing: the failed process already fails the step.
+          python3 - <<'PY' | tee -a "${GITHUB_STEP_SUMMARY:-/dev/null}" || true
+          import glob
+          import xml.etree.ElementTree as ET
+          from collections import defaultdict
+          times = defaultdict(float)
+          for path in sorted(glob.glob('build/junit-*.xml')):
+              try:
+                  for case in ET.parse(path).iter('testcase'):
+                      times[case.get('classname') or case.get('class') or '?'] += float(case.get('time') or 0)
+              except (ET.ParseError, OSError, ValueError):
+                  continue
+          if times:
+              print('### Slowest covers-nothing classes (php ${{ matrix.php }})\n')
+              print('| Class | Seconds |\n|---|---|')
+              for name, t in sorted(times.items(), key=lambda kv: -kv[1])[:10]:
+                  print('| `%s` | %.1f |' % (name, t))
+          PY
           if [ "$failed" -ne 0 ]; then exit 1; fi
       # ubuntu-latest generates no comma locale, so the comma-locale tests skip in the step "Run tests
       # with the matrix Composer binary". The 8.5/latest row generates de_DE and fails when they skip.

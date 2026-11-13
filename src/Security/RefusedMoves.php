@@ -11,7 +11,7 @@ use Composer\Semver\VersionParser;
 /**
  * The moves of one package that Composer's solver refused in every form, with their holds. A
  * refusal of a constraint holds every release that the constraint admits, so a candidate there
- * takes the holds and its class follows them (SPEC §5.3).
+ * takes the holds and its class follows them.
  *
  * @internal
  */

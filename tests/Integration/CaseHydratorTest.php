@@ -397,7 +397,95 @@ final class CaseHydratorTest extends TestCase
 
         $notes = static fn (array $case): array => array_values(array_filter(JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::report($case)->toArray()), ['notes']), static fn ($note): bool => \is_string($note) && strpos($note, 'lock: ') === 0));
 
-        self::assertSame([[], ['lock: the lock file does not match composer.json (acme/feature-flags is required but not locked): run composer update']], [$notes($case), $notes($unlocked)]);
+        self::assertSame([[], ['lock: the lock file does not match composer.json (acme/feature-flags is not locked at a version that composer.json allows): run composer update']], [$notes($case), $notes($unlocked)]);
+    }
+
+    /**
+     * A solver world states the lock's hash in `lock_hash`: `stale` writes a hash that differs from
+     * composer.json's, and an absent key writes none, so no lock_out_of_sync note appears.
+     */
+    public function testASolverWorldLockHasAContentHashOnlyWhenTheWorldSetsLockHash(): void
+    {
+        $case = CaseHydrator::case('A');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $root = JsonPath::arrayAt($inputs, ['root']);
+        $root['require'] = JsonPath::arrayAt($root, ['require']) + ['acme/feature-flags' => '^1.0'];
+        $inputs['root'] = $root;
+        $hashless = $inputs + ['solver_world' => ['world' => ['root' => $root]]];
+        $stale = $inputs + ['solver_world' => ['world' => ['root' => $root, 'lock_hash' => 'stale']]];
+
+        $notes = static fn (array $inputs): array => array_values(array_filter(JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::report(['inputs' => $inputs] + $case)->toArray()), ['notes']), static fn ($note): bool => \is_string($note) && strpos($note, 'lock: ') === 0));
+
+        self::assertSame([[], ['lock: the lock file does not match composer.json (acme/feature-flags is not locked at a version that composer.json allows): run composer update']], [$notes($hashless), $notes($stale)]);
+    }
+
+    /** A stale world whose lock holds every root name, one at a version that the root does not admit. */
+    public function testAStaleSolverWorldNamesALockedNameAtAVersionThatTheRootDoesNotAdmit(): void
+    {
+        $case = CaseHydrator::case('A');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $root = JsonPath::arrayAt($inputs, ['root']);
+        $root['require'] = ['twig/twig' => '^99.0'] + JsonPath::arrayAt($root, ['require']);
+        $inputs['root'] = $root;
+        $inputs['solver_world'] = ['world' => ['root' => $root, 'lock_hash' => 'stale']];
+
+        $notes = array_values(array_filter(JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::report(['inputs' => $inputs] + $case)->toArray()), ['notes']), static fn ($note): bool => \is_string($note) && strpos($note, 'lock: ') === 0));
+
+        self::assertSame(['lock: the lock file does not match composer.json (twig/twig is not locked at a version that composer.json allows): run composer update'], $notes);
+    }
+
+    /**
+     * The oracle answers Composer's refusal, and lockrot reads a refused baseline as not checked when
+     * a name stays unloaded and the world's lock does not hold a root requirement.
+     *
+     * @param array{string, ?string} $expected
+     *
+     * @dataProvider baselinesOfTheSolverWorlds
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('baselinesOfTheSolverWorlds')]
+    public function testARefusedBaselineReadsAsLockrotReadsTheWorldsLock(string $id, array $expected): void
+    {
+        $run = JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::report(CaseHydrator::case($id))->toArray()), ['run', 'move_check']);
+
+        self::assertSame($expected, [$run['baseline'] ?? null, $run['reason'] ?? null]);
+    }
+
+    /** @return iterable<string, array{string, array{string, ?string}}> */
+    public static function baselinesOfTheSolverWorlds(): iterable
+    {
+        yield 'a lock that omits a root requirement' => ['mc-baseline-unsynced‡', ['not_checked', 'unloaded_name']];
+        yield 'the same lock with no hash' => ['mc-baseline-unsynced-hashless‡', ['not_checked', 'unloaded_name']];
+        yield 'a provide below the link' => ['mc-baseline-provide-unmatched‡', ['not_checked', 'unloaded_name']];
+        yield 'a lock that holds every root requirement' => ['mc-baseline-synced-non-dev‡', ['refused', null]];
+    }
+
+    /**
+     * The oracle reads the root with `root_extra` and at `env.COMPOSER_ROOT_VERSION`.
+     *
+     * @param array<string, mixed> $root
+     *
+     * @dataProvider rootsThatTheOracleReads
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('rootsThatTheOracleReads')]
+    public function testARefusedBaselineReadsTheRootAsTheOracleDoes(array $root, bool $unchecked): void
+    {
+        $world = $root + [
+            'root' => ['require' => ['acme/virtual' => '^2.0']],
+            'vcs_repos' => ['https://git.example.com/acme/private-lib.git'],
+            'repo' => ['acme/lib' => [['version' => '1.1.0', 'require' => ['acme/private-lib' => '^1.0']]]],
+            'lock' => ['packages' => [], 'packages-dev' => []],
+        ];
+
+        self::assertSame($unchecked, CaseHydrator::leavesARefusedBaselineUnchecked($world));
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, bool}> */
+    public static function rootsThatTheOracleReads(): iterable
+    {
+        yield 'nothing holds the link' => [[], true];
+        yield 'a replace of root_extra' => [['root_extra' => ['replace' => ['acme/virtual' => 'self.version']]], false];
+        yield 'a provide at the root version of env' => [['root_extra' => ['provide' => ['acme/virtual' => 'self.version']], 'env' => ['COMPOSER_ROOT_VERSION' => '2.1.0']], false];
+        yield 'a provide at the default root version' => [['root_extra' => ['provide' => ['acme/virtual' => 'self.version']]], true];
     }
 
     public function testACaseWithoutInputsIsRefused(): void

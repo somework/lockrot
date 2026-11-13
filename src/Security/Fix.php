@@ -103,7 +103,7 @@ final class Fix implements \JsonSerializable
         return $clone;
     }
 
-    /** A copy at a release that the joint request moves to: nothing holds it (SPEC §5.6, ruling R1). */
+    /** A copy at a release that the joint request moves to: nothing holds it. */
     public function resolvedJointly(): self
     {
         $clone = clone $this;

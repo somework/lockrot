@@ -72,7 +72,7 @@ final class SolverChecker implements MoveChecker
         $this->deadline = $deadline;
     }
 
-    /** Its own ladder, not {@see attempt()}: a resolving baseline ignores its unloaded names (ruling R2-4). */
+    /** Its own ladder, not {@see attempt()}: a resolving baseline ignores its unloaded names. */
     public function baseline(): CheckOutcome
     {
         if ($this->baseline === null) {
@@ -232,12 +232,12 @@ final class SolverChecker implements MoveChecker
     }
 
     /**
-     * The request as listed, then `-w`, then `-W`, folded into one answer (ruling R6-1). A clean
+     * The request as listed, then `-w`, then `-W`, folded into one answer. A clean
      * resolve wins: the first form that installs $newest, else the form that installs the highest
      * release, the first on a tie. Else the first form that the budget, Composer or a load stopped
      * gives its outcome. With $release, a form that installs no release of the package (it keeps the
      * package or installs a dev version) does not resolve. When no other form resolves or stops, the
-     * move reads {@see MoveCheck::installsNoRelease()} (ruling R17-1). Only when every form is a clean
+     * move reads {@see MoveCheck::installsNoRelease()}. Only when every form is a clean
      * refusal does the move read refused: a null form with the last refusal.
      *
      * @param non-empty-list<string> $moved   the names that the request moves, the move's package first

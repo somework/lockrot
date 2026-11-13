@@ -8,9 +8,9 @@ use Lockrot\Analyzer\RunSettings;
 use Lockrot\Config\Gate;
 
 /**
- * The `gate:` line, `gate.text` (text grammar 1): rendered from the root `gate` and the run fields
- * only. It holds no package name and no user text, so it needs no escaping beyond each format's
- * own. Prose, not contract: a consumer keys on the fields. The grammar is SPEC §6.2, "RunGateText".
+ * The `gate:` line, `gate.text` (docs/ci.md#reading-the-gate-line): rendered from the root `gate`
+ * and the run fields only. It holds no package name and no user text, so it needs no escaping
+ * beyond each format's own. Prose, not contract: a consumer keys on the fields.
  *
  * @internal
  */

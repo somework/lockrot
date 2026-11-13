@@ -872,6 +872,11 @@ checked.
   [`moves_not_checked`](notes.md#moves_not_checked) gives Composer's problem text. When that refusal
   needs a package that could not be loaded, `run.move_check.baseline` is `not_checked` with the load
   reason (`unloaded_name`, `offline` or `install_time_budget`). Each move then reads that reason.
+  When the lock does not hold a `require` or `require-dev` name of the root, Composer can install
+  that name. Then any package that the solve could not load gives the baseline that load reason,
+  also when Composer refuses the lock. The lock holds a name when the root or a locked package has
+  it, replaces it, or provides it at a version that the requirement admits. Of the locked
+  packages, only an entry of `packages` holds a `require` name.
 
 Limits of the check:
 
@@ -961,7 +966,8 @@ Limits of the check:
   lower release than Composer installs. The move is then not checked, with the load reason
   (`unloaded_name`, `offline` or `install_time_budget`). A refusal that needs such a package reads
   the same. So does a refusal of the second solve over the `require` links, because it reads the
-  first solve's answer. The baseline keeps that refusal, because it keeps every locked package.
+  first solve's answer. The baseline keeps that refusal when the lock holds every `require` and
+  `require-dev` name of the root, because it keeps every locked package.
 - A package that no Composer repository lists, while a path, VCS or package repository can serve
   it, is not loaded either. A resolving solve is then not checked only when a release that the
   solve could install requires the package and no loaded package provides it. The solve could

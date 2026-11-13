@@ -64,8 +64,40 @@ final class ProjectConfigTest extends TestCase
         $manifest = ['require' => ['psr/log' => '^3.0', 'psr/container' => '^2.0'], 'require-dev' => ['acme/dev' => '*']];
         $stale = ['content-hash' => 'deadbeef'];
 
-        self::assertSame(['psr/container'], self::outOfSync($manifest, $stale, ['psr/log']));
-        self::assertSame(['acme/dev', 'psr/container'], self::outOfSync($manifest, $stale, ['psr/log'], true));
+        self::assertSame(['psr/container'], self::outOfSync($manifest, $stale, [['name' => 'psr/log', 'version' => '3.0.0']]));
+        self::assertSame(['acme/dev', 'psr/container'], self::outOfSync($manifest, $stale, [['name' => 'psr/log', 'version' => '3.0.0']], true));
+    }
+
+    /**
+     * Composer's Locker matches each link's constraint: a locked, provided or replaced name at a
+     * version that the link does not admit is missing.
+     *
+     * @dataProvider namesAtAVersionThatTheLinkDoesNotAdmit
+     *
+     * @param array<string, mixed>       $manifest
+     * @param list<array<string, mixed>> $locked
+     * @param list<string>               $missing
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('namesAtAVersionThatTheLinkDoesNotAdmit')]
+    public function testALockedNameAtAVersionThatTheLinkDoesNotAdmitIsMissing(array $manifest, array $locked, array $missing): void
+    {
+        self::assertSame($missing, self::outOfSync($manifest, ['content-hash' => 'deadbeef'], $locked, true));
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, list<array<string, mixed>>, list<string>}> */
+    public static function namesAtAVersionThatTheLinkDoesNotAdmit(): iterable
+    {
+        yield 'a name locked under its own name' => [['require' => ['acme/lib' => '^2.0']], [['name' => 'acme/lib', 'version' => '1.0.0']], ['acme/lib']];
+        yield 'a provided name' => [['require' => ['acme/lib' => '^2.0']], [['name' => 'acme/x', 'version' => '1.0.0', 'provide' => ['acme/lib' => '1.0.0']]], ['acme/lib']];
+        yield 'a replaced name' => [['require' => ['acme/lib' => '^2.0']], [['name' => 'acme/x', 'version' => '1.0.0', 'replace' => ['acme/lib' => '1.0.0']]], ['acme/lib']];
+        yield 'a provided name that only require-dev admits' => [
+            ['require' => ['symfony/routing' => '^6.4', 'acme/contract' => '^2.0'], 'require-dev' => ['acme/contract' => '^1.0']],
+            [['name' => 'symfony/routing', 'version' => 'v6.4.28'], ['name' => 'acme/x', 'version' => '1.0.0', 'require' => ['acme/y' => '^1.0'], 'provide' => ['acme/contract' => '1.0.0']]],
+            ['acme/contract'],
+        ];
+        yield 'a provided name at a version that the link admits' => [['require' => ['acme/lib' => '^1.0']], [['name' => 'acme/x', 'version' => '1.0.0', 'provide' => ['acme/lib' => '1.2.0']]], []];
+        yield 'a name that the root replaces at its own version' => [['version' => '2.1.0', 'require' => ['acme/part' => '^2.0'], 'replace' => ['acme/part' => 'self.version']], [], []];
+        yield 'a name that the root provides below the link' => [['version' => '1.5.0', 'require' => ['acme/part' => '^2.0'], 'provide' => ['acme/part' => 'self.version']], [], ['acme/part']];
     }
 
     /** Composer's own probe: a name that a locked package provides is present, a name that nothing holds is not. */
@@ -128,12 +160,12 @@ final class ProjectConfigTest extends TestCase
     {
         $manifest = ['require' => ['php' => '>=7.4', 'ext-json' => '*', 'lib-curl' => '*', 'composer-plugin-api' => '^2', 'psr/log' => '^3.0']];
 
-        self::assertSame([], self::outOfSync($manifest, ['content-hash' => 'deadbeef'], ['psr/log']));
+        self::assertSame([], self::outOfSync($manifest, ['content-hash' => 'deadbeef'], [['name' => 'psr/log', 'version' => '3.0.0']]));
     }
 
     public function testAChangedConstraintMakesTheLockStaleWithNoMissingName(): void
     {
-        self::assertSame([], self::outOfSync(['require' => ['psr/log' => '^3.0']], ['content-hash' => 'deadbeef'], ['psr/log']));
+        self::assertSame([], self::outOfSync(['require' => ['psr/log' => '^3.0']], ['content-hash' => 'deadbeef'], [['name' => 'psr/log', 'version' => '3.0.0']]));
     }
 
     public function testAFreshLockGivesNoNote(): void

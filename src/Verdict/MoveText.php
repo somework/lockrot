@@ -11,7 +11,7 @@ use Lockrot\Solver\MoveCheck;
 use Lockrot\Solver\MoveCheckers;
 
 /**
- * `next_step.text`, text grammar 1: rendered from the move object, the package and the run alone.
+ * `next_step.text`: rendered from the move object, the package and the run alone.
  * A renderer that meets an unknown kind prints it.
  *
  * @internal
@@ -137,7 +137,7 @@ final class MoveText
     }
 
     /**
-     * SPEC §5.6: while Composer's config sets a platform PHP outside the target minor, Composer
+     * While Composer's config sets a platform PHP outside the target minor, Composer
      * solves the commands at that PHP, not at the target. The sentence and a space, else an empty
      * string. While Composer refuses the lock itself, the step alone does not make it install: the
      * sentence points at the moves_not_checked note.
@@ -153,7 +153,7 @@ final class MoveText
         return 'First set config.platform.php to your PHP '.$targetPhp.' release: Composer\'s config sets '.$platformOverride.'.'.($baselineRefused ? self::REFUSED_POINTER : '').' ';
     }
 
-    /** D10: what Composer's solver said about the move, or why lockrot did not ask it. */
+    /** What Composer's solver said about the move, or why lockrot did not ask it. */
     private static function checked(Move $move): string
     {
         $check = $move->check();
@@ -173,7 +173,7 @@ final class MoveText
         }
     }
 
-    /** Ruling R17-1: what the first resolving form gives in place of the move's newest: a dev version, the locked version, or no entry when the solve removes the package. */
+    /** What the first resolving form gives in place of the move's newest: a dev version, the locked version, or no entry when the solve removes the package. */
     private static function noRelease(?string $installs, Move $move): string
     {
         $newest = $move->newest() ?? $move->version();
@@ -310,7 +310,7 @@ final class MoveText
         return $text.self::phpClause($move, $subject).self::adds($move);
     }
 
-    /** Ruling R17-X1a: a pinned move with no stable tag targets a pre-release. */
+    /** A pinned move with no stable tag targets a pre-release. */
     private static function preRelease(string $version): string
     {
         return $version !== '' && VersionParser::parseStability($version) !== 'stable' ? ', a pre-release' : '';
@@ -403,7 +403,6 @@ final class MoveText
             return '';
         }
         $latest = $move->latest();
-        // Ruling W17-X3a: the first of to_branch, latest.version, version and constraint.
         $phpSubject = $move->toBranch() ?? ($latest === null ? null : $latest->version()) ?? $move->version() ?? $move->constraint();
         if ($phpSubject === null) {
             return '';

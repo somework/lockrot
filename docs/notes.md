@@ -364,7 +364,7 @@ install-time budget ran out. The report writes no `update now:` command, and
 - `data`: `reason` (a value of `check.reason`), `packages` (the candidates).
 - `sets_network_failures`: no.
 
-### Move check failed {#move_check_failed}
+### <a name="move_check_failed"></a>Move check failed {#move_check_failed}
 
 Composer's solver failed on a request with an error other than a refusal, such as an answer of a
 repository that does not parse. That move's `check.reason` reads `solver_error`, and the run goes
@@ -461,7 +461,8 @@ run without composer.json gets no such note. A lock with no hash gets none eithe
 `composer install` reads such a lock as out of date.
 
 - `data`: `missing`, the root requirements that the lock does not hold, sorted. A requirement is
-  held when a locked package or the root package has the name, replaces it or provides it. It lists
+  held when a locked package or the root package has the name, replaces it or provides it, at a
+  version that the requirement admits, as `composer install` reads it. It lists
   `require-dev` names only when the run reads require-dev, and never a platform requirement or a
   `self.version` link. It can be empty: a changed constraint also changes the hash.
 - Findings: none change.

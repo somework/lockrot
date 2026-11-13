@@ -183800,7 +183800,7 @@
    "run_notes": [
     {
      "code": "lock_out_of_sync",
-     "text": "lock: the lock file does not match composer.json (acme/feature-flags and acme/metrics are required but not locked): run composer update",
+     "text": "lock: the lock file does not match composer.json (acme/feature-flags and acme/metrics are not locked at a version that composer.json allows): run composer update",
      "docs_url": "https://lockrot.dev/notes/#lock_out_of_sync",
      "sets_network_failures": false,
      "data": {
@@ -275384,10 +275384,10 @@
      "transitive: maintenance 36 ÷ 2 = 18",
      "maintenance alone makes it high",
      "without abandoned: at least 9, medium (stale would show) · without old-promise: 16, high",
-     "checks not run: its push date (undated)"
+     "checks not run: its push date (no date)"
     ],
     "gate_line": null,
-    "checks": "4 fired (S1, S2, S3, S5) · 6 quiet · S4 not run (undated)",
+    "checks": "4 fired (S1, S2, S3, S5) · 6 quiet · S4 not run (no date)",
     "baseline_suffix": null,
     "commands_posix": [],
     "commands_cmd": [],
@@ -503383,6 +503383,7504 @@
      ],
      "baseline": "resolves",
      "reason": null,
+     "php": "8.4.99"
+    }
+   }
+  },
+  {
+   "id": "mc-baseline-unsynced‡",
+   "label": "the lock omits the root requirement acme/lib, whose 1.1.0 needs acme/private-lib that only a vcs repository serves: the baseline's first solve leaves that name unloaded, and Composer's second solve over the require links refuses. The baseline reads not_checked unloaded_name, every move the same, no moves_not_checked note, and lock_out_of_sync names acme/lib (ruling R20-1)",
+   "project": "typo3-v12",
+   "run": {
+    "project": "typo3/cms",
+    "root_package": "typo3/cms",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "project_php": "^8.1",
+    "project_php_lowest": "8.1.0",
+    "lock_file": "composer.lock",
+    "fail_on": "high",
+    "fail_on_source": "option",
+    "gates": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "threshold": "high"
+     }
+    ],
+    "strict_network": false,
+    "mode": "check",
+    "include_dev": false,
+    "thresholds": {
+     "release-warn-years": 3,
+     "release-high-years": 5,
+     "push-warn-years": 3,
+     "push-high-years": 5
+    },
+    "flag_ids": [
+     "abandoned",
+     "silent",
+     "pinned",
+     "left-behind",
+     "old-promise",
+     "stale",
+     "capped",
+     "vulnerable"
+    ],
+    "verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     "unknown",
+     "finished",
+     "ok"
+    ],
+    "graded_verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "signal_ids": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7",
+     "S8",
+     "S9",
+     "S10",
+     "S11"
+    ],
+    "fix_model": 1,
+    "text_grammar": 1,
+    "score_model": {
+     "id": 1,
+     "score_text_grammar": 1,
+     "flag_order": [
+      "abandoned",
+      "silent",
+      "pinned",
+      "left-behind",
+      "old-promise",
+      "stale",
+      "capped",
+      "vulnerable"
+     ],
+     "parts": [
+      {
+       "id": "maintenance",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale",
+        "capped"
+       ],
+       "combine": "lead_plus_share"
+      },
+      {
+       "id": "security",
+       "flag_ids": [
+        "vulnerable"
+       ],
+       "combine": "max"
+      }
+     ],
+     "flags": [
+      {
+       "id": "abandoned",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "abandoned",
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S1",
+        "S3"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "silent",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "silent",
+        "pinned",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-high-years",
+        "push-high-years"
+       ],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "pinned",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 22,
+       "max_maintenance_flags": [
+        "pinned",
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S6"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "left-behind",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 20,
+       "max_maintenance_flags": [
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S8"
+       ],
+       "thresholds": [
+        "release-warn-years"
+       ],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "old-promise",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 18,
+       "max_maintenance_flags": [
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S5"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "stale",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 10,
+       "max_maintenance_flags": [
+        "stale",
+        "capped"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-warn-years",
+        "push-warn-years"
+       ],
+       "basis": {
+        "v013_base": "medium",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "capped",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 8,
+       "max_maintenance_flags": [
+        "capped"
+       ],
+       "raised_by": [
+        "S11"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "vulnerable",
+       "part": "security",
+       "points": null,
+       "band": null,
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": null,
+       "max_maintenance_flags": null,
+       "raised_by": [
+        "S9"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "severities"
+       },
+       "points_from": "severities"
+      }
+     ],
+     "severities": [
+      {
+       "id": "critical",
+       "points": 32,
+       "band": "critical",
+       "points_no_reachable_fix": 64,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 4,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "high",
+       "points": 16,
+       "band": "high",
+       "points_no_reachable_fix": 32,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 3,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "medium",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "unrated",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": "medium",
+       "basis": {
+        "points": "counts_as"
+       }
+      },
+      {
+       "id": "low",
+       "points": 2,
+       "band": "low",
+       "points_no_reachable_fix": 4,
+       "band_no_reachable_fix": "low",
+       "gate_rank": 1,
+       "counts_as": null,
+       "basis": {
+        "points": "share",
+        "of": "medium",
+        "share": {
+         "num": 1,
+         "den": 4
+        }
+       }
+      }
+     ],
+     "fix_kinds": [
+      {
+       "id": "update",
+       "ease": 1,
+       "doubles": false
+      },
+      {
+       "id": "upgrade",
+       "ease": 2,
+       "doubles": false
+      },
+      {
+       "id": "raise-php",
+       "ease": 3,
+       "doubles": false
+      },
+      {
+       "id": "unknown",
+       "ease": 4,
+       "doubles": false
+      },
+      {
+       "id": "blocked",
+       "ease": 5,
+       "doubles": true
+      },
+      {
+       "id": "none",
+       "ease": 6,
+       "doubles": true
+      }
+     ],
+     "bands": [
+      {
+       "verdict": "critical",
+       "floor": 32
+      },
+      {
+       "verdict": "high",
+       "floor": 16
+      },
+      {
+       "verdict": "medium",
+       "floor": 8
+      },
+      {
+       "verdict": "low",
+       "floor": 1
+      }
+     ],
+     "zero_verdicts": [
+      {
+       "verdict": "finished",
+       "when": "allowlisted"
+      },
+      {
+       "verdict": "unknown",
+       "when": "no_metadata"
+      },
+      {
+       "verdict": "ok",
+       "when": "otherwise"
+      }
+     ],
+     "exact_unit": 0.5,
+     "rounding": "floor_once",
+     "max_total": 104,
+     "bar_max": 64,
+     "bar_overflow": "clip",
+     "exclusive_groups": [
+      {
+       "id": "liveness",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "stale"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "branch",
+       "flag_ids": [
+        "pinned",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_age",
+       "flag_ids": [
+        "silent",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_push",
+       "flag_ids": [
+        "left-behind",
+        "stale"
+       ],
+       "holds_unless": {
+        "threshold": "push-warn-years",
+        "below": "release-warn-years"
+       }
+      },
+      {
+       "id": "php_bound",
+       "flag_ids": [
+        "old-promise",
+        "capped"
+       ],
+       "holds_unless": null
+      }
+     ],
+     "sort": [
+      {
+       "key": "verdict",
+       "path": "verdict",
+       "dir": "order",
+       "order": [
+        [
+         "critical"
+        ],
+        [
+         "high"
+        ],
+        [
+         "medium"
+        ],
+        [
+         "low"
+        ],
+        [
+         "unknown"
+        ],
+        [
+         "finished",
+         "ok"
+        ]
+       ],
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "security",
+       "path": "score.parts.security.contribution",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "score",
+       "path": "score.exact",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "direct",
+       "path": "direct",
+       "dir": "true_first",
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "package",
+       "path": "package",
+       "dir": "asc",
+       "collation": "bytes",
+       "default": null
+      }
+     ],
+     "rules": [
+      {
+       "id": "counted",
+       "stage": 1,
+       "kind": "select",
+       "applies_to": "flags",
+       "accept_group": "liveness",
+       "accept_covers": "listed_and_below",
+       "why": "accepted-facts-shown-not-counted",
+       "doc": "score-counted",
+       "illustration": null
+      },
+      {
+       "id": "lead-first",
+       "stage": 2,
+       "kind": "select",
+       "applies_to": "maintenance",
+       "order": "flag_order",
+       "share": {
+        "num": 1,
+        "den": 1
+       },
+       "why": "strongest-fact-in-full",
+       "doc": "score-lead-first",
+       "illustration": null
+      },
+      {
+       "id": "corroborating-share",
+       "stage": 3,
+       "kind": "share",
+       "applies_to": "maintenance",
+       "share": {
+        "num": 1,
+        "den": 4
+       },
+       "why": "correlated-evidence",
+       "doc": "score-corroborating-share",
+       "illustration": {
+        "lead": "left-behind",
+        "flag": "old-promise",
+        "weight": 16,
+        "points": 4
+       }
+      },
+      {
+       "id": "advisory-points",
+       "stage": 4,
+       "kind": "lookup",
+       "applies_to": "security",
+       "table": "severities",
+       "why": "severity-points",
+       "doc": "score-advisory-points",
+       "illustration": null
+      },
+      {
+       "id": "no-reachable-fix-multiplier",
+       "stage": 5,
+       "kind": "multiply",
+       "applies_to": "advisory",
+       "factor": 2,
+       "when_fix": [
+        "none",
+        "blocked"
+       ],
+       "why": "one-band-up",
+       "doc": "score-no-reachable-fix-multiplier",
+       "illustration": {
+        "severity": "high",
+        "before": 16,
+        "after": 32,
+        "band_before": "high",
+        "band_after": "critical"
+       }
+      },
+      {
+       "id": "security-max",
+       "stage": 6,
+       "kind": "max",
+       "applies_to": "security",
+       "tie_break": [
+        {
+         "key": "points",
+         "dir": "desc",
+         "collation": null
+        },
+        {
+         "key": "severity",
+         "dir": "order",
+         "collation": null
+        },
+        {
+         "key": "id",
+         "dir": "asc",
+         "collation": "bytes"
+        }
+       ],
+       "why": "one-number-per-part",
+       "doc": "score-security-max",
+       "illustration": null
+      },
+      {
+       "id": "divide-reach",
+       "stage": 7,
+       "kind": "divide",
+       "applies_to": "maintenance",
+       "by": 2,
+       "when": [
+        "transitive",
+        "unreached"
+       ],
+       "why": "reach-halves-maintenance",
+       "doc": "score-divide-reach",
+       "illustration": {
+        "flag": "abandoned",
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "security-exempt-from-reach",
+       "stage": 8,
+       "kind": "exempt",
+       "applies_to": "security",
+       "of": "divide-reach",
+       "why": "exploitability-independent-of-reach",
+       "doc": "score-security-exempt-from-reach",
+       "illustration": {
+        "severity": "critical",
+        "reach": "transitive",
+        "total": 32
+       }
+      },
+      {
+       "id": "sum",
+       "stage": 9,
+       "kind": "combine",
+       "applies_to": "total",
+       "op": "sum",
+       "ratio_from": "medium",
+       "why": "parts-add",
+       "doc": "score-sum",
+       "illustration": {
+        "maintenance": 16,
+        "security": 16,
+        "total": 32,
+        "band": "critical",
+        "low_maintenance": 4,
+        "low_security": 4,
+        "low_total": 8,
+        "low_band": "medium"
+       }
+      },
+      {
+       "id": "divide-dev",
+       "stage": 10,
+       "kind": "divide",
+       "applies_to": "total",
+       "by": 2,
+       "when": [
+        "dev"
+       ],
+       "why": "dev-halves-total",
+       "doc": "score-divide-dev",
+       "illustration": {
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "floor-once",
+       "stage": 11,
+       "kind": "floor",
+       "applies_to": "total",
+       "why": "integer-band-edges",
+       "doc": "score-floor-once",
+       "illustration": {
+        "exact": 4.5,
+        "total": 4
+       }
+      },
+      {
+       "id": "band-floors",
+       "stage": 12,
+       "kind": "band",
+       "applies_to": "total",
+       "ratio": 2,
+       "ratio_from": "medium",
+       "why": "two-floor-parts-make-next",
+       "doc": "score-band-floors",
+       "illustration": null
+      },
+      {
+       "id": "zero-verdicts",
+       "stage": 13,
+       "kind": "zero",
+       "applies_to": "total",
+       "table": "zero_verdicts",
+       "why": "score-zero-says-why",
+       "doc": "score-zero-verdicts",
+       "illustration": null
+      },
+      {
+       "id": "sort",
+       "stage": 14,
+       "kind": "order",
+       "applies_to": "findings",
+       "why": "advisory-findings-first",
+       "doc": "score-sort",
+       "illustration": null
+      },
+      {
+       "id": "gate-bounded-new",
+       "stage": 15,
+       "kind": "gate",
+       "applies_to": "gate",
+       "cap_multiplier": 2,
+       "why": "new-fact-sets-level",
+       "doc": "score-gate-bounded-new",
+       "illustration": {
+        "score": 36,
+        "new": 16,
+        "gate": 32
+       }
+      },
+      {
+       "id": "baseline-cover",
+       "stage": 16,
+       "kind": "cover",
+       "applies_to": "gate",
+       "order": "flag_order",
+       "covers": "listed_and_below",
+       "why": "recorded-lead-covers-below",
+       "doc": "score-baseline-cover",
+       "illustration": null
+      }
+     ],
+     "docs": "https://lockrot.dev/verdicts/model-1/"
+    },
+    "score_rules_used": {
+     "counted": 0,
+     "lead-first": 0,
+     "corroborating-share": 0,
+     "advisory-points": 1,
+     "no-reachable-fix-multiplier": 0,
+     "security-max": 0,
+     "divide-reach": 0,
+     "security-exempt-from-reach": 0,
+     "sum": 0,
+     "divide-dev": 0,
+     "floor-once": 0,
+     "band-floors": 1,
+     "zero-verdicts": 0,
+     "sort": null,
+     "gate-bounded-new": 0,
+     "baseline-cover": 0
+    },
+    "advisory_lookup": {
+     "scope": "all",
+     "scope_source": "default",
+     "packages_asked": 1,
+     "packages_not_asked": 0,
+     "other_repositories": 0,
+     "repositories": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "outcome": "answered",
+       "reason": null,
+       "message": null,
+       "packages_with_records": 1,
+       "records": 4
+      }
+     ]
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": false,
+     "blocking_disabled_by": [
+      "config.audit.block-insecure"
+     ],
+     "ignored_platform": [
+      "ext-*",
+      "lib-*",
+      "php-debug",
+      "php-ipv6",
+      "php-zts"
+     ],
+     "baseline": "not_checked",
+     "reason": "unloaded_name"
+    },
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/routing",
+         "version": "v6.4.28",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/routing",
+         "version": "v6.4.28",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     },
+     "target_fix": null
+    }
+   },
+   "synthetic_inputs": [
+    "the world of r3/cases.json `solver_world`: branch rows, advisory, lock and composer.json designed; every check is the Composer 2.10.3 answer of design/move-check-oracle (‡)"
+   ],
+   "finding": {
+    "package": "symfony/routing",
+    "version": "v6.4.28",
+    "branch": "6.x",
+    "installed_php": {
+     "requires": ">=8.1",
+     "target_runs": true,
+     "project_allows": true
+    },
+    "verdict": "high",
+    "priority": "high",
+    "lead": null,
+    "rank": 7,
+    "flags": [
+     {
+      "id": "vulnerable",
+      "role": "security",
+      "baseline": null,
+      "signal_ids": [
+       "S9"
+      ],
+      "degree": null,
+      "headline": {
+       "unit": "advisories",
+       "value": 1,
+       "source": null
+      },
+      "summary": "1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization"
+     }
+    ],
+    "score": {
+     "model": 1,
+     "total": 16,
+     "exact": 16,
+     "rounded_down": false,
+     "band": {
+      "floor": 16,
+      "next": "critical",
+      "to_next": 16
+     },
+     "decided_by": "security",
+     "parts": {
+      "maintenance": {
+       "status": "none",
+       "contribution": 0,
+       "alone": {
+        "total": 0,
+        "verdict": null
+       }
+      },
+      "security": {
+       "status": "counted",
+       "contribution": 16,
+       "alone": {
+        "total": 16,
+        "verdict": "high"
+       },
+       "of": 1,
+       "tied": []
+      }
+     },
+     "terms": [
+      {
+       "part": "security",
+       "flag": "vulnerable",
+       "role": "security",
+       "advisory": "PKSA-bf7t-jnpz-492k",
+       "severity": "high",
+       "fix_kind": "update",
+       "weight": 16,
+       "multiplier": 1,
+       "points": 16,
+       "contribution": 16
+      }
+     ],
+     "modifiers": [],
+     "accepted": [],
+     "without": [],
+     "text": "16 = vulnerable 16 [high advisory]"
+    },
+    "next_step": {
+     "kind": "update",
+     "source": "vulnerable",
+     "merged": [],
+     "fix_kind": "update",
+     "reason": null,
+     "replacement": null,
+     "quiet_years": null,
+     "to_branch": "6.x",
+     "version": "v6.4.41",
+     "newest": "v6.4.41",
+     "constraint": null,
+     "latest": null,
+     "php_check": {
+      "requires": ">=8.1",
+      "project_allows": true,
+      "target_runs": true,
+      "raise_to": null,
+      "raise_size": null
+     },
+     "crosses_major": false,
+     "held_by": [],
+     "clears": [
+      {
+       "kind": "advisory",
+       "id": "PKSA-bf7t-jnpz-492k",
+       "basis": "outside_range"
+      }
+     ],
+     "unverified": [],
+     "adds": [],
+     "leaves": [],
+     "clears_all": true,
+     "if_applied": {
+      "total": 0,
+      "verdict": "ok",
+      "lead": null,
+      "deciding_advisory": null,
+      "at_most": false,
+      "assumes": [
+       "clears_hold"
+      ]
+     },
+     "check": {
+      "result": "not_checked",
+      "form": null,
+      "reason": "unloaded_name",
+      "installs": null
+     },
+     "moves_with": [],
+     "composer_moves_because": [],
+     "commands": [
+      [
+       "composer",
+       "update",
+       "symfony/routing:^6.4.41"
+      ],
+      [
+       "composer",
+       "why-not",
+       "symfony/routing",
+       "v6.4.41",
+       "--locked"
+      ]
+     ],
+     "through": [],
+     "also": [],
+     "text": "composer update 'symfony/routing:^6.4.41' (gets v6.4.41) — clears the advisory; not checked with Composer's solver (a package it needs could not be loaded), so it holds only if Composer resolves it"
+    },
+    "security": {
+     "status": "vulnerable",
+     "check": "complete",
+     "complete": true,
+     "unchecked_reason": null,
+     "records": 4,
+     "feeds": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "answer": "answered",
+       "records": 4,
+       "reason": null
+      }
+     ],
+     "worst": "high",
+     "counts": {
+      "critical": 0,
+      "high": 1,
+      "medium": 0,
+      "unrated": 0,
+      "low": 0
+     },
+     "ignored": [],
+     "ignored_count": 0,
+     "fix_kind": "update",
+     "installed_branch_fixes": {
+      "fixed": 1,
+      "unknown": 0,
+      "of": 1,
+      "fix_kind": "update",
+      "lowest": "v6.4.41",
+      "newest": "v6.4.41",
+      "held_by": [],
+      "if_applied": {
+       "total": 0,
+       "verdict": "ok",
+       "at_most": false,
+       "assumes": [
+        "clears_hold"
+       ]
+      },
+      "check": {
+       "result": "not_checked",
+       "form": null,
+       "reason": "unloaded_name",
+       "installs": null
+      }
+     },
+     "move_in": "next_step",
+     "gets": {
+      "version": "v6.4.41",
+      "php_check": {
+       "requires": ">=8.1",
+       "project_allows": true,
+       "target_runs": true,
+       "raise_to": null,
+       "raise_size": null
+      },
+      "clears": [
+       {
+        "kind": "advisory",
+        "id": "PKSA-bf7t-jnpz-492k",
+        "basis": "outside_range"
+       }
+      ],
+      "clears_all": true
+     },
+     "partial": null
+    },
+    "checks_missing": [],
+    "checks_skipped": [],
+    "unchecked_accepted": [],
+    "maintenance_judged": true,
+    "metadata": {
+     "status": "read",
+     "reason": null,
+     "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/routing",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:06:16+00:00",
+     "cached_at": "2026-10-01T16:06:16+00:00"
+    },
+    "allowlist": null,
+    "abandoned_ignored": null,
+    "from_composer_repository": true,
+    "origin": {
+     "kind": "packagist",
+     "registry": "packagist.org",
+     "package_url": "https://packagist.org/packages/symfony/routing",
+     "local": false
+    },
+    "replacement": null,
+    "replacement_url": null,
+    "note": null,
+    "libyears_unmeasured": null,
+    "libyears_at_least": false,
+    "direct": true,
+    "dev": false,
+    "reach": "direct",
+    "chain": [
+     "symfony/routing"
+    ],
+    "depth": 0,
+    "depth_unmeasured": null,
+    "named_in": [
+     "require"
+    ],
+    "direct_dependents": [
+     "symfony/routing"
+    ],
+    "signals": [
+     {
+      "id": "S9",
+      "level": "high",
+      "summary": "1 security advisory affects v6.4.28 (CVE-2026-48784); fixed in v6.4.41",
+      "data": {
+       "advisories": [
+        {
+         "id": "PKSA-bf7t-jnpz-492k",
+         "cve": "CVE-2026-48784",
+         "title": "UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+         "link": "https://symfony.com/cve-2026-48784",
+         "reported_at": "2026-05-26T08:00:00+00:00",
+         "severity": "high",
+         "severity_published": "high",
+         "affected_versions": ">=6.4.0,<6.4.41",
+         "counted": true,
+         "points": 16,
+         "deciding": true,
+         "fix": {
+          "kind": "update",
+          "to_branch": "6.x",
+          "version": "v6.4.41",
+          "newest": "v6.4.41",
+          "on_installed_branch": true,
+          "php": ">=8.1",
+          "admits_target_php": true,
+          "admits_project_php": true,
+          "held_by": [],
+          "reason": null
+         },
+         "baseline": null
+        }
+       ],
+       "releases_read": true,
+       "complete": true
+      }
+     }
+    ],
+    "evidence": "vulnerable: 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+    "allowlist_reason": null,
+    "data_date": "2026-10-01T17:41:59+00:00",
+    "libyears": 0.67,
+    "age": {
+     "installed": {
+      "at": "2025-10-31T16:43:05+00:00",
+      "years": 0.9,
+      "dated_by": null
+     },
+     "installed_unmeasured": null,
+     "release": {
+      "version": "v6.4.41",
+      "at": "2026-07-03T10:00:00+00:00",
+      "years": 0.2,
+      "level": null,
+      "dated_by": null
+     },
+     "release_unmeasured": null,
+     "branch_release": {
+      "version": "v6.4.41",
+      "at": "2026-07-03T10:00:00+00:00",
+      "years": 0.2,
+      "level": null,
+      "dated_by": null
+     },
+     "branch_release_unmeasured": null,
+     "push": {
+      "at": "2026-09-29T14:09:10+00:00",
+      "years": 0,
+      "level": null
+     },
+     "push_unmeasured": null
+    },
+    "baseline": null,
+    "gate": {
+     "reaches_fail_on": true,
+     "fails": true,
+     "exempt_by": null,
+     "by": [
+      {
+       "value": "high",
+       "kind": "grade",
+       "facts": [
+        {
+         "kind": "advisory",
+         "id": "PKSA-bf7t-jnpz-492k"
+        }
+       ]
+      }
+     ],
+     "basis": null
+    }
+   },
+   "details": {
+    "metadata": {
+     "installed_branch": "6.x",
+     "branches": [
+      {
+       "branch": "6.x",
+       "installed": true,
+       "highest": "v6.4.41",
+       "highest_released": "2026-07-03T10:00:00+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v6.4.41",
+       "newest_dated_released": "2026-07-03T10:00:00+00:00",
+       "dated_by": null,
+       "php": ">=8.1",
+       "highest_php": ">=8.1",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 0.2,
+       "fixes": {
+        "fixed": 1,
+        "unknown": 0,
+        "of": 1,
+        "fix_kind": "update",
+        "lowest": "v6.4.41",
+        "newest": "v6.4.41",
+        "held_by": [],
+        "if_applied": {
+         "total": 0,
+         "verdict": "ok",
+         "at_most": false,
+         "assumes": [
+          "clears_hold"
+         ]
+        },
+        "check": {
+         "result": "not_checked",
+         "form": null,
+         "reason": "unloaded_name",
+         "installs": null
+        }
+       }
+      }
+     ]
+    }
+   },
+   "golden": {
+    "score_text": "16 = vulnerable 16 [high advisory]",
+    "next_step_text": "composer update 'symfony/routing:^6.4.41' (gets v6.4.41) — clears the advisory; not checked with Composer's solver (a package it needs could not be loaded), so it holds only if Composer resolves it",
+    "verdict_line": "High: a high-severity advisory affects your version (CVE-2026-48784 PKSA-bf7t-jnpz-492k: UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization).",
+    "readings": [],
+    "qualifiers": {
+     "reach": [
+      "Production: not in packages-dev",
+      "Required directly"
+     ],
+     "origin": null,
+     "not_judged": null,
+     "unchecked": [],
+     "not_run": [],
+     "php": null,
+     "php_edge": [],
+     "accepted": [],
+     "gate": [
+      "fails the run: grade high or above",
+      "Tripped by CVE-2026-48784"
+     ]
+    },
+    "moves": [
+     {
+      "heading": "The move",
+      "action": "Update to v6.4.41 on 6.x",
+      "platform_step": null,
+      "command_note": null,
+      "moves_with": null,
+      "commands": [
+       "composer update 'symfony/routing:^6.4.41'",
+       "composer why-not symfony/routing v6.4.41 --locked"
+      ],
+      "commands_label": "Commands, in order",
+      "clears": "the advisory",
+      "stays": null,
+      "not_checked": null,
+      "adds": [],
+      "php": {
+       "head": "6.x needs php >=8.1",
+       "lines": [
+        {
+         "answer": "yes",
+         "text": "your require.php allows it"
+        },
+        {
+         "answer": "yes",
+         "text": "your target, 8.4, runs it"
+        }
+       ]
+      },
+      "after": {
+       "result": "0, ok",
+       "conditions": [
+        "if Composer resolves it (not checked: a package it needs could not be loaded)"
+       ]
+      },
+      "composer": []
+     }
+    ],
+    "held_by": [
+     null
+    ],
+    "security": {
+     "summary": [
+      "1 high advisory",
+      "4 on record for this name",
+      "fix: composer update",
+      "lookup complete"
+     ],
+     "counts": [],
+     "meanwhile": null,
+     "caption": [
+      "By severity. Each affects your version, v6.4.28."
+     ],
+     "groups": [],
+     "rows": [
+      {
+       "name": "CVE-2026-48784",
+       "source": "PKSA-bf7t-jnpz-492k",
+       "deciding": true,
+       "severity": "high",
+       "fix": "fix v6.4.41 on 6.x, your branch (composer update)",
+       "affects": "affects >=6.4.0,<6.4.41",
+       "ranges": null,
+       "same_as": null
+      }
+     ],
+     "ignored": [],
+     "ladder": [
+      {
+       "branch": "6.x",
+       "marks": [
+        "your branch",
+        "the move"
+       ],
+       "lines": [
+        "6.x your branch the move clears 1 of 1 from v6.4.41",
+        "composer update",
+        "after it: 0, ok · not checked: a package it needs could not be loaded"
+       ]
+      }
+     ]
+    },
+    "branches_lead": [
+     "Your branch, 6.x, had its last release, v6.4.41, 0.2 years ago.",
+     "It has no higher branch."
+    ],
+    "branch_rows": [],
+    "age_rows": [
+     {
+      "label": "installed",
+      "value": "v6.4.28 · 2025-10-31 · 0.9 years ago"
+     },
+     {
+      "label": "6.x last",
+      "value": "v6.4.41 · 2026-07-03 · 0.2 years ago · its most recent release"
+     },
+     {
+      "label": "last push",
+      "value": "2026-09-29 · less than three weeks ago"
+     }
+    ],
+    "security_row": [
+     "1 high advisory",
+     "4 on record for this name",
+     "fix: composer update",
+     "lookup complete",
+     "6.x your branch the move clears 1 of 1 from v6.4.41",
+     "composer update",
+     "after it: 0, ok · not checked: a package it needs could not be loaded"
+    ],
+    "why": [
+     "16 · high from 16 · 16 points short of critical",
+     "vulnerable 16: high advisory CVE-2026-48784; its own fix (composer update on 6.x) is reachable, so no × 2",
+     "the advisory alone makes it high"
+    ],
+    "gate_line": null,
+    "checks": "1 fired (S9) · 10 quiet · every check ran",
+    "baseline_suffix": null,
+    "commands_posix": [
+     "composer update 'symfony/routing:^6.4.41'",
+     "composer why-not symfony/routing v6.4.41 --locked"
+    ],
+    "commands_cmd": [
+     "composer update \"symfony/routing:^6.4.41\"",
+     "composer why-not symfony/routing v6.4.41 --locked"
+    ],
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-03 (0.2 years ago), its newest release; last push 2026-09-29 (less than three weeks ago)"
+   },
+   "run_notes": [
+    {
+     "code": "lock_out_of_sync",
+     "text": "lock: the lock file does not match composer.json (acme/lib is not locked at a version that composer.json allows): run composer update",
+     "docs_url": "https://lockrot.dev/notes/#lock_out_of_sync",
+     "sets_network_failures": false,
+     "data": {
+      "missing": [
+       "acme/lib"
+      ]
+     }
+    }
+   ],
+   "parents": [],
+   "solver_world": {
+    "world_id": "baseline-unsynced",
+    "world": {
+     "platform_php": "8.4.99",
+     "root": {
+      "name": "typo3/cms",
+      "require": {
+       "php": "^8.1",
+       "symfony/routing": "^6.4",
+       "acme/lib": ">=1.1"
+      },
+      "require-dev": {
+       "acme/lib": "^1.0"
+      }
+     },
+     "lock": {
+      "packages": [
+       {
+        "version": "v6.4.28",
+        "require": {
+         "php": ">=8.1"
+        },
+        "name": "symfony/routing",
+        "time": "2025-10-31T16:43:05+00:00"
+       }
+      ],
+      "packages-dev": []
+     },
+     "repo": {
+      "acme/lib": [
+       {
+        "version": "1.0.0",
+        "require": {
+         "php": ">=8.1"
+        },
+        "time": "2026-07-01T10:00:00+00:00"
+       },
+       {
+        "version": "1.1.0",
+        "require": {
+         "php": ">=8.1",
+         "acme/private-lib": "^1.0"
+        },
+        "time": "2026-07-02T10:00:00+00:00"
+       }
+      ],
+      "symfony/routing": [
+       {
+        "version": "v6.4.28",
+        "require": {
+         "php": ">=8.1"
+        },
+        "time": "2025-10-31T16:43:05+00:00"
+       },
+       {
+        "version": "v6.4.41",
+        "require": {
+         "php": ">=8.1"
+        },
+        "time": "2026-07-03T10:00:00+00:00"
+       }
+      ]
+     },
+     "vcs_repos": [
+      "https://example.invalid/acme/private-lib.git"
+     ],
+     "lock_hash": "stale"
+    },
+    "check_passes": null,
+    "update_now": null,
+    "answers": {
+     "baseline": {
+      "result": "refused",
+      "form": null,
+      "holds": [
+       {
+        "constraint": ">=1.1",
+        "link": "root-require",
+        "package": null,
+        "source": "root",
+        "target": "acme/lib",
+        "version": null
+       }
+      ],
+      "problem": "  Problem 1\n    - Root composer.json requires acme/lib >=1.1, found acme/lib[1.0.0] but it does not match the constraint."
+     }
+    }
+   },
+   "inputs": {
+    "root": {
+     "name": "typo3/cms",
+     "require": {
+      "php": "^8.1",
+      "symfony/routing": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "symfony/routing",
+      "version": "v6.4.28",
+      "time": "2025-10-31T16:43:05+00:00",
+      "php": ">=8.1",
+      "dev": false,
+      "origin": "packagist"
+     }
+    ],
+    "releases": [
+     {
+      "version": "v6.4.28",
+      "time": "2025-10-31T16:43:05+00:00",
+      "php": ">=8.1"
+     },
+     {
+      "version": "v6.4.41",
+      "time": "2026-07-03T10:00:00+00:00",
+      "php": ">=8.1"
+     }
+    ],
+    "advisories": [
+     {
+      "id": "PKSA-bf7t-jnpz-492k",
+      "cve": "CVE-2026-48784",
+      "title": "UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+      "link": "https://symfony.com/cve-2026-48784",
+      "reported_at": "2026-05-26T08:00:00+00:00",
+      "severity": "high",
+      "affected_versions": ">=6.4.0,<6.4.41"
+     }
+    ],
+    "records": 4,
+    "ignored": [],
+    "abandoned": null,
+    "activity": {
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/routing",
+     "status": "read",
+     "reason": null,
+     "pushed_at": "2026-09-29T14:09:10+00:00",
+     "archived": false
+    },
+    "dependents": {},
+    "run": {
+     "target_php": "8.4",
+     "project_php": "^8.1",
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    },
+    "solver_world": {
+     "world_id": "baseline-unsynced",
+     "world": {
+      "platform_php": "8.4.99",
+      "root": {
+       "name": "typo3/cms",
+       "require": {
+        "php": "^8.1",
+        "symfony/routing": "^6.4",
+        "acme/lib": ">=1.1"
+       },
+       "require-dev": {
+        "acme/lib": "^1.0"
+       }
+      },
+      "lock": {
+       "packages": [
+        {
+         "version": "v6.4.28",
+         "require": {
+          "php": ">=8.1"
+         },
+         "name": "symfony/routing",
+         "time": "2025-10-31T16:43:05+00:00"
+        }
+       ],
+       "packages-dev": []
+      },
+      "repo": {
+       "acme/lib": [
+        {
+         "version": "1.0.0",
+         "require": {
+          "php": ">=8.1"
+         },
+         "time": "2026-07-01T10:00:00+00:00"
+        },
+        {
+         "version": "1.1.0",
+         "require": {
+          "php": ">=8.1",
+          "acme/private-lib": "^1.0"
+         },
+         "time": "2026-07-02T10:00:00+00:00"
+        }
+       ],
+       "symfony/routing": [
+        {
+         "version": "v6.4.28",
+         "require": {
+          "php": ">=8.1"
+         },
+         "time": "2025-10-31T16:43:05+00:00"
+        },
+        {
+         "version": "v6.4.41",
+         "require": {
+          "php": ">=8.1"
+         },
+         "time": "2026-07-03T10:00:00+00:00"
+        }
+       ]
+      },
+      "vcs_repos": [
+       "https://example.invalid/acme/private-lib.git"
+      ],
+      "lock_hash": "stale"
+     },
+     "check_passes": null,
+     "update_now": null,
+     "answers": {
+      "baseline": {
+       "result": "refused",
+       "form": null,
+       "holds": [
+        {
+         "constraint": ">=1.1",
+         "link": "root-require",
+         "package": null,
+         "source": "root",
+         "target": "acme/lib",
+         "version": null
+        }
+       ],
+       "problem": "  Problem 1\n    - Root composer.json requires acme/lib >=1.1, found acme/lib[1.0.0] but it does not match the constraint."
+      }
+     }
+    },
+    "checks": {
+     "baseline": {
+      "result": "refused",
+      "form": null,
+      "holds": [
+       {
+        "constraint": ">=1.1",
+        "link": "root-require",
+        "package": null,
+        "source": "root",
+        "target": "acme/lib",
+        "version": null
+       }
+      ],
+      "problem": "  Problem 1\n    - Root composer.json requires acme/lib >=1.1, found acme/lib[1.0.0] but it does not match the constraint.",
+      "reason": null
+     }
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": false,
+     "blocking_disabled_by": [
+      "config.audit.block-insecure"
+     ],
+     "ignored_platform": [
+      "ext-*",
+      "lib-*",
+      "php-debug",
+      "php-ipv6",
+      "php-zts"
+     ],
+     "baseline": "not_checked",
+     "reason": "unloaded_name",
+     "php": "8.4.99"
+    }
+   }
+  },
+  {
+   "id": "mc-baseline-unsynced-hashless‡",
+   "label": "the same world with a lock that has no content-hash: the baseline still reads not_checked unloaded_name, and the run writes no lock_out_of_sync note (ruling R20-1a)",
+   "project": "typo3-v12",
+   "run": {
+    "project": "typo3/cms",
+    "root_package": "typo3/cms",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "project_php": "^8.1",
+    "project_php_lowest": "8.1.0",
+    "lock_file": "composer.lock",
+    "fail_on": "high",
+    "fail_on_source": "option",
+    "gates": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "threshold": "high"
+     }
+    ],
+    "strict_network": false,
+    "mode": "check",
+    "include_dev": false,
+    "thresholds": {
+     "release-warn-years": 3,
+     "release-high-years": 5,
+     "push-warn-years": 3,
+     "push-high-years": 5
+    },
+    "flag_ids": [
+     "abandoned",
+     "silent",
+     "pinned",
+     "left-behind",
+     "old-promise",
+     "stale",
+     "capped",
+     "vulnerable"
+    ],
+    "verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     "unknown",
+     "finished",
+     "ok"
+    ],
+    "graded_verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "signal_ids": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7",
+     "S8",
+     "S9",
+     "S10",
+     "S11"
+    ],
+    "fix_model": 1,
+    "text_grammar": 1,
+    "score_model": {
+     "id": 1,
+     "score_text_grammar": 1,
+     "flag_order": [
+      "abandoned",
+      "silent",
+      "pinned",
+      "left-behind",
+      "old-promise",
+      "stale",
+      "capped",
+      "vulnerable"
+     ],
+     "parts": [
+      {
+       "id": "maintenance",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale",
+        "capped"
+       ],
+       "combine": "lead_plus_share"
+      },
+      {
+       "id": "security",
+       "flag_ids": [
+        "vulnerable"
+       ],
+       "combine": "max"
+      }
+     ],
+     "flags": [
+      {
+       "id": "abandoned",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "abandoned",
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S1",
+        "S3"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "silent",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "silent",
+        "pinned",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-high-years",
+        "push-high-years"
+       ],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "pinned",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 22,
+       "max_maintenance_flags": [
+        "pinned",
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S6"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "left-behind",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 20,
+       "max_maintenance_flags": [
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S8"
+       ],
+       "thresholds": [
+        "release-warn-years"
+       ],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "old-promise",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 18,
+       "max_maintenance_flags": [
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S5"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "stale",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 10,
+       "max_maintenance_flags": [
+        "stale",
+        "capped"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-warn-years",
+        "push-warn-years"
+       ],
+       "basis": {
+        "v013_base": "medium",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "capped",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 8,
+       "max_maintenance_flags": [
+        "capped"
+       ],
+       "raised_by": [
+        "S11"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "vulnerable",
+       "part": "security",
+       "points": null,
+       "band": null,
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": null,
+       "max_maintenance_flags": null,
+       "raised_by": [
+        "S9"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "severities"
+       },
+       "points_from": "severities"
+      }
+     ],
+     "severities": [
+      {
+       "id": "critical",
+       "points": 32,
+       "band": "critical",
+       "points_no_reachable_fix": 64,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 4,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "high",
+       "points": 16,
+       "band": "high",
+       "points_no_reachable_fix": 32,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 3,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "medium",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "unrated",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": "medium",
+       "basis": {
+        "points": "counts_as"
+       }
+      },
+      {
+       "id": "low",
+       "points": 2,
+       "band": "low",
+       "points_no_reachable_fix": 4,
+       "band_no_reachable_fix": "low",
+       "gate_rank": 1,
+       "counts_as": null,
+       "basis": {
+        "points": "share",
+        "of": "medium",
+        "share": {
+         "num": 1,
+         "den": 4
+        }
+       }
+      }
+     ],
+     "fix_kinds": [
+      {
+       "id": "update",
+       "ease": 1,
+       "doubles": false
+      },
+      {
+       "id": "upgrade",
+       "ease": 2,
+       "doubles": false
+      },
+      {
+       "id": "raise-php",
+       "ease": 3,
+       "doubles": false
+      },
+      {
+       "id": "unknown",
+       "ease": 4,
+       "doubles": false
+      },
+      {
+       "id": "blocked",
+       "ease": 5,
+       "doubles": true
+      },
+      {
+       "id": "none",
+       "ease": 6,
+       "doubles": true
+      }
+     ],
+     "bands": [
+      {
+       "verdict": "critical",
+       "floor": 32
+      },
+      {
+       "verdict": "high",
+       "floor": 16
+      },
+      {
+       "verdict": "medium",
+       "floor": 8
+      },
+      {
+       "verdict": "low",
+       "floor": 1
+      }
+     ],
+     "zero_verdicts": [
+      {
+       "verdict": "finished",
+       "when": "allowlisted"
+      },
+      {
+       "verdict": "unknown",
+       "when": "no_metadata"
+      },
+      {
+       "verdict": "ok",
+       "when": "otherwise"
+      }
+     ],
+     "exact_unit": 0.5,
+     "rounding": "floor_once",
+     "max_total": 104,
+     "bar_max": 64,
+     "bar_overflow": "clip",
+     "exclusive_groups": [
+      {
+       "id": "liveness",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "stale"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "branch",
+       "flag_ids": [
+        "pinned",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_age",
+       "flag_ids": [
+        "silent",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_push",
+       "flag_ids": [
+        "left-behind",
+        "stale"
+       ],
+       "holds_unless": {
+        "threshold": "push-warn-years",
+        "below": "release-warn-years"
+       }
+      },
+      {
+       "id": "php_bound",
+       "flag_ids": [
+        "old-promise",
+        "capped"
+       ],
+       "holds_unless": null
+      }
+     ],
+     "sort": [
+      {
+       "key": "verdict",
+       "path": "verdict",
+       "dir": "order",
+       "order": [
+        [
+         "critical"
+        ],
+        [
+         "high"
+        ],
+        [
+         "medium"
+        ],
+        [
+         "low"
+        ],
+        [
+         "unknown"
+        ],
+        [
+         "finished",
+         "ok"
+        ]
+       ],
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "security",
+       "path": "score.parts.security.contribution",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "score",
+       "path": "score.exact",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "direct",
+       "path": "direct",
+       "dir": "true_first",
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "package",
+       "path": "package",
+       "dir": "asc",
+       "collation": "bytes",
+       "default": null
+      }
+     ],
+     "rules": [
+      {
+       "id": "counted",
+       "stage": 1,
+       "kind": "select",
+       "applies_to": "flags",
+       "accept_group": "liveness",
+       "accept_covers": "listed_and_below",
+       "why": "accepted-facts-shown-not-counted",
+       "doc": "score-counted",
+       "illustration": null
+      },
+      {
+       "id": "lead-first",
+       "stage": 2,
+       "kind": "select",
+       "applies_to": "maintenance",
+       "order": "flag_order",
+       "share": {
+        "num": 1,
+        "den": 1
+       },
+       "why": "strongest-fact-in-full",
+       "doc": "score-lead-first",
+       "illustration": null
+      },
+      {
+       "id": "corroborating-share",
+       "stage": 3,
+       "kind": "share",
+       "applies_to": "maintenance",
+       "share": {
+        "num": 1,
+        "den": 4
+       },
+       "why": "correlated-evidence",
+       "doc": "score-corroborating-share",
+       "illustration": {
+        "lead": "left-behind",
+        "flag": "old-promise",
+        "weight": 16,
+        "points": 4
+       }
+      },
+      {
+       "id": "advisory-points",
+       "stage": 4,
+       "kind": "lookup",
+       "applies_to": "security",
+       "table": "severities",
+       "why": "severity-points",
+       "doc": "score-advisory-points",
+       "illustration": null
+      },
+      {
+       "id": "no-reachable-fix-multiplier",
+       "stage": 5,
+       "kind": "multiply",
+       "applies_to": "advisory",
+       "factor": 2,
+       "when_fix": [
+        "none",
+        "blocked"
+       ],
+       "why": "one-band-up",
+       "doc": "score-no-reachable-fix-multiplier",
+       "illustration": {
+        "severity": "high",
+        "before": 16,
+        "after": 32,
+        "band_before": "high",
+        "band_after": "critical"
+       }
+      },
+      {
+       "id": "security-max",
+       "stage": 6,
+       "kind": "max",
+       "applies_to": "security",
+       "tie_break": [
+        {
+         "key": "points",
+         "dir": "desc",
+         "collation": null
+        },
+        {
+         "key": "severity",
+         "dir": "order",
+         "collation": null
+        },
+        {
+         "key": "id",
+         "dir": "asc",
+         "collation": "bytes"
+        }
+       ],
+       "why": "one-number-per-part",
+       "doc": "score-security-max",
+       "illustration": null
+      },
+      {
+       "id": "divide-reach",
+       "stage": 7,
+       "kind": "divide",
+       "applies_to": "maintenance",
+       "by": 2,
+       "when": [
+        "transitive",
+        "unreached"
+       ],
+       "why": "reach-halves-maintenance",
+       "doc": "score-divide-reach",
+       "illustration": {
+        "flag": "abandoned",
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "security-exempt-from-reach",
+       "stage": 8,
+       "kind": "exempt",
+       "applies_to": "security",
+       "of": "divide-reach",
+       "why": "exploitability-independent-of-reach",
+       "doc": "score-security-exempt-from-reach",
+       "illustration": {
+        "severity": "critical",
+        "reach": "transitive",
+        "total": 32
+       }
+      },
+      {
+       "id": "sum",
+       "stage": 9,
+       "kind": "combine",
+       "applies_to": "total",
+       "op": "sum",
+       "ratio_from": "medium",
+       "why": "parts-add",
+       "doc": "score-sum",
+       "illustration": {
+        "maintenance": 16,
+        "security": 16,
+        "total": 32,
+        "band": "critical",
+        "low_maintenance": 4,
+        "low_security": 4,
+        "low_total": 8,
+        "low_band": "medium"
+       }
+      },
+      {
+       "id": "divide-dev",
+       "stage": 10,
+       "kind": "divide",
+       "applies_to": "total",
+       "by": 2,
+       "when": [
+        "dev"
+       ],
+       "why": "dev-halves-total",
+       "doc": "score-divide-dev",
+       "illustration": {
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "floor-once",
+       "stage": 11,
+       "kind": "floor",
+       "applies_to": "total",
+       "why": "integer-band-edges",
+       "doc": "score-floor-once",
+       "illustration": {
+        "exact": 4.5,
+        "total": 4
+       }
+      },
+      {
+       "id": "band-floors",
+       "stage": 12,
+       "kind": "band",
+       "applies_to": "total",
+       "ratio": 2,
+       "ratio_from": "medium",
+       "why": "two-floor-parts-make-next",
+       "doc": "score-band-floors",
+       "illustration": null
+      },
+      {
+       "id": "zero-verdicts",
+       "stage": 13,
+       "kind": "zero",
+       "applies_to": "total",
+       "table": "zero_verdicts",
+       "why": "score-zero-says-why",
+       "doc": "score-zero-verdicts",
+       "illustration": null
+      },
+      {
+       "id": "sort",
+       "stage": 14,
+       "kind": "order",
+       "applies_to": "findings",
+       "why": "advisory-findings-first",
+       "doc": "score-sort",
+       "illustration": null
+      },
+      {
+       "id": "gate-bounded-new",
+       "stage": 15,
+       "kind": "gate",
+       "applies_to": "gate",
+       "cap_multiplier": 2,
+       "why": "new-fact-sets-level",
+       "doc": "score-gate-bounded-new",
+       "illustration": {
+        "score": 36,
+        "new": 16,
+        "gate": 32
+       }
+      },
+      {
+       "id": "baseline-cover",
+       "stage": 16,
+       "kind": "cover",
+       "applies_to": "gate",
+       "order": "flag_order",
+       "covers": "listed_and_below",
+       "why": "recorded-lead-covers-below",
+       "doc": "score-baseline-cover",
+       "illustration": null
+      }
+     ],
+     "docs": "https://lockrot.dev/verdicts/model-1/"
+    },
+    "score_rules_used": {
+     "counted": 0,
+     "lead-first": 0,
+     "corroborating-share": 0,
+     "advisory-points": 1,
+     "no-reachable-fix-multiplier": 0,
+     "security-max": 0,
+     "divide-reach": 0,
+     "security-exempt-from-reach": 0,
+     "sum": 0,
+     "divide-dev": 0,
+     "floor-once": 0,
+     "band-floors": 1,
+     "zero-verdicts": 0,
+     "sort": null,
+     "gate-bounded-new": 0,
+     "baseline-cover": 0
+    },
+    "advisory_lookup": {
+     "scope": "all",
+     "scope_source": "default",
+     "packages_asked": 1,
+     "packages_not_asked": 0,
+     "other_repositories": 0,
+     "repositories": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "outcome": "answered",
+       "reason": null,
+       "message": null,
+       "packages_with_records": 1,
+       "records": 4
+      }
+     ]
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": false,
+     "blocking_disabled_by": [
+      "config.audit.block-insecure"
+     ],
+     "ignored_platform": [
+      "ext-*",
+      "lib-*",
+      "php-debug",
+      "php-ipv6",
+      "php-zts"
+     ],
+     "baseline": "not_checked",
+     "reason": "unloaded_name"
+    },
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/routing",
+         "version": "v6.4.28",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/routing",
+         "version": "v6.4.28",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     },
+     "target_fix": null
+    }
+   },
+   "synthetic_inputs": [
+    "the world of r3/cases.json `solver_world`: branch rows, advisory, lock and composer.json designed; every check is the Composer 2.10.3 answer of design/move-check-oracle (‡)"
+   ],
+   "finding": {
+    "package": "symfony/routing",
+    "version": "v6.4.28",
+    "branch": "6.x",
+    "installed_php": {
+     "requires": ">=8.1",
+     "target_runs": true,
+     "project_allows": true
+    },
+    "verdict": "high",
+    "priority": "high",
+    "lead": null,
+    "rank": 7,
+    "flags": [
+     {
+      "id": "vulnerable",
+      "role": "security",
+      "baseline": null,
+      "signal_ids": [
+       "S9"
+      ],
+      "degree": null,
+      "headline": {
+       "unit": "advisories",
+       "value": 1,
+       "source": null
+      },
+      "summary": "1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization"
+     }
+    ],
+    "score": {
+     "model": 1,
+     "total": 16,
+     "exact": 16,
+     "rounded_down": false,
+     "band": {
+      "floor": 16,
+      "next": "critical",
+      "to_next": 16
+     },
+     "decided_by": "security",
+     "parts": {
+      "maintenance": {
+       "status": "none",
+       "contribution": 0,
+       "alone": {
+        "total": 0,
+        "verdict": null
+       }
+      },
+      "security": {
+       "status": "counted",
+       "contribution": 16,
+       "alone": {
+        "total": 16,
+        "verdict": "high"
+       },
+       "of": 1,
+       "tied": []
+      }
+     },
+     "terms": [
+      {
+       "part": "security",
+       "flag": "vulnerable",
+       "role": "security",
+       "advisory": "PKSA-bf7t-jnpz-492k",
+       "severity": "high",
+       "fix_kind": "update",
+       "weight": 16,
+       "multiplier": 1,
+       "points": 16,
+       "contribution": 16
+      }
+     ],
+     "modifiers": [],
+     "accepted": [],
+     "without": [],
+     "text": "16 = vulnerable 16 [high advisory]"
+    },
+    "next_step": {
+     "kind": "update",
+     "source": "vulnerable",
+     "merged": [],
+     "fix_kind": "update",
+     "reason": null,
+     "replacement": null,
+     "quiet_years": null,
+     "to_branch": "6.x",
+     "version": "v6.4.41",
+     "newest": "v6.4.41",
+     "constraint": null,
+     "latest": null,
+     "php_check": {
+      "requires": ">=8.1",
+      "project_allows": true,
+      "target_runs": true,
+      "raise_to": null,
+      "raise_size": null
+     },
+     "crosses_major": false,
+     "held_by": [],
+     "clears": [
+      {
+       "kind": "advisory",
+       "id": "PKSA-bf7t-jnpz-492k",
+       "basis": "outside_range"
+      }
+     ],
+     "unverified": [],
+     "adds": [],
+     "leaves": [],
+     "clears_all": true,
+     "if_applied": {
+      "total": 0,
+      "verdict": "ok",
+      "lead": null,
+      "deciding_advisory": null,
+      "at_most": false,
+      "assumes": [
+       "clears_hold"
+      ]
+     },
+     "check": {
+      "result": "not_checked",
+      "form": null,
+      "reason": "unloaded_name",
+      "installs": null
+     },
+     "moves_with": [],
+     "composer_moves_because": [],
+     "commands": [
+      [
+       "composer",
+       "update",
+       "symfony/routing:^6.4.41"
+      ],
+      [
+       "composer",
+       "why-not",
+       "symfony/routing",
+       "v6.4.41",
+       "--locked"
+      ]
+     ],
+     "through": [],
+     "also": [],
+     "text": "composer update 'symfony/routing:^6.4.41' (gets v6.4.41) — clears the advisory; not checked with Composer's solver (a package it needs could not be loaded), so it holds only if Composer resolves it"
+    },
+    "security": {
+     "status": "vulnerable",
+     "check": "complete",
+     "complete": true,
+     "unchecked_reason": null,
+     "records": 4,
+     "feeds": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "answer": "answered",
+       "records": 4,
+       "reason": null
+      }
+     ],
+     "worst": "high",
+     "counts": {
+      "critical": 0,
+      "high": 1,
+      "medium": 0,
+      "unrated": 0,
+      "low": 0
+     },
+     "ignored": [],
+     "ignored_count": 0,
+     "fix_kind": "update",
+     "installed_branch_fixes": {
+      "fixed": 1,
+      "unknown": 0,
+      "of": 1,
+      "fix_kind": "update",
+      "lowest": "v6.4.41",
+      "newest": "v6.4.41",
+      "held_by": [],
+      "if_applied": {
+       "total": 0,
+       "verdict": "ok",
+       "at_most": false,
+       "assumes": [
+        "clears_hold"
+       ]
+      },
+      "check": {
+       "result": "not_checked",
+       "form": null,
+       "reason": "unloaded_name",
+       "installs": null
+      }
+     },
+     "move_in": "next_step",
+     "gets": {
+      "version": "v6.4.41",
+      "php_check": {
+       "requires": ">=8.1",
+       "project_allows": true,
+       "target_runs": true,
+       "raise_to": null,
+       "raise_size": null
+      },
+      "clears": [
+       {
+        "kind": "advisory",
+        "id": "PKSA-bf7t-jnpz-492k",
+        "basis": "outside_range"
+       }
+      ],
+      "clears_all": true
+     },
+     "partial": null
+    },
+    "checks_missing": [],
+    "checks_skipped": [],
+    "unchecked_accepted": [],
+    "maintenance_judged": true,
+    "metadata": {
+     "status": "read",
+     "reason": null,
+     "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/routing",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:06:16+00:00",
+     "cached_at": "2026-10-01T16:06:16+00:00"
+    },
+    "allowlist": null,
+    "abandoned_ignored": null,
+    "from_composer_repository": true,
+    "origin": {
+     "kind": "packagist",
+     "registry": "packagist.org",
+     "package_url": "https://packagist.org/packages/symfony/routing",
+     "local": false
+    },
+    "replacement": null,
+    "replacement_url": null,
+    "note": null,
+    "libyears_unmeasured": null,
+    "libyears_at_least": false,
+    "direct": true,
+    "dev": false,
+    "reach": "direct",
+    "chain": [
+     "symfony/routing"
+    ],
+    "depth": 0,
+    "depth_unmeasured": null,
+    "named_in": [
+     "require"
+    ],
+    "direct_dependents": [
+     "symfony/routing"
+    ],
+    "signals": [
+     {
+      "id": "S9",
+      "level": "high",
+      "summary": "1 security advisory affects v6.4.28 (CVE-2026-48784); fixed in v6.4.41",
+      "data": {
+       "advisories": [
+        {
+         "id": "PKSA-bf7t-jnpz-492k",
+         "cve": "CVE-2026-48784",
+         "title": "UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+         "link": "https://symfony.com/cve-2026-48784",
+         "reported_at": "2026-05-26T08:00:00+00:00",
+         "severity": "high",
+         "severity_published": "high",
+         "affected_versions": ">=6.4.0,<6.4.41",
+         "counted": true,
+         "points": 16,
+         "deciding": true,
+         "fix": {
+          "kind": "update",
+          "to_branch": "6.x",
+          "version": "v6.4.41",
+          "newest": "v6.4.41",
+          "on_installed_branch": true,
+          "php": ">=8.1",
+          "admits_target_php": true,
+          "admits_project_php": true,
+          "held_by": [],
+          "reason": null
+         },
+         "baseline": null
+        }
+       ],
+       "releases_read": true,
+       "complete": true
+      }
+     }
+    ],
+    "evidence": "vulnerable: 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+    "allowlist_reason": null,
+    "data_date": "2026-10-01T17:41:59+00:00",
+    "libyears": 0.67,
+    "age": {
+     "installed": {
+      "at": "2025-10-31T16:43:05+00:00",
+      "years": 0.9,
+      "dated_by": null
+     },
+     "installed_unmeasured": null,
+     "release": {
+      "version": "v6.4.41",
+      "at": "2026-07-03T10:00:00+00:00",
+      "years": 0.2,
+      "level": null,
+      "dated_by": null
+     },
+     "release_unmeasured": null,
+     "branch_release": {
+      "version": "v6.4.41",
+      "at": "2026-07-03T10:00:00+00:00",
+      "years": 0.2,
+      "level": null,
+      "dated_by": null
+     },
+     "branch_release_unmeasured": null,
+     "push": {
+      "at": "2026-09-29T14:09:10+00:00",
+      "years": 0,
+      "level": null
+     },
+     "push_unmeasured": null
+    },
+    "baseline": null,
+    "gate": {
+     "reaches_fail_on": true,
+     "fails": true,
+     "exempt_by": null,
+     "by": [
+      {
+       "value": "high",
+       "kind": "grade",
+       "facts": [
+        {
+         "kind": "advisory",
+         "id": "PKSA-bf7t-jnpz-492k"
+        }
+       ]
+      }
+     ],
+     "basis": null
+    }
+   },
+   "details": {
+    "metadata": {
+     "installed_branch": "6.x",
+     "branches": [
+      {
+       "branch": "6.x",
+       "installed": true,
+       "highest": "v6.4.41",
+       "highest_released": "2026-07-03T10:00:00+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v6.4.41",
+       "newest_dated_released": "2026-07-03T10:00:00+00:00",
+       "dated_by": null,
+       "php": ">=8.1",
+       "highest_php": ">=8.1",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 0.2,
+       "fixes": {
+        "fixed": 1,
+        "unknown": 0,
+        "of": 1,
+        "fix_kind": "update",
+        "lowest": "v6.4.41",
+        "newest": "v6.4.41",
+        "held_by": [],
+        "if_applied": {
+         "total": 0,
+         "verdict": "ok",
+         "at_most": false,
+         "assumes": [
+          "clears_hold"
+         ]
+        },
+        "check": {
+         "result": "not_checked",
+         "form": null,
+         "reason": "unloaded_name",
+         "installs": null
+        }
+       }
+      }
+     ]
+    }
+   },
+   "golden": {
+    "score_text": "16 = vulnerable 16 [high advisory]",
+    "next_step_text": "composer update 'symfony/routing:^6.4.41' (gets v6.4.41) — clears the advisory; not checked with Composer's solver (a package it needs could not be loaded), so it holds only if Composer resolves it",
+    "verdict_line": "High: a high-severity advisory affects your version (CVE-2026-48784 PKSA-bf7t-jnpz-492k: UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization).",
+    "readings": [],
+    "qualifiers": {
+     "reach": [
+      "Production: not in packages-dev",
+      "Required directly"
+     ],
+     "origin": null,
+     "not_judged": null,
+     "unchecked": [],
+     "not_run": [],
+     "php": null,
+     "php_edge": [],
+     "accepted": [],
+     "gate": [
+      "fails the run: grade high or above",
+      "Tripped by CVE-2026-48784"
+     ]
+    },
+    "moves": [
+     {
+      "heading": "The move",
+      "action": "Update to v6.4.41 on 6.x",
+      "platform_step": null,
+      "command_note": null,
+      "moves_with": null,
+      "commands": [
+       "composer update 'symfony/routing:^6.4.41'",
+       "composer why-not symfony/routing v6.4.41 --locked"
+      ],
+      "commands_label": "Commands, in order",
+      "clears": "the advisory",
+      "stays": null,
+      "not_checked": null,
+      "adds": [],
+      "php": {
+       "head": "6.x needs php >=8.1",
+       "lines": [
+        {
+         "answer": "yes",
+         "text": "your require.php allows it"
+        },
+        {
+         "answer": "yes",
+         "text": "your target, 8.4, runs it"
+        }
+       ]
+      },
+      "after": {
+       "result": "0, ok",
+       "conditions": [
+        "if Composer resolves it (not checked: a package it needs could not be loaded)"
+       ]
+      },
+      "composer": []
+     }
+    ],
+    "held_by": [
+     null
+    ],
+    "security": {
+     "summary": [
+      "1 high advisory",
+      "4 on record for this name",
+      "fix: composer update",
+      "lookup complete"
+     ],
+     "counts": [],
+     "meanwhile": null,
+     "caption": [
+      "By severity. Each affects your version, v6.4.28."
+     ],
+     "groups": [],
+     "rows": [
+      {
+       "name": "CVE-2026-48784",
+       "source": "PKSA-bf7t-jnpz-492k",
+       "deciding": true,
+       "severity": "high",
+       "fix": "fix v6.4.41 on 6.x, your branch (composer update)",
+       "affects": "affects >=6.4.0,<6.4.41",
+       "ranges": null,
+       "same_as": null
+      }
+     ],
+     "ignored": [],
+     "ladder": [
+      {
+       "branch": "6.x",
+       "marks": [
+        "your branch",
+        "the move"
+       ],
+       "lines": [
+        "6.x your branch the move clears 1 of 1 from v6.4.41",
+        "composer update",
+        "after it: 0, ok · not checked: a package it needs could not be loaded"
+       ]
+      }
+     ]
+    },
+    "branches_lead": [
+     "Your branch, 6.x, had its last release, v6.4.41, 0.2 years ago.",
+     "It has no higher branch."
+    ],
+    "branch_rows": [],
+    "age_rows": [
+     {
+      "label": "installed",
+      "value": "v6.4.28 · 2025-10-31 · 0.9 years ago"
+     },
+     {
+      "label": "6.x last",
+      "value": "v6.4.41 · 2026-07-03 · 0.2 years ago · its most recent release"
+     },
+     {
+      "label": "last push",
+      "value": "2026-09-29 · less than three weeks ago"
+     }
+    ],
+    "security_row": [
+     "1 high advisory",
+     "4 on record for this name",
+     "fix: composer update",
+     "lookup complete",
+     "6.x your branch the move clears 1 of 1 from v6.4.41",
+     "composer update",
+     "after it: 0, ok · not checked: a package it needs could not be loaded"
+    ],
+    "why": [
+     "16 · high from 16 · 16 points short of critical",
+     "vulnerable 16: high advisory CVE-2026-48784; its own fix (composer update on 6.x) is reachable, so no × 2",
+     "the advisory alone makes it high"
+    ],
+    "gate_line": null,
+    "checks": "1 fired (S9) · 10 quiet · every check ran",
+    "baseline_suffix": null,
+    "commands_posix": [
+     "composer update 'symfony/routing:^6.4.41'",
+     "composer why-not symfony/routing v6.4.41 --locked"
+    ],
+    "commands_cmd": [
+     "composer update \"symfony/routing:^6.4.41\"",
+     "composer why-not symfony/routing v6.4.41 --locked"
+    ],
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-03 (0.2 years ago), its newest release; last push 2026-09-29 (less than three weeks ago)"
+   },
+   "parents": [],
+   "solver_world": {
+    "world_id": "baseline-unsynced-hashless",
+    "world": {
+     "platform_php": "8.4.99",
+     "root": {
+      "name": "typo3/cms",
+      "require": {
+       "php": "^8.1",
+       "symfony/routing": "^6.4",
+       "acme/lib": ">=1.1"
+      },
+      "require-dev": {
+       "acme/lib": "^1.0"
+      }
+     },
+     "lock": {
+      "packages": [
+       {
+        "version": "v6.4.28",
+        "require": {
+         "php": ">=8.1"
+        },
+        "name": "symfony/routing",
+        "time": "2025-10-31T16:43:05+00:00"
+       }
+      ],
+      "packages-dev": []
+     },
+     "repo": {
+      "acme/lib": [
+       {
+        "version": "1.0.0",
+        "require": {
+         "php": ">=8.1"
+        },
+        "time": "2026-07-01T10:00:00+00:00"
+       },
+       {
+        "version": "1.1.0",
+        "require": {
+         "php": ">=8.1",
+         "acme/private-lib": "^1.0"
+        },
+        "time": "2026-07-02T10:00:00+00:00"
+       }
+      ],
+      "symfony/routing": [
+       {
+        "version": "v6.4.28",
+        "require": {
+         "php": ">=8.1"
+        },
+        "time": "2025-10-31T16:43:05+00:00"
+       },
+       {
+        "version": "v6.4.41",
+        "require": {
+         "php": ">=8.1"
+        },
+        "time": "2026-07-03T10:00:00+00:00"
+       }
+      ]
+     },
+     "vcs_repos": [
+      "https://example.invalid/acme/private-lib.git"
+     ]
+    },
+    "check_passes": null,
+    "update_now": null,
+    "answers": {
+     "baseline": {
+      "result": "refused",
+      "form": null,
+      "holds": [
+       {
+        "constraint": ">=1.1",
+        "link": "root-require",
+        "package": null,
+        "source": "root",
+        "target": "acme/lib",
+        "version": null
+       }
+      ],
+      "problem": "  Problem 1\n    - Root composer.json requires acme/lib >=1.1, found acme/lib[1.0.0] but it does not match the constraint."
+     }
+    }
+   },
+   "inputs": {
+    "root": {
+     "name": "typo3/cms",
+     "require": {
+      "php": "^8.1",
+      "symfony/routing": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "symfony/routing",
+      "version": "v6.4.28",
+      "time": "2025-10-31T16:43:05+00:00",
+      "php": ">=8.1",
+      "dev": false,
+      "origin": "packagist"
+     }
+    ],
+    "releases": [
+     {
+      "version": "v6.4.28",
+      "time": "2025-10-31T16:43:05+00:00",
+      "php": ">=8.1"
+     },
+     {
+      "version": "v6.4.41",
+      "time": "2026-07-03T10:00:00+00:00",
+      "php": ">=8.1"
+     }
+    ],
+    "advisories": [
+     {
+      "id": "PKSA-bf7t-jnpz-492k",
+      "cve": "CVE-2026-48784",
+      "title": "UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+      "link": "https://symfony.com/cve-2026-48784",
+      "reported_at": "2026-05-26T08:00:00+00:00",
+      "severity": "high",
+      "affected_versions": ">=6.4.0,<6.4.41"
+     }
+    ],
+    "records": 4,
+    "ignored": [],
+    "abandoned": null,
+    "activity": {
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/routing",
+     "status": "read",
+     "reason": null,
+     "pushed_at": "2026-09-29T14:09:10+00:00",
+     "archived": false
+    },
+    "dependents": {},
+    "run": {
+     "target_php": "8.4",
+     "project_php": "^8.1",
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    },
+    "solver_world": {
+     "world_id": "baseline-unsynced-hashless",
+     "world": {
+      "platform_php": "8.4.99",
+      "root": {
+       "name": "typo3/cms",
+       "require": {
+        "php": "^8.1",
+        "symfony/routing": "^6.4",
+        "acme/lib": ">=1.1"
+       },
+       "require-dev": {
+        "acme/lib": "^1.0"
+       }
+      },
+      "lock": {
+       "packages": [
+        {
+         "version": "v6.4.28",
+         "require": {
+          "php": ">=8.1"
+         },
+         "name": "symfony/routing",
+         "time": "2025-10-31T16:43:05+00:00"
+        }
+       ],
+       "packages-dev": []
+      },
+      "repo": {
+       "acme/lib": [
+        {
+         "version": "1.0.0",
+         "require": {
+          "php": ">=8.1"
+         },
+         "time": "2026-07-01T10:00:00+00:00"
+        },
+        {
+         "version": "1.1.0",
+         "require": {
+          "php": ">=8.1",
+          "acme/private-lib": "^1.0"
+         },
+         "time": "2026-07-02T10:00:00+00:00"
+        }
+       ],
+       "symfony/routing": [
+        {
+         "version": "v6.4.28",
+         "require": {
+          "php": ">=8.1"
+         },
+         "time": "2025-10-31T16:43:05+00:00"
+        },
+        {
+         "version": "v6.4.41",
+         "require": {
+          "php": ">=8.1"
+         },
+         "time": "2026-07-03T10:00:00+00:00"
+        }
+       ]
+      },
+      "vcs_repos": [
+       "https://example.invalid/acme/private-lib.git"
+      ]
+     },
+     "check_passes": null,
+     "update_now": null,
+     "answers": {
+      "baseline": {
+       "result": "refused",
+       "form": null,
+       "holds": [
+        {
+         "constraint": ">=1.1",
+         "link": "root-require",
+         "package": null,
+         "source": "root",
+         "target": "acme/lib",
+         "version": null
+        }
+       ],
+       "problem": "  Problem 1\n    - Root composer.json requires acme/lib >=1.1, found acme/lib[1.0.0] but it does not match the constraint."
+      }
+     }
+    },
+    "checks": {
+     "baseline": {
+      "result": "refused",
+      "form": null,
+      "holds": [
+       {
+        "constraint": ">=1.1",
+        "link": "root-require",
+        "package": null,
+        "source": "root",
+        "target": "acme/lib",
+        "version": null
+       }
+      ],
+      "problem": "  Problem 1\n    - Root composer.json requires acme/lib >=1.1, found acme/lib[1.0.0] but it does not match the constraint.",
+      "reason": null
+     }
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": false,
+     "blocking_disabled_by": [
+      "config.audit.block-insecure"
+     ],
+     "ignored_platform": [
+      "ext-*",
+      "lib-*",
+      "php-debug",
+      "php-ipv6",
+      "php-zts"
+     ],
+     "baseline": "not_checked",
+     "reason": "unloaded_name",
+     "php": "8.4.99"
+    }
+   }
+  },
+  {
+   "id": "mc-baseline-synced-non-dev‡",
+   "label": "the lock holds every root requirement, the first solve leaves acme/private-lib unloaded, and Composer's second solve over the require links refuses the lock: the baseline exemption holds, so the baseline reads refused with the moves_not_checked note (ruling R20-1, the control)",
+   "project": "typo3-v12",
+   "run": {
+    "project": "typo3/cms",
+    "root_package": "typo3/cms",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "project_php": "^8.1",
+    "project_php_lowest": "8.1.0",
+    "lock_file": "composer.lock",
+    "fail_on": "high",
+    "fail_on_source": "option",
+    "gates": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "threshold": "high"
+     }
+    ],
+    "strict_network": false,
+    "mode": "check",
+    "include_dev": false,
+    "thresholds": {
+     "release-warn-years": 3,
+     "release-high-years": 5,
+     "push-warn-years": 3,
+     "push-high-years": 5
+    },
+    "flag_ids": [
+     "abandoned",
+     "silent",
+     "pinned",
+     "left-behind",
+     "old-promise",
+     "stale",
+     "capped",
+     "vulnerable"
+    ],
+    "verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     "unknown",
+     "finished",
+     "ok"
+    ],
+    "graded_verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "signal_ids": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7",
+     "S8",
+     "S9",
+     "S10",
+     "S11"
+    ],
+    "fix_model": 1,
+    "text_grammar": 1,
+    "score_model": {
+     "id": 1,
+     "score_text_grammar": 1,
+     "flag_order": [
+      "abandoned",
+      "silent",
+      "pinned",
+      "left-behind",
+      "old-promise",
+      "stale",
+      "capped",
+      "vulnerable"
+     ],
+     "parts": [
+      {
+       "id": "maintenance",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale",
+        "capped"
+       ],
+       "combine": "lead_plus_share"
+      },
+      {
+       "id": "security",
+       "flag_ids": [
+        "vulnerable"
+       ],
+       "combine": "max"
+      }
+     ],
+     "flags": [
+      {
+       "id": "abandoned",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "abandoned",
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S1",
+        "S3"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "silent",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "silent",
+        "pinned",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-high-years",
+        "push-high-years"
+       ],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "pinned",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 22,
+       "max_maintenance_flags": [
+        "pinned",
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S6"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "left-behind",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 20,
+       "max_maintenance_flags": [
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S8"
+       ],
+       "thresholds": [
+        "release-warn-years"
+       ],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "old-promise",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 18,
+       "max_maintenance_flags": [
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S5"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "stale",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 10,
+       "max_maintenance_flags": [
+        "stale",
+        "capped"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-warn-years",
+        "push-warn-years"
+       ],
+       "basis": {
+        "v013_base": "medium",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "capped",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 8,
+       "max_maintenance_flags": [
+        "capped"
+       ],
+       "raised_by": [
+        "S11"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "vulnerable",
+       "part": "security",
+       "points": null,
+       "band": null,
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": null,
+       "max_maintenance_flags": null,
+       "raised_by": [
+        "S9"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "severities"
+       },
+       "points_from": "severities"
+      }
+     ],
+     "severities": [
+      {
+       "id": "critical",
+       "points": 32,
+       "band": "critical",
+       "points_no_reachable_fix": 64,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 4,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "high",
+       "points": 16,
+       "band": "high",
+       "points_no_reachable_fix": 32,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 3,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "medium",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "unrated",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": "medium",
+       "basis": {
+        "points": "counts_as"
+       }
+      },
+      {
+       "id": "low",
+       "points": 2,
+       "band": "low",
+       "points_no_reachable_fix": 4,
+       "band_no_reachable_fix": "low",
+       "gate_rank": 1,
+       "counts_as": null,
+       "basis": {
+        "points": "share",
+        "of": "medium",
+        "share": {
+         "num": 1,
+         "den": 4
+        }
+       }
+      }
+     ],
+     "fix_kinds": [
+      {
+       "id": "update",
+       "ease": 1,
+       "doubles": false
+      },
+      {
+       "id": "upgrade",
+       "ease": 2,
+       "doubles": false
+      },
+      {
+       "id": "raise-php",
+       "ease": 3,
+       "doubles": false
+      },
+      {
+       "id": "unknown",
+       "ease": 4,
+       "doubles": false
+      },
+      {
+       "id": "blocked",
+       "ease": 5,
+       "doubles": true
+      },
+      {
+       "id": "none",
+       "ease": 6,
+       "doubles": true
+      }
+     ],
+     "bands": [
+      {
+       "verdict": "critical",
+       "floor": 32
+      },
+      {
+       "verdict": "high",
+       "floor": 16
+      },
+      {
+       "verdict": "medium",
+       "floor": 8
+      },
+      {
+       "verdict": "low",
+       "floor": 1
+      }
+     ],
+     "zero_verdicts": [
+      {
+       "verdict": "finished",
+       "when": "allowlisted"
+      },
+      {
+       "verdict": "unknown",
+       "when": "no_metadata"
+      },
+      {
+       "verdict": "ok",
+       "when": "otherwise"
+      }
+     ],
+     "exact_unit": 0.5,
+     "rounding": "floor_once",
+     "max_total": 104,
+     "bar_max": 64,
+     "bar_overflow": "clip",
+     "exclusive_groups": [
+      {
+       "id": "liveness",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "stale"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "branch",
+       "flag_ids": [
+        "pinned",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_age",
+       "flag_ids": [
+        "silent",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_push",
+       "flag_ids": [
+        "left-behind",
+        "stale"
+       ],
+       "holds_unless": {
+        "threshold": "push-warn-years",
+        "below": "release-warn-years"
+       }
+      },
+      {
+       "id": "php_bound",
+       "flag_ids": [
+        "old-promise",
+        "capped"
+       ],
+       "holds_unless": null
+      }
+     ],
+     "sort": [
+      {
+       "key": "verdict",
+       "path": "verdict",
+       "dir": "order",
+       "order": [
+        [
+         "critical"
+        ],
+        [
+         "high"
+        ],
+        [
+         "medium"
+        ],
+        [
+         "low"
+        ],
+        [
+         "unknown"
+        ],
+        [
+         "finished",
+         "ok"
+        ]
+       ],
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "security",
+       "path": "score.parts.security.contribution",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "score",
+       "path": "score.exact",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "direct",
+       "path": "direct",
+       "dir": "true_first",
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "package",
+       "path": "package",
+       "dir": "asc",
+       "collation": "bytes",
+       "default": null
+      }
+     ],
+     "rules": [
+      {
+       "id": "counted",
+       "stage": 1,
+       "kind": "select",
+       "applies_to": "flags",
+       "accept_group": "liveness",
+       "accept_covers": "listed_and_below",
+       "why": "accepted-facts-shown-not-counted",
+       "doc": "score-counted",
+       "illustration": null
+      },
+      {
+       "id": "lead-first",
+       "stage": 2,
+       "kind": "select",
+       "applies_to": "maintenance",
+       "order": "flag_order",
+       "share": {
+        "num": 1,
+        "den": 1
+       },
+       "why": "strongest-fact-in-full",
+       "doc": "score-lead-first",
+       "illustration": null
+      },
+      {
+       "id": "corroborating-share",
+       "stage": 3,
+       "kind": "share",
+       "applies_to": "maintenance",
+       "share": {
+        "num": 1,
+        "den": 4
+       },
+       "why": "correlated-evidence",
+       "doc": "score-corroborating-share",
+       "illustration": {
+        "lead": "left-behind",
+        "flag": "old-promise",
+        "weight": 16,
+        "points": 4
+       }
+      },
+      {
+       "id": "advisory-points",
+       "stage": 4,
+       "kind": "lookup",
+       "applies_to": "security",
+       "table": "severities",
+       "why": "severity-points",
+       "doc": "score-advisory-points",
+       "illustration": null
+      },
+      {
+       "id": "no-reachable-fix-multiplier",
+       "stage": 5,
+       "kind": "multiply",
+       "applies_to": "advisory",
+       "factor": 2,
+       "when_fix": [
+        "none",
+        "blocked"
+       ],
+       "why": "one-band-up",
+       "doc": "score-no-reachable-fix-multiplier",
+       "illustration": {
+        "severity": "high",
+        "before": 16,
+        "after": 32,
+        "band_before": "high",
+        "band_after": "critical"
+       }
+      },
+      {
+       "id": "security-max",
+       "stage": 6,
+       "kind": "max",
+       "applies_to": "security",
+       "tie_break": [
+        {
+         "key": "points",
+         "dir": "desc",
+         "collation": null
+        },
+        {
+         "key": "severity",
+         "dir": "order",
+         "collation": null
+        },
+        {
+         "key": "id",
+         "dir": "asc",
+         "collation": "bytes"
+        }
+       ],
+       "why": "one-number-per-part",
+       "doc": "score-security-max",
+       "illustration": null
+      },
+      {
+       "id": "divide-reach",
+       "stage": 7,
+       "kind": "divide",
+       "applies_to": "maintenance",
+       "by": 2,
+       "when": [
+        "transitive",
+        "unreached"
+       ],
+       "why": "reach-halves-maintenance",
+       "doc": "score-divide-reach",
+       "illustration": {
+        "flag": "abandoned",
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "security-exempt-from-reach",
+       "stage": 8,
+       "kind": "exempt",
+       "applies_to": "security",
+       "of": "divide-reach",
+       "why": "exploitability-independent-of-reach",
+       "doc": "score-security-exempt-from-reach",
+       "illustration": {
+        "severity": "critical",
+        "reach": "transitive",
+        "total": 32
+       }
+      },
+      {
+       "id": "sum",
+       "stage": 9,
+       "kind": "combine",
+       "applies_to": "total",
+       "op": "sum",
+       "ratio_from": "medium",
+       "why": "parts-add",
+       "doc": "score-sum",
+       "illustration": {
+        "maintenance": 16,
+        "security": 16,
+        "total": 32,
+        "band": "critical",
+        "low_maintenance": 4,
+        "low_security": 4,
+        "low_total": 8,
+        "low_band": "medium"
+       }
+      },
+      {
+       "id": "divide-dev",
+       "stage": 10,
+       "kind": "divide",
+       "applies_to": "total",
+       "by": 2,
+       "when": [
+        "dev"
+       ],
+       "why": "dev-halves-total",
+       "doc": "score-divide-dev",
+       "illustration": {
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "floor-once",
+       "stage": 11,
+       "kind": "floor",
+       "applies_to": "total",
+       "why": "integer-band-edges",
+       "doc": "score-floor-once",
+       "illustration": {
+        "exact": 4.5,
+        "total": 4
+       }
+      },
+      {
+       "id": "band-floors",
+       "stage": 12,
+       "kind": "band",
+       "applies_to": "total",
+       "ratio": 2,
+       "ratio_from": "medium",
+       "why": "two-floor-parts-make-next",
+       "doc": "score-band-floors",
+       "illustration": null
+      },
+      {
+       "id": "zero-verdicts",
+       "stage": 13,
+       "kind": "zero",
+       "applies_to": "total",
+       "table": "zero_verdicts",
+       "why": "score-zero-says-why",
+       "doc": "score-zero-verdicts",
+       "illustration": null
+      },
+      {
+       "id": "sort",
+       "stage": 14,
+       "kind": "order",
+       "applies_to": "findings",
+       "why": "advisory-findings-first",
+       "doc": "score-sort",
+       "illustration": null
+      },
+      {
+       "id": "gate-bounded-new",
+       "stage": 15,
+       "kind": "gate",
+       "applies_to": "gate",
+       "cap_multiplier": 2,
+       "why": "new-fact-sets-level",
+       "doc": "score-gate-bounded-new",
+       "illustration": {
+        "score": 36,
+        "new": 16,
+        "gate": 32
+       }
+      },
+      {
+       "id": "baseline-cover",
+       "stage": 16,
+       "kind": "cover",
+       "applies_to": "gate",
+       "order": "flag_order",
+       "covers": "listed_and_below",
+       "why": "recorded-lead-covers-below",
+       "doc": "score-baseline-cover",
+       "illustration": null
+      }
+     ],
+     "docs": "https://lockrot.dev/verdicts/model-1/"
+    },
+    "score_rules_used": {
+     "counted": 0,
+     "lead-first": 0,
+     "corroborating-share": 0,
+     "advisory-points": 1,
+     "no-reachable-fix-multiplier": 0,
+     "security-max": 0,
+     "divide-reach": 0,
+     "security-exempt-from-reach": 0,
+     "sum": 0,
+     "divide-dev": 0,
+     "floor-once": 0,
+     "band-floors": 1,
+     "zero-verdicts": 1,
+     "sort": null,
+     "gate-bounded-new": 0,
+     "baseline-cover": 0
+    },
+    "advisory_lookup": {
+     "scope": "all",
+     "scope_source": "default",
+     "packages_asked": 2,
+     "packages_not_asked": 0,
+     "other_repositories": 0,
+     "repositories": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "outcome": "answered",
+       "reason": null,
+       "message": null,
+       "packages_with_records": 1,
+       "records": 4
+      }
+     ]
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": false,
+     "blocking_disabled_by": [
+      "config.audit.block-insecure"
+     ],
+     "ignored_platform": [
+      "ext-*",
+      "lib-*",
+      "php-debug",
+      "php-ipv6",
+      "php-zts"
+     ],
+     "baseline": "refused",
+     "reason": null
+    },
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "acme/x",
+         "version": "1.0.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/routing",
+         "version": "v6.4.28",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "acme/x",
+         "version": "1.0.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/routing",
+         "version": "v6.4.28",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     },
+     "target_fix": null
+    }
+   },
+   "synthetic_inputs": [
+    "the world of r3/cases.json `solver_world`: branch rows, advisory, lock and composer.json designed; every check is the Composer 2.10.3 answer of design/move-check-oracle (‡)"
+   ],
+   "finding": {
+    "package": "symfony/routing",
+    "version": "v6.4.28",
+    "branch": "6.x",
+    "installed_php": {
+     "requires": ">=8.1",
+     "target_runs": true,
+     "project_allows": true
+    },
+    "verdict": "high",
+    "priority": "high",
+    "lead": null,
+    "rank": 7,
+    "flags": [
+     {
+      "id": "vulnerable",
+      "role": "security",
+      "baseline": null,
+      "signal_ids": [
+       "S9"
+      ],
+      "degree": null,
+      "headline": {
+       "unit": "advisories",
+       "value": 1,
+       "source": null
+      },
+      "summary": "1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization"
+     }
+    ],
+    "score": {
+     "model": 1,
+     "total": 16,
+     "exact": 16,
+     "rounded_down": false,
+     "band": {
+      "floor": 16,
+      "next": "critical",
+      "to_next": 16
+     },
+     "decided_by": "security",
+     "parts": {
+      "maintenance": {
+       "status": "none",
+       "contribution": 0,
+       "alone": {
+        "total": 0,
+        "verdict": null
+       }
+      },
+      "security": {
+       "status": "counted",
+       "contribution": 16,
+       "alone": {
+        "total": 16,
+        "verdict": "high"
+       },
+       "of": 1,
+       "tied": []
+      }
+     },
+     "terms": [
+      {
+       "part": "security",
+       "flag": "vulnerable",
+       "role": "security",
+       "advisory": "PKSA-bf7t-jnpz-492k",
+       "severity": "high",
+       "fix_kind": "update",
+       "weight": 16,
+       "multiplier": 1,
+       "points": 16,
+       "contribution": 16
+      }
+     ],
+     "modifiers": [],
+     "accepted": [],
+     "without": [],
+     "text": "16 = vulnerable 16 [high advisory]"
+    },
+    "next_step": {
+     "kind": "update",
+     "source": "vulnerable",
+     "merged": [],
+     "fix_kind": "update",
+     "reason": null,
+     "replacement": null,
+     "quiet_years": null,
+     "to_branch": "6.x",
+     "version": "v6.4.41",
+     "newest": "v6.4.41",
+     "constraint": null,
+     "latest": null,
+     "php_check": {
+      "requires": ">=8.1",
+      "project_allows": true,
+      "target_runs": true,
+      "raise_to": null,
+      "raise_size": null
+     },
+     "crosses_major": false,
+     "held_by": [],
+     "clears": [
+      {
+       "kind": "advisory",
+       "id": "PKSA-bf7t-jnpz-492k",
+       "basis": "outside_range"
+      }
+     ],
+     "unverified": [],
+     "adds": [],
+     "leaves": [],
+     "clears_all": true,
+     "if_applied": {
+      "total": 0,
+      "verdict": "ok",
+      "lead": null,
+      "deciding_advisory": null,
+      "at_most": false,
+      "assumes": [
+       "clears_hold"
+      ]
+     },
+     "check": {
+      "result": "not_checked",
+      "form": null,
+      "reason": "baseline_refused",
+      "installs": null
+     },
+     "moves_with": [],
+     "composer_moves_because": [],
+     "commands": [
+      [
+       "composer",
+       "update",
+       "symfony/routing:^6.4.41"
+      ],
+      [
+       "composer",
+       "why-not",
+       "symfony/routing",
+       "v6.4.41",
+       "--locked"
+      ]
+     ],
+     "through": [],
+     "also": [],
+     "text": "composer update 'symfony/routing:^6.4.41' (gets v6.4.41) — clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
+    },
+    "security": {
+     "status": "vulnerable",
+     "check": "complete",
+     "complete": true,
+     "unchecked_reason": null,
+     "records": 4,
+     "feeds": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "answer": "answered",
+       "records": 4,
+       "reason": null
+      }
+     ],
+     "worst": "high",
+     "counts": {
+      "critical": 0,
+      "high": 1,
+      "medium": 0,
+      "unrated": 0,
+      "low": 0
+     },
+     "ignored": [],
+     "ignored_count": 0,
+     "fix_kind": "update",
+     "installed_branch_fixes": {
+      "fixed": 1,
+      "unknown": 0,
+      "of": 1,
+      "fix_kind": "update",
+      "lowest": "v6.4.41",
+      "newest": "v6.4.41",
+      "held_by": [],
+      "if_applied": {
+       "total": 0,
+       "verdict": "ok",
+       "at_most": false,
+       "assumes": [
+        "clears_hold"
+       ]
+      },
+      "check": {
+       "result": "not_checked",
+       "form": null,
+       "reason": "baseline_refused",
+       "installs": null
+      }
+     },
+     "move_in": "next_step",
+     "gets": {
+      "version": "v6.4.41",
+      "php_check": {
+       "requires": ">=8.1",
+       "project_allows": true,
+       "target_runs": true,
+       "raise_to": null,
+       "raise_size": null
+      },
+      "clears": [
+       {
+        "kind": "advisory",
+        "id": "PKSA-bf7t-jnpz-492k",
+        "basis": "outside_range"
+       }
+      ],
+      "clears_all": true
+     },
+     "partial": null
+    },
+    "checks_missing": [],
+    "checks_skipped": [],
+    "unchecked_accepted": [],
+    "maintenance_judged": true,
+    "metadata": {
+     "status": "read",
+     "reason": null,
+     "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/routing",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:06:16+00:00",
+     "cached_at": "2026-10-01T16:06:16+00:00"
+    },
+    "allowlist": null,
+    "abandoned_ignored": null,
+    "from_composer_repository": true,
+    "origin": {
+     "kind": "packagist",
+     "registry": "packagist.org",
+     "package_url": "https://packagist.org/packages/symfony/routing",
+     "local": false
+    },
+    "replacement": null,
+    "replacement_url": null,
+    "note": null,
+    "libyears_unmeasured": null,
+    "libyears_at_least": false,
+    "direct": true,
+    "dev": false,
+    "reach": "direct",
+    "chain": [
+     "symfony/routing"
+    ],
+    "depth": 0,
+    "depth_unmeasured": null,
+    "named_in": [
+     "require",
+     "require-dev"
+    ],
+    "direct_dependents": [
+     "symfony/routing"
+    ],
+    "signals": [
+     {
+      "id": "S9",
+      "level": "high",
+      "summary": "1 security advisory affects v6.4.28 (CVE-2026-48784); fixed in v6.4.41",
+      "data": {
+       "advisories": [
+        {
+         "id": "PKSA-bf7t-jnpz-492k",
+         "cve": "CVE-2026-48784",
+         "title": "UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+         "link": "https://symfony.com/cve-2026-48784",
+         "reported_at": "2026-05-26T08:00:00+00:00",
+         "severity": "high",
+         "severity_published": "high",
+         "affected_versions": ">=6.4.0,<6.4.41",
+         "counted": true,
+         "points": 16,
+         "deciding": true,
+         "fix": {
+          "kind": "update",
+          "to_branch": "6.x",
+          "version": "v6.4.41",
+          "newest": "v6.4.41",
+          "on_installed_branch": true,
+          "php": ">=8.1",
+          "admits_target_php": true,
+          "admits_project_php": true,
+          "held_by": [],
+          "reason": null
+         },
+         "baseline": null
+        }
+       ],
+       "releases_read": true,
+       "complete": true
+      }
+     }
+    ],
+    "evidence": "vulnerable: 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+    "allowlist_reason": null,
+    "data_date": "2026-10-01T17:41:59+00:00",
+    "libyears": 0.67,
+    "age": {
+     "installed": {
+      "at": "2025-10-31T16:43:05+00:00",
+      "years": 0.9,
+      "dated_by": null
+     },
+     "installed_unmeasured": null,
+     "release": {
+      "version": "v6.4.41",
+      "at": "2026-07-04T10:00:00+00:00",
+      "years": 0.2,
+      "level": null,
+      "dated_by": null
+     },
+     "release_unmeasured": null,
+     "branch_release": {
+      "version": "v6.4.41",
+      "at": "2026-07-04T10:00:00+00:00",
+      "years": 0.2,
+      "level": null,
+      "dated_by": null
+     },
+     "branch_release_unmeasured": null,
+     "push": {
+      "at": "2026-09-29T14:09:10+00:00",
+      "years": 0,
+      "level": null
+     },
+     "push_unmeasured": null
+    },
+    "baseline": null,
+    "gate": {
+     "reaches_fail_on": true,
+     "fails": true,
+     "exempt_by": null,
+     "by": [
+      {
+       "value": "high",
+       "kind": "grade",
+       "facts": [
+        {
+         "kind": "advisory",
+         "id": "PKSA-bf7t-jnpz-492k"
+        }
+       ]
+      }
+     ],
+     "basis": null
+    }
+   },
+   "details": {
+    "metadata": {
+     "installed_branch": "6.x",
+     "branches": [
+      {
+       "branch": "6.x",
+       "installed": true,
+       "highest": "v6.4.41",
+       "highest_released": "2026-07-04T10:00:00+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v6.4.41",
+       "newest_dated_released": "2026-07-04T10:00:00+00:00",
+       "dated_by": null,
+       "php": ">=8.1",
+       "highest_php": ">=8.1",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 0.2,
+       "fixes": {
+        "fixed": 1,
+        "unknown": 0,
+        "of": 1,
+        "fix_kind": "update",
+        "lowest": "v6.4.41",
+        "newest": "v6.4.41",
+        "held_by": [],
+        "if_applied": {
+         "total": 0,
+         "verdict": "ok",
+         "at_most": false,
+         "assumes": [
+          "clears_hold"
+         ]
+        },
+        "check": {
+         "result": "not_checked",
+         "form": null,
+         "reason": "baseline_refused",
+         "installs": null
+        }
+       }
+      }
+     ]
+    }
+   },
+   "golden": {
+    "score_text": "16 = vulnerable 16 [high advisory]",
+    "next_step_text": "composer update 'symfony/routing:^6.4.41' (gets v6.4.41) — clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it",
+    "verdict_line": "High: a high-severity advisory affects your version (CVE-2026-48784 PKSA-bf7t-jnpz-492k: UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization).",
+    "readings": [],
+    "qualifiers": {
+     "reach": [
+      "Production: not in packages-dev",
+      "Required directly"
+     ],
+     "origin": null,
+     "not_judged": null,
+     "unchecked": [],
+     "not_run": [],
+     "php": null,
+     "php_edge": [],
+     "accepted": [],
+     "gate": [
+      "fails the run: grade high or above",
+      "Tripped by CVE-2026-48784"
+     ]
+    },
+    "moves": [
+     {
+      "heading": "The move",
+      "action": "Update to v6.4.41 on 6.x",
+      "platform_step": null,
+      "command_note": null,
+      "moves_with": null,
+      "commands": [
+       "composer update 'symfony/routing:^6.4.41'",
+       "composer why-not symfony/routing v6.4.41 --locked"
+      ],
+      "commands_label": "Commands, in order",
+      "clears": "the advisory",
+      "stays": null,
+      "not_checked": null,
+      "adds": [],
+      "php": {
+       "head": "6.x needs php >=8.1",
+       "lines": [
+        {
+         "answer": "yes",
+         "text": "your require.php allows it"
+        },
+        {
+         "answer": "yes",
+         "text": "your target, 8.4, runs it"
+        }
+       ]
+      },
+      "after": {
+       "result": "0, ok",
+       "conditions": [
+        "if Composer resolves it (not checked: Composer's solver refuses the lock itself; the Run data tab names the cause)"
+       ]
+      },
+      "composer": []
+     }
+    ],
+    "held_by": [
+     null
+    ],
+    "security": {
+     "summary": [
+      "1 high advisory",
+      "4 on record for this name",
+      "fix: composer update",
+      "lookup complete"
+     ],
+     "counts": [],
+     "meanwhile": null,
+     "caption": [
+      "By severity. Each affects your version, v6.4.28."
+     ],
+     "groups": [],
+     "rows": [
+      {
+       "name": "CVE-2026-48784",
+       "source": "PKSA-bf7t-jnpz-492k",
+       "deciding": true,
+       "severity": "high",
+       "fix": "fix v6.4.41 on 6.x, your branch (composer update)",
+       "affects": "affects >=6.4.0,<6.4.41",
+       "ranges": null,
+       "same_as": null
+      }
+     ],
+     "ignored": [],
+     "ladder": [
+      {
+       "branch": "6.x",
+       "marks": [
+        "your branch",
+        "the move"
+       ],
+       "lines": [
+        "6.x your branch the move clears 1 of 1 from v6.4.41",
+        "composer update",
+        "after it: 0, ok · not checked: Composer refuses the lock itself"
+       ]
+      }
+     ]
+    },
+    "branches_lead": [
+     "Your branch, 6.x, had its last release, v6.4.41, 0.2 years ago.",
+     "It has no higher branch."
+    ],
+    "branch_rows": [],
+    "age_rows": [
+     {
+      "label": "installed",
+      "value": "v6.4.28 · 2025-10-31 · 0.9 years ago"
+     },
+     {
+      "label": "6.x last",
+      "value": "v6.4.41 · 2026-07-04 · 0.2 years ago · its most recent release"
+     },
+     {
+      "label": "last push",
+      "value": "2026-09-29 · less than three weeks ago"
+     }
+    ],
+    "security_row": [
+     "1 high advisory",
+     "4 on record for this name",
+     "fix: composer update",
+     "lookup complete",
+     "6.x your branch the move clears 1 of 1 from v6.4.41",
+     "composer update",
+     "after it: 0, ok · not checked: Composer refuses the lock itself"
+    ],
+    "why": [
+     "16 · high from 16 · 16 points short of critical",
+     "vulnerable 16: high advisory CVE-2026-48784; its own fix (composer update on 6.x) is reachable, so no × 2",
+     "the advisory alone makes it high"
+    ],
+    "gate_line": null,
+    "checks": "1 fired (S9) · 10 quiet · every check ran",
+    "baseline_suffix": null,
+    "commands_posix": [
+     "composer update 'symfony/routing:^6.4.41'",
+     "composer why-not symfony/routing v6.4.41 --locked"
+    ],
+    "commands_cmd": [
+     "composer update \"symfony/routing:^6.4.41\"",
+     "composer why-not symfony/routing v6.4.41 --locked"
+    ],
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-04 (0.2 years ago), its newest release; last push 2026-09-29 (less than three weeks ago)"
+   },
+   "run_notes": [
+    {
+     "code": "lock_out_of_sync",
+     "text": "lock: the lock file does not match composer.json (symfony/routing is not locked at a version that composer.json allows): run composer update",
+     "docs_url": "https://lockrot.dev/notes/#lock_out_of_sync",
+     "sets_network_failures": false,
+     "data": {
+      "missing": [
+       "symfony/routing"
+      ]
+     }
+    },
+    {
+     "code": "moves_not_checked",
+     "text": "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: Root composer.json requires symfony/routing >=6.4.0,<6.4.28, found symfony/routing[v6.4.28] but it does not match the constraint.",
+     "docs_url": "https://lockrot.dev/notes/#moves_not_checked",
+     "sets_network_failures": false,
+     "data": {
+      "reason": "baseline_refused",
+      "php": "8.4.99",
+      "problem": "  Problem 1\n    - Root composer.json requires symfony/routing >=6.4.0,<6.4.28, found symfony/routing[v6.4.28] but it does not match the constraint."
+     }
+    }
+   ],
+   "parents": [
+    {
+     "package": "acme/x",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/x",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/x",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/x"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/x"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-01T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
+   "solver_world": {
+    "world_id": "baseline-synced-non-dev",
+    "world": {
+     "platform_php": "8.4.99",
+     "root": {
+      "name": "typo3/cms",
+      "require": {
+       "php": "^8.1",
+       "symfony/routing": ">=6.4.0,<6.4.28"
+      },
+      "require-dev": {
+       "symfony/routing": "^6.4"
+      }
+     },
+     "lock": {
+      "packages": [
+       {
+        "version": "1.0.0",
+        "require": {
+         "php": ">=8.1",
+         "acme/y": "^1.0"
+        },
+        "name": "acme/x",
+        "time": "2026-07-01T10:00:00+00:00"
+       },
+       {
+        "version": "v6.4.28",
+        "require": {
+         "php": ">=8.1"
+        },
+        "name": "symfony/routing",
+        "time": "2025-10-31T16:43:05+00:00"
+       }
+      ],
+      "packages-dev": []
+     },
+     "repo": {
+      "acme/x": [
+       {
+        "version": "1.0.0",
+        "require": {
+         "php": ">=8.1",
+         "acme/y": "^1.0"
+        },
+        "time": "2026-07-01T10:00:00+00:00"
+       }
+      ],
+      "acme/y": [
+       {
+        "version": "1.0.0",
+        "require": {
+         "php": ">=8.1"
+        },
+        "time": "2026-07-02T10:00:00+00:00"
+       },
+       {
+        "version": "1.1.0",
+        "require": {
+         "php": ">=8.1",
+         "acme/private-lib": "^1.0"
+        },
+        "time": "2026-07-03T10:00:00+00:00"
+       }
+      ],
+      "symfony/routing": [
+       {
+        "version": "v6.4.28",
+        "require": {
+         "php": ">=8.1"
+        },
+        "time": "2025-10-31T16:43:05+00:00"
+       },
+       {
+        "version": "v6.4.41",
+        "require": {
+         "php": ">=8.1"
+        },
+        "time": "2026-07-04T10:00:00+00:00"
+       }
+      ]
+     },
+     "vcs_repos": [
+      "https://example.invalid/acme/private-lib.git"
+     ],
+     "lock_hash": "stale"
+    },
+    "check_passes": null,
+    "update_now": null,
+    "answers": {
+     "baseline": {
+      "result": "refused",
+      "form": null,
+      "holds": [
+       {
+        "constraint": ">=6.4.0,<6.4.28",
+        "link": "root-require",
+        "package": null,
+        "source": "root",
+        "target": "symfony/routing",
+        "version": null
+       }
+      ],
+      "problem": "  Problem 1\n    - Root composer.json requires symfony/routing >=6.4.0,<6.4.28, found symfony/routing[v6.4.28] but it does not match the constraint."
+     }
+    }
+   },
+   "inputs": {
+    "root": {
+     "name": "typo3/cms",
+     "require": {
+      "php": "^8.1",
+      "symfony/routing": "*"
+     },
+     "require-dev": {
+      "symfony/routing": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "symfony/routing",
+      "version": "v6.4.28",
+      "time": "2025-10-31T16:43:05+00:00",
+      "php": ">=8.1",
+      "dev": false,
+      "origin": "packagist"
+     }
+    ],
+    "releases": [
+     {
+      "version": "v6.4.28",
+      "time": "2025-10-31T16:43:05+00:00",
+      "php": ">=8.1"
+     },
+     {
+      "version": "v6.4.41",
+      "time": "2026-07-04T10:00:00+00:00",
+      "php": ">=8.1"
+     }
+    ],
+    "advisories": [
+     {
+      "id": "PKSA-bf7t-jnpz-492k",
+      "cve": "CVE-2026-48784",
+      "title": "UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+      "link": "https://symfony.com/cve-2026-48784",
+      "reported_at": "2026-05-26T08:00:00+00:00",
+      "severity": "high",
+      "affected_versions": ">=6.4.0,<6.4.41"
+     }
+    ],
+    "records": 4,
+    "ignored": [],
+    "abandoned": null,
+    "activity": {
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/routing",
+     "status": "read",
+     "reason": null,
+     "pushed_at": "2026-09-29T14:09:10+00:00",
+     "archived": false
+    },
+    "dependents": {},
+    "run": {
+     "target_php": "8.4",
+     "project_php": "^8.1",
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    },
+    "packages": {
+     "acme/x": {
+      "lock": {
+       "name": "acme/x",
+       "version": "1.0.0",
+       "time": "2026-07-01T10:00:00+00:00",
+       "php": ">=8.1",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "1.0.0",
+        "time": "2026-07-01T10:00:00+00:00",
+        "php": ">=8.1"
+       }
+      ],
+      "advisories": [],
+      "records": 0,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "acme/x",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-07-01T10:00:00+00:00",
+       "archived": false
+      },
+      "chain": [
+       "acme/x"
+      ],
+      "below": null
+     }
+    },
+    "solver_world": {
+     "world_id": "baseline-synced-non-dev",
+     "world": {
+      "platform_php": "8.4.99",
+      "root": {
+       "name": "typo3/cms",
+       "require": {
+        "php": "^8.1",
+        "symfony/routing": ">=6.4.0,<6.4.28"
+       },
+       "require-dev": {
+        "symfony/routing": "^6.4"
+       }
+      },
+      "lock": {
+       "packages": [
+        {
+         "version": "1.0.0",
+         "require": {
+          "php": ">=8.1",
+          "acme/y": "^1.0"
+         },
+         "name": "acme/x",
+         "time": "2026-07-01T10:00:00+00:00"
+        },
+        {
+         "version": "v6.4.28",
+         "require": {
+          "php": ">=8.1"
+         },
+         "name": "symfony/routing",
+         "time": "2025-10-31T16:43:05+00:00"
+        }
+       ],
+       "packages-dev": []
+      },
+      "repo": {
+       "acme/x": [
+        {
+         "version": "1.0.0",
+         "require": {
+          "php": ">=8.1",
+          "acme/y": "^1.0"
+         },
+         "time": "2026-07-01T10:00:00+00:00"
+        }
+       ],
+       "acme/y": [
+        {
+         "version": "1.0.0",
+         "require": {
+          "php": ">=8.1"
+         },
+         "time": "2026-07-02T10:00:00+00:00"
+        },
+        {
+         "version": "1.1.0",
+         "require": {
+          "php": ">=8.1",
+          "acme/private-lib": "^1.0"
+         },
+         "time": "2026-07-03T10:00:00+00:00"
+        }
+       ],
+       "symfony/routing": [
+        {
+         "version": "v6.4.28",
+         "require": {
+          "php": ">=8.1"
+         },
+         "time": "2025-10-31T16:43:05+00:00"
+        },
+        {
+         "version": "v6.4.41",
+         "require": {
+          "php": ">=8.1"
+         },
+         "time": "2026-07-04T10:00:00+00:00"
+        }
+       ]
+      },
+      "vcs_repos": [
+       "https://example.invalid/acme/private-lib.git"
+      ],
+      "lock_hash": "stale"
+     },
+     "check_passes": null,
+     "update_now": null,
+     "answers": {
+      "baseline": {
+       "result": "refused",
+       "form": null,
+       "holds": [
+        {
+         "constraint": ">=6.4.0,<6.4.28",
+         "link": "root-require",
+         "package": null,
+         "source": "root",
+         "target": "symfony/routing",
+         "version": null
+        }
+       ],
+       "problem": "  Problem 1\n    - Root composer.json requires symfony/routing >=6.4.0,<6.4.28, found symfony/routing[v6.4.28] but it does not match the constraint."
+      }
+     }
+    },
+    "checks": {
+     "baseline": {
+      "result": "refused",
+      "form": null,
+      "holds": [
+       {
+        "constraint": ">=6.4.0,<6.4.28",
+        "link": "root-require",
+        "package": null,
+        "source": "root",
+        "target": "symfony/routing",
+        "version": null
+       }
+      ],
+      "problem": "  Problem 1\n    - Root composer.json requires symfony/routing >=6.4.0,<6.4.28, found symfony/routing[v6.4.28] but it does not match the constraint.",
+      "reason": null
+     }
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": false,
+     "blocking_disabled_by": [
+      "config.audit.block-insecure"
+     ],
+     "ignored_platform": [
+      "ext-*",
+      "lib-*",
+      "php-debug",
+      "php-ipv6",
+      "php-zts"
+     ],
+     "baseline": "refused",
+     "reason": null,
+     "php": "8.4.99"
+    }
+   }
+  },
+  {
+   "id": "mc-baseline-provide-unmatched‡",
+   "label": "composer.json requires acme/contract ^2.0, which the locked acme/x provides only at 1.0.0, and require-dev names it ^1.0: the second solve over the require links refuses, the provide holds no require link, and the first solve leaves acme/private-lib unloaded, so the baseline reads not_checked unloaded_name and lock_out_of_sync names acme/contract (rulings R20-1b and R20-1c)",
+   "project": "typo3-v12",
+   "run": {
+    "project": "typo3/cms",
+    "root_package": "typo3/cms",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "project_php": "^8.1",
+    "project_php_lowest": "8.1.0",
+    "lock_file": "composer.lock",
+    "fail_on": "high",
+    "fail_on_source": "option",
+    "gates": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "threshold": "high"
+     }
+    ],
+    "strict_network": false,
+    "mode": "check",
+    "include_dev": false,
+    "thresholds": {
+     "release-warn-years": 3,
+     "release-high-years": 5,
+     "push-warn-years": 3,
+     "push-high-years": 5
+    },
+    "flag_ids": [
+     "abandoned",
+     "silent",
+     "pinned",
+     "left-behind",
+     "old-promise",
+     "stale",
+     "capped",
+     "vulnerable"
+    ],
+    "verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     "unknown",
+     "finished",
+     "ok"
+    ],
+    "graded_verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "signal_ids": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7",
+     "S8",
+     "S9",
+     "S10",
+     "S11"
+    ],
+    "fix_model": 1,
+    "text_grammar": 1,
+    "score_model": {
+     "id": 1,
+     "score_text_grammar": 1,
+     "flag_order": [
+      "abandoned",
+      "silent",
+      "pinned",
+      "left-behind",
+      "old-promise",
+      "stale",
+      "capped",
+      "vulnerable"
+     ],
+     "parts": [
+      {
+       "id": "maintenance",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale",
+        "capped"
+       ],
+       "combine": "lead_plus_share"
+      },
+      {
+       "id": "security",
+       "flag_ids": [
+        "vulnerable"
+       ],
+       "combine": "max"
+      }
+     ],
+     "flags": [
+      {
+       "id": "abandoned",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "abandoned",
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S1",
+        "S3"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "silent",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "silent",
+        "pinned",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-high-years",
+        "push-high-years"
+       ],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "pinned",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 22,
+       "max_maintenance_flags": [
+        "pinned",
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S6"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "left-behind",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 20,
+       "max_maintenance_flags": [
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S8"
+       ],
+       "thresholds": [
+        "release-warn-years"
+       ],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "old-promise",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 18,
+       "max_maintenance_flags": [
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S5"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "stale",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 10,
+       "max_maintenance_flags": [
+        "stale",
+        "capped"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-warn-years",
+        "push-warn-years"
+       ],
+       "basis": {
+        "v013_base": "medium",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "capped",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 8,
+       "max_maintenance_flags": [
+        "capped"
+       ],
+       "raised_by": [
+        "S11"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "vulnerable",
+       "part": "security",
+       "points": null,
+       "band": null,
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": null,
+       "max_maintenance_flags": null,
+       "raised_by": [
+        "S9"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "severities"
+       },
+       "points_from": "severities"
+      }
+     ],
+     "severities": [
+      {
+       "id": "critical",
+       "points": 32,
+       "band": "critical",
+       "points_no_reachable_fix": 64,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 4,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "high",
+       "points": 16,
+       "band": "high",
+       "points_no_reachable_fix": 32,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 3,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "medium",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "unrated",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": "medium",
+       "basis": {
+        "points": "counts_as"
+       }
+      },
+      {
+       "id": "low",
+       "points": 2,
+       "band": "low",
+       "points_no_reachable_fix": 4,
+       "band_no_reachable_fix": "low",
+       "gate_rank": 1,
+       "counts_as": null,
+       "basis": {
+        "points": "share",
+        "of": "medium",
+        "share": {
+         "num": 1,
+         "den": 4
+        }
+       }
+      }
+     ],
+     "fix_kinds": [
+      {
+       "id": "update",
+       "ease": 1,
+       "doubles": false
+      },
+      {
+       "id": "upgrade",
+       "ease": 2,
+       "doubles": false
+      },
+      {
+       "id": "raise-php",
+       "ease": 3,
+       "doubles": false
+      },
+      {
+       "id": "unknown",
+       "ease": 4,
+       "doubles": false
+      },
+      {
+       "id": "blocked",
+       "ease": 5,
+       "doubles": true
+      },
+      {
+       "id": "none",
+       "ease": 6,
+       "doubles": true
+      }
+     ],
+     "bands": [
+      {
+       "verdict": "critical",
+       "floor": 32
+      },
+      {
+       "verdict": "high",
+       "floor": 16
+      },
+      {
+       "verdict": "medium",
+       "floor": 8
+      },
+      {
+       "verdict": "low",
+       "floor": 1
+      }
+     ],
+     "zero_verdicts": [
+      {
+       "verdict": "finished",
+       "when": "allowlisted"
+      },
+      {
+       "verdict": "unknown",
+       "when": "no_metadata"
+      },
+      {
+       "verdict": "ok",
+       "when": "otherwise"
+      }
+     ],
+     "exact_unit": 0.5,
+     "rounding": "floor_once",
+     "max_total": 104,
+     "bar_max": 64,
+     "bar_overflow": "clip",
+     "exclusive_groups": [
+      {
+       "id": "liveness",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "stale"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "branch",
+       "flag_ids": [
+        "pinned",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_age",
+       "flag_ids": [
+        "silent",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_push",
+       "flag_ids": [
+        "left-behind",
+        "stale"
+       ],
+       "holds_unless": {
+        "threshold": "push-warn-years",
+        "below": "release-warn-years"
+       }
+      },
+      {
+       "id": "php_bound",
+       "flag_ids": [
+        "old-promise",
+        "capped"
+       ],
+       "holds_unless": null
+      }
+     ],
+     "sort": [
+      {
+       "key": "verdict",
+       "path": "verdict",
+       "dir": "order",
+       "order": [
+        [
+         "critical"
+        ],
+        [
+         "high"
+        ],
+        [
+         "medium"
+        ],
+        [
+         "low"
+        ],
+        [
+         "unknown"
+        ],
+        [
+         "finished",
+         "ok"
+        ]
+       ],
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "security",
+       "path": "score.parts.security.contribution",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "score",
+       "path": "score.exact",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "direct",
+       "path": "direct",
+       "dir": "true_first",
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "package",
+       "path": "package",
+       "dir": "asc",
+       "collation": "bytes",
+       "default": null
+      }
+     ],
+     "rules": [
+      {
+       "id": "counted",
+       "stage": 1,
+       "kind": "select",
+       "applies_to": "flags",
+       "accept_group": "liveness",
+       "accept_covers": "listed_and_below",
+       "why": "accepted-facts-shown-not-counted",
+       "doc": "score-counted",
+       "illustration": null
+      },
+      {
+       "id": "lead-first",
+       "stage": 2,
+       "kind": "select",
+       "applies_to": "maintenance",
+       "order": "flag_order",
+       "share": {
+        "num": 1,
+        "den": 1
+       },
+       "why": "strongest-fact-in-full",
+       "doc": "score-lead-first",
+       "illustration": null
+      },
+      {
+       "id": "corroborating-share",
+       "stage": 3,
+       "kind": "share",
+       "applies_to": "maintenance",
+       "share": {
+        "num": 1,
+        "den": 4
+       },
+       "why": "correlated-evidence",
+       "doc": "score-corroborating-share",
+       "illustration": {
+        "lead": "left-behind",
+        "flag": "old-promise",
+        "weight": 16,
+        "points": 4
+       }
+      },
+      {
+       "id": "advisory-points",
+       "stage": 4,
+       "kind": "lookup",
+       "applies_to": "security",
+       "table": "severities",
+       "why": "severity-points",
+       "doc": "score-advisory-points",
+       "illustration": null
+      },
+      {
+       "id": "no-reachable-fix-multiplier",
+       "stage": 5,
+       "kind": "multiply",
+       "applies_to": "advisory",
+       "factor": 2,
+       "when_fix": [
+        "none",
+        "blocked"
+       ],
+       "why": "one-band-up",
+       "doc": "score-no-reachable-fix-multiplier",
+       "illustration": {
+        "severity": "high",
+        "before": 16,
+        "after": 32,
+        "band_before": "high",
+        "band_after": "critical"
+       }
+      },
+      {
+       "id": "security-max",
+       "stage": 6,
+       "kind": "max",
+       "applies_to": "security",
+       "tie_break": [
+        {
+         "key": "points",
+         "dir": "desc",
+         "collation": null
+        },
+        {
+         "key": "severity",
+         "dir": "order",
+         "collation": null
+        },
+        {
+         "key": "id",
+         "dir": "asc",
+         "collation": "bytes"
+        }
+       ],
+       "why": "one-number-per-part",
+       "doc": "score-security-max",
+       "illustration": null
+      },
+      {
+       "id": "divide-reach",
+       "stage": 7,
+       "kind": "divide",
+       "applies_to": "maintenance",
+       "by": 2,
+       "when": [
+        "transitive",
+        "unreached"
+       ],
+       "why": "reach-halves-maintenance",
+       "doc": "score-divide-reach",
+       "illustration": {
+        "flag": "abandoned",
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "security-exempt-from-reach",
+       "stage": 8,
+       "kind": "exempt",
+       "applies_to": "security",
+       "of": "divide-reach",
+       "why": "exploitability-independent-of-reach",
+       "doc": "score-security-exempt-from-reach",
+       "illustration": {
+        "severity": "critical",
+        "reach": "transitive",
+        "total": 32
+       }
+      },
+      {
+       "id": "sum",
+       "stage": 9,
+       "kind": "combine",
+       "applies_to": "total",
+       "op": "sum",
+       "ratio_from": "medium",
+       "why": "parts-add",
+       "doc": "score-sum",
+       "illustration": {
+        "maintenance": 16,
+        "security": 16,
+        "total": 32,
+        "band": "critical",
+        "low_maintenance": 4,
+        "low_security": 4,
+        "low_total": 8,
+        "low_band": "medium"
+       }
+      },
+      {
+       "id": "divide-dev",
+       "stage": 10,
+       "kind": "divide",
+       "applies_to": "total",
+       "by": 2,
+       "when": [
+        "dev"
+       ],
+       "why": "dev-halves-total",
+       "doc": "score-divide-dev",
+       "illustration": {
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "floor-once",
+       "stage": 11,
+       "kind": "floor",
+       "applies_to": "total",
+       "why": "integer-band-edges",
+       "doc": "score-floor-once",
+       "illustration": {
+        "exact": 4.5,
+        "total": 4
+       }
+      },
+      {
+       "id": "band-floors",
+       "stage": 12,
+       "kind": "band",
+       "applies_to": "total",
+       "ratio": 2,
+       "ratio_from": "medium",
+       "why": "two-floor-parts-make-next",
+       "doc": "score-band-floors",
+       "illustration": null
+      },
+      {
+       "id": "zero-verdicts",
+       "stage": 13,
+       "kind": "zero",
+       "applies_to": "total",
+       "table": "zero_verdicts",
+       "why": "score-zero-says-why",
+       "doc": "score-zero-verdicts",
+       "illustration": null
+      },
+      {
+       "id": "sort",
+       "stage": 14,
+       "kind": "order",
+       "applies_to": "findings",
+       "why": "advisory-findings-first",
+       "doc": "score-sort",
+       "illustration": null
+      },
+      {
+       "id": "gate-bounded-new",
+       "stage": 15,
+       "kind": "gate",
+       "applies_to": "gate",
+       "cap_multiplier": 2,
+       "why": "new-fact-sets-level",
+       "doc": "score-gate-bounded-new",
+       "illustration": {
+        "score": 36,
+        "new": 16,
+        "gate": 32
+       }
+      },
+      {
+       "id": "baseline-cover",
+       "stage": 16,
+       "kind": "cover",
+       "applies_to": "gate",
+       "order": "flag_order",
+       "covers": "listed_and_below",
+       "why": "recorded-lead-covers-below",
+       "doc": "score-baseline-cover",
+       "illustration": null
+      }
+     ],
+     "docs": "https://lockrot.dev/verdicts/model-1/"
+    },
+    "score_rules_used": {
+     "counted": 0,
+     "lead-first": 0,
+     "corroborating-share": 0,
+     "advisory-points": 1,
+     "no-reachable-fix-multiplier": 0,
+     "security-max": 0,
+     "divide-reach": 0,
+     "security-exempt-from-reach": 0,
+     "sum": 0,
+     "divide-dev": 0,
+     "floor-once": 0,
+     "band-floors": 1,
+     "zero-verdicts": 1,
+     "sort": null,
+     "gate-bounded-new": 0,
+     "baseline-cover": 0
+    },
+    "advisory_lookup": {
+     "scope": "all",
+     "scope_source": "default",
+     "packages_asked": 2,
+     "packages_not_asked": 0,
+     "other_repositories": 0,
+     "repositories": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "outcome": "answered",
+       "reason": null,
+       "message": null,
+       "packages_with_records": 1,
+       "records": 4
+      }
+     ]
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": false,
+     "blocking_disabled_by": [
+      "config.audit.block-insecure"
+     ],
+     "ignored_platform": [
+      "ext-*",
+      "lib-*",
+      "php-debug",
+      "php-ipv6",
+      "php-zts"
+     ],
+     "baseline": "not_checked",
+     "reason": "unloaded_name"
+    },
+    "php_window": {
+     "platform_override": null,
+     "host_requires": [],
+     "with_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "acme/x",
+         "version": "1.0.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/routing",
+         "version": "v6.4.28",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "without_dev": {
+      "minors": [
+       "8.1",
+       "8.2",
+       "8.3",
+       "8.4",
+       "8.5"
+      ],
+      "gaps": false,
+      "lower_edge": {
+       "php": "8.1.0",
+       "set_by": [
+        {
+         "name": null,
+         "version": null,
+         "link": "require",
+         "target": "php",
+         "constraint": "^8.1",
+         "dev": false
+        },
+        {
+         "name": "acme/x",
+         "version": "1.0.0",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        },
+        {
+         "name": "symfony/routing",
+         "version": "v6.4.28",
+         "link": "require",
+         "target": "php",
+         "constraint": ">=8.1",
+         "dev": false
+        }
+       ]
+      },
+      "upper_edge": null,
+      "closest": null
+     },
+     "target": {
+      "php": "8.4.99",
+      "inside": true
+     },
+     "target_fix": null
+    }
+   },
+   "synthetic_inputs": [
+    "the world of r3/cases.json `solver_world`: branch rows, advisory, lock and composer.json designed; every check is the Composer 2.10.3 answer of design/move-check-oracle (‡)"
+   ],
+   "finding": {
+    "package": "symfony/routing",
+    "version": "v6.4.28",
+    "branch": "6.x",
+    "installed_php": {
+     "requires": ">=8.1",
+     "target_runs": true,
+     "project_allows": true
+    },
+    "verdict": "high",
+    "priority": "high",
+    "lead": null,
+    "rank": 7,
+    "flags": [
+     {
+      "id": "vulnerable",
+      "role": "security",
+      "baseline": null,
+      "signal_ids": [
+       "S9"
+      ],
+      "degree": null,
+      "headline": {
+       "unit": "advisories",
+       "value": 1,
+       "source": null
+      },
+      "summary": "1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization"
+     }
+    ],
+    "score": {
+     "model": 1,
+     "total": 16,
+     "exact": 16,
+     "rounded_down": false,
+     "band": {
+      "floor": 16,
+      "next": "critical",
+      "to_next": 16
+     },
+     "decided_by": "security",
+     "parts": {
+      "maintenance": {
+       "status": "none",
+       "contribution": 0,
+       "alone": {
+        "total": 0,
+        "verdict": null
+       }
+      },
+      "security": {
+       "status": "counted",
+       "contribution": 16,
+       "alone": {
+        "total": 16,
+        "verdict": "high"
+       },
+       "of": 1,
+       "tied": []
+      }
+     },
+     "terms": [
+      {
+       "part": "security",
+       "flag": "vulnerable",
+       "role": "security",
+       "advisory": "PKSA-bf7t-jnpz-492k",
+       "severity": "high",
+       "fix_kind": "update",
+       "weight": 16,
+       "multiplier": 1,
+       "points": 16,
+       "contribution": 16
+      }
+     ],
+     "modifiers": [],
+     "accepted": [],
+     "without": [],
+     "text": "16 = vulnerable 16 [high advisory]"
+    },
+    "next_step": {
+     "kind": "update",
+     "source": "vulnerable",
+     "merged": [],
+     "fix_kind": "update",
+     "reason": null,
+     "replacement": null,
+     "quiet_years": null,
+     "to_branch": "6.x",
+     "version": "v6.4.41",
+     "newest": "v6.4.41",
+     "constraint": null,
+     "latest": null,
+     "php_check": {
+      "requires": ">=8.1",
+      "project_allows": true,
+      "target_runs": true,
+      "raise_to": null,
+      "raise_size": null
+     },
+     "crosses_major": false,
+     "held_by": [],
+     "clears": [
+      {
+       "kind": "advisory",
+       "id": "PKSA-bf7t-jnpz-492k",
+       "basis": "outside_range"
+      }
+     ],
+     "unverified": [],
+     "adds": [],
+     "leaves": [],
+     "clears_all": true,
+     "if_applied": {
+      "total": 0,
+      "verdict": "ok",
+      "lead": null,
+      "deciding_advisory": null,
+      "at_most": false,
+      "assumes": [
+       "clears_hold"
+      ]
+     },
+     "check": {
+      "result": "not_checked",
+      "form": null,
+      "reason": "unloaded_name",
+      "installs": null
+     },
+     "moves_with": [],
+     "composer_moves_because": [],
+     "commands": [
+      [
+       "composer",
+       "update",
+       "symfony/routing:^6.4.41"
+      ],
+      [
+       "composer",
+       "why-not",
+       "symfony/routing",
+       "v6.4.41",
+       "--locked"
+      ]
+     ],
+     "through": [],
+     "also": [],
+     "text": "composer update 'symfony/routing:^6.4.41' (gets v6.4.41) — clears the advisory; not checked with Composer's solver (a package it needs could not be loaded), so it holds only if Composer resolves it"
+    },
+    "security": {
+     "status": "vulnerable",
+     "check": "complete",
+     "complete": true,
+     "unchecked_reason": null,
+     "records": 4,
+     "feeds": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "answer": "answered",
+       "records": 4,
+       "reason": null
+      }
+     ],
+     "worst": "high",
+     "counts": {
+      "critical": 0,
+      "high": 1,
+      "medium": 0,
+      "unrated": 0,
+      "low": 0
+     },
+     "ignored": [],
+     "ignored_count": 0,
+     "fix_kind": "update",
+     "installed_branch_fixes": {
+      "fixed": 1,
+      "unknown": 0,
+      "of": 1,
+      "fix_kind": "update",
+      "lowest": "v6.4.41",
+      "newest": "v6.4.41",
+      "held_by": [],
+      "if_applied": {
+       "total": 0,
+       "verdict": "ok",
+       "at_most": false,
+       "assumes": [
+        "clears_hold"
+       ]
+      },
+      "check": {
+       "result": "not_checked",
+       "form": null,
+       "reason": "unloaded_name",
+       "installs": null
+      }
+     },
+     "move_in": "next_step",
+     "gets": {
+      "version": "v6.4.41",
+      "php_check": {
+       "requires": ">=8.1",
+       "project_allows": true,
+       "target_runs": true,
+       "raise_to": null,
+       "raise_size": null
+      },
+      "clears": [
+       {
+        "kind": "advisory",
+        "id": "PKSA-bf7t-jnpz-492k",
+        "basis": "outside_range"
+       }
+      ],
+      "clears_all": true
+     },
+     "partial": null
+    },
+    "checks_missing": [],
+    "checks_skipped": [],
+    "unchecked_accepted": [],
+    "maintenance_judged": true,
+    "metadata": {
+     "status": "read",
+     "reason": null,
+     "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/routing",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:06:16+00:00",
+     "cached_at": "2026-10-01T16:06:16+00:00"
+    },
+    "allowlist": null,
+    "abandoned_ignored": null,
+    "from_composer_repository": true,
+    "origin": {
+     "kind": "packagist",
+     "registry": "packagist.org",
+     "package_url": "https://packagist.org/packages/symfony/routing",
+     "local": false
+    },
+    "replacement": null,
+    "replacement_url": null,
+    "note": null,
+    "libyears_unmeasured": null,
+    "libyears_at_least": false,
+    "direct": true,
+    "dev": false,
+    "reach": "direct",
+    "chain": [
+     "symfony/routing"
+    ],
+    "depth": 0,
+    "depth_unmeasured": null,
+    "named_in": [
+     "require"
+    ],
+    "direct_dependents": [
+     "symfony/routing"
+    ],
+    "signals": [
+     {
+      "id": "S9",
+      "level": "high",
+      "summary": "1 security advisory affects v6.4.28 (CVE-2026-48784); fixed in v6.4.41",
+      "data": {
+       "advisories": [
+        {
+         "id": "PKSA-bf7t-jnpz-492k",
+         "cve": "CVE-2026-48784",
+         "title": "UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+         "link": "https://symfony.com/cve-2026-48784",
+         "reported_at": "2026-05-26T08:00:00+00:00",
+         "severity": "high",
+         "severity_published": "high",
+         "affected_versions": ">=6.4.0,<6.4.41",
+         "counted": true,
+         "points": 16,
+         "deciding": true,
+         "fix": {
+          "kind": "update",
+          "to_branch": "6.x",
+          "version": "v6.4.41",
+          "newest": "v6.4.41",
+          "on_installed_branch": true,
+          "php": ">=8.1",
+          "admits_target_php": true,
+          "admits_project_php": true,
+          "held_by": [],
+          "reason": null
+         },
+         "baseline": null
+        }
+       ],
+       "releases_read": true,
+       "complete": true
+      }
+     }
+    ],
+    "evidence": "vulnerable: 1 advisory: 1 high — all fixed on 6.x; advisory: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+    "allowlist_reason": null,
+    "data_date": "2026-10-01T17:41:59+00:00",
+    "libyears": 0.68,
+    "age": {
+     "installed": {
+      "at": "2025-10-31T16:43:05+00:00",
+      "years": 0.9,
+      "dated_by": null
+     },
+     "installed_unmeasured": null,
+     "release": {
+      "version": "v6.4.41",
+      "at": "2026-07-05T10:00:00+00:00",
+      "years": 0.2,
+      "level": null,
+      "dated_by": null
+     },
+     "release_unmeasured": null,
+     "branch_release": {
+      "version": "v6.4.41",
+      "at": "2026-07-05T10:00:00+00:00",
+      "years": 0.2,
+      "level": null,
+      "dated_by": null
+     },
+     "branch_release_unmeasured": null,
+     "push": {
+      "at": "2026-09-29T14:09:10+00:00",
+      "years": 0,
+      "level": null
+     },
+     "push_unmeasured": null
+    },
+    "baseline": null,
+    "gate": {
+     "reaches_fail_on": true,
+     "fails": true,
+     "exempt_by": null,
+     "by": [
+      {
+       "value": "high",
+       "kind": "grade",
+       "facts": [
+        {
+         "kind": "advisory",
+         "id": "PKSA-bf7t-jnpz-492k"
+        }
+       ]
+      }
+     ],
+     "basis": null
+    }
+   },
+   "details": {
+    "metadata": {
+     "installed_branch": "6.x",
+     "branches": [
+      {
+       "branch": "6.x",
+       "installed": true,
+       "highest": "v6.4.41",
+       "highest_released": "2026-07-05T10:00:00+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v6.4.41",
+       "newest_dated_released": "2026-07-05T10:00:00+00:00",
+       "dated_by": null,
+       "php": ">=8.1",
+       "highest_php": ">=8.1",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "highest_admits_target_php": true,
+       "highest_admits_project_php": true,
+       "highest_misses_project_php": null,
+       "released_years": 0.2,
+       "fixes": {
+        "fixed": 1,
+        "unknown": 0,
+        "of": 1,
+        "fix_kind": "update",
+        "lowest": "v6.4.41",
+        "newest": "v6.4.41",
+        "held_by": [],
+        "if_applied": {
+         "total": 0,
+         "verdict": "ok",
+         "at_most": false,
+         "assumes": [
+          "clears_hold"
+         ]
+        },
+        "check": {
+         "result": "not_checked",
+         "form": null,
+         "reason": "unloaded_name",
+         "installs": null
+        }
+       }
+      }
+     ]
+    }
+   },
+   "golden": {
+    "score_text": "16 = vulnerable 16 [high advisory]",
+    "next_step_text": "composer update 'symfony/routing:^6.4.41' (gets v6.4.41) — clears the advisory; not checked with Composer's solver (a package it needs could not be loaded), so it holds only if Composer resolves it",
+    "verdict_line": "High: a high-severity advisory affects your version (CVE-2026-48784 PKSA-bf7t-jnpz-492k: UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization).",
+    "readings": [],
+    "qualifiers": {
+     "reach": [
+      "Production: not in packages-dev",
+      "Required directly"
+     ],
+     "origin": null,
+     "not_judged": null,
+     "unchecked": [],
+     "not_run": [],
+     "php": null,
+     "php_edge": [],
+     "accepted": [],
+     "gate": [
+      "fails the run: grade high or above",
+      "Tripped by CVE-2026-48784"
+     ]
+    },
+    "moves": [
+     {
+      "heading": "The move",
+      "action": "Update to v6.4.41 on 6.x",
+      "platform_step": null,
+      "command_note": null,
+      "moves_with": null,
+      "commands": [
+       "composer update 'symfony/routing:^6.4.41'",
+       "composer why-not symfony/routing v6.4.41 --locked"
+      ],
+      "commands_label": "Commands, in order",
+      "clears": "the advisory",
+      "stays": null,
+      "not_checked": null,
+      "adds": [],
+      "php": {
+       "head": "6.x needs php >=8.1",
+       "lines": [
+        {
+         "answer": "yes",
+         "text": "your require.php allows it"
+        },
+        {
+         "answer": "yes",
+         "text": "your target, 8.4, runs it"
+        }
+       ]
+      },
+      "after": {
+       "result": "0, ok",
+       "conditions": [
+        "if Composer resolves it (not checked: a package it needs could not be loaded)"
+       ]
+      },
+      "composer": []
+     }
+    ],
+    "held_by": [
+     null
+    ],
+    "security": {
+     "summary": [
+      "1 high advisory",
+      "4 on record for this name",
+      "fix: composer update",
+      "lookup complete"
+     ],
+     "counts": [],
+     "meanwhile": null,
+     "caption": [
+      "By severity. Each affects your version, v6.4.28."
+     ],
+     "groups": [],
+     "rows": [
+      {
+       "name": "CVE-2026-48784",
+       "source": "PKSA-bf7t-jnpz-492k",
+       "deciding": true,
+       "severity": "high",
+       "fix": "fix v6.4.41 on 6.x, your branch (composer update)",
+       "affects": "affects >=6.4.0,<6.4.41",
+       "ranges": null,
+       "same_as": null
+      }
+     ],
+     "ignored": [],
+     "ladder": [
+      {
+       "branch": "6.x",
+       "marks": [
+        "your branch",
+        "the move"
+       ],
+       "lines": [
+        "6.x your branch the move clears 1 of 1 from v6.4.41",
+        "composer update",
+        "after it: 0, ok · not checked: a package it needs could not be loaded"
+       ]
+      }
+     ]
+    },
+    "branches_lead": [
+     "Your branch, 6.x, had its last release, v6.4.41, 0.2 years ago.",
+     "It has no higher branch."
+    ],
+    "branch_rows": [],
+    "age_rows": [
+     {
+      "label": "installed",
+      "value": "v6.4.28 · 2025-10-31 · 0.9 years ago"
+     },
+     {
+      "label": "6.x last",
+      "value": "v6.4.41 · 2026-07-05 · 0.2 years ago · its most recent release"
+     },
+     {
+      "label": "last push",
+      "value": "2026-09-29 · less than three weeks ago"
+     }
+    ],
+    "security_row": [
+     "1 high advisory",
+     "4 on record for this name",
+     "fix: composer update",
+     "lookup complete",
+     "6.x your branch the move clears 1 of 1 from v6.4.41",
+     "composer update",
+     "after it: 0, ok · not checked: a package it needs could not be loaded"
+    ],
+    "why": [
+     "16 · high from 16 · 16 points short of critical",
+     "vulnerable 16: high advisory CVE-2026-48784; its own fix (composer update on 6.x) is reachable, so no × 2",
+     "the advisory alone makes it high"
+    ],
+    "gate_line": null,
+    "checks": "1 fired (S9) · 10 quiet · every check ran",
+    "baseline_suffix": null,
+    "commands_posix": [
+     "composer update 'symfony/routing:^6.4.41'",
+     "composer why-not symfony/routing v6.4.41 --locked"
+    ],
+    "commands_cmd": [
+     "composer update \"symfony/routing:^6.4.41\"",
+     "composer why-not symfony/routing v6.4.41 --locked"
+    ],
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v6.4.28 released 2025-10-31 (0.9 years ago); 6.x last released v6.4.41 2026-07-05 (0.2 years ago), its newest release; last push 2026-09-29 (less than three weeks ago)"
+   },
+   "run_notes": [
+    {
+     "code": "lock_out_of_sync",
+     "text": "lock: the lock file does not match composer.json (acme/contract is not locked at a version that composer.json allows): run composer update",
+     "docs_url": "https://lockrot.dev/notes/#lock_out_of_sync",
+     "sets_network_failures": false,
+     "data": {
+      "missing": [
+       "acme/contract"
+      ]
+     }
+    }
+   ],
+   "parents": [
+    {
+     "package": "acme/x",
+     "version": "1.0.0",
+     "branch": "1.x",
+     "installed_php": {
+      "requires": ">=8.1",
+      "target_runs": true,
+      "project_allows": true
+     },
+     "verdict": "ok",
+     "priority": "none",
+     "lead": null,
+     "rank": 11,
+     "flags": [],
+     "score": {
+      "model": 1,
+      "total": 0,
+      "exact": 0,
+      "accepted": [],
+      "text": "0"
+     },
+     "next_step": null,
+     "security": {
+      "status": "clear",
+      "check": "complete",
+      "complete": true,
+      "unchecked_reason": null,
+      "records": 0,
+      "feeds": [
+       {
+        "composer_repository": "composer repo (https://repo.packagist.org)",
+        "registry": "packagist.org",
+        "answer": "answered",
+        "records": 0,
+        "reason": null
+       }
+      ],
+      "ignored": [],
+      "ignored_count": 0
+     },
+     "checks_missing": [],
+     "checks_skipped": [],
+     "unchecked_accepted": [],
+     "maintenance_judged": true,
+     "metadata": {
+      "status": "read",
+      "reason": null,
+      "message": null
+     },
+     "activity": {
+      "status": "read",
+      "reason": null,
+      "forge": "github",
+      "host": "github.com",
+      "repo": "acme/x",
+      "event": "push",
+      "archived": false,
+      "fetched_at": "2026-10-01T16:06:16+00:00",
+      "cached_at": "2026-10-01T16:06:16+00:00"
+     },
+     "allowlist": null,
+     "abandoned_ignored": null,
+     "from_composer_repository": true,
+     "origin": {
+      "kind": "packagist",
+      "registry": "packagist.org",
+      "package_url": "https://packagist.org/packages/acme/x",
+      "local": false
+     },
+     "replacement": null,
+     "replacement_url": null,
+     "note": null,
+     "libyears_unmeasured": null,
+     "libyears_at_least": false,
+     "direct": true,
+     "dev": false,
+     "reach": "direct",
+     "chain": [
+      "acme/x"
+     ],
+     "depth": 0,
+     "depth_unmeasured": null,
+     "named_in": [
+      "require"
+     ],
+     "direct_dependents": [
+      "acme/x"
+     ],
+     "signals": [],
+     "evidence": "",
+     "allowlist_reason": null,
+     "data_date": "2026-10-01T17:41:59+00:00",
+     "libyears": 0,
+     "age": {
+      "installed": {
+       "at": "2026-07-02T10:00:00+00:00",
+       "years": 0.3,
+       "dated_by": null
+      },
+      "installed_unmeasured": null,
+      "release": {
+       "version": "1.0.0",
+       "at": "2026-07-02T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "release_unmeasured": null,
+      "branch_release": {
+       "version": "1.0.0",
+       "at": "2026-07-02T10:00:00+00:00",
+       "years": 0.3,
+       "level": null,
+       "dated_by": null
+      },
+      "branch_release_unmeasured": null,
+      "push": {
+       "at": "2026-07-02T10:00:00+00:00",
+       "years": 0.3,
+       "level": null
+      },
+      "push_unmeasured": null
+     },
+     "baseline": null,
+     "gate": {
+      "reaches_fail_on": false,
+      "fails": false,
+      "exempt_by": null,
+      "by": [],
+      "basis": null
+     }
+    }
+   ],
+   "solver_world": {
+    "world_id": "baseline-provide-unmatched",
+    "world": {
+     "platform_php": "8.4.99",
+     "root": {
+      "name": "typo3/cms",
+      "require": {
+       "php": "^8.1",
+       "symfony/routing": "^6.4",
+       "acme/contract": "^2.0"
+      },
+      "require-dev": {
+       "acme/contract": "^1.0"
+      }
+     },
+     "lock": {
+      "packages": [
+       {
+        "version": "1.0.0",
+        "require": {
+         "php": ">=8.1",
+         "acme/y": "^1.0"
+        },
+        "name": "acme/x",
+        "provide": {
+         "acme/contract": "1.0.0"
+        },
+        "time": "2026-07-02T10:00:00+00:00"
+       },
+       {
+        "version": "v6.4.28",
+        "require": {
+         "php": ">=8.1"
+        },
+        "name": "symfony/routing",
+        "time": "2025-10-31T16:43:05+00:00"
+       }
+      ],
+      "packages-dev": []
+     },
+     "repo": {
+      "acme/contract": [
+       {
+        "version": "1.0.0",
+        "require": {
+         "php": ">=8.1"
+        },
+        "time": "2026-07-01T10:00:00+00:00"
+       }
+      ],
+      "acme/x": [
+       {
+        "version": "1.0.0",
+        "require": {
+         "php": ">=8.1",
+         "acme/y": "^1.0"
+        },
+        "provide": {
+         "acme/contract": "1.0.0"
+        },
+        "time": "2026-07-02T10:00:00+00:00"
+       }
+      ],
+      "acme/y": [
+       {
+        "version": "1.0.0",
+        "require": {
+         "php": ">=8.1"
+        },
+        "time": "2026-07-03T10:00:00+00:00"
+       },
+       {
+        "version": "1.1.0",
+        "require": {
+         "php": ">=8.1",
+         "acme/private-lib": "^1.0"
+        },
+        "time": "2026-07-04T10:00:00+00:00"
+       }
+      ],
+      "symfony/routing": [
+       {
+        "version": "v6.4.28",
+        "require": {
+         "php": ">=8.1"
+        },
+        "time": "2025-10-31T16:43:05+00:00"
+       },
+       {
+        "version": "v6.4.41",
+        "require": {
+         "php": ">=8.1"
+        },
+        "time": "2026-07-05T10:00:00+00:00"
+       }
+      ]
+     },
+     "vcs_repos": [
+      "https://example.invalid/acme/private-lib.git"
+     ],
+     "lock_hash": "stale"
+    },
+    "check_passes": null,
+    "update_now": null,
+    "answers": {
+     "baseline": {
+      "result": "refused",
+      "form": null,
+      "holds": [
+       {
+        "constraint": "^2.0",
+        "link": "root-require",
+        "package": null,
+        "source": "root",
+        "target": "acme/contract",
+        "version": null
+       }
+      ],
+      "problem": "  Problem 1\n    - Root composer.json requires acme/contract ^2.0, it could not be found in any version, but the following packages provide it:\n      - acme/x\n      Consider requiring one of these to satisfy the acme/contract requirement."
+     }
+    }
+   },
+   "inputs": {
+    "root": {
+     "name": "typo3/cms",
+     "require": {
+      "php": "^8.1",
+      "symfony/routing": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "symfony/routing",
+      "version": "v6.4.28",
+      "time": "2025-10-31T16:43:05+00:00",
+      "php": ">=8.1",
+      "dev": false,
+      "origin": "packagist"
+     }
+    ],
+    "releases": [
+     {
+      "version": "v6.4.28",
+      "time": "2025-10-31T16:43:05+00:00",
+      "php": ">=8.1"
+     },
+     {
+      "version": "v6.4.41",
+      "time": "2026-07-05T10:00:00+00:00",
+      "php": ">=8.1"
+     }
+    ],
+    "advisories": [
+     {
+      "id": "PKSA-bf7t-jnpz-492k",
+      "cve": "CVE-2026-48784",
+      "title": "UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization",
+      "link": "https://symfony.com/cve-2026-48784",
+      "reported_at": "2026-05-26T08:00:00+00:00",
+      "severity": "high",
+      "affected_versions": ">=6.4.0,<6.4.41"
+     }
+    ],
+    "records": 4,
+    "ignored": [],
+    "abandoned": null,
+    "activity": {
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/routing",
+     "status": "read",
+     "reason": null,
+     "pushed_at": "2026-09-29T14:09:10+00:00",
+     "archived": false
+    },
+    "dependents": {},
+    "run": {
+     "target_php": "8.4",
+     "project_php": "^8.1",
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    },
+    "packages": {
+     "acme/x": {
+      "lock": {
+       "name": "acme/x",
+       "version": "1.0.0",
+       "time": "2026-07-02T10:00:00+00:00",
+       "php": ">=8.1",
+       "dev": false,
+       "origin": "packagist"
+      },
+      "releases": [
+       {
+        "version": "1.0.0",
+        "time": "2026-07-02T10:00:00+00:00",
+        "php": ">=8.1"
+       }
+      ],
+      "advisories": [],
+      "records": 0,
+      "ignored": [],
+      "abandoned": null,
+      "activity": {
+       "forge": "github",
+       "host": "github.com",
+       "repo": "acme/x",
+       "status": "read",
+       "reason": null,
+       "pushed_at": "2026-07-02T10:00:00+00:00",
+       "archived": false
+      },
+      "chain": [
+       "acme/x"
+      ],
+      "below": null
+     }
+    },
+    "solver_world": {
+     "world_id": "baseline-provide-unmatched",
+     "world": {
+      "platform_php": "8.4.99",
+      "root": {
+       "name": "typo3/cms",
+       "require": {
+        "php": "^8.1",
+        "symfony/routing": "^6.4",
+        "acme/contract": "^2.0"
+       },
+       "require-dev": {
+        "acme/contract": "^1.0"
+       }
+      },
+      "lock": {
+       "packages": [
+        {
+         "version": "1.0.0",
+         "require": {
+          "php": ">=8.1",
+          "acme/y": "^1.0"
+         },
+         "name": "acme/x",
+         "provide": {
+          "acme/contract": "1.0.0"
+         },
+         "time": "2026-07-02T10:00:00+00:00"
+        },
+        {
+         "version": "v6.4.28",
+         "require": {
+          "php": ">=8.1"
+         },
+         "name": "symfony/routing",
+         "time": "2025-10-31T16:43:05+00:00"
+        }
+       ],
+       "packages-dev": []
+      },
+      "repo": {
+       "acme/contract": [
+        {
+         "version": "1.0.0",
+         "require": {
+          "php": ">=8.1"
+         },
+         "time": "2026-07-01T10:00:00+00:00"
+        }
+       ],
+       "acme/x": [
+        {
+         "version": "1.0.0",
+         "require": {
+          "php": ">=8.1",
+          "acme/y": "^1.0"
+         },
+         "provide": {
+          "acme/contract": "1.0.0"
+         },
+         "time": "2026-07-02T10:00:00+00:00"
+        }
+       ],
+       "acme/y": [
+        {
+         "version": "1.0.0",
+         "require": {
+          "php": ">=8.1"
+         },
+         "time": "2026-07-03T10:00:00+00:00"
+        },
+        {
+         "version": "1.1.0",
+         "require": {
+          "php": ">=8.1",
+          "acme/private-lib": "^1.0"
+         },
+         "time": "2026-07-04T10:00:00+00:00"
+        }
+       ],
+       "symfony/routing": [
+        {
+         "version": "v6.4.28",
+         "require": {
+          "php": ">=8.1"
+         },
+         "time": "2025-10-31T16:43:05+00:00"
+        },
+        {
+         "version": "v6.4.41",
+         "require": {
+          "php": ">=8.1"
+         },
+         "time": "2026-07-05T10:00:00+00:00"
+        }
+       ]
+      },
+      "vcs_repos": [
+       "https://example.invalid/acme/private-lib.git"
+      ],
+      "lock_hash": "stale"
+     },
+     "check_passes": null,
+     "update_now": null,
+     "answers": {
+      "baseline": {
+       "result": "refused",
+       "form": null,
+       "holds": [
+        {
+         "constraint": "^2.0",
+         "link": "root-require",
+         "package": null,
+         "source": "root",
+         "target": "acme/contract",
+         "version": null
+        }
+       ],
+       "problem": "  Problem 1\n    - Root composer.json requires acme/contract ^2.0, it could not be found in any version, but the following packages provide it:\n      - acme/x\n      Consider requiring one of these to satisfy the acme/contract requirement."
+      }
+     }
+    },
+    "checks": {
+     "baseline": {
+      "result": "refused",
+      "form": null,
+      "holds": [
+       {
+        "constraint": "^2.0",
+        "link": "root-require",
+        "package": null,
+        "source": "root",
+        "target": "acme/contract",
+        "version": null
+       }
+      ],
+      "problem": "  Problem 1\n    - Root composer.json requires acme/contract ^2.0, it could not be found in any version, but the following packages provide it:\n      - acme/x\n      Consider requiring one of these to satisfy the acme/contract requirement.",
+      "reason": null
+     }
+    },
+    "move_check": {
+     "composer": "2.10.3",
+     "blocks_advisories": false,
+     "blocking_disabled_by": [
+      "config.audit.block-insecure"
+     ],
+     "ignored_platform": [
+      "ext-*",
+      "lib-*",
+      "php-debug",
+      "php-ipv6",
+      "php-zts"
+     ],
+     "baseline": "not_checked",
+     "reason": "unloaded_name",
      "php": "8.4.99"
     }
    }

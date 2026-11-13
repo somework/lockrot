@@ -95,7 +95,7 @@ final class FixFinder
         foreach ($rows as $row) {
             $rowNewest[$row->branch()] = $row->newest();
         }
-        // On one branch the S9 fix, the row and the move read one `newest` (SPEC 5.3, the S9 row).
+        // On one branch the S9 fix, the row and the move read one `newest`.
         $branchNewest = static fn (string $branch): string => $rowNewest[ReleaseBranch::label($branch)] ?? $newest[$branch];
         $fixes = [];
         foreach ($ranges as $id => $range) {
@@ -201,7 +201,7 @@ final class FixFinder
      * A branch's safe window: every release from its lower bound R up to its newest, where R is the
      * lowest release from which each one lies outside every range. R then rises above each range of
      * $own that leaves the newest release outside. A range that holds the newest release reaches
-     * every constraint on the branch, so it does not raise R (SPEC §5.3).
+     * every constraint on the branch, so it does not raise R.
      *
      * @param list<Candidate>            $candidates one branch, ascending
      * @param array<ConstraintInterface> $ranges
@@ -307,10 +307,10 @@ final class FixFinder
      * `composer update <package>` installs the highest release on the installed branch that the
      * lock's links allow and the target runs, whatever `require.php` says. With none that the target
      * runs, the highest one that the links allow says why. A package hold of a refusal that admits a
-     * release is a lock link of that release (ruling R17-13a). When such holds exclude every release
+     * release is a lock link of that release. When such holds exclude every release
      * that the links allow, the Gets is capped ({@see Gets::capped()}), and null when the target
      * cannot run the highest such release. A solve that installs another release names that release
-     * ({@see \Lockrot\Verdict\FindingDetails}, SPEC §5.6 ruling R2).
+     * ({@see \Lockrot\Verdict\FindingDetails}).
      *
      * @param list<string>                       $names       the package's name and each name that it replaces
      * @param list<Candidate>                    $onInstalled ascending
@@ -408,7 +408,7 @@ final class FixFinder
     }
 
     /**
-     * The `newest` of a move to $for on its branch (SPEC 5.6, `version` and `newest`).
+     * The `newest` of a move to $for on its branch.
      *
      * @param list<StableRelease> $releases ascending
      */
@@ -422,7 +422,7 @@ final class FixFinder
     /**
      * The highest release on the installed branch that the target runs and that no link excludes.
      * For $for, only a release at or above it counts, and no link in its `held_by` counts: the move
-     * clears that hold (SPEC §5.3). Null when no release qualifies, so `newest` never lies below the fix.
+     * clears that hold. Null when no release qualifies, so `newest` never lies below the fix.
      *
      * @param list<Candidate> $onInstalled ascending
      */

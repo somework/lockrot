@@ -85,8 +85,7 @@ final class MoveCheck implements \JsonSerializable
 
     /**
      * Every resolving form keeps the moved package's locked version or installs a dev version of it.
-     * A snapshot is no release that a move proposes, and Composer's advisory blocking skips it
-     * (ruling R17-1).
+     * A snapshot is no release that a move proposes, and Composer's advisory blocking skips it.
      *
      * @param ?string $installs the version that the first resolving form, in form order, installs or keeps; null when it drops the package
      */

@@ -259,6 +259,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** a repository URL whose host is unclear, such as one whose userinfo holds a raw
   `/`, `?` or `#`, prints as `https://(withheld: ambiguous host)`. It gets no link and no
   repository host, so its userinfo does not reach the report.
+- **Run notes:** the `move_check_failed` note holds no PHP `TypeError` text, which can name an
+  absolute path of the machine. A release that a repository serves with a numeric package name in
+  a link map is solved as Composer solves it. ([Move check failed](docs/notes.md#move_check_failed))
 
 ### Added
 
@@ -269,7 +272,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Action: read stdout alone, because `-q` also silences the report.
   ([Reading the gate line](docs/ci.md#reading-the-gate-line))
 - **Run notes:** the note `lock_out_of_sync` says that the lock does not match composer.json, as
-  `composer install` warns, and lists the root requirements that the lock does not hold.
+  `composer install` warns, and lists the root requirements that the lock does not hold at a
+  version that the requirement admits.
   ([Lock out of sync](docs/notes.md#lock_out_of_sync))
 - **JSON:** `run.move_check.blocking_disabled_by` lists each environment variable and composer.json
   key that turns Composer's advisory blocking off. The move check then blocks no advisory.
@@ -754,7 +758,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CLI:** a run exits `2` with a message that names `config.platform.php` when that value is a
   branch name, such as `dev-master`. ([Exit codes](docs/ci.md#exit-codes))
 - **CLI:** a run exits `2` with a message that names the `composer.lock` field when the field has
-  the wrong type. The message holds no PHP error text and no absolute path.
+  the wrong type, or when a link map such as `require` holds a numeric package name. The message
+  holds no PHP error text and no absolute path.
+- **CLI:** a run exits `2` with a message that names composer.json and the field when a link map
+  such as `require` in composer.json holds a numeric package name. The message holds no PHP error
+  text and no absolute path.
 - **CLI:** a run on a `composer.lock` that is not a regular file exits `2` with
   `composer.lock exists and is not a regular file`.
 - **All formats:** the capped fact stays unverified when the target release's `php` is
@@ -766,6 +774,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** an unloaded name in the first solve gives a move `not_checked` with
   `unloaded_name` also when the second solve over the non-dev requirements refuses.
   ([Move](docs/verdicts.md#move))
+- **All formats:** when `composer.lock` omits a `require` or `require-dev` name of the root, or
+  a locked package provides it only at a version that the requirement does not admit, a package
+  that lockrot could not load gives every move `not_checked` with `unloaded_name`, not
+  `baseline_refused`. ([Move](docs/verdicts.md#move))
 
 ## [0.13.0] - 2026-10-01
 

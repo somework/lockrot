@@ -66,6 +66,7 @@ final class ComposerSolver
     private ?ArrayRepository $lockedOnly = null;
     private bool $setsPhp = false;
     private bool $minimalChanges = false;
+    private bool $locksEveryRootRequirement = false;
     private string $lastInputs = '';
     /** @phpstan-ignore property.onlyWritten (the last built pool keeps the object ids of its packages taken: {@see SolverInputs}) */
     private Pool $lastBuilt;
@@ -129,6 +130,18 @@ final class ComposerSolver
         return $clone;
     }
 
+    /**
+     * A copy for a lock that holds every root requirement: its baseline then fixes each one, so a
+     * refusal of the second solve stands beside a name that the first solve could not load.
+     */
+    public function withEveryRootRequirementLocked(): self
+    {
+        $clone = clone $this;
+        $clone->locksEveryRootRequirement = true;
+
+        return $clone;
+    }
+
     public function root(): RootPackageInterface
     {
         return $this->root;
@@ -184,10 +197,11 @@ final class ComposerSolver
         $nonDev = $root->getDevRequires() === [] ? null : $this->nonDevAnswer($root, $policy, $answer, $requires, $temporary);
         // A pool that lacks a name the builder asked for can resolve at a release that the full pool would not choose.
         // The second solve of a move reads that answer, so its refusal proves no more. The baseline
-        // keeps every locked package, so a fuller pool cannot change its refusal.
+        // fixes every locked package, so a fuller pool cannot change its refusal when the lock holds
+        // every root requirement. A root requirement that the lock omits stays free.
         $unloaded = $this->withoutMetUnreached($this->failures($loaded->asked()), $built, $answer);
         if ($nonDev !== null) {
-            return $this->refused($nonDev[3], $nonDev[2], $nonDev[0], $nonDev[1], $composerRequest, $root, $request, $loaded, $request->isBaseline() ? [] : $unloaded);
+            return $this->refused($nonDev[3], $nonDev[2], $nonDev[0], $nonDev[1], $composerRequest, $root, $request, $loaded, $request->isBaseline() && $this->locksEveryRootRequirement ? [] : $unloaded);
         }
 
         // Composer blocks a release by each name that it replaces too.
@@ -278,7 +292,7 @@ final class ComposerSolver
      */
     private function withoutMetUnreached(array $failures, Pool $pool, LockTransaction $answer): array
     {
-        $unreached = array_keys($failures, VersionSource::UNREACHED, true);
+        $unreached = array_map('strval', array_keys($failures, VersionSource::UNREACHED, true));
         if ($unreached === []) {
             return $failures;
         }
@@ -301,7 +315,8 @@ final class ComposerSolver
                 continue;
             }
             $counted[spl_object_id($package)] = true;
-            foreach ($package->getRequires() as $name => $link) {
+            foreach ($package->getRequires() as $link) {
+                $name = $link->getTarget();
                 $providers = $pool->whatProvides($name, $link->getConstraint());
                 if (!\in_array($name, $unreached, true)) {
                     $queue = array_merge($queue, array_filter($providers, static fn (BasePackage $provider): bool => !isset($installed[self::baseOf($provider)->getName()])));
@@ -327,7 +342,8 @@ final class ComposerSolver
      */
     private function isInstallable(BasePackage $package, Pool $pool, array $unreached): bool
     {
-        foreach ($package->getRequires() as $name => $link) {
+        foreach ($package->getRequires() as $link) {
+            $name = $link->getTarget();
             if (!\in_array($name, $unreached, true) && !$this->filter->isIgnored($name) && $pool->whatProvides($name, $link->getConstraint()) === []) {
                 return false;
             }
@@ -480,7 +496,7 @@ final class ComposerSolver
         $filter = $this->advisories->blocking()->poolFilter();
         $error = $this->advisories->blocking()->filterError();
         if ($filter === null) {
-            throw new \RuntimeException('Composer\'s advisory pool filter cannot be built: '.($error === null ? 'unknown error' : $error->getMessage()));
+            throw new \RuntimeException('Composer\'s advisory pool filter cannot be built: '.($error === null ? 'unknown error' : Solution::errorText($error)));
         }
         $feed = new PoolAdvisoryFeed($this->advisories);
         try {
@@ -488,7 +504,7 @@ final class ComposerSolver
         } catch (\Error $e) {
             // The filter is Composer's internal API. The `move_check_failed` note names it as the
             // source of a drift, which an \Error from inside Composer does not.
-            throw new \RuntimeException('Composer\'s advisory pool filter failed: '.$e->getMessage());
+            throw new \RuntimeException('Composer\'s advisory pool filter failed: '.Solution::errorText($e));
         }
 
         return [$set, $composerRequest, $pool, $fixedRoot, $loaded, $feed];

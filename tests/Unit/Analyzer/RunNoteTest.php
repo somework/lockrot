@@ -36,21 +36,21 @@ final class RunNoteTest extends TestCase
         yield 'lock out of sync, one name' => [
             static fn (): RunNote => RunNote::lockOutOfSync(['psr/container']),
             'lock_out_of_sync',
-            'lock: the lock file does not match composer.json (psr/container is required but not locked): run composer update',
+            'lock: the lock file does not match composer.json (psr/container is not locked at a version that composer.json allows): run composer update',
             false,
             ['missing' => ['psr/container']],
         ];
         yield 'lock out of sync, two names' => [
             static fn (): RunNote => RunNote::lockOutOfSync(['psr/container', 'psr/log']),
             'lock_out_of_sync',
-            'lock: the lock file does not match composer.json (psr/container and psr/log are required but not locked): run composer update',
+            'lock: the lock file does not match composer.json (psr/container and psr/log are not locked at a version that composer.json allows): run composer update',
             false,
             ['missing' => ['psr/container', 'psr/log']],
         ];
         yield 'lock out of sync, three names' => [
             static fn (): RunNote => RunNote::lockOutOfSync(['a/a', 'b/b', 'c/c']),
             'lock_out_of_sync',
-            'lock: the lock file does not match composer.json (a/a, b/b and c/c are required but not locked): run composer update',
+            'lock: the lock file does not match composer.json (a/a, b/b and c/c are not locked at a version that composer.json allows): run composer update',
             false,
             ['missing' => ['a/a', 'b/b', 'c/c']],
         ];

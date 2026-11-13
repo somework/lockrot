@@ -94,7 +94,7 @@ final class Moves
         return $this->rowChecks[$branch] ?? null;
     }
 
-    /** Whether the joint request resolves the move to the row's candidate: then nothing holds it (SPEC §5.6, ruling R1). */
+    /** Whether the joint request resolves the move to the row's candidate: then nothing holds it. */
     public function rowIsJoint(string $branch): bool
     {
         return isset($this->rowsJoint[$branch]);

@@ -110,7 +110,7 @@ final class MoveBuilder
         $movesWith = $joint ? $outcome->movesWith() : [];
         $because = self::because($kind, $crosses, $heldBy, $subject);
         $ifApplied = null;
-        // A solve below the newest release can clear nothing: the score after such a move is the current total (SPEC I14).
+        // A solve below the newest release can clear nothing: the score after such a move is the current total.
         if ($clears !== [] && \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true)) {
             $resolves = $check !== null && $check->isResolved();
             $assumes = array_merge([IfApplied::CLEARS_HOLD], !$resolves && ($because !== [] || $heldBy !== [] || ($check !== null && $check->installsNoReleaseOfIt())) ? [IfApplied::COMPOSER_RESOLVES] : [], $context->advisoriesComplete() ? [] : [IfApplied::NO_NEW_ADVISORIES]);
@@ -151,7 +151,7 @@ final class MoveBuilder
 
     /**
      * The version, constraint or tag that a step quotes, when it holds a character that a Windows
-     * shell runs or redirects (SPEC §5.6). A value that no step quotes does not count.
+     * shell runs or redirects. A value that no step quotes does not count.
      *
      * @param list<list<string>> $commands
      * @param list<?string>      $values
@@ -220,7 +220,7 @@ final class MoveBuilder
      * @param list<string> $advisories ids
      * @param ?BranchRow   $branch     the branch row of $row, which dates the branch as S8 does: a row
      *                                 of a release below the newest is dated by the branch's newest dated release
-     * @param ?StableRelease $installs the release below the newest that the solve installs: old-promise reads its date (ruling R2-1), and an advisory that affects it stays
+     * @param ?StableRelease $installs the release below the newest that the solve installs: old-promise reads its date, and an advisory that affects it stays
      *
      * @return array{0: list<MoveFact>, 1: list<MoveFact>}
      */

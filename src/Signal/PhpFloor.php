@@ -280,7 +280,7 @@ final class PhpFloor
      * The lowest stable `X.Y.Z` that $constraint admits, above $above when given. Each range is
      * read at its start and at the patch after it, because a `!=` hole or a start such as `>7.4.0`
      * or `>=7.4.0-p1` admits no `X.Y.Z` of its own there. Without $above, a constraint with no lower
-     * bound gives null (SPEC §8.2). With $above, a range with no lower bound is skipped. A date
+     * bound gives null. With $above, a range with no lower bound is skipped. A date
      * start (`>=201001`) is skipped.
      */
     public static function lowestStable(ConstraintInterface $constraint, ?string $above = null): ?string
