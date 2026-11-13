@@ -215,8 +215,8 @@ final class InstallTimeSummary
     /**
      * The manifest with the root's `require` and `require-dev`, as the run would write it. A name
      * that the manifest lists keeps its spelling. A constraint keeps its text, so `self.version`
-     * stays `self.version`. The lock hash is compared against composer.json as read, as Composer's
-     * Locker compares it.
+     * stays `self.version`. The copy's {@see ProjectConfig::lockOutOfSync()} compares the lock hash
+     * against composer.json as read, as Composer's Locker does.
      */
     public static function withRootRequirements(ProjectConfig $project, string $composerFile, RootPackageInterface $root): ProjectConfig
     {
