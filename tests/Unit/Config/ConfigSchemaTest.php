@@ -14,6 +14,7 @@ use Lockrot\Json\SchemaPayload;
 use Lockrot\Json\Schemas;
 use Lockrot\Tests\Support\ColdConfigSchema;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\SchemaCheck;
 use Lockrot\Verdict\FailOn;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -365,10 +366,8 @@ final class ConfigSchemaTest extends TestCase
     #[DataProvider('config1ValuesThatConfig2Refuses')]
     public function testAConfig1ValueThatConfig2RefusesIsReportedWithItsPath(array $extra, string $expectedPropertyPath): void
     {
-        $validator = new Validator();
         $data = SchemaPayload::of($extra, 'extra.lockrot');
-        $validator->validate($data, self::decodedFile(self::CONFIG_1));
-        self::assertSame([], $validator->getErrors(), 'config-1 accepts it');
+        self::assertSame([], SchemaCheck::errors((string) file_get_contents(self::CONFIG_1), json_encode($data, SchemaCheck::ENCODE)), 'config-1 accepts it');
 
         try {
             ConfigSchema::validate($extra);

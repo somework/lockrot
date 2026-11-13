@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "findings[7].allowlist.reason_id: NULL value found, but a string is required"
+  "error": "findings[7].allowlist.reason_id: type"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

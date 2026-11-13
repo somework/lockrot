@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "findings[0].security.ignored[0].matched: Does not match the regex pattern"
+  "error": "findings[0].security.ignored[0].matched: pattern"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

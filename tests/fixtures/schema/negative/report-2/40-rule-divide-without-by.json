@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "rules[6].by: The property by is required"
+  "error": "rules[6].by: required"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

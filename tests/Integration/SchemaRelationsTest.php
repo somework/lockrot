@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use JsonSchema\Validator;
 use Lockrot\Json\Schemas;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Tests\Support\NegativeFixtures;
+use Lockrot\Tests\Support\SchemaCheck;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -50,17 +50,16 @@ final class SchemaRelationsTest extends TestCase
     /** @var list<string> the pointers of the WAITING relations, found by their description */
     private static array $waiting = [];
 
-    /** @var array<string, object> by mode */
+    /** @var array<string, string> the schema JSON by mode */
     private static array $schemas = [];
     /** @var list<string> */
     private static array $relations = [];
 
     public static function setUpBeforeClass(): void
     {
-        $schema = json_decode((string) file_get_contents(Schemas::path(Schemas::REPORT, JsonFormatter::SCHEMA)), true);
+        $published = (string) file_get_contents(Schemas::path(Schemas::REPORT, JsonFormatter::SCHEMA));
+        $schema = self::arrays(json_decode($published));
         self::assertIsArray($schema);
-        $published = json_decode((string) json_encode($schema));
-        self::assertIsObject($published);
         self::$schemas['published'] = $published;
         self::$waiting = [];
         foreach (array_keys(self::WAITING) as $description) {
@@ -70,9 +69,7 @@ final class SchemaRelationsTest extends TestCase
         }
         foreach (['none', 'break', 'reach'] as $mode) {
             $relations = [];
-            $instrumented = json_decode((string) json_encode(self::instrument($schema, '#', $mode, $relations)));
-            self::assertIsObject($instrumented);
-            self::$schemas[$mode] = $instrumented;
+            self::$schemas[$mode] = json_encode(self::instrument($schema, '#', $mode, $relations), SchemaCheck::ENCODE);
             self::$relations = $relations;
         }
     }
@@ -119,28 +116,28 @@ final class SchemaRelationsTest extends TestCase
             ['description' => 'c is never 0.', 'properties' => ['c' => ['not' => ['enum' => [0]]]]],
         ]];
         $relations = [];
-        $break = json_decode((string) json_encode(self::instrument($schema, '#', 'break', $relations)));
-        self::assertIsObject($break);
+        $break = json_encode(self::instrument($schema, '#', 'break', $relations), SchemaCheck::ENCODE);
 
-        $validator = new Validator();
-        $document = json_decode('{"a": "x", "b": null, "c": 1}');
-        $validator->validate($document, $break);
-        $errors = self::messages($validator);
+        $errors = SchemaCheck::justinrainbowErrors($break, '{"a": "x", "b": null, "c": 1}');
 
         self::assertSame(['#/allOf/0' => true], self::markers($errors, self::BROKEN, $relations));
     }
 
-    /** @return list<string> */
-    private static function messages(Validator $validator): array
+    /**
+     * A decoded schema as arrays, with each `{}` kept as an object: an empty array is no schema,
+     * and `properties: []` is no map of schemas.
+     *
+     * @param mixed $node
+     *
+     * @return mixed
+     */
+    private static function arrays($node)
     {
-        $messages = [];
-        foreach ($validator->getErrors() as $error) {
-            self::assertIsArray($error);
-            self::assertIsString($error['message'] ?? null);
-            $messages[] = $error['message'];
+        if ($node instanceof \stdClass && get_object_vars($node) !== []) {
+            $node = get_object_vars($node);
         }
 
-        return $messages;
+        return \is_array($node) ? array_map(static fn ($child) => self::arrays($child), $node) : $node;
     }
 
     /** @return list<string> */
@@ -175,19 +172,19 @@ final class SchemaRelationsTest extends TestCase
         return $found;
     }
 
-    /** @return list<string> the messages of the errors */
+    /**
+     * The markers need every keyword checked: opis stops at the first failing `allOf` entry, and a
+     * failing keyword hides the `allOf` of its schema ({@see \Lockrot\Tests\Unit\Support\ValidatesJsonSchemasTest}).
+     *
+     * @return list<string> the error lines ({@see SchemaCheck::errors()})
+     */
     private static function errors(string $mode, string $json): array
     {
-        $document = json_decode($json);
-        self::assertNotNull($document);
-        $validator = new Validator();
-        $validator->validate($document, self::$schemas[$mode]);
-
-        return self::messages($validator);
+        return $mode === 'published' ? SchemaCheck::errors(self::$schemas[$mode], $json) : SchemaCheck::justinrainbowErrors(self::$schemas[$mode], $json);
     }
 
     /**
-     * @param list<string>      $messages
+     * @param list<string>      $messages the error lines
      * @param list<string>|null $relations the relations the markers count, the schema's unless given
      *
      * @return array<string, true> the relations that a marker names

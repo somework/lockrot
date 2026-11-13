@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "findings[0].score.total: Does not have a value in the enumeration [0]"
+  "error": "findings[0].score.total: enum"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

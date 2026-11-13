@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support;
 
-use JsonSchema\Validator;
 use Lockrot\Json\KnownValues;
 use Lockrot\Json\Schemas;
 
@@ -20,7 +19,8 @@ trait ValidatesJsonSchemas
 {
     /**
      * The JSON of each schema file that the class read in this test process, and of each strict twin
-     * that it built. Strings only: each call decodes its own schema object.
+     * that it built. Strings only: {@see SchemaCheck::errors()} reads the JSON, and
+     * {@see schemaAt()} and {@see strictSchemaAt()} decode a copy on each call.
      *
      * @var array<string, string> by path
      */
@@ -73,26 +73,13 @@ trait ValidatesJsonSchemas
     /** @return list<string> as {@see errorsOf()} */
     private function errorsAt(string $path, string $json, bool $strict): array
     {
-        return $this->errorsOf($strict ? self::strictSchemaAt($path) : self::schemaAt($path), $json);
+        return SchemaCheck::errors($strict ? self::strictJson($path) : self::schemaJson($path), $json);
     }
 
-    /** @return list<string> each as `<property>: <message>`, `(root)` for the document itself */
+    /** @return list<string> each as {@see SchemaCheck::errors()} gives it */
     private function errorsOf(object $schema, string $json): array
     {
-        $data = json_decode($json);
-        self::assertNotNull($data, 'valid JSON');
-
-        $validator = new Validator();
-        $validator->validate($data, $schema);
-        $errors = [];
-        foreach ($validator->getErrors() as $error) {
-            self::assertIsArray($error);
-            $property = $error['property'] ?? null;
-            $message = $error['message'] ?? null;
-            $errors[] = (\is_string($property) ? ($property === '' ? '(root)' : $property) : '?').': '.(\is_string($message) ? $message : '?');
-        }
-
-        return $errors;
+        return SchemaCheck::errors(json_encode($schema, SchemaCheck::ENCODE), $json);
     }
 
     /**
@@ -164,18 +151,24 @@ trait ValidatesJsonSchemas
      */
     private static function strictSchemaAt(string $path): \stdClass
     {
+        $decoded = json_decode(self::strictJson($path));
+        self::assertIsObject($decoded, $path);
+        self::assertInstanceOf(\stdClass::class, $decoded);
+
+        return $decoded;
+    }
+
+    private static function strictJson(string $path): string
+    {
         if (!isset(self::$strictTwins[$path])) {
             $schema = json_decode(self::schemaJson($path));
             if (!$schema instanceof \stdClass) {
                 throw new \UnexpectedValueException($path.' is not a JSON object');
             }
-            self::$strictTwins[$path] = json_encode(self::strictTwin(KnownValues::closed($schema)), \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
+            self::$strictTwins[$path] = json_encode(self::strictTwin(KnownValues::closed($schema)), SchemaCheck::ENCODE);
         }
-        $decoded = json_decode(self::$strictTwins[$path]);
-        self::assertIsObject($decoded, $path);
-        self::assertInstanceOf(\stdClass::class, $decoded);
 
-        return $decoded;
+        return self::$strictTwins[$path];
     }
 
     private static function schemaJson(string $path): string
@@ -192,20 +185,26 @@ trait ValidatesJsonSchemas
      * and leaves the question open. Nodes that only say `type: object` (a signal's generic `data`)
      * and maps that already say what their members are (a baseline's `findings`) are left alone.
      * So are the `anyOf` branches, which have no `type` of their own.
+     *
+     * The root declares `$schema` when the schema does not, as justinrainbow/json-schema reads a
+     * document's `$schema` key as no additional property. The published schema stays as published.
      */
-    private static function strictTwin(\stdClass $node): \stdClass
+    private static function strictTwin(\stdClass $node, bool $root = true): \stdClass
     {
         $copy = clone $node;
         foreach (get_object_vars($copy) as $key => $value) {
             if ($value instanceof \stdClass) {
-                $copy->{$key} = self::strictTwin($value);
+                $copy->{$key} = self::strictTwin($value, false);
             } elseif (\is_array($value)) {
-                $copy->{$key} = array_map(static fn ($item) => $item instanceof \stdClass ? self::strictTwin($item) : $item, $value);
+                $copy->{$key} = array_map(static fn ($item) => $item instanceof \stdClass ? self::strictTwin($item, false) : $item, $value);
             }
         }
         $vars = get_object_vars($copy);
         if (($vars['type'] ?? null) === 'object' && isset($vars['properties']) && !\array_key_exists('additionalProperties', $vars)) {
             $copy->additionalProperties = false;
+        }
+        if ($root && ($vars['properties'] ?? null) instanceof \stdClass && !property_exists($vars['properties'], '$schema')) {
+            $vars['properties']->{'$schema'} = new \stdClass();
         }
 
         return $copy;

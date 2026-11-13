@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "findings[0].score: Matched a schema which it should not"
+  "error": "findings[0].score: not"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

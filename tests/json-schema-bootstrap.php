@@ -3,8 +3,9 @@
 declare(strict_types=1);
 
 // The PHAR job's bootstrap: it loads justinrainbow/json-schema from LOCKROT_JR_VENDOR, the vendor
-// directory of build/phar/composer.lock, in place of the dev copy. It exits 1 when the validator
-// comes from elsewhere, so a wrong path cannot pass on the dev copy.
+// directory of build/phar/composer.lock, in place of the dev copy, and the document checks of the
+// tests run on it (Lockrot\Tests\Support\SchemaCheck). It exits 1 when the validator comes from
+// elsewhere, so a wrong path cannot pass on the dev copy.
 require __DIR__.'/../vendor/autoload.php';
 
 $source = realpath(getenv('LOCKROT_JR_VENDOR').'/justinrainbow/json-schema/src/JsonSchema');
@@ -20,3 +21,5 @@ if ($source === false || !\is_string($loaded) || strpos($loaded, $source.'/') !=
     fwrite(\STDERR, "justinrainbow/json-schema does not load from LOCKROT_JR_VENDOR\n");
     exit(1);
 }
+
+\define(Lockrot\Tests\Support\SchemaCheck::JUSTINRAINBOW, true);

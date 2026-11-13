@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "findings[1].next_step.reason: String value found, but a null is required"
+  "error": "findings[1].next_step.reason: type"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

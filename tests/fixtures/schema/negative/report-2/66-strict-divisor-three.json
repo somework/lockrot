@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": true,
-  "error": "findings[1].score.terms[1].divisor: Does not have a value in the enumeration"
+  "error": "findings[1].score.terms[1].divisor: enum"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {
