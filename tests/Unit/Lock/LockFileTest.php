@@ -516,6 +516,7 @@ final class LockFileTest extends TestCase
         yield 'number as dist url beside a false notification url' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'notification-url' => false, 'dist' => ['type' => 'zip', 'url' => 5]]]], 'alt.lock entry #0 in packages cannot be loaded: "dist.url" must be a string'];
         yield 'number as bin beside a false archive name' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'archive' => ['name' => false], 'bin' => 5]]], 'alt.lock entry #0 in packages cannot be loaded: "bin" must be a string or a list of strings'];
         yield 'source without a url beside a list in keywords' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'source' => ['type' => 'git', 'reference' => 'r'], 'keywords' => [['k']]]]], "alt.lock entry #0 in packages cannot be loaded: Package a/b's source key should be specified"];
+        yield 'number as type beside a time and transport-options that the loader reads' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'type' => 5, 'time' => '2020-01-01', 'transport-options' => []]]], 'alt.lock entry #0 in packages cannot be loaded: "type" must be a string'];
         yield 'number as type beside a source that is a string' => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', 'type' => 5, 'source' => 'x']]], 'alt.lock entry #0 in packages cannot be loaded: "type" must be a string'];
         foreach (['require', 'require-dev', 'conflict', 'provide', 'replace'] as $field) {
             yield 'number as a key of '.$field => [['packages' => [['name' => 'a/b', 'version' => '1.0.0', $field => ['5' => '1.0']]]], 'alt.lock entry #0 in packages cannot be loaded: "'.$field.'" of a/b has the key 5, which is no package name'];
@@ -612,6 +613,38 @@ final class LockFileTest extends TestCase
             yield 'the key 0 alone in '.$field => [$field, ['0' => '^1']];
             yield 'the keys 0 and 1 in '.$field => [$field, ['^1', '^2']];
         }
+    }
+
+    /**
+     * One Composer's loader reads a number as `time` and skips a `transport-options` that is no
+     * object, another fails on both with a TypeError.
+     *
+     * @dataProvider fieldsThatSomeLoadersCannotRead
+     *
+     * @param mixed $value
+     */
+    #[DataProvider('fieldsThatSomeLoadersCannotRead')]
+    public function testAFieldThatTheRunningLoaderCannotReadIsNamed(string $field, $value, string $message): void
+    {
+        $entry = ['name' => 'a/b', 'version' => '1.0.0', $field => $value];
+        try {
+            (new ArrayLoader(null, true))->load($entry);
+            self::markTestSkipped('this Composer reads the field');
+        } catch (\TypeError $e) {
+        }
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('alt.lock entry #0 in packages cannot be loaded: "'.$field.'" '.$message);
+
+        LockFile::fromArray(['packages' => [$entry]], 'alt.lock');
+    }
+
+    /** @return iterable<string, array{string, mixed, string}> */
+    public static function fieldsThatSomeLoadersCannotRead(): iterable
+    {
+        yield 'a number as time' => ['time', 5, 'must be a string'];
+        yield 'a list as time' => ['time', ['x'], 'must be a string'];
+        yield 'a string as transport-options' => ['transport-options', 'x', 'must be a JSON object'];
     }
 
     /** @return iterable<string, array{array<string, mixed>}> */

@@ -237,12 +237,18 @@ final class LockFile
      * is what a user can fix. It runs after a failure only, so that no lock which the loader reads
      * is refused.
      *
-     * @param mixed $entry
+     * @param array<mixed> $entry
      *
      * @throws ConfigException for a field of the wrong type
      */
-    private static function refuseWrongTypes($entry, string $refusal): void
+    private static function refuseWrongTypes(array $entry, string $refusal): void
     {
+        // One Composer's loader reads a number as `time` and skips a `transport-options` that is no object, another fails on both.
+        foreach (['time' => 'string', 'transport-options' => 'object'] as $field => $kind) {
+            if (isset($entry[$field]) && !self::loadsAlone($field, $entry[$field])) {
+                throw new ConfigException($refusal.'"'.$field.'" '.self::KIND_MESSAGES[$kind]);
+            }
+        }
         foreach (self::FIELD_KINDS as $kind => $paths) {
             foreach ($paths as $path) {
                 $value = $entry;
@@ -254,6 +260,18 @@ final class LockFile
                 }
             }
         }
+    }
+
+    /** @param mixed $value */
+    private static function loadsAlone(string $field, $value): bool
+    {
+        try {
+            (new ArrayLoader(null, true))->load(['name' => 'a/b', 'version' => '1.0.0', $field => $value]);
+        } catch (\TypeError $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
