@@ -56,17 +56,13 @@ use PHPUnit\Framework\TestCase;
  *
  * It covers nothing: Infection skips a mutant whose covering tests together outlast its timeout, and
  * this sweep pushes every line of the gate past it. GateTest and ReportTest kill those mutants.
- * The group parallel-rows gives each data row and each test a unit of its own in the ParaTest
- * run of ci.yml.
  *
  * @coversNothing
  *
  * @group covers-nothing
- * @group parallel-rows
  */
 #[CoversNothing]
 #[Group('covers-nothing')]
-#[Group('parallel-rows')]
 final class GateAgreementTest extends TestCase
 {
     use ValidatesJsonSchemas;

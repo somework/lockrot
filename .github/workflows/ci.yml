@@ -66,13 +66,15 @@ jobs:
         run: composer require --dev --no-update "composer/composer:${{ matrix.composer }}.*"
       # ParaTest runs the tests of a row in parallel. ParaTest 7, for PHPUnit 10 and 11, needs
       # symfony/console 6.2 or later, and require-dev holds console 5.4 (CONTRIBUTING, "What the code
-      # has to run on"). ParaTest 6 needs PHPUnit 9.6. So only the PHPUnit 9.6 rows install it, and
-      # the other rows keep the processes that the test step starts itself.
-      - if: matrix.php == '7.4' || matrix.php == '8.0'
+      # has to run on"). ParaTest 6 needs PHPUnit 9.6. On a covers_nothing row, ParaTest 6 starts a
+      # process for each test file or data row, and the covers-nothing classes then take longer than in
+      # the processes of the test step. So only the PHPUnit 9.6 rows without covers-nothing install it.
+      # Measurements: https://github.com/somework/lockrot/pull/212
+      - if: (matrix.php == '7.4' || matrix.php == '8.0') && !matrix.covers_nothing
         run: composer require --dev --no-update "brianium/paratest:^6.11"
       - run: composer update --no-interaction --prefer-dist
       - name: Run tests with the matrix Composer binary
-        env: {PARATEST_PROCESSES: 3, PARATEST_BATCH: 4}
+        env: {PARATEST_PROCESSES: 3, PARATEST_BATCH: 1}
         run: |
           composer -V
           config=phpunit.xml.dist
@@ -92,19 +94,12 @@ jobs:
           if [ -x vendor/bin/paratest ]; then
             # Two ParaTest runs, one after the other, each on every process. The first runs each test
             # file in a new process: a WrapperRunner worker of PHPUnit 9 does not find a test class
-            # that an earlier file loaded. The second runs the classes of the group parallel-rows
-            # (or runtime-php) in functional mode, a process for each batch of data rows, so that a
-            # class that loops over the fixtures does not end the row alone. ParaTest 6 selects the
-            # tests of functional mode by its own --group options, not by the configuration.
-            if [ "${{ matrix.covers_nothing }}" = "true" ]; then
-              files="<exclude>$slow<group>parallel-rows</group></exclude>"
-              rows=parallel-rows
-            else
-              files="<exclude>$slow<group>covers-nothing</group></exclude>"
-              rows=runtime-php
-            fi
-            groups_config phpunit-ci-files.xml "$files"
-            groups_config phpunit-ci-rows.xml "<include><group>$rows</group></include><exclude>$slow</exclude>"
+            # that an earlier file loaded. The second runs the runtime-php classes in functional mode,
+            # a process for each data row, so that a class that loops over the fixtures does not end
+            # the row alone. ParaTest 6 selects the tests of functional mode by its own --group
+            # options, not by the configuration.
+            groups_config phpunit-ci-files.xml "<exclude>$slow<group>covers-nothing</group></exclude>"
+            groups_config phpunit-ci-rows.xml "<include><group>runtime-php</group></include><exclude>$slow</exclude>"
             status=0
             vendor/bin/paratest -c phpunit-ci-files.xml -p "$PARATEST_PROCESSES" --log-junit build/junit-files.xml || status=$?
             echo "=== paratest files: exit $status"
@@ -113,7 +108,7 @@ jobs:
             # ParaTest 6 keeps a test that matches --group or misses --exclude-group, so the run passes
             # only --group, and the configuration excludes e2e, network and sweep.
             vendor/bin/paratest -c phpunit-ci-rows.xml -p "$PARATEST_PROCESSES" --functional --max-batch-size "$PARATEST_BATCH" \
-              --group "$rows" --log-junit build/junit-rows.xml || status=$?
+              --group runtime-php --log-junit build/junit-rows.xml || status=$?
             echo "=== paratest rows: exit $status"
             if [ "$status" -ne 0 ]; then failed=1; fi
           else

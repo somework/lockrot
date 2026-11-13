@@ -35,18 +35,17 @@ use PHPUnit\Framework\TestCase;
  * allowlist accepts flags and the recorded repositories name replacements, which the cases do not.
  *
  * It covers nothing: it analyses every fixture lock twice, which outlasts the timeout of a mutation
- * run. Report2RootTest and ScoreRulesUsedTest kill those mutants.
- * The group parallel-rows gives each data row and each test a unit of its own in the ParaTest
- * run of ci.yml.
+ * run. Report2RootTest and ScoreRulesUsedTest kill those mutants. The group schema-sweep gives this
+ * class to the schema-sweep process of ci.yml.
  *
  * @coversNothing
  *
  * @group covers-nothing
- * @group parallel-rows
+ * @group schema-sweep
  */
 #[CoversNothing]
 #[Group('covers-nothing')]
-#[Group('parallel-rows')]
+#[Group('schema-sweep')]
 final class AppRootRecountTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures/';

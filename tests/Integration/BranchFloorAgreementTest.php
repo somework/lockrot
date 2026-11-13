@@ -48,17 +48,13 @@ use PHPUnit\Framework\TestCase;
  * It covers nothing: it validates an explanation per branch of every fixture app, which pushes the
  * lines it covers past the timeout of a mutation run. PhpFloorTest, BranchRowTest and
  * ExplanationTest kill those mutants.
- * The group parallel-rows gives each data row and each test a unit of its own in the ParaTest
- * run of ci.yml.
  *
  * @coversNothing
  *
  * @group covers-nothing
- * @group parallel-rows
  */
 #[CoversNothing]
 #[Group('covers-nothing')]
-#[Group('parallel-rows')]
 final class BranchFloorAgreementTest extends TestCase
 {
     use ValidatesJsonSchemas;

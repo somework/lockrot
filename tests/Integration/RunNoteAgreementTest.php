@@ -46,19 +46,15 @@ use PHPUnit\Framework\TestCase;
  * the activity notes agree with the reason each package's own facts give for not reading its
  * repository (what S10 reports): the cap's two parts are the packages skipped for a token and for
  * the budget, and every package the forge failed for is a repository the notes name.
- * The group parallel-rows gives each data row and each test a unit of its own in the ParaTest
- * run of ci.yml.
  *
  * @coversNothing
  *
  * @group covers-nothing
  * @group schema-sweep
- * @group parallel-rows
  */
 #[CoversNothing]
 #[Group('covers-nothing')]
 #[Group('schema-sweep')]
-#[Group('parallel-rows')]
 final class RunNoteAgreementTest extends TestCase
 {
     use AssertsNoteDetails;

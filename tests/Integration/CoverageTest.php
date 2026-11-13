@@ -20,17 +20,13 @@ use PHPUnit\Framework\TestCase;
  * Each document is walked through its schema: `$ref`s resolved, a `oneOf` or `anyOf` branch
  * entered only when its one-value `enum` members fit the value. explain-2 copies report-2's
  * finding definitions, so a node inside a copied definition counts report-2's documents too.
- * The group parallel-rows gives each data row and each test a unit of its own in the ParaTest
- * run of ci.yml.
  *
  * @coversNothing
  *
  * @group covers-nothing
- * @group parallel-rows
  */
 #[CoversNothing]
 #[Group('covers-nothing')]
-#[Group('parallel-rows')]
 final class CoverageTest extends TestCase
 {
     use ValidatesJsonSchemas;

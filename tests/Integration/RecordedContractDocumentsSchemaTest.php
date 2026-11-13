@@ -15,19 +15,16 @@ use PHPUnit\Framework\TestCase;
  * Every document lockrot-report vendors, against its published schema and its strict twin: the
  * recorded contract bundle (tools/report/record) and the real baselined scenarios.
  *
- * It covers nothing, as JsonSchemaConformanceTest does. The group parallel-rows gives each data row
- * a unit of its own in the ParaTest run of ci.yml.
+ * It covers nothing, as JsonSchemaConformanceTest does.
  *
  * @coversNothing
  *
  * @group covers-nothing
  * @group schema-sweep
- * @group parallel-rows
  */
 #[CoversNothing]
 #[Group('covers-nothing')]
 #[Group('schema-sweep')]
-#[Group('parallel-rows')]
 final class RecordedContractDocumentsSchemaTest extends TestCase
 {
     use ValidatesJsonSchemas;
