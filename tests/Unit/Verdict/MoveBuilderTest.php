@@ -561,6 +561,26 @@ final class MoveBuilderTest extends TestCase
         self::assertSame([], $move->commands());
     }
 
+    public function testARequireStepThatNoShellQuotesSafelyLeavesOutThePhpStepOfItsMove(): void
+    {
+        [$row, $context] = self::checked(['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], true, '>=8.1', [], '>=7.4');
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::RAISE_PHP, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0;calc'), [], null, $context);
+
+        self::assertSame([], $move->commands());
+    }
+
+    public function testAWhyNotStepThatNoShellQuotesSafelyLeavesTheOtherStepsOfItsMove(): void
+    {
+        [$row, $context] = self::checkedOn(self::factsOf([['2.0.0+x;calc', '2026-01-01', '>=7.4']]), ['*' => ['result' => 'not_checked', 'form' => null, 'reason' => 'offline', 'holds' => []]], true, ['a/b' => '^1.0']);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+
+        self::assertSame([['composer', 'require', 'a/b:^2.0']], $move->commands());
+    }
+
     public function testAnUpdateThatAJointRequestResolvesNamesItsHoldersInTheSameStep(): void
     {
         [$row, $context] = self::checked(self::refusedThenJoint('update a/b ^2.0.0 '), false);
