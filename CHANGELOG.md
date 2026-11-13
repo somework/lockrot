@@ -19,15 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** a newest pre-release with no date, or on a commit that three or more stable tags
   share, keeps S2 unknown, with an S10 `release_dates` entry, also when a monorepo parent is present.
   ([Dates from the monorepo](docs/verdicts.md#dates-from-the-monorepo))
-- **All formats:** libyears end at the highest stable tag. A pre-release never ends libyears,
-  dated or not, so a package whose newest tag is a pre-release reads fewer libyears (roots/wp-config
-  1.0.0 below 2.0.0-beta.1: 7.61 to 0). A lower tag with a later date, own-dated, parent-dated or on
-  a shared commit, does not make the project behind. An installed version that is the highest
-  stable tag, or a pre-release above it, is 0 behind, also when its own date is untrusted
-  (`shared_commit`, `undated`). ([Libyears](docs/verdicts.md#libyears))
-- **All formats:** a date version such as `20200101` belongs to no branch, so it does not end
-  libyears while a stable tag on a branch exists. If no stable tag is on a branch, the highest
-  stable tag ends libyears. ([Libyears](docs/verdicts.md#libyears))
+- **All formats:** libyears end at the highest stable tag, so a newest pre-release, dated or not,
+  reads fewer libyears. A lower tag with a later date does not make the project behind. Nor does a
+  date version such as `20200101` while a stable tag is on a branch. The highest stable tag, or a
+  pre-release above it, is 0 behind, also with an untrusted date (`shared_commit`, `undated`).
+  ([Libyears](docs/verdicts.md#libyears))
 - **Breaking:** **All formats:** S6 and the `has_stable_release` and `last_stable_*` fields read
   stable tags only. A tag with build metadata counts, a pre-release does not. S2 still reads
   pre-releases. A snapshot with pre-release tags only moves to the newest one, and its line says
@@ -452,11 +448,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   action writes its job summary from an `--offline` run, which shows no advisory on 0.14: upgrade
   the action before you set `version: latest`.
   ([Upgrading to 0.14](docs/changes/0.14.md#how-014-reaches-you))
-- **Breaking:** **Config:** on Composer 2.10 and later, a value that Composer refuses in
-  `COMPOSER_NO_BLOCKING`, `COMPOSER_NO_SECURITY_BLOCKING`, `COMPOSER_POLICY`,
-  `COMPOSER_POLICY_ADVISORIES_BLOCK`, `config.policy` or `config.audit` exits 2, `--offline` too.
-  0.13 read none of them. Action: set the variable to `0`, `1`, `true`, `false`, `on` or `off`,
-  or fix the key.
+- **Breaking:** **Config:** on Composer 2.10 and later, a value that Composer refuses in a
+  blocking or policy variable, such as `COMPOSER_NO_BLOCKING` or `COMPOSER_POLICY_MALWARE_BLOCK`,
+  or in `config.policy` or `config.audit` exits 2, `--offline` too. 0.13 ignored such a value.
+  Action: set a value that Composer accepts, or fix the key.
   ([The move check](docs/verdicts.md#the-move-check))
 - **Breaking:** **Config:** an `ignore[].flags`, `accept-unchecked` or `advisory-lookup` value that
   0.13 ignored and config-2 refuses (`"flags": "stale"`, `"advisory-lookup": 1`) now exits 2. One
@@ -598,8 +593,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   acts as `--offline`, as in Composer. An uncached package reads `unavailable` (`offline`), not
   `not_found`, and the `--strict-network` exit code can change either way. Action: unset the
   variable for an online run. ([Options](docs/configuration.md#cli-options))
-- **All formats:** a package with a date version among its tags, such as `20200101`, no longer
-  stops the run with a TypeError and exit `2`. ([Libyears](docs/verdicts.md#libyears))
 - **table, markdown:** the footer reads `Run lockrot with --format=json for details.`, because the
   standalone PHAR has no `composer lockrot` command.
 - **json, html, sarif, gitlab, `--explain`:** invalid UTF-8 in a transport or repository message no
