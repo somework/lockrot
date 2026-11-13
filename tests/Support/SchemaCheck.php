@@ -26,12 +26,12 @@ use PHPUnit\Framework\Assert;
  * the object and, in its message, the extra key.
  *
  * The check runs opis/json-schema, which has no draft-04 reading: a draft-04 schema is read as
- * draft-06, and a float in an integer field fails as it does in justinrainbow/json-schema. The PHAR
- * step of ci.yml checks with the justinrainbow/json-schema of the PHAR (tests/json-schema-bootstrap.php).
+ * draft-06, and a float in an integer field fails as it does in justinrainbow/json-schema. When the
+ * constant {@see JUSTINRAINBOW} is defined, the check runs justinrainbow/json-schema.
  */
 final class SchemaCheck
 {
-    /** The constant that tests/json-schema-bootstrap.php defines. */
+    /** When a constant of this name is defined, {@see errors()} checks with justinrainbow/json-schema. */
     public const JUSTINRAINBOW = 'LOCKROT_TESTS_JUSTINRAINBOW';
 
     /** How a test writes a schema object for {@see errors()}: `{}` stays an object, 1.0 stays a float. */
@@ -47,8 +47,8 @@ final class SchemaCheck
     private const BRANCHES = ['allOf', 'anyOf', 'oneOf'];
 
     /**
-     * Only the keywords of the draft: justinrainbow/json-schema reads no opis extension, and the
-     * extension `default` writes into the document.
+     * The opis extensions are off: justinrainbow/json-schema reads none of them, and the extension
+     * `default` writes into the document. The draft-04 forms of opis (`exclusiveMinimum: true`) stay on.
      */
     private const OPTIONS = [
         'allowFilters' => false,
@@ -190,7 +190,7 @@ final class SchemaCheck
 
     /**
      * The path as justinrainbow/json-schema writes it: a numeric key in brackets, any other key
-     * after a dot (JsonSchema\Constraints\Constraint::convertJsonPointerIntoPropertyPath()).
+     * after a dot (JsonSchema\Constraints\BaseConstraint::convertJsonPointerIntoPropertyPath()).
      *
      * @param list<int|string> $path
      */
