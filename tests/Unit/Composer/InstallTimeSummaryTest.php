@@ -1282,6 +1282,20 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertSame($outputs[0], $outputs[1]);
     }
 
+    /** A constraint keeps its text as written, `self.version` included, and a listed name keeps its spelling. */
+    public function testTheManifestAsWrittenKeepsEachConstraintAsWritten(): void
+    {
+        $dir = $this->tempDir('lockrot-install-time-');
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/app', 'require' => ['Acme/Sib' => 'self.version', 'phpzip/phpzip' => '2.0.8']]));
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.2.0', 'require' => ['Acme/Sib' => 'self.version', 'phpzip/phpzip' => '2.0.8', 'new/pkg' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+
+        $written = InstallTimeSummary::withRootRequirements(ProjectConfig::fromFile($dir.'/composer.json'), $dir.'/composer.json', $root);
+
+        self::assertSame(['acme/sib' => 'self.version', 'phpzip/phpzip' => '2.0.8', 'new/pkg' => '^1.0'], $written->constraints(ProjectConfig::REQUIRE));
+        self::assertSame([ProjectConfig::REQUIRE => 'Acme/Sib'], $written->listedIn('acme/sib'));
+    }
+
     /** A dry run whose root holds the manifest's links reads composer.json as written, its lock hash included. */
     public function testADryRunWithTheLinksOfTheManifestStillComparesTheLockHash(): void
     {

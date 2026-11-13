@@ -214,10 +214,11 @@ final class InstallTimeSummary
 
     /**
      * The manifest with the root's `require` and `require-dev`, as the run would write it. A name
-     * that the manifest lists keeps its spelling. When the root holds the manifest's links, the
+     * that the manifest lists keeps its spelling. A constraint keeps its text, so `self.version`
+     * stays `self.version`. When the root holds the manifest's links, the
      * project stays as read, with the contents that the lock hash is compared against.
      */
-    private static function withRootRequirements(ProjectConfig $project, string $composerFile, RootPackageInterface $root): ProjectConfig
+    public static function withRootRequirements(ProjectConfig $project, string $composerFile, RootPackageInterface $root): ProjectConfig
     {
         $json = JsonReader::readObject($composerFile);
         $changed = false;
@@ -227,12 +228,12 @@ final class InstallTimeSummary
             foreach ($listed as $name => $constraint) {
                 $link = $links[strtolower((string) $name)] ?? null;
                 if ($link !== null) {
-                    $written[$name] = $link->getConstraint()->getPrettyString();
+                    $written[$name] = $link->getPrettyConstraint();
                     unset($links[strtolower((string) $name)]);
                 }
             }
             foreach ($links as $name => $link) {
-                $written[$name] = $link->getConstraint()->getPrettyString();
+                $written[$name] = $link->getPrettyConstraint();
             }
             $changed = $changed || $written !== $listed;
             $json[$section] = $written;
