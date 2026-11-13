@@ -354,7 +354,7 @@ and `unchecked` reads the finding's S10. An unchanged lock can cross a
 threshold too, as its packages' releases age ([baseline.md](baseline.md)).
 
 A new score model id also refuses every committed baseline-2 file. A check run that reads a file
-written under another score model exits `2` and names both ids, until `--generate-baseline` writes
+written under another score model exits `2` and names both ids. Run `--generate-baseline` to write
 the file again under the new model
 ([A baseline from a newer lockrot](baseline.md#a-baseline-from-a-newer-lockrot)).
 
