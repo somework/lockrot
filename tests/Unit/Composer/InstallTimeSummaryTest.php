@@ -1309,6 +1309,19 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringContainsString('note: lock: the lock file does not match composer.json', $io->getOutput());
     }
 
+    /** A plugin can add a link that composer.json does not hold. The lock hash is still compared against the file as read. */
+    public function testADryRunWithALinkThatTheManifestLacksStillComparesTheLockHash(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'lockrot/install-time-test', 'version' => '1.0.0', 'require' => ['phpzip/phpzip' => '2.0.8', 'merged/lib' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $this->project();
+        $io = new BufferIO();
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]), false, false, null, $root));
+
+        self::assertStringContainsString('note: lock: the lock file does not match composer.json', $io->getOutput());
+    }
+
     public function testInstallTimeBudgetComesFromConfig(): void
     {
         $this->project(['install-time-budget' => 1]);

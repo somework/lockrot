@@ -111,6 +111,15 @@ final class ProjectConfig
         }
     }
 
+    /** A copy whose {@see lockOutOfSync()} reads the composer.json that $read came from. */
+    public function withManifestOf(self $read): self
+    {
+        $config = clone $this;
+        $config->manifestContents = $read->manifestContents;
+
+        return $config;
+    }
+
     /** @param array<string, mixed> $json */
     public static function fromArray(array $json): self
     {

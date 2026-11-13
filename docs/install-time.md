@@ -227,9 +227,12 @@ updated lock in memory, and lockrot reads that lock. So a package from `composer
 With `include-dev` on, its score is halved for `dev`, as in `composer lockrot`. With `include-dev`
 off, the check skips it.
 
-`composer require … --dry-run` writes no `composer.json`. lockrot reads the `require` and
-`require-dev` that the command would write. So the new package is a direct requirement, as after
-the `composer require` that writes it.
+`composer require … --dry-run` and `composer remove … --dry-run` write no `composer.json`.
+lockrot reads the `require` and `require-dev` that the command would write. So the new package is a
+direct requirement, as after the `composer require` that writes it.
+
+Under `--dry-run`, a requirement that a plugin adds to the root also counts as a direct
+requirement. The test of the lock against `composer.json` reads the file as it is.
 
 ## Related
 
