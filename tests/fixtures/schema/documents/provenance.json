@@ -1,14 +1,14 @@
 {
  "source": "security-axis/r3/docs",
- "model_run_date": "2026-11-12",
+ "model_run_date": "2026-11-14",
  "suite": "every case and the composite pass the report-2 field reference (I21) with 0 violations",
  "documents": {
   "corpus": 49,
   "variants": 3,
-  "cases": 272,
+  "cases": 273,
   "coverage/baselined": 49,
   "coverage/variants": 90,
-  "explain": 267,
+  "explain": 268,
   "explain/coverage": 117,
   "baseline/cases": 6,
   "baseline/corpus": 49,

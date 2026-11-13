@@ -238,10 +238,10 @@ repository metadata
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned · stale
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest     1.6.2     2019-01-23   7.7 years ago                 past release-high-years 5
-          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+age       installed  dev-master not read (a branch snapshot has no release branch)
+          its branch            not read (a branch snapshot has no release branch)
+          newest     1.6.2      2019-01-23   7.7 years ago                 past release-high-years 5
+          last push             2024-01-12   2.7 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
 
@@ -268,10 +268,10 @@ repository metadata
 roots/wp-config 1.0.0 — high: old-promise
   direct requirement (composer.json require)
 
-age       installed  1.0.0     2018-08-10   8.1 years ago
-          1.x        1.0.0     2018-08-10   8.1 years ago                 past release-high-years 5
-          newest     v2.0.0-beta.12026-03-21   0.5 years ago                 below release-warn-years 3
-          last push            2026-03-29   0.5 years ago                 below push-warn-years 3
+age       installed  1.0.0         2018-08-10   8.1 years ago
+          1.x        1.0.0         2018-08-10   8.1 years ago                 past release-high-years 5
+          newest     v2.0.0-beta.1 2026-03-21   0.5 years ago                 below release-warn-years 3
+          last push                2026-03-29   0.5 years ago                 below push-warn-years 3
           libyears 0.0 behind the newest stable release
 repository GitHub github.com/roots/wp-config: last push 2026-03-29 · fetched 2026-09-14
 
@@ -296,10 +296,10 @@ repository metadata
 hoa/consistency 1.17.05.02 — high: abandoned · old-promise
   via lorisleiva/laravel-search-string > hoa/compiler > hoa/consistency: 2 hops from the nearest composer.json line; no line of composer.json names it
 
-age       installed  1.17.05.022017-05-02   9.4 years ago
-          1.x        1.17.05.022017-05-02   9.4 years ago                 past release-high-years 5
-          newest     2.17.08.292017-08-29   9.1 years ago                 past release-high-years 5
-          last push            2021-04-28   5.4 years ago                 past push-high-years 5
+age       installed  1.17.05.02 2017-05-02   9.4 years ago
+          1.x        1.17.05.02 2017-05-02   9.4 years ago                 past release-high-years 5
+          newest     2.17.08.29 2017-08-29   9.1 years ago                 past release-high-years 5
+          last push             2021-04-28   5.4 years ago                 past push-high-years 5
           libyears 0.3 behind the newest stable release
 repository GitHub github.com/hoaproject/Consistency: last push 2021-04-28, archived · fetched 2026-09-14
 
@@ -755,10 +755,10 @@ repository metadata
 tobscure/json-api dev-joomla-backports — high: pinned
   direct requirement (composer.json require)
 
-age       installed  dev-joomla-backportsnot read (a branch snapshot has no release branch)
-          its branch           not read (not from a Composer repository)
-          newest               not read (not from a Composer repository)
-          last push            not read (not from a Composer repository)
+age       installed  dev-joomla-backports not read (a branch snapshot has no release branch)
+          its branch                      not read (not from a Composer repository)
+          newest                          not read (not from a Composer repository)
+          last push                       not read (not from a Composer repository)
           libyears not measured: not from a Composer repository
 repository github.com/joomla-backports/json-api-php: not asked (not from a Composer repository)
 
@@ -1929,10 +1929,10 @@ repository metadata
 matomo/searchengine-and-social-list dev-master — high: pinned · stale
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest     3.14.0    2023-01-20   3.7 years ago                 past release-warn-years 3
-          last push            2026-09-23   less than three weeks ago     below push-warn-years 3
+age       installed  dev-master not read (a branch snapshot has no release branch)
+          its branch            not read (a branch snapshot has no release branch)
+          newest     3.14.0     2023-01-20   3.7 years ago                 past release-warn-years 3
+          last push             2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/matomo-org/searchengine-and-social-list: last push 2026-09-23 · fetched 2026-09-14
 
@@ -2154,10 +2154,10 @@ repository metadata
 symfony/monolog-bridge v2.9.0-RC1 — critical: left-behind · old-promise · vulnerable
   direct requirement (composer.json require)
 
-age       installed  v2.9.0-RC12020-03-01   6.6 years ago
-          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
-          newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
-          last push            2026-09-23   less than three weeks ago     below push-warn-years 3
+age       installed  v2.9.0-RC1 2020-03-01   6.6 years ago
+          2.x        v2.8.52    2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
+          newest     v6.4.45    2026-08-30   0.1 years ago                 below release-warn-years 3
+          last push             2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears 6.5 behind the newest stable release
 repository GitHub github.com/symfony/monolog-bridge: last push 2026-09-23 · fetched 2026-09-14
 
@@ -2880,10 +2880,10 @@ note: extra.lockrot.ignore[] accepts maintenance flags only, not advisories: sym
 hoa/consistency 1.17.05.02 — high: abandoned · old-promise
   via lorisleiva/laravel-search-string > hoa/compiler > hoa/consistency: 2 hops from the nearest composer.json line; no line of composer.json names it
 
-age       installed  1.17.05.022017-05-02   9.4 years ago
-          1.x        1.17.05.022017-05-02   9.4 years ago                 past release-high-years 5
-          newest     2.17.08.292017-08-29   9.1 years ago                 past release-high-years 5
-          last push            not read (no token)
+age       installed  1.17.05.02 2017-05-02   9.4 years ago
+          1.x        1.17.05.02 2017-05-02   9.4 years ago                 past release-high-years 5
+          newest     2.17.08.29 2017-08-29   9.1 years ago                 past release-high-years 5
+          last push             not read (no token)
           libyears 0.3 behind the newest stable release
 repository github.com/hoaproject/Consistency: not asked (no token)
 
@@ -3271,10 +3271,10 @@ repository metadata
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned · stale
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest     1.6.2     2019-01-23   7.7 years ago                 past release-high-years 5
-          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+age       installed  dev-master not read (a branch snapshot has no release branch)
+          its branch            not read (a branch snapshot has no release branch)
+          newest     1.6.2      2019-01-23   7.7 years ago                 past release-high-years 5
+          last push             2024-01-12   2.7 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
 
@@ -3302,10 +3302,10 @@ repository metadata
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned · stale
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest     1.6.2     2019-01-23   7.7 years ago                 past release-high-years 5
-          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+age       installed  dev-master not read (a branch snapshot has no release branch)
+          its branch            not read (a branch snapshot has no release branch)
+          newest     1.6.2      2019-01-23   7.7 years ago                 past release-high-years 5
+          last push             2024-01-12   2.7 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
 
@@ -3438,10 +3438,10 @@ note: 1 package is not from a Composer repository: its release metadata and repo
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned · stale
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest     1.6.2     2019-01-23   7.7 years ago                 past release-high-years 5
-          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+age       installed  dev-master not read (a branch snapshot has no release branch)
+          its branch            not read (a branch snapshot has no release branch)
+          newest     1.6.2      2019-01-23   7.7 years ago                 past release-high-years 5
+          last push             2024-01-12   2.7 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
 
@@ -3469,10 +3469,10 @@ repository metadata
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned · stale
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest     1.4.9     2019-03-01   7.6 years ago                 past release-high-years 5
-          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+age       installed  dev-master not read (a branch snapshot has no release branch)
+          its branch            not read (a branch snapshot has no release branch)
+          newest     1.4.9      2019-03-01   7.6 years ago                 past release-high-years 5
+          last push             2024-01-12   2.7 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
 
@@ -3500,10 +3500,10 @@ repository metadata
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned · stale
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest     1.4.9     2019-03-01   7.6 years ago                 past release-high-years 5
-          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+age       installed  dev-master not read (a branch snapshot has no release branch)
+          its branch            not read (a branch snapshot has no release branch)
+          newest     1.4.9      2019-03-01   7.6 years ago                 past release-high-years 5
+          last push             2024-01-12   2.7 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
 
@@ -3530,10 +3530,10 @@ repository metadata
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest               not read (undated releases)
-          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+age       installed  dev-master not read (a branch snapshot has no release branch)
+          its branch            not read (a branch snapshot has no release branch)
+          newest                not read (undated releases)
+          last push             2024-01-12   2.7 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
 
@@ -3561,10 +3561,10 @@ repository metadata
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest     v12.70.0  2026-03-12   0.6 years ago                 below release-warn-years 3
-          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+age       installed  dev-master not read (a branch snapshot has no release branch)
+          its branch            not read (a branch snapshot has no release branch)
+          newest     v12.70.0   2026-03-12   0.6 years ago                 below release-warn-years 3
+          last push             2024-01-12   2.7 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
 
@@ -3592,10 +3592,10 @@ repository metadata
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest               not read (undated releases)
-          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+age       installed  dev-master not read (a branch snapshot has no release branch)
+          its branch            not read (a branch snapshot has no release branch)
+          newest                not read (undated releases)
+          last push             2024-01-12   2.7 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
 
@@ -3622,10 +3622,10 @@ repository metadata
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest     v4.1.0-beta12025-06-01   1.3 years ago                 below release-warn-years 3
-          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+age       installed  dev-master   not read (a branch snapshot has no release branch)
+          its branch              not read (a branch snapshot has no release branch)
+          newest     v4.1.0-beta1 2025-06-01   1.3 years ago                 below release-warn-years 3
+          last push               2024-01-12   2.7 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
 
@@ -3652,10 +3652,10 @@ repository metadata
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest     v5.0.0-beta12025-06-01   1.3 years ago                 below release-warn-years 3
-          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+age       installed  dev-master   not read (a branch snapshot has no release branch)
+          its branch              not read (a branch snapshot has no release branch)
+          newest     v5.0.0-beta1 2025-06-01   1.3 years ago                 below release-warn-years 3
+          last push               2024-01-12   2.7 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
 
@@ -3682,10 +3682,10 @@ repository metadata
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest               not read (undated releases)
-          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+age       installed  dev-master not read (a branch snapshot has no release branch)
+          its branch            not read (a branch snapshot has no release branch)
+          newest                not read (undated releases)
+          last push             2024-01-12   2.7 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
 
@@ -3712,10 +3712,10 @@ repository metadata
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest     v4.0.0+x|calc2025-01-01   1.7 years ago                 below release-warn-years 3
-          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+age       installed  dev-master    not read (a branch snapshot has no release branch)
+          its branch               not read (a branch snapshot has no release branch)
+          newest     v4.0.0+x|calc 2025-01-01   1.7 years ago                 below release-warn-years 3
+          last push                2024-01-12   2.7 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
 
@@ -4890,10 +4890,10 @@ repository metadata
 hoa/consistency 1.17.05.02 — high: abandoned · old-promise
   via lorisleiva/laravel-search-string > hoa/compiler > hoa/consistency: 2 hops from the nearest composer.json line; no line of composer.json names it
 
-age       installed  1.17.05.022017-05-02   9.4 years ago
-          1.x        1.17.05.022017-05-02   9.4 years ago                 past release-high-years 5
-          newest     2.17.08.292017-08-29   9.1 years ago                 past release-high-years 5
-          last push            not read (repository not found)
+age       installed  1.17.05.02 2017-05-02   9.4 years ago
+          1.x        1.17.05.02 2017-05-02   9.4 years ago                 past release-high-years 5
+          newest     2.17.08.29 2017-08-29   9.1 years ago                 past release-high-years 5
+          last push             not read (repository not found)
           libyears 0.3 behind the newest stable release
 repository GitHub github.com/hoaproject/Consistency: the host answered 404 (private, renamed or removed)
 
@@ -4922,10 +4922,10 @@ note: GitHub did not answer for 1 repositories (private, renamed or removed); re
 hoa/consistency 1.17.05.02 — high: abandoned · old-promise
   via lorisleiva/laravel-search-string > hoa/compiler > hoa/consistency: 2 hops from the nearest composer.json line; no line of composer.json names it
 
-age       installed  1.17.05.022017-05-02   9.4 years ago
-          1.x        1.17.05.022017-05-02   9.4 years ago                 past release-high-years 5
-          newest     2.17.08.292017-08-29   9.1 years ago                 past release-high-years 5
-          last push            not read (repository not found)
+age       installed  1.17.05.02 2017-05-02   9.4 years ago
+          1.x        1.17.05.02 2017-05-02   9.4 years ago                 past release-high-years 5
+          newest     2.17.08.29 2017-08-29   9.1 years ago                 past release-high-years 5
+          last push             not read (repository not found)
           libyears 0.3 behind the newest stable release
 repository GitHub github.com/hoaproject/Consistency: the host answered 404 (private, renamed or removed) (cached 2026-09-28)
 
@@ -4954,10 +4954,10 @@ note: GitHub did not answer for 1 repositories (private, renamed or removed); re
 hoa/consistency 1.17.05.02 — high: abandoned · old-promise
   via lorisleiva/laravel-search-string > hoa/compiler > hoa/consistency: 2 hops from the nearest composer.json line; no line of composer.json names it
 
-age       installed  1.17.05.022017-05-02   9.4 years ago
-          1.x        1.17.05.022017-05-02   9.4 years ago                 past release-high-years 5
-          newest     2.17.08.292017-08-29   9.1 years ago                 past release-high-years 5
-          last commit          2021-04-28   5.4 years ago                 past push-high-years 5
+age       installed  1.17.05.02 2017-05-02   9.4 years ago
+          1.x        1.17.05.02 2017-05-02   9.4 years ago                 past release-high-years 5
+          newest     2.17.08.29 2017-08-29   9.1 years ago                 past release-high-years 5
+          last commit           2021-04-28   5.4 years ago                 past push-high-years 5
           libyears 0.3 behind the newest stable release
 repository GitLab gitlab.com/hoaproject/Consistency: last commit 2021-04-28, archived flag not read (no token) · fetched 2026-09-14
 
@@ -4985,10 +4985,10 @@ repository metadata
 hoa/consistency 1.17.05.02 — high: abandoned · old-promise
   via lorisleiva/laravel-search-string > hoa/compiler > hoa/consistency: 2 hops from the nearest composer.json line; no line of composer.json names it
 
-age       installed  1.17.05.022017-05-02   9.4 years ago
-          1.x        1.17.05.022017-05-02   9.4 years ago                 past release-high-years 5
-          newest     2.17.08.292017-08-29   9.1 years ago                 past release-high-years 5
-          last push            2021-04-28   5.4 years ago                 past push-high-years 5
+age       installed  1.17.05.02 2017-05-02   9.4 years ago
+          1.x        1.17.05.02 2017-05-02   9.4 years ago                 past release-high-years 5
+          newest     2.17.08.29 2017-08-29   9.1 years ago                 past release-high-years 5
+          last push             2021-04-28   5.4 years ago                 past push-high-years 5
           libyears 0.3 behind the newest stable release
 repository GitHub github.com/hoaproject/Consistency: last push 2021-04-28, archived flag not read (request failed) · fetched 2026-09-14
 
@@ -5016,10 +5016,10 @@ repository metadata
 hoa/consistency 1.17.05.02 — high: abandoned · old-promise
   via lorisleiva/laravel-search-string > hoa/compiler > hoa/consistency: 2 hops from the nearest composer.json line; no line of composer.json names it
 
-age       installed  1.17.05.022017-05-02   9.4 years ago
-          1.x        1.17.05.022017-05-02   9.4 years ago                 past release-high-years 5
-          newest     2.17.08.292017-08-29   9.1 years ago                 past release-high-years 5
-          last push            not read (no date)
+age       installed  1.17.05.02 2017-05-02   9.4 years ago
+          1.x        1.17.05.02 2017-05-02   9.4 years ago                 past release-high-years 5
+          newest     2.17.08.29 2017-08-29   9.1 years ago                 past release-high-years 5
+          last push             not read (no date)
           libyears 0.3 behind the newest stable release
 repository GitHub github.com/hoaproject/Consistency: no push reported, archived · fetched 2026-09-14
 
@@ -6299,10 +6299,10 @@ repository metadata
 matomo/referrer-spam-list dev-master — high: pinned
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest     4.0.5     2026-04-15   0.5 years ago                 below release-warn-years 3
-          last push            2026-09-22   less than three weeks ago     below push-warn-years 3
+age       installed  dev-master not read (a branch snapshot has no release branch)
+          its branch            not read (a branch snapshot has no release branch)
+          newest     4.0.5      2026-04-15   0.5 years ago                 below release-warn-years 3
+          last push             2026-09-22   less than three weeks ago     below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/matomo-org/referrer-spam-list: last push 2026-09-22 · fetched 2026-09-14
 
@@ -6330,10 +6330,10 @@ repository metadata
 matomo/referrer-spam-list dev-master — high: pinned · capped
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest     4.0.5     2026-04-15   0.5 years ago                 below release-warn-years 3
-          last push            2026-09-22   less than three weeks ago     below push-warn-years 3
+age       installed  dev-master not read (a branch snapshot has no release branch)
+          its branch            not read (a branch snapshot has no release branch)
+          newest     4.0.5      2026-04-15   0.5 years ago                 below release-warn-years 3
+          last push             2026-09-22   less than three weeks ago     below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/matomo-org/referrer-spam-list: last push 2026-09-22 · fetched 2026-09-14
 
@@ -6749,10 +6749,10 @@ repository metadata
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned · stale
   direct requirement (composer.json require)
 
-age       installed  dev-masternot read (a branch snapshot has no release branch)
-          its branch           not read (a branch snapshot has no release branch)
-          newest     1.6.2     2019-01-23   7.7 years ago                 past release-high-years 5
-          last push            2024-01-12   2.7 years ago                 below push-warn-years 3
+age       installed  dev-master not read (a branch snapshot has no release branch)
+          its branch            not read (a branch snapshot has no release branch)
+          newest     1.6.2      2019-01-23   7.7 years ago                 past release-high-years 5
+          last push             2024-01-12   2.7 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/FriendsOfSymfony/FOSOAuthServerBundle: last push 2024-01-12 · fetched 2026-09-14
 
