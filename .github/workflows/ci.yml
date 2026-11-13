@@ -92,24 +92,25 @@ jobs:
           if [ -x vendor/bin/paratest ]; then
             # Two ParaTest runs, one after the other, each on every process. The first gives each
             # worker a test class at a time. The second runs the classes of the group parallel-rows
-            # (or runtime-php) with a process for each test and each data row, so that a class that
-            # loops over the fixtures does not end the row alone. ParaTest 6 runs a data row as a
-            # test of its own only in its functional mode, which starts a process for each one.
+            # (or runtime-php) in functional mode, a process for each batch of data rows, so that a
+            # class that loops over the fixtures does not end the row alone. ParaTest 6 selects the
+            # tests of functional mode by its own --group options, not by the configuration.
             if [ "${{ matrix.covers_nothing }}" = "true" ]; then
               files="<exclude>$slow<group>parallel-rows</group></exclude>"
-              rows="<include><group>parallel-rows</group></include><exclude>$slow</exclude>"
+              rows=parallel-rows
             else
               files="<exclude>$slow<group>covers-nothing</group></exclude>"
-              rows="<include><group>runtime-php</group></include><exclude>$slow</exclude>"
+              rows=runtime-php
             fi
             groups_config phpunit-ci-files.xml "$files"
-            groups_config phpunit-ci-rows.xml "$rows"
+            groups_config phpunit-ci-rows.xml "<include><group>$rows</group></include><exclude>$slow</exclude>"
             status=0
             vendor/bin/paratest -c phpunit-ci-files.xml -p "$PARATEST_PROCESSES" --runner WrapperRunner --log-junit build/junit-files.xml || status=$?
             echo "=== paratest files: exit $status"
             if [ "$status" -ne 0 ]; then failed=1; fi
             status=0
-            vendor/bin/paratest -c phpunit-ci-rows.xml -p "$PARATEST_PROCESSES" --functional --max-batch-size "$PARATEST_BATCH" --log-junit build/junit-rows.xml || status=$?
+            vendor/bin/paratest -c phpunit-ci-rows.xml -p "$PARATEST_PROCESSES" --functional --max-batch-size "$PARATEST_BATCH" \
+              --group "$rows" --exclude-group e2e,network,sweep --log-junit build/junit-rows.xml || status=$?
             echo "=== paratest rows: exit $status"
             if [ "$status" -ne 0 ]; then failed=1; fi
           else
