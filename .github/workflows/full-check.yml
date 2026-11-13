@@ -61,9 +61,9 @@ jobs:
           - {name: signals, filter: 'src/Signal src/Analyzer/Analyzer.php', min_msi: 98}
           - {name: analyzer, filter: 'src/Analyzer/AdvisoryLookup.php src/Analyzer/Analysis.php src/Analyzer/FlagTotals.php src/Analyzer/Libyears.php src/Analyzer/LibyearsMeasurement.php src/Analyzer/MoveCheckRun.php src/Analyzer/Report.php src/Analyzer/Report2Root.php src/Analyzer/RotDepth.php src/Analyzer/RunNote.php src/Analyzer/RunSettings.php src/Analyzer/ScoreRulesUsed.php src/Analyzer/SecurityTotals.php src/Analyzer/TargetFix.php src/Analyzer/TransitiveExposure.php src/Analyzer/UncoveredAdvisories.php src/Analyzer/UpdateNow.php', min_msi: 98}
           - {name: solver, filter: 'src/Solver src/Analyzer/PhpWindow.php', min_msi: 98}
-          - {name: composer and self-update, filter: 'src/Composer', min_msi: 96}
+          - {name: composer, filter: 'src/Composer', min_msi: 96}
           - {name: repository data, filter: 'src/Data/Repository', min_msi: 96}
-          - {name: lock and graph, filter: 'src/Lock src/Graph src/Config src/SelfUpdate', min_msi: 96}
+          - {name: project inputs and self-update, filter: 'src/Lock src/Graph src/Config src/SelfUpdate', min_msi: 96}
           - {name: data and the rest, filter: 'src/Data/Advisory src/Data/Forge src/Data/Http src/Data/Cache src/Data/Php src/Data/Abandoned src/Baseline src/Filesystem src/Allowlist src/Json src/Exception src/Version.php src/Clock.php src/Deadline.php src/AsciiCase.php', min_msi: 96}
     name: mutation (${{ matrix.shard.name }})
     # A job's `if` cannot read the matrix, so a shard outside the subset still starts, and its steps skip.
