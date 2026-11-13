@@ -485,9 +485,7 @@ def inputs_of(case):
             # A link below chain[1] gives the package a shorter chain than the model's. chain[1] ties it, and the walk takes
             # chain[0] first, because chain[0] comes first in the root's require.
             entry(name).setdefault('require', {})[f['package'] if requires_it else chain[1]] = '*'
-    moves = [m for m in [f.get('next_step')] if m] + [m for m in ((f.get('next_step') or {}).get('also') or [])]
-    held = ([h for a in advisories for h in a['fix']['held_by']] + [h for m in moves for h in m['held_by']]
-            + [h for r in rows for h in ((r.get('fixes') or {}).get('held_by') or [])])
+    held = holds_of(f, rows)
     root_links = {}
     for h in held:
         # A hold with a target is a link to that name. A `root-require` hold is the root's `require` of it.
@@ -684,11 +682,22 @@ def recorded_checks(f, rows):
 PACKAGE_NAME = re.compile(r'[a-z0-9](?:[_.-]?[a-z0-9]+)*/[a-z0-9](?:(?:[_.]|-{1,2})?[a-z0-9]+)*')
 
 
+def holds_of(f, rows):
+    """Each hold that the finding's advisory fixes, its moves and its branch rows name."""
+    advisories = (next((s for s in f.get('signals') or [] if s['id'] == 'S9'), None) or {}).get('data', {}).get('advisories', [])
+    moves = [m for m in [f.get('next_step')] if m] + [m for m in ((f.get('next_step') or {}).get('also') or [])]
+    return ([h for a in advisories for h in a['fix']['held_by']] + [h for m in moves for h in m.get('held_by') or []]
+            + [h for r in rows for h in ((r.get('fixes') or {}).get('held_by') or [])])
+
+
 def lock_names(case):
-    """The names that the case's lock holds: its package, its parents, its holders and its solver world's lock."""
+    """The names that the case's lock holds: each entry that inputs_of() writes, its parents and its solver world's lock."""
     f = case['finding']
     world = ((case.get('solver_world') or {}).get('world') or {}).get('lock') or {}
-    return ([f.get('package')] + [p.get('package') for p in case.get('parents') or []]
+    return ([f.get('package')] + [p.get('package') for p in case.get('parents') or []] + list(f.get('chain') or [])
+            + list(f.get('direct_dependents') or [])
+            + [h['package'] for h in holds_of(f, rows_of(case.get('details'))) if h['source'] != 'root']
+            + list(((case.get('run_inputs') or {}).get('_lock_links') or {}).keys())
             + [m['package'] for m in (f.get('next_step') or {}).get('moves_with') or []]
             + [e['name'] for key in ('packages', 'packages-dev') for e in world.get(key) or []])
 

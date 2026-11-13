@@ -397,6 +397,21 @@ class ACaseWhoseLockHoldsANameOutsideComposersNameRuleIsNotHydrated(unittest.Tes
     def test_names_inside_the_rule_hydrate(self):
         self.assertIsNone(project_fixtures.unhydrated(self.case('acme/gz--client', 'acme/gz.client', 'acme/gz_client')))
 
+    def test_a_name_outside_the_rule_in_any_lock_entry_that_inputs_of_writes_is_not_hydrated(self):
+        cases = []
+        for key, value in (('chain', ['acme/app', 'h/x;calc', 'guzzlehttp/guzzle']), ('direct_dependents', ['h/x;calc'])):
+            case = self.case()
+            case['finding'][key] = value
+            cases.append(case)
+        case = self.case()
+        case['finding']['next_step']['held_by'] = [{'source': 'dependency', 'package': 'h/x;calc'}]
+        cases.append(case)
+        case = self.case()
+        case['run_inputs'] = {'_lock_links': {'h/x;calc': {'version': '1.0.0'}}}
+        cases.append(case)
+
+        self.assertEqual(['package-name-invalid'] * 4, [project_fixtures.unhydrated(c) for c in cases])
+
 
 class ADirectDependentThatDoesNotRequireThePackageKeepsTheModelsChain(unittest.TestCase):
     """capped-nette‡: a second direct dependent reaches the package through the chain, never by a shorter path."""
