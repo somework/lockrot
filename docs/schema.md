@@ -420,8 +420,9 @@ spaces. Only the Composer options that lockrot writes start with `-`:
 Every other option comes after the package arguments. The first argument is `composer`, and the
 second is `update`, `require` or `why-not`.
 
-An argument comes from the lock or a repository, so lockrot leaves out a step that breaks this
-rule. The move keeps its `constraint`, `text` and other steps. When a version, constraint or tag
+An argument comes from the lock or a repository. When one `update` or `require` step of a move
+breaks this rule, lockrot leaves out every `update` and `require` step of that move. The move keeps
+its `constraint`, its `text` and its `why-not` step. When a version, constraint or tag
 that a step quotes holds `|`, `<` or `>`, the move has no step at all
 ([`command_argument_unsafe`](notes.md#command_argument_unsafe)). The `>=` of the php step
 `php:>=8.1` does not count. `text` shows a command only as the
