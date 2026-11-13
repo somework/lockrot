@@ -1120,6 +1120,7 @@
                 "ext-zlib": "*",
                 "friendsofphp/php-cs-fixer": "^3.70",
                 "nikic/php-parser": "^5.1",
+                "opis/json-schema": "^2.6",
                 "phpstan/phpstan": "^2.1",
                 "phpunit/phpunit": "^9.6 || ^10.5 || ^11.5",
                 "symfony/console": "^5.4",
