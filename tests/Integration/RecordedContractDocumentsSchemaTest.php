@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  * Every document lockrot-report vendors, against its published schema and its strict twin: the
  * recorded contract bundle (tools/report/record) and the real baselined scenarios.
  *
- * It covers nothing, as JsonSchemaConformanceTest does.
+ * It covers nothing, for the reason that JsonSchemaConformanceTest gives.
  *
  * @coversNothing
  *
@@ -58,8 +58,12 @@ final class RecordedContractDocumentsSchemaTest extends TestCase
         }
         $rows = array_keys(iterator_to_array(self::recordedContractDocuments()));
 
-        self::assertGreaterThan(100, \count($rows), 'record the bundle with tools/report/record');
         self::assertSame([], array_values(array_diff($bundle, $rows)));
+    }
+
+    public function testTheRowsHoldMoreThanAHundredDocuments(): void
+    {
+        self::assertGreaterThan(100, \count(iterator_to_array(self::recordedContractDocuments())), 'record the bundle with tools/report/record');
     }
 
     /**

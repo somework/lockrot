@@ -74,6 +74,8 @@ jobs:
         run: composer require --dev --no-update "brianium/paratest:^6.11"
       - run: composer update --no-interaction --prefer-dist
       - name: Run tests with the matrix Composer binary
+        # Three processes: a fourth CPU-bound process slows every process on the runner.
+        # https://github.com/somework/lockrot/pull/208
         env: {PARATEST_PROCESSES: 3, PARATEST_BATCH: 1}
         run: |
           composer -V
@@ -91,13 +93,15 @@ jobs:
           }
           mkdir -p build
           failed=0
-          if [ -x vendor/bin/paratest ]; then
-            # Two ParaTest runs, one after the other, each on every process. The first runs each test
-            # file in a new process: a WrapperRunner worker of PHPUnit 9 does not find a test class
-            # that an earlier file loaded. The second runs the runtime-php classes in functional mode,
-            # a process for each data row, so that a class that loops over the fixtures does not end
-            # the row alone. ParaTest 6 selects the tests of functional mode by its own --group
-            # options, not by the configuration.
+          if [ -x vendor/bin/paratest ] && [ "${{ matrix.covers_nothing }}" != "true" ]; then
+            # Two ParaTest runs, one after the other, each with PARATEST_PROCESSES processes. The first
+            # runs each test file in a new process: a WrapperRunner worker of PHPUnit 9 does not find
+            # a test class that an earlier file loaded. The second runs the runtime-php classes in
+            # functional mode, a process for each data row, so that a class that loops over the
+            # fixtures does not end the row alone. ParaTest 6 selects the tests of functional mode by
+            # its own --group options, not by the configuration. The ParaTest runs exclude
+            # covers-nothing, so a covers_nothing row takes the processes that the step starts itself
+            # (TestsStepTest).
             groups_config phpunit-ci-files.xml "<exclude>$slow<group>covers-nothing</group></exclude>"
             groups_config phpunit-ci-rows.xml "<include><group>runtime-php</group></include><exclude>$slow</exclude>"
             status=0

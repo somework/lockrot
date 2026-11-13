@@ -63,8 +63,12 @@ final class AppRootRecountTest extends TestCase
         }
         sort($dirs);
 
-        self::assertNotSame([], $dirs);
         self::assertSame($dirs, array_keys(iterator_to_array(self::fixtureApps())));
+    }
+
+    public function testTheRowsHoldAFixtureApp(): void
+    {
+        self::assertNotSame([], iterator_to_array(self::fixtureApps()));
     }
 
     /** @return iterable<string, array{string}> every fixture app and skeleton, by its directory below tests/fixtures */
@@ -96,7 +100,7 @@ final class AppRootRecountTest extends TestCase
         self::assertSame([], $mismatches);
     }
 
-    /** The sweep stops at the first app after which every counted fact occurred. */
+    /** It stops when the set is complete, because the rows already analyse every lock. */
     public function testTheFixturesMakeEveryCountedFactOccur(): void
     {
         $server = self::server();

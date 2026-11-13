@@ -78,8 +78,12 @@ final class RunNoteAgreementTest extends TestCase
         }
         sort($dirs);
 
-        self::assertGreaterThanOrEqual(20, \count($dirs), 'the fixture locks');
         self::assertSame($dirs, array_keys(iterator_to_array(self::fixtureLocks())));
+    }
+
+    public function testTheRowsHoldAtLeastTwentyFixtureLocks(): void
+    {
+        self::assertGreaterThanOrEqual(20, \count(iterator_to_array(self::fixtureLocks())), 'the fixture locks');
     }
 
     /** @return iterable<string, array{string}> every fixture lock, by its directory below tests/fixtures */

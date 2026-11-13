@@ -81,8 +81,12 @@ final class BranchFloorAgreementTest extends TestCase
         }
         sort($dirs);
 
-        self::assertGreaterThanOrEqual(20, \count($dirs), 'the fixture locks');
         self::assertSame($dirs, array_keys(iterator_to_array(self::fixtureLocks())));
+    }
+
+    public function testTheRowsHoldAtLeastTwentyFixtureLocks(): void
+    {
+        self::assertGreaterThanOrEqual(20, \count(iterator_to_array(self::fixtureLocks())), 'the fixture locks');
     }
 
     /** @return iterable<string, array{string}> every fixture app and skeleton, by its directory below tests/fixtures */
@@ -118,7 +122,7 @@ final class BranchFloorAgreementTest extends TestCase
     }
 
     /**
-     * The sweep stops at the first lock after which every floor_source and every side was given.
+     * It stops when the set is complete, because the rows already analyse every lock.
      *
      * @runInSeparateProcess
      *
