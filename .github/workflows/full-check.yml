@@ -16,12 +16,12 @@ on:
   push:
     branches: ['release/full-check-**']
     tags: ['v*-rc.*']
-# Every job name starts with `full-check`: ruleset 23668295 requires the job names of ci.yml, and a
-# subset run, whose skipped shards end green, must not post a check run under one of them.
 # No job of this workflow writes to the repository: the token reads only.
 permissions:
   contents: read
 jobs:
+  # Every job name starts with `full-check`: ruleset 23668295 requires the job names of ci.yml, and a
+  # subset run, whose skipped shards end green, must not post a check run under one of them.
   subset:
     name: full-check subset
     runs-on: ubuntu-latest

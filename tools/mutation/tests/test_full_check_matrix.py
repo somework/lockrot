@@ -33,7 +33,7 @@ def job_names(workflow):
 
 
 def checkout_steps(workflow):
-    """Each checkout step with the lines of its `with:` line."""
+    """The `with:` line that follows each checkout step, or an empty string."""
     return re.findall(r'uses: actions/checkout@\S+ # \S+\n( +with: .+\n)?', workflow)
 
 
@@ -91,6 +91,7 @@ class FullCheckMatrixTest(unittest.TestCase):
 
         self.assertIn("REFUSED_MINOR: '2.9'", floor)
         self.assertIn('is older than 2.10, so lockrot does nothing. Upgrade Composer, or run the PHAR: https://lockrot.dev/phar/', floor)
+        self.assertIn("private const COMPOSER_FLOOR = '2.10';", plugin)
         self.assertIn("' is older than '.self::COMPOSER_FLOOR.', so lockrot does nothing. Upgrade Composer, or run the PHAR: https://lockrot.dev/phar/'", plugin)
 
     def test_a_changed_shard_is_seen(self):
