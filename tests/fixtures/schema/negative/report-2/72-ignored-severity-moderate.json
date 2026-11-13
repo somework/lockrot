@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "findings[0].security.ignored[0].severity: Does not have a value"
+  "error": "findings[0].security.ignored[0].severity: enum"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

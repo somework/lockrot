@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "findings[0].baseline.status: Does not have a value"
+  "error": "findings[0].baseline.status: enum"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

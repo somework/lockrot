@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": true,
-  "error": "rules[6].id: Does not have a value in the enumeration"
+  "error": "rules[6].id: enum"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

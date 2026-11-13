@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "findings[1].score.terms[0].part: Does not have a value"
+  "error": "findings[1].score.terms[0].part: enum"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

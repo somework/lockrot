@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use JsonSchema\Validator;
 use Lockrot\Json\Schemas;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\SchemaCheck;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -243,8 +243,9 @@ final class CaseHydratorTest extends TestCase
     #[Group('covers-nothing')]
     public function testEveryCaseFindingValidatesAgainstReport2(): void
     {
-        $schema = JsonPath::decodeFile(Schemas::path(Schemas::REPORT, JsonFormatter::SCHEMA));
-        $finding = json_decode((string) json_encode(['$ref' => '#/definitions/finding', 'definitions' => JsonPath::arrayAt($schema, ['definitions'])]));
+        $schema = json_decode((string) file_get_contents(Schemas::path(Schemas::REPORT, JsonFormatter::SCHEMA)));
+        self::assertInstanceOf(\stdClass::class, $schema);
+        $finding = json_encode((object) ['$ref' => '#/definitions/finding', 'definitions' => $schema->definitions], SchemaCheck::ENCODE);
         $cases = JsonPath::decodeFile(__DIR__.'/../fixtures/flags/cases.json');
         $cases = JsonPath::has($cases, ['cases']) ? JsonPath::arrayAt($cases, ['cases']) : $cases;
         self::assertNotSame([], $cases);
@@ -252,10 +253,7 @@ final class CaseHydratorTest extends TestCase
         $invalid = [];
         foreach ($cases as $case) {
             self::assertIsArray($case);
-            $validator = new Validator();
-            $document = json_decode((string) json_encode(JsonPath::arrayAt($case, ['finding'])));
-            $validator->validate($document, $finding);
-            if (!$validator->isValid()) {
+            if (SchemaCheck::errors($finding, (string) json_encode(JsonPath::arrayAt($case, ['finding']))) !== []) {
                 $invalid[] = JsonPath::stringAt($case, ['id']);
             }
         }

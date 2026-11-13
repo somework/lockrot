@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "findings[1].security.installed_branch_fixes: The property installed_branch_fixes is required"
+  "error": "findings[1].security.installed_branch_fixes: required"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

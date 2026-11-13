@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "data.packages[0].verdict: Does not have a value"
+  "error": "data.packages[0].verdict: enum"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

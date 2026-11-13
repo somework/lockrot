@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "data.event: The property event is required"
+  "error": "data.event: required"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

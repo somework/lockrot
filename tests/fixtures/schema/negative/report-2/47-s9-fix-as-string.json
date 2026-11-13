@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "advisories[0].fix: String value found, but an object is required"
+  "error": "advisories[0].fix: type"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

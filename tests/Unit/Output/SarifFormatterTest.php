@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
-use JsonSchema\Validator;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
@@ -26,6 +25,7 @@ use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
+use Lockrot\Tests\Support\SchemaCheck;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Support\TextGolden;
 use Lockrot\Verdict\FailOn;
@@ -118,21 +118,10 @@ final class SarifFormatterTest extends TestCase
 
     private function assertValidSarif(string $sarif): void
     {
-        $schema = json_decode((string) file_get_contents(self::SCHEMA));
-        self::assertIsObject($schema);
-        $document = json_decode($sarif);
-        self::assertIsObject($document);
+        self::assertIsObject(json_decode($sarif));
+        $errors = SchemaCheck::errors((string) file_get_contents(self::SCHEMA), $sarif);
 
-        $validator = new Validator();
-        $validator->validate($document, $schema);
-
-        $messages = [];
-        foreach ($validator->getErrors() as $error) {
-            if (\is_array($error) && \is_string($error['property'] ?? null) && \is_string($error['message'] ?? null)) {
-                $messages[] = $error['property'].': '.$error['message'];
-            }
-        }
-        self::assertTrue($validator->isValid(), implode("\n", $messages));
+        self::assertSame([], $errors, implode("\n", $errors));
     }
 
     /** SPEC-0.14.md §8.5.4: a whole number reads `0`, never `0.0`; only `rank` keeps its zero fraction. */

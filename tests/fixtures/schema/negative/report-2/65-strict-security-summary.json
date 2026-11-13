@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": true,
-  "error": "The property summary is not defined"
+  "error": "findings[1].security: additionalProperties: The property summary is not defined"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

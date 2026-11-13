@@ -68,9 +68,9 @@ def _(d): d['findings'][DEBUG]['flags'][0]['id'] = 'archived'  # S3 is a degree 
 def _(d): d['findings'][m]['flags'][0]['headline']['unit'] = 'days'
 @case('headline-source-commit', 'composite', f + '.flags[0].headline.source')
 def _(d): d['findings'][m]['flags'][0]['headline']['source'] = 'commit'
-@case('term-part-unknown', 'composite', f + '.score.terms[0].part: Does not have a value')
+@case('term-part-unknown', 'composite', f + '.score.terms[0].part: enum')
 def _(d): d['findings'][m]['score']['terms'][0]['part'] = 'liveness'  # the discriminator is closed
-@case('without-remove-kind-signal', 'composite', f + '.score.without[0].remove.kind: Does not have a value')
+@case('without-remove-kind-signal', 'composite', f + '.score.without[0].remove.kind: enum')
 def _(d): d['findings'][m]['score']['without'][0]['remove']['kind'] = 'signal'
 @case('composer-moves-because-unknown', 'composite', f + '.next_step.composer_moves_because[0]')
 def _(d): d['findings'][m]['next_step']['composer_moves_because'] = ['holder']
@@ -86,23 +86,23 @@ def _(d): d['findings'][POLY]['security']['status'] = 'ignored'
 def _(d): d['findings'][m]['security']['worst'] = 'moderate'  # Composer's raw word; the bucket is medium
 @case('metadata-status-missing', 'composite', f + '.metadata.status')
 def _(d): d['findings'][m]['metadata']['status'] = 'missing'
-@case('allowlist-by-user', 'composite', 'findings[%d].allowlist.by: Does not have a value' % POLY)
+@case('allowlist-by-user', 'composite', 'findings[%d].allowlist.by: enum' % POLY)
 def _(d): d['findings'][POLY]['allowlist']['by'] = 'user'
-@case('allowlist-reason-by-project', 'composite', 'findings[%d].allowlist.reason_by: Does not have a value' % POLY)
+@case('allowlist-reason-by-project', 'composite', 'findings[%d].allowlist.reason_by: enum' % POLY)
 def _(d): d['findings'][POLY]['allowlist']['reason_by'] = 'project'
-@case('baseline-status-accepted', 'B-baselined-dagger', 'findings[0].baseline.status: Does not have a value')
+@case('baseline-status-accepted', 'B-baselined-dagger', 'findings[0].baseline.status: enum')
 def _(d): d['findings'][0]['baseline']['status'] = 'accepted'  # the baseline's word is known
-@case('gate-limited-by-new', 'B-baselined-dagger', 'findings[0].gate.basis.limited_by: Does not have a value')
+@case('gate-limited-by-new', 'B-baselined-dagger', 'findings[0].gate.basis.limited_by: enum')
 def _(d): d['findings'][0]['gate']['basis']['limited_by'] = 'new'
 @case('target-php-source-composer', 'composite', 'run.target_php_source')
 def _(d): d['run']['target_php_source'] = 'composer'
 @case('fail-on-source-cli', 'composite', 'run.fail_on_source')
 def _(d): d['run']['fail_on_source'] = 'cli'
-@case('s1-marked-by-registry', 'composite', 'data.marked_by: Does not have a value')
+@case('s1-marked-by-registry', 'composite', 'data.marked_by: enum')
 def _(d): sig(d['findings'][DEBUG], 'S1')['data']['marked_by'] = 'registry'
-@case('s7-verdict-cause-word', 'composite', 'data.packages[0].verdict: Does not have a value')
+@case('s7-verdict-cause-word', 'composite', 'data.packages[0].verdict: enum')
 def _(d): sig(d['findings'][OAUTH], 'S7')['data']['packages'][0]['verdict'] = 'stale'  # report-2: the grade
-@case('accepted-vulnerable', 'psr-log', 'findings[0].score.accepted[0].flag: Does not have a value')
+@case('accepted-vulnerable', 'psr-log', 'findings[0].score.accepted[0].flag: enum')
 def _(d): d['findings'][0]['score']['accepted'][0]['flag'] = 'vulnerable'  # the allowlist accepts maintenance flags only
 @case('envelope-schema-1', 'composite', 'lockrot.schema')
 def _(d): d['lockrot']['schema'] = 1
@@ -116,65 +116,65 @@ def _(d): d['flags']['vulnerable']['leading'] = 3  # vulnerable is never a lead
 # required keys (every key always written)
 @case('missing-next-step', 'composite', f + '.next_step')
 def _(d): d['findings'][m]['do'] = d['findings'][m].pop('next_step')  # another key in place of the required next_step
-@case('missing-score-band', 'composite', f + '.score.band: The property band is required')
+@case('missing-score-band', 'composite', f + '.score.band: required')
 def _(d): del d['findings'][m]['score']['band']
-@case('term-without-contribution', 'composite', f + '.score.terms[0].contribution: The property contribution is required')
+@case('term-without-contribution', 'composite', f + '.score.terms[0].contribution: required')
 def _(d): del d['findings'][m]['score']['terms'][0]['contribution']
-@case('security-term-without-advisory', 'composite', f + '.score.terms[2].advisory: The property advisory is required')
+@case('security-term-without-advisory', 'composite', f + '.score.terms[2].advisory: required')
 def _(d): del term(d['findings'][m], 'security')['advisory']
-@case('vulnerable-without-installed-branch-fixes', 'composite', f + '.security.installed_branch_fixes: The property installed_branch_fixes is required')
+@case('vulnerable-without-installed-branch-fixes', 'composite', f + '.security.installed_branch_fixes: required')
 def _(d): del d['findings'][m]['security']['installed_branch_fixes']
 @case('counts-without-finished', 'composite', 'counts.finished')
 def _(d): del d['counts']['finished']
 @case('counts-report-1', 'composite', 'counts.critical')
 def _(d): d['counts'] = {k: 0 for k in ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'unknown', 'finished', 'ok']}
-@case('s8-without-reachable-admits', 'composite', 'data.reachable_admits: The property reachable_admits is required')
+@case('s8-without-reachable-admits', 'composite', 'data.reachable_admits: required')
 def _(d): del sig(d['findings'][m], 'S8')['data']['reachable_admits']
-@case('s10-without-blocks', 'ok-unchecked', 'data.blocks: The property blocks is required')
+@case('s10-without-blocks', 'ok-unchecked', 'data.blocks: required')
 def _(d): del sig(d['findings'][0], 'S10')['data']['blocks']
-@case('s7-flags-not-flag-ids', 'composite', 'flag_ids: The property flag_ids is required')
+@case('s7-flags-not-flag-ids', 'composite', 'flag_ids: required')
 def _(d):
     p = sig(d['findings'][OAUTH], 'S7')['data']['packages'][0]
     p['flags'] = p.pop('flag_ids')  # every list of bare flag ids is flag_ids
 @case('run-without-score-model', 'composite', 'run.score_model')
 def _(d): d['run']['score_model_id'] = d['run'].pop('score_model')['id']
-@case('rule-divide-without-by', 'composite', 'rules[6].by: The property by is required')
+@case('rule-divide-without-by', 'composite', 'rules[6].by: required')
 def _(d): del rule(d, 'divide-reach')['by']  # a page renders an unknown rule's arithmetic from its kind's parameters
 
 # one name, one type
-@case('score-total-not-integer', 'composite', f + '.score.total: Double value found, but an integer is required')
+@case('score-total-not-integer', 'composite', f + '.score.total: type')
 def _(d): d['findings'][m]['score']['total'] = 36.5
-@case('score-total-string', 'composite', f + '.score.total: String value found, but an integer is required')
+@case('score-total-string', 'composite', f + '.score.total: type')
 def _(d): d['findings'][m]['score']['total'] = '36'
-@case('score-exact-quarter', 'composite', f + '.score.exact: Must be a multiple of 0.5')
+@case('score-exact-quarter', 'composite', f + '.score.exact: multipleOf')
 def _(d): d['findings'][m]['score']['exact'] = 36.25  # half points only (multipleOf 0.5)
-@case('band-to-next-half', 'composite', 'findings[%d].score.band.to_next: Double value found' % CSSMIN)
+@case('band-to-next-half', 'composite', 'findings[%d].score.band.to_next: type' % CSSMIN)
 def _(d): d['findings'][CSSMIN]['score']['band']['to_next'] = 13.5  # to_next is measured from total, an integer
-@case('modifier-divide-by-string', 'composite', 'findings[%d].score.modifiers[0].divide_by: String value found' % POLY)
+@case('modifier-divide-by-string', 'composite', 'findings[%d].score.modifiers[0].divide_by: type' % POLY)
 def _(d): d['findings'][POLY]['score']['modifiers'][0]['divide_by'] = '2'
 @case('commands-as-strings', 'composite', f + '.next_step.commands[0]')
 def _(d): d['findings'][m]['next_step']['commands'] = ['composer require symfony/monolog-bridge:^5.4.52']  # argv lists
-@case('s9-fix-as-string', 'composite', 'advisories[0].fix: String value found, but an object is required')
+@case('s9-fix-as-string', 'composite', 'advisories[0].fix: type')
 def _(d): sig(d['findings'][m], 'S9')['data']['advisories'][0]['fix'] = 'upgrade'  # fix is always the object, fix_kind the string
 @case('score-model-id-string', 'composite', 'run.score_model.id')
 def _(d): d['run']['score_model']['id'] = '1'
 @case('rules-used-string', 'composite', 'run.score_rules_used.band-floors')
 def _(d): d['run']['score_rules_used']['band-floors'] = '7'
-@case('ignored-count-string', 'composite', 'findings[%d].security.ignored_count: String value found' % YAML)
+@case('ignored-count-string', 'composite', 'findings[%d].security.ignored_count: type' % YAML)
 def _(d): d['findings'][YAML]['security']['ignored_count'] = '0'
-@case('headline-php-string', 'composite', f + '.flags[1].headline.value: String value found, but an integer is required')
+@case('headline-php-string', 'composite', f + '.flags[1].headline.value: type')
 def _(d): d['findings'][m]['flags'][1]['headline']['value'] = '5'  # unit php: an integer major
 
 # shapes and discriminators
-@case('score-zero-with-terms', 'psr-log', 'findings[0].score: Matched a schema which it should not')
+@case('score-zero-with-terms', 'psr-log', 'findings[0].score: not')
 def _(d): d['findings'][0]['score']['terms'] = []  # 'terms' in score is the discriminator
-@case('score-zero-shape-nonzero-total', 'psr-log', 'findings[0].score.total: Does not have a value in the enumeration [0]')
+@case('score-zero-shape-nonzero-total', 'psr-log', 'findings[0].score.total: enum')
 def _(d): d['findings'][0]['score']['total'] = 3
-@case('security-clear-on-partial-lookup', 'composite', 'findings[%d].security.check: Does not have a value in the enumeration ["complete"]' % DEBUG)
+@case('security-clear-on-partial-lookup', 'composite', 'findings[%d].security.check: enum' % DEBUG)
 def _(d):
     s = d['findings'][DEBUG]['security']
     s['check'], s['complete'] = 'partial', False  # clear only on a complete lookup
-@case('abandoned-without-degree', 'composite', 'findings[%d].flags[0].degree: NULL value found' % DEBUG)
+@case('abandoned-without-degree', 'composite', 'findings[%d].flags[0].degree: type' % DEBUG)
 def _(d): d['findings'][DEBUG]['flags'][0]['degree'] = None  # abandoned carries {reasons, liveness_complete}
 @case('gate-by-without-facts', 'composite', f + '.gate.by[0].facts')
 def _(d): d['findings'][m]['gate']['by'][0]['facts'] = []  # a failing value names at least one fact
@@ -184,42 +184,42 @@ def _(d): d['findings'][POLY]['checks_skipped'][0]['blocks'] = []
 # open sets: malformed, or unknown under the strict twin
 @case('fail-on-not-canonical', 'composite', 'run.fail_on')
 def _(d): d['run']['fail_on'] = 'High, vulnerable-high'  # canonical: lower case, no spaces
-@case('rule-id-malformed', 'composite', 'rules[6].id: Does not match the regex pattern')
+@case('rule-id-malformed', 'composite', 'rules[6].id: pattern')
 def _(d): rule(d, 'divide-reach')['id'] = 'Divide Reach'
 @case('next-step-kind-malformed', 'composite', f + '.next_step.kind')
 def _(d): d['findings'][m]['next_step']['kind'] = 'Require'
 @case('gate-value-uppercase', 'composite', f + '.gate.by[0].value')
 def _(d): d['findings'][m]['gate']['by'][0]['value'] = 'HIGH'
-@case('strict-rule-id-unknown', 'composite', 'rules[6].id: Does not have a value in the enumeration', strict=True)
+@case('strict-rule-id-unknown', 'composite', 'rules[6].id: enum', strict=True)
 def _(d): rule(d, 'divide-reach')['id'] = 'divide-reachx'  # well-formed: the published schema takes it, the strict twin does not
 @case('strict-move-kind-unknown', 'composite', f + '.next_step.kind', strict=True)
 def _(d): d['findings'][m]['next_step']['kind'] = 'upgrade-major'
-@case('strict-flag-weight-revision-2', 'composite', f + '.flags[0]: The property weight is not defined', strict=True)
+@case('strict-flag-weight-revision-2', 'composite', f + '.flags[0]: additionalProperties: The property weight is not defined', strict=True)
 def _(d): d['findings'][m]['flags'][0].update(weight=16, points=16)  # a flag carries no weight or points: score.terms[] holds them
-@case('strict-security-summary', 'composite', 'The property summary is not defined', strict=True)
+@case('strict-security-summary', 'composite', 'findings[1].security: additionalProperties: The property summary is not defined', strict=True)
 def _(d): d['findings'][m]['security']['summary'] = 'dropped in round 2'
-@case('strict-divisor-three', 'composite', f + '.score.terms[1].divisor: Does not have a value in the enumeration', strict=True)
+@case('strict-divisor-three', 'composite', f + '.score.terms[1].divisor: enum', strict=True)
 def _(d):  # model 1's divisors are 1 and 4 (x-known-values); a later divisor comes with a later model id
     d['findings'][m]['score']['terms'][1]['divisor'] = 3
     d['findings'][m]['score']['model'] = 2
 
-@case('clears-kind-signal', 'composite', f + '.next_step.clears[0].kind: Does not have a value')
+@case('clears-kind-signal', 'composite', f + '.next_step.clears[0].kind: enum')
 def _(d): d['findings'][m]['next_step']['clears'][0]['kind'] = 'signal'  # fact kinds are closed
-@case('worsened-by-kind-check', 'B-baselined-dagger', 'findings[0].baseline.worsened_by[0].kind: Does not have a value')
+@case('worsened-by-kind-check', 'B-baselined-dagger', 'findings[0].baseline.worsened_by[0].kind: enum')
 def _(d): d['findings'][0]['baseline']['worsened_by'][0]['kind'] = 'check'
 @case('move-in-security', 'composite', f + '.security.move_in')
 def _(d): d['findings'][m]['security']['move_in'] = 'security'  # closed: it points into the document
-@case('ignored-by-malformed', 'E-ignored-dagger', 'findings[0].security.ignored[0].by: Does not match the regex pattern')
+@case('ignored-by-malformed', 'E-ignored-dagger', 'findings[0].security.ignored[0].by: pattern')
 def _(d): d['findings'][0]['security']['ignored'][0]['by'] = 'Audit Ignore'
-@case('ignored-matched-the-value', 'E-ignored-dagger', 'findings[0].security.ignored[0].matched: Does not match the regex pattern')
+@case('ignored-matched-the-value', 'E-ignored-dagger', 'findings[0].security.ignored[0].matched: pattern')
 def _(d): d['findings'][0]['security']['ignored'][0]['matched'] = 'PKSA-ign0-0000-0000'  # matched names the kind of match, not the matched value
-@case('ignored-severity-moderate', 'E-ignored-dagger', 'findings[0].security.ignored[0].severity: Does not have a value')
+@case('ignored-severity-moderate', 'E-ignored-dagger', 'findings[0].security.ignored[0].severity: enum')
 def _(d): d['findings'][0]['security']['ignored'][0]['severity'] = 'moderate'  # the bucket
-@case('points-from-missing', 'composite', 'run.score_model.flags[0].points_from: The property points_from is required')
+@case('points-from-missing', 'composite', 'run.score_model.flags[0].points_from: required')
 def _(d): del d['run']['score_model']['flags'][0]['points_from']  # every row writes every key
-@case('rank-null', 'composite', f + '.rank: NULL value found')
+@case('rank-null', 'composite', f + '.rank: type')
 def _(d): d['findings'][m]['rank'] = None  # an int >= 1 in every report
-@case('strict-ignored-by-config-prefix', 'E-ignored-dagger', 'findings[0].security.ignored[0].by: Does not have a value in the enumeration', strict=True)
+@case('strict-ignored-by-config-prefix', 'E-ignored-dagger', 'findings[0].security.ignored[0].by: enum', strict=True)
 def _(d): d['findings'][0]['security']['ignored'][0]['by'] = 'config.audit.ignore'  # well-formed, not a reserved name
 
 @case('gates-hold-none', 'composite', 'run.gates[0]')
@@ -227,19 +227,19 @@ def _(d): d['run']['gates'] = [{'value': 'none', 'kind': 'grade', 'threshold': N
 
 
 # relations
-@case('relation-priority-not-the-grade', 'composite', f + '.priority: Does not have a value in the enumeration ["critical"]')
+@case('relation-priority-not-the-grade', 'composite', f + '.priority: enum')
 def _(d): d['findings'][m]['priority'] = 'high'  # the alias equals the grade
-@case('relation-judged-without-metadata', 'composite', f + '.maintenance_judged: Does not have a value in the enumeration [false]')
+@case('relation-judged-without-metadata', 'composite', f + '.maintenance_judged: enum')
 def _(d): d['findings'][m]['metadata']['status'] = 'not_from_composer_repository'  # maintenance_judged <=> metadata read
-@case('relation-reach-against-direct', 'composite', f + '.reach: Does not have a value in the enumeration ["direct"]')
+@case('relation-reach-against-direct', 'composite', f + '.reach: enum')
 def _(d): d['findings'][m]['reach'] = 'transitive'
-@case('relation-reason-on-a-require-move', 'composite', f + '.next_step.reason: String value found, but a null is required')
+@case('relation-reason-on-a-require-move', 'composite', f + '.next_step.reason: type')
 def _(d): d['findings'][m]['next_step']['reason'] = 'package_quiet'  # reason only on no-move
-@case('relation-clears-all-false-with-nothing-left', 'composite', f + '.next_step.clears_all: Does not have a value in the enumeration [true]')
+@case('relation-clears-all-false-with-nothing-left', 'composite', f + '.next_step.clears_all: enum')
 def _(d): d['findings'][m]['next_step']['clears_all'] = False
-@case('relation-fails-without-a-value', 'composite', f + '.gate.by: There must be a minimum of 1 items')
+@case('relation-fails-without-a-value', 'composite', f + '.gate.by: minItems')
 def _(d): d['findings'][m]['gate']['by'] = []
-@case('relation-builtin-entry-without-reason-id', 'composite', 'findings[%d].allowlist.reason_id: NULL value found, but a string is required' % POLY)
+@case('relation-builtin-entry-without-reason-id', 'composite', 'findings[%d].allowlist.reason_id: type' % POLY)
 def _(d): d['findings'][POLY]['allowlist']['reason_id'] = None  # a lockrot-authored reason has an id
 
 
@@ -250,9 +250,9 @@ def _(d): d['findings'][m]['flags'][0]['headline']['source'] = None  # a years v
 def _(d): d['findings'][m]['flags'][2]['headline'] = {'unit': 'years', 'value': 10.9, 'source': 'release'}  # vulnerable's unit is advisories
 @case('a1-flag-old-promise-years-headline', 'composite', f + '.flags[1]')
 def _(d): d['findings'][m]['flags'][1]['headline'] = {'unit': 'years', 'value': 10.9, 'source': 'release'}  # old-promise's unit is php
-@case('a1-flags-identical-copy', 'composite', f + '.flags: There are no duplicates allowed')
+@case('a1-flags-identical-copy', 'composite', f + '.flags: uniqueItems')
 def _(d): d['findings'][m]['flags'].insert(1, copy.deepcopy(d['findings'][m]['flags'][0]))  # uniqueItems catches an identical copy only ("each flag once" is ScoreContractTest's)
-@case('a1-flag-signals-empty', 'composite', f + '.flags[0].signal_ids: There must be a minimum of 1 items')
+@case('a1-flag-signals-empty', 'composite', f + '.flags[0].signal_ids: minItems')
 def _(d): d['findings'][m]['flags'][0]['signal_ids'] = []
 @case('a1-without-total-0-graded', 'composite', f + '.score')
 def _(d): d['findings'][m]['score']['without'][0].update(total=0, verdict='high')  # a rerun at 0 reads a score-0 word
@@ -262,7 +262,7 @@ def _(d): d['findings'][0]['score']['accepted'][0]['if_counted'].update(total=0,
 def _(d): d['findings'][m]['score']['exact'] = 0.5
 @case('a1-gate-threshold-null-on-a-grade', 'composite', 'run.gates[0]')
 def _(d): d['run']['gates'][0]['threshold'] = None  # null exactly for unchecked
-@case('a1-gate-kind-hyphen', 'composite', 'run.gates[0].kind: Does not match the regex pattern')
+@case('a1-gate-kind-hyphen', 'composite', 'run.gates[0].kind: pattern')
 def _(d): d['run']['gates'][0]['kind'] = 'abandoned-since'  # gate kinds are reason-like: underscores
 @case('a1-allowlist-project-pattern-null', 'D-partial-dagger', 'findings[0].allowlist')
 def _(d): d['findings'][0]['allowlist']['pattern'] = None  # null exactly on a type entry
@@ -678,7 +678,7 @@ def _(d):
     x['activity'].update(status='not_found', reason='repository_not_found', event=None, archived=None, fetched_at=None, cached_at=None)
     x['checks_skipped'] = [dict(check='repository_activity', reason='repository_not_found', blocks=['S3', 'S4'])]
     x['flags'][0]['degree']['liveness_complete'] = False
-@case('c73-s4-data-activity', 'composite', 'data.event: The property event is required')
+@case('c73-s4-data-activity', 'composite', 'data.event: required')
 def _(d):
     x = sig(d['findings'][DEBUG], 'S4')['data']
     x['activity'] = x.pop('event')

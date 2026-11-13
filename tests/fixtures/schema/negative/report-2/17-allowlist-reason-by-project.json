@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "findings[7].allowlist.reason_by: Does not have a value"
+  "error": "findings[7].allowlist.reason_by: enum"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

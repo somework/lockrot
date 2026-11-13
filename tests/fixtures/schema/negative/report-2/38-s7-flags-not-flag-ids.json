@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "flag_ids: The property flag_ids is required"
+  "error": "flag_ids: required"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

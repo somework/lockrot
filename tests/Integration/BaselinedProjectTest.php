@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Composer\Composer;
-use JsonSchema\Validator;
 use Lockrot\Baseline\BaselineFile;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Tests\Support\Contract\BaselinedFloors;
 use Lockrot\Tests\Support\Contract\BaselinedScenario;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\SchemaCheck;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -71,10 +71,7 @@ final class BaselinedProjectTest extends TestCase
             }
         }
         self::assertSame([], BaselinedFloors::missed($scenario, $files));
-        $provenance = json_decode($files['provenance.json']);
-        $validator = new Validator();
-        $validator->validate($provenance, json_decode((string) file_get_contents(BaselinedScenario::FIXTURES.'baselined/provenance.schema.json')));
-        self::assertTrue($validator->isValid(), (string) json_encode($validator->getErrors()));
+        self::assertSame([], SchemaCheck::errors((string) file_get_contents(BaselinedScenario::FIXTURES.'baselined/provenance.schema.json'), $files['provenance.json']));
         $check = JsonPath::decoded(json_decode($files['check/report.json'], true));
         self::assertRootCountsAreTheFindingsCounts($check);
         self::assertRecordedValuesAreSet($check);

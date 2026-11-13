@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "findings[1].score.terms[2].advisory: The property advisory is required"
+  "error": "findings[1].score.terms[2].advisory: required"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

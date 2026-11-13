@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": true,
-  "error": "findings[1].flags[0]: The property weight is not defined"
+  "error": "findings[1].flags[0]: additionalProperties: The property weight is not defined"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

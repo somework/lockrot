@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "findings[1].reach: Does not have a value in the enumeration [\"direct\"]"
+  "error": "findings[1].reach: enum"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

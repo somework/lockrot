@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "findings[1].score.terms[0].contribution: The property contribution is required"
+  "error": "findings[1].score.terms[0].contribution: required"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {

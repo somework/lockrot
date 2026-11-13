@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "data.reachable_admits: The property reachable_admits is required"
+  "error": "data.reachable_admits: required"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {
