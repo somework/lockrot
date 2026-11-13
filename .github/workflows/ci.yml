@@ -64,8 +64,15 @@ jobs:
           tools: composer:v2
       - if: matrix.composer != 'latest'
         run: composer require --dev --no-update "composer/composer:${{ matrix.composer }}.*"
+      # ParaTest runs the tests of a row in parallel. ParaTest 7, for PHPUnit 10 and 11, needs
+      # symfony/console 6.2 or later, and require-dev holds console 5.4 (CONTRIBUTING, "What the code
+      # has to run on"). ParaTest 6 needs PHPUnit 9.6. So only the PHPUnit 9.6 rows install it, and
+      # the other rows keep the processes that the test step starts itself.
+      - if: matrix.php == '7.4' || matrix.php == '8.0'
+        run: composer require --dev --no-update "brianium/paratest:^6.11"
       - run: composer update --no-interaction --prefer-dist
       - name: Run tests with the matrix Composer binary
+        env: {PARATEST_PROCESSES: 3, PARATEST_BATCH: 1}
         run: |
           composer -V
           config=phpunit.xml.dist
@@ -80,48 +87,73 @@ jobs:
             # A configuration whose <groups> element the sed does not match runs the wrong groups.
             grep -qF "<groups>$2</groups>" "$1" || { echo "::error::$1 does not hold the <groups> of its process"; return 1; }
           }
-          # Processes side by side shorten the row. Each writes its own log, and the step checks every exit code.
-          # A runtime-php test reads the PHP that runs it, so a row without covers-nothing still runs it.
-          # On a covers_nothing row, a second process runs the covers-nothing classes in the group schema-sweep.
-          # Move a class between the two processes by the class times in the step summary, so that both end together.
-          # Keep three processes: a fourth CPU-bound process slows every process on the runner.
-          # https://github.com/somework/lockrot/pull/208
-          names=(default)
-          runs=("<exclude>$slow<group>covers-nothing</group></exclude>")
-          if [ "${{ matrix.covers_nothing }}" = "true" ]; then
-            names+=(covers-nothing schema-sweep)
-            runs+=("<include><group>covers-nothing</group></include><exclude>$slow<group>schema-sweep</group></exclude>")
-            runs+=("<include><group>schema-sweep</group></include><exclude>$slow</exclude>")
-          else
-            names+=(runtime-php)
-            runs+=("<include><group>runtime-php</group></include><exclude>$slow</exclude>")
-          fi
           mkdir -p build
-          # The copies stay beside the configuration, because PHPUnit resolves its paths from there.
-          # All of them exist before a process starts, so a failed copy leaves no process running.
-          for i in "${!runs[@]}"; do groups_config "phpunit-ci-$i.xml" "${runs[$i]}"; done
-          # Each process streams its output with its name as a prefix, so the log shows progress while it runs.
-          # pipefail makes the subshell exit with PHPUnit's status, not the status of tee or sed.
-          pids=()
-          for i in "${!runs[@]}"; do
-            # The covers-nothing processes write a JUnit log, which the class timing report below reads.
-            junit=()
-            if [ "${{ matrix.covers_nothing }}" = "true" ] && [ "${names[$i]}" != default ]; then junit=(--log-junit "build/junit-${names[$i]}.xml"); fi
-            (
-              set -o pipefail
-              vendor/bin/phpunit -c "phpunit-ci-$i.xml" "${junit[@]}" 2>&1 \
-                | tee "build/phpunit-${names[$i]}.log" | sed -u "s/^/[${names[$i]}] /"
-            ) &
-            pids+=($!)
-          done
           failed=0
-          for i in "${!runs[@]}"; do
-            status=0; wait "${pids[$i]}" || status=$?
-            echo "=== phpunit ${names[$i]}: exit $status"
+          if [ -x vendor/bin/paratest ]; then
+            # Two ParaTest runs, one after the other, each on every process. The first gives each
+            # worker a test class at a time. The second runs the classes of the group parallel-rows
+            # (or runtime-php) with a process for each test and each data row, so that a class that
+            # loops over the fixtures does not end the row alone. ParaTest 6 runs a data row as a
+            # test of its own only in its functional mode, which starts a process for each one.
+            if [ "${{ matrix.covers_nothing }}" = "true" ]; then
+              files="<exclude>$slow<group>parallel-rows</group></exclude>"
+              rows="<include><group>parallel-rows</group></include><exclude>$slow</exclude>"
+            else
+              files="<exclude>$slow<group>covers-nothing</group></exclude>"
+              rows="<include><group>runtime-php</group></include><exclude>$slow</exclude>"
+            fi
+            groups_config phpunit-ci-files.xml "$files"
+            groups_config phpunit-ci-rows.xml "$rows"
+            status=0
+            vendor/bin/paratest -c phpunit-ci-files.xml -p "$PARATEST_PROCESSES" --runner WrapperRunner --log-junit build/junit-files.xml || status=$?
+            echo "=== paratest files: exit $status"
             if [ "$status" -ne 0 ]; then failed=1; fi
-          done
-          # The ten slowest classes of the covers-nothing processes, from their JUnit logs. A missing log
-          # prints nothing: the failed process already fails the step.
+            status=0
+            vendor/bin/paratest -c phpunit-ci-rows.xml -p "$PARATEST_PROCESSES" --functional --max-batch-size "$PARATEST_BATCH" --log-junit build/junit-rows.xml || status=$?
+            echo "=== paratest rows: exit $status"
+            if [ "$status" -ne 0 ]; then failed=1; fi
+          else
+            # Processes side by side shorten the row. Each writes its own log, and the step checks every exit code.
+            # A runtime-php test reads the PHP that runs it, so a row without covers-nothing still runs it.
+            # On a covers_nothing row, a second process runs the covers-nothing classes in the group schema-sweep.
+            # Move a class between the two processes by the class times in the step summary, so that both end together.
+            # Keep three processes: a fourth CPU-bound process slows every process on the runner.
+            # https://github.com/somework/lockrot/pull/208
+            names=(default)
+            runs=("<exclude>$slow<group>covers-nothing</group></exclude>")
+            if [ "${{ matrix.covers_nothing }}" = "true" ]; then
+              names+=(covers-nothing schema-sweep)
+              runs+=("<include><group>covers-nothing</group></include><exclude>$slow<group>schema-sweep</group></exclude>")
+              runs+=("<include><group>schema-sweep</group></include><exclude>$slow</exclude>")
+            else
+              names+=(runtime-php)
+              runs+=("<include><group>runtime-php</group></include><exclude>$slow</exclude>")
+            fi
+            # The copies stay beside the configuration, because PHPUnit resolves its paths from there.
+            # All of them exist before a process starts, so a failed copy leaves no process running.
+            for i in "${!runs[@]}"; do groups_config "phpunit-ci-$i.xml" "${runs[$i]}"; done
+            # Each process streams its output with its name as a prefix, so the log shows progress while it runs.
+            # pipefail makes the subshell exit with PHPUnit's status, not the status of tee or sed.
+            pids=()
+            for i in "${!runs[@]}"; do
+              # The covers-nothing processes write a JUnit log, which the class timing report below reads.
+              junit=()
+              if [ "${{ matrix.covers_nothing }}" = "true" ] && [ "${names[$i]}" != default ]; then junit=(--log-junit "build/junit-${names[$i]}.xml"); fi
+              (
+                set -o pipefail
+                vendor/bin/phpunit -c "phpunit-ci-$i.xml" "${junit[@]}" 2>&1 \
+                  | tee "build/phpunit-${names[$i]}.log" | sed -u "s/^/[${names[$i]}] /"
+              ) &
+              pids+=($!)
+            done
+            for i in "${!runs[@]}"; do
+              status=0; wait "${pids[$i]}" || status=$?
+              echo "=== phpunit ${names[$i]}: exit $status"
+              if [ "$status" -ne 0 ]; then failed=1; fi
+            done
+          fi
+          # The ten slowest classes of the runs that write a JUnit log. A missing log prints nothing:
+          # the failed run already fails the step.
           python3 - <<'PY' | tee -a "${GITHUB_STEP_SUMMARY:-/dev/null}" || true
           import glob
           import xml.etree.ElementTree as ET
@@ -134,7 +166,7 @@ jobs:
               except (ET.ParseError, OSError, ValueError):
                   continue
           if times:
-              print('### Slowest covers-nothing classes (php ${{ matrix.php }})\n')
+              print('### Slowest test classes (php ${{ matrix.php }})\n')
               print('| Class | Seconds |\n|---|---|')
               for name, t in sorted(times.items(), key=lambda kv: -kv[1])[:10]:
                   print('| `%s` | %.1f |' % (name, t))

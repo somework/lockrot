@@ -26,6 +26,7 @@ use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\RootRecount;
 use Lockrot\Verdict\FailOn;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
@@ -35,40 +36,58 @@ use PHPUnit\Framework\TestCase;
  *
  * It covers nothing: it analyses every fixture lock twice, which outlasts the timeout of a mutation
  * run. Report2RootTest and ScoreRulesUsedTest kill those mutants.
+ * The group parallel-rows gives each data row and each test a unit of its own in the ParaTest
+ * run of ci.yml.
  *
  * @coversNothing
  *
  * @group covers-nothing
+ * @group parallel-rows
  */
 #[CoversNothing]
 #[Group('covers-nothing')]
+#[Group('parallel-rows')]
 final class AppRootRecountTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures/';
     private const NOW = '2026-09-14T00:00:00+00:00';
 
-    public function testEveryRootBlockOfEveryAppRecountsFromItsFindings(): void
+    public function testTheRowsAreEveryFixtureAppAndSkeleton(): void
     {
-        $dirs = array_merge(glob(self::FIXTURES.'apps/*', \GLOB_ONLYDIR) ?: [], glob(self::FIXTURES.'skeletons/*', \GLOB_ONLYDIR) ?: []);
+        $dirs = [];
+        foreach (['apps/', 'skeletons/'] as $group) {
+            foreach (scandir(self::FIXTURES.$group) ?: [] as $entry) {
+                if ($entry[0] !== '.' && is_dir(self::FIXTURES.$group.$entry)) {
+                    $dirs[] = $group.$entry;
+                }
+            }
+        }
         sort($dirs);
+
         self::assertNotSame([], $dirs);
-        $server = FixtureRepositoryServer::fromLockFiles(array_map(static fn (string $dir): string => $dir.'/composer.lock', $dirs));
-        $server->start();
+        self::assertSame($dirs, array_keys(iterator_to_array(self::fixtureApps())));
+    }
+
+    /** @return iterable<string, array{string}> every fixture app and skeleton, by its directory below tests/fixtures */
+    public static function fixtureApps(): iterable
+    {
+        foreach (self::dirs() as $dir) {
+            yield substr($dir, \strlen(self::FIXTURES)) => [$dir];
+        }
+    }
+
+    /**
+     * @dataProvider fixtureApps
+     */
+    #[DataProvider('fixtureApps')]
+    public function testEveryRootBlockOfTheAppRecountsFromItsFindings(string $dir): void
+    {
+        $server = self::server();
         $mismatches = [];
-        $seen = ['accepted' => 0, 'replacement' => 0, 'reaching' => 0, 'libyears' => 0];
         try {
-            foreach ($dirs as $dir) {
-                foreach ([false, true] as $dev) {
-                    $document = self::document($server, $dir, $dev);
-                    foreach (RootRecount::mismatches($document) as $mismatch) {
-                        $mismatches[] = basename($dir).($dev ? ' --dev ' : ' ').$mismatch;
-                    }
-                    foreach (JsonPath::arrayAt($document, ['flags']) as $flag) {
-                        $seen['accepted'] += \is_array($flag) && \is_array($flag['accepted'] ?? null) ? JsonPath::intAt($flag, ['accepted', 'all']) : 0;
-                    }
-                    $seen['replacement'] += JsonPath::intAt($document, ['abandoned', 'with_replacement']) + JsonPath::intAt($document, ['abandoned', 'with_suggestion']);
-                    $seen['reaching'] += JsonPath::intAt($document, ['gate', 'reaching']);
-                    $seen['libyears'] += \is_float(JsonPath::arrayAt($document, ['libyears'])['total'] ?? null) ? 1 : 0;
+            foreach ([false, true] as $dev) {
+                foreach (RootRecount::mismatches(self::document($server, $dir, $dev)) as $mismatch) {
+                    $mismatches[] = basename($dir).($dev ? ' --dev ' : ' ').$mismatch;
                 }
             }
         } finally {
@@ -76,7 +95,51 @@ final class AppRootRecountTest extends TestCase
         }
 
         self::assertSame([], $mismatches);
+    }
+
+    /** The sweep stops at the first app after which every counted fact occurred. */
+    public function testTheFixturesMakeEveryCountedFactOccur(): void
+    {
+        $server = self::server();
+        $seen = ['accepted' => 0, 'replacement' => 0, 'reaching' => 0, 'libyears' => 0];
+        try {
+            foreach (self::dirs() as $dir) {
+                foreach ([false, true] as $dev) {
+                    $document = self::document($server, $dir, $dev);
+                    foreach (JsonPath::arrayAt($document, ['flags']) as $flag) {
+                        $seen['accepted'] += \is_array($flag) && \is_array($flag['accepted'] ?? null) ? JsonPath::intAt($flag, ['accepted', 'all']) : 0;
+                    }
+                    $seen['replacement'] += JsonPath::intAt($document, ['abandoned', 'with_replacement']) + JsonPath::intAt($document, ['abandoned', 'with_suggestion']);
+                    $seen['reaching'] += JsonPath::intAt($document, ['gate', 'reaching']);
+                    $seen['libyears'] += \is_float(JsonPath::arrayAt($document, ['libyears'])['total'] ?? null) ? 1 : 0;
+                }
+                if (!\in_array(0, $seen, true)) {
+                    break;
+                }
+            }
+        } finally {
+            $server->stop();
+        }
+
         self::assertSame([], array_keys(array_filter($seen, static fn (int $count): bool => $count === 0)), 'the fixtures make every counted fact occur');
+    }
+
+    /** @return list<string> */
+    private static function dirs(): array
+    {
+        $dirs = array_merge(glob(self::FIXTURES.'apps/*', \GLOB_ONLYDIR) ?: [], glob(self::FIXTURES.'skeletons/*', \GLOB_ONLYDIR) ?: []);
+        sort($dirs);
+
+        return $dirs;
+    }
+
+    /** Every fixture lock served at once, whichever app a test reads, so each run reads the same metadata. */
+    private static function server(): FixtureRepositoryServer
+    {
+        $server = FixtureRepositoryServer::fromLockFiles(array_map(static fn (string $dir): string => $dir.'/composer.lock', self::dirs()));
+        $server->start();
+
+        return $server;
     }
 
     /** @return array<mixed, mixed> */

@@ -31,6 +31,7 @@ use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
@@ -47,23 +48,53 @@ use PHPUnit\Framework\TestCase;
  * It covers nothing: it validates an explanation per branch of every fixture app, which pushes the
  * lines it covers past the timeout of a mutation run. PhpFloorTest, BranchRowTest and
  * ExplanationTest kill those mutants.
+ * The group parallel-rows gives each data row and each test a unit of its own in the ParaTest
+ * run of ci.yml.
  *
  * @coversNothing
  *
  * @group covers-nothing
+ * @group parallel-rows
  */
 #[CoversNothing]
 #[Group('covers-nothing')]
+#[Group('parallel-rows')]
 final class BranchFloorAgreementTest extends TestCase
 {
     use ValidatesJsonSchemas;
 
     private const FIXTURES = __DIR__.'/../fixtures/';
     private const NOW = '2026-09-14T00:00:00+00:00';
+    /** The fixture whose explanations go through the schema. */
+    private const VALIDATED = 'apps/wallabag_wallabag';
     private const SIDES = [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE];
 
     /** @var array<string, true> every `<floor> <side>` the rows gave, so the check is seen to bite */
     private array $sides = [];
+
+    public function testTheRowsAreEveryFixtureLock(): void
+    {
+        $dirs = [];
+        foreach (['apps/', 'skeletons/'] as $group) {
+            foreach (scandir(self::FIXTURES.$group) ?: [] as $entry) {
+                if ($entry[0] !== '.' && is_file(self::FIXTURES.$group.$entry.'/composer.lock')) {
+                    $dirs[] = $group.$entry;
+                }
+            }
+        }
+        sort($dirs);
+
+        self::assertGreaterThanOrEqual(20, \count($dirs), 'the fixture locks');
+        self::assertSame($dirs, array_keys(iterator_to_array(self::fixtureLocks())));
+    }
+
+    /** @return iterable<string, array{string}> every fixture app and skeleton, by its directory below tests/fixtures */
+    public static function fixtureLocks(): iterable
+    {
+        foreach (self::dirs() as $dir) {
+            yield $dir => [$dir];
+        }
+    }
 
     /**
      * Every fixture lock served at once, so a package has every branch any of them locks. That much
@@ -71,46 +102,38 @@ final class BranchFloorAgreementTest extends TestCase
      * shared process: the test runs in a process of its own, which never calls setUpBeforeClass(), so it builds its own server.
      *
      * @runInSeparateProcess
+     *
+     * @dataProvider fixtureLocks
      */
     #[RunInSeparateProcess]
-    public function testEveryBranchRowAgreesWithS8OnEveryFixture(): void
+    #[DataProvider('fixtureLocks')]
+    public function testEveryBranchRowOfTheLockAgreesWithS8(string $dir): void
     {
-        $dirs = [];
-        foreach (['apps', 'skeletons'] as $group) {
-            foreach ((array) glob(self::FIXTURES.$group.'/*/composer.lock') as $lock) {
-                $dirs[] = $group.'/'.basename(\dirname((string) $lock));
-            }
-        }
-        sort($dirs);
-        self::assertGreaterThanOrEqual(20, \count($dirs), 'the fixture locks');
-        $server = FixtureRepositoryServer::fromLockFiles(array_map(static fn (string $dir): string => self::FIXTURES.$dir.'/composer.lock', $dirs));
-        $server->start();
+        $server = self::server();
         try {
-            // One loader for every analysis: the metadata does not depend on the floors, only S8 does.
-            $loader = new MemoisingMetadataLoader(new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::NOW)));
-            $sources = [];
-            $validated = [];
-            foreach ($dirs as $dir) {
-                $project = ProjectConfig::fromFile(self::FIXTURES.$dir.'/composer.json');
-                // The command's two floors, and a run on an old target with no project php of its own.
-                foreach ([['8.4', $project->requirePhp()], ['7.4', null]] as [$target, $projectPhp]) {
-                    $what = $dir.' @'.$target.($projectPhp === null ? '' : ' php '.$projectPhp);
-                    $analysis = $this->analysis($loader, $dir, $target, $projectPhp);
-                    foreach ($analysis->report()->findings() as $finding) {
-                        $facts = $analysis->facts($finding->package());
-                        self::assertNotNull($facts, $finding->package());
-                        $explanation = new Explanation($finding, $facts, new Thresholds(), $target, $analysis->report(), $projectPhp);
-                        $rows = $this->rows($explanation, $what.' '.$finding->package());
-                        if ($dir === 'apps/wallabag_wallabag' && $projectPhp !== null && $rows !== []) {
-                            $validated += $this->validate($explanation, $finding->package());
-                        }
-                        foreach ($finding->signals() as $signal) {
-                            if ($signal->id() === Signal::S8) {
-                                $source = $this->agree(SignalDataStub::fields($signal), $rows, $target, $projectPhp, $what.' '.$finding->package());
-                                $sources[$source ?? 'null'] = true;
-                            }
-                        }
-                    }
+            $this->check(self::loader($server), $dir);
+        } finally {
+            $server->stop();
+        }
+    }
+
+    /**
+     * The sweep stops at the first lock after which every floor_source and every side was given.
+     *
+     * @runInSeparateProcess
+     */
+    #[RunInSeparateProcess]
+    public function testTheFixturesGiveEveryFloorSourceAndEverySide(): void
+    {
+        $sides = ['project needs_newer', 'project stops_before', 'target needs_newer', 'target stops_before'];
+        $sources = [];
+        $server = self::server();
+        try {
+            $loader = self::loader($server);
+            foreach (self::dirs() as $dir) {
+                $sources += $this->check($loader, $dir)[0];
+                if (\count($sources) === 3 && array_diff($sides, array_keys($this->sides)) === []) {
+                    break;
                 }
             }
         } finally {
@@ -119,15 +142,89 @@ final class BranchFloorAgreementTest extends TestCase
 
         ksort($sources);
         self::assertSame(['null' => true, 'project' => true, 'target' => true], $sources, 'every floor_source the fixtures can give, or the agreement proves little');
-        // Rows answering both ways went through the schema, not only rows with nothing to say.
+        ksort($this->sides);
+        self::assertSame($sides, array_keys(array_intersect_key($this->sides, array_flip($sides))), 'rows missing a floor from either side, or the side check proves little');
+    }
+
+    /**
+     * Rows answering both ways went through the schema, not only rows with nothing to say.
+     *
+     * @runInSeparateProcess
+     */
+    #[RunInSeparateProcess]
+    public function testWallabagsRowsWithinReachAndHeldBackValidate(): void
+    {
+        $server = self::server();
+        try {
+            $validated = $this->check(self::loader($server), self::VALIDATED)[1];
+        } finally {
+            $server->stop();
+        }
+
         self::assertArrayHasKey('NULL', $validated, 'a row within reach, validated');
         self::assertArrayHasKey("'project'", $validated, 'a row wallabag\'s own php >=8.2 holds back, validated');
-        ksort($this->sides);
-        self::assertSame(
-            ['project needs_newer', 'project stops_before', 'target needs_newer', 'target stops_before'],
-            array_keys(array_intersect_key($this->sides, array_flip(['project needs_newer', 'project stops_before', 'target needs_newer', 'target stops_before']))),
-            'rows missing a floor from either side, or the side check proves little'
-        );
+    }
+
+    /**
+     * The command's two floors, and a run on an old target with no project php of its own.
+     *
+     * @return array{array<string, true>, array<string, true>} the floor_source values S8 gave, and
+     *                                                         the php_blocked_by values of the validated rows
+     */
+    private function check(MetadataLoaderInterface $loader, string $dir): array
+    {
+        $sources = [];
+        $validated = [];
+        $project = ProjectConfig::fromFile(self::FIXTURES.$dir.'/composer.json');
+        foreach ([['8.4', $project->requirePhp()], ['7.4', null]] as [$target, $projectPhp]) {
+            $what = $dir.' @'.$target.($projectPhp === null ? '' : ' php '.$projectPhp);
+            $analysis = $this->analysis($loader, $dir, $target, $projectPhp);
+            foreach ($analysis->report()->findings() as $finding) {
+                $facts = $analysis->facts($finding->package());
+                self::assertNotNull($facts, $finding->package());
+                $explanation = new Explanation($finding, $facts, new Thresholds(), $target, $analysis->report(), $projectPhp);
+                $rows = $this->rows($explanation, $what.' '.$finding->package());
+                if ($dir === self::VALIDATED && $projectPhp !== null && $rows !== []) {
+                    $validated += $this->validate($explanation, $finding->package());
+                }
+                foreach ($finding->signals() as $signal) {
+                    if ($signal->id() === Signal::S8) {
+                        $source = $this->agree(SignalDataStub::fields($signal), $rows, $target, $projectPhp, $what.' '.$finding->package());
+                        $sources[$source ?? 'null'] = true;
+                    }
+                }
+            }
+        }
+
+        return [$sources, $validated];
+    }
+
+    /** @return list<string> */
+    private static function dirs(): array
+    {
+        $dirs = [];
+        foreach (['apps', 'skeletons'] as $group) {
+            foreach ((array) glob(self::FIXTURES.$group.'/*/composer.lock') as $lock) {
+                $dirs[] = $group.'/'.basename(\dirname((string) $lock));
+            }
+        }
+        sort($dirs);
+
+        return $dirs;
+    }
+
+    private static function server(): FixtureRepositoryServer
+    {
+        $server = FixtureRepositoryServer::fromLockFiles(array_map(static fn (string $dir): string => self::FIXTURES.$dir.'/composer.lock', self::dirs()));
+        $server->start();
+
+        return $server;
+    }
+
+    /** One loader for every analysis of a process: the metadata does not depend on the floors, only S8 does. */
+    private static function loader(FixtureRepositoryServer $server): MetadataLoaderInterface
+    {
+        return new MemoisingMetadataLoader(new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::NOW)));
     }
 
     /**

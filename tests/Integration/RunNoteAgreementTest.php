@@ -34,6 +34,7 @@ use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
@@ -45,15 +46,19 @@ use PHPUnit\Framework\TestCase;
  * the activity notes agree with the reason each package's own facts give for not reading its
  * repository (what S10 reports): the cap's two parts are the packages skipped for a token and for
  * the budget, and every package the forge failed for is a repository the notes name.
+ * The group parallel-rows gives each data row and each test a unit of its own in the ParaTest
+ * run of ci.yml.
  *
  * @coversNothing
  *
  * @group covers-nothing
  * @group schema-sweep
+ * @group parallel-rows
  */
 #[CoversNothing]
 #[Group('covers-nothing')]
 #[Group('schema-sweep')]
+#[Group('parallel-rows')]
 final class RunNoteAgreementTest extends TestCase
 {
     use AssertsNoteDetails;
@@ -61,15 +66,85 @@ final class RunNoteAgreementTest extends TestCase
 
     private const FIXTURES = __DIR__.'/../fixtures/';
     private const NOW = '2026-09-14T00:00:00+00:00';
+    /** By name: a token, offline, the install-time budget spent. */
+    private const VARIANTS = ['online-token' => [true, false, false], 'online-anonymous' => [false, false, false], 'offline' => [true, true, false], 'budget' => [false, false, true]];
 
-    /** @var array<string, true> every code the corpus gave, so the check is seen to bite */
-    private array $seen = [];
+    public function testTheRowsAreEveryFixtureLock(): void
+    {
+        $dirs = ['mini', 'mini-split'];
+        foreach (['apps/', 'skeletons/'] as $group) {
+            foreach (scandir(self::FIXTURES.$group) ?: [] as $entry) {
+                if ($entry[0] !== '.' && is_file(self::FIXTURES.$group.$entry.'/composer.lock')) {
+                    $dirs[] = $group.$entry;
+                }
+            }
+        }
+        sort($dirs);
+
+        self::assertGreaterThanOrEqual(20, \count($dirs), 'the fixture locks');
+        self::assertSame($dirs, array_keys(iterator_to_array(self::fixtureLocks())));
+    }
+
+    /** @return iterable<string, array{string}> every fixture lock, by its directory below tests/fixtures */
+    public static function fixtureLocks(): iterable
+    {
+        foreach (self::dirs() as $dir) {
+            yield $dir => [$dir];
+        }
+    }
 
     /**
      * @runInSeparateProcess
+     *
+     * @dataProvider fixtureLocks
      */
     #[RunInSeparateProcess]
-    public function testEveryRunsNotesAgreeWithItsDocumentAndItsFindings(): void
+    #[DataProvider('fixtureLocks')]
+    public function testEveryRunOfTheLockAgreesWithItsDocumentAndItsFindings(string $dir): void
+    {
+        $server = self::server();
+        try {
+            foreach (self::VARIANTS as $variant => [$token, $offline, $budget]) {
+                $this->agree($this->analyse($server, $dir, $token, $offline, $budget), $dir.' '.$variant);
+            }
+        } finally {
+            $server->stop();
+        }
+    }
+
+    /**
+     * The runs stop at the first lock after which every code was given.
+     *
+     * @runInSeparateProcess
+     */
+    #[RunInSeparateProcess]
+    public function testTheFixturesGiveEveryCodeThatTheAgreementReads(): void
+    {
+        $codes = [RunNote::OFFLINE, RunNote::METADATA_UNAVAILABLE, RunNote::ADVISORIES_NOT_CHECKED, RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED, RunNote::REPOSITORY_ACTIVITY_ANONYMOUS_CAP, RunNote::REPOSITORY_ACTIVITY_UNREACHABLE, RunNote::NOT_FROM_COMPOSER_REPOSITORY];
+        $seen = [];
+        $server = self::server();
+        try {
+            foreach (self::dirs() as $dir) {
+                foreach (self::VARIANTS as [$token, $offline, $budget]) {
+                    foreach ($this->analyse($server, $dir, $token, $offline, $budget)->report()->runNotes() as $note) {
+                        $seen[$note->code()] = true;
+                    }
+                }
+                if (array_diff($codes, array_keys($seen)) === []) {
+                    break;
+                }
+            }
+        } finally {
+            $server->stop();
+        }
+
+        foreach ($codes as $code) {
+            self::assertArrayHasKey($code, $seen, 'the fixtures give '.$code.', or the agreement proves little');
+        }
+    }
+
+    /** @return list<string> */
+    private static function dirs(): array
     {
         $dirs = ['mini', 'mini-split'];
         foreach (['apps', 'skeletons'] as $group) {
@@ -78,22 +153,17 @@ final class RunNoteAgreementTest extends TestCase
             }
         }
         sort($dirs);
-        self::assertGreaterThanOrEqual(20, \count($dirs), 'the fixture locks');
-        $server = FixtureRepositoryServer::fromLockFiles(array_map(static fn (string $dir): string => self::FIXTURES.$dir.'/composer.lock', $dirs));
-        $server->start();
-        try {
-            foreach ($dirs as $dir) {
-                foreach (['online-token' => [true, false, false], 'online-anonymous' => [false, false, false], 'offline' => [true, true, false], 'budget' => [false, false, true]] as $variant => [$token, $offline, $budget]) {
-                    $this->agree($this->analyse($server, $dir, $token, $offline, $budget), $dir.' '.$variant);
-                }
-            }
-        } finally {
-            $server->stop();
-        }
 
-        foreach ([RunNote::OFFLINE, RunNote::METADATA_UNAVAILABLE, RunNote::ADVISORIES_NOT_CHECKED, RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED, RunNote::REPOSITORY_ACTIVITY_ANONYMOUS_CAP, RunNote::REPOSITORY_ACTIVITY_UNREACHABLE, RunNote::NOT_FROM_COMPOSER_REPOSITORY] as $code) {
-            self::assertArrayHasKey($code, $this->seen, 'the fixtures give '.$code.', or the agreement proves little');
-        }
+        return $dirs;
+    }
+
+    /** Every fixture lock served at once, whichever lock a test analyses, so each run reads the same metadata. */
+    private static function server(): FixtureRepositoryServer
+    {
+        $server = FixtureRepositoryServer::fromLockFiles(array_map(static fn (string $dir): string => self::FIXTURES.$dir.'/composer.lock', self::dirs()));
+        $server->start();
+
+        return $server;
     }
 
     private function agree(Analysis $analysis, string $what): void
@@ -117,7 +187,6 @@ final class RunNoteAgreementTest extends TestCase
 
         $byCode = [];
         foreach ($report->runNotes() as $note) {
-            $this->seen[$note->code()] = true;
             $byCode[$note->code()][] = $note;
         }
         $this->activityAgrees($analysis, $byCode, $what);
