@@ -15,9 +15,9 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * A lock in a pull request is untrusted, and so are the repositories it names. A version, a branch or
- * a name outside the command argument set (SPEC-0.14.md §5.6) leaves its step out of `commands[]`.
- * The move keeps its constraint, its text and its other steps, and the report stays valid against
- * its schema.
+ * a name outside the command argument set (SPEC-0.14.md §5.6) in an update or require step leaves
+ * every update and require step of its move out of `commands[]`. The move keeps its constraint, its
+ * text and its why-not step, and the report stays valid against its schema.
  */
 final class HostileCommandArgumentsTest extends TestCase
 {
@@ -34,13 +34,13 @@ final class HostileCommandArgumentsTest extends TestCase
         'leading dash' => '--working-dir/x',
     ];
 
-    public function testAHostileReleaseVersionLeavesOutTheRequireStepOnly(): void
+    public function testAHostileReleaseVersionLeavesOutTheRequireStepAndThePhpStep(): void
     {
         $move = $this->move('A', 'twig/twig', static function (array $inputs): array {
             return self::with($inputs, ['releases'], self::renamed(JsonPath::arrayAt($inputs, ['releases']), 'v3.27.0', 'v3.27.0+%PATH%'));
         });
 
-        self::assertSame([['composer', 'require', 'php:>=8.1', '--no-update']], $move['commands']);
+        self::assertSame([], $move['commands']);
         self::assertSame('^3.27.0+%PATH%', $move['constraint']);
         self::assertNotSame('', $move['text']);
     }
