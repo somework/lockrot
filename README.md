@@ -141,7 +141,7 @@ Each package gets the flags that fired on it:
   each direct requirement's evidence lists the graded packages it pulls in
   ([Transitive exposure](https://lockrot.dev/verdicts/#transitive-exposure)).
 - **Libyears:** the summary's `libyears:` line sums, over the lock, the years between each
-  installed release and the package's newest release
+  installed release and the package's highest stable tag. A pre-release never ends libyears
   ([Libyears](https://lockrot.dev/verdicts/#libyears)).
 
 [What it reports: every flag, signal and score rule →](https://lockrot.dev/verdicts/)
