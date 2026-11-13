@@ -633,14 +633,18 @@ final class ComposerHttpClientTest extends TestCase
     /**
      * Composer's downloader stores the user info of a URL that it adds as the credential of that URL's
      * origin, so a redirect target with user info would replace the user's token for the whole run.
+     * Composer reads the user info with its own pattern, which also matches in a query or a fragment.
+     *
+     * @dataProvider redirectTargetsWithUserInfo
      */
-    public function testARedirectToAUrlWithUserInfoFailsAndKeepsTheStoredCredential(): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('redirectTargetsWithUserInfo')]
+    public function testARedirectToAUrlWithUserInfoFailsAndKeepsTheStoredCredential(string $target): void
     {
         $url = 'https://api.github.com/repos/vendor/name';
         $io = new BufferIO();
         $io->setAuthentication('github.com', 'users-token', 'x-oauth-basic');
         $config = new Config(false, sys_get_temp_dir());
-        $downloader = new ScriptedDownloader($io, $config, [$url => 'https://x:y@foo.github.com/z', 'https://x:y@foo.github.com/z' => [200, 'moved']]);
+        $downloader = new ScriptedDownloader($io, $config, [$url => $target, $target => [200, 'moved']]);
         $client = new ComposerHttpClient($downloader, $io, $config, Clock::fixed(self::NOW), null, true);
 
         $results = $client->fetchAll([$url], self::HEADERS);
@@ -648,6 +652,28 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame(['username' => 'users-token', 'password' => 'x-oauth-basic'], $io->getAuthentication('github.com'));
         self::assertSame([$url => [0, null, 'redirect to a URL with a user name or a password']], self::summarize($results));
         self::assertSame([$url], array_column($downloader->requests, 'url'));
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function redirectTargetsWithUserInfo(): iterable
+    {
+        yield 'a user and a password' => ['https://x:y@foo.github.com/z'];
+        yield 'a user alone' => ['https://x@foo.github.com/z'];
+        yield 'a user and a password in the query' => ['https://foo.github.com?x:y@z/'];
+        yield 'a user and a password in the fragment' => ['https://foo.github.com#x:y@z/'];
+    }
+
+    /** An `@` that Composer's pattern does not read as user info leaves the target a plain redirect. */
+    public function testARedirectToAUrlWithAnAtSignInItsQueryIsFollowed(): void
+    {
+        $url = 'https://api.github.com/repos/vendor/name';
+        $target = 'https://objects.example.com/p?a=b@c';
+        [$client, $downloader] = self::clientWith([$url => $target, $target => [200, 'moved']]);
+
+        $results = $client->fetchAll([$url], self::HEADERS);
+
+        self::assertSame([$url => [200, 'moved', null]], self::summarize($results));
+        self::assertSame([$url, $target], array_column($downloader->requests, 'url'));
     }
 
     /** A request that carries credentials blocks in add() without curl's redirect guard, so it must free its slot itself. */
