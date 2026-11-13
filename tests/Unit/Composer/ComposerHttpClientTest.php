@@ -10,9 +10,11 @@ use Composer\Downloader\TransportException;
 use Composer\IO\BufferIO;
 use Composer\IO\IOInterface;
 use Composer\IO\NullIO;
+use Composer\Pcre\Preg;
 use Composer\Util\Http\Response;
 use Composer\Util\HttpDownloader;
 use Composer\Util\Platform;
+use Composer\Util\Url;
 use Lockrot\Clock;
 use Lockrot\Composer\ComposerHttpClient;
 use Lockrot\Data\Http\HttpResult;
@@ -628,6 +630,26 @@ final class ComposerHttpClientTest extends TestCase
         self::assertSame([$first => $failure, $second => $failure], self::summarize($results));
     }
 
+    /**
+     * Composer's downloader stores the user info of a URL that it adds as the credential of that URL's
+     * origin, so a redirect target with user info would replace the user's token for the whole run.
+     */
+    public function testARedirectToAUrlWithUserInfoFailsAndKeepsTheStoredCredential(): void
+    {
+        $url = 'https://api.github.com/repos/vendor/name';
+        $io = new BufferIO();
+        $io->setAuthentication('github.com', 'users-token', 'x-oauth-basic');
+        $config = new Config(false, sys_get_temp_dir());
+        $downloader = new ScriptedDownloader($io, $config, [$url => 'https://x:y@foo.github.com/z', 'https://x:y@foo.github.com/z' => [200, 'moved']]);
+        $client = new ComposerHttpClient($downloader, $io, $config, Clock::fixed(self::NOW), null, true);
+
+        $results = $client->fetchAll([$url], self::HEADERS);
+
+        self::assertSame(['username' => 'users-token', 'password' => 'x-oauth-basic'], $io->getAuthentication('github.com'));
+        self::assertSame([$url => [0, null, 'redirect to a URL with a user name or a password']], self::summarize($results));
+        self::assertSame([$url], array_column($downloader->requests, 'url'));
+    }
+
     /** A request that carries credentials blocks in add() without curl's redirect guard, so it must free its slot itself. */
     public function testWithOneSlotARequestThatHoldsItsCredentialsFreesTheSlot(): void
     {
@@ -849,12 +871,16 @@ final class ScriptedDownloader extends HttpDownloader
     private array $script;
     /** @var list<array{0: non-empty-string, 1: Deferred<Response>, 2: array<string, mixed>}> */
     private array $pending = [];
+    private IOInterface $io;
+    private Config $config;
 
     /** @param array<string, array{0: int, 1: string}|\Throwable|string> $script */
     public function __construct(IOInterface $io, Config $config, array $script)
     {
         parent::__construct($io, $config);
         $this->script = $script;
+        $this->io = $io;
+        $this->config = $config;
     }
 
     /**
@@ -871,6 +897,10 @@ final class ScriptedDownloader extends HttpDownloader
             throw new \InvalidArgumentException('$url must not be an empty string');
         }
         $options = \is_array($options) ? $options : [];
+        // Composer's HttpDownloader::addJob() stores the user info of a URL as the credential of its origin.
+        if (Preg::isMatchStrictGroups('{^https?://([^:/]+):([^@/]+)@([^/]+)}i', $url, $match)) {
+            $this->io->setAuthentication(Url::getOrigin($this->config, $url), rawurldecode($match[1]), rawurldecode($match[2]));
+        }
         $this->requests[] = ['url' => $url, 'options' => $options];
         $this->depths[] = \count(debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS));
         /** @var Deferred<Response> $deferred */

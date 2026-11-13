@@ -250,6 +250,13 @@ final class ComposerHttpClient implements HttpClientInterface
 
                     return;
                 }
+                // Composer's downloader stores the user info of a URL that it adds as the credential of its origin for the rest of the run.
+                if (parse_url($target, \PHP_URL_USER) !== null) {
+                    $results[$url] = HttpResult::failure($url, 'redirect to a URL with a user name or a password', $this->clock->now());
+                    $done();
+
+                    return;
+                }
                 $options = self::options($this->timeoutSeconds(), self::withoutCredentials($headers));
                 if ($this->refusesRedirects) {
                     $options['prevent_url_access_callable'] = static fn (): bool => $budgetEnded($url);
