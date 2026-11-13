@@ -37,9 +37,27 @@ def checkout_steps(workflow):
     return re.findall(r'uses: actions/checkout@[^\n]*\n( +with: .+\n)?', workflow)
 
 
+FLOW_ENTRY = re.compile(r'\s*([\w-]+):\s*("(?:[^"\\]|\\.)*"|\'[^\']*\'|[^,"\'{}]*?)\s*(?:,|$)')
+
+
+def with_map(step):
+    """The entries of the step's inline `with:` map, a quoted value kept whole, or None when the map does not parse."""
+    found = re.fullmatch(r' +with: \{(.*)\}\n', step)
+    if found is None:
+        return None
+    inner, entries, at = found[1], {}, 0
+    while at < len(inner):
+        entry = FLOW_ENTRY.match(inner, at)
+        if entry is None or entry.end() == at:
+            return None
+        entries[entry[1]] = entry[2]
+        at = entry.end()
+    return entries
+
+
 def drops_the_token(step):
     """True when the step's inline `with:` map sets `persist-credentials` to the boolean false."""
-    return re.fullmatch(r' +with: \{(?:.*, )?persist-credentials: false(?:, .*)?\}\n', step) is not None
+    return (with_map(step) or {}).get('persist-credentials') == 'false'
 
 
 class FullCheckMatrixTest(unittest.TestCase):
@@ -95,9 +113,11 @@ class FullCheckMatrixTest(unittest.TestCase):
             '        with: {persist-credentials: falsey}\n'
             '      - uses: actions/checkout@abc # v7\n'
             '        with: {fetch-depth: 0, persist-credentials: false}\n'
+            '      - uses: actions/checkout@abc # v7\n'
+            '        with: {path: "example, persist-credentials: false, checkout"}\n'
         )
 
-        self.assertEqual([False, False, True], [drops_the_token(step) for step in checkout_steps(workflow)])
+        self.assertEqual([False, False, True, False], [drops_the_token(step) for step in checkout_steps(workflow)])
 
     def test_the_floor_job_runs_the_plugin_on_composer_2_9_and_asserts_the_refusal(self):
         ci = read('ci.yml')
