@@ -30,8 +30,8 @@ final class TextGolden
         Assert::assertFileExists($path, 'record it with LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit --filter '.$test);
         $expected = (string) file_get_contents($path);
         $command = 'rewrite it with LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit --filter '.$test.', then review the diff';
-        // A failing assertSame() diffs the whole text. On a large golden that diff takes several times
-        // as long as the test, and mutation testing pays it once per killed mutant.
+        // A failing assertSame() diffs the whole text. On a large golden that diff costs more than the
+        // test, and mutation testing pays it once per killed mutant.
         if ($expected !== $actual) {
             self::assertFirstDifference($path, explode("\n", $expected), explode("\n", $actual), $command);
         }
