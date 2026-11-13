@@ -380,6 +380,24 @@ class ACaseWhoseDesignedRowsMissItsNewestReleaseIsNotHydrated(unittest.TestCase)
         self.assertIsNone(project_fixtures.unhydrated(self.case('3.0.0', world=False)))
 
 
+class ACaseWhoseLockHoldsANameOutsideComposersNameRuleIsNotHydrated(unittest.TestCase):
+    """mc-joint-unsafe-holder‡: lockrot skips such a lock entry with the note package_name_invalid, so no finding names it."""
+    @staticmethod
+    def case(parent='acme/gz-client', world_name='acme/gz-client', holder='acme/gz-client'):
+        return {'run': {}, 'finding': {'package': 'guzzlehttp/guzzle', 'metadata': {'status': 'read'}, 'direct_dependents': [],
+                                       'next_step': {'moves_with': [{'package': holder}]}},
+                'parents': [{'package': parent}],
+                'solver_world': {'world': {'lock': {'packages': [{'name': 'guzzlehttp/guzzle'}, {'name': world_name}], 'packages-dev': []}}}}
+
+    def test_a_holder_name_outside_the_rule_is_not_hydrated(self):
+        self.assertEqual('package-name-invalid', project_fixtures.unhydrated(self.case('h/x;calc', 'h/x;calc', 'h/x;calc')))
+        self.assertEqual('package-name-invalid', project_fixtures.unhydrated(self.case(world_name='Acme/GZ')))
+        self.assertEqual('package-name-invalid', project_fixtures.unhydrated(self.case(holder='acme/gz client')))
+
+    def test_names_inside_the_rule_hydrate(self):
+        self.assertIsNone(project_fixtures.unhydrated(self.case('acme/gz--client', 'acme/gz.client', 'acme/gz_client')))
+
+
 class ADirectDependentThatDoesNotRequireThePackageKeepsTheModelsChain(unittest.TestCase):
     """capped-nette‡: a second direct dependent reaches the package through the chain, never by a shorter path."""
     FINDING = dict(ACaseWithoutBranchRowsHydratesFromItsRunReleases.FINDING, package='nette/schema', version='v1.3.2',

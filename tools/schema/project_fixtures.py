@@ -680,10 +680,26 @@ def recorded_checks(f, rows):
     return out
 
 
+# Composer's package-name rule as lockrot's LockFile::NAME holds it. lockrot skips a lock entry outside it (package_name_invalid).
+PACKAGE_NAME = re.compile(r'[a-z0-9](?:[_.-]?[a-z0-9]+)*/[a-z0-9](?:(?:[_.]|-{1,2})?[a-z0-9]+)*')
+
+
+def lock_names(case):
+    """The names that the case's lock holds: its package, its parents, its holders and its solver world's lock."""
+    f = case['finding']
+    world = ((case.get('solver_world') or {}).get('world') or {}).get('lock') or {}
+    return ([f.get('package')] + [p.get('package') for p in case.get('parents') or []]
+            + [m['package'] for m in (f.get('next_step') or {}).get('moves_with') or []]
+            + [e['name'] for key in ('packages', 'packages-dev') for e in world.get(key) or []])
+
+
 def unhydrated(case):
-    """Why the hydrator cannot rebuild the case, or None: an advisory lookup scope other than `all`, an accept-unchecked
-    entry of the project, registry dates on a package that no registry serves, a lower tag that a shared commit dates,
-    or a solver world whose designed branch rows lack the branch of its newest stable release."""
+    """Why the hydrator cannot rebuild the case, or None: a lock name outside Composer's name rule, an advisory lookup
+    scope other than `all`, an accept-unchecked entry of the project, registry dates on a package that no registry serves,
+    a lower tag that a shared commit dates, or a solver world whose designed branch rows lack the branch of its newest
+    stable release."""
+    if any(name is not None and not PACKAGE_NAME.fullmatch(name) for name in lock_names(case)):
+        return 'package-name-invalid'
     if (case['run'].get('advisory_lookup') or {}).get('scope', 'all') != 'all':
         return 'advisory-lookup'
     if any(c['reason'] == 'accepted_by_config' for c in case['finding'].get('checks_skipped') or []):
