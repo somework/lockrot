@@ -1205,6 +1205,37 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertSame([['foo/foo' => BasePackage::STABILITY_DEV], ['foo/foo' => 'abc']], [$root->getStabilityFlags(), $root->getReferences()], 'the running command keeps its root');
     }
 
+    /** The move check of the install-time block gets the root that the next command reads. */
+    public function testTheInstallTimeMoveCheckSolvesWithoutTheInlineFlagsOfAnUpdate(): void
+    {
+        $loader = new ArrayLoader();
+        $require = ['foo/foo' => '*', 'bar/bar' => '^1.0'];
+        $dir = $this->project();
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/app', 'require' => $require, 'extra' => ['lockrot' => ['target-php' => '8.4']]]));
+        $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
+        file_put_contents($dir.'/composer.lock', (string) json_encode(['packages' => [['name' => 'foo/foo', 'version' => 'dev-main'] + $packagist, ['name' => 'bar/bar', 'version' => '1.0.0'] + $packagist], 'packages-dev' => []]));
+        $root = $loader->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => $require], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $inline = ['foo/foo' => 'dev-main#abc'];
+        $root->setStabilityFlags(RootPackageLoader::extractStabilityFlags($inline, $root->getMinimumStability(), $root->getStabilityFlags()));
+        $root->setReferences(RootPackageLoader::extractReferences($inline, $root->getReferences()));
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$loader->load(['name' => 'bar/bar', 'version' => '1.0.0'])]), true, false, null, $root);
+        $event->getComposer()->getRepositoryManager()->addRepository(new RecordingComposerRepository([$loader->load(['name' => 'foo/foo', 'version' => 'dev-main']), $loader->load(['name' => 'bar/bar', 'version' => '1.0.0']), $loader->load(['name' => 'bar/bar', 'version' => '1.1.0'])]));
+        $checks = null;
+        $factory = $this->analyzerFactory();
+        $capturing = static function (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline, ?string $requirePhp, ?\Closure $moveChecks) use ($factory, &$checks): Analyzer {
+            $checks = $moveChecks;
+
+            return $factory($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline);
+        };
+
+        (new InstallTimeSummary($capturing, static fn (): float => 0.0))->onPreOperationsExec($event);
+
+        self::assertInstanceOf(\Closure::class, $checks, $io->getOutput());
+        self::assertSame(MoveCheck::REFUSED, $checks()->checker()->baseline()->check()->result());
+    }
+
     /**
      * `composer require foo/foo:dev-main#abc --dry-run` puts the link in the root and in no file.
      * The flag and the reference come from that link, as the written composer.json gives them.
