@@ -56,14 +56,17 @@ use PHPUnit\Framework\TestCase;
  * together, and the annotation level that the machine formats print.
  *
  * It covers nothing: Infection skips a mutant whose covering tests together outlast its timeout, and
- * this sweep pushes every line of the gate past it. GateTest and ReportTest kill those mutants.
+ * this sweep pushes every line of the gate past it. GateTest and ReportTest kill those mutants. The
+ * group schema-sweep gives this class to the schema-sweep process of ci.yml.
  *
  * @coversNothing
  *
  * @group covers-nothing
+ * @group schema-sweep
  */
 #[CoversNothing]
 #[Group('covers-nothing')]
+#[Group('schema-sweep')]
 final class GateAgreementTest extends TestCase
 {
     use ValidatesJsonSchemas;
