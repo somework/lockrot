@@ -51,9 +51,10 @@ final class PharSchemaStepTest extends TestCase
     {
         $step = self::step();
 
-        if (preg_match("/SPLIT: '?(\\w+)/", $step, $split) !== 1) {
+        if (preg_match("/SPLIT: (?|'([^']*)'|([^,}\\s]+))/", $step, $split) !== 1) {
             self::fail('the step names no split pattern in SPLIT');
         }
+        self::assertMatchesRegularExpression('/^\w+$/', $split[1], 'SPLIT must be a plain method name, not a wider pattern');
         self::assertStringContainsString('for part in filter exclude-filter', $step);
         self::assertStringContainsString('"--$part" "$SPLIT"', $step);
         self::assertStringContainsString('--fail-on-empty-test-suite', $step);
