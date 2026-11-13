@@ -442,7 +442,8 @@ final class MoveBuilder
             : [];
         $steps = $check !== null && $check->isRefused() ? [] : self::steps($kind, $subject, $constraint, $phpCheck, $latest, $version, $check, $checks, $holders);
 
-        return array_merge($steps, $whyNot);
+        // Each step before the last writes composer.json with `--no-update`, so a move prints every step or none.
+        return array_merge(self::runnable($steps) === $steps ? $steps : [], $whyNot);
     }
 
     /**

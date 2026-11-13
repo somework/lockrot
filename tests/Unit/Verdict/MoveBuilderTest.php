@@ -539,6 +539,28 @@ final class MoveBuilderTest extends TestCase
         );
     }
 
+    /**
+     * A lock can name a holder with a character that no step may quote. Its update step drops out,
+     * and the `--no-update` step must not stay alone: it changes composer.json and installs nothing.
+     */
+    public function testAJointMoveWhoseHolderNameNoStepMayQuoteKeepsNoLoneRequireStep(): void
+    {
+        $checks = [
+            'require a/b ^2.0 ' => [
+                'result' => 'refused', 'form' => null, 'reason' => null,
+                'holds' => [['source' => 'package', 'package' => 'h/x;calc', 'version' => '1.0.0', 'link' => 'require', 'target' => null, 'constraint' => '^1.0', 'holder' => null]],
+            ],
+            'joint require a/b ^2.0 with h/x;calc' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => ['a/b' => '2.0.0', 'h/x;calc' => '2.1.0'], 'holds' => []],
+        ];
+        [$row, $context] = self::checked($checks, true, null, ['a/b' => '^1.0']);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+
+        self::assertSame([['package' => 'h/x;calc', 'installed_version' => '1.0.0', 'version' => '2.1.0']], $move->movesWith());
+        self::assertSame([], $move->commands());
+    }
+
     public function testAnUpdateThatAJointRequestResolvesNamesItsHoldersInTheSameStep(): void
     {
         [$row, $context] = self::checked(self::refusedThenJoint('update a/b ^2.0.0 '), false);
