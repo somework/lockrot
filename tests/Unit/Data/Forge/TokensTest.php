@@ -207,6 +207,29 @@ final class TokensTest extends TestCase
     }
 
     /** @return iterable<string, array{string, string}> */
+    public static function issuersWithWhitespaceOrNoScheme(): iterable
+    {
+        yield 'a leading space before the public host' => [' https://github.com', Tokens::READ_TWO_WAYS];
+        yield 'a trailing newline after a bare public host' => ["github.com\n", Tokens::READ_TWO_WAYS];
+        yield 'a trailing space after another host' => ["https://ghe.corp \t", 'ghe.corp'];
+        yield 'a scheme-relative host' => ['//ghe.corp', '//ghe.corp'];
+        yield 'a scheme-relative host with a path' => ['//ghe.corp/api', '//ghe.corp'];
+        yield 'a scheme-relative public host' => ['//github.com', '//github.com'];
+    }
+
+    /**
+     * @dataProvider issuersWithWhitespaceOrNoScheme
+     */
+    #[DataProvider('issuersWithWhitespaceOrNoScheme')]
+    public function testAnIssuerWithWhitespaceOrNoSchemeIsWithheldUnderANameThatReadsTrue(string $issuer, string $shown): void
+    {
+        $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => $issuer], null);
+
+        self::assertNull($tokens->github());
+        self::assertSame(['GITHUB_TOKEN' => $shown], $tokens->withheld());
+    }
+
+    /** @return iterable<string, array{string, string}> */
     public static function issuersWithThePublicHostAfterAnAt(): iterable
     {
         yield 'in the path' => ['GITHUB_SERVER_URL', 'https://ghe.corp/@github.com'];

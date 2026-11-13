@@ -108,6 +108,11 @@ final class Tokens
             if ($url === null) {
                 continue;
             }
+            $trimmed = trim($url);
+            if ($trimmed !== $url) {
+                // A WHATWG parser strips the whitespace and parse_url() does not, so the host reads two ways.
+                return self::issuerRefusal([$trimmed], $publicHost) ?? self::READ_TWO_WAYS;
+            }
             $bare = self::withoutUserinfo($url);
             $host = self::host($bare);
             // $bare also cuts at an `@` in a path, a query or a fragment, so the host of $url
@@ -141,8 +146,11 @@ final class Tokens
     {
         $scheme = self::schemeOf($url);
         $rest = substr($url, \strlen($scheme));
+        // A scheme-relative value (`//host/path`) keeps its slashes and shows its host.
+        $lead = $scheme === '' && strncmp($rest, '//', 2) === 0 ? '//' : '';
+        $rest = substr($rest, \strlen($lead));
 
-        return $scheme.substr($rest, 0, strcspn($rest, '/?#'));
+        return $scheme.$lead.substr($rest, 0, strcspn($rest, '/?#'));
     }
 
     private static function schemeOf(string $url): string
