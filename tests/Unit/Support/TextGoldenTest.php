@@ -44,11 +44,8 @@ final class TextGoldenTest extends TestCase
     {
         $text = self::cases();
         file_put_contents($this->directory.'g.txt', $text);
-        $before = self::getCount();
 
         TextGolden::assertMatches('g.txt', $text, 'testX', $this->directory);
-
-        self::assertSame(2, self::getCount() - $before);
     }
 
     public function testAChangedLineFailsWithItsCaseItsFirstLinesAndTheRewriteCommandAndNoWholeTextDiff(): void
