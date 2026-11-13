@@ -64,6 +64,10 @@ The block does not show the direct requirements that reach a transitive package,
 requirement, the graded packages it pulls in (S7). `composer lockrot` shows both
 ([transitive exposure](verdicts.md#transitive-exposure)).
 
+The check of each move reads the stability flags and the `#<commit>` references of
+`composer.json`, as the next Composer command reads them. A flag or a reference that
+`composer update <package>:<constraint>` or `--with` gives one command does not count.
+
 An `extra.lockrot` key that lockrot does not read adds one `lockrot: unknown key …` line above the
 block, outside its ten, whether or not anything is graded
 ([unknown keys](configuration.md#unknown-keys)). The line prints whenever the install-time check
@@ -222,6 +226,10 @@ lockrot reads the lock through the locker of Composer. On a plain install, the l
 updated lock in memory, and lockrot reads that lock. So a package from `composer require --dev … --dry-run` keeps its `packages-dev` membership.
 With `include-dev` on, its score is halved for `dev`, as in `composer lockrot`. With `include-dev`
 off, the check skips it.
+
+`composer require … --dry-run` writes no `composer.json`. lockrot reads the `require` and
+`require-dev` that the command would write. So the new package is a direct requirement, as after
+the `composer require` that writes it.
 
 ## Related
 

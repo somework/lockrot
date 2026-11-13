@@ -251,14 +251,14 @@ final class InstallTimeSummaryTest extends TestCase
         return (new ArrayLoader())->load($entry);
     }
 
-    private function event(BufferIO $io, Transaction $transaction, bool $executeOperations = true, bool $devMode = false, ?Locker $locker = null): InstallerEvent
+    private function event(BufferIO $io, Transaction $transaction, bool $executeOperations = true, bool $devMode = false, ?Locker $locker = null, ?RootPackageInterface $root = null): InstallerEvent
     {
         $server = self::$server;
         self::assertNotNull($server);
         $config = $server->config();
         $composer = new Composer();
         $composer->setConfig($config);
-        $composer->setPackage(new RootPackage('__root__', '1.0.0.0', '1.0.0'));
+        $composer->setPackage($root ?? new RootPackage('__root__', '1.0.0.0', '1.0.0'));
         $composer->setRepositoryManager(RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config)));
         $composer->setLocker($locker ?? self::locker($io, $config));
 
@@ -1217,6 +1217,51 @@ final class InstallTimeSummaryTest extends TestCase
         $written = InstallTimeSummary::rootAsWritten($root);
 
         self::assertSame([['foo/foo' => BasePackage::STABILITY_DEV], ['foo/foo' => 'abc']], [$written->getStabilityFlags(), $written->getReferences()]);
+    }
+
+    /**
+     * `composer require phpzip/phpzip --dry-run` adds the requirement to the root in memory and
+     * writes no composer.json. The block reads the manifest that the command would write, so it
+     * equals the block of the `composer require` that writes it.
+     */
+    public function testARequireDryRunJudgesTheNewRequirementAsTheWrittenManifestDoes(): void
+    {
+        $manifest = ['name' => 'lockrot/install-time-test', 'require' => ['vendor/direct-req' => '1.0.0'], 'extra' => ['lockrot' => ['target-php' => '8.4']]];
+        $written = $manifest;
+        $written['require']['phpzip/phpzip'] = '2.0.8';
+        $direct = ['name' => 'vendor/direct-req', 'version' => '1.0.0', 'require' => ['php' => '>=5.3.0'], 'type' => 'library', 'notification-url' => 'https://packagist.org/downloads/', 'time' => '2026-01-01T00:00:00+00:00'];
+        $root = (new ArrayLoader())->load(['name' => 'lockrot/install-time-test', 'version' => '1.0.0', 'require' => $written['require']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $outputs = [];
+        foreach ([[$written, true], [$manifest, false]] as [$json, $executeOperations]) {
+            $dir = $this->project([], [$direct, self::PHPZIP]);
+            $contents = (string) json_encode($json);
+            file_put_contents($dir.'/composer.json', $contents);
+            // The lock of the update carries the hash of the composer.json that Composer's Locker holds.
+            file_put_contents($dir.'/composer.lock', (string) json_encode(['content-hash' => Locker::getContentHash($contents), 'packages' => [$direct, self::PHPZIP], 'packages-dev' => []]));
+            $io = new BufferIO();
+            $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]), $executeOperations, false, null, $root);
+
+            (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+            $outputs[] = $io->getOutput();
+        }
+
+        self::assertStringContainsString('phpzip/phpzip 2.0.8', $outputs[0]);
+        self::assertSame($outputs[0], $outputs[1]);
+    }
+
+    /** A dry run whose root holds the manifest's links reads composer.json as written, its lock hash included. */
+    public function testADryRunWithTheLinksOfTheManifestStillComparesTheLockHash(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'lockrot/install-time-test', 'version' => '1.0.0', 'require' => ['phpzip/phpzip' => '2.0.8']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $this->project();
+        $io = new BufferIO();
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]), false, false, null, $root));
+
+        self::assertStringContainsString('note: lock: the lock file does not match composer.json', $io->getOutput());
     }
 
     public function testInstallTimeBudgetComesFromConfig(): void

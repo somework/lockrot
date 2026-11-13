@@ -25,6 +25,7 @@ use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Exception\InstallBlockedException;
+use Lockrot\Json\JsonReader;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
@@ -109,6 +110,10 @@ final class InstallTimeSummary
         $composerFile = Factory::getComposerFile();
         $project = ProjectConfig::fromFile($composerFile);
         $composer = $event->getComposer();
+        // RequireCommand::doUpdate() adds the requirement of a dry run to the root in memory only.
+        if (!$event->isExecutingOperations() && $project->isRead()) {
+            $project = self::withRootRequirements($project, $composerFile, $composer->getPackage());
+        }
         $config = $composer->getConfig();
         $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), $env, [], \PHP_VERSION, MoveCheckers::configuredPhp($config));
         if ($lockrot->isDisabled() || !$lockrot->installTime()) {
@@ -205,6 +210,35 @@ final class InstallTimeSummary
         $written->setReferences($references);
 
         return $written;
+    }
+
+    /**
+     * The manifest with the root's `require` and `require-dev`, as the run would write it. A name
+     * that the manifest lists keeps its spelling. When the root holds the manifest's links, the
+     * project stays as read, with the contents that the lock hash is compared against.
+     */
+    private static function withRootRequirements(ProjectConfig $project, string $composerFile, RootPackageInterface $root): ProjectConfig
+    {
+        $json = JsonReader::readObject($composerFile);
+        $changed = false;
+        foreach ([ProjectConfig::REQUIRE => $root->getRequires(), ProjectConfig::REQUIRE_DEV => $root->getDevRequires()] as $section => $links) {
+            $listed = \is_array($json[$section] ?? null) ? $json[$section] : [];
+            $written = [];
+            foreach ($listed as $name => $constraint) {
+                $link = $links[strtolower((string) $name)] ?? null;
+                if ($link !== null) {
+                    $written[$name] = $link->getConstraint()->getPrettyString();
+                    unset($links[strtolower((string) $name)]);
+                }
+            }
+            foreach ($links as $name => $link) {
+                $written[$name] = $link->getConstraint()->getPrettyString();
+            }
+            $changed = $changed || $written !== $listed;
+            $json[$section] = $written;
+        }
+
+        return $changed ? ProjectConfig::fromArray($json) : $project;
     }
 
     /**
