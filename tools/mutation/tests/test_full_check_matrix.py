@@ -34,7 +34,12 @@ def job_names(workflow):
 
 def checkout_steps(workflow):
     """The `with:` line that follows each checkout step, or an empty string."""
-    return re.findall(r'uses: actions/checkout@\S+ # \S+\n( +with: .+\n)?', workflow)
+    return re.findall(r'uses: actions/checkout@[^\n]*\n( +with: .+\n)?', workflow)
+
+
+def drops_the_token(step):
+    """True when the step's inline `with:` map sets `persist-credentials` to the boolean false."""
+    return re.fullmatch(r' +with: \{(?:.*, )?persist-credentials: false(?:, .*)?\}\n', step) is not None
 
 
 class FullCheckMatrixTest(unittest.TestCase):
@@ -81,7 +86,18 @@ class FullCheckMatrixTest(unittest.TestCase):
         self.assertNotEqual([], steps)
         for workflow, step in steps:
             with self.subTest(workflow=workflow, step=step):
-                self.assertIn('persist-credentials: false', step)
+                self.assertTrue(drops_the_token(step))
+
+    def test_a_checkout_without_a_version_comment_or_with_the_token_kept_is_seen(self):
+        workflow = (
+            '      - uses: actions/checkout@abc\n'
+            '      - uses: actions/checkout@abc # v7\n'
+            '        with: {persist-credentials: falsey}\n'
+            '      - uses: actions/checkout@abc # v7\n'
+            '        with: {fetch-depth: 0, persist-credentials: false}\n'
+        )
+
+        self.assertEqual([False, False, True], [drops_the_token(step) for step in checkout_steps(workflow)])
 
     def test_the_floor_job_runs_the_plugin_on_composer_2_9_and_asserts_the_refusal(self):
         ci = read('ci.yml')
