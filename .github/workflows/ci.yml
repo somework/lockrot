@@ -109,8 +109,10 @@ jobs:
             echo "=== paratest files: exit $status"
             if [ "$status" -ne 0 ]; then failed=1; fi
             status=0
+            # ParaTest 6 keeps a test that matches --group or misses --exclude-group, so the run passes
+            # only --group, and the configuration excludes e2e, network and sweep.
             vendor/bin/paratest -c phpunit-ci-rows.xml -p "$PARATEST_PROCESSES" --functional --max-batch-size "$PARATEST_BATCH" \
-              --group "$rows" --exclude-group e2e,network,sweep --log-junit build/junit-rows.xml || status=$?
+              --group "$rows" --log-junit build/junit-rows.xml || status=$?
             echo "=== paratest rows: exit $status"
             if [ "$status" -ne 0 ]; then failed=1; fi
           else
