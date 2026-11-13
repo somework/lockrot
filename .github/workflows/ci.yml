@@ -316,7 +316,8 @@ jobs:
           - {name: solver, filter: 'src/Solver', min_msi: 98}
           - {name: composer and self-update, filter: 'src/Composer src/Config src/SelfUpdate', min_msi: 96}
           - {name: repository data, filter: 'src/Data/Repository src/Data/Advisory', min_msi: 96}
-          - {name: data and the rest, filter: 'src/Data/Forge src/Data/Http src/Data/Cache src/Data/Php src/Data/Abandoned src/Graph src/Baseline src/Filesystem src/Allowlist src/Lock src/Json src/Exception src/Version.php src/Clock.php src/Deadline.php src/AsciiCase.php', min_msi: 96}
+          - {name: lock and graph, filter: 'src/Lock src/Graph', min_msi: 96}
+          - {name: data and the rest, filter: 'src/Data/Forge src/Data/Http src/Data/Cache src/Data/Php src/Data/Abandoned src/Baseline src/Filesystem src/Allowlist src/Json src/Exception src/Version.php src/Clock.php src/Deadline.php src/AsciiCase.php', min_msi: 96}
     name: mutation (${{ matrix.shard.name }})
     steps:
       # A pull request is diffed against its base branch: it needs the history down to the merge base.
