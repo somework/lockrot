@@ -79,7 +79,7 @@ use PHPUnit\Framework\TestCase;
  * It covers nothing: Infection skips a mutant whose covering tests together outlast its timeout, and
  * the report-2 validations of this sweep push every line of the analyzer and the writers past it.
  * The unit tests of the writers and ScoreFactsConsistencyTest kill those mutants.
- * The group schema-sweep puts this class in the second covers-nothing process of ci.yml.
+ * The group schema-sweep gives this class to the schema-sweep process of ci.yml.
  *
  * @coversNothing
  *

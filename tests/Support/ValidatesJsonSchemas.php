@@ -19,8 +19,8 @@ use Lockrot\Json\Schemas;
 trait ValidatesJsonSchemas
 {
     /**
-     * The JSON of each schema file that this test process read, and of each strict twin that it
-     * built. Strings only: each call decodes its own schema object.
+     * The JSON of each schema file that the class read in this test process, and of each strict twin
+     * that it built. Strings only: each call decodes its own schema object.
      *
      * @var array<string, string> by path
      */

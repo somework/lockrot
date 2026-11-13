@@ -8,12 +8,19 @@ use JsonSchema\Validator;
 use Lockrot\Json\KnownValues;
 use Lockrot\Json\Schemas;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
- * A test process reads each schema file and builds each strict twin once. Every call still gets a
- * schema decoded afresh, because the validator writes into the schema that it is given.
+ * Each class that uses the trait reads each schema file and builds each strict twin once per test
+ * process. Every call still gets a schema decoded afresh, because the validator writes into the
+ * schema that it is given.
+ *
+ * It covers nothing: both sides of each comparison call KnownValues::closed(), so it kills no mutant.
+ *
+ * @coversNothing
  */
+#[CoversNothing]
 final class ValidatesJsonSchemasTest extends TestCase
 {
     use ValidatesJsonSchemas;
