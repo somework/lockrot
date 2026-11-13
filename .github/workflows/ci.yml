@@ -304,12 +304,14 @@ jobs:
       fail-fast: false
       matrix:
         shard:
-          - {name: moves, filter: 'src/Verdict/Move.php src/Verdict/MoveBuilder.php src/Verdict/MoveContext.php src/Verdict/MoveText.php src/Verdict/ListWords.php src/Verdict/MaintenanceMove.php', min_msi: 98}
+          - {name: moves, filter: 'src/Verdict/Move.php src/Verdict/MoveBuilder.php src/Verdict/MoveText.php src/Verdict/ListWords.php', min_msi: 98}
           - {name: findings, filter: 'src/Verdict/Finding.php src/Verdict/FindingDetails.php src/Verdict/GradedPackage.php src/Verdict/NextStep.php src/Verdict/Score.php src/Verdict/SecurityPartial.php src/Verdict/SecurityStanding.php', min_msi: 98}
-          - {name: verdicts, filter: 'src/Verdict/Age.php src/Verdict/CommandArgument.php src/Verdict/FailOn.php src/Verdict/FailOnValue.php src/Verdict/FlagSentence.php src/Verdict/FlagSet.php src/Verdict/Latest.php src/Verdict/MoveChecks.php src/Verdict/MoveDraft.php src/Verdict/MoveFact.php src/Verdict/MoveSubject.php src/Verdict/Moves.php src/Verdict/Replacement.php src/Verdict/ScoreModel.php src/Verdict/ShellCommand.php src/Verdict/ThroughCheck.php src/Verdict/ThroughEntry.php src/Verdict/Verdict.php', min_msi: 98}
+          - {name: verdicts, filter: 'src/Verdict/Age.php src/Verdict/CommandArgument.php src/Verdict/FailOn.php src/Verdict/FailOnValue.php src/Verdict/FlagSentence.php src/Verdict/FlagSet.php src/Verdict/Latest.php src/Verdict/MaintenanceMove.php src/Verdict/MoveChecks.php src/Verdict/MoveContext.php src/Verdict/MoveDraft.php src/Verdict/MoveFact.php src/Verdict/MoveSubject.php src/Verdict/Moves.php src/Verdict/Replacement.php src/Verdict/ScoreModel.php src/Verdict/ShellCommand.php src/Verdict/ThroughCheck.php src/Verdict/ThroughEntry.php src/Verdict/Verdict.php', min_msi: 98}
           - {name: score, filter: 'src/Score', min_msi: 98}
-          - {name: output and security, filter: 'src/Output src/Html src/Explain src/Security', min_msi: 98}
-          - {name: signals and analyzer, filter: 'src/Signal src/Analyzer', min_msi: 98}
+          - {name: text output, filter: 'src/Output/AgeText.php src/Output/CauseWords.php src/Output/ConsoleMarkup.php src/Output/ExplainFormatter.php src/Output/FailedValue.php src/Output/FindingBlock.php src/Output/MarkedFact.php src/Output/RunFooter.php src/Output/RunGateText.php src/Output/TableFormatter.php src/Output/TerminalText.php src/Output/TerminalWidth.php src/Explain', min_msi: 98}
+          - {name: formats and security, filter: 'src/Output/FormatContext.php src/Output/FormatterInterface.php src/Output/Formatters.php src/Output/GithubFormatter.php src/Output/GitlabFormatter.php src/Output/HtmlFormatter.php src/Output/InstallSummaryFormatter.php src/Output/JsonFormatter.php src/Output/MarkdownFormatter.php src/Output/RecordMarks.php src/Output/ReportTarget.php src/Output/ReportTargets.php src/Output/SarifFormatter.php src/Output/SarifRecords.php src/Html src/Security', min_msi: 98}
+          - {name: signals, filter: 'src/Signal', min_msi: 98}
+          - {name: analyzer, filter: 'src/Analyzer', min_msi: 98}
           - {name: solver, filter: 'src/Solver', min_msi: 98}
           - {name: composer and self-update, filter: 'src/Composer src/Config src/SelfUpdate', min_msi: 96}
           - {name: repository data, filter: 'src/Data/Repository', min_msi: 96}
@@ -531,9 +533,24 @@ jobs:
       - run: build/build-phar.sh
       - run: LOCKROT_E2E=1 vendor/bin/phpunit --group e2e --filter PharTest
       # The PHAR validates extra.lockrot and the baseline with the justinrainbow/json-schema of
-      # build/phar/composer.lock, which the tests rows do not install.
+      # build/phar/composer.lock, which the tests rows do not install. This job keeps Xdebug loaded
+      # for PharTest, which checks the archive's restart without it, so this step turns Xdebug off.
+      # The test that SPLIT names validates the whole contract bundle, so it runs in a second
+      # process beside the rest of the class. Measurements: https://github.com/somework/lockrot/pull/211
       - name: The schema fixtures validate with the PHAR's justinrainbow/json-schema
-        run: LOCKROT_JR_VENDOR=build/phar/vendor vendor/bin/phpunit --bootstrap tests/json-schema-bootstrap.php tests/Integration/JsonSchemaConformanceTest.php
+        env: {LOCKROT_JR_VENDOR: build/phar/vendor, XDEBUG_MODE: 'off', SPLIT: testEveryRecordedContractDocumentValidatesAgainstItsSchemaAndItsStrictTwin}
+        run: |
+          pids=()
+          for part in filter exclude-filter; do
+            (
+              set -o pipefail
+              vendor/bin/phpunit --bootstrap tests/json-schema-bootstrap.php --fail-on-empty-test-suite "--$part" "$SPLIT" tests/Integration/JsonSchemaConformanceTest.php 2>&1 | sed -u "s/^/[$part] /"
+            ) &
+            pids+=($!)
+          done
+          failed=0
+          for pid in "${pids[@]}"; do wait "$pid" || failed=1; done
+          exit "$failed"
       # This step runs the release workflow's signing helper with a throw-away key: wrap and unwrap
       # must round-trip, openssl must accept the unwrapped bytes, and the archive's verifier must
       # refuse a signature by a key that is not the release key.
