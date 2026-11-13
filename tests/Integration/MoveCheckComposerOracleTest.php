@@ -106,7 +106,7 @@ final class MoveCheckComposerOracleTest extends TestCase
                 if (JsonPath::has($case, ['solver_world', 'world', 'config', 'lock']) && JsonPath::boolAt($case, ['solver_world', 'world', 'config', 'lock']) === false) {
                     continue;
                 }
-                // Composer refuses such a name, so the world carries the answers of another world and the CLI gives none to compare.
+                // mc-joint-unsafe-holder‡: Composer refuses its holder name `h/x;calc`, so the CLI gives no answer to compare.
                 if (self::locksANameThatComposerRefuses($case['solver_world'])) {
                     continue;
                 }
