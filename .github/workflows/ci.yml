@@ -82,7 +82,8 @@ jobs:
           }
           # Processes side by side shorten the row. Each writes its own log, and the step checks every exit code.
           # A runtime-php test reads the PHP that runs it, so a row without covers-nothing still runs it.
-          # On a covers_nothing row, schema-sweep holds the longest covers-nothing class and gets a process of its own.
+          # On a covers_nothing row, a second process runs the covers-nothing classes in the group schema-sweep.
+          # Move a class between the two processes by the class times in the step summary, so that both end together.
           # Keep three processes: a fourth CPU-bound process slows every process on the runner.
           # https://github.com/somework/lockrot/pull/208
           names=(default)

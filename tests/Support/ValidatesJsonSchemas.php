@@ -19,6 +19,17 @@ use Lockrot\Json\Schemas;
 trait ValidatesJsonSchemas
 {
     /**
+     * The JSON of each schema file that the class read in this test process, and of each strict twin
+     * that it built. Strings only: each call decodes its own schema object.
+     *
+     * @var array<string, string> by path
+     */
+    private static array $schemaFiles = [];
+
+    /** @var array<string, string> by path */
+    private static array $strictTwins = [];
+
+    /**
      * A document that the strict twin accepts, the published schema accepts too
      * ({@see \Lockrot\Tests\Integration\StrictTwinNarrowsTest}), so a strict call checks both.
      *
@@ -27,32 +38,49 @@ trait ValidatesJsonSchemas
      */
     private function assertValid(string $document, string $json, string $what, bool $strict = false, ?int $number = null): void
     {
-        $this->assertValidAgainst(self::schema($document, $json, $number), $json, $what, $strict);
+        self::assertNoErrors($this->errors($document, $json, $strict, $number), $what, $strict);
     }
 
     /** As {@see assertValid()}, against a schema already loaded: an older release's copy, or a part of one. */
     private function assertValidAgainst(object $schema, string $json, string $what, bool $strict = false): void
     {
-        $errors = $this->errorsAgainst($schema, $json, $strict);
+        self::assertNoErrors($this->errorsAgainst($schema, $json, $strict), $what, $strict);
+    }
 
+    /** @param list<string> $errors */
+    private static function assertNoErrors(array $errors, string $what, bool $strict): void
+    {
         self::assertSame([], $errors, $what.($strict ? ' (strict twin)' : '').': '.json_encode($errors, \JSON_PRETTY_PRINT));
     }
 
     /** @return list<string> */
     private function errors(string $document, string $json, bool $strict, ?int $number = null): array
     {
-        return $this->errorsAgainst(self::schema($document, $json, $number), $json, $strict);
+        return $this->errorsAt(self::schemaFileFor($document, $json, $number), $json, $strict);
     }
 
-    /** @return list<string> each as `<property>: <message>`, `(root)` for the document itself */
+    /** @return list<string> as {@see errorsOf()} */
     private function errorsAgainst(object $schema, string $json, bool $strict): array
     {
-        $data = json_decode($json);
-        self::assertNotNull($data, 'valid JSON');
         if ($strict) {
             self::assertInstanceOf(\stdClass::class, $schema);
             $schema = self::strictTwin(KnownValues::closed($schema));
         }
+
+        return $this->errorsOf($schema, $json);
+    }
+
+    /** @return list<string> as {@see errorsOf()} */
+    private function errorsAt(string $path, string $json, bool $strict): array
+    {
+        return $this->errorsOf($strict ? self::strictSchemaAt($path) : self::schemaAt($path), $json);
+    }
+
+    /** @return list<string> each as `<property>: <message>`, `(root)` for the document itself */
+    private function errorsOf(object $schema, string $json): array
+    {
+        $data = json_decode($json);
+        self::assertNotNull($data, 'valid JSON');
 
         $validator = new Validator();
         $validator->validate($data, $schema);
@@ -76,14 +104,9 @@ trait ValidatesJsonSchemas
     {
         [$document, $number] = NegativeFixtures::documentOf(basename(\dirname($path)));
         [$json, $strict, $error] = NegativeFixtures::read($path);
-        $errors = $this->errorsAgainst(self::schemaAt(Schemas::path($document, $number)), $json, $strict);
+        $errors = $this->errorsAt(Schemas::path($document, $number), $json, $strict);
 
         return [NegativeFixtures::rejects($errors, $error), $strict, $errors];
-    }
-
-    private static function schema(string $document, string $json, ?int $number = null): object
-    {
-        return self::schemaAt(self::schemaFileFor($document, $json, $number));
     }
 
     /**
@@ -128,10 +151,40 @@ trait ValidatesJsonSchemas
     /** A schema file, decoded afresh on every call: the validator is free to annotate what it is given. */
     private static function schemaAt(string $path): object
     {
-        $decoded = json_decode((string) file_get_contents($path));
+        $decoded = json_decode(self::schemaJson($path));
         self::assertIsObject($decoded, $path);
 
         return $decoded;
+    }
+
+    /**
+     * The strict twin of a schema file, decoded afresh on every call as {@see schemaAt()} is. A call
+     * makes the assertions of {@see schemaAt()} and of the strict branch of {@see errorsAgainst()},
+     * so a twin from the cache counts the same assertions as a twin built from the file.
+     */
+    private static function strictSchemaAt(string $path): \stdClass
+    {
+        if (!isset(self::$strictTwins[$path])) {
+            $schema = json_decode(self::schemaJson($path));
+            if (!$schema instanceof \stdClass) {
+                throw new \UnexpectedValueException($path.' is not a JSON object');
+            }
+            self::$strictTwins[$path] = json_encode(self::strictTwin(KnownValues::closed($schema)), \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
+        }
+        $decoded = json_decode(self::$strictTwins[$path]);
+        self::assertIsObject($decoded, $path);
+        self::assertInstanceOf(\stdClass::class, $decoded);
+
+        return $decoded;
+    }
+
+    private static function schemaJson(string $path): string
+    {
+        if (!isset(self::$schemaFiles[$path])) {
+            self::$schemaFiles[$path] = (string) file_get_contents($path);
+        }
+
+        return self::$schemaFiles[$path];
     }
 
     /**
