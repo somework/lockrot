@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Tests\Support\Contract\ContractBundle;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\VersionMask;
+use Lockrot\Verdict\ScoreModel;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -104,6 +107,25 @@ final class ContractBundleIsCurrentTest extends TestCase
         foreach ($records as $name => $path) {
             self::assertSame($hash, JsonPath::stringAt(JsonPath::decodeFile($path), ['page_goldens', 'sha256']), $name.' names other page goldens than the committed page-goldens.json');
         }
+    }
+
+    /**
+     * The byte comparison skips provenance.json, so a change to an input, a grammar number or the
+     * version mask that leaves the output as it was needs this pin to show a stale record.
+     */
+    public function testTheProvenanceNamesTheCurrentInputsGrammarsAndVersionMask(): void
+    {
+        $fixtures = \dirname(ContractBundle::DIRECTORY).'/';
+        $inputs = [];
+        foreach (['flags/cases.json', 'flags/composite.json', 'flags/provenance.json'] as $input) {
+            $inputs['tests/fixtures/'.$input] = hash_file('sha256', $fixtures.$input);
+        }
+        $provenance = JsonPath::decodeFile(ContractBundle::DIRECTORY.'/provenance.json');
+
+        self::assertSame($inputs, JsonPath::arrayAt($provenance, ['inputs']), 're-record with tools/report/record: an input changed');
+        self::assertSame(RunSettings::TEXT_GRAMMAR, JsonPath::intAt($provenance, ['text_grammar']), 're-record with tools/report/record');
+        self::assertSame(ScoreModel::SCORE_TEXT_GRAMMAR, JsonPath::intAt($provenance, ['score_text_grammar']), 're-record with tools/report/record');
+        self::assertSame(['paths' => VersionMask::PATHS, 'value' => VersionMask::VALUE], JsonPath::arrayAt($provenance, ['version_mask']), 're-record with tools/report/record');
     }
 
     public function testTheBundleHashIsTheHashOfTheCommittedFiles(): void
