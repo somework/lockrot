@@ -109,9 +109,11 @@ of a request is the time left of the [budget](install-time.md#time-budget), at l
   name the public host. lockrot reads only these variables. A host that only a `gh` or `glab`
   configuration file names is not seen. In that case, set the issuer variable of that host, or pass
   the token as `LOCKROT_GITHUB_TOKEN` or `LOCKROT_GITLAB_TOKEN`. An issuer URL that two URL parsers
-  read as different hosts names no public host: it holds a backslash in its authority, or an `@` in
-  the path, query or fragment. When the host after the last `@` is the public host, `-v` names "an
-  issuer that URL parsers read two ways". Else `-v` names that host.
+  read as different hosts names no public host. Such a URL holds a backslash in its authority, or
+  an `@` in the path, query or fragment. A control character or a space at either end, or a tab or
+  a newline in it, has the same effect. When the public host is the host after the last `@`, or the
+  host without those characters, `-v` names "an issuer that URL parsers read two ways". Else `-v`
+  names that host.
 
 - lockrot cannot keep Composer's own credentials from a host. A setup step that writes the
   runner's token into Composer's `github-oauth` for github.com makes Composer send it to

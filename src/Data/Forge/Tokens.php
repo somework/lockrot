@@ -147,7 +147,6 @@ final class Tokens
     {
         $scheme = self::schemeOf($url);
         $rest = substr($url, \strlen($scheme));
-        // A scheme-relative value (`//host/path`) keeps its slashes and shows its host.
         $lead = $scheme === '' && strncmp($rest, '//', 2) === 0 ? '//' : '';
         $rest = substr($rest, \strlen($lead));
 
