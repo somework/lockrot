@@ -108,10 +108,11 @@ final class Tokens
             if ($url === null) {
                 continue;
             }
-            $trimmed = trim($url);
-            if ($trimmed !== $url) {
-                // A WHATWG parser strips the whitespace and parse_url() does not, so the host reads two ways.
-                return self::issuerRefusal([$trimmed], $publicHost) ?? self::READ_TWO_WAYS;
+            // A WHATWG parser strips C0 controls and spaces around the value and every tab or newline
+            // in it, and parse_url() does not: https://url.spec.whatwg.org/#concept-basic-url-parser
+            $whatwg = str_replace(["\t", "\n", "\r"], '', trim($url, "\x00..\x20"));
+            if ($whatwg !== $url) {
+                return $whatwg === '' ? self::READ_TWO_WAYS : (self::issuerRefusal([$whatwg], $publicHost) ?? self::READ_TWO_WAYS);
             }
             $bare = self::withoutUserinfo($url);
             $host = self::host($bare);

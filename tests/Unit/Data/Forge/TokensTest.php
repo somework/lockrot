@@ -215,6 +215,10 @@ final class TokensTest extends TestCase
         yield 'a scheme-relative host' => ['//ghe.corp', '//ghe.corp'];
         yield 'a scheme-relative host with a path' => ['//ghe.corp/api', '//ghe.corp'];
         yield 'a scheme-relative public host' => ['//github.com', '//github.com'];
+        yield 'only whitespace' => ["  \r\n", Tokens::READ_TWO_WAYS];
+        yield 'a tab inside the public host' => ["https://git\thub.com", Tokens::READ_TWO_WAYS];
+        yield 'a control character before the public host' => ["\x01https://github.com", Tokens::READ_TWO_WAYS];
+        yield 'a control character after another host' => ["https://ghe.corp\x1f", 'ghe.corp'];
     }
 
     /**
