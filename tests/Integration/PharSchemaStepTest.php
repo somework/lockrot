@@ -10,8 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The schema step of the phar job in ci.yml validates the fixtures with the justinrainbow/json-schema
- * of the PHAR. Its two processes split JsonSchemaConformanceTest with one pattern, so each test of
- * the class runs in exactly one process, and a failure in either process fails the step.
+ * of the PHAR. Its two processes run JsonSchemaConformanceTest and RecordedContractDocumentsSchemaTest,
+ * one class each, and a failure in either process fails the step.
  *
  * @coversNothing
  *
@@ -47,22 +47,14 @@ final class PharSchemaStepTest extends TestCase
         self::assertMatchesRegularExpression("/XDEBUG_MODE: 'off'/", self::step());
     }
 
-    public function testTheTwoProcessesSplitTheClassByOnePatternThatNamesOneTestMethod(): void
+    public function testTheTwoProcessesRunTheConformanceClassAndTheContractBundleClass(): void
     {
         $step = self::step();
 
-        if (preg_match("/SPLIT: (?|'([^']*)'|([^,}\\n]*?))\\s*[,}\\n]/", $step, $split) !== 1) {
-            self::fail('the step names no split pattern in SPLIT');
-        }
-        self::assertMatchesRegularExpression('/^\w+$/', $split[1], 'SPLIT must be a plain method name, not a wider pattern');
-        self::assertStringContainsString('for part in filter exclude-filter', $step);
-        self::assertStringContainsString('"--$part" "$SPLIT"', $step);
-        self::assertStringContainsString('--fail-on-empty-test-suite', $step);
-        $matching = array_values(array_filter(
-            get_class_methods(JsonSchemaConformanceTest::class),
-            static fn (string $method): bool => strpos($method, 'test') === 0 && stripos($method, $split[1]) !== false
-        ));
-        self::assertSame([$split[1]], $matching, 'SPLIT must match one test method of JsonSchemaConformanceTest');
+        self::assertStringContainsString('for class in JsonSchemaConformanceTest RecordedContractDocumentsSchemaTest; do', $step);
+        self::assertStringContainsString('--fail-on-empty-test-suite "tests/Integration/$class.php"', $step);
+        self::assertFileExists(__DIR__.'/JsonSchemaConformanceTest.php');
+        self::assertFileExists(__DIR__.'/RecordedContractDocumentsSchemaTest.php');
     }
 
     private static function step(): string

@@ -72,7 +72,7 @@ jobs:
         run: composer require --dev --no-update "brianium/paratest:^6.11"
       - run: composer update --no-interaction --prefer-dist
       - name: Run tests with the matrix Composer binary
-        env: {PARATEST_PROCESSES: 3, PARATEST_BATCH: 1}
+        env: {PARATEST_PROCESSES: 3, PARATEST_BATCH: 4}
         run: |
           composer -V
           config=phpunit.xml.dist
@@ -90,8 +90,9 @@ jobs:
           mkdir -p build
           failed=0
           if [ -x vendor/bin/paratest ]; then
-            # Two ParaTest runs, one after the other, each on every process. The first gives each
-            # worker a test class at a time. The second runs the classes of the group parallel-rows
+            # Two ParaTest runs, one after the other, each on every process. The first runs each test
+            # file in a new process: a WrapperRunner worker of PHPUnit 9 does not find a test class
+            # that an earlier file loaded. The second runs the classes of the group parallel-rows
             # (or runtime-php) in functional mode, a process for each batch of data rows, so that a
             # class that loops over the fixtures does not end the row alone. ParaTest 6 selects the
             # tests of functional mode by its own --group options, not by the configuration.
@@ -105,7 +106,7 @@ jobs:
             groups_config phpunit-ci-files.xml "$files"
             groups_config phpunit-ci-rows.xml "<include><group>$rows</group></include><exclude>$slow</exclude>"
             status=0
-            vendor/bin/paratest -c phpunit-ci-files.xml -p "$PARATEST_PROCESSES" --runner WrapperRunner --log-junit build/junit-files.xml || status=$?
+            vendor/bin/paratest -c phpunit-ci-files.xml -p "$PARATEST_PROCESSES" --log-junit build/junit-files.xml || status=$?
             echo "=== paratest files: exit $status"
             if [ "$status" -ne 0 ]; then failed=1; fi
             status=0
@@ -573,16 +574,16 @@ jobs:
       # The PHAR validates extra.lockrot and the baseline with the justinrainbow/json-schema of
       # build/phar/composer.lock, which the tests rows do not install. This job keeps Xdebug loaded
       # for PharTest, which checks the archive's restart without it, so this step disables Xdebug.
-      # The test that SPLIT names validates the whole contract bundle, so it runs in a second
-      # process beside the rest of the class. Measurements: https://github.com/somework/lockrot/pull/211
+      # RecordedContractDocumentsSchemaTest validates the whole contract bundle, so it runs in a
+      # second process beside JsonSchemaConformanceTest. Measurements: https://github.com/somework/lockrot/pull/211
       - name: The schema fixtures validate with the PHAR's justinrainbow/json-schema
-        env: {LOCKROT_JR_VENDOR: build/phar/vendor, XDEBUG_MODE: 'off', SPLIT: testEveryRecordedContractDocumentValidatesAgainstItsSchemaAndItsStrictTwin}
+        env: {LOCKROT_JR_VENDOR: build/phar/vendor, XDEBUG_MODE: 'off'}
         run: |
           pids=()
-          for part in filter exclude-filter; do
+          for class in JsonSchemaConformanceTest RecordedContractDocumentsSchemaTest; do
             (
               set -o pipefail
-              vendor/bin/phpunit --bootstrap tests/json-schema-bootstrap.php --fail-on-empty-test-suite "--$part" "$SPLIT" tests/Integration/JsonSchemaConformanceTest.php 2>&1 | sed -u "s/^/[$part] /"
+              vendor/bin/phpunit --bootstrap tests/json-schema-bootstrap.php --fail-on-empty-test-suite "tests/Integration/$class.php" 2>&1 | sed -u "s/^/[$class] /"
             ) &
             pids+=($!)
           done
