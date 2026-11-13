@@ -959,8 +959,12 @@ Limits of the check:
     `policy.advisories.audit` is not a switch.
 
     When Composer refuses the value of one of the variables, such as `COMPOSER_NO_BLOCKING=maybe`,
-    or a key under `config.policy` or `config.audit`, lockrot stops with exit code 2. It prints
-    `Composer rejects the policy configuration:` and Composer's message, which can omit the key.
+    or a key under `config.policy` or `config.audit`, lockrot stops with exit code 2. For a key under
+    `config.policy` or `config.audit`, and for `COMPOSER_POLICY_MALWARE_BLOCK` and
+    `COMPOSER_AUDIT_ABANDONED`, it prints `Composer rejects the policy configuration:` and
+    Composer's message, which can omit the key. For `COMPOSER_NO_BLOCKING`,
+    `COMPOSER_NO_SECURITY_BLOCKING`, `COMPOSER_POLICY` and `COMPOSER_POLICY_ADVISORIES_BLOCK`, it
+    prints Composer's message alone, and that message names the variable.
 
 - When a package that a resolving solve asks for could not be loaded, the solve can resolve at a
   lower release than Composer installs. The move is then not checked, with the load reason
