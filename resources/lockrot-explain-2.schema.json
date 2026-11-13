@@ -39,7 +39,7 @@
             "minLength": 1
         },
         "finding": {
-            "description": "The finding, exactly as the report carries it (report-2's definition, copied).",
+            "description": "The finding as report-2 defines it, with `baseline` null and `gate` decided as if no baseline existed.",
             "$ref": "#/definitions/finding"
         },
         "lock": {
