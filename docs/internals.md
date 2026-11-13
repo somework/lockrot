@@ -79,6 +79,12 @@ carries `User-Agent: lockrot`.
 | GitLab | `GET https://{host}/api/v4/projects/{path}/repository/commits?all=true&per_page=1`. With credentials, also `GET https://{host}/api/v4/projects/{path}`. `{path}` is the project path URL-encoded as one segment, for example `group%2Fproject` | `PRIVATE-TOKEN: …`, to gitlab.com only |
 | Bitbucket | `GET https://api.bitbucket.org/2.0/repositories/{workspace}/{slug}/commits?pagelen=1` | None: Composer's credentials only |
 
+Each of these requests has a total timeout of 10 seconds, from connect to the last byte. Composer's
+own metadata requests use a longer limit. A request that needs more time fails, and Composer
+can retry it. A repository whose request still fails reads S10 `fetch_failed`, with the
+[unreachable](notes.md#repository_activity_unreachable) note. In an install-time run, the timeout
+of a request is the time left of the [budget](install-time.md#time-budget), at least one second.
+
 ### Which credentials
 
 - A host counts as authenticated, with no cap, when lockrot has a token for it or Composer holds
