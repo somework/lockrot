@@ -49,9 +49,11 @@ use PHPUnit\Framework\TestCase;
  * @coversNothing
  *
  * @group covers-nothing
+ * @group schema-sweep
  */
 #[CoversNothing]
 #[Group('covers-nothing')]
+#[Group('schema-sweep')]
 final class RunNoteAgreementTest extends TestCase
 {
     use AssertsNoteDetails;
