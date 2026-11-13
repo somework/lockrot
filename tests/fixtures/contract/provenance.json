@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "a9a9b45f22748129f2a25477a53b1d384f994ef2199853a321b004f1da041ce9",
+        "tests/fixtures/flags/cases.json": "9d3c6c343a92268bb16d3f847b7729f06bc7ee6b86de675acf3caec1d5be1dcb",
         "tests/fixtures/flags/composite.json": "9555297c629a29bfbc66af13263d464b93830dd004e87adab4fdc7d8696a60e8",
-        "tests/fixtures/flags/provenance.json": "04653ebf54a9daaea800e9070fbbcdb8207ac7a3e877a7ef0c30a83587b2e814"
+        "tests/fixtures/flags/provenance.json": "d08397eddecb9428678163e4401f6408acd1b8dd1f4b725ff9151a2929158ff4"
     },
     "version_mask": {
         "paths": [

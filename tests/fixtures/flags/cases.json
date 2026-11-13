@@ -443647,7 +443647,7 @@
     }
    },
    "synthetic_inputs": [
-    "the world of mc-joint‡ with its holder acme/gz-client named h/x;calc; every check is the Composer 2.10.3 answer of mc-joint‡ with that name, recorded, because Composer aborts on the name. In composer.json: \"require.h/x;calc is invalid, it should have a vendor name, a forward slash, and a package name\" (RootPackageLoader). Required by a locked package and listed in the repository: \"Invalid package found during dependency resolution, aborting: h/x;calc is invalid\" (ValidatingArrayLoader), log design/move-check-oracle/logs/joint-unsafe-holder.baseline.inline.log. A lockrot that loads its pool through Composer repositories does not reach this shape (ruling R21-5) (‡)"
+    "the world of mc-joint‡ with its holder acme/gz-client named h/x;calc; every check is the Composer 2.10.3 answer of mc-joint‡ with that name, recorded, because Composer aborts on the name. In composer.json: \"require.h/x;calc is invalid, it should have a vendor name, a forward slash, and a package name\" (RootPackageLoader). Required by a locked package and listed in the repository: \"Invalid package found during dependency resolution, aborting: h/x;calc is invalid\" (ValidatingArrayLoader), log design/move-check-oracle/logs/joint-unsafe-holder.baseline.inline.log. A lockrot that loads its pool through Composer repositories does not reach this shape (ruling R21-5). lockrot skips a lock entry whose name fails Composer's package-name rule (the `package_name_invalid` note), so the case is model-only (‡)"
    ],
    "finding": {
     "package": "guzzlehttp/guzzle",
