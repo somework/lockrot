@@ -734,7 +734,7 @@ final class LockrotCommand extends BaseCommand
     /**
      * The manifest that Composer reads (`COMPOSER`, else composer.json) as an absolute path, so the
      * lock, the baseline and every message point at the file that Composer uses.
-     * {@see InstallTimeSummary} resolves it the same way.
+     * {@see InstallTimeSummary} keeps the path as Composer gives it.
      */
     private static function composerFile(): string
     {
