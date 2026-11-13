@@ -185,6 +185,7 @@ final class GateAgreementTest extends TestCase
         foreach ($shapes as $shape) {
             self::assertArrayHasKey($shape, $this->seen, 'the fixtures give '.$shape.', or the agreement proves little');
         }
+        self::assertSame([], \array_slice($this->mismatches, 0, 20), \sprintf('%d of %d checks disagree', \count($this->mismatches), $this->checks));
     }
 
     /**

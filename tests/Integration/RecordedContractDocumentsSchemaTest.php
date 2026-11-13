@@ -50,10 +50,13 @@ final class RecordedContractDocumentsSchemaTest extends TestCase
     {
         $bundle = [];
         foreach (['report-2', 'model-only', 'explain-2', 'baseline-2'] as $directory) {
-            foreach (scandir(self::FIXTURES.'contract/'.$directory) ?: [] as $entry) {
-                if (substr($entry, -5) === '.json') {
-                    $bundle[] = 'contract/'.$directory.'/'.$entry;
-                }
+            $documents = array_values(array_filter(
+                scandir(self::FIXTURES.'contract/'.$directory) ?: [],
+                static fn (string $entry): bool => substr($entry, -5) === '.json'
+            ));
+            self::assertNotSame([], $documents, 'contract/'.$directory.' holds no document');
+            foreach ($documents as $entry) {
+                $bundle[] = 'contract/'.$directory.'/'.$entry;
             }
         }
         $rows = array_keys(iterator_to_array(self::recordedContractDocuments()));
