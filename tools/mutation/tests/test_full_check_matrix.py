@@ -76,12 +76,12 @@ class FullCheckMatrixTest(unittest.TestCase):
         self.assertEqual([], [name for name in ci if name.startswith('full-check')])
 
     def test_no_checkout_keeps_the_job_token(self):
-        for workflow in ('ci.yml', 'full-check.yml'):
-            steps = checkout_steps(read(workflow))
-            self.assertNotEqual([], steps)
-            for step in steps:
-                with self.subTest(workflow=workflow, step=step):
-                    self.assertIn('persist-credentials: false', step)
+        workflows = sorted(name for name in os.listdir(WORKFLOWS) if name.endswith(('.yml', '.yaml')))
+        steps = [(workflow, step) for workflow in workflows for step in checkout_steps(read(workflow))]
+        self.assertNotEqual([], steps)
+        for workflow, step in steps:
+            with self.subTest(workflow=workflow, step=step):
+                self.assertIn('persist-credentials: false', step)
 
     def test_the_floor_job_runs_the_plugin_on_composer_2_9_and_asserts_the_refusal(self):
         ci = read('ci.yml')
