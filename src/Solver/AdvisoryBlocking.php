@@ -89,7 +89,8 @@ final class AdvisoryBlocking
         try {
             $policy = PolicyConfig::fromConfig($config);
         } catch (\Throwable $e) {
-            throw new ConfigException('Composer rejects the policy configuration: '.$e->getMessage(), 0, $e);
+            // A TypeError's message quotes a PHP signature and an absolute path of the install, and it names no key.
+            throw new ConfigException('Composer rejects the policy configuration: '.($e instanceof \TypeError ? 'a value of config.policy or config.audit has the wrong type' : $e->getMessage()), 0, $e);
         }
         $disabledBy = self::noBlocking();
         if (!$policy->enabled || !$policy->advisories->shouldBlock(ListPolicyConfig::BLOCK_SCOPE_UPDATE)) {

@@ -159,6 +159,23 @@ final class AdvisoryBlockingTest extends TestCase
         }
     }
 
+    /** PHP's TypeError text names a signature and an absolute path, so the message names the config keys instead. */
+    public function testAPolicyValueOfTheWrongTypeNamesTheConfigKeysAndNoPhpTextOrPath(): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['audit' => ['block-insecure' => 'false']]]);
+
+        try {
+            AdvisoryBlocking::fromConfig($config);
+            self::fail('a value of the wrong type must stop the run');
+        } catch (ConfigException $e) {
+            self::assertStringStartsWith('Composer rejects the policy configuration: ', $e->getMessage());
+            self::assertStringContainsString('config.audit', $e->getMessage());
+            self::assertStringContainsString('config.policy', $e->getMessage());
+            self::assertDoesNotMatchRegularExpression('#::|\(\)|\$|/|\.php#', $e->getMessage());
+        }
+    }
+
     /** @return iterable<string, array{array<string, mixed>, array<string, string>, string}> the policy, the variables, a word that the message holds */
     public static function policiesThatComposerRejects(): iterable
     {
