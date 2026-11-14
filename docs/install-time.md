@@ -197,8 +197,7 @@ transaction before any package operation runs, and Composer exits `1`. The messa
   So does a package whose metadata did not arrive and that carries a counted advisory
   (`releases_unknown`).
 - lockrot never stops a `--dry-run`, since no operation is about to run.
-- The stop works only when Composer runs plugins. `--no-plugins` or `COMPOSER_NO_PLUGINS=1` skips
-  it.
+- The stop works only when Composer runs plugins. Only `--no-plugins` skips it.
 - A project-local plugin does not stop the install that first installs it, a fresh clone and a CI
   job with an empty `vendor/` included ([time budget](#time-budget)). To gate CI, run
   `composer lockrot --fail-on=<value>` or the [PHAR](phar.md).
