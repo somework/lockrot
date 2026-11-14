@@ -627,7 +627,8 @@ every `conflict`.
   `held by abandoned symfony/x (replacement: …)`.
 
 - `security.installed_branch_fixes` says how many advisories the installed branch fixes.
-  `security.gets` says what `composer update` installs and which advisories it clears.
+  `security.gets` says what `composer update <package>` installs on the installed branch and which
+  advisories it clears.
   `security.partial` says what a `composer update` clears when the move goes further.
 
 - In `--explain`, every branch row carries `fixes`: the advisories it fixes, the release to move

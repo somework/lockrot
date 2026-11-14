@@ -450,7 +450,7 @@ the rest of the line unchanged.
 
 | `status` | When | Holds |
 |---|---|---|
-| `vulnerable` | At least one advisory counts | `worst`, `counts` by severity, `fix_kind`, `installed_branch_fixes`, `gets` (what `composer update` installs), `partial`, `move_in` (where the move is) |
+| `vulnerable` | At least one advisory counts | `worst`, `counts` by severity, `fix_kind`, `installed_branch_fixes`, `gets` (what `composer update <package>` installs on the installed branch), `partial`, `move_in` (where the move is) |
 | `clear` | The lookup was complete and found nothing that counts | |
 | `unchecked` | The lookup did not run, or ran in part, and found nothing that counts | |
 
