@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-VXGcZxI/ZoqFnig4JZh+IARqOoymgAhUEJCW5DOCtYc='; style-src 'sha256-piRBjZqzeUuCphk26oX9sBtCAblnm4zn4sYqubk2Too='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-9QMMkOpiH1SLoyLImhq+LF7lgf652Ertb/pSWCrCoIU='; style-src 'sha256-piRBjZqzeUuCphk26oX9sBtCAblnm4zn4sYqubk2Too='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -9156,7 +9156,7 @@ var LockrotReport = (function(exports) {
 		const of = "parts" in finding.score ? finding.score.parts.security.of : 0;
 		const flags = partial.clears.filter((c) => c.kind === "flag").map((c) => c.id);
 		const advisories = partial.clears.filter((c) => c.kind === "advisory").length;
-		return [...flags, `${advisories} of its ${of} advisories`].join(" and ");
+		return joinAnd([...flags, `${advisories} of its ${of} advisories`]);
 	}
 	var acceptsWholePackage = (finding) => finding.allowlist !== null && finding.allowlist.flag_ids === null;
 	//#endregion
@@ -11052,7 +11052,6 @@ var LockrotReport = (function(exports) {
 	}
 	function radiusLayout(model, visibleFlagged, allFlagged = visibleFlagged) {
 		const every = radiusRows(model, visibleFlagged, allFlagged);
-		const visible = new Set(visibleFlagged.map((f) => f.package));
 		const all = new Set(allFlagged.map((f) => f.package));
 		const rows = every.filter((r) => r.count > 0 || r.self !== null || r.unfiltered === 0);
 		const ones = trailingSingles(rows);
@@ -11066,7 +11065,6 @@ var LockrotReport = (function(exports) {
 			unlisted: visibleFlagged.filter((f) => f.direct && !parents.has(f.package)),
 			unfilteredUnlisted: allFlagged.filter((f) => f.direct && !parents.has(f.package)).length,
 			exposureCount: every.length,
-			narrowed: allFlagged.some((f) => !visible.has(f.package)),
 			unfilteredTotal: unfilteredListed.size,
 			unfilteredRows: every.filter((r) => r.unfiltered > 0).length,
 			unattributed: unattributedOf(model, visibleFlagged)
@@ -11213,18 +11211,17 @@ var LockrotReport = (function(exports) {
 			n: findings.filter((f) => f.verdict === verdict).length
 		})).filter(({ n }) => n > 0).map(({ verdict, n }) => `${n} ${verdict}`).join(", ");
 	}
-	function radiusAnswer2(report, layout) {
+	function radiusAnswer2(report, all) {
 		const pulled = report.rot_depth.by_reach.transitive;
-		const answer = radiusAnswer(layout, pulled);
-		if (answer === null && layout.narrowed) return ["No direct requirement lists a flagged package that matches the filter."];
 		if (pulled === 0) return [];
+		const answer = radiusAnswer(radiusLayout2(report, all, all), pulled);
 		const unlisted = pulled - listedTransitive(report);
 		const sit = (n) => `${String(n)} of them ${pluralNoun(n, "sits", "sit")} under`;
 		const names = answer?.top.map((row) => row.package) ?? [];
 		return [
 			`${plural(pulled, "flagged package", "flagged packages")} pulled in.`,
 			...unlisted > 0 ? [`${sit(unlisted)} more than ${String(report.exposure_rule.max_fan_in)} direct requirements.`] : [],
-			...answer !== null && answer.held > 0 && !layout.narrowed ? [`${sit(answer.held)} ${joinAnd(names)}.`] : []
+			...answer !== null && answer.held > 0 ? [`${sit(answer.held)} ${joinAnd(names)}.`] : []
 		];
 	}
 	function listedTransitive(report) {
@@ -11498,21 +11495,26 @@ var LockrotReport = (function(exports) {
 		].filter((group) => group !== null);
 	}
 	var union = (a, b) => [...new Set([...a, ...b])];
+	var FIX_013 = new Map([["branch", "update"], ["move", "upgrade"]]);
 	function fitFilters2(report, filters) {
 		const flagIds = report.run.flag_ids;
 		const named = filters.verdict.filter((key) => flagIds.includes(key));
+		const fixKinds = report.run.score_model.fix_kinds.map(({ id }) => id);
+		const fix = [...new Set(filters.fix.map((key) => FIX_013.get(key) ?? key).filter((key) => fixKinds.includes(key)))];
 		const gate = filters.gate.filter((key) => key === "ready" || key === "held" || (key === "fails" || key === "wayout") && findingsFailGate(report));
 		const accepted = filters.accepted.filter((key) => key === HIDE_ACCEPTED);
 		const scope = filters.scope.filter((key) => SCOPE_ROWS.some(([own]) => own === key));
 		const since = report.baseline === null ? [] : filters.since.filter((key) => SINCE_ROWS.some(([own]) => own === key));
-		if (filters.prio.length === 0 && named.length === 0 && gate.length === filters.gate.length && accepted.length === filters.accepted.length && scope.length === filters.scope.length && since.length === filters.since.length) return filters;
+		if (filters.prio.length === 0 && named.length === 0 && gate.length === filters.gate.length && accepted.length === filters.accepted.length && scope.length === filters.scope.length && since.length === filters.since.length && fix.length === filters.fix.length && fix.every((key, i) => key === filters.fix[i])) return filters;
+		const zero = report.run.score_model.zero_verdicts.map(({ verdict }) => verdict);
 		return {
 			...filters,
 			accepted,
 			scope,
 			since,
+			fix,
 			prio: [],
-			verdict: union(filters.verdict.filter((key) => !flagIds.includes(key)), filters.prio),
+			verdict: union(filters.verdict.filter((key) => !flagIds.includes(key)), filters.prio.flatMap((key) => key === "none" ? zero : [key])),
 			flag: union(filters.flag, named),
 			gate
 		};
@@ -17076,7 +17078,7 @@ var LockrotReport = (function(exports) {
 		if (section === "advisories") return population2(report, "advisories").length > 0;
 		if (section === "radius") {
 			const layout = printedRadius(report);
-			return layout.rows.length + layout.unlisted.length + layout.unattributed.length > 0 || radiusAnswer2(report, layout).length > 0;
+			return layout.rows.length + layout.unlisted.length + layout.unattributed.length > 0 || radiusAnswer2(report, population2(report, "radius")).length > 0;
 		}
 		return true;
 	}
@@ -19364,8 +19366,9 @@ var LockrotReport = (function(exports) {
 		const printed = usePrinted();
 		const empty = radiusEmpty(report);
 		const depth = printed ? null : depthSentence(report);
-		const layout = radiusLayout2(report, applyFilters2(report, state, "radius"), population2(report, "radius"));
-		const answer = radiusAnswer2(report, layout);
+		const all = population2(report, "radius");
+		const layout = radiusLayout2(report, applyFilters2(report, state, "radius"), all);
+		const answer = radiusAnswer2(report, all);
 		const hintId = `${g()}-hint`;
 		const input = {
 			disclosure: state.disclosure,
@@ -21138,7 +21141,7 @@ var LockrotReport = (function(exports) {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.21";
+	var version = "0.14.0-rc.22";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");

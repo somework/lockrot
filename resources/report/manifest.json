@@ -1,23 +1,23 @@
 {
   "name": "lockrot-report",
-  "version": "0.14.0-rc.21",
+  "version": "0.14.0-rc.22",
   "schema": {
     "report": [
       2
     ]
   },
   "contract": {
-    "bundle_sha256": "2f9a2d3642ad5b804e58aba2be9cc8e5f8453ac547420ddb52eb334902a21ce4",
+    "bundle_sha256": "db81bfd6fa96ee38100a1e3cf4be7ac8bd9939759e483f07c7c18fd6279f78cd",
     "score_text_grammar": 1,
     "text_grammar": 1
   },
   "files": {
-    "report.html": "7255ddc16d17815f863ac222aa3fca12d15d166a8654e62460af183a99619cb8",
-    "lockrot-report.js": "55719c67123f668a859e283825987e20046a3a8ca6800854109096e43382b587",
+    "report.html": "36978191697bdd920e130d8b47251c8159e5218967555dd40d7bd2d17c14cf2e",
+    "lockrot-report.js": "f5030c90ea621f548ba322c89a1abe2c5ee581feb9d84aed6ffa52582ac2a085",
     "lockrot-report.css": "a624418d9ab3794b82a61936ea85fdb01b4201b9679b8ce7e2c62ab9b9364e8a"
   },
   "csp": {
-    "script": "sha256-VXGcZxI/ZoqFnig4JZh+IARqOoymgAhUEJCW5DOCtYc=",
+    "script": "sha256-9QMMkOpiH1SLoyLImhq+LF7lgf652Ertb/pSWCrCoIU=",
     "style": "sha256-piRBjZqzeUuCphk26oX9sBtCAblnm4zn4sYqubk2Too="
   }
 }
