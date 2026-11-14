@@ -204,7 +204,8 @@ transaction before any package operation runs, and Composer exits `1`. The messa
   operation. With `--no-update` on `require` or `remove`, it writes only `composer.json`. In both
   cases, lockrot prints no block and the stop does not run. The stop runs at the next command
   that installs the packages.
-- The stop works only when Composer runs plugins. Only `--no-plugins` skips it.
+- The stop works only when Composer runs the plugin. `--no-plugins` skips it, and so does a
+  `config.allow-plugins` that does not allow `somework/lockrot`.
 - A project-local plugin does not stop the install that first installs it, a fresh clone and a CI
   job with an empty `vendor/` included ([time budget](#time-budget)). To gate CI, run
   `composer lockrot --fail-on=<value>` or the [PHAR](phar.md).
