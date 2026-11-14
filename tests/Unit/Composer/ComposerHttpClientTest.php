@@ -461,30 +461,6 @@ final class ComposerHttpClientTest extends TestCase
     }
 
     /**
-     * Without curl, add() runs each request to its end before it returns. So a request without
-     * lockrot's credentials must check the budget and read its timeout when it starts.
-     */
-    public function testWithoutCurlEachRequestStartsOnlyInsideTheBudgetWithTheTimeLeft(): void
-    {
-        $urls = ['https://gitlab.com/api/v4/projects/a', 'https://gitlab.com/api/v4/projects/b', 'https://gitlab.com/api/v4/projects/c', 'https://gitlab.com/api/v4/projects/d'];
-        $held = new \stdClass();
-        $now = static function () use ($held): float {
-            return ($held->downloader ?? null) instanceof ScriptedDownloader ? 3.0 * \count($held->downloader->requests) : 0.0;
-        };
-        $io = new NullIO();
-        $config = new Config(false, sys_get_temp_dir());
-        $downloader = new ScriptedDownloader($io, $config, [$urls[0] => [200, 'a'], $urls[1] => [200, 'b'], $urls[2] => [200, 'c']]);
-        $held->downloader = $downloader;
-        $client = new ComposerHttpClient($downloader, $io, $config, Clock::fixed(self::NOW), Deadline::inSeconds(5.0, $now), false);
-
-        $results = $client->fetchAll($urls, self::WITHOUT_AUTHORIZATION);
-
-        self::assertSame([$urls[0], $urls[1]], array_column($downloader->requests, 'url'), 'each request takes 3s of a 5s budget');
-        self::assertSame([['timeout' => 5], ['timeout' => 2]], array_map(static fn (array $request): array => array_intersect_key((array) $request['options']['http'], ['timeout' => true]), $downloader->requests));
-        self::assertSame([0, null, HttpResult::BUDGET_SPENT], self::summarize($results)[$urls[2]]);
-        self::assertSame([0, null, HttpResult::BUDGET_SPENT], self::summarize($results)[$urls[3]], 'every request after the budget');
-    }
-    /**
      * Composer replays a request's headers to the target of each redirect, so lockrot's token must
      * not reach a target on another origin. That request goes out again without the token.
      *

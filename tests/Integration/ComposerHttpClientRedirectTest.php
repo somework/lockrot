@@ -59,6 +59,10 @@ final class ComposerHttpClientRedirectTest extends TestCase
             header('Location: http://localhost:'.$port.'/headers', true, 302);
             exit;
         }
+        if ($path === '/other-host-then-local-file') {
+            header('Location: http://localhost:'.$port.'/local-file', true, 302);
+            exit;
+        }
         if ($path === '/unparsable') {
             header('Location: http://:'.$port.'/headers', true, 302);
             exit;
@@ -206,6 +210,29 @@ final class ComposerHttpClientRedirectTest extends TestCase
         self::assertSame([0, null], [$result->status(), $result->body()]);
     }
 
+    /** Without curl, each request blocks until it ends, so a request without lockrot's credentials checks the budget when it starts. */
+    public function testARequestWithoutLockrotsCredentialsAfterTheBudgetRanOutIsNotSentWithoutCurl(): void
+    {
+        $log = $this->dir.'/root/requests.log';
+        $before = \count(file($log) ?: []);
+        $now = static function () use ($log, $before): float {
+            clearstatcache();
+
+            return 3.0 * (\count(file($log) ?: []) - $before);
+        };
+        $io = new NullIO();
+        $config = HermeticComposerConfig::create($this->dir.'/home', $io);
+        $config->merge(['config' => ['secure-http' => false]]);
+        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, Clock::fixed('2026-09-14T00:00:00+00:00'), Deadline::inSeconds(5.0, $now), false);
+        $urls = [$this->server->url().'/headers?a', $this->server->url().'/headers?b', $this->server->url().'/headers?c'];
+
+        $results = $client->fetchAll($urls, ['User-Agent: lockrot']);
+
+        self::assertSame([200, 200, 0], [$results[$urls[0]]->status(), $results[$urls[1]]->status(), $results[$urls[2]]->status()], 'each request takes 3s of a 5s budget');
+        self::assertSame(HttpResult::BUDGET_SPENT, $results[$urls[2]]->error());
+        self::assertSame($before + 2, \count(file($log) ?: []), 'the third request does not reach the server');
+    }
+
     /** Without curl, lockrot follows a same-host hop itself, so the budget can end between two hops. */
     public function testASameHostHopAfterTheBudgetRanOutIsNotSentWithoutCurl(): void
     {
@@ -322,6 +349,47 @@ final class ComposerHttpClientRedirectTest extends TestCase
         $result = $this->fetch('/same-host-user-info', false);
 
         self::assertSame([0, null, 'redirect to a URL with a user name or a password'], [$result->status(), $result->body(), $result->error()]);
+    }
+
+    /**
+     * Composer before 2.10.2 follows a `file://` redirect without curl, so lockrot stops each redirect itself.
+     *
+     * @dataProvider locationsWithoutAHost
+     */
+    #[DataProvider('locationsWithoutAHost')]
+    public function testARedirectOfARequestWithoutLockrotsCredentialsToAnythingButAnHttpHostIsAFailedRequestWithoutCurl(string $path): void
+    {
+        $url = $this->server->url().$path;
+
+        $result = $this->client(false)->fetchAll([$url], ['User-Agent: lockrot'])[$url];
+
+        self::assertSame([0, null, 'redirect to a URL that is not http or https with a host'], [$result->status(), $result->body(), $result->error()]);
+    }
+
+    public function testARedirectOfARequestWithoutLockrotsCredentialsToAUrlWithUserInfoIsAFailedRequestWithoutCurl(): void
+    {
+        $url = $this->server->url().'/same-host-user-info';
+
+        $result = $this->client(false)->fetchAll([$url], ['User-Agent: lockrot'])[$url];
+
+        self::assertSame([0, null, 'redirect to a URL with a user name or a password'], [$result->status(), $result->body(), $result->error()]);
+    }
+
+    /** The request that lockrot sends again without its credentials stops each redirect too. */
+    public function testARedirectOfTheRequestToAnotherHostToALocalFileIsAFailedRequestWithoutCurl(): void
+    {
+        $result = $this->fetch('/other-host-then-local-file', false);
+
+        self::assertSame([0, null, 'redirect to a URL that is not http or https with a host'], [$result->status(), $result->body(), $result->error()]);
+    }
+
+    public function testARequestWithoutLockrotsCredentialsFollowsARedirectToAnotherHostWithoutCurl(): void
+    {
+        $url = $this->server->url().'/other-host';
+
+        $result = $this->client(false)->fetchAll([$url], ['User-Agent: lockrot'])[$url];
+
+        self::assertSame([200, '/headers'], [$result->status(), json_decode((string) $result->body(), true)['path'] ?? null]);
     }
 
     /** URL schemes are case-insensitive (RFC 3986, section 3.1). */

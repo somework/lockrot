@@ -208,25 +208,27 @@ final class ComposerHttpClient implements HttpClientInterface
                 }
                 $sent = self::withoutRedundantAuthorization($this->io, $this->config, $url, $headers);
                 $options = self::options($this->timeoutSeconds(), $sent);
-                if (!$this->refusesRedirects && self::carriesCredentials($sent)) {
-                    $this->fetchHolding($url, $options, $results, $redirects);
+                // Without curl, Composer follows each redirect itself: to a URL with user info, and before 2.10.2 to a file:// URL.
+                if (!$this->refusesRedirects) {
+                    $next = $this->fetchHolding($url, $url, HttpResult::BUDGET_SPENT, $options, $results);
+                    if ($next !== null) {
+                        $redirects[$url] = $next;
+                    }
                     $done();
 
                     return;
                 }
-                if ($this->refusesRedirects) {
-                    $options['prevent_url_access_callable'] = static function (string $target) use ($url, &$redirects, $budgetEnded): bool {
-                        if ($budgetEnded($url)) {
-                            return true;
-                        }
-                        if ($target === '' || (self::origin($target) === self::origin($url) && !self::hasUserInfo($target))) {
-                            return false;
-                        }
-                        $redirects[$url] = $target;
-
+                $options['prevent_url_access_callable'] = static function (string $target) use ($url, &$redirects, $budgetEnded): bool {
+                    if ($budgetEnded($url)) {
                         return true;
-                    };
-                }
+                    }
+                    if ($target === '' || (self::origin($target) === self::origin($url) && !self::hasUserInfo($target))) {
+                        return false;
+                    }
+                    $redirects[$url] = $target;
+
+                    return true;
+                };
                 $this->add($url, $url, $options, $results, $done);
             };
         }
@@ -242,24 +244,21 @@ final class ComposerHttpClient implements HttpClientInterface
 
                     return;
                 }
-                // Composer's downloader throws a TypeError on a URL without a host, which would end the run,
-                // and without curl it reads a file:// URL from the disk.
-                if (!\in_array(strtolower((string) parse_url($target, \PHP_URL_SCHEME)), ['http', 'https'], true) || (string) parse_url($target, \PHP_URL_HOST) === '') {
-                    $results[$url] = HttpResult::failure($url, 'redirect to a URL that is not http or https with a host', $this->clock->now());
-                    $done();
-
-                    return;
-                }
-                if (self::hasUserInfo($target)) {
-                    $results[$url] = HttpResult::failure($url, 'redirect to a URL with a user name or a password', $this->clock->now());
+                $refusal = self::refusal($target);
+                if ($refusal !== null) {
+                    $results[$url] = HttpResult::failure($url, $refusal, $this->clock->now());
                     $done();
 
                     return;
                 }
                 $options = self::options($this->timeoutSeconds(), self::withoutCredentials($headers));
-                if ($this->refusesRedirects) {
-                    $options['prevent_url_access_callable'] = static fn (): bool => $budgetEnded($url);
+                if (!$this->refusesRedirects) {
+                    $this->fetchHolding($url, $target, self::BUDGET_SPENT_AFTER_START, $options, $results);
+                    $done();
+
+                    return;
                 }
+                $options['prevent_url_access_callable'] = static fn (): bool => $budgetEnded($url);
                 $this->add($url, $target, $options, $results, $done);
             };
         }
@@ -355,25 +354,24 @@ final class ComposerHttpClient implements HttpClientInterface
     }
 
     /**
-     * A request with lockrot's credentials where the downloader cannot stop a redirect: without
-     * curl. RemoteFilesystem follows no hop past its `redirects` cap, so lockrot
-     * follows a same-origin hop with the credentials. A target on another origin goes in $redirects
-     * for a request without them.
+     * A request where the downloader cannot stop a redirect: without curl. RemoteFilesystem follows
+     * no hop past its `redirects` cap, so lockrot follows each hop itself. A request with lockrot's
+     * credentials follows only a same-origin hop. It returns another hop for a request without them.
      *
+     * @param string                                                                            $spent   the failure when the install-time budget ends before the first hop
      * @param array{http: array{timeout: int, header: list<string>}, retry-auth-failure: false} $options
      * @param array<string, HttpResult>                                                       $results
-     * @param array<string, string>                                                           $redirects
      */
-    private function fetchHolding(string $url, array $options, array &$results, array &$redirects): void
+    private function fetchHolding(string $url, string $target, string $spent, array $options, array &$results): ?string
     {
         $filesystem = new RemoteFilesystem($this->io, $this->config, $this->downloader->getOptions(), (bool) $this->config->get('disable-tls'));
-        $target = $url;
+        $credentials = self::carriesCredentials($options['http']['header']);
         for ($hop = 0; $hop <= self::MAX_REDIRECTS && $target !== ''; ++$hop) {
             // Each request blocks until it ends, so it takes only what the install-time budget has left.
             if ($this->deadline->isPast()) {
-                $results[$url] = HttpResult::failure($url, $hop === 0 ? HttpResult::BUDGET_SPENT : self::BUDGET_SPENT_AFTER_START, $this->clock->now());
+                $results[$url] = HttpResult::failure($url, $hop === 0 ? $spent : self::BUDGET_SPENT_AFTER_START, $this->clock->now());
 
-                return;
+                return null;
             }
             $options['http']['timeout'] = $this->timeoutSeconds();
             try {
@@ -381,7 +379,7 @@ final class ComposerHttpClient implements HttpClientInterface
             } catch (\Throwable $e) {
                 $results[$url] = $this->failed($url, $e);
 
-                return;
+                return null;
             }
             $headers = $filesystem->getLastHeaders();
             $status = (int) RemoteFilesystem::findStatusCode($headers);
@@ -389,17 +387,38 @@ final class ComposerHttpClient implements HttpClientInterface
             if ($location === null || $location === '') {
                 $results[$url] = new HttpResult($url, $status, \is_string($body) ? $body : null, $this->clock->now(), null, $headers);
 
-                return;
+                return null;
             }
             $next = self::resolve($target, $location);
             if (self::origin($next) !== self::origin($target) || self::hasUserInfo($next)) {
-                $redirects[$url] = $next;
+                if ($credentials) {
+                    return $next;
+                }
+                $refusal = self::refusal($next);
+                if ($refusal !== null) {
+                    $results[$url] = HttpResult::failure($url, $refusal, $this->clock->now());
 
-                return;
+                    return null;
+                }
             }
             $target = $next;
         }
         $results[$url] = HttpResult::failure($url, 'too many redirects', $this->clock->now());
+
+        return null;
+    }
+
+    /**
+     * Composer's downloader throws a TypeError on a URL without a host, which would end the run.
+     * Composer before 2.10.2 reads a file:// URL from the disk without curl.
+     */
+    private static function refusal(string $target): ?string
+    {
+        if (!\in_array(strtolower((string) parse_url($target, \PHP_URL_SCHEME)), ['http', 'https'], true) || (string) parse_url($target, \PHP_URL_HOST) === '') {
+            return 'redirect to a URL that is not http or https with a host';
+        }
+
+        return self::hasUserInfo($target) ? 'redirect to a URL with a user name or a password' : null;
     }
 
     /** A `Location` against the URL that answered it, as Composer's CurlDownloader reads it. */
