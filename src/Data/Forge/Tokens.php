@@ -108,6 +108,12 @@ final class Tokens
             if ($url === null) {
                 continue;
             }
+            // A WHATWG parser strips C0 controls and spaces around the value and every tab or newline
+            // in it, and parse_url() does not: https://url.spec.whatwg.org/#concept-basic-url-parser
+            $whatwg = str_replace(["\t", "\n", "\r"], '', trim($url, "\x00..\x20"));
+            if ($whatwg !== $url) {
+                return $whatwg === '' ? self::READ_TWO_WAYS : (self::issuerRefusal([$whatwg], $publicHost) ?? self::READ_TWO_WAYS);
+            }
             $bare = self::withoutUserinfo($url);
             $host = self::host($bare);
             // $bare also cuts at an `@` in a path, a query or a fragment, so the host of $url
@@ -141,8 +147,10 @@ final class Tokens
     {
         $scheme = self::schemeOf($url);
         $rest = substr($url, \strlen($scheme));
+        $lead = $scheme === '' && strncmp($rest, '//', 2) === 0 ? '//' : '';
+        $rest = substr($rest, \strlen($lead));
 
-        return $scheme.substr($rest, 0, strcspn($rest, '/?#'));
+        return $scheme.$lead.substr($rest, 0, strcspn($rest, '/?#'));
     }
 
     private static function schemeOf(string $url): string

@@ -413,6 +413,8 @@ final class LockrotCommandTest extends TestCase
         self::assertStringNotContainsString('verdict', $description, 'a 0.14 verdict is a grade or a word, not a flag');
         self::assertStringNotContainsString('priority', $description, 'a 0.14 threshold is a grade, not a priority');
         self::assertStringContainsString('the baseline exempts', $description, 'a finding that the baseline exempts reaches a value and does not fail');
+        self::assertStringContainsString('a flag (none, '.implode(', ', array_keys(ScoreModel::POINTS)).')', $description, 'the flags in flag order, after none');
+        self::assertStringContainsString('A flag fails on itself and on each flag before it in this order', $description, '--fail-on=capped also fails on each flag before capped');
     }
 
     public function testTableOutputAndExitCodeOnWallabag(): void

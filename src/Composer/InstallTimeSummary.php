@@ -8,6 +8,10 @@ use Composer\Config;
 use Composer\Factory;
 use Composer\Installer\InstallerEvent;
 use Composer\IO\IOInterface;
+use Composer\Package\Link;
+use Composer\Package\Loader\RootPackageLoader;
+use Composer\Package\RootAliasPackage;
+use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryInterface;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
@@ -22,6 +26,7 @@ use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Exception\InstallBlockedException;
+use Lockrot\Json\JsonReader;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
@@ -106,6 +111,10 @@ final class InstallTimeSummary
         $composerFile = Factory::getComposerFile();
         $project = ProjectConfig::fromFile($composerFile);
         $composer = $event->getComposer();
+        // Under `--dry-run`, `composer require` and `composer remove` change the root links in memory only.
+        if (!$event->isExecutingOperations() && $project->isRead()) {
+            $project = self::withRootRequirements($project, $composerFile, $composer->getPackage());
+        }
         $config = $composer->getConfig();
         $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), $env, [], \PHP_VERSION, MoveCheckers::configuredPhp($config));
         if ($lockrot->isDisabled() || !$lockrot->installTime()) {
@@ -145,7 +154,8 @@ final class InstallTimeSummary
         $repositories = array_values($composer->getRepositoryManager()->getRepositories());
 
         // The check counts against the same budget: a move that it reaches too late is not checked.
-        $checks = static fn (): MoveChecks => MoveChecks::of(MoveCheckers::forProject($composer->getPackage(), $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), $deadline, $lockrot->advisoryLookup()));
+        $root = self::rootAsWritten($composer->getPackage());
+        $checks = static fn (): MoveChecks => MoveChecks::of(MoveCheckers::forProject($root, $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), $deadline, $lockrot->advisoryLookup()));
         $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $event->getIO(), $config, $repositories, $project, $lockrot, $env, $deadline, $checks, $lock->platform()['php'] ?? null);
 
         $report = $analyzer->analyzePackages($packages, $lock, $project, $includeDev);
@@ -180,6 +190,67 @@ final class InstallTimeSummary
         if ($lockrot->installTimeStrict() && $event->isExecutingOperations() && $gate !== null && $run !== null && $gate->fails()) {
             throw new InstallBlockedException('lockrot: install-time-strict stopped the install; '.RunGateText::render($gate, $run).'; run composer lockrot for details');
         }
+    }
+
+    /**
+     * A copy of the root whose stability flags and references come from its own links, as
+     * RootPackageLoader::load() reads them from composer.json. `composer update name:constraint`
+     * and `--with` add both to the running root only, and a later command does not have them.
+     */
+    public static function rootAsWritten(RootPackageInterface $root): RootPackageInterface
+    {
+        $written = clone $root;
+        $flags = [];
+        $references = [];
+        foreach ([$root->getRequires(), $root->getDevRequires()] as $links) {
+            $constraints = array_map(static fn (Link $link): string => $link->getConstraint()->getPrettyString(), $links);
+            $flags = RootPackageLoader::extractStabilityFlags($constraints, $root->getMinimumStability(), $flags);
+            $references = RootPackageLoader::extractReferences($constraints, $references);
+        }
+        $written->setStabilityFlags($flags);
+        $written->setReferences($references);
+
+        return $written;
+    }
+
+    /**
+     * The manifest with the root's `require` and `require-dev`, as the run would write it. A name
+     * that the manifest lists keeps its spelling. A constraint keeps its text, so `self.version`
+     * stays `self.version`. The copy's {@see ProjectConfig::lockOutOfSync()} compares the lock hash
+     * against composer.json as read, as Composer's Locker does.
+     */
+    public static function withRootRequirements(ProjectConfig $project, string $composerFile, RootPackageInterface $root): ProjectConfig
+    {
+        $json = JsonReader::readObject($composerFile);
+        $own = self::withOwnLinks($root);
+        foreach ([ProjectConfig::REQUIRE => $own->getRequires(), ProjectConfig::REQUIRE_DEV => $own->getDevRequires()] as $section => $links) {
+            $listed = \is_array($json[$section] ?? null) ? $json[$section] : [];
+            // Composer's ArrayLoader keeps the last of two keys that differ only in case.
+            $spelling = [];
+            foreach ($listed as $name => $constraint) {
+                $spelling[strtolower((string) $name)] = $name;
+            }
+            $written = [];
+            foreach ($listed as $name => $constraint) {
+                $link = $links[strtolower((string) $name)] ?? null;
+                if ($link !== null && $spelling[strtolower((string) $name)] === $name) {
+                    $written[$name] = $link->getPrettyConstraint();
+                    unset($links[strtolower((string) $name)]);
+                }
+            }
+            foreach ($links as $name => $link) {
+                $written[$name] = $link->getPrettyConstraint();
+            }
+            $json[$section] = $written;
+        }
+
+        return ProjectConfig::fromArray($json)->withManifestOf($project);
+    }
+
+    /** A root with a branch alias gives its links with the alias version in place of `self.version`. */
+    private static function withOwnLinks(RootPackageInterface $root): RootPackageInterface
+    {
+        return $root instanceof RootAliasPackage ? $root->getAliasOf() : $root;
     }
 
     /**

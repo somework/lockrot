@@ -1,8 +1,8 @@
 {
  "pr": "7d",
  "source": {
-  "cases.json": "41cefb8d6c58d53bed23af2bf2f877dd3047905cf8189ce2b08493ed0e6a1507",
-  "model_run_date": "2026-11-12"
+  "cases.json": "47fa53deab777d84fbae2cc189251d9f01d9c4ff010a573be64c46c3a818ff35",
+  "model_run_date": "2026-11-14"
  },
  "suite": "every case and the composite pass the report-2 field reference (I21) with 0 violations",
  "page_goldens": {
@@ -33,7 +33,8 @@
   "host-accepted‡",
   "host-accept-expired‡",
   "no-feed-accepted‡",
-  "vcs-accepted‡"
+  "vcs-accepted‡",
+  "mc-joint-unsafe-holder‡"
  ],
  "negative_bases": [
   "composite",

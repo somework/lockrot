@@ -17,8 +17,11 @@ use Composer\IO\IOInterface;
 use Composer\Json\JsonFile;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
+use Composer\Package\Loader\RootPackageLoader;
 use Composer\Package\Locker;
+use Composer\Package\RootAliasPackage;
 use Composer\Package\RootPackage;
+use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryFactory;
 use Composer\Repository\RepositoryInterface;
 use Composer\Util\Loop;
@@ -43,13 +46,17 @@ use Lockrot\Exception\InstallBlockedException;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
+use Lockrot\Solver\MoveCheck;
+use Lockrot\Solver\MoveCheckers;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\ColdConfigSchema;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\HermeticComposerConfig;
 use Lockrot\Tests\Support\MarkupRefusingFormatter;
+use Lockrot\Tests\Support\RecordingComposerRepository;
 use Lockrot\Tests\Support\RecordingIO;
 use Lockrot\Verdict\FailOn;
+use Lockrot\Verdict\MoveChecks;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
@@ -246,14 +253,14 @@ final class InstallTimeSummaryTest extends TestCase
         return (new ArrayLoader())->load($entry);
     }
 
-    private function event(BufferIO $io, Transaction $transaction, bool $executeOperations = true, bool $devMode = false, ?Locker $locker = null): InstallerEvent
+    private function event(BufferIO $io, Transaction $transaction, bool $executeOperations = true, bool $devMode = false, ?Locker $locker = null, ?RootPackageInterface $root = null): InstallerEvent
     {
         $server = self::$server;
         self::assertNotNull($server);
         $config = $server->config();
         $composer = new Composer();
         $composer->setConfig($config);
-        $composer->setPackage(new RootPackage('__root__', '1.0.0.0', '1.0.0'));
+        $composer->setPackage($root ?? new RootPackage('__root__', '1.0.0.0', '1.0.0'));
         $composer->setRepositoryManager(RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config)));
         $composer->setLocker($locker ?? self::locker($io, $config));
 
@@ -1175,6 +1182,179 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringContainsString('note: lock: lockrot skips 1 entry whose name is no Composer package name', $output, $output);
     }
 
+    /**
+     * `composer update foo/foo:dev-main#abc` gives the root a stability flag and a reference that
+     * composer.json does not hold. A later `composer update bar/bar` reloads composer.json, and
+     * Composer refuses it: the locked foo/foo dev-main is below the minimum stability.
+     */
+    public function testTheMoveCheckSolvesWithoutTheInlineFlagsOfAnUpdate(): void
+    {
+        $loader = new ArrayLoader();
+        $root = $loader->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['foo/foo' => '*', 'bar/bar' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $inline = ['foo/foo' => 'dev-main#abc'];
+        $root->setStabilityFlags(RootPackageLoader::extractStabilityFlags($inline, $root->getMinimumStability(), $root->getStabilityFlags()));
+        $root->setReferences(RootPackageLoader::extractReferences($inline, $root->getReferences()));
+        $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
+        $lock = LockFile::fromArray(['packages' => [['name' => 'foo/foo', 'version' => 'dev-main'] + $packagist, ['name' => 'bar/bar', 'version' => '1.0.0'] + $packagist]]);
+        $remote = [$loader->load(['name' => 'foo/foo', 'version' => 'dev-main']), $loader->load(['name' => 'bar/bar', 'version' => '1.0.0']), $loader->load(['name' => 'bar/bar', 'version' => '1.1.0'])];
+
+        $written = InstallTimeSummary::rootAsWritten($root);
+        $baseline = MoveCheckers::forProject($written, $lock, ProjectConfig::empty(), new Config(false), [new RecordingComposerRepository($remote)], '8.4', false, Deadline::never())->baseline()->check();
+
+        self::assertSame(MoveCheck::REFUSED, $baseline->result());
+        self::assertSame([[], []], [$written->getStabilityFlags(), $written->getReferences()]);
+        self::assertSame([['foo/foo' => BasePackage::STABILITY_DEV], ['foo/foo' => 'abc']], [$root->getStabilityFlags(), $root->getReferences()], 'the running command keeps its root');
+    }
+
+    /** The move check of the install-time block gets the root that the next command reads. */
+    public function testTheInstallTimeMoveCheckSolvesWithoutTheInlineFlagsOfAnUpdate(): void
+    {
+        $loader = new ArrayLoader();
+        $require = ['foo/foo' => '*', 'bar/bar' => '^1.0'];
+        $dir = $this->project();
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/app', 'require' => $require, 'extra' => ['lockrot' => ['target-php' => '8.4']]]));
+        $packagist = ['notification-url' => 'https://packagist.org/downloads/'];
+        file_put_contents($dir.'/composer.lock', (string) json_encode(['packages' => [['name' => 'foo/foo', 'version' => 'dev-main'] + $packagist, ['name' => 'bar/bar', 'version' => '1.0.0'] + $packagist], 'packages-dev' => []]));
+        $root = $loader->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => $require], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $inline = ['foo/foo' => 'dev-main#abc'];
+        $root->setStabilityFlags(RootPackageLoader::extractStabilityFlags($inline, $root->getMinimumStability(), $root->getStabilityFlags()));
+        $root->setReferences(RootPackageLoader::extractReferences($inline, $root->getReferences()));
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$loader->load(['name' => 'bar/bar', 'version' => '1.0.0'])]), true, false, null, $root);
+        $event->getComposer()->getRepositoryManager()->addRepository(new RecordingComposerRepository([$loader->load(['name' => 'foo/foo', 'version' => 'dev-main']), $loader->load(['name' => 'bar/bar', 'version' => '1.0.0']), $loader->load(['name' => 'bar/bar', 'version' => '1.1.0'])]));
+
+        (new InstallTimeSummary(\Closure::fromCallable([$this, 'moveChecksRecordingAnalyzerFactory']), static fn (): float => 0.0))->onPreOperationsExec($event);
+
+        self::assertNotNull($this->moveChecksAtHandOver, $io->getOutput());
+        self::assertSame(MoveCheck::REFUSED, ($this->moveChecksAtHandOver)()->checker()->baseline()->check()->result());
+    }
+
+    /**
+     * `composer require foo/foo:dev-main#abc --dry-run` puts the link in the root and in no file.
+     * The flag and the reference come from that link, as the written composer.json gives them.
+     */
+    public function testARootLinkKeepsTheFlagAndTheReferenceOfItsConstraint(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require-dev' => ['foo/foo' => 'dev-main#abc']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+
+        $written = InstallTimeSummary::rootAsWritten($root);
+
+        self::assertSame([['foo/foo' => BasePackage::STABILITY_DEV], ['foo/foo' => 'abc']], [$written->getStabilityFlags(), $written->getReferences()]);
+    }
+
+    public function testARequireLinkKeepsTheFlagAndTheReferenceOfItsConstraint(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['foo/foo' => 'dev-main#abc']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+
+        $written = InstallTimeSummary::rootAsWritten($root);
+
+        self::assertSame([['foo/foo' => BasePackage::STABILITY_DEV], ['foo/foo' => 'abc']], [$written->getStabilityFlags(), $written->getReferences()]);
+    }
+
+    /**
+     * `composer require phpzip/phpzip --dry-run` adds the requirement to the root in memory and
+     * writes no composer.json. The block reads the manifest that the command would write, so it
+     * equals the block of the `composer require` that writes it.
+     */
+    public function testARequireDryRunJudgesTheNewRequirementAsTheWrittenManifestDoes(): void
+    {
+        $manifest = ['name' => 'lockrot/install-time-test', 'require' => ['vendor/direct-req' => '1.0.0'], 'extra' => ['lockrot' => ['target-php' => '8.4']]];
+        $written = $manifest;
+        $written['require']['phpzip/phpzip'] = '2.0.8';
+        $direct = ['name' => 'vendor/direct-req', 'version' => '1.0.0', 'require' => ['php' => '>=5.3.0'], 'type' => 'library', 'notification-url' => 'https://packagist.org/downloads/', 'time' => '2026-01-01T00:00:00+00:00'];
+        $root = (new ArrayLoader())->load(['name' => 'lockrot/install-time-test', 'version' => '1.0.0', 'require' => $written['require']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $outputs = [];
+        foreach ([[$written, true], [$manifest, false]] as [$json, $executeOperations]) {
+            $dir = $this->project([], [$direct, self::PHPZIP]);
+            $contents = (string) json_encode($json);
+            file_put_contents($dir.'/composer.json', $contents);
+            // The lock of the update carries the hash of the composer.json that Composer's Locker holds.
+            file_put_contents($dir.'/composer.lock', (string) json_encode(['content-hash' => Locker::getContentHash($contents), 'packages' => [$direct, self::PHPZIP], 'packages-dev' => []]));
+            $io = new BufferIO();
+            $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]), $executeOperations, false, null, $root);
+
+            (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+            $outputs[] = $io->getOutput();
+        }
+
+        self::assertStringContainsString('phpzip/phpzip 2.0.8', $outputs[0]);
+        self::assertSame($outputs[0], $outputs[1]);
+    }
+
+    /** A constraint keeps its text as written, `self.version` included, and a listed name keeps its spelling. */
+    public function testTheManifestAsWrittenKeepsEachConstraintAsWritten(): void
+    {
+        $dir = $this->tempDir('lockrot-install-time-');
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/app', 'require' => ['Acme/Sib' => 'self.version', 'phpzip/phpzip' => '2.0.8']]));
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.2.0', 'require' => ['Acme/Sib' => 'self.version', 'phpzip/phpzip' => '2.0.8', 'new/pkg' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+
+        $written = InstallTimeSummary::withRootRequirements(ProjectConfig::fromFile($dir.'/composer.json'), $dir.'/composer.json', $root);
+
+        self::assertSame(['acme/sib' => 'self.version', 'phpzip/phpzip' => '2.0.8', 'new/pkg' => '^1.0'], $written->constraints(ProjectConfig::REQUIRE));
+        self::assertSame([ProjectConfig::REQUIRE => 'Acme/Sib'], $written->listedIn('acme/sib'));
+    }
+
+    /** A root with a branch alias gives its links with the alias version in place of `self.version`. */
+    public function testTheManifestAsWrittenKeepsSelfVersionUnderABranchAlias(): void
+    {
+        $dir = $this->tempDir('lockrot-install-time-');
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/app', 'require' => ['acme/sib' => 'self.version']]));
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => 'dev-main', 'require' => ['acme/sib' => 'self.version']], RootPackage::class);
+        self::assertInstanceOf(RootPackage::class, $root);
+        $aliased = new RootAliasPackage($root, '2.9999999.9999999.9999999-dev', '2.x-dev');
+
+        $written = InstallTimeSummary::withRootRequirements(ProjectConfig::fromFile($dir.'/composer.json'), $dir.'/composer.json', $aliased);
+
+        self::assertSame(['acme/sib' => 'self.version'], $written->constraints(ProjectConfig::REQUIRE));
+    }
+
+    /** Composer's ArrayLoader keeps the last of two keys that differ only in case. */
+    public function testTheManifestAsWrittenKeepsTheLastSpellingOfADuplicateKey(): void
+    {
+        $dir = $this->tempDir('lockrot-install-time-');
+        $require = ['Vendor/A' => '^1.0', 'vendor/a' => '^2.0'];
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/app', 'require' => $require]));
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => $require], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+
+        $written = InstallTimeSummary::withRootRequirements(ProjectConfig::fromFile($dir.'/composer.json'), $dir.'/composer.json', $root);
+
+        self::assertSame([[ProjectConfig::REQUIRE => 'vendor/a'], ['vendor/a' => '^2.0']], [$written->listedIn('vendor/a'), $written->constraints(ProjectConfig::REQUIRE)]);
+    }
+
+    /** A dry run whose root holds the manifest's links reads composer.json as written, its lock hash included. */
+    public function testADryRunWithTheLinksOfTheManifestStillComparesTheLockHash(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'lockrot/install-time-test', 'version' => '1.0.0', 'require' => ['phpzip/phpzip' => '2.0.8']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $this->project();
+        $io = new BufferIO();
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]), false, false, null, $root));
+
+        self::assertStringContainsString('note: lock: the lock file does not match composer.json', $io->getOutput());
+    }
+
+    /** A plugin can add a link that composer.json does not hold. The lock hash is still compared against the file as read. */
+    public function testADryRunWithALinkThatTheManifestLacksStillComparesTheLockHash(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'lockrot/install-time-test', 'version' => '1.0.0', 'require' => ['phpzip/phpzip' => '2.0.8', 'merged/lib' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $this->project();
+        $io = new BufferIO();
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]), false, false, null, $root));
+
+        self::assertStringContainsString('note: lock: the lock file does not match composer.json', $io->getOutput());
+    }
+
     public function testInstallTimeBudgetComesFromConfig(): void
     {
         $this->project(['install-time-budget' => 1]);
@@ -1198,6 +1378,9 @@ final class InstallTimeSummaryTest extends TestCase
     /** @var list<string> the target minor of each LockrotConfig that reaches the factory */
     private array $targetsAtHandOver = [];
 
+    /** @var (\Closure(): MoveChecks)|null */
+    private ?\Closure $moveChecksAtHandOver = null;
+
     /** The seconds the deadline has left when the factory gets it, read before the analysis runs. */
     private function remainingAtHandOver(InstallerEvent $event): ?float
     {
@@ -1205,6 +1388,17 @@ final class InstallTimeSummaryTest extends TestCase
         (new InstallTimeSummary(\Closure::fromCallable([$this, 'recordingAnalyzerFactory']), $monotonicNow))->onPreOperationsExec($event);
 
         return $this->remainingAtHandOver;
+    }
+
+    /**
+     * @param list<RepositoryInterface>     $repositories
+     * @param (\Closure(): MoveChecks)|null $moveChecks
+     */
+    private function moveChecksRecordingAnalyzerFactory(IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline, ?string $requirePhp, ?\Closure $moveChecks): Analyzer
+    {
+        $this->moveChecksAtHandOver = $moveChecks;
+
+        return ($this->analyzerFactory())($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline);
     }
 
     /** @param list<RepositoryInterface> $repositories */

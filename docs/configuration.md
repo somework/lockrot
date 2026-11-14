@@ -401,7 +401,7 @@ not fail on it. It stays listed as a skip, hides no flag and changes no score.
 
 | Field | Required | Effect |
 |---|---|---|
-| `check` | yes | `repository_activity` (S3, S4), `release_metadata` (S2, S5, S8) or `advisories` (S9) |
+| `check` | yes | `repository_activity` (S3, S4), `release_metadata` (S2 and S8, with S5 when S5 could fire and S11 when S11 fired) or `advisories` (S9) |
 | `host` | exactly one of `host`, `repository` and `package` | The host of the package's repository, as `activity.host` writes it: lower case, with its port, without a scheme or a path (`codeberg.org`, `git.example.com:8443`). Never with `check: advisories` |
 | `repository` | | The repository the package is installed from: its vcs URL (`https://…`, or the scp form `git@host:path`), or the URL of a Composer repository |
 | `package` | | A package name, or a shell-style pattern, matched as an `ignore` entry matches it |

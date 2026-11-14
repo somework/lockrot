@@ -380,6 +380,39 @@ class ACaseWhoseDesignedRowsMissItsNewestReleaseIsNotHydrated(unittest.TestCase)
         self.assertIsNone(project_fixtures.unhydrated(self.case('3.0.0', world=False)))
 
 
+class ACaseWhoseLockHoldsANameOutsideComposersNameRuleIsNotHydrated(unittest.TestCase):
+    """mc-joint-unsafe-holder‡: lockrot skips such a lock entry with the note package_name_invalid, so no finding names it."""
+    @staticmethod
+    def case(parent='acme/gz-client', world_name='acme/gz-client', holder='acme/gz-client'):
+        return {'run': {}, 'finding': {'package': 'guzzlehttp/guzzle', 'metadata': {'status': 'read'}, 'direct_dependents': [],
+                                       'next_step': {'moves_with': [{'package': holder}]}},
+                'parents': [{'package': parent}],
+                'solver_world': {'world': {'lock': {'packages': [{'name': 'guzzlehttp/guzzle'}, {'name': world_name}], 'packages-dev': []}}}}
+
+    def test_a_holder_name_outside_the_rule_is_not_hydrated(self):
+        self.assertEqual('package-name-invalid', project_fixtures.unhydrated(self.case('h/x;calc', 'h/x;calc', 'h/x;calc')))
+        self.assertEqual('package-name-invalid', project_fixtures.unhydrated(self.case(world_name='Acme/GZ')))
+        self.assertEqual('package-name-invalid', project_fixtures.unhydrated(self.case(holder='acme/gz client')))
+
+    def test_names_inside_the_rule_hydrate(self):
+        self.assertIsNone(project_fixtures.unhydrated(self.case('acme/gz--client', 'acme/gz.client', 'acme/gz_client')))
+
+    def test_a_name_outside_the_rule_in_any_lock_entry_that_inputs_of_writes_is_not_hydrated(self):
+        cases = []
+        for key, value in (('chain', ['acme/app', 'h/x;calc', 'guzzlehttp/guzzle']), ('direct_dependents', ['h/x;calc'])):
+            case = self.case()
+            case['finding'][key] = value
+            cases.append(case)
+        case = self.case()
+        case['finding']['next_step']['held_by'] = [{'source': 'dependency', 'package': 'h/x;calc'}]
+        cases.append(case)
+        case = self.case()
+        case['run_inputs'] = {'_lock_links': {'h/x;calc': {'version': '1.0.0'}}}
+        cases.append(case)
+
+        self.assertEqual(['package-name-invalid'] * 4, [project_fixtures.unhydrated(c) for c in cases])
+
+
 class ADirectDependentThatDoesNotRequireThePackageKeepsTheModelsChain(unittest.TestCase):
     """capped-nette‡: a second direct dependent reaches the package through the chain, never by a shorter path."""
     FINDING = dict(ACaseWithoutBranchRowsHydratesFromItsRunReleases.FINDING, package='nette/schema', version='v1.3.2',

@@ -250,6 +250,13 @@ final class ComposerHttpClient implements HttpClientInterface
 
                     return;
                 }
+                // Composer's HttpDownloader::addJob() stores what this pattern reads as the credential of the URL's origin for the rest of the run.
+                if (parse_url($target, \PHP_URL_USER) !== null || preg_match('{^https?://([^:/]+):([^@/]+)@([^/]+)}i', $target) === 1) {
+                    $results[$url] = HttpResult::failure($url, 'redirect to a URL with a user name or a password', $this->clock->now());
+                    $done();
+
+                    return;
+                }
                 $options = self::options($this->timeoutSeconds(), self::withoutCredentials($headers));
                 if ($this->refusesRedirects) {
                     $options['prevent_url_access_callable'] = static fn (): bool => $budgetEnded($url);

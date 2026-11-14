@@ -178,13 +178,19 @@ def changed_since(base: str, root: str) -> Ranges:
     Infection's --git-diff-lines."""
     found: Ranges = {}
     path = ''
+    header = False
     # The explicit prefixes override diff.noprefix and diff.mnemonicPrefix of a user's git config, and
-    # the parser keys each file on '+++ b/'.
+    # the parser keys each file on '+++ b/'. Only the lines between 'diff --git' and the first hunk
+    # are a header: an added line that starts with '++ ' also prints as '+++ ' inside a hunk.
     for line in git(root, 'diff', '--no-ext-diff', '--no-color', '--src-prefix=a/', '--dst-prefix=b/', '--unified=0', '--diff-filter=AM', base, '--', 'src').splitlines():
-        if line.startswith('+++ '):
+        if line.startswith('diff --git '):
+            header = True
+        if header and line.startswith('+++ '):
             path = line[6:] if line.startswith('+++ b/') else ''
             found.setdefault(path, [])
         hunk = HUNK.match(line)
+        if hunk:
+            header = False
         if hunk and path and int(hunk.group(2) or 1) > 0:
             start = int(hunk.group(1))
             found[path].append((start, start + int(hunk.group(2) or 1) - 1))

@@ -82,9 +82,11 @@ final class AgeText
             ['newest', $age->release()->version(), $age->release(), [$thresholds->releaseWarnYears(), $thresholds->releaseHighYears(), 'release']],
             ['last '.$event, null, $age->push(), [$thresholds->pushWarnYears(), $thresholds->pushHighYears(), 'push']],
         ];
+        // One space past the longest version keeps it apart from the date or the cause that follows.
+        $width = max(10, ...array_map(static fn (array $row): int => \strlen($row[1] ?? '') + 1, $rows));
         $lines = [];
         foreach ($rows as [$name, $release, $reading, $limits]) {
-            $head = str_pad($name, 11).str_pad($release ?? '', 10);
+            $head = str_pad($name, 11).str_pad($release ?? '', $width);
             if (!$reading->isMeasured()) {
                 $lines[] = $head.'not read ('.FindingBlock::checkWords($finding, (string) $reading->unmeasured()).')';
                 continue;

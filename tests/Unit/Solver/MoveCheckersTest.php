@@ -584,6 +584,33 @@ final class MoveCheckersTest extends TestCase
         }
     }
 
+    /**
+     * A `require` name that only `packages-dev` holds stays free in a non-dev install, so the lock
+     * does not hold every root requirement, and the unloaded name leaves the baseline not checked.
+     */
+    public function testARequireNameThatOnlyPackagesDevHoldsLeavesTheBaselineNotChecked(): void
+    {
+        $lock = LockFile::fromArray([
+            'packages' => [['name' => 'acme/lib', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']],
+            'packages-dev' => [['name' => 'acme/new', 'version' => '1.0.0', 'require' => ['acme/plugin' => '^1.0'], 'notification-url' => 'https://packagist.org/downloads/']],
+        ]);
+        $loader = new ArrayLoader();
+        $remote = [
+            $loader->load(['name' => 'acme/lib', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/lib', 'version' => '1.2.0']),
+            $loader->load(['name' => 'acme/plugin', 'version' => '1.0.0']),
+            $loader->load(['name' => 'acme/plugin', 'version' => '1.1.0', 'require' => ['acme/private' => '^1.0']]),
+        ];
+        $root = $loader->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^2.0', 'acme/new' => '^1.0'], 'require-dev' => ['acme/lib' => '^1.0']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $vcs = new ConfiguredRepository(['type' => 'vcs', 'url' => 'https://git.example.org/acme/private']);
+        $checker = MoveCheckers::forProject($root, $lock, ProjectConfig::empty(), new Config(false), [$vcs, new RecordingComposerRepository($remote)], '8.4', false, Deadline::never());
+
+        $baseline = $checker->baseline()->check();
+
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::UNLOADED_NAME], [$baseline->result(), $baseline->reason()]);
+    }
+
     /** @return iterable<string, array{?string, array{string, ?string}}> */
     public static function locksThatHoldEveryRootRequirement(): iterable
     {

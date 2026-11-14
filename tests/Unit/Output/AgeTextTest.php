@@ -136,6 +136,40 @@ final class AgeTextTest extends TestCase
         ], AgeText::block($finding, new Thresholds()));
     }
 
+    /**
+     * @param non-empty-string $newestStart
+     *
+     * @dataProvider longVersions
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('longVersions')]
+    public function testAVersionOfTenOrMoreCharactersKeepsASeparatorBeforeTheNextColumn(string $installed, string $newest, string $installedLine, string $newestStart): void
+    {
+        $snapshot = AgeReading::unmeasuredBecause(AgeMeasure::BRANCH_SNAPSHOT);
+        $finding = self::finding($installed, $snapshot, self::release($newest, '2024-05-01', 2.0), $snapshot, self::push('2026-09-25', 0.0), RepoRef::GITHUB);
+
+        $lines = AgeText::block($finding, new Thresholds());
+
+        self::assertSame($installedLine, $lines[0]);
+        self::assertStringStartsWith($newestStart, $lines[2]);
+    }
+
+    /** @return iterable<string, array{string, string, string, non-empty-string}> */
+    public static function longVersions(): iterable
+    {
+        yield 'branch and prerelease' => [
+            'dev-master',
+            '2.0.0-alpha1',
+            'installed  dev-master   not read (a branch snapshot has no release branch)',
+            'newest     2.0.0-alpha1 2024-05-01',
+        ];
+        yield 'long newest version' => [
+            'v6.4.13',
+            'v6.4.13-RC1',
+            'installed  v6.4.13     not read (a branch snapshot has no release branch)',
+            'newest     v6.4.13-RC1 2024-05-01',
+        ];
+    }
+
     private static function installed(string $date, float $years, ?string $datedBy = null): AgeReading
     {
         return AgeReading::measured(new \DateTimeImmutable($date.'T10:00:00+00:00'), (int) round($years * 10), $years, null, $datedBy, null, AgeReading::INSTALLED);

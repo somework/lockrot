@@ -79,6 +79,13 @@ carries `User-Agent: lockrot`.
 | GitLab | `GET https://{host}/api/v4/projects/{path}/repository/commits?all=true&per_page=1`. With credentials, also `GET https://{host}/api/v4/projects/{path}`. `{path}` is the project path URL-encoded as one segment, for example `group%2Fproject` | `PRIVATE-TOKEN: …`, to gitlab.com only |
 | Bitbucket | `GET https://api.bitbucket.org/2.0/repositories/{workspace}/{slug}/commits?pagelen=1` | None: Composer's credentials only |
 
+Each of these requests has a timeout of 10 seconds. With PHP's curl extension, the timeout runs
+from connect to the last byte. Without it, the timeout is the longest wait for data. Composer's
+own metadata requests use a longer limit. A request that needs more time fails, and Composer
+can retry it. A repository whose request still fails reads S10 `fetch_failed`, with the
+[unreachable](notes.md#repository_activity_unreachable) note. In an install-time run, the timeout
+of a request is the time left of the [budget](install-time.md#time-budget), at least one second.
+
 ### Which credentials
 
 - A host counts as authenticated, with no cap, when lockrot has a token for it or Composer holds
@@ -103,9 +110,11 @@ carries `User-Agent: lockrot`.
   name the public host. lockrot reads only these variables. A host that only a `gh` or `glab`
   configuration file names is not seen. In that case, set the issuer variable of that host, or pass
   the token as `LOCKROT_GITHUB_TOKEN` or `LOCKROT_GITLAB_TOKEN`. An issuer URL that two URL parsers
-  read as different hosts names no public host: it holds a backslash in its authority, or an `@` in
-  the path, query or fragment. When the host after the last `@` is the public host, `-v` names "an
-  issuer that URL parsers read two ways". Else `-v` names that host.
+  read as different hosts names no public host. Such a URL holds a backslash in its authority, or
+  an `@` in the path, query or fragment. A control character or a space at either end, or a tab or
+  a newline in it, has the same effect. When the public host is the host after the last `@`, or the
+  host without those characters, `-v` names "an issuer that URL parsers read two ways". Else `-v`
+  names that host.
 
 - lockrot cannot keep Composer's own credentials from a host. A setup step that writes the
   runner's token into Composer's `github-oauth` for github.com makes Composer send it to
@@ -122,6 +131,8 @@ carries `User-Agent: lockrot`.
   of such a list.
 
 - When a host redirects to another origin, lockrot asks that origin again without its own header.
+  A redirect to a URL that holds a user name or a password is a failed request, so a redirect
+  cannot replace Composer's credentials for a host.
   Where Composer cannot stop a redirect (without the curl extension), lockrot
   follows each same-origin redirect of a request with its header itself.
 
@@ -173,6 +184,10 @@ composer config --global gitlab-token.git.drupalcode.org <token>
 - Without a token, lockrot asks the host for the newest commit only. The answer carries no archived
   flag, so S3 cannot fire, and each such finding carries the skip
   `{check: repository_archived, reason: no_token}`.
+- lockrot asks a GitLab host over https only, also for an `http://` clone URL with Composer's
+  `secure-http` set to `false`. A host that serves its API only over http gives S10 `fetch_failed`
+  and the [Unreachable](notes.md#repository_activity_unreachable) note for each of its packages.
+  Accept its gap with [`accept-unchecked`](configuration.md#accept-unchecked).
 - A Forgejo or Gitea host is not GitLab: `gitlab-domains` cannot make it askable, and Composer's
   `forgejo-domains` does not either. Accept its gap with
   [`accept-unchecked`](configuration.md#accept-unchecked).

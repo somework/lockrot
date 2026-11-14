@@ -20,12 +20,16 @@ on:
 permissions:
   contents: read
 jobs:
+  # Every job name starts with `full-check`: ruleset 23668295 requires the job names of ci.yml, and a
+  # subset run, whose skipped shards end green, must not post a check run under one of them.
   subset:
+    name: full-check subset
     runs-on: ubuntu-latest
     outputs:
       shards: ${{ steps.subset.outputs.shards }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
       - id: subset
         env: {REF: '${{ github.ref_name }}'}
         # An assignment, not `echo "shards=$(...)"`: bash -e stops on the script's failure only there.
@@ -35,6 +39,7 @@ jobs:
           echo "This full check mutates the shards $shards." >> "$GITHUB_STEP_SUMMARY"
   # A misspelt shard name fails the subset job before this job takes a runner for the coverage run.
   mutation-coverage:
+    name: full-check mutation-coverage
     needs: subset
     runs-on: ubuntu-latest
     steps:
@@ -65,7 +70,7 @@ jobs:
           - {name: repository data, filter: 'src/Data/Repository', min_msi: 96}
           - {name: project inputs and self-update, filter: 'src/Lock src/Graph src/Config src/SelfUpdate', min_msi: 96}
           - {name: data and the rest, filter: 'src/Data/Advisory src/Data/Forge src/Data/Http src/Data/Cache src/Data/Php src/Data/Abandoned src/Baseline src/Filesystem src/Allowlist src/Json src/Exception src/Version.php src/Clock.php src/Deadline.php src/AsciiCase.php', min_msi: 96}
-    name: mutation (${{ matrix.shard.name }})
+    name: full-check mutation (${{ matrix.shard.name }})
     # A job's `if` cannot read the matrix, so a shard outside the subset still starts, and its steps skip.
     steps:
       - if: "!contains(fromJSON(needs.subset.outputs.shards), matrix.shard.name)"
@@ -96,6 +101,7 @@ jobs:
         with: {name: 'infection (${{ matrix.shard.name }})', path: 'build/infection*.*', if-no-files-found: ignore}
   # ci.yml's move-check-oracle job gives its reason.
   move-check-oracle:
+    name: full-check move-check-oracle
     runs-on: ubuntu-latest
     steps:
       # composer update runs package code, and no later step needs the token.

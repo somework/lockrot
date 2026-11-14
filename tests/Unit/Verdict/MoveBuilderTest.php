@@ -162,6 +162,17 @@ final class MoveBuilderTest extends TestCase
         self::assertSame([[], '2.0+x|calc'], [$move->commands(), $move->unsafeArgument()]);
     }
 
+    /** A step that the argument rule leaves out still quotes its values, so a pipe in them names the move's unsafe argument. */
+    public function testAConstraintWithAPipeInAStepThatTheArgumentRuleLeavesOutIsTheUnsafeArgument(): void
+    {
+        [$row, $context] = self::checkedOn(self::factsOf([['2.0.0', '2026-01-01', '>=7.4']]), ['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]]);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0+x|y;calc'), [], null, $context);
+
+        self::assertSame([[], '2.0+x|y;calc'], [$move->commands(), $move->unsafeArgument()]);
+    }
+
     /** Under `config.lock` false the move has no command for that reason, so the unsafe clause does not apply. */
     public function testAMoveUnderALockThatComposerIgnoresGetsNoUnsafeArgument(): void
     {
@@ -537,6 +548,48 @@ final class MoveBuilderTest extends TestCase
             [MoveCheck::RESOLVES, [], [['package' => 'h/x', 'installed_version' => '1.0.0', 'version' => '2.1.0']], [['composer', 'require', 'a/b:^2.0', '--no-update'], ['composer', 'update', 'a/b', 'h/x']]],
             [$check->result(), $move->heldBy(), $move->movesWith(), $move->commands()]
         );
+    }
+
+    /**
+     * A lock can name a holder with a character that no step may quote. Its update step drops out,
+     * and the `--no-update` step must not stay alone: it changes composer.json and installs nothing.
+     */
+    public function testAJointMoveWhoseHolderNameNoStepMayQuoteKeepsNoLoneRequireStep(): void
+    {
+        $checks = [
+            'require a/b ^2.0 ' => [
+                'result' => 'refused', 'form' => null, 'reason' => null,
+                'holds' => [['source' => 'package', 'package' => 'h/x;calc', 'version' => '1.0.0', 'link' => 'require', 'target' => null, 'constraint' => '^1.0', 'holder' => null]],
+            ],
+            'joint require a/b ^2.0 with h/x;calc' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'installs' => ['a/b' => '2.0.0', 'h/x;calc' => '2.1.0'], 'holds' => []],
+        ];
+        [$row, $context] = self::checked($checks, true, null, ['a/b' => '^1.0']);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+
+        self::assertSame([['package' => 'h/x;calc', 'installed_version' => '1.0.0', 'version' => '2.1.0']], $move->movesWith());
+        self::assertSame([], $move->commands());
+    }
+
+    public function testARequireStepThatNoShellQuotesSafelyLeavesOutThePhpStepOfItsMove(): void
+    {
+        [$row, $context] = self::checked(['*' => ['result' => 'resolves', 'form' => 'inline', 'reason' => null, 'holds' => []]], true, '>=8.1', [], '>=7.4');
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::RAISE_PHP, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0;calc'), [], null, $context);
+
+        self::assertSame([], $move->commands());
+    }
+
+    public function testAWhyNotStepThatNoShellQuotesSafelyLeavesTheOtherStepsOfItsMove(): void
+    {
+        [$row, $context] = self::checkedOn(self::factsOf([['2.0.0+x;calc', '2026-01-01', '>=7.4']]), ['*' => ['result' => 'not_checked', 'form' => null, 'reason' => 'offline', 'holds' => []]], true, ['a/b' => '^1.0']);
+        [$lower] = $context->lowestAdmitted($row, '^2.0');
+
+        $move = MoveBuilder::build(MoveDraft::of(Move::REQUIRE, FlagSet::LEFT_BEHIND)->to($row, $lower, '^2.0'), [], null, $context);
+
+        self::assertSame([['composer', 'require', 'a/b:^2.0']], $move->commands());
     }
 
     public function testAnUpdateThatAJointRequestResolvesNamesItsHoldersInTheSameStep(): void

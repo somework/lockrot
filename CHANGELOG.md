@@ -19,12 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** a newest pre-release with no date, or on a commit that three or more stable tags
   share, keeps S2 unknown, with an S10 `release_dates` entry, also when a monorepo parent is present.
   ([Dates from the monorepo](docs/verdicts.md#dates-from-the-monorepo))
-- **All formats:** libyears end at the highest stable tag. A pre-release never ends libyears,
-  dated or not, so a package whose newest tag is a pre-release reads fewer libyears (roots/wp-config
-  1.0.0 below 2.0.0-beta.1: 7.61 to 0). A lower tag with a later date, own-dated, parent-dated or on
-  a shared commit, does not make the project behind. An installed version that is the highest
-  stable tag, or a pre-release above it, is 0 behind, also when its own date is untrusted
-  (`shared_commit`, `undated`). ([Libyears](docs/verdicts.md#libyears))
+- **All formats:** libyears end at the highest stable tag, so a newest pre-release, dated or not,
+  reads fewer libyears. A lower tag with a later date does not make the project behind. Nor does a
+  date version such as `20200101` while a stable tag is on a branch. The highest stable tag, or a
+  pre-release above it, is 0 behind, also with an untrusted date (`shared_commit`, `undated`).
+  ([Libyears](docs/verdicts.md#libyears))
 - **Breaking:** **All formats:** S6 and the `has_stable_release` and `last_stable_*` fields read
   stable tags only. A tag with build metadata counts, a pre-release does not. S2 still reads
   pre-releases. A snapshot with pre-release tags only moves to the newest one, and its line says
@@ -209,13 +208,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([What lockrot contacts](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
 - **All formats:** `next_step.commands`, `security.update_now_command`, the `update now:` line and
   the `do:` command hold only arguments that every shell quotes safely. A step with another
-  version, branch or name is left out, and a release name with `|`, `<` or `>` leaves out the whole
-  move's command. Action: if a step is missing, check that lock entry before you write the command
+  version, branch or name leaves out every `update` and `require` step of its move. A release name
+  with `|`, `<` or `>` leaves out the whole move's command. Action: if a step is missing, check that lock entry before you write the command
   by hand. ([Command argument unsafe](docs/notes.md#command_argument_unsafe))
 - **CLI:** a repository host's redirect to another origin no longer receives lockrot's
   `Authorization` or `PRIVATE-TOKEN` header. lockrot asks the redirect target again without it. A
-  redirect to a URL that is not http or https, or that has no host, is a failed request, so a
-  `file://` redirect reads no local file. ([Which credentials](docs/internals.md#which-credentials))
+  redirect to a URL that is not http or https, has no host, or holds a user name or a password is
+  a failed request. So a `file://` redirect reads no local file, and a redirect cannot replace
+  Composer's credentials for a host. ([Which credentials](docs/internals.md#which-credentials))
 - **table, github, markdown:** a control character from the lock or a repository prints as an
   escape (`\x1B`), also in `--explain`, in the error lines on stderr, as in the install-time
   summary. So does a character that prints as nothing, such as a zero-width space (`\u{200B}`). A
@@ -449,11 +449,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   action writes its job summary from an `--offline` run, which shows no advisory on 0.14: upgrade
   the action before you set `version: latest`.
   ([Upgrading to 0.14](docs/changes/0.14.md#how-014-reaches-you))
-- **Breaking:** **Config:** on Composer 2.10 and later, a value that Composer refuses in
-  `COMPOSER_NO_BLOCKING`, `COMPOSER_NO_SECURITY_BLOCKING`, `COMPOSER_POLICY`,
-  `COMPOSER_POLICY_ADVISORIES_BLOCK`, `config.policy` or `config.audit` exits 2, `--offline` too.
-  0.13 read none of them. Action: set the variable to `0`, `1`, `true`, `false`, `on` or `off`,
-  or fix the key.
+- **Breaking:** **Config:** on Composer 2.10 and later, a value that Composer refuses in a
+  blocking or policy variable, such as `COMPOSER_NO_BLOCKING` or `COMPOSER_POLICY_MALWARE_BLOCK`,
+  or in `config.policy` or `config.audit` exits 2, `--offline` too. 0.13 ignored such a value.
+  Action: set a value that Composer accepts, or fix the key.
   ([The move check](docs/verdicts.md#the-move-check))
 - **Breaking:** **Config:** an `ignore[].flags`, `accept-unchecked` or `advisory-lookup` value that
   0.13 ignored and config-2 refuses (`"flags": "stale"`, `"advisory-lookup": 1`) now exits 2. One
@@ -757,9 +756,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **sarif, gitlab:** a lock entry written as `"name" : "a/b"` gets its line number.
 - **CLI:** a run exits `2` with a message that names `config.platform.php` when that value is a
   branch name, such as `dev-master`. ([Exit codes](docs/ci.md#exit-codes))
-- **CLI:** a run exits `2` with a message that names the `composer.lock` field when the field has
-  the wrong type, or when a link map such as `require` holds a numeric package name. The message
-  holds no PHP error text and no absolute path.
+- **CLI:** a `composer.lock` field with the wrong type, or a link map such as `require` that holds a
+  numeric package name, exits `2`. The message names the field and the package, and holds no PHP
+  error text and no absolute path.
 - **CLI:** a run exits `2` with a message that names composer.json and the field when a link map
   such as `require` in composer.json holds a numeric package name. The message holds no PHP error
   text and no absolute path.

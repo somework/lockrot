@@ -345,11 +345,18 @@ final class ReferenceText
             ['release', Fields::string($names, 'release'), null, 'release'],
             ['push', str_replace('{event}', self::event($in), Fields::string($names, 'push')), null, 'push'],
         ];
+        $shownVersions = array_map(static function (array $row) use ($age): string {
+            $reading = Fields::nullableObject($age, $row[0]);
+            $released = $row[2] ?? ($reading === null ? null : ($reading['version'] ?? null));
+
+            return \is_string($released) ? $released : '';
+        }, $rows);
+        // The version column is 10 wide and grows to keep one space after the longest version.
+        $width = max(10, 1 + max(array_map('strlen', $shownVersions)));
         $lines = [];
-        foreach ($rows as [$key, $name, $shown, $kind]) {
+        foreach ($rows as $i => [$key, $name, , $kind]) {
             $reading = Fields::nullableObject($age, $key);
-            $released = $shown ?? ($reading === null ? null : ($reading['version'] ?? null));
-            $head = str_pad($name, 11).str_pad(\is_string($released) ? $released : '', 10);
+            $head = str_pad($name, 11).str_pad($shownVersions[$i], $width);
             if ($reading === null) {
                 $lines[] = $head.strtr(Fields::string($words, 'not_read'), ['{reading} ' => '', '{reason words}' => $because(Fields::string($age, $key.'_unmeasured'))]);
                 continue;

@@ -738,7 +738,7 @@ def explain_schema():
             'lockrot': ref('envelope', 'The writer and the schema number.'),
             'package': ref('packageName', 'The package explained; equal to `finding.package`.'),
             'version': string('Its installed version; equal to `finding.version`.', minLength=1),
-            'finding': ref('finding', 'The finding, exactly as the report carries it (report-2\'s definition, copied).'),
+            'finding': ref('finding', 'The finding as report-2 defines it, with `baseline` null and `gate` decided as if no baseline existed.'),
             'lock': ref('lock', 'The package\'s entry in composer.lock.'),
             'metadata': nullable(ref('repositoryMetadata'), 'What the Composer repository said; null when it could not be loaded or was never asked.'),
             'run': ref('explainRun', 'What the run read.'),

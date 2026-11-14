@@ -113,6 +113,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Data/Forge/ActivityFetchPlanner.php` DecrementInteger, IncrementInteger `$checkedPackages[$forge] = ($checkedPackages[$forge] ?? 0) + 1;` — in select(): for a repository already seen, an earlier package set the counter of its forge, so `?? 0` never applies.
 - `src/Data/Forge/ActivityFetchPlanner.php` TrueValue `$seen[$repo->key()] = true;` — a set. Only `isset()` reads it.
 - `src/Data/Forge/RepoLocator.php` CastString `$bareHost = (string) preg_replace('{:\d+$}', '', $lowerHost);` — the pattern is a literal, so `preg_replace()` never returns null.
+- `src/Data/Forge/Tokens.php` Concat `return $scheme.$lead.substr($rest, 0, strcspn($rest, '/?#'));` — `$lead` is `//` only when `$scheme` is empty, so one of the two operands is always empty and their order does not change the result.
 - `src/Data/Forge/SupportSource.php` CastString `$url = (string) preg_replace('{/(?:-/)?(?:tree|src)/[^/]+$}', '', $url);` — the pattern is a literal, so `preg_replace()` never returns null.
 - `src/Data/Http/HttpResult.php` GreaterThan `if ($at === false || ($errors !== false && $errors['warning_count'] > 0)) {` — `getLastErrors()` returns false when it has nothing to report. The 7.4 leg of the test matrix kills it.
 - `src/Data/Php/PhpReleaseDates.php` CastString, Concat `$dates[(string) $minor] = new \DateTimeImmutable($date.'T00:00:00+00:00');` — PHP never casts a key with a dot to an int, and the date parser reads the date and the time in either order.

@@ -206,6 +206,41 @@ final class TokensTest extends TestCase
         self::assertSame(['GITHUB_TOKEN' => $expected], Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => $issuer], null)->withheld());
     }
 
+    public function testAPathWithOneLeadingSlashIsNotShownAsASchemeRelativeHost(): void
+    {
+        $withheld = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => '/ghe.corp'], null)->withheld();
+
+        self::assertSame(['GITHUB_TOKEN'], array_keys($withheld));
+        self::assertStringStartsNotWith('//', $withheld['GITHUB_TOKEN']);
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function issuersWithWhitespaceOrNoScheme(): iterable
+    {
+        yield 'a leading space before the public host' => [' https://github.com', Tokens::READ_TWO_WAYS];
+        yield 'a trailing newline after a bare public host' => ["github.com\n", Tokens::READ_TWO_WAYS];
+        yield 'a trailing space after another host' => ["https://ghe.corp \t", 'ghe.corp'];
+        yield 'a scheme-relative host' => ['//ghe.corp', '//ghe.corp'];
+        yield 'a scheme-relative host with a path' => ['//ghe.corp/api', '//ghe.corp'];
+        yield 'a scheme-relative public host' => ['//github.com', '//github.com'];
+        yield 'only whitespace' => ["  \r\n", Tokens::READ_TWO_WAYS];
+        yield 'a tab inside the public host' => ["https://git\thub.com", Tokens::READ_TWO_WAYS];
+        yield 'a control character before the public host' => ["\x01https://github.com", Tokens::READ_TWO_WAYS];
+        yield 'a control character after another host' => ["https://ghe.corp\x1f", 'ghe.corp'];
+    }
+
+    /**
+     * @dataProvider issuersWithWhitespaceOrNoScheme
+     */
+    #[DataProvider('issuersWithWhitespaceOrNoScheme')]
+    public function testAnIssuerWithWhitespaceOrNoSchemeIsWithheldUnderANameThatReadsTrue(string $issuer, string $shown): void
+    {
+        $tokens = Tokens::fromEnvironment(['GITHUB_TOKEN' => 'b', 'GITHUB_SERVER_URL' => $issuer], null);
+
+        self::assertNull($tokens->github());
+        self::assertSame(['GITHUB_TOKEN' => $shown], $tokens->withheld());
+    }
+
     /** @return iterable<string, array{string, string}> */
     public static function issuersWithThePublicHostAfterAnAt(): iterable
     {

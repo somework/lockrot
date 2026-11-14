@@ -311,6 +311,14 @@ class ChangedSince(Gate):
         self.assertEqual(1, code, summary)
         self.assertIn('`src/Signal/Openness.php` Plus (line 7)', summary)
 
+    def test_an_added_line_that_starts_with_two_plus_signs_is_content_not_a_file_header(self):
+        self.write('src/Signal/Openness.php', SOURCE.replace('{\n    public', '{\n++ added\n    public', 1).replace('+ 0;', '+ 1;'))
+
+        code, summary = self.run_gate([log((8, 'Plus', '        return (int) $parts[0] + 1;'))], '', ('--changed', 'HEAD'))
+
+        self.assertEqual(1, code, summary)
+        self.assertIn('`src/Signal/Openness.php` Plus (line 8)', summary)
+
     def test_a_diff_prefix_in_the_git_config_keeps_the_changed_lines(self):
         for option in ('diff.mnemonicPrefix', 'diff.noprefix'):
             with self.subTest(option=option):
