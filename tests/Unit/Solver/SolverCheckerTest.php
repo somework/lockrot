@@ -1301,6 +1301,21 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['class' => \TypeError::class, 'message' => 'a value has the wrong type'], $checker->solverError());
     }
 
+    /** Composer renders its problem text when it is read, after the solve, so a throw in it is a failed solve too. */
+    public function testAnExceptionWhileRenderingTheProblemTextLeavesTheMoveNotCheckedWithASolverError(): void
+    {
+        $failure = static fn (): \RuntimeException => new \RuntimeException('the repository has no name');
+        $requires = ['acme/lib' => '^1.0', 'acme/new' => '^1.0', 'acme/x' => '^2.0'];
+        $baseline = self::namedRepositoryChecker('named', $requires, $failure());
+        $combined = self::namedRepositoryChecker('named', ['acme/lib' => '^1.0'], $failure());
+
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::SOLVER_ERROR], [$baseline->baseline()->check()->result(), $baseline->baseline()->check()->reason()]);
+        self::assertSame(\RuntimeException::class, ($baseline->solverError() ?? [])['class'] ?? null);
+        $outcome = $combined->combined(['acme/lib' => '^1.1.0']);
+        self::assertSame([MoveCheck::NOT_CHECKED, MoveCheck::SOLVER_ERROR], [$outcome->check()->result(), $outcome->check()->reason()]);
+        self::assertSame(\RuntimeException::class, ($combined->solverError() ?? [])['class'] ?? null);
+    }
+
     /** Ruling R14-1: after an error in a repository's answer stops one solve, a later solve that needs that name reads it as not loaded. */
     public function testALaterSolveThatNeedsANameWhoseLoadRaisedAnErrorIsNotCheckedWithAnUnloadedName(): void
     {
@@ -1870,20 +1885,27 @@ final class SolverCheckerTest extends TestCase
      * acme/x 2.0.0 among them, so Composer names it as a lower-priority repository of acme/x.
      *
      * @param array<string, string> $requires
+     * @param ?\Throwable           $nameFails thrown when Composer reads the repository's name, which only its problem text does
      */
-    private static function namedRepositoryChecker(string $repository, array $requires): SolverChecker
+    private static function namedRepositoryChecker(string $repository, array $requires, ?\Throwable $nameFails = null): SolverChecker
     {
-        $named = new class ($repository) extends ArrayRepository {
+        $named = new class ($repository, $nameFails) extends ArrayRepository {
             private string $name;
+            private ?\Throwable $fails;
 
-            public function __construct(string $name)
+            public function __construct(string $name, ?\Throwable $fails)
             {
                 parent::__construct();
                 $this->name = $name;
+                $this->fails = $fails;
             }
 
             public function getRepoName(): string
             {
+                if ($this->fails !== null) {
+                    throw $this->fails;
+                }
+
                 return $this->name;
             }
         };
