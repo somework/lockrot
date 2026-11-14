@@ -441,7 +441,7 @@ on every run ([What `--fail-on=unchecked` fails on](ci.md#what-unchecked-fails-o
   release fixes it, the true score can be higher. `vulnerable-*` values still read the raw
   severity.
 - **Its place.** lockrot first drops the maintenance gaps of a package whose S1 fired, or that an
-  `ignore` entry accepts whole. `accept-unchecked` then acts on the S10 entries that are left. The
+  allowlist entry (built-in, type or ignore) accepts whole. `accept-unchecked` then acts on the S10 entries that are left. The
   first entry in the list that accepts a check is the one the report names.
 
 **What the report writes.** The accepted check moves from `checks_missing[]` to `checks_skipped[]`,
