@@ -131,6 +131,7 @@ of a request is the time left of the [budget](install-time.md#time-budget), at l
   of such a list.
 
 - When a host redirects to another origin, lockrot asks that origin again without its own header.
+  The default port of the scheme (`:443`, `:80`) names the same origin as no port.
   A redirect to a URL that holds a user name or a password is a failed request, so a redirect
   cannot replace Composer's credentials for a host.
   Where Composer cannot stop a redirect (without the curl extension), lockrot

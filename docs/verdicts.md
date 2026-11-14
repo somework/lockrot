@@ -1173,11 +1173,10 @@ of the refusal, the root links of the root ceiling, or the reason that the run d
 Each `lock_platform` link adds "the lock records …, which composer.json does not have" last, with
 the update that rewrites it. A
 root hold on a package of `packages-dev` ends with " in require-dev". Without
-`target_fix`, the line adds the PHP of `platform_override` and the links that set one edge. When
-`run.move_check.reason` is `platform_config_invalid`, Composer refuses that PHP, so the line leaves
-it out. That is
+`target_fix`, the line adds the PHP of `platform_override` and the links that set one edge. That is
 the lowest edge when the target lies below it, else the edge after the last minor of the analysed
-set. Abridged from the [example run](example-run.md):
+set. When `run.move_check.reason` is `platform_config_invalid`, Composer refuses a
+`config.platform` value, so the line leaves out the PHP of `platform_override`. Abridged from the [example run](example-run.md):
 
 ```text
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked

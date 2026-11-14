@@ -6,8 +6,9 @@ description: "The block lockrot prints during composer require, update and insta
 # Install-time summary {#install-time-summary}
 
 With the [plugin installed](index.md#install), `composer require`, `composer update` and
-`composer install` print a block above Composer's operations list. It covers only the packages that
-the transaction installs or updates, not the whole lock. It follows
+`composer install` print a block above Composer's operations list, unless
+[`--no-install` or `--no-update`](#install-time-strict) skips the operations. It covers only the
+packages that the transaction installs or updates, not the whole lock. It follows
 [`include-dev`](configuration.md#extralockrot-keys), as `composer lockrot` does: without it, the
 check skips each `packages-dev` package, even when Composer installs it. It never fails the install
 unless you set [`install-time-strict`](#install-time-strict).

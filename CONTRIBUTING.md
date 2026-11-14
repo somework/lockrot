@@ -630,11 +630,17 @@ maintainer.
 
     Last, finish the lockrot.dev pull request that holds the content for the release. For lockrot
     0.14.0 it is [somework/lockrot.dev#39](https://github.com/somework/lockrot.dev/pull/39), which
-    must merge only after the `v0.14.0` tag. Rebase it onto lockrot.dev `main`. Then re-check what
-    it quotes against the `vX.Y.Z` tag: the terminal sample, the `do:` words, the `--fail-on` kinds,
-    the flag counts and the size and alt text of the GIF. Each must match the tag's recording and
-    docs. Merge it, and check that the `deploy.yml` push run of the merge passes. After step 8, move
-    the lockrot.dev `rot-watch.yml` workflow to the new action release.
+    must merge only after the `v0.14.0` tag. Rebase it onto lockrot.dev `main`. Then check that
+    each text that it quotes matches the recording and the docs of the `vX.Y.Z` tag:
+
+    - the terminal sample
+    - the `do:` words
+    - the `--fail-on` kinds
+    - the flag counts
+    - the size and the alt text of the GIF
+
+    Merge it, and check that the `deploy.yml` push run of the merge passes. After step 8, move the
+    lockrot.dev `rot-watch.yml` workflow to the new action release.
 7. When the published release changes what lockrot writes (a schema differs from the previous
    release's), record it and pin the hashes ([Recording a release](#recording-a-release)). Then
    remove the version from `RECORDING_PENDING`. `SchemaEvolutionTest` fails when a release whose
@@ -651,8 +657,8 @@ maintainer.
        and `LOCKROT_SHA256` in `lockrot.env` from the published PHAR.
     3. Merge that pull request when its CI passes. Without the `UPDATE_TOKEN` secret, its CI does
        not start: close and reopen the pull request to start it.
-    4. Write the release body from the whole `CHANGELOG.md` section of the action release, with
-       its introduction, its **Breaking** entries and their migration lines. Then run
+    4. Copy the whole `CHANGELOG.md` section of the action release into a body file. Keep its
+       introduction, its **Breaking** entries and their migration lines. Then run
        `gh release create v1.x.y --repo somework/lockrot-action --notes-file <body file>` on that
        `main`. Do not use `--generate-notes` alone: it lists pull requests and leaves out the
        migration lines. The release moves the `v1` tag to its commit, and publishes the Docker image

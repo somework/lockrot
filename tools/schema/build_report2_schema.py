@@ -1703,7 +1703,7 @@ defs['noteMoveCheckFailed'] = obj(("`move_check_failed`: Composer's solver faile
 })
 defs['noteLockOutOfSync'] = obj(("`lock_out_of_sync`: the lock's `content-hash` differs from the hash of composer.json, as Composer's lock freshness check "
                                  "reads it (the legacy `hash` key too). lockrot reads the lock as it is. No note without composer.json or without a hash in the lock."), {
-    'missing': arr(("The root requirements that no locked package holds at a version that the link admits, sorted: `require`, and `require-dev` when the run reads dev packages. "
+    'missing': arr(("The root requirements that the lock does not hold at a version that the link admits, sorted: `require`, and `require-dev` when the run reads dev packages. "
                     "A name is held when a locked package or the root has it as its name, replaces it or provides it, at a version that the link admits. "
                     "Platform requirements and `self.version` links are never in it. It can be empty: a changed constraint changes the hash too."), ref('packageName'), uniqueItems=True),
 })
