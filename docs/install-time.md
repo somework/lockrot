@@ -137,7 +137,8 @@ grade can read milder than the one `composer lockrot` gives for the same package
 | A package's metadata | The package carries `libyears_unmeasured` `unavailable`. It reads `unknown` when nothing else counts, such as a counted advisory or the lock's abandoned marking. When nothing is graded, the [could-not-be-checked header](#never-silent-about-a-package-it-could-not-check) counts it | [`metadata_unavailable`](notes.md#metadata_unavailable), a network failure |
 | The advisory check | The advisories that the lookup did not reach add nothing to the score, and the findings carry S10 `install_time_budget` | [`advisories_not_checked`](notes.md#advisories_not_checked) |
 | A monorepo parent's metadata | Split packages whose own tags have no trusted date stay unmeasured and carry S10 `undated_releases` ([dates from the monorepo](verdicts.md#dates-from-the-monorepo)) | None |
-| The move check, before a solve began | The moves read `not_checked` with the reason `install_time_budget`, and the block has no `update now:` line | [`update_now_not_checked`](notes.md#update_now_not_checked) |
+| A move-check solve, before it began | That move reads `not_checked` with the reason `install_time_budget`, and no `update now:` command includes it | None |
+| The `update now:` solve, before it began | Each move keeps its own check. The block has no `update now:` line | [`update_now_not_checked`](notes.md#update_now_not_checked) |
 | The repository activity check, before a request began | lockrot does not read S3 and S4. Findings carry S10 `install_time_budget` | [`repository_activity_not_checked`](notes.md#repository_activity_not_checked) |
 | The repository activity check, part way | Each request that is still running stops at the timeout it got when it started. Those that time out, and those whose retry or redirect the budget stops, have no activity, and their findings carry S10 `fetch_failed` | [`repository_activity_unreachable`](notes.md#repository_activity_unreachable), a network failure |
 
@@ -199,7 +200,9 @@ transaction before any package operation runs, and Composer exits `1`. The messa
   (`releases_unknown`).
 - lockrot never stops a `--dry-run`, since no operation is about to run.
 - With `--no-install` on `update`, `require` or `remove`, Composer writes the lock and runs no
-  operation. lockrot prints no block and the stop does not run. The gate trips at the next install.
+  operation. With `--no-update` on `require` or `remove`, it writes only `composer.json`. In both
+  cases, lockrot prints no block and the stop does not run. The stop runs at the next command
+  that installs the packages.
 - The stop works only when Composer runs plugins. Only `--no-plugins` skips it.
 - A project-local plugin does not stop the install that first installs it, a fresh clone and a CI
   job with an empty `vendor/` included ([time budget](#time-budget)). To gate CI, run

@@ -189,10 +189,11 @@ reports accepted findings as `new` or `worsened`:
 
 - **`--dev`.** If you generate the baseline without `--dev` and the CI step passes it, the baseline
   holds no development findings. The `--dev` run reports each of them as `new` and can fail. The
-  reverse is safe only with a GitHub token: lockrot measures `stale` entries against the whole
-  `composer.lock`, `packages-dev` included. Without a token, the repository activity budget spreads
-  over a smaller set when `--dev` is off, so a check without `--dev` can read a production package
-  as `worsened`. Generate the baseline with the same `--dev` as the check.
+  reverse is safe only when no [anonymous cap](internals.md) applies, so with credentials for GitHub
+  and Bitbucket: lockrot measures `stale` entries against the whole `composer.lock`, `packages-dev`
+  included. Without them, the repository activity budget spreads over a smaller set when `--dev`
+  is off, so a check without `--dev` can read a production package as `worsened`. Generate the
+  baseline with the same `--dev` as the check.
 
 - **The target PHP.** Pass the same `--target-php` or `LOCKROT_TARGET_PHP`, or set the `target-php`
   key so both runs read it. Without any of them, lockrot uses `config.platform.php`, else the PHP
