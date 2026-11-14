@@ -282,7 +282,10 @@ final class RunFooter
             return 'php: '.$clause.($fix['packages'] === [] ? '' : '; '.self::fixWords($fix, $target, $name)).$records;
         }
         $parts = [$clause];
-        if ($data['platform_override'] !== null) {
+        $moveCheck = $report->moveCheck();
+        // Composer refuses the value, so "solves at" would contradict the `moves:` line.
+        $refused = $moveCheck !== null && $moveCheck->jsonSerialize()['reason'] === MoveCheck::PLATFORM_CONFIG_INVALID;
+        if ($data['platform_override'] !== null && !$refused) {
             $parts[] = 'Composer solves at '.$data['platform_override'].' from config.platform.php';
         }
         $edge = self::edgeWords($window, $report->includesDev(), $name);

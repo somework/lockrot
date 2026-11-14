@@ -240,6 +240,22 @@ final class RunFooterTest extends TestCase
         self::assertSame('php: the lock installs on PHP 5.3 to 8.3; Composer solves at 8.2.0 from config.platform.php; require.php, acme/a, acme/b and 2 more exclude 8.4', $line);
     }
 
+    public function testThePhpLineKeepsTheOverrideWordsWhenTheMoveCheckStoppedForAnotherReason(): void
+    {
+        $composer = ['require' => ['php' => '<8.4'], 'config' => ['platform' => ['php' => '8.2.0']]];
+        $lock = ['packages' => [self::package('acme/a', ['php' => '<8.4'])], 'packages-dev' => []];
+
+        self::assertStringContainsString('Composer solves at 8.2.0 from config.platform.php', (string) self::phpLine($lock, $composer, '8.3', false, null, MoveCheck::OFFLINE));
+    }
+
+    public function testThePhpLineLeavesOutTheOverrideWordsWhenComposerRefusesThePlatformConfig(): void
+    {
+        $composer = ['require' => ['php' => '<8.4'], 'config' => ['platform' => ['php' => '8.2.0']]];
+        $lock = ['packages' => [self::package('acme/a', ['php' => '<8.4'])], 'packages-dev' => []];
+
+        self::assertSame('php: the lock installs on PHP 5.3 to 8.3; require.php and acme/a exclude 8.4', self::phpLine($lock, $composer, '8.3', false, null, MoveCheck::PLATFORM_CONFIG_INVALID));
+    }
+
     public function testThePhpLineSpansAPlatformMinorThatTheReleaseDataDoesNotList(): void
     {
         $platform = ['config' => ['platform' => ['php' => '7.5.0']]];
@@ -504,11 +520,15 @@ final class RunFooterTest extends TestCase
      * @param array<string, mixed> $lock
      * @param array<string, mixed> $composer
      */
-    private static function phpLine(array $lock, array $composer, string $target, bool $includeDev = false, ?MoveChecker $checker = null): ?string
+    private static function phpLine(array $lock, array $composer, string $target, bool $includeDev = false, ?MoveChecker $checker = null, ?string $baselineReason = null): ?string
     {
         $at = new \DateTimeImmutable(self::AT);
         $window = PhpWindow::of(LockFile::fromArray($lock), ProjectConfig::fromArray($composer), $target, PhpReleaseDates::load()->minors(new Clock($at)));
         $report = (new Report([], [], $at, 0, 0, null, null, $includeDev))->withPhpWindow($window === null ? null : $window->withTargetFix($checker));
+        if ($baselineReason !== null) {
+            $checks = MoveChecks::of(new UncheckedMoves($baselineReason, AdvisoryBlocking::everyAdvisory()));
+            $report = $report->withMoveChecks(new MoveCheckRun(null, false, [], MoveCheck::notChecked($baselineReason)), UpdateNow::of([], $checks));
+        }
 
         return RunFooter::phpWindow($report, [self::class, 'asWritten']);
     }
