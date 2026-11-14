@@ -23566,7 +23566,7 @@
       ],
       "properties": {
         "missing": {
-          "description": "The root requirements that the lock holds no package for, sorted: `require`, and `require-dev` when the run reads dev packages. Platform requirements are never in it. It can be empty: a changed constraint changes the hash too.",
+          "description": "The root requirements that no locked package holds at a version that the link admits, sorted: `require`, and `require-dev` when the run reads dev packages. A name that a locked package, the root, a matching root `replace` or a matching `provide` holds is not in it. Platform requirements and `self.version` links are never in it. It can be empty: a changed constraint changes the hash too.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/packageName"
