@@ -32,6 +32,7 @@ final class ComposerHttpClientRedirectTest extends TestCase
         $path = (string) parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $port = $_SERVER['SERVER_PORT'];
         file_put_contents(__DIR__.'/requests.log', $_SERVER['HTTP_HOST'].' '.($_SERVER['HTTP_AUTHORIZATION'] ?? '-')."\n", FILE_APPEND);
+        file_put_contents(__DIR__.'/paths.log', $path."\n", FILE_APPEND);
         if (preg_match('{^/chain/(\d+)$}', $path, $hops) && $hops[1] > 0) {
             header('Location: /chain/'.($hops[1] - 1), true, 302);
             exit;
@@ -50,6 +51,14 @@ final class ComposerHttpClientRedirectTest extends TestCase
         }
         if ($path === '/ok-with-location') {
             header('Location: /headers', true, 200);
+        }
+        if ($path === '/redirect-without-location') {
+            http_response_code(302);
+            exit;
+        }
+        if ($path === '/not-modified-with-location') {
+            header('Location: /after-not-modified', true, 304);
+            exit;
         }
         if ($path === '/limited') {
             header('X-RateLimit-Remaining: 0', true, 403);
@@ -377,6 +386,54 @@ final class ComposerHttpClientRedirectTest extends TestCase
         $result = $this->client(false)->fetchAll([$url], ['User-Agent: lockrot'])[$url];
 
         self::assertSame([0, null, 'redirect to a URL with a user name or a password'], [$result->status(), $result->body(), $result->error()]);
+    }
+
+    /** @return iterable<string, array{list<string>}> */
+    public static function requestHeaders(): iterable
+    {
+        yield 'with lockrot\'s credentials' => [self::HEADERS];
+        yield 'without them' => [['User-Agent: lockrot']];
+    }
+
+    /**
+     * Composer's downloaders refuse a redirect without a `Location`.
+     *
+     * @param list<string> $headers
+     *
+     * @dataProvider requestHeaders
+     */
+    #[DataProvider('requestHeaders')]
+    public function testARedirectWithoutALocationIsAFailedRequestWithoutCurl(array $headers): void
+    {
+        $url = $this->server->url().'/redirect-without-location';
+
+        $result = $this->client(false)->fetchAll([$url], $headers)[$url];
+
+        self::assertSame([0, null], [$result->status(), $result->body()]);
+    }
+
+    /**
+     * Composer's downloaders follow no `Location` of a 304 answer.
+     *
+     * @param list<string> $headers
+     *
+     * @dataProvider requestHeaders
+     */
+    #[DataProvider('requestHeaders')]
+    public function testANotModifiedAnswerWithALocationIsNotFollowedWithoutCurl(array $headers): void
+    {
+        $url = $this->server->url().'/not-modified-with-location';
+
+        $result = $this->client(false)->fetchAll([$url], $headers)[$url];
+
+        self::assertSame(304, $result->status(), (string) $result->error());
+        self::assertSame([], array_values(preg_grep('{^/after-not-modified$}', $this->pathsRequested()) ?: []), 'no request goes to the Location of a 304 answer');
+    }
+
+    /** @return list<string> */
+    private function pathsRequested(): array
+    {
+        return file($this->dir.'/root/paths.log', \FILE_IGNORE_NEW_LINES) ?: [];
     }
 
     /** @return iterable<string, array{?bool}> */

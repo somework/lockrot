@@ -400,9 +400,15 @@ final class ComposerHttpClient implements HttpClientInterface
             }
             $headers = $filesystem->getLastHeaders();
             $status = (int) RemoteFilesystem::findStatusCode($headers);
-            $location = $status >= 300 && $status < 400 ? Response::findHeaderValue($headers, 'location') : null;
-            if ($location === null || $location === '') {
+            // Composer's downloaders follow a 3xx answer other than 304, and refuse one without a Location.
+            if ($status < 300 || $status >= 400 || $status === 304) {
                 $results[$url] = new HttpResult($url, $status, \is_string($body) ? $body : null, $this->clock->now(), null, $headers);
+
+                return null;
+            }
+            $location = Response::findHeaderValue($headers, 'location');
+            if ($location === null || $location === '') {
+                $results[$url] = HttpResult::failure($url, 'redirect without a Location', $this->clock->now());
 
                 return null;
             }
@@ -476,7 +482,7 @@ final class ComposerHttpClient implements HttpClientInterface
     {
         $parts = parse_url($url) ?: [];
         $scheme = strtolower($parts['scheme'] ?? '');
-        // A default port that the URL spells out names the same origin as no port, as Composer's AuthHelper::getRedirectOrigin() reads it.
+        // A default port that the URL spells out names the same origin as no port (RFC 6454, section 4).
         $defaultPort = $scheme === 'https' ? 443 : ($scheme === 'http' ? 80 : null);
 
         return [$scheme, strtolower($parts['host'] ?? ''), $parts['port'] ?? $defaultPort];
