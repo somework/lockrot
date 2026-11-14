@@ -219,7 +219,7 @@ final class ComposerHttpClient implements HttpClientInterface
                         if ($budgetEnded($url)) {
                             return true;
                         }
-                        if ($target === '' || self::origin($target) === self::origin($url)) {
+                        if ($target === '' || (self::origin($target) === self::origin($url) && !self::hasUserInfo($target))) {
                             return false;
                         }
                         $redirects[$url] = $target;
@@ -250,8 +250,7 @@ final class ComposerHttpClient implements HttpClientInterface
 
                     return;
                 }
-                // Composer's HttpDownloader::addJob() stores what this pattern reads as the credential of the URL's origin for the rest of the run.
-                if (parse_url($target, \PHP_URL_USER) !== null || preg_match('{^https?://([^:/]+):([^@/]+)@([^/]+)}i', $target) === 1) {
+                if (self::hasUserInfo($target)) {
                     $results[$url] = HttpResult::failure($url, 'redirect to a URL with a user name or a password', $this->clock->now());
                     $done();
 
@@ -393,7 +392,7 @@ final class ComposerHttpClient implements HttpClientInterface
                 return;
             }
             $next = self::resolve($target, $location);
-            if (self::origin($next) !== self::origin($target)) {
+            if (self::origin($next) !== self::origin($target) || self::hasUserInfo($next)) {
                 $redirects[$url] = $next;
 
                 return;
@@ -428,6 +427,12 @@ final class ComposerHttpClient implements HttpClientInterface
     private static function options(int $timeout, array $headers): array
     {
         return ['http' => ['timeout' => $timeout, 'header' => $headers], 'retry-auth-failure' => false];
+    }
+
+    // Composer's HttpDownloader::addJob() stores what this pattern reads as the credential of the URL's origin for the rest of the run.
+    private static function hasUserInfo(string $url): bool
+    {
+        return parse_url($url, \PHP_URL_USER) !== null || preg_match('{^https?://([^:/]+):([^@/]+)@([^/]+)}i', $url) === 1;
     }
 
     /** @return array{string, string, ?int} the scheme and the host in lower case, and the port */

@@ -673,6 +673,8 @@ final class ComposerHttpClientTest extends TestCase
         yield 'a user alone' => ['https://x@foo.github.com/z'];
         yield 'a user and a password in the query' => ['https://foo.github.com?x:y@z/'];
         yield 'a user and a password in the fragment' => ['https://foo.github.com#x:y@z/'];
+        yield 'a user and a password on the same origin' => ['https://x:y@api.github.com/z'];
+        yield 'a user and a password on the same origin with its default port' => ['https://x:y@api.github.com:443/z'];
     }
 
     /** An `@` that Composer's pattern does not read as user info leaves the target a plain redirect. */

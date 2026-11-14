@@ -83,6 +83,10 @@ final class ComposerHttpClientRedirectTest extends TestCase
             header('Location: //localhost:'.$port.'/headers', true, 302);
             exit;
         }
+        if ($path === '/same-host-user-info') {
+            header('Location: http://x:y@'.$_SERVER['HTTP_HOST'].'/headers', true, 302);
+            exit;
+        }
         if ($path === '/same-host') {
             header('Location: /headers', true, 302);
             exit;
@@ -310,6 +314,14 @@ final class ComposerHttpClientRedirectTest extends TestCase
         $result = $this->fetch($path, false);
 
         self::assertSame([0, null, 'redirect to a URL that is not http or https with a host'], [$result->status(), $result->body(), $result->error()]);
+    }
+
+    /** Composer stores the user info of a URL that it requests as the credential of its origin. */
+    public function testARedirectOnTheSameHostToAUrlWithUserInfoIsAFailedRequestWithoutCurl(): void
+    {
+        $result = $this->fetch('/same-host-user-info', false);
+
+        self::assertSame([0, null, 'redirect to a URL with a user name or a password'], [$result->status(), $result->body(), $result->error()]);
     }
 
     /** URL schemes are case-insensitive (RFC 3986, section 3.1). */
