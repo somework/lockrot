@@ -59,6 +59,10 @@ final class ComposerHttpClientRedirectTest extends TestCase
             header('Location: http://localhost:'.$port.'/headers', true, 302);
             exit;
         }
+        if ($path === '/other-host-then-user-info') {
+            header('Location: http://localhost:'.$port.'/same-host-user-info', true, 302);
+            exit;
+        }
         if ($path === '/other-host-then-local-file') {
             header('Location: http://localhost:'.$port.'/local-file', true, 302);
             exit;
@@ -371,6 +375,29 @@ final class ComposerHttpClientRedirectTest extends TestCase
         $url = $this->server->url().'/same-host-user-info';
 
         $result = $this->client(false)->fetchAll([$url], ['User-Agent: lockrot'])[$url];
+
+        self::assertSame([0, null, 'redirect to a URL with a user name or a password'], [$result->status(), $result->body(), $result->error()]);
+    }
+
+    /** @return iterable<string, array{?bool}> */
+    public static function downloaders(): iterable
+    {
+        yield 'with curl' => [null];
+        yield 'without curl' => [false];
+    }
+
+    /**
+     * The request that lockrot sends again without its credentials checks each later redirect too.
+     *
+     * @dataProvider downloaders
+     */
+    #[DataProvider('downloaders')]
+    public function testALaterRedirectOfTheRequestToAnotherHostToAUrlWithUserInfoIsAFailedRequest(?bool $refusesRedirects): void
+    {
+        if ($refusesRedirects === null && !HttpDownloader::isCurlEnabled()) {
+            self::markTestSkipped('Composer takes prevent_url_access_callable through curl only');
+        }
+        $result = $this->fetch('/other-host-then-user-info', $refusesRedirects);
 
         self::assertSame([0, null, 'redirect to a URL with a user name or a password'], [$result->status(), $result->body(), $result->error()]);
     }

@@ -236,8 +236,10 @@ final class ComposerHttpClient implements HttpClientInterface
         // Composer replays the request's own headers to a redirect's target, so the request goes
         // again to that target without lockrot's credentials.
         $starts = [];
+        /** @var array<string, string> $refused url => why a later redirect of the request sent again is a failed request */
+        $refused = [];
         foreach ($redirects as $url => $target) {
-            $starts[] = function (\Closure $done) use ($url, $target, $headers, &$results, $budgetEnded): void {
+            $starts[] = function (\Closure $done) use ($url, $target, $headers, &$results, &$refused, $budgetEnded): void {
                 if ($this->deadline->isPast()) {
                     $results[$url] = HttpResult::failure($url, self::BUDGET_SPENT_AFTER_START, $this->clock->now());
                     $done();
@@ -258,12 +260,27 @@ final class ComposerHttpClient implements HttpClientInterface
 
                     return;
                 }
-                $options['prevent_url_access_callable'] = static fn (): bool => $budgetEnded($url);
+                // Composer asks this before each hop too.
+                $options['prevent_url_access_callable'] = static function (string $next) use ($url, &$refused, $budgetEnded): bool {
+                    if ($budgetEnded($url)) {
+                        return true;
+                    }
+                    $refusal = self::refusal($next);
+                    if ($refusal === null) {
+                        return false;
+                    }
+                    $refused[$url] = $refusal;
+
+                    return true;
+                };
                 $this->add($url, $target, $options, $results, $done);
             };
         }
         if ($starts !== []) {
             $this->run($starts);
+        }
+        foreach ($refused as $url => $refusal) {
+            $results[$url] = HttpResult::failure($url, $refusal, $this->clock->now());
         }
         foreach ($stopped as $url) {
             $results[$url] = HttpResult::failure($url, HttpResult::BUDGET_SPENT, $this->clock->now());
