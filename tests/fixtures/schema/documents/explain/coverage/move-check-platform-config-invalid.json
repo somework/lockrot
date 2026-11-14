@@ -1204,7 +1204,7 @@
    "reason": "platform_config_invalid"
   },
   "php_window": {
-   "platform_override": null,
+   "platform_override": "^8.2",
    "target": {
     "php": "8.4.99",
     "inside": true
