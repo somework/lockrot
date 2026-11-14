@@ -405,7 +405,7 @@ final class LockrotCommand extends BaseCommand
         }
         $locked = $lock->find($name);
         if ($locked === null) {
-            if (\in_array($name, $lock->skippedNames(), true)) {
+            if (\in_array($name, array_map('trim', $lock->skippedNames()), true)) {
                 throw new ConfigException($name.' is in '.$lockName.', and lockrot skips it because its name is no Composer package name (run note '.RunNote::PACKAGE_NAME_INVALID.')');
             }
             throw new ConfigException($name.' is not in '.$lockName);

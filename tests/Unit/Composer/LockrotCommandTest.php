@@ -730,6 +730,19 @@ final class LockrotCommandTest extends TestCase
         self::assertStringNotContainsString('is not in composer.lock', $stderr);
     }
 
+    public function testExplainNamesTheSkipCauseOfALockEntryWhoseNameHasASpaceThatTheRequestTrims(): void
+    {
+        $dir = $this->tempDir('lockrot-explain-skipped-space-');
+        file_put_contents($dir.'/composer.json', '{}');
+        file_put_contents($dir.'/composer.lock', '{"packages": [{"name": " acme/pkg", "version": "1.0.0"}], "packages-dev": []}');
+        chdir($dir);
+
+        [$code, , $stderr] = $this->runWithSplitStreams(['--explain' => 'acme/pkg', '--target-php' => '8.4']);
+
+        self::assertSame(2, $code);
+        self::assertStringContainsString('lockrot: acme/pkg is in composer.lock, and lockrot skips it because its name is no Composer package name (run note package_name_invalid)', $stderr);
+    }
+
     /** An explanation does not consult the baseline, so a baseline that fails the report run does not fail it. */
     public function testExplainDoesNotNeedTheBaseline(): void
     {
