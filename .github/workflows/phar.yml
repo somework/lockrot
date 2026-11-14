@@ -52,7 +52,7 @@ jobs:
       - name: The CHANGELOG heading is dated on the tag day
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          DAY="$(git for-each-ref "refs/tags/$GITHUB_REF_NAME" --format='%(taggerdate:short)')"
+          DAY="$(git for-each-ref "refs/tags/$GITHUB_REF_NAME" --format='%(taggerdate:unix)')"
           python3 tools/release/tag_day.py "${GITHUB_REF_NAME#v}" "$DAY" --warning
       # Every report, explanation, baseline and config names its schema by URL in `$schema`, so the
       # release waits until lockrot.dev serves the schemas that this tag carries. lockrot.dev serves
