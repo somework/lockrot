@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Fail a release whose CHANGELOG.md heading names another day than the tag.
 
-    python3 tools/release/tag_day.py <X.Y.Z> <YYYY-MM-DD of the tag> [--warning]
+    python3 tools/release/tag_day.py <X.Y.Z> <YYYY-MM-DD or unix seconds of the tag> [--warning]
 
-The tag day is the tagger's local day: `git for-each-ref refs/tags/vX.Y.Z --format='%(taggerdate:short)'`.
+The tag day is the UTC day of the tag: pass `git for-each-ref refs/tags/vX.Y.Z --format='%(taggerdate:unix)'`.
+A YYYY-MM-DD argument is taken as the day already.
 With --warning a mismatch is annotated as a warning and the exit code stays 0.
 
 The heading `## [X.Y.Z] - YYYY-MM-DD` is dated on the tag day (CONTRIBUTING, "Cutting a release"),
@@ -12,6 +13,7 @@ day without a date pull request would publish them with a day that the tag does 
 Standard library only, as tools/corpus.
 """
 
+import datetime
 import os
 import re
 import sys
@@ -19,6 +21,12 @@ from typing import List, Optional
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 DAY = re.compile(r'^\d{4}-\d{2}-\d{2}$')
+
+
+def utc_day(value: str) -> str:
+    if re.match(r'^\d+$', value) is None:
+        return value
+    return datetime.datetime.fromtimestamp(int(value), datetime.timezone.utc).strftime('%Y-%m-%d')
 
 
 def heading_day(changelog: str, version: str) -> Optional[str]:
@@ -43,7 +51,7 @@ def main(argv: List[str]) -> int:
         print(__doc__.strip().splitlines()[2].strip(), file=sys.stderr)
         return 2
     with open(os.path.join(ROOT, 'CHANGELOG.md'), encoding='utf-8') as handle:
-        found = problems(handle.read(), argv[1], argv[2])
+        found = problems(handle.read(), argv[1], utc_day(argv[2]))
     for problem in found:
         print('::%s::%s' % ('warning' if warning else 'error', problem))
     return 1 if found and not warning else 0
