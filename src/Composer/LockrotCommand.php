@@ -15,6 +15,7 @@ use Composer\Repository\RepositoryInterface;
 use Composer\Util\Platform;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\AsciiCase;
 use Lockrot\Baseline\Baseline;
@@ -404,6 +405,9 @@ final class LockrotCommand extends BaseCommand
         }
         $locked = $lock->find($name);
         if ($locked === null) {
+            if (\in_array($name, array_map([AsciiCase::class, 'lower'], $lock->skippedNames()), true)) {
+                throw new ConfigException($name.' is in '.$lockName.', and lockrot skips it because its name is no Composer package name (run note '.RunNote::PACKAGE_NAME_INVALID.')');
+            }
             throw new ConfigException($name.' is not in '.$lockName);
         }
         if ($locked->isDev() && !$lockrot->includeDev()) {

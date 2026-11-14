@@ -716,6 +716,21 @@ final class LockrotCommandTest extends TestCase
         self::assertStringContainsString('lockrot: '.$message, implode("\n", $errors));
     }
 
+    public function testExplainNamesTheSkipCauseOfALockEntryWhoseNameIsNoComposerName(): void
+    {
+        $dir = $this->tempDir('lockrot-explain-skipped-');
+        file_put_contents($dir.'/composer.json', '{}');
+        file_put_contents($dir.'/composer.lock', '{"packages": [{"name": "Bad_/X", "version": "1.0.0"}], "packages-dev": []}');
+        chdir($dir);
+
+        [$code, , $stderr] = $this->runWithSplitStreams(['--explain' => 'bad_/x', '--target-php' => '8.4']);
+
+        self::assertSame(2, $code);
+        self::assertStringContainsString('bad_/x', $stderr);
+        self::assertStringContainsString('package_name_invalid', $stderr);
+        self::assertStringNotContainsString('is not in composer.lock', $stderr);
+    }
+
     /** An explanation does not consult the baseline, so a baseline that fails the report run does not fail it. */
     public function testExplainDoesNotNeedTheBaseline(): void
     {
