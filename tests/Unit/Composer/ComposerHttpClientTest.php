@@ -851,6 +851,7 @@ final class ComposerHttpClientTest extends TestCase
         yield 'a port in place of no port' => ['https://a.example.com/1', 'https://a.example.com:8443/1'];
         yield 'a host that ends in the port digits' => ['https://a.example.com:8443/1', 'https://a.example.com8443/1'];
         yield 'another scheme' => ['https://a.example.com/1', 'http://a.example.com/1'];
+        yield 'another scheme on the same port' => ['https://a.example.com:8443/1', 'http://a.example.com:8443/1'];
         yield 'the http default port on https' => ['https://a.example.com/1', 'https://a.example.com:80/1'];
         yield 'the https default port on http' => ['http://a.example.com/1', 'http://a.example.com:443/1'];
     }
