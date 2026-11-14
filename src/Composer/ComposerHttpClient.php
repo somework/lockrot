@@ -433,7 +433,10 @@ final class ComposerHttpClient implements HttpClientInterface
     private static function origin(string $url): string
     {
         $parts = parse_url($url) ?: [];
+        $scheme = strtolower($parts['scheme'] ?? '');
+        // A default port that the URL spells out names the same origin as no port, as Composer's AuthHelper::getRedirectOrigin() reads it.
+        $defaultPort = $scheme === 'https' ? 443 : ($scheme === 'http' ? 80 : null);
 
-        return strtolower(($parts['scheme'] ?? '').'://'.($parts['host'] ?? '')).':'.(string) ($parts['port'] ?? '');
+        return $scheme.'://'.strtolower($parts['host'] ?? '').':'.(string) ($parts['port'] ?? $defaultPort);
     }
 }

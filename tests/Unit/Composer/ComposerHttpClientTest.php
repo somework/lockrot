@@ -851,6 +851,8 @@ final class ComposerHttpClientTest extends TestCase
         yield 'a port in place of no port' => ['https://a.example.com/1', 'https://a.example.com:8443/1'];
         yield 'a host that ends in the port digits' => ['https://a.example.com:8443/1', 'https://a.example.com8443/1'];
         yield 'another scheme' => ['https://a.example.com/1', 'http://a.example.com/1'];
+        yield 'the http default port on https' => ['https://a.example.com/1', 'https://a.example.com:80/1'];
+        yield 'the https default port on http' => ['http://a.example.com/1', 'http://a.example.com:443/1'];
     }
 
     /** @dataProvider redirectsOnTheSameOrigin */
@@ -872,6 +874,9 @@ final class ComposerHttpClientTest extends TestCase
         yield 'another path' => ['https://a.example.com/1', 'https://a.example.com/2'];
         yield 'the same port' => ['https://a.example.com:8443/1', 'https://a.example.com:8443/2'];
         yield 'another letter case' => ['HTTPS://A.Example.com/1', 'https://a.example.com/2'];
+        yield 'the https default port spelled out' => ['https://a.example.com/1', 'https://a.example.com:443/2'];
+        yield 'the https default port spelled out on the request' => ['https://a.example.com:443/1', 'https://a.example.com/2'];
+        yield 'the http default port spelled out' => ['http://a.example.com/1', 'http://a.example.com:80/2'];
     }
 }
 
