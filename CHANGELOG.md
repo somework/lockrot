@@ -211,7 +211,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   version, branch or name leaves out every `update` and `require` step of its move. A release name
   with `|`, `<` or `>` leaves out the whole move's command. Action: if a step is missing, check that lock entry before you write the command
   by hand. ([Command argument unsafe](docs/notes.md#command_argument_unsafe))
-- **CLI:** a repository host's redirect to another origin (`:443` and `:80` count as no port) no
+- **CLI:** a repository host's redirect to another origin (the default port counts as no port) no
   longer receives lockrot's `Authorization` or `PRIVATE-TOKEN` header. lockrot asks the target
   again without it. A redirect to a URL that is not http or https, has no host, or holds a user
   name or a password is a failed request, so a `file://` redirect reads no local file.
