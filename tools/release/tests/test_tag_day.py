@@ -1,3 +1,4 @@
+import datetime
 import os
 import subprocess
 import sys
@@ -61,6 +62,21 @@ class TheTagDay(unittest.TestCase):
         self.assertEqual(0, warned.returncode)
         self.assertTrue(warned.stdout.startswith('::warning::'), warned.stdout)
         self.assertNotIn('::error::', warned.stdout)
+
+    def test_utc_day_reads_a_unix_timestamp_as_the_utc_day(self):
+        # 2026-11-20T23:30:00Z is 2026-11-21 in UTC+3: the heading follows the UTC day.
+        self.assertEqual('2026-11-20', tag_day.utc_day('1795217400'))
+        self.assertEqual('2026-11-20', tag_day.utc_day('2026-11-20'))
+
+    def test_main_takes_a_timestamp_as_the_utc_day_of_the_tag(self):
+        script = os.path.join(ROOT, 'tools', 'release', 'tag_day.py')
+        with open(os.path.join(ROOT, 'CHANGELOG.md'), encoding='utf-8') as handle:
+            day = tag_day.heading_day(handle.read(), '0.13.0')
+        stamp = str(int(datetime.datetime.strptime(day, '%Y-%m-%d').replace(tzinfo=datetime.timezone.utc).timestamp()) + 23 * 3600 + 1800)
+
+        match = subprocess.run([sys.executable, script, '0.13.0', stamp], capture_output=True, text=True, env={**os.environ, 'TZ': 'Asia/Tokyo'})
+
+        self.assertEqual((0, ''), (match.returncode, match.stdout))
 
 
 if __name__ == '__main__':

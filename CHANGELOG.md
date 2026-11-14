@@ -211,11 +211,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   version, branch or name leaves out every `update` and `require` step of its move. A release name
   with `|`, `<` or `>` leaves out the whole move's command. Action: if a step is missing, check that lock entry before you write the command
   by hand. ([Command argument unsafe](docs/notes.md#command_argument_unsafe))
-- **CLI:** a repository host's redirect to another origin no longer receives lockrot's
-  `Authorization` or `PRIVATE-TOKEN` header. lockrot asks the redirect target again without it. A
-  redirect to a URL that is not http or https, has no host, or holds a user name or a password is
-  a failed request. So a `file://` redirect reads no local file, and a redirect cannot replace
-  Composer's credentials for a host. ([Which credentials](docs/internals.md#which-credentials))
+- **CLI:** a repository host's redirect to another origin (the default port counts as no port) no
+  longer receives lockrot's `Authorization` or `PRIVATE-TOKEN` header. lockrot asks the target
+  again without it. A redirect to a URL that is not http or https, has no host, or holds a user
+  name or a password is a failed request, so a `file://` redirect reads no local file.
+  ([Which credentials](docs/internals.md#which-credentials))
 - **table, github, markdown:** a control character from the lock or a repository prints as an
   escape (`\x1B`), also in `--explain`, in the error lines on stderr, as in the install-time
   summary. So does a character that prints as nothing, such as a zero-width space (`\u{200B}`). A
@@ -328,7 +328,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `update_now_reduced`, `update_now_refused`, `update_now_not_checked` and `package_name_invalid`
   say what the move check and `update now:` did. A move whose solve throws an error reads
   `not_checked` with `solver_error`. lockrot skips a lock entry or a transaction package whose name
-  is no Composer package name.
+  is no Composer package name, and `--explain` of such an entry names that cause.
   ([Run notes](docs/notes.md#moves_not_checked))
 - **All formats:** the run notes `baseline_target_differs`, `baseline_fix_model_differs` and
   `ignore_does_not_cover_advisories` say when the baseline does not compare fix changes, and when an
@@ -451,8 +451,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([Upgrading to 0.14](docs/changes/0.14.md#how-014-reaches-you))
 - **Breaking:** **Config:** on Composer 2.10 and later, a value that Composer refuses in a
   blocking or policy variable, such as `COMPOSER_NO_BLOCKING` or `COMPOSER_POLICY_MALWARE_BLOCK`,
-  or in `config.policy` or `config.audit` exits 2, `--offline` too. 0.13 ignored such a value.
-  Action: set a value that Composer accepts, or fix the key.
+  or in `config.policy` or `config.audit` exits 2, `--offline` too. A value of the wrong type
+  names those two keys, with no PHP error text. 0.13 ignored such a value. Action: set a value
+  that Composer accepts, or fix the key.
   ([The move check](docs/verdicts.md#the-move-check))
 - **Breaking:** **Config:** an `ignore[].flags`, `accept-unchecked` or `advisory-lookup` value that
   0.13 ignored and config-2 refuses (`"flags": "stale"`, `"advisory-lookup": 1`) now exits 2. One

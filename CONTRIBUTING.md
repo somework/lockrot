@@ -375,8 +375,8 @@ maintainer.
       the compare links at the end of the file, point `[Unreleased]` to `vX.Y.Z...HEAD` and add an
       `[X.Y.Z]` link. The release pull request fails without the two links.
 
-    - The heading carries the day of the final `vX.Y.Z` tag, not the day of the rc tag. Write the
-      planned tag day. If the final tag falls on another day, add a commit to the release pull
+    - The heading carries the UTC day of the final `vX.Y.Z` tag, not the day of the rc tag. Write
+      the planned tag day. If the final tag falls on another day, add a commit to the release pull
       request that changes only that date and `docs/example-run.md`. That commit changes no file
       of the contract bundle. If the day changes after the merge, open a pull request into `main`
       that changes only that date and `docs/example-run.md`. Then tag the commit that its merge
@@ -527,6 +527,11 @@ maintainer.
       that it skips, so `sweep.yml` is not required, and no ruleset stops a red sweep. When the
       release pull request changes no path that `sweep.yml` filters, run
       `gh workflow run sweep.yml --ref <release branch>`.
+    - Confirm a green `phar-audit.yml` run on the head of the release pull request. It runs
+      `composer audit --locked` on the PHAR's lock (`build/phar/composer.lock`). No ruleset requires
+      it, so a red run does not stop the merge, and `phar.yml` can sign a PHAR whose lock has an
+      advisory. When the release pull request changes no path that `phar-audit.yml` filters, run
+      `gh workflow run phar-audit.yml --ref <release branch>`.
     - When the release changes the flag set, a schema number or the score model, the lockrot.dev
       change that reads it is merged. The lockrot.dev build stops on a set that it does not know.
     - Before the first final renderer tag, list the renderer's rulesets with
@@ -558,11 +563,11 @@ maintainer.
    Approve the `schemas` environment of the lockrot.dev run, then check that each new schema URL
    answers (`curl -fsI https://lockrot.dev/schema/<document>-<number>.json`).
 6. When the `ci.yml` push run of the squash commit on `main` passes, tag the commit `vX.Y.Z` with
-   `git tag -a`. Before you push the tag, check that its day is the day of the `## [X.Y.Z]`
+   `git tag -a`. Before you push the tag, check that its UTC day is the day of the `## [X.Y.Z]`
    heading:
 
     ```bash
-    python3 tools/release/tag_day.py X.Y.Z "$(git for-each-ref refs/tags/vX.Y.Z --format='%(taggerdate:short)')"
+    python3 tools/release/tag_day.py X.Y.Z "$(git for-each-ref refs/tags/vX.Y.Z --format='%(taggerdate:unix)')"
     ```
 
     If the check fails, delete the local tag. Then fix the date first. If the tag day changed
@@ -605,6 +610,37 @@ maintainer.
     release with an upgrade page. The `grep` must not print `0` when the release refuses a
     baseline-1 file. If a check fails, run `gh workflow run deploy.yml --repo somework/lockrot.dev`
     and check again.
+
+    Then check the update path from the previous release, P. Download its archive, check it, and
+    update a copy of it:
+
+    ```bash
+    gh release download vP --repo somework/lockrot --pattern lockrot.phar --output lockrot-P.phar
+    php lockrot-P.phar self-update --check
+    cp lockrot-P.phar lockrot-update.phar
+    php lockrot-update.phar self-update
+    php lockrot-update.phar --version
+    ```
+
+    `self-update --check` reads only the release list and `lockrot.phar.meta.json`. It must name
+    X.Y.Z and exit `1` ([Keeping it updated](docs/phar.md#keeping-it-updated)). The full
+    `self-update` also downloads the archive, its hash and its signature, and verifies them with the
+    key of P. It must exit `0`, and `--version` must print X.Y.Z. For lockrot 0.14.0, P is 0.13.0.
+    If a command fails, stop and ask the maintainer.
+
+    Last, finish the lockrot.dev pull request that holds the content for the release. For lockrot
+    0.14.0 it is [somework/lockrot.dev#39](https://github.com/somework/lockrot.dev/pull/39), which
+    must merge only after the `v0.14.0` tag. Rebase it onto lockrot.dev `main`. Then check that
+    each text that it quotes matches the recording and the docs of the `vX.Y.Z` tag:
+
+    - the terminal sample
+    - the `do:` words
+    - the `--fail-on` kinds
+    - the flag counts
+    - the size and the alt text of the GIF
+
+    Merge it, and check that the `deploy.yml` push run of the merge passes. After step 8, move the
+    lockrot.dev `rot-watch.yml` workflow to the new action release.
 7. When the published release changes what lockrot writes (a schema differs from the previous
    release's), record it and pin the hashes ([Recording a release](#recording-a-release)). Then
    remove the version from `RECORDING_PENDING`. `SchemaEvolutionTest` fails when a release whose
@@ -621,8 +657,11 @@ maintainer.
        and `LOCKROT_SHA256` in `lockrot.env` from the published PHAR.
     3. Merge that pull request when its CI passes. Without the `UPDATE_TOKEN` secret, its CI does
        not start: close and reopen the pull request to start it.
-    4. Run `gh release create v1.x.y --repo somework/lockrot-action --generate-notes` on that
-       `main`. The release moves the `v1` tag to its commit, and publishes the Docker image
+    4. Copy the whole `CHANGELOG.md` section of the action release into a body file. Keep its
+       introduction, its **Breaking** entries and their migration lines. Then run
+       `gh release create v1.x.y --repo somework/lockrot-action --notes-file <body file>` on that
+       `main`. Do not use `--generate-notes` alone: it lists pull requests and leaves out the
+       migration lines. The release moves the `v1` tag to its commit, and publishes the Docker image
        `ghcr.io/somework/lockrot` for the lockrot version in `lockrot.env`.
     5. Check that `v1` names the release commit
        (`gh api repos/somework/lockrot-action/git/ref/tags/v1`), and that the `docker.yml` run

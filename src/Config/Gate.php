@@ -22,7 +22,7 @@ use Lockrot\Verdict\SecurityStanding;
  *
  * A grade value reads the gate score, a flag value the flags that the baseline does not cover, a
  * `vulnerable` value the advisories that the baseline does not know, and `unchecked` S10. A finding
- * that reaches a value and does not fail it, under a baseline entry, is exempt.
+ * that reaches a value and fails none of the values, under a baseline entry, is exempt.
  *
  * @internal
  *

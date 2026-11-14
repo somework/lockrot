@@ -85,7 +85,7 @@ final class SolverChecker implements MoveChecker
                 if ($unloaded !== null) {
                     $this->baseline = new CheckOutcome(MoveCheck::notChecked($unloaded));
                 } else {
-                    $this->baseline = $solution->resolves() ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : new CheckOutcome(MoveCheck::refused(), [], $solution->problem());
+                    $this->baseline = $solution->resolves() ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : $this->refusedWithProblem($solution, []);
                 }
             }
         }
@@ -114,7 +114,7 @@ final class SolverChecker implements MoveChecker
             return $solution;
         }
         if (!$solution->resolves()) {
-            return new CheckOutcome(MoveCheck::refused(), Holder::distinct($solution->holds()), $solution->problem());
+            return $this->refusedWithProblem($solution, Holder::distinct($solution->holds()));
         }
 
         return $this->unread($solution) ?? (new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)))->withChanges($solution->installs(), $solution->updatedFrom());
@@ -383,6 +383,24 @@ final class SolverChecker implements MoveChecker
         }
 
         return \count($range) === 1 ? $outcome : $outcome->withRange(MultiConstraint::create($range, true));
+    }
+
+    /**
+     * Composer renders the problem text when it is read, after the solve, so a throw in it is a failed solve.
+     *
+     * @param list<Holder> $holds
+     */
+    private function refusedWithProblem(Solution $solution, array $holds): CheckOutcome
+    {
+        try {
+            $problem = $solution->problem();
+        } catch (\Throwable $e) {
+            $this->failed(Solution::failed($e));
+
+            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::SOLVER_ERROR));
+        }
+
+        return new CheckOutcome(MoveCheck::refused(), $holds, $problem);
     }
 
     /** Whether Composer failed on the solve: the first failure of the run is kept for its run note. */

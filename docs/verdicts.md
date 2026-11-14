@@ -627,7 +627,8 @@ every `conflict`.
   `held by abandoned symfony/x (replacement: …)`.
 
 - `security.installed_branch_fixes` says how many advisories the installed branch fixes.
-  `security.gets` says what `composer update` installs and which advisories it clears.
+  `security.gets` says what `composer update <package>` installs on the installed branch and which
+  advisories it clears.
   `security.partial` says what a `composer update` clears when the move goes further.
 
 - In `--explain`, every branch row carries `fixes`: the advisories it fixes, the release to move
@@ -962,7 +963,8 @@ Limits of the check:
     of a policy variable or key, lockrot stops with exit code 2. For a switch variable, it prints
     Composer's message alone, and that message names the variable. For the other values, it
     prints `Composer rejects the policy configuration:` and Composer's message, which can omit
-    the key. These values are:
+    the key. When a value has the wrong type, it prints `a value of config.policy or config.audit
+    has the wrong type` in place of Composer's message. These values are:
 
     - a key under `config.policy` or `config.audit`
     - `COMPOSER_POLICY_MALWARE_BLOCK`, `COMPOSER_POLICY_ABANDONED_BLOCK`,
@@ -970,7 +972,9 @@ Limits of the check:
     - on Composer 2.11 and later, `COMPOSER_POLICY_COOLDOWN_BLOCK` and
       `COMPOSER_POLICY_COOLDOWN_PERIOD`
 
-    Composer reads the policy variables only when `config.policy` is not `false`.
+    Composer reads the `COMPOSER_POLICY_*` variables of this list only when `config.policy` is not
+    `false`. Composer and lockrot read `COMPOSER_AUDIT_ABANDONED` and
+    `COMPOSER_SECURITY_BLOCKING_ABANDONED` whatever `config.policy` holds, and a bad value exits 2.
 
 - When a package that a resolving solve asks for could not be loaded, the solve can resolve at a
   lower release than Composer installs. The move is then not checked, with the load reason
@@ -1171,7 +1175,8 @@ the update that rewrites it. A
 root hold on a package of `packages-dev` ends with " in require-dev". Without
 `target_fix`, the line adds the PHP of `platform_override` and the links that set one edge. That is
 the lowest edge when the target lies below it, else the edge after the last minor of the analysed
-set. Abridged from the [example run](example-run.md):
+set. When `run.move_check.reason` is `platform_config_invalid`, Composer refuses a
+`config.platform` value, so the line leaves out the PHP of `platform_override`. Abridged from the [example run](example-run.md):
 
 ```text
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-*, lib-*, php-debug, php-ipv6 and php-zts requirements not checked

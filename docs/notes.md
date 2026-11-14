@@ -462,7 +462,8 @@ run without composer.json gets no such note. A lock with no hash gets none eithe
 
 - `data`: `missing`, the root requirements that the lock does not hold, sorted. A requirement is
   held when a locked package or the root package has the name, replaces it or provides it, at a
-  version that the requirement admits, as `composer install` reads it. It lists
+  version that the requirement admits, as `composer install` reads it. Only a `packages` entry or
+  the root holds a `require` name. It lists
   `require-dev` names only when the run reads require-dev, and never a platform requirement or a
   `self.version` link. It can be empty: a changed constraint also changes the hash.
 - Findings: none change.

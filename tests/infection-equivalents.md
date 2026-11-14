@@ -79,7 +79,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 - `src/Composer/ComposerHttpClient.php` UnwrapArrayFilter, UnwrapArrayValues `return new HttpResult($url, $status, $body, $this->clock->now(), RepositoryUrl::inText($e->getMessage()), array_values(array_filter($headers, 'is_string')));` — Composer's downloaders give a `TransportException` its header lines as a list of strings.
 - `src/Composer/ComposerHttpClient.php` FalseValue `$body = $filesystem->getContents(Url::getOrigin($this->config, $target), $target, false, $options + ['redirects' => \PHP_INT_MAX]);` — the `redirects` option marks the request as a redirect, and `RemoteFilesystem` shows no progress for a redirect.
 - `src/Composer/ComposerHttpClient.php` CastInt `$status = (int) RemoteFilesystem::findStatusCode($headers);` — `getContents()` returns only after an answer, and each answer starts with a status line.
-- `src/Composer/ComposerHttpClient.php` LessThan `$location = $status >= 300 && $status < 400 ? Response::findHeaderValue($headers, 'location') : null;` — `RemoteFilesystem` throws on a 400 answer, so no 400 status reaches this line.
+- `src/Composer/ComposerHttpClient.php` GreaterThanOrEqualTo `if ($status < 300 || $status >= 400 || $status === 304) {` — `RemoteFilesystem` throws on a 400 answer, so no 400 status reaches this line.
 - `src/Composer/ComposerHttpClient.php` CastString `$scheme = (string) parse_url($base, \PHP_URL_SCHEME);` — the base is a URL that lockrot requested, so it has a scheme.
 - `src/Composer/ComposerHttpClient.php` CastString `return (string) preg_replace('{^([^:]+://[^/?#]+).*$}', '$1', $base).$location;` — the pattern is a literal, so `preg_replace()` never returns null.
 - `src/Composer/ComposerHttpClient.php` CastString `return (string) preg_replace('{^(.+/)[^/?]*(?:\?.*)?$}', '${1}', $base).$location;` — the pattern is a literal, so `preg_replace()` never returns null.
@@ -211,7 +211,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 
 ## src/Solver
 
-- `src/Solver/AdvisoryBlocking.php` DecrementInteger, IncrementInteger `throw new ConfigException('Composer rejects the policy configuration: '.$e->getMessage(), 0, $e);` — no code reads the code of this exception.
+- `src/Solver/AdvisoryBlocking.php` DecrementInteger, IncrementInteger `throw new ConfigException('Composer rejects the policy configuration: '.($e instanceof \TypeError ? 'a value of config.policy or config.audit has the wrong type' : $e->getMessage()), 0, $e);` — no code reads the code of this exception.
 - `src/Solver/AdvisoryBlocking.php` FalseValue `return self::blocking(PolicyConfig::fromConfig(new Config(false)));` — only tests call `everyAdvisory()`, and their environment sets no variable that `Config` reads.
 - `src/Solver/ComposerSolver.php` Concat `$inputs = SolverInputs::of($pool, $request, $root).serialize($preferred);` — a cache key. A `serialize()` string ends where its own syntax ends, so either order tells the inputs apart.
 - `src/Solver/ComposerSolver.php` ReturnRemoval `return $failures;` — in withoutMetUnreached(): a shortcut. With no unreached name the walk loses no name, and the last filter returns `$failures` unchanged.

@@ -32,6 +32,7 @@ final class ComposerHttpClientRedirectTest extends TestCase
         $path = (string) parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $port = $_SERVER['SERVER_PORT'];
         file_put_contents(__DIR__.'/requests.log', $_SERVER['HTTP_HOST'].' '.($_SERVER['HTTP_AUTHORIZATION'] ?? '-')."\n", FILE_APPEND);
+        file_put_contents(__DIR__.'/paths.log', $path."\n", FILE_APPEND);
         if (preg_match('{^/chain/(\d+)$}', $path, $hops) && $hops[1] > 0) {
             header('Location: /chain/'.($hops[1] - 1), true, 302);
             exit;
@@ -51,12 +52,28 @@ final class ComposerHttpClientRedirectTest extends TestCase
         if ($path === '/ok-with-location') {
             header('Location: /headers', true, 200);
         }
+        if ($path === '/redirect-without-location') {
+            http_response_code(302);
+            exit;
+        }
+        if ($path === '/not-modified-with-location') {
+            header('Location: /after-not-modified', true, 304);
+            exit;
+        }
         if ($path === '/limited') {
             header('X-RateLimit-Remaining: 0', true, 403);
             exit;
         }
         if ($path === '/other-host') {
             header('Location: http://localhost:'.$port.'/headers', true, 302);
+            exit;
+        }
+        if ($path === '/other-host-then-user-info') {
+            header('Location: http://localhost:'.$port.'/same-host-user-info', true, 302);
+            exit;
+        }
+        if ($path === '/other-host-then-local-file') {
+            header('Location: http://localhost:'.$port.'/local-file', true, 302);
             exit;
         }
         if ($path === '/unparsable') {
@@ -81,6 +98,10 @@ final class ComposerHttpClientRedirectTest extends TestCase
         }
         if ($path === '/protocol-relative') {
             header('Location: //localhost:'.$port.'/headers', true, 302);
+            exit;
+        }
+        if ($path === '/same-host-user-info') {
+            header('Location: http://x:y@'.$_SERVER['HTTP_HOST'].'/headers', true, 302);
             exit;
         }
         if ($path === '/same-host') {
@@ -202,6 +223,29 @@ final class ComposerHttpClientRedirectTest extends TestCase
         self::assertSame([0, null], [$result->status(), $result->body()]);
     }
 
+    /** Without curl, each request blocks until it ends, so a request without lockrot's credentials checks the budget when it starts. */
+    public function testARequestWithoutLockrotsCredentialsAfterTheBudgetRanOutIsNotSentWithoutCurl(): void
+    {
+        $log = $this->dir.'/root/requests.log';
+        $before = \count(file($log) ?: []);
+        $now = static function () use ($log, $before): float {
+            clearstatcache();
+
+            return 3.0 * (\count(file($log) ?: []) - $before);
+        };
+        $io = new NullIO();
+        $config = HermeticComposerConfig::create($this->dir.'/home', $io);
+        $config->merge(['config' => ['secure-http' => false]]);
+        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, Clock::fixed('2026-09-14T00:00:00+00:00'), Deadline::inSeconds(5.0, $now), false);
+        $urls = [$this->server->url().'/headers?a', $this->server->url().'/headers?b', $this->server->url().'/headers?c'];
+
+        $results = $client->fetchAll($urls, ['User-Agent: lockrot']);
+
+        self::assertSame([200, 200, 0], [$results[$urls[0]]->status(), $results[$urls[1]]->status(), $results[$urls[2]]->status()], 'each request takes 3s of a 5s budget');
+        self::assertSame(HttpResult::BUDGET_SPENT, $results[$urls[2]]->error());
+        self::assertSame($before + 2, \count(file($log) ?: []), 'the third request does not reach the server');
+    }
+
     /** Without curl, lockrot follows a same-host hop itself, so the budget can end between two hops. */
     public function testASameHostHopAfterTheBudgetRanOutIsNotSentWithoutCurl(): void
     {
@@ -310,6 +354,144 @@ final class ComposerHttpClientRedirectTest extends TestCase
         $result = $this->fetch($path, false);
 
         self::assertSame([0, null, 'redirect to a URL that is not http or https with a host'], [$result->status(), $result->body(), $result->error()]);
+    }
+
+    /** Composer stores the user info of a URL that it requests as the credential of its origin. */
+    public function testARedirectOnTheSameHostToAUrlWithUserInfoIsAFailedRequestWithoutCurl(): void
+    {
+        $result = $this->fetch('/same-host-user-info', false);
+
+        self::assertSame([0, null, 'redirect to a URL with a user name or a password'], [$result->status(), $result->body(), $result->error()]);
+    }
+
+    /**
+     * Composer before 2.10.2 follows a `file://` redirect without curl, so lockrot stops each redirect itself.
+     *
+     * @dataProvider locationsWithoutAHost
+     */
+    #[DataProvider('locationsWithoutAHost')]
+    public function testARedirectOfARequestWithoutLockrotsCredentialsToAnythingButAnHttpHostIsAFailedRequestWithoutCurl(string $path): void
+    {
+        $url = $this->server->url().$path;
+
+        $result = $this->client(false)->fetchAll([$url], ['User-Agent: lockrot'])[$url];
+
+        self::assertSame([0, null, 'redirect to a URL that is not http or https with a host'], [$result->status(), $result->body(), $result->error()]);
+    }
+
+    public function testARedirectOfARequestWithoutLockrotsCredentialsToAUrlWithUserInfoIsAFailedRequestWithoutCurl(): void
+    {
+        $url = $this->server->url().'/same-host-user-info';
+
+        $result = $this->client(false)->fetchAll([$url], ['User-Agent: lockrot'])[$url];
+
+        self::assertSame([0, null, 'redirect to a URL with a user name or a password'], [$result->status(), $result->body(), $result->error()]);
+    }
+
+    /** @return iterable<string, array{list<string>}> */
+    public static function requestHeaders(): iterable
+    {
+        yield 'with lockrot\'s credentials' => [self::HEADERS];
+        yield 'without them' => [['User-Agent: lockrot']];
+    }
+
+    /**
+     * Composer's downloaders refuse a redirect without a `Location`.
+     *
+     * @param list<string> $headers
+     *
+     * @dataProvider requestHeaders
+     */
+    #[DataProvider('requestHeaders')]
+    public function testARedirectWithoutALocationIsAFailedRequestWithoutCurl(array $headers): void
+    {
+        $url = $this->server->url().'/redirect-without-location';
+
+        $result = $this->client(false)->fetchAll([$url], $headers)[$url];
+
+        self::assertSame([0, null], [$result->status(), $result->body()]);
+    }
+
+    /**
+     * Composer's downloaders follow no `Location` of a 304 answer.
+     *
+     * @param list<string> $headers
+     *
+     * @dataProvider requestHeaders
+     */
+    #[DataProvider('requestHeaders')]
+    public function testANotModifiedAnswerWithALocationIsNotFollowedWithoutCurl(array $headers): void
+    {
+        $url = $this->server->url().'/not-modified-with-location';
+
+        $result = $this->client(false)->fetchAll([$url], $headers)[$url];
+
+        self::assertSame(304, $result->status(), (string) $result->error());
+        self::assertSame([], array_values(preg_grep('{^/after-not-modified$}', $this->pathsRequested()) ?: []), 'no request goes to the Location of a 304 answer');
+    }
+
+    /** @return list<string> */
+    private function pathsRequested(): array
+    {
+        return file($this->dir.'/root/paths.log', \FILE_IGNORE_NEW_LINES) ?: [];
+    }
+
+    /** @return iterable<string, array{?bool}> */
+    public static function downloaders(): iterable
+    {
+        yield 'with curl' => [null];
+        yield 'without curl' => [false];
+    }
+
+    /**
+     * The request that lockrot sends again without its credentials checks each later redirect too.
+     *
+     * @dataProvider downloaders
+     */
+    #[DataProvider('downloaders')]
+    public function testALaterRedirectOfTheRequestToAnotherHostToAUrlWithUserInfoIsAFailedRequest(?bool $refusesRedirects): void
+    {
+        if ($refusesRedirects === null && !HttpDownloader::isCurlEnabled()) {
+            self::markTestSkipped('Composer takes prevent_url_access_callable through curl only');
+        }
+        $result = $this->fetch('/other-host-then-user-info', $refusesRedirects);
+
+        self::assertSame([0, null, 'redirect to a URL with a user name or a password'], [$result->status(), $result->body(), $result->error()]);
+        self::assertSame([], array_values(preg_grep('{ Basic }', file($this->dir.'/root/requests.log', \FILE_IGNORE_NEW_LINES) ?: []) ?: []), 'no request goes to the URL with user info');
+    }
+
+    /** The request that lockrot sends again without its credentials stops each redirect too. */
+    public function testARedirectOfTheRequestToAnotherHostToALocalFileIsAFailedRequestWithoutCurl(): void
+    {
+        $result = $this->fetch('/other-host-then-local-file', false);
+
+        self::assertSame([0, null, 'redirect to a URL that is not http or https with a host'], [$result->status(), $result->body(), $result->error()]);
+    }
+
+    public function testARequestWithoutLockrotsCredentialsFollowsARedirectToAnotherHostWithoutCurl(): void
+    {
+        $url = $this->server->url().'/other-host';
+
+        $result = $this->client(false)->fetchAll([$url], ['User-Agent: lockrot'])[$url];
+
+        self::assertSame(200, $result->status(), (string) $result->error());
+        $seen = json_decode((string) $result->body(), true);
+        self::assertIsArray($seen);
+        self::assertSame('/headers', $seen['path']);
+    }
+
+    /** Each request that lockrot sends again without its credentials frees its slot when it ends. */
+    public function testEveryRequestToAnotherHostEndsWithOneRequestAtATimeWithoutCurl(): void
+    {
+        $io = new NullIO();
+        $config = HermeticComposerConfig::create($this->dir.'/home', $io);
+        $config->merge(['config' => ['secure-http' => false]]);
+        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, Clock::fixed('2026-09-14T00:00:00+00:00'), null, false, 1);
+        $urls = [$this->server->url().'/other-host?a', $this->server->url().'/other-host?b'];
+
+        $results = $client->fetchAll($urls, self::HEADERS);
+
+        self::assertSame([200, 200], [$results[$urls[0]]->status(), $results[$urls[1]]->status()]);
     }
 
     /** URL schemes are case-insensitive (RFC 3986, section 3.1). */

@@ -13,7 +13,7 @@ description: Draft of the lockrot 1.0 promise — which fields, sets, exit codes
 
     - **Decided at 1.0.0-RC1:** the [default thresholds](#configuration), the
       [Docker tag scheme](#distribution) and the [PHP and Composer floor](#php-platform) for 1.x.
-    - *Planned:* [`--schema=1` in 2.x](#documents), a
+    - *Planned:* [`--schema=2` in 2.x](#documents), a
       [configuration file named by `extends`](#configuration) and the
       [floor-rise warning](#php-platform).
 
