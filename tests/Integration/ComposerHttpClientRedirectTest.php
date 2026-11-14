@@ -400,6 +400,7 @@ final class ComposerHttpClientRedirectTest extends TestCase
         $result = $this->fetch('/other-host-then-user-info', $refusesRedirects);
 
         self::assertSame([0, null, 'redirect to a URL with a user name or a password'], [$result->status(), $result->body(), $result->error()]);
+        self::assertSame([], array_values(preg_grep('{ Basic }', file($this->dir.'/root/requests.log', \FILE_IGNORE_NEW_LINES) ?: []) ?: []), 'no request goes to the URL with user info');
     }
 
     /** The request that lockrot sends again without its credentials stops each redirect too. */
