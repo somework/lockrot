@@ -3,7 +3,7 @@
      coverage gate to the unit-tested core. PHPUnit's coverage filter option takes only
      directories, and this list names single files, so it cannot move to the command line. -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         bootstrap="vendor/autoload.php" colors="true" failOnWarning="true"
+         bootstrap="vendor/autoload.php" colors="true" failOnWarning="true" failOnRisky="true"
          beStrictAboutOutputDuringTests="true">
     <testsuites>
         <testsuite name="unit"><directory>tests/Unit</directory></testsuite>
