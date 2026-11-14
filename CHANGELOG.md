@@ -211,12 +211,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   version, branch or name leaves out every `update` and `require` step of its move. A release name
   with `|`, `<` or `>` leaves out the whole move's command. Action: if a step is missing, check that lock entry before you write the command
   by hand. ([Command argument unsafe](docs/notes.md#command_argument_unsafe))
-- **CLI:** a repository host's redirect to another origin no longer receives lockrot's
-  `Authorization` or `PRIVATE-TOKEN` header. lockrot asks the redirect target again without it. A
-  redirect to a URL that is not http or https, has no host, or holds a user name or a password is
-  a failed request. So a `file://` redirect reads no local file, and a redirect cannot replace
-  Composer's credentials for a host. A default port that the URL writes (`:443`, `:80`) is the
-  same origin. ([Which credentials](docs/internals.md#which-credentials))
+- **CLI:** a repository host's redirect to another origin (`:443` and `:80` count as no port) no
+  longer receives lockrot's `Authorization` or `PRIVATE-TOKEN` header. lockrot asks the target
+  again without it. A redirect to a URL that is not http or https, has no host, or holds a user
+  name or a password is a failed request, so a `file://` redirect reads no local file.
+  ([Which credentials](docs/internals.md#which-credentials))
 - **table, github, markdown:** a control character from the lock or a repository prints as an
   escape (`\x1B`), also in `--explain`, in the error lines on stderr, as in the install-time
   summary. So does a character that prints as nothing, such as a zero-width space (`\u{200B}`). A
