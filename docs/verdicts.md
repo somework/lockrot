@@ -971,7 +971,9 @@ Limits of the check:
     - on Composer 2.11 and later, `COMPOSER_POLICY_COOLDOWN_BLOCK` and
       `COMPOSER_POLICY_COOLDOWN_PERIOD`
 
-    Composer reads the policy variables only when `config.policy` is not `false`.
+    Composer reads `COMPOSER_POLICY_MALWARE_BLOCK` and `COMPOSER_POLICY_ABANDONED_BLOCK` only when
+    `config.policy` is not `false`. Composer and lockrot read `COMPOSER_AUDIT_ABANDONED` and
+    `COMPOSER_SECURITY_BLOCKING_ABANDONED` whatever `config.policy` holds, and a bad value exits 2.
 
 - When a package that a resolving solve asks for could not be loaded, the solve can resolve at a
   lower release than Composer installs. The move is then not checked, with the load reason
