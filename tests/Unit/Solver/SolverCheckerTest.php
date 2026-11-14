@@ -1885,7 +1885,7 @@ final class SolverCheckerTest extends TestCase
      * acme/x 2.0.0 among them, so Composer names it as a lower-priority repository of acme/x.
      *
      * @param array<string, string> $requires
-     * @param ?\Throwable           $nameFails thrown when Composer reads the repository's name, which only its problem text does
+     * @param ?\Throwable           $nameFails thrown when Composer reads the repository's name
      */
     private static function namedRepositoryChecker(string $repository, array $requires, ?\Throwable $nameFails = null): SolverChecker
     {

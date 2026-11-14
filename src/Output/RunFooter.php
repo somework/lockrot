@@ -283,7 +283,7 @@ final class RunFooter
         }
         $parts = [$clause];
         $moveCheck = $report->moveCheck();
-        // Composer refuses the value, so "solves at" would contradict the `moves:` line.
+        // Composer refuses the value, and the `moves:` line says so: the "solves at" words contradict it.
         $refused = $moveCheck !== null && $moveCheck->jsonSerialize()['reason'] === MoveCheck::PLATFORM_CONFIG_INVALID;
         if ($data['platform_override'] !== null && !$refused) {
             $parts[] = 'Composer solves at '.$data['platform_override'].' from config.platform.php';

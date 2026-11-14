@@ -963,7 +963,8 @@ Limits of the check:
     of a policy variable or key, lockrot stops with exit code 2. For a switch variable, it prints
     Composer's message alone, and that message names the variable. For the other values, it
     prints `Composer rejects the policy configuration:` and Composer's message, which can omit
-    the key. These values are:
+    the key. When a value has the wrong type, it prints `a value of config.policy or config.audit
+    has the wrong type` in place of Composer's message. These values are:
 
     - a key under `config.policy` or `config.audit`
     - `COMPOSER_POLICY_MALWARE_BLOCK`, `COMPOSER_POLICY_ABANDONED_BLOCK`,
@@ -1172,7 +1173,9 @@ of the refusal, the root links of the root ceiling, or the reason that the run d
 Each `lock_platform` link adds "the lock records …, which composer.json does not have" last, with
 the update that rewrites it. A
 root hold on a package of `packages-dev` ends with " in require-dev". Without
-`target_fix`, the line adds the PHP of `platform_override` and the links that set one edge. That is
+`target_fix`, the line adds the PHP of `platform_override` and the links that set one edge. When
+`run.move_check.reason` is `platform_config_invalid`, Composer refuses that PHP, so the line leaves
+it out. That is
 the lowest edge when the target lies below it, else the edge after the last minor of the analysed
 set. Abridged from the [example run](example-run.md):
 

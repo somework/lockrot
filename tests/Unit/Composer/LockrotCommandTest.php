@@ -726,8 +726,7 @@ final class LockrotCommandTest extends TestCase
         [$code, , $stderr] = $this->runWithSplitStreams(['--explain' => 'bad_/x', '--target-php' => '8.4']);
 
         self::assertSame(2, $code);
-        self::assertStringContainsString('bad_/x', $stderr);
-        self::assertStringContainsString('package_name_invalid', $stderr);
+        self::assertStringContainsString('lockrot: bad_/x is in composer.lock, and lockrot skips it because its name is no Composer package name (run note package_name_invalid)', $stderr);
         self::assertStringNotContainsString('is not in composer.lock', $stderr);
     }
 
