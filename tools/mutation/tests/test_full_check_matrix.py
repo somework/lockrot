@@ -34,7 +34,7 @@ def job_names(workflow):
 
 def checkout_steps(workflow):
     """The `with:` line that follows each checkout step, or an empty string."""
-    return re.findall(r'uses: actions/checkout@[^\n]*\n( +with: .+\n)?', workflow)
+    return re.findall(r'uses:\s+["\']?actions/checkout\b[^\n]*\n( +with: .+\n)?', workflow)
 
 
 FLOW_ENTRY = re.compile(r'\s*([\w-]+):\s*("(?:[^"\\]|\\.)*"|\'[^\']*\'|[^,"\'{}]*?)\s*(?:,|$)')
@@ -115,9 +115,12 @@ class FullCheckMatrixTest(unittest.TestCase):
             '        with: {fetch-depth: 0, persist-credentials: false}\n'
             '      - uses: actions/checkout@abc # v7\n'
             '        with: {path: "example, persist-credentials: false, checkout"}\n'
+            '      - uses: "actions/checkout@abc"\n'
+            '      - uses:  actions/checkout@abc\n'
+            '      - uses: actions/checkout\n'
         )
 
-        self.assertEqual([False, False, True, False], [drops_the_token(step) for step in checkout_steps(workflow)])
+        self.assertEqual([False, False, True, False, False, False, False], [drops_the_token(step) for step in checkout_steps(workflow)])
 
     def test_the_floor_job_runs_the_plugin_on_composer_2_9_and_asserts_the_refusal(self):
         ci = read('ci.yml')
