@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-9QMMkOpiH1SLoyLImhq+LF7lgf652Ertb/pSWCrCoIU='; style-src 'sha256-piRBjZqzeUuCphk26oX9sBtCAblnm4zn4sYqubk2Too='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-zncRhHrBow/qefFwqwrity6jh1YihDm6GsEbIyurq+Y='; style-src 'sha256-piRBjZqzeUuCphk26oX9sBtCAblnm4zn4sYqubk2Too='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -9514,7 +9514,7 @@ var LockrotReport = (function(exports) {
 		const s11 = capped.map((f) => signalData(f, "S11")).find((data) => data !== null) ?? null;
 		return [
 			head,
-			...window.platform_override === null ? [] : [`Composer solves at ${window.platform_override}, the PHP that config.platform.php sets in Composer's config, not the PHP of the machine`],
+			...window.platform_override === null || run.move_check?.reason === "platform_config_invalid" ? [] : [`Composer solves at ${window.platform_override}, the PHP that config.platform.php sets in Composer's config, not the PHP of the machine`],
 			...s11 === null ? [] : [`${plural(capped.length, "package stops", "packages stop")} below ${newestPhpWords(s11)}`]
 		];
 	}
@@ -11188,7 +11188,7 @@ var LockrotReport = (function(exports) {
 	}
 	var parentKey2 = (pkg) => `p:${pkg}`;
 	var childKey2 = (parent, pkg) => `c:${parent}:${pkg}`;
-	function radiusKeys2(layout, input) {
+	function radiusTrees2(layout, input) {
 		const rowsOf = (rows) => rows.flatMap((row) => [{
 			key: parentKey2(row.package),
 			pkg: row.package
@@ -11196,7 +11196,14 @@ var LockrotReport = (function(exports) {
 			key: childKey2(row.package, node.finding.package),
 			pkg: node.finding.package
 		})) : []]);
-		return [...rowsOf(layout.lead), ...isSinglesOpen(layout, input) ? rowsOf(layout.singles) : []];
+		return {
+			lead: rowsOf(layout.lead),
+			singles: isSinglesOpen(layout, input) ? rowsOf(layout.singles) : []
+		};
+	}
+	function radiusKeys2(layout, input) {
+		const { lead, singles } = radiusTrees2(layout, input);
+		return [...lead, ...singles];
 	}
 	function radiusRows2(layout, state, narrow) {
 		return radiusKeys2(layout, {
@@ -15095,6 +15102,10 @@ var LockrotReport = (function(exports) {
 		}
 		return first;
 	}
+	function treeStop(rows, pkg, key, first, cursor) {
+		const stop = rows.find((row) => pkg(row) === cursor && first.has(key(row))) ?? rows[0];
+		return stop === void 0 ? null : key(stop);
+	}
 	//#endregion
 	//#region src/ui/rowOpen.ts
 	function openInteractions(pkg, dispatch) {
@@ -17724,8 +17735,10 @@ var LockrotReport = (function(exports) {
 	}
 	function Lead({ report }) {
 		const figure = figureLine(report);
+		const hasMoves = firstMoves(report).moves.length > 0;
+		const printed = usePrinted();
 		return u$1("div", {
-			className: `ov-top${firstMoves(report).moves.length > 0 ? "" : " no-moves"}`,
+			className: `ov-top${hasMoves ? "" : " no-moves"}`,
 			children: [
 				u$1("p", {
 					className: "ov-kicker",
@@ -17733,7 +17746,7 @@ var LockrotReport = (function(exports) {
 				}),
 				u$1("div", {
 					className: "ov-answer",
-					children: figure === null ? u$1("p", {
+					children: figure === null ? !printed && u$1("p", {
 						className: "ov-empty",
 						children: OVERVIEW_WORDS.emptyLock
 					}) : u$1(GradeLineView, { report })
@@ -19157,8 +19170,8 @@ var LockrotReport = (function(exports) {
 			]
 		});
 	}
-	function ChildRow2({ finding, depth, parent, note, report, first }) {
-		const { state, dispatch, cursor } = useReport();
+	function ChildRow2({ finding, depth, parent, note, report, stop }) {
+		const { state, dispatch } = useReport();
 		const id = g();
 		const described = useRowDescription(`${id}-said`);
 		return u$1("li", {
@@ -19171,7 +19184,7 @@ var LockrotReport = (function(exports) {
 			"aria-label": finding.package,
 			"aria-describedby": described,
 			"aria-current": state.pkg === finding.package ? "true" : void 0,
-			tabIndex: rowTabIndex(finding.package, cursor, first),
+			tabIndex: stop ? 0 : -1,
 			...openInteractions(finding.package, dispatch),
 			children: [
 				u$1("span", {
@@ -19219,8 +19232,9 @@ var LockrotReport = (function(exports) {
 			]
 		});
 	}
-	function ParentRow2({ layout, row, rank, input, report, first }) {
-		const { state, dispatch, cursor } = useReport();
+	function ParentRow2({ layout, row, rank, input, report, stopKey }) {
+		const { state, dispatch } = useReport();
+		const isStop = stopKey === parentKey2(row.package);
 		const printed = usePrinted();
 		const canOpen = row.count > 0;
 		const open = canOpen && (printed || isRowOpen(layout, row, input));
@@ -19248,7 +19262,7 @@ var LockrotReport = (function(exports) {
 			"aria-label": row.package,
 			"aria-describedby": described,
 			"aria-current": state.pkg === row.package ? "true" : void 0,
-			tabIndex: rowTabIndex(row.package, cursor, first.has(parentKey2(row.package))),
+			tabIndex: isStop ? 0 : -1,
 			...openInteractions(row.package, dispatch),
 			children: [u$1("div", {
 				className: "r2-line",
@@ -19302,7 +19316,7 @@ var LockrotReport = (function(exports) {
 						"aria-expanded": open ? "true" : "false",
 						"aria-controls": kidsId,
 						"aria-label": RADIUS_WORDS.show(row),
-						tabIndex: innerTabIndex(row.package, cursor, first.has(parentKey2(row.package))),
+						tabIndex: isStop ? void 0 : -1,
 						onClick: toggle,
 						children: u$1("span", {
 							"aria-hidden": "true",
@@ -19322,7 +19336,7 @@ var LockrotReport = (function(exports) {
 					parent: (nodes[i + 1]?.depth ?? -1) > node.depth,
 					note: node.via.length > 0 ? RADIUS_WORDS.via(node.via) : null,
 					report,
-					first: first.has(childKey2(row.package, node.finding.package))
+					stop: stopKey === childKey2(row.package, node.finding.package)
 				}, node.finding.package))
 			})]
 		});
@@ -19360,7 +19374,7 @@ var LockrotReport = (function(exports) {
 		});
 	}
 	function RadiusView2() {
-		const { state } = useReport();
+		const { state, cursor } = useReport();
 		const { report } = useReport2();
 		const narrow = useNarrow();
 		const printed = usePrinted();
@@ -19375,14 +19389,16 @@ var LockrotReport = (function(exports) {
 			pkg: state.pkg,
 			narrow
 		};
-		const first = firstRows(radiusKeys2(layout, input), (entry) => entry.pkg, (entry) => entry.key);
-		const rows = (list, from) => list.map((row, i) => u$1(ParentRow2, {
+		const trees = radiusTrees2(layout, input);
+		const first = firstRows([...trees.lead, ...trees.singles], (entry) => entry.pkg, (entry) => entry.key);
+		const stopOf = (keys) => treeStop(keys, (entry) => entry.pkg, (entry) => entry.key, first, cursor);
+		const rows = (list, from, stop) => list.map((row, i) => u$1(ParentRow2, {
 			layout,
 			row,
 			rank: from + i,
 			input,
 			report,
-			first
+			stopKey: stop
 		}, row.package));
 		if (empty !== null) return u$1("section", {
 			className: "radius2",
@@ -19391,7 +19407,7 @@ var LockrotReport = (function(exports) {
 			children: [!printed && u$1("h2", {
 				className: "vh",
 				children: RADIUS_WORDS.tab
-			}), u$1("p", {
+			}), !printed && u$1("p", {
 				className: "empty",
 				children: empty
 			})]
@@ -19420,7 +19436,7 @@ var LockrotReport = (function(exports) {
 					"aria-label": RADIUS_WORDS.list,
 					children: u$1(RowHintContext.Provider, {
 						value: hintId,
-						children: rows(layout.lead, 1)
+						children: rows(layout.lead, 1, stopOf(trees.lead))
 					})
 				}),
 				layout.singles.length > 0 && u$1(Fold, {
@@ -19433,7 +19449,7 @@ var LockrotReport = (function(exports) {
 						"aria-label": RADIUS_WORDS.singles(layout.singles.length),
 						children: u$1(RowHintContext.Provider, {
 							value: hintId,
-							children: rows(layout.singles, layout.lead.length + 1)
+							children: rows(layout.singles, layout.lead.length + 1, stopOf(trees.singles))
 						})
 					})
 				}),
@@ -20960,7 +20976,8 @@ var LockrotReport = (function(exports) {
 					onClick: (event) => {
 						event.preventDefault();
 						const panel = document.getElementById(panelId);
-						(panel?.querySelector("[data-pkg][tabindex=\"0\"]") ?? panel)?.focus();
+						const stops = [...panel?.querySelectorAll("[data-pkg][tabindex=\"0\"]") ?? []];
+						(stops.find((stop) => stop.dataset.pkg === cursor) ?? stops[0] ?? panel)?.focus();
 					},
 					children: skipLinkLabel(state.view === "radius" ? shownExposure(model.report).length > 0 : filterable)
 				}),
@@ -21141,7 +21158,7 @@ var LockrotReport = (function(exports) {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.22";
+	var version = "0.14.0-rc.23";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");
