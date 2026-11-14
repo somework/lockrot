@@ -389,7 +389,24 @@ final class ComposerHttpClientRedirectTest extends TestCase
 
         $result = $this->client(false)->fetchAll([$url], ['User-Agent: lockrot'])[$url];
 
-        self::assertSame([200, '/headers'], [$result->status(), json_decode((string) $result->body(), true)['path'] ?? null]);
+        self::assertSame(200, $result->status(), (string) $result->error());
+        $seen = json_decode((string) $result->body(), true);
+        self::assertIsArray($seen);
+        self::assertSame('/headers', $seen['path']);
+    }
+
+    /** Each request that lockrot sends again without its credentials frees its slot when it ends. */
+    public function testEveryRequestToAnotherHostEndsWithOneRequestAtATimeWithoutCurl(): void
+    {
+        $io = new NullIO();
+        $config = HermeticComposerConfig::create($this->dir.'/home', $io);
+        $config->merge(['config' => ['secure-http' => false]]);
+        $client = new ComposerHttpClient(Factory::createHttpDownloader($io, $config), $io, $config, Clock::fixed('2026-09-14T00:00:00+00:00'), null, false, 1);
+        $urls = [$this->server->url().'/other-host?a', $this->server->url().'/other-host?b'];
+
+        $results = $client->fetchAll($urls, self::HEADERS);
+
+        self::assertSame([200, 200], [$results[$urls[0]]->status(), $results[$urls[1]]->status()]);
     }
 
     /** URL schemes are case-insensitive (RFC 3986, section 3.1). */
