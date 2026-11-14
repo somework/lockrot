@@ -430,13 +430,14 @@ final class ComposerHttpClient implements HttpClientInterface
         return ['http' => ['timeout' => $timeout, 'header' => $headers], 'retry-auth-failure' => false];
     }
 
-    private static function origin(string $url): string
+    /** @return array{string, string, ?int} the scheme and the host in lower case, and the port */
+    private static function origin(string $url): array
     {
         $parts = parse_url($url) ?: [];
         $scheme = strtolower($parts['scheme'] ?? '');
         // A default port that the URL spells out names the same origin as no port, as Composer's AuthHelper::getRedirectOrigin() reads it.
         $defaultPort = $scheme === 'https' ? 443 : ($scheme === 'http' ? 80 : null);
 
-        return $scheme.'://'.strtolower($parts['host'] ?? '').':'.(string) ($parts['port'] ?? $defaultPort);
+        return [$scheme, strtolower($parts['host'] ?? ''), $parts['port'] ?? $defaultPort];
     }
 }

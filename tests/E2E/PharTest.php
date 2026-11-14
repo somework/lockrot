@@ -440,7 +440,7 @@ final class PharTest extends TestCase
         $explained = $this->runPhar(['--offline', '--explain=acme/<<fg=red>>'], $dir);
 
         self::assertSame(2, $explained->getExitCode(), $explained->getErrorOutput());
-        self::assertStringContainsString('lockrot: acme/<<fg=red>> is not in composer.lock', $explained->getErrorOutput());
+        self::assertStringContainsString('lockrot: acme/<<fg=red>> is in composer.lock, and lockrot skips it because its name is no Composer package name (run note package_name_invalid)', $explained->getErrorOutput());
     }
 
     /**

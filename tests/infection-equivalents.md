@@ -211,7 +211,7 @@ names an entry that matches fewer mutants than its count. The reason is one of t
 
 ## src/Solver
 
-- `src/Solver/AdvisoryBlocking.php` DecrementInteger, IncrementInteger `throw new ConfigException('Composer rejects the policy configuration: '.$e->getMessage(), 0, $e);` — no code reads the code of this exception.
+- `src/Solver/AdvisoryBlocking.php` DecrementInteger, IncrementInteger `throw new ConfigException('Composer rejects the policy configuration: '.($e instanceof \TypeError ? 'a value of config.policy or config.audit has the wrong type' : $e->getMessage()), 0, $e);` — no code reads the code of this exception.
 - `src/Solver/AdvisoryBlocking.php` FalseValue `return self::blocking(PolicyConfig::fromConfig(new Config(false)));` — only tests call `everyAdvisory()`, and their environment sets no variable that `Config` reads.
 - `src/Solver/ComposerSolver.php` Concat `$inputs = SolverInputs::of($pool, $request, $root).serialize($preferred);` — a cache key. A `serialize()` string ends where its own syntax ends, so either order tells the inputs apart.
 - `src/Solver/ComposerSolver.php` ReturnRemoval `return $failures;` — in withoutMetUnreached(): a shortcut. With no unreached name the walk loses no name, and the last filter returns `$failures` unchanged.
